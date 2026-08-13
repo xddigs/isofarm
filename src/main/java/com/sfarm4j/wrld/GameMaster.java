@@ -78,6 +78,7 @@ public class GameMaster {
     public void update(float delta) {
         timeService.update(delta);
         world.update(delta);
+        camera.update(delta);
 
         boolean isCtrlDown = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL) ||
                 Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
@@ -89,6 +90,11 @@ public class GameMaster {
                 float panSensitivity = 0.015f;
                 camera.pan(Mouse.getDeltaX(), Mouse.getDeltaY(), panSensitivity);
             }
+        }
+
+        float scrollY = Mouse.getScrollY();
+        if (scrollY != 0.0f) {
+            camera.zoom(scrollY);
         }
 
         if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_MIDDLE)) {
@@ -126,9 +132,9 @@ public class GameMaster {
         defaultShader.setUniform("uProjection", camera.getProjectionMatrix());
         defaultShader.setUniform("uView", camera.getViewMatrix());
 
-        Vector3f skyColor = TimeService.getSkyColor();
-        defaultShader.setUniform("uSunColor", skyColor);
-        defaultShader.setUniform("uSunDirection", sunlight.getDirection());
+        defaultShader.setUniform("uSunColor", TimeService.getSunLightColor());
+        defaultShader.setUniform("uLightIntensity", TimeService.getSunIntensity());
+        defaultShader.setUniform("uLightDirection", sunlight.getDirection());
 
         defaultShader.setUniform("uUseTexture", false);
         defaultShader.setUniform("uBaseColor", new Vector3f(0.4f, 0.25f, 0.1f));

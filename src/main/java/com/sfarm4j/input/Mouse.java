@@ -10,6 +10,7 @@ public class Mouse {
     private static float lastX = 0, lastY = 0;
     private static float deltaX = 0, deltaY = 0;
     private static boolean firstMouse = true;
+    private static float scrollY = 0.0f;
 
     public static void init(long windowId) {
         glfwSetCursorPosCallback(windowId, (_, xpos, ypos) -> {
@@ -36,12 +37,17 @@ public class Mouse {
                 buttons[button] = (action != GLFW_RELEASE);
             }
         });
+
+        glfwSetScrollCallback(windowId, (_, _, yoffset) -> {
+            scrollY = (float) yoffset;
+        });
     }
 
     public static void update() {
         System.arraycopy(buttons, 0, lastButtons, 0, buttons.length);
         deltaX = 0;
         deltaY = 0;
+        scrollY = 0.0f;
     }
 
     public static boolean isButtonDown(int button) {
@@ -57,4 +63,12 @@ public class Mouse {
     public static float getDeltaY() { return deltaY; }
     public static float getX() { return x; }
     public static float getY() { return y; }
+
+    public static float getScrollY() {
+        return scrollY;
+    }
+
+    public static void setScrollY(float scrollY) {
+        Mouse.scrollY = scrollY;
+    }
 }
