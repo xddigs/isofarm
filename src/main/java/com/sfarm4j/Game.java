@@ -76,6 +76,12 @@ public class Game {
         });
 
         glfwMakeContextCurrent(window);
+
+        GL.createCapabilities();
+        log.info("OpenGL context loaded successfully.");
+        log.info("GPU Renderer: {}", glGetString(GL_RENDERER));
+        log.info("OpenGL Version: {}", glGetString(GL_VERSION));
+
         glfwSwapInterval(VSYNC_INTERVAL);
         glfwShowWindow(window);
         log.info("GLFW window successfully initialized.");
@@ -83,11 +89,6 @@ public class Game {
     }
 
     private void loop() {
-        GL.createCapabilities();
-        log.info("OpenGL context loaded successfully.");
-        log.info("GPU Renderer: {}", glGetString(GL_RENDERER));
-        log.info("OpenGL Version: {}", glGetString(GL_VERSION));
-
         glClearColor(CLEAR_COLOR_RED, CLEAR_COLOR_GREEN, CLEAR_COLOR_BLUE, CLEAR_COLOR_ALPHA);
         double lastTime = glfwGetTime();
         while (!glfwWindowShouldClose(window)) {
@@ -97,7 +98,6 @@ public class Game {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             master.update(delta);
             master.render();
-
             glfwSwapBuffers(window);
             glfwPollEvents();
         }

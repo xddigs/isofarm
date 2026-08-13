@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -42,11 +43,17 @@ public class Shader {
         log.info("Shader program successfully compiled and linked [ID: {}]", programId);
     }
 
-    private String load(String filePath) {
-        try {
-            return Files.readString(Path.of(filePath));
+    private String load(String resourcePath) {
+        try (var inputStream = Shader.class.getClassLoader()
+                .getResourceAsStream(resourcePath)) {
+            if (inputStream == null) {
+                throw new IllegalArgumentException("Resource not" +
+                        " found on classpath: " + resourcePath);
+            }
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to read shader file [" + filePath + "]", e);
+            throw new RuntimeException("Failed to read shader " +
+                    "resource [" + resourcePath + "]", e);
         }
     }
 
