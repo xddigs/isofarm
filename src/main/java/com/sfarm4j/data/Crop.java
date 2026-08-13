@@ -9,7 +9,7 @@ public class Crop {
     private final Season season;
     private final int value;
     private final int daysToGrow;
-    private int days;
+    private int daysGrown;
     private boolean readyToHarvest;
 
     public Crop(float x, float z,
@@ -22,7 +22,7 @@ public class Crop {
         this.season = season;
         this.value = value;
         this.daysToGrow = type.getDaysToGrow();
-        this.days = 0;
+        this.daysGrown = 0;
         this.readyToHarvest = false;
     }
 
@@ -58,8 +58,8 @@ public class Crop {
         return daysToGrow;
     }
 
-    public int getDays() {
-        return days;
+    public int getDaysGrown() {
+        return daysGrown;
     }
 
     public boolean isReadyToHarvest() {
@@ -71,14 +71,22 @@ public class Crop {
             return;
         }
 
-        this.days++;
-        if (this.days % 2 == 0) {
-            this.stage = stage.next(1);
-        }
+        daysGrown++;
 
-        if (this.days >= daysToGrow) {
+        if (daysGrown >= daysToGrow) {
             this.readyToHarvest = true;
             this.stage = GrowthStage.HARVESTABLE;
+        } else {
+            float progress = (float) daysGrown / daysToGrow;
+            if (progress >= 0.90f) {
+                this.stage = GrowthStage.MATURE;
+            } else if (progress >= 0.75f) {
+                this.stage = GrowthStage.GROWING;
+            } else if (progress >= 0.50f) {
+                this.stage = GrowthStage.BUD;
+            } else if (progress >= 0.25f) {
+                this.stage = GrowthStage.SEED;
+            }
         }
     }
 }

@@ -7,20 +7,20 @@ import org.slf4j.LoggerFactory;
 
 public class TimeService {
     private static final Logger log = LoggerFactory.getLogger(TimeService.class);
-    private static final float REAL_SECONDS_PER_IN_GAME_MINUTE = 0.1f;
+    private static final float REAL_SECONDS_PER_IN_GAME_MINUTE = 0.7f;
     private static final int MINUTES_PER_HOUR = 60;
     private static final int HOURS_PER_DAY = 24;
     private static final int DAYS_PER_SEASON = 28;
     private static final int STARTING_HOUR = 8;
 
     private final CropService cropService;
-
+    private Season currentSeason = Season.SPRING;
     private float secondAccumulator = 0.0f;
     private static int minute = 0;
     private static int hour = STARTING_HOUR;
     private int day = 1;
-    private Season currentSeason = Season.SPRING;
-    private int year = 1;
+    private int year = 2016;
+    private float timeScale = 1.0f;
 
     public TimeService(CropService cropService) {
         this.cropService = cropService;
@@ -29,11 +29,52 @@ public class TimeService {
     }
 
     public void update(float delta) {
-        secondAccumulator += delta;
+        secondAccumulator += delta * timeScale;
         while (secondAccumulator >= REAL_SECONDS_PER_IN_GAME_MINUTE) {
             secondAccumulator -= REAL_SECONDS_PER_IN_GAME_MINUTE;
             advanceMinute();
         }
+    }
+
+    public int getMinute() {
+        return minute;
+    }
+
+    public int getHour() {
+        return hour;
+    }
+
+    public int getDay() {
+        return day;
+    }
+
+    public Season getCurrentSeason() {
+        return currentSeason;
+    }
+
+    public int getYear() {
+        return year;
+    }
+
+    public String getFormattedTime() {
+        return String.format("Year %d %s, Day %02d | %02d:%02d", 
+                year, currentSeason, day, hour, minute);
+    }
+
+    public void setTimeScale(float timeScale) {
+        this.timeScale = Math.max(0.0f, timeScale);
+    }
+
+    public float getTimeScale() {
+        return timeScale;
+    }
+
+    public void addTimeScale(float delta) {
+        setTimeScale(getTimeScale() + delta);
+    }
+
+    public void slowTimeScale(float delta) {
+        setTimeScale(getTimeScale() * (1.0f - delta));
     }
 
     private void advanceMinute() {
@@ -77,31 +118,6 @@ public class TimeService {
         }
 
         log.info("Season changed to {}", currentSeason);
-    }
-
-    public int getMinute() {
-        return minute;
-    }
-
-    public int getHour() {
-        return hour;
-    }
-
-    public int getDay() {
-        return day;
-    }
-
-    public Season getCurrentSeason() {
-        return currentSeason;
-    }
-
-    public int getYear() {
-        return year;
-    }
-
-    public String getFormattedTime() {
-        return String.format("Year %d %s, Day %02d | %02d:%02d", 
-                year, currentSeason, day, hour, minute);
     }
 
     public static Vector3f getSkyColor() {
