@@ -92,7 +92,7 @@ public class GameMaster {
         this.blockMesh = Mesh.createMesh(K.World.DEFAULT_BLOCK_DEPTH);
         this.selectionMesh = Mesh.selection();
         this.spriteMesh = Mesh.createCrop();
-        this.wheat = new Spritesheet(K.Paths.WHEAT_TEXTURE, K.Render.WHEAT_TOTAL_FRAMES);
+        this.wheat = new Spritesheet(K.Paths.WHEAT_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
 
         this.camera = new Camera(K.Camera.DEFAULT_WIDTH, K.Camera.DEFAULT_HEIGHT);
         this.camera.setPosition(0.0f, 0.0f, 0.0f);

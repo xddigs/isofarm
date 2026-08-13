@@ -44,7 +44,7 @@ public final class K {
     public static final class Render {
         public static final float LINE_WIDTH = 2.5f;
         public static final float SELECTION_Y_OFFSET = 0.002f;
-        public static final int WHEAT_TOTAL_FRAMES = 5;
+        public static final int CROP_TOTAL_FRAMES = 5;
         public static final String GLSL_VERSION = "#version 330 core";
     }
 
