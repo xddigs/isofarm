@@ -74,12 +74,6 @@ public class Game {
         Keyboard.init(window);
         Mouse.init(window);
 
-        glfwSetKeyCallback(window, (win, key, _, action, _) -> {
-            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
-                glfwSetWindowShouldClose(win, true);
-            }
-        });
-
         glfwMakeContextCurrent(window);
 
         GL.createCapabilities();
@@ -101,6 +95,11 @@ public class Game {
             double currentTime = glfwGetTime();
             float delta = (float) (currentTime - lastTime);
             lastTime = currentTime;
+
+            if (Keyboard.isKeyPressed(GLFW_KEY_ESCAPE)) {
+                glfwSetWindowShouldClose(window, true);
+            }
+
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             master.update(delta);
             master.render();

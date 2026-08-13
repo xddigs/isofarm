@@ -135,7 +135,31 @@ public class Mesh {
         };
     }
 
-    public static Mesh createVerticalQuad() {
+    public static Mesh selection() {
+        float[] positions = new float[] {
+                -0.5f, 0.002f, -0.5f,   0.5f, 0.002f, -0.5f,
+                0.5f, 0.002f, -0.5f,   0.5f, 0.002f,  0.5f,
+                0.5f, 0.002f,  0.5f,  -0.5f, 0.002f,  0.5f,
+                -0.5f, 0.002f,  0.5f,  -0.5f, 0.002f, -0.5f
+        };
+
+        float[] normals = new float[24];
+        float[] textCoords = new float[16];
+        int[] indices = new int[] { 0, 1, 2, 3, 4, 5, 6, 7 };
+
+        return new Mesh(positions, normals, textCoords, indices);
+    }
+
+    public void renderLines() {
+        glBindVertexArray(vaoId);
+        glLineWidth(2.5f);
+        glDrawElements(GL_LINES, vertexCount,
+                GL_UNSIGNED_INT, 0);
+
+        glBindVertexArray(0);
+    }
+
+    public static Mesh quadVertical() {
         float[] positions = new float[] {
                 -0.5f, 1.0f, 0.0f,
                 -0.5f, 0.0f, 0.0f,

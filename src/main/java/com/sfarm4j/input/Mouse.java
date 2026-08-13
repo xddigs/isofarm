@@ -4,14 +4,15 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class Mouse {
     private static final boolean[] buttons = new boolean[GLFW_MOUSE_BUTTON_LAST + 1];
+    private static final boolean[] lastButtons = new boolean[GLFW_MOUSE_BUTTON_LAST + 1];
+
     private static float x = 0, y = 0;
     private static float lastX = 0, lastY = 0;
     private static float deltaX = 0, deltaY = 0;
     private static boolean firstMouse = true;
 
     public static void init(long windowId) {
-        glfwSetCursorPosCallback(windowId, (_,
-                                            xpos, ypos) -> {
+        glfwSetCursorPosCallback(windowId, (_, xpos, ypos) -> {
             float currentX = (float) xpos;
             float currentY = (float) ypos;
 
@@ -30,21 +31,26 @@ public class Mouse {
             y = currentY;
         });
 
-        glfwSetMouseButtonCallback(windowId, (_,
-                                              button, action, _) -> {
+        glfwSetMouseButtonCallback(windowId, (_, button, action, _) -> {
             if (button >= 0 && button <= GLFW_MOUSE_BUTTON_LAST) {
                 buttons[button] = (action != GLFW_RELEASE);
             }
         });
     }
 
-    public static void clearDeltas() {
+    public static void update() {
+        System.arraycopy(buttons, 0, lastButtons, 0, buttons.length);
         deltaX = 0;
         deltaY = 0;
     }
 
     public static boolean isButtonDown(int button) {
         return button >= 0 && button <= GLFW_MOUSE_BUTTON_LAST && buttons[button];
+    }
+
+    public static boolean isButtonPressed(int button) {
+        return button >= 0 && button <= GLFW_MOUSE_BUTTON_LAST
+                && buttons[button] && !lastButtons[button];
     }
 
     public static float getDeltaX() { return deltaX; }
