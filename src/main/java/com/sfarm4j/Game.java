@@ -1,6 +1,7 @@
 package com.sfarm4j;
 
 import com.sfarm4j.service.CropService;
+import com.sfarm4j.wrld.GameMaster;
 import com.sfarm4j.wrld.World;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
@@ -22,14 +23,15 @@ public class Game {
     private static final int OPENGL_MINOR_VERSION = 3;
     private static final int VSYNC_INTERVAL = 1;
 
+    private static final float FRAMES_PER_SECOND = 60.0f;
+
     private static final float CLEAR_COLOR_RED = 0.15f;
     private static final float CLEAR_COLOR_GREEN = 0.15f;
     private static final float CLEAR_COLOR_BLUE = 0.20f;
     private static final float CLEAR_COLOR_ALPHA = 1.0f;
 
     private long window;
-    private World world;
-    private CropService cropService;
+    private GameMaster master;
 
     public void run() {
         log.info("Starting Java 25 / LWJGL 3 application...");
@@ -78,24 +80,24 @@ public class Game {
         glfwSwapInterval(VSYNC_INTERVAL);
         glfwShowWindow(window);
         log.info("GLFW window successfully initialized.");
-
-        world = new World();
-        cropService = new CropService(world);
+        master = new GameMaster();
     }
 
     private void loop() {
         GL.createCapabilities();
-
         log.info("OpenGL context loaded successfully.");
         log.info("GPU Renderer: {}", glGetString(GL_RENDERER));
         log.info("OpenGL Version: {}", glGetString(GL_VERSION));
 
         glClearColor(CLEAR_COLOR_RED, CLEAR_COLOR_GREEN, CLEAR_COLOR_BLUE, CLEAR_COLOR_ALPHA);
-
+        double lastTime = glfwGetTime();
         while (!glfwWindowShouldClose(window)) {
+            double currentTime = glfwGetTime();
+            float delta = (float) (currentTime - lastTime);
+            lastTime = currentTime;
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-            // TODO: Game loop updates and rendering pipeline
+            master.update(delta);
+            master.render();
 
             glfwSwapBuffers(window);
             glfwPollEvents();
