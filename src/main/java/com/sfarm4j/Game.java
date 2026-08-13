@@ -77,7 +77,6 @@ public class Game {
         Mouse.init(window);
 
         glfwMakeContextCurrent(window);
-
         GL.createCapabilities();
         glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
         log.info("OpenGL context loaded successfully.");
@@ -87,7 +86,7 @@ public class Game {
         glfwSwapInterval(VSYNC_INTERVAL);
         glfwShowWindow(window);
         log.info("GLFW window successfully initialized.");
-        master = new GameMaster();
+        master = new GameMaster(window);
     }
 
     private void loop() {

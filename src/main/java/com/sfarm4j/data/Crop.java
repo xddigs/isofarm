@@ -1,7 +1,7 @@
 package com.sfarm4j.data;
 
 @DataClass
-public class Crop {
+public class Crop extends Item {
     private final float x, z;
     private GrowthStage stage;
     private final CropType type;
@@ -14,6 +14,7 @@ public class Crop {
 
     public Crop(float x, float z,
                 CropType type, Cell cell, Season season, int value) {
+        super(type.getName(), 1, value);
         this.x = x;
         this.z = z;
         this.cell = cell;

@@ -3,12 +3,17 @@ package com.sfarm4j.wrld;
 import com.sfarm4j.data.CellType;
 import com.sfarm4j.data.Crop;
 import com.sfarm4j.data.CropType;
+import com.sfarm4j.data.Player;
 import com.sfarm4j.graphics.*;
 import com.sfarm4j.input.Keyboard;
 import com.sfarm4j.input.Mouse;
 import com.sfarm4j.service.CellService;
 import com.sfarm4j.service.CropService;
 import com.sfarm4j.service.TimeService;
+import imgui.ImGui;
+import imgui.gl3.ImGuiImplGl3;
+import imgui.glfw.ImGuiImplGlfw;
+import imgui.type.ImString;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
@@ -48,8 +53,13 @@ public class GameMaster {
 
     private float windowWidth = 1280.0f;
     private float windowHeight = 720.0f;
+    private Player player;
 
-    public GameMaster() {
+    private final ImGuiImplGlfw imGuiGlfw = new ImGuiImplGlfw();
+    private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
+    private final ImString nameBuffer = new ImString("Farmer", 32);
+
+    public GameMaster(long windowHandle) {
         this.world = new World();
         this.cropService = new CropService(world);
         this.timeService = new TimeService(cropService);
@@ -80,10 +90,18 @@ public class GameMaster {
         this.camera = new Camera(16.0f, 8.0f);
         this.camera.setPosition(0.0f, 0.0f, 0.0f);
         recenter();
+
+        ImGui.createContext();
+        imGuiGlfw.init(windowHandle, true);
+        imGuiGl3.init("#version 330 core");
         log.info("GameMaster initialized with grid size: {}x{}", SIZE, SIZE);
     }
 
     public void update(float delta) {
+        if (player == null) {
+            return;
+        }
+
         timeService.update(delta);
         camera.update(delta);
 
@@ -204,9 +222,31 @@ public class GameMaster {
         }
 
         defaultShader.unbind();
+
+        imGuiGlfw.newFrame();
+        ImGui.newFrame();
+
+        if (player == null) {
+            ImGui.begin("New Farmer");
+            ImGui.inputText("Who are you, kid?", nameBuffer);
+            if (ImGui.button("Start")) {
+                if (!nameBuffer.get().isBlank()) {
+                    this.player = new Player(nameBuffer.get());
+                    log.info("Player created: {}", player.getName());
+                }
+            }
+            ImGui.end();
+        }
+
+        ImGui.render();
+        imGuiGl3.renderDrawData(ImGui.getDrawData());
     }
 
     public void dispose() {
+        imGuiGl3.dispose();
+        imGuiGlfw.dispose();
+        ImGui.destroyContext();
+
         blockMesh.dispose();
         selectionMesh.dispose();
         spriteMesh.dispose();
