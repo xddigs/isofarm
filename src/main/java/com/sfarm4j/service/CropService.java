@@ -21,9 +21,7 @@ public class CropService implements Service<Crop> {
                     "but cell already has a crop!", type.getName(), x, z);
             return crop;
         } else if (crop.getCell().hasCrop() && crop.isReadyToHarvest()) {
-            world.removeCrop(crop);
-            int yield = harvest(player, crop);
-            player.add(crop, yield);
+            harvest(player, crop);
         }
 
         log.info("Planted {} at ({}, {}) during season {}",
@@ -51,6 +49,7 @@ public class CropService implements Service<Crop> {
         }
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public int harvest(Player player, Crop crop) {
         if (!crop.isReadyToHarvest()) {
             log.warn("Attempted to harvest {} " +
@@ -59,6 +58,7 @@ public class CropService implements Service<Crop> {
         }
 
         int yield = crop.getType().getYield();
+        player.add(crop, yield);
         world.removeCrop(crop);
         log.info("Successfully harvested {}" +
                 " giving {} items.", crop.getType().getName(), yield);

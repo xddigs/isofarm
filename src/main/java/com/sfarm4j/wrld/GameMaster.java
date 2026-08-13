@@ -165,7 +165,6 @@ public class GameMaster {
 
         if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT) && hoveredCell != null) {
             CropType selectedType = CropType.WHEAT;
-
             Crop plantedCrop = cropService.plant(
                     hoveredCell.x,
                     hoveredCell.y,
@@ -173,8 +172,7 @@ public class GameMaster {
                     cellService.getCell(hoveredCell.x, hoveredCell.y),
                     selectedType,
                     timeService.getCurrentSeason(),
-                    10
-            );
+                    10);
         }
 
         Mouse.update();

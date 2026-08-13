@@ -20,7 +20,7 @@ public class TimeService {
     private static int hour = STARTING_HOUR;
     private int day = 1;
     private int year = 0;
-    private float timeScale = 1.0f;
+    private float timeScale = 2.0f;
 
     public TimeService(CropService cropService) {
         this.cropService = cropService;
