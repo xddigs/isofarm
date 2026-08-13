@@ -3,35 +3,39 @@ package com.sfarm4j.service;
 import com.sfarm4j.data.Crop;
 import com.sfarm4j.data.CropType;
 import com.sfarm4j.data.Season;
+import com.sfarm4j.wrld.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-public class CropService {
+public class CropService implements Service<Crop> {
     private static final Logger log = LoggerFactory.getLogger(CropService.class);
-    private final List<Crop> activeCrops = new ArrayList<>();
+    private final World world;
+
+    public CropService(World world) {
+        this.world = world;
+    }
 
     public Crop plant(CropType type, Season currentSeason, int value) {
         Crop crop = new Crop(type, currentSeason, value);
-        activeCrops.add(crop);
-        log.info("Planted {} during season {}", type.getName(), currentSeason);
+        world.addCrop(crop);
+        log.info("Planted {} during season {}", type.getName(),
+                currentSeason.getName());
         return crop;
     }
 
     public void process(Season currentSeason) {
-        log.info("Processing daily growth for {} active crops...", activeCrops.size());
-        
-        for (Crop crop : activeCrops) {
+        log.info("Processing daily growth for {} active crops...",
+                world.getActiveCrops().size());
+
+        for (Crop crop : world.getActiveCrops()) {
             if (crop.getSeason() == currentSeason) {
                 crop.grow();
                 if (crop.isReadyToHarvest()) {
-                    log.info("Crop {} is now fully grown and ready for harvest!", crop.getType().getName());
+                    log.info("Crop {} is now fully grown " +
+                            "and ready for harvest!", crop.getType().getName());
                 }
             } else {
-                log.debug("Crop {} did not grow because season mismatch (Crop: {}, Current: {})",
+                log.debug("Crop {} did not grow due to season mismatch (Crop: {}, Current: {})",
                         crop.getType().getName(), crop.getSeason(), currentSeason);
             }
         }
@@ -39,17 +43,15 @@ public class CropService {
 
     public int harvest(Crop crop) {
         if (!crop.isReadyToHarvest()) {
-            log.warn("Attempted to harvest {} before it was fully grown.", crop.getType().getName());
+            log.warn("Attempted to harvest {} " +
+                    "before it was fully grown.", crop.getType().getName());
             return 0;
         }
 
         int yield = crop.getType().getYield();
-        activeCrops.remove(crop);
-        log.info("Successfully harvested {} giving {} items.", crop.getType().getName(), yield);
+        world.removeCrop(crop);
+        log.info("Successfully harvested {}" +
+                " giving {} items.", crop.getType().getName(), yield);
         return yield;
-    }
-
-    public List<Crop> getActiveCrops() {
-        return Collections.unmodifiableList(activeCrops);
     }
 }
