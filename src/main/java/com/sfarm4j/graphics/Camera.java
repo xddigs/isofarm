@@ -1,5 +1,6 @@
 package com.sfarm4j.graphics;
 
+import com.sfarm4j.utils.K;
 import org.joml.Matrix4f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
@@ -9,15 +10,13 @@ public class Camera {
     private final Vector3f position;
     private final Matrix4f projectionMatrix;
 
-    private float pitch = 35.264f;
-    private float yaw = -45.0f;
+    private float pitch = K.Camera.DEFAULT_PITCH;
+    private float yaw = K.Camera.DEFAULT_YAW;
 
     private final float baseWidth;
     private final float baseHeight;
     private float zoom = 1.0f;
     private float targetZoom = 1.0f;
-    private static final float MIN_ZOOM = 0.3f;
-    private static final float MAX_ZOOM = 2.5f;
 
     public Camera(float width, float height) {
         this.position = new Vector3f(0.0f, 0.0f, 0.0f);
@@ -30,23 +29,19 @@ public class Camera {
 
     public void zoom(float scrollOffset) {
         if (scrollOffset == 0.0f) return;
-        float zoomFactor = 1.15f;
 
         if (scrollOffset > 0) {
-            this.targetZoom /= (float)
-                    Math.pow(zoomFactor, scrollOffset);
+            this.targetZoom /= (float) Math.pow(K.Camera.ZOOM_FACTOR, scrollOffset);
         } else {
-            this.targetZoom *= (float)
-                    Math.pow(zoomFactor, -scrollOffset);
+            this.targetZoom *= (float) Math.pow(K.Camera.ZOOM_FACTOR, -scrollOffset);
         }
 
-        this.targetZoom = Math.clamp(this.targetZoom, MIN_ZOOM, MAX_ZOOM);
+        this.targetZoom = Math.clamp(this.targetZoom, K.Camera.MIN_ZOOM, K.Camera.MAX_ZOOM);
     }
 
     public void update(float delta) {
         if (Math.abs(zoom - targetZoom) > 0.0001f) {
-            float lerpSpeed = 12.0f;
-            this.zoom += (targetZoom - zoom) * Math.min(delta * lerpSpeed, 1.0f);
+            this.zoom += (targetZoom - zoom) * Math.min(delta * K.Camera.LERP_SPEED, 1.0f);
             updateMatrix();
         }
     }
@@ -55,7 +50,7 @@ public class Camera {
         float halfWidth = (baseWidth * zoom) / 2.0f;
         float halfHeight = (baseHeight * zoom) / 2.0f;
         this.projectionMatrix.identity().ortho(-halfWidth, halfWidth,
-                -halfHeight, halfHeight, -100.0f, 100.0f);
+                -halfHeight, halfHeight, K.Camera.ORTHO_NEAR, K.Camera.ORTHO_FAR);
     }
 
     public Matrix4f getViewMatrix() {
@@ -131,7 +126,7 @@ public class Camera {
         Vector3f dir = new Vector3f(rayEnd.x - rayStart.x, rayEnd.y - rayStart.y,
                 rayEnd.z - rayStart.z).normalize();
 
-        if (Math.abs(dir.y) < 0.00001f) {
+        if (Math.abs(dir.y) < K.World.EPSILON_RAY_Y) {
             return null;
         }
 

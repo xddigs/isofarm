@@ -5,6 +5,7 @@ import com.sfarm4j.data.CellType;
 import com.sfarm4j.graphics.Mesh;
 import com.sfarm4j.graphics.Shader;
 import com.sfarm4j.graphics.Sunlight;
+import com.sfarm4j.utils.K;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -14,14 +15,13 @@ import java.util.Map;
 
 @SuppressWarnings("all")
 public class CellService {
-    public static final float TILE_SIZE = 1.0f;
     private final Map<String, Cell> cells = new HashMap<>();
     private final Map<CellType, Vector3f> colors = new EnumMap<>(CellType.class);
 
     public CellService() {
-        colors.put(CellType.WATERED, new Vector3f(0.45f, 0.28f, 0.24f));
-        colors.put(CellType.DIRT, new Vector3f(0.45f, 0.28f, 0.12f));
-        colors.put(CellType.TILLED, new Vector3f(0.3f, 0.18f, 0.08f));
+        colors.put(CellType.WATERED, K.Colors.WATERED);
+        colors.put(CellType.DIRT, K.Colors.DIRT);
+        colors.put(CellType.TILLED, K.Colors.TILLED);
     }
 
     public void setCell(CellType type, int x, int z) {
@@ -36,16 +36,15 @@ public class CellService {
 
         for (Cell cell : cells.values()) {
             boolean isEven = (cell.getX() + cell.getZ()) % 2 == 0;
-            Vector3f color = isEven ? new Vector3f(0.4f, 0.25f, 0.1f) :
-                    new Vector3f(0.37f, 0.23f, 0.09f);
+            Vector3f color = isEven ? K.Colors.CELL_EVEN : K.Colors.CELL_ODD;
             shader.setUniform("uBaseColor", color);
 
-            float worldX = cell.getX() * TILE_SIZE;
-            float worldZ = cell.getZ() * TILE_SIZE;
+            float worldX = cell.getX() * K.World.TILE_SIZE;
+            float worldZ = cell.getZ() * K.World.TILE_SIZE;
 
             modelMatrix.identity()
                     .translate(new Vector3f(worldX, 0.0f, worldZ))
-                    .scale(TILE_SIZE);
+                    .scale(K.World.TILE_SIZE);
 
             shader.setUniform("uModel", modelMatrix);
             cellMesh.render();

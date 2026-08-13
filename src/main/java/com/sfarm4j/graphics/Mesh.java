@@ -1,5 +1,6 @@
 package com.sfarm4j.graphics;
 
+import com.sfarm4j.utils.K;
 import org.lwjgl.system.MemoryStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,7 +120,6 @@ public class Mesh {
     }
 
     private static float[] getFloats(float depth) {
-
         return new float[] {
                 -0.5f,  0.0f, -0.5f,
                 -0.5f,  0.0f,  0.5f,
@@ -154,11 +154,12 @@ public class Mesh {
     }
 
     public static Mesh selection() {
+        float y = K.Render.SELECTION_Y_OFFSET;
         float[] positions = new float[] {
-                -0.5f, 0.002f, -0.5f,   0.5f, 0.002f, -0.5f,
-                0.5f, 0.002f, -0.5f,   0.5f, 0.002f,  0.5f,
-                0.5f, 0.002f,  0.5f,  -0.5f, 0.002f,  0.5f,
-                -0.5f, 0.002f,  0.5f,  -0.5f, 0.002f, -0.5f
+                -0.5f, y, -0.5f,   0.5f, y, -0.5f,
+                0.5f, y, -0.5f,   0.5f, y,  0.5f,
+                0.5f, y,  0.5f,  -0.5f, y,  0.5f,
+                -0.5f, y,  0.5f,  -0.5f, y, -0.5f
         };
 
         float[] normals = new float[24];
@@ -170,10 +171,8 @@ public class Mesh {
 
     public void renderLines() {
         glBindVertexArray(vaoId);
-        glLineWidth(2.5f);
-        glDrawElements(GL_LINES, vertexCount,
-                GL_UNSIGNED_INT, 0);
-
+        glLineWidth(K.Render.LINE_WIDTH);
+        glDrawElements(GL_LINES, vertexCount, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
 

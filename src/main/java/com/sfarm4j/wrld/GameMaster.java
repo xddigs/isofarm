@@ -10,7 +10,13 @@ import com.sfarm4j.input.Mouse;
 import com.sfarm4j.service.CellService;
 import com.sfarm4j.service.CropService;
 import com.sfarm4j.service.TimeService;
+import com.sfarm4j.utils.K;
 import imgui.ImGui;
+import imgui.ImGuiIO;
+import imgui.ImGuiStyle;
+import imgui.flag.ImGuiCol;
+import imgui.flag.ImGuiCond;
+import imgui.flag.ImGuiWindowFlags;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
 import imgui.type.ImString;
@@ -20,6 +26,8 @@ import org.joml.Vector2i;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -48,16 +56,15 @@ public class GameMaster {
     private final Matrix4f modelMatrix = new Matrix4f();
     private final Sunlight sunlight;
 
-    private static final int SIZE = 2;
     private Vector2i hoveredCell = null;
 
-    private float windowWidth = 1280.0f;
-    private float windowHeight = 720.0f;
+    private float windowWidth = K.Window.DEFAULT_WIDTH;
+    private float windowHeight = K.Window.DEFAULT_HEIGHT;
     private Player player;
 
     private final ImGuiImplGlfw imGuiGlfw = new ImGuiImplGlfw();
     private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
-    private final ImString nameBuffer = new ImString("Farmer", 32);
+    private final ImString nameBuffer = new ImString("", 32);
 
     public GameMaster(long windowHandle) {
         this.world = new World();
@@ -66,8 +73,8 @@ public class GameMaster {
         this.cellService = new CellService();
         this.sunlight = new Sunlight(new Vector3f(-0.5f, -1.0f, -0.5f));
 
-        for (int x = 0; x < SIZE; x++) {
-            for (int z = 0; z < SIZE; z++) {
+        for (int x = 0; x < K.World.GRID_SIZE; x++) {
+            for (int z = 0; z < K.World.GRID_SIZE; z++) {
                 cellService.setCell(CellType.TILLED, x, z);
             }
         }
@@ -76,26 +83,50 @@ public class GameMaster {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_DEPTH_TEST);
 
-        this.defaultShader = new Shader("shaders/default.vert", "shaders/default.frag");
-        this.outlineShader = new Shader("shaders/outline.vert", "shaders/outline.frag");
+        this.defaultShader = new Shader(K.Paths.DEFAULT_VERT_SHADER, K.Paths.DEFAULT_FRAG_SHADER);
+        this.outlineShader = new Shader(K.Paths.OUTLINE_VERT_SHADER, K.Paths.OUTLINE_FRAG_SHADER);
 
         this.maskFbo = new Framebuffer((int) windowWidth, (int) windowHeight);
         this.screenQuadMesh = Mesh.screenQuad();
 
-        this.blockMesh = Mesh.createMesh(0.4f);
+        this.blockMesh = Mesh.createMesh(K.World.DEFAULT_BLOCK_DEPTH);
         this.selectionMesh = Mesh.selection();
         this.spriteMesh = Mesh.createCrop();
-        this.wheat = new Spritesheet("assets/crops/wheat_crop.png", 5);
+        this.wheat = new Spritesheet(K.Paths.WHEAT_TEXTURE, K.Render.WHEAT_TOTAL_FRAMES);
 
-        this.camera = new Camera(16.0f, 8.0f);
+        this.camera = new Camera(K.Camera.DEFAULT_WIDTH, K.Camera.DEFAULT_HEIGHT);
         this.camera.setPosition(0.0f, 0.0f, 0.0f);
         recenter();
 
         ImGui.createContext();
         ImGui.getIO().setIniFilename(null);
+
+        ImGuiIO io = ImGui.getIO();
+        if (new File(K.Paths.FONT).exists()) {
+            io.getFonts().addFontFromFileTTF(K.Paths.FONT, 17.0f);
+        }
+
+        ImGuiStyle style = ImGui.getStyle();
+        style.setWindowRounding(12.0f);
+        style.setFrameRounding(8.0f);
+        style.setWindowBorderSize(0.0f);
+        style.setFrameBorderSize(0.0f);
+        style.setWindowPadding(24.0f, 24.0f);
+        style.setFramePadding(12.0f, 10.0f);
+        style.setItemSpacing(0.0f, 14.0f);
+
+        style.setColor(ImGuiCol.WindowBg, 0.08f, 0.08f, 0.10f, 0.92f);
+        style.setColor(ImGuiCol.FrameBg, 0.15f, 0.15f, 0.18f, 1.00f);
+        style.setColor(ImGuiCol.FrameBgHovered, 0.20f, 0.20f, 0.24f, 1.00f);
+        style.setColor(ImGuiCol.FrameBgActive, 0.22f, 0.22f, 0.26f, 1.00f);
+        style.setColor(ImGuiCol.Button, 0.25f, 0.25f, 0.30f, 1.00f);
+        style.setColor(ImGuiCol.ButtonHovered, 0.35f, 0.35f, 0.42f, 1.00f);
+        style.setColor(ImGuiCol.ButtonActive, 0.20f, 0.20f, 0.25f, 1.00f);
+        style.setColor(ImGuiCol.Text, 0.92f, 0.92f, 0.95f, 1.00f);
+
         imGuiGlfw.init(windowHandle, true);
-        imGuiGl3.init("#version 330 core");
-        log.info("GameMaster initialized with grid size: {}x{}", SIZE, SIZE);
+        imGuiGl3.init(K.Render.GLSL_VERSION);
+        log.info("GameMaster initialized with grid size: {}x{}", K.World.GRID_SIZE, K.World.GRID_SIZE);
     }
 
     public void update(float delta) {
@@ -110,11 +141,9 @@ public class GameMaster {
                 Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
         if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_RIGHT)) {
             if (isCtrlDown) {
-                float rotSensitivity = 0.2f;
-                camera.rotateYaw(Mouse.getDeltaX() * rotSensitivity);
+                camera.rotateYaw(Mouse.getDeltaX() * K.Camera.ROTATION_SENSITIVITY);
             } else {
-                float panSensitivity = 0.015f;
-                camera.pan(Mouse.getDeltaX(), Mouse.getDeltaY(), panSensitivity);
+                camera.pan(Mouse.getDeltaX(), Mouse.getDeltaY(), K.Camera.PAN_SENSITIVITY);
             }
         }
 
@@ -128,7 +157,7 @@ public class GameMaster {
         }
 
         Vector2i cell = camera.highlight(Mouse.getX(), Mouse.getY(), windowWidth, windowHeight);
-        if (cell != null && cell.x >= 0 && cell.x < SIZE && cell.y >= 0 && cell.y < SIZE) {
+        if (cell != null && cell.x >= 0 && cell.x < K.World.GRID_SIZE && cell.y >= 0 && cell.y < K.World.GRID_SIZE) {
             hoveredCell = cell;
         } else {
             hoveredCell = null;
@@ -164,7 +193,7 @@ public class GameMaster {
         defaultShader.setUniform("uLightDirection", sunlight.getDirection());
 
         defaultShader.setUniform("uUseTexture", false);
-        defaultShader.setUniform("uBaseColor", new Vector3f(0.4f, 0.25f, 0.1f));
+        defaultShader.setUniform("uBaseColor", K.Colors.CELL_EVEN);
         cellService.renderAll(defaultShader, blockMesh, modelMatrix, sunlight);
 
         defaultShader.setUniform("uUseTexture", true);
@@ -212,7 +241,7 @@ public class GameMaster {
 
             outlineShader.bind();
             outlineShader.setUniform("uScreenSize", new Vector2f(windowWidth, windowHeight));
-            outlineShader.setUniform("uOutlineColor", new Vector3f(0.0f, 0.0f, 0.0f));
+            outlineShader.setUniform("uOutlineColor", K.Colors.OUTLINE_DEFAULT);
             outlineShader.setUniform("uMaskTexture", 0);
 
             glBindTexture(GL_TEXTURE_2D, maskFbo.getTextureId());
@@ -228,14 +257,32 @@ public class GameMaster {
         ImGui.newFrame();
 
         if (player == null) {
-            ImGui.begin("New Farmer");
-            ImGui.inputText("Who are you, kid?", nameBuffer);
-            if (ImGui.button("Start")) {
+            ImGui.setNextWindowPos(windowWidth / 2.0f,
+                    windowHeight / 2.0f,
+                    ImGuiCond.Always,
+                    0.5f, 0.5f);
+
+            ImGui.setNextWindowSize(340.0f, 200.0f);
+            int windowFlags = ImGuiWindowFlags.NoTitleBar
+                    | ImGuiWindowFlags.NoResize
+                    | ImGuiWindowFlags.NoMove
+                    | ImGuiWindowFlags.NoCollapse;
+
+            ImGui.begin("New Farmer", windowFlags);
+
+            ImGui.text("What's your name, kid?");
+
+            ImGui.pushItemWidth(-1.0f);
+            ImGui.inputText("##PlayerName", nameBuffer);
+            ImGui.popItemWidth();
+
+            if (ImGui.button("Start your journey", -1.0f, 40.0f)) {
                 if (!nameBuffer.get().isBlank()) {
                     this.player = new Player(nameBuffer.get());
                     log.info("Player created: {}", player.getName());
                 }
             }
+
             ImGui.end();
         }
 
@@ -260,7 +307,7 @@ public class GameMaster {
     }
 
     public void recenter() {
-        float center = (SIZE - 1) / 2.0f;
+        float center = (K.World.GRID_SIZE - 1) / 2.0f;
         this.camera.setPosition(center, 0.0f, center);
     }
 }

@@ -1,5 +1,6 @@
 package com.sfarm4j.graphics;
 
+import com.sfarm4j.utils.K;
 import org.joml.Vector3f;
 
 public class Sunlight {
@@ -14,7 +15,7 @@ public class Sunlight {
     }
 
     public Sunlight(Vector3f direction) {
-        this(direction, new Vector3f(1.0f, 1.0f, 1.0f), 1.0f);
+        this(direction, K.Colors.SUNLIGHT_DEFAULT, 1.0f);
     }
 
     public Vector3f getDirection() { return direction; }
