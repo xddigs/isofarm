@@ -13,8 +13,8 @@ public class Camera {
     private float pitch = K.Camera.DEFAULT_PITCH;
     private float yaw = K.Camera.DEFAULT_YAW;
 
-    private final float baseWidth;
-    private final float baseHeight;
+    private float baseWidth;
+    private float baseHeight;
     private float zoom = 1.0f;
     private float targetZoom = 1.0f;
 
@@ -27,6 +27,20 @@ public class Camera {
         updateMatrix();
     }
 
+    public void updateProjection(float width, float height) {
+        float aspectRatio = width / height;
+        this.baseHeight = K.Camera.DEFAULT_HEIGHT;
+        this.baseWidth = this.baseHeight * aspectRatio;
+        updateMatrix();
+    }
+
+    public void update(float delta) {
+        if (Math.abs(zoom - targetZoom) > 0.0001f) {
+            this.zoom += (targetZoom - zoom) * Math.min(delta * K.Camera.LERP_SPEED, 1.0f);
+            updateMatrix();
+        }
+    }
+
     public void zoom(float scrollOffset) {
         if (scrollOffset == 0.0f) return;
 
@@ -37,13 +51,6 @@ public class Camera {
         }
 
         this.targetZoom = Math.clamp(this.targetZoom, K.Camera.MIN_ZOOM, K.Camera.MAX_ZOOM);
-    }
-
-    public void update(float delta) {
-        if (Math.abs(zoom - targetZoom) > 0.0001f) {
-            this.zoom += (targetZoom - zoom) * Math.min(delta * K.Camera.LERP_SPEED, 1.0f);
-            updateMatrix();
-        }
     }
 
     private void updateMatrix() {

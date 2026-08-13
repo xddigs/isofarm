@@ -310,4 +310,18 @@ public class GameMaster {
         float center = (K.World.GRID_SIZE - 1) / 2.0f;
         this.camera.setPosition(center, 0.0f, center);
     }
+
+    public void onResize(int newWidth, int newHeight) {
+        this.windowWidth = newWidth;
+        this.windowHeight = newHeight;
+
+        if (camera != null) {
+            camera.updateProjection(newWidth, newHeight);
+        }
+
+        if (maskFbo != null) {
+            maskFbo.dispose();
+            maskFbo = new Framebuffer(newWidth, newHeight);
+        }
+    }
 }

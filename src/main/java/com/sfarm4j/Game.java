@@ -3,6 +3,7 @@ package com.sfarm4j;
 import com.sfarm4j.input.Keyboard;
 import com.sfarm4j.input.Mouse;
 import com.sfarm4j.service.TimeService;
+import com.sfarm4j.utils.K;
 import com.sfarm4j.wrld.GameMaster;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -18,8 +19,6 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 @SuppressWarnings("unused")
 public class Game {
     private static final Logger log = LoggerFactory.getLogger(Game.class);
-    private static final int WINDOW_WIDTH = 1280;
-    private static final int WINDOW_HEIGHT = 720;
     private static final String WINDOW_TITLE = "SFARM4J";
 
     private static final int OPENGL_MAJOR_VERSION = 3;
@@ -68,7 +67,10 @@ public class Game {
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 
-        window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, NULL, NULL);
+        window = glfwCreateWindow(
+                (int) K.Window.DEFAULT_WIDTH,
+                (int) K.Window.DEFAULT_HEIGHT,
+                WINDOW_TITLE, NULL, NULL);
         if (window == NULL) {
             throw new RuntimeException("Failed to create GLFW window");
         }
@@ -78,7 +80,17 @@ public class Game {
 
         glfwMakeContextCurrent(window);
         GL.createCapabilities();
-        glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+
+        glfwSetFramebufferSizeCallback(window, (
+                windowHandle, width, height) -> {
+            if (width > 0 && height > 0) {
+                glViewport(0, 0, width, height);
+                if (master != null) {
+                    master.onResize(width, height);
+                }
+            }
+        });
+
         log.info("OpenGL context loaded successfully.");
         log.info("GPU Renderer: {}", glGetString(GL_RENDERER));
         log.info("OpenGL Version: {}", glGetString(GL_VERSION));
