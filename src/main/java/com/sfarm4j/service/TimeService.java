@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 public class TimeService {
     private static final Logger log = LoggerFactory.getLogger(TimeService.class);
-    private static final float REAL_SECONDS_PER_IN_GAME_MINUTE = 0.7f;
+    private static final float REAL_SECONDS_PER_IN_GAME_MINUTE = 0.1f;
     private static final int MINUTES_PER_HOUR = 60;
     private static final int HOURS_PER_DAY = 24;
     private static final int DAYS_PER_SEASON = 28;

@@ -1,7 +1,7 @@
 package com.sfarm4j.data;
 
 public enum CropType {
-    WHEAT((byte) 0, "Wheat", 2, 4),
+    WHEAT((byte) 0, "Wheat", 1, 4),
     CARROT((byte) 1, "Carrot", 4, 3),
     POTATO((byte) 2, "Potato", 6, 6),
     CABBAGE((byte) 3, "Cabbage", 8, 4),;
