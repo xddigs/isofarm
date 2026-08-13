@@ -14,14 +14,14 @@ public class CropService {
     private static final Logger log = LoggerFactory.getLogger(CropService.class);
     private final List<Crop> activeCrops = new ArrayList<>();
 
-    public Crop plantCrop(CropType type, Season currentSeason, int value) {
+    public Crop plant(CropType type, Season currentSeason, int value) {
         Crop crop = new Crop(type, currentSeason, value);
         activeCrops.add(crop);
         log.info("Planted {} during season {}", type.getName(), currentSeason);
         return crop;
     }
 
-    public void processDailyGrowth(Season currentSeason) {
+    public void process(Season currentSeason) {
         log.info("Processing daily growth for {} active crops...", activeCrops.size());
         
         for (Crop crop : activeCrops) {
