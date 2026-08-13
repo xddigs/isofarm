@@ -19,7 +19,7 @@ public class TimeService {
     private static int minute = 0;
     private static int hour = STARTING_HOUR;
     private int day = 1;
-    private int year = 2016;
+    private int year = 0;
     private float timeScale = 1.0f;
 
     public TimeService(CropService cropService) {
