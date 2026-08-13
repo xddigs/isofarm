@@ -1,8 +1,6 @@
 package com.sfarm4j;
 
-import com.sfarm4j.service.CropService;
 import com.sfarm4j.wrld.GameMaster;
-import com.sfarm4j.wrld.World;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 import org.slf4j.Logger;
