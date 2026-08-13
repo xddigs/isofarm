@@ -7,9 +7,13 @@ import com.sfarm4j.utils.K;
 import com.sfarm4j.wrld.GameMaster;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.system.MemoryStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -73,6 +77,21 @@ public class Game {
                 WINDOW_TITLE, NULL, NULL);
         if (window == NULL) {
             throw new RuntimeException("Failed to create GLFW window");
+        }
+
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            IntBuffer pWidth = stack.mallocInt(1);
+            IntBuffer pHeight = stack.mallocInt(1);
+
+            glfwGetWindowSize(window, pWidth, pHeight);
+            GLFWVidMode videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+            if (videoMode != null) {
+                glfwSetWindowPos(window,
+                        (videoMode.width() - pWidth.get(0)) / 2,
+                        (videoMode.height() - pHeight.get(0)) / 2
+                );
+            }
         }
 
         Keyboard.init(window);
