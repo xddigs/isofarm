@@ -20,10 +20,4 @@ public class World {
     public List<Crop> getActiveCrops() {
         return Collections.unmodifiableList(crops);
     }
-
-    public void update(float delta) {
-        for (Crop crop : crops) {
-            crop.grow();
-        }
-    }
 }

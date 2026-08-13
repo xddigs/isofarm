@@ -1,6 +1,7 @@
 package com.sfarm4j.graphics;
 
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryStack;
 import org.slf4j.Logger;
@@ -101,6 +102,16 @@ public class Shader {
     public void setUniform(String name, Vector3f value) {
         int location = glGetUniformLocation(programId, name);
         glUniform3f(location, value.x, value.y, value.z);
+    }
+
+    public void setUniform(String name, Vector2f value) {
+        int location = glGetUniformLocation(programId, name);
+        glUniform2f(location, value.x, value.y);
+    }
+
+    public void setUniform(String name, float x, float y) {
+        int location = glGetUniformLocation(programId, name);
+        glUniform2f(location, x, y);
     }
 
     public void setUniform(String name, Matrix4f matrix) {

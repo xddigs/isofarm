@@ -17,6 +17,14 @@ public class Spritesheet {
         texture.unbind();
     }
 
+    public float getWidth() {
+        return (float) texture.getWidth() /(totalFrames);
+    }
+
+    public float getHeight() {
+        return (float) texture.getHeight() /(totalFrames);
+    }
+
     public int getTotalFrames() {
         return totalFrames;
     }

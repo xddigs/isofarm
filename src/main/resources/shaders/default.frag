@@ -12,15 +12,21 @@ uniform vec3 uLightDirection;
 uniform vec3 uSunColor;
 uniform float uLightIntensity;
 
+uniform bool uIsMaskPass;
+
 void main() {
     vec4 objectColor = uUseTexture ? texture(uTexture, vTexCoord) : vec4(uBaseColor, 1.0);
 
-    if (objectColor.a < 0.1) {
+    if (uUseTexture && objectColor.a < 0.1) {
         discard;
     }
 
-    vec3 ambient = 0.25 * uSunColor;
+    if (uIsMaskPass) {
+        FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+        return;
+    }
 
+    vec3 ambient = 0.25 * uSunColor;
     vec3 norm = normalize(vNormal);
     vec3 lightDir = normalize(-uLightDirection);
     float diff = max(dot(norm, lightDir), 0.0);

@@ -10,6 +10,7 @@ import com.sfarm4j.service.CellService;
 import com.sfarm4j.service.CropService;
 import com.sfarm4j.service.TimeService;
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
@@ -30,6 +31,10 @@ public class GameMaster {
     private final CellService cellService;
 
     private Shader defaultShader;
+    private Shader outlineShader;
+    private Framebuffer maskFbo;
+    private Mesh screenQuadMesh;
+
     private Mesh blockMesh;
     private Mesh selectionMesh;
     private Mesh spriteMesh;
@@ -61,8 +66,11 @@ public class GameMaster {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_DEPTH_TEST);
 
-        this.defaultShader = new Shader("shaders/default.vert",
-                                        "shaders/default.frag");
+        this.defaultShader = new Shader("shaders/default.vert", "shaders/default.frag");
+        this.outlineShader = new Shader("shaders/outline.vert", "shaders/outline.frag");
+
+        this.maskFbo = new Framebuffer((int) windowWidth, (int) windowHeight);
+        this.screenQuadMesh = Mesh.screenQuad();
 
         this.blockMesh = Mesh.createMesh(0.4f);
         this.selectionMesh = Mesh.selection();
@@ -77,7 +85,6 @@ public class GameMaster {
 
     public void update(float delta) {
         timeService.update(delta);
-        world.update(delta);
         camera.update(delta);
 
         boolean isCtrlDown = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL) ||
@@ -128,6 +135,7 @@ public class GameMaster {
     public void render() {
         glActiveTexture(GL_TEXTURE0);
         defaultShader.bind();
+        defaultShader.setUniform("uIsMaskPass", false);
 
         defaultShader.setUniform("uProjection", camera.getProjectionMatrix());
         defaultShader.setUniform("uView", camera.getViewMatrix());
@@ -155,15 +163,46 @@ public class GameMaster {
 
         if (hoveredCell != null) {
             defaultShader.setUniform("uUseTexture", false);
-            glDisable(GL_DEPTH_TEST);
             modelMatrix.identity().translate(hoveredCell.x, 0.0f, hoveredCell.y);
             defaultShader.setUniform("uModel", modelMatrix);
             selectionMesh.renderLines();
+        }
+
+        if (hoveredCell != null) {
+            maskFbo.bind();
+            glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            defaultShader.setUniform("uIsMaskPass", true);
+            defaultShader.setUniform("uUseTexture", true);
+            wheat.bind();
+
+            world.getActiveCrops().stream()
+                    .filter(c -> Math.round(c.getX()) == hoveredCell.x && Math.round(c.getZ()) == hoveredCell.y)
+                    .findFirst()
+                    .ifPresent(crop -> {
+                        modelMatrix.identity().translate(crop.getX(), 0.0f, crop.getZ());
+                        defaultShader.setUniform("uModel", modelMatrix);
+                        defaultShader.setUniform("uFrameIndex", crop.getStage().getFrameIndex());
+                        spriteMesh.render();
+                    });
+
+            wheat.unbind();
+            maskFbo.unbind((int) windowWidth, (int) windowHeight);
+            glDisable(GL_DEPTH_TEST);
+
+            outlineShader.bind();
+            outlineShader.setUniform("uScreenSize", new Vector2f(windowWidth, windowHeight));
+            outlineShader.setUniform("uOutlineColor", new Vector3f(0.0f, 0.0f, 0.0f));
+            outlineShader.setUniform("uMaskTexture", 0);
+
+            glBindTexture(GL_TEXTURE_2D, maskFbo.getTextureId());
+            screenQuadMesh.render();
+
+            outlineShader.unbind();
             glEnable(GL_DEPTH_TEST);
         }
 
-        defaultShader.setUniform("uFrameIndex", 0);
-        defaultShader.setUniform("uTotalFrames", 1);
         defaultShader.unbind();
     }
 
@@ -171,8 +210,11 @@ public class GameMaster {
         blockMesh.dispose();
         selectionMesh.dispose();
         spriteMesh.dispose();
+        screenQuadMesh.dispose();
         wheat.dispose();
+        maskFbo.dispose();
         defaultShader.dispose();
+        outlineShader.dispose();
         log.info("GameMaster resources successfully cleaned up");
     }
 
