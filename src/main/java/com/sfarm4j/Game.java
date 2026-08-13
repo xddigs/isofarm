@@ -11,6 +11,7 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
+@SuppressWarnings("unused")
 public class Game {
     private static final Logger log = LoggerFactory.getLogger(Game.class);
     private static final int WINDOW_WIDTH = 1280;
@@ -21,7 +22,6 @@ public class Game {
     private static final int OPENGL_MINOR_VERSION = 3;
     private static final int VSYNC_INTERVAL = 1;
 
-    @SuppressWarnings("unused")
     private static final float FRAMES_PER_SECOND = 60.0f;
 
     private static final float CLEAR_COLOR_RED = 0.15f;
