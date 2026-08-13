@@ -7,15 +7,15 @@ public class Crop {
     private final int value;
     private final int daysToGrow;
     private int days;
-    private boolean canBeHarvested;
+    private boolean readyToHarvest;
 
-    public Crop(CropType type, Season season,
-                int value, boolean canBeHarvested) {
+    public Crop(CropType type, Season season, int value) {
         this.type = type;
         this.season = season;
         this.value = value;
         this.daysToGrow = type.getDaysToGrow();
-        this.canBeHarvested = canBeHarvested;
+        this.days = 0;
+        this.readyToHarvest = false;
     }
 
     public CropType getType() {
@@ -38,20 +38,18 @@ public class Crop {
         return days;
     }
 
-    public boolean isCanBeHarvested() {
-        return canBeHarvested;
+    public boolean isReadyToHarvest() {
+        return readyToHarvest;
     }
 
     public void grow() {
-        this.days += 1;
-        if (days >= daysToGrow) {
-            this.days = 0;
-            harvest();
+        if (readyToHarvest) {
+            return;
         }
-    }
 
-    private void harvest() {
-        if (daysToGrow < type.getDaysToGrow()) return;
-        this.canBeHarvested = true;
+        this.days++;
+        if (this.days >= daysToGrow) {
+            this.readyToHarvest = true;
+        }
     }
 }
