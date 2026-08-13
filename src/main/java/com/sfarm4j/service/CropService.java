@@ -15,11 +15,11 @@ public class CropService implements Service<Crop> {
         this.world = world;
     }
 
-    public Crop plant(CropType type, Season currentSeason, int value) {
-        Crop crop = new Crop(type, currentSeason, value);
+    public Crop plant(int x, int z, CropType type, Season currentSeason, int value) {
+        Crop crop = new Crop(x, z, type, currentSeason, value);
         world.addCrop(crop);
-        log.info("Planted {} during season {}", type.getName(),
-                currentSeason.getName());
+        log.info("Planted {} at ({}, {}) during season {}",
+                type.getName(), x, z, currentSeason.getName());
         return crop;
     }
 

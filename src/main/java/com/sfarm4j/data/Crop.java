@@ -2,6 +2,7 @@ package com.sfarm4j.data;
 
 @DataClass
 public class Crop {
+    private float x, z;
     private final CropType type;
     private final Season season;
     private final int value;
@@ -9,13 +10,24 @@ public class Crop {
     private int days;
     private boolean readyToHarvest;
 
-    public Crop(CropType type, Season season, int value) {
+    public Crop(float x, float z,
+                CropType type, Season season, int value) {
+        this.x = x;
+        this.z = z;
         this.type = type;
         this.season = season;
         this.value = value;
         this.daysToGrow = type.getDaysToGrow();
         this.days = 0;
         this.readyToHarvest = false;
+    }
+
+    public float getX() {
+        return x;
+    }
+
+    public float getZ() {
+        return z;
     }
 
     public CropType getType() {

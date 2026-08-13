@@ -1,6 +1,7 @@
 package com.sfarm4j.wrld;
 
 import com.sfarm4j.data.CellType;
+import com.sfarm4j.data.Crop;
 import com.sfarm4j.data.CropType;
 import com.sfarm4j.graphics.*;
 import com.sfarm4j.input.Keyboard;
@@ -14,7 +15,8 @@ import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_RIGHT;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
@@ -31,6 +33,8 @@ public class GameMaster {
     private Shader defaultShader;
     private Mesh blockMesh;
     private Mesh selectionMesh;
+    private Mesh spriteMesh;
+    private Texture wheatTexture;
     private Camera camera;
     private final Matrix4f modelMatrix = new Matrix4f();
     private final Sunlight sunlight;
@@ -58,11 +62,12 @@ public class GameMaster {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_DEPTH_TEST);
 
-        this.defaultShader = new Shader("shaders/default.vert",
-                "shaders/default.frag");
+        this.defaultShader = new Shader("shaders/default.vert", "shaders/default.frag");
 
         this.blockMesh = Mesh.createMesh(0.4f);
         this.selectionMesh = Mesh.selection();
+        this.spriteMesh = Mesh.quadVertical();
+        this.wheatTexture = new Texture("assets/crops/wheat_crop.png");
 
         this.camera = new Camera(16.0f, 8.0f);
         this.camera.setPosition(0.0f, 0.0f, 0.0f);
@@ -86,8 +91,21 @@ public class GameMaster {
         }
 
         if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT) && hoveredCell != null) {
-            cropService.plant(CropType.WHEAT, timeService.getCurrentSeason(), 10);
-            log.info("Planted crop WHEAT at cell coordinates: ({}, {})", hoveredCell.x, hoveredCell.y);
+            CropType selectedType = CropType.WHEAT;
+
+            Crop plantedCrop = cropService.plant(
+                    hoveredCell.x,
+                    hoveredCell.y,
+                    selectedType,
+                    timeService.getCurrentSeason(),
+                    10
+            );
+
+            log.info("Planted crop {} at cell coordinates: ({}, {})",
+                    plantedCrop.getType().getName(),
+                    hoveredCell.x,
+                    hoveredCell.y
+            );
         }
 
         Mouse.update();
@@ -100,10 +118,28 @@ public class GameMaster {
 
         defaultShader.setUniform("uProjection", camera.getProjectionMatrix());
         defaultShader.setUniform("uView", camera.getViewMatrix());
+
         defaultShader.setUniform("uUseTexture", false);
         cellService.renderAll(defaultShader, blockMesh, modelMatrix, sunlight);
 
+        defaultShader.setUniform("uUseTexture", true);
+        defaultShader.setUniform("uTexture", 0);
+        wheatTexture.bind();
+
+        world.getActiveCrops().forEach(crop -> {
+            modelMatrix.identity()
+                    .translate(crop.getX(), 0.0f, crop.getZ())
+                    .rotateY((float) Math.toRadians(-camera.getYaw()))
+                    .rotateX((float) Math.toRadians(-camera.getPitch()));
+
+            defaultShader.setUniform("uModel", modelMatrix);
+            spriteMesh.render();
+        });
+
+        wheatTexture.unbind();
+
         if (hoveredCell != null) {
+            defaultShader.setUniform("uUseTexture", false);
             glDisable(GL_DEPTH_TEST);
             modelMatrix.identity().translate(hoveredCell.x, 0.0f, hoveredCell.y);
             defaultShader.setUniform("uModel", modelMatrix);
@@ -117,6 +153,8 @@ public class GameMaster {
     public void cleanup() {
         blockMesh.cleanup();
         selectionMesh.cleanup();
+        spriteMesh.cleanup();
+        wheatTexture.cleanup();
         defaultShader.cleanup();
         log.info("GameMaster resources successfully cleaned up");
     }
