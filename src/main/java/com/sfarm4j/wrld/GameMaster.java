@@ -34,7 +34,7 @@ public class GameMaster {
     private Mesh blockMesh;
     private Mesh selectionMesh;
     private Mesh spriteMesh;
-    private Texture wheatTexture;
+    private Spritesheet wheat;
     private Camera camera;
     private final Matrix4f modelMatrix = new Matrix4f();
     private final Sunlight sunlight;
@@ -66,8 +66,8 @@ public class GameMaster {
 
         this.blockMesh = Mesh.createMesh(0.4f);
         this.selectionMesh = Mesh.selection();
-        this.spriteMesh = Mesh.quadVertical();
-        this.wheatTexture = new Texture("assets/crops/wheat_crop.png");
+        this.spriteMesh = Mesh.createCrop();
+        this.wheat = new Spritesheet("assets/crops/wheat_crop.png", 6);
 
         this.camera = new Camera(16.0f, 8.0f);
         this.camera.setPosition(0.0f, 0.0f, 0.0f);
@@ -120,11 +120,14 @@ public class GameMaster {
         defaultShader.setUniform("uView", camera.getViewMatrix());
 
         defaultShader.setUniform("uUseTexture", false);
+        defaultShader.setUniform("uBaseColor", new Vector3f(0.4f, 0.25f, 0.1f));
         cellService.renderAll(defaultShader, blockMesh, modelMatrix, sunlight);
 
         defaultShader.setUniform("uUseTexture", true);
         defaultShader.setUniform("uTexture", 0);
-        wheatTexture.bind();
+        defaultShader.setUniform("uTotalFrames", wheat.getTotalFrames());
+
+        wheat.bind();
 
         world.getActiveCrops().forEach(crop -> {
             modelMatrix.identity()
@@ -133,10 +136,12 @@ public class GameMaster {
                     .rotateX((float) Math.toRadians(-camera.getPitch()));
 
             defaultShader.setUniform("uModel", modelMatrix);
+            defaultShader.setUniform("uFrameIndex", crop.getStage().getFrameIndex());
+
             spriteMesh.render();
         });
 
-        wheatTexture.unbind();
+        wheat.unbind();
 
         if (hoveredCell != null) {
             defaultShader.setUniform("uUseTexture", false);
@@ -147,15 +152,17 @@ public class GameMaster {
             glEnable(GL_DEPTH_TEST);
         }
 
+        defaultShader.setUniform("uFrameIndex", 0);
+        defaultShader.setUniform("uTotalFrames", 1);
         defaultShader.unbind();
     }
 
-    public void cleanup() {
-        blockMesh.cleanup();
-        selectionMesh.cleanup();
-        spriteMesh.cleanup();
-        wheatTexture.cleanup();
-        defaultShader.cleanup();
+    public void dispose() {
+        blockMesh.dispose();
+        selectionMesh.dispose();
+        spriteMesh.dispose();
+        wheat.dispose();
+        defaultShader.dispose();
         log.info("GameMaster resources successfully cleaned up");
     }
 

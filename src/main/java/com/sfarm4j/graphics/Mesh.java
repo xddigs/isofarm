@@ -161,10 +161,10 @@ public class Mesh {
 
     public static Mesh quadVertical() {
         float[] positions = new float[] {
-                -0.5f, 1.0f, 0.0f,
-                -0.5f, 0.0f, 0.0f,
-                0.5f, 0.0f, 0.0f,
-                0.5f, 1.0f, 0.0f
+                -0.25f, 0.0f, 0.0f,
+                0.25f, 0.0f, 0.0f,
+                0.25f, 1.0f, 0.0f,
+                -0.25f, 1.0f, 0.0f
         };
 
         float[] normals = new float[] {
@@ -174,19 +174,63 @@ public class Mesh {
                 0.0f, 0.0f, 1.0f
         };
 
-        float[] textCoords = new float[] {
+        float[] texCoords = new float[] {
                 0.0f, 1.0f,
-                0.0f, 0.0f,
+                1.0f, 1.0f,
                 1.0f, 0.0f,
-                1.0f, 1.0f
+                0.0f, 0.0f
         };
 
         int[] indices = new int[] {
-                0, 1, 3,
-                3, 1, 2
+                0, 1, 2,
+                2, 3, 0
         };
 
-        return new Mesh(positions, normals, textCoords, indices);
+        return new Mesh(positions, normals, texCoords, indices);
+    }
+
+    public static Mesh createCrop() {
+        float[] positions = new float[] {
+                -0.35f, 0.0f, -0.35f,
+                0.35f, 0.0f,  0.35f,
+                0.35f, 0.8f,  0.35f,
+                -0.35f, 0.8f, -0.35f,
+                -0.35f, 0.0f,  0.35f,
+                0.35f, 0.0f, -0.35f,
+                0.35f, 0.8f, -0.35f,
+                -0.35f, 0.8f,  0.35f
+        };
+
+        float[] normals = new float[] {
+                -0.707f, 0.0f,  0.707f,
+                -0.707f, 0.0f,  0.707f,
+                -0.707f, 0.0f,  0.707f,
+                -0.707f, 0.0f,  0.707f,
+                0.707f, 0.0f,  0.707f,
+                0.707f, 0.0f,  0.707f,
+                0.707f, 0.0f,  0.707f,
+                0.707f, 0.0f,  0.707f
+        };
+
+        float[] texCoords = new float[] {
+                0.0f, 1.0f,
+                1.0f, 1.0f,
+                1.0f, 0.0f,
+                0.0f, 0.0f,
+                0.0f, 1.0f,
+                1.0f, 1.0f,
+                1.0f, 0.0f,
+                0.0f, 0.0f
+        };
+
+        int[] indices = new int[] {
+                0, 1, 2,  2, 3, 0,
+                2, 1, 0,  0, 3, 2,
+                4, 5, 6,  6, 7, 4,
+                6, 5, 4,  4, 7, 6
+        };
+
+        return new Mesh(positions, normals, texCoords, indices);
     }
 
     public void render() {
@@ -195,7 +239,7 @@ public class Mesh {
         glBindVertexArray(0);
     }
 
-    public void cleanup() {
+    public void dispose() {
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
         glDisableVertexAttribArray(2);

@@ -89,7 +89,7 @@ public class Texture {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    public void cleanup() {
+    public void dispose() {
         glDeleteTextures(id);
         log.info("Texture resource deleted (ID: {})", id);
     }

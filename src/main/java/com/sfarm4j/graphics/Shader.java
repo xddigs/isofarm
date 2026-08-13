@@ -78,7 +78,7 @@ public class Shader {
         glUseProgram(0);
     }
 
-    public void cleanup() {
+    public void dispose() {
         glUnbind();
         glDeleteProgram(programId);
         log.info("Shader program deleted [ID: {}]", programId);

@@ -2,7 +2,8 @@ package com.sfarm4j.data;
 
 @DataClass
 public class Crop {
-    private float x, z;
+    private final float x, z;
+    private GrowthStage stage;
     private final CropType type;
     private final Season season;
     private final int value;
@@ -14,6 +15,7 @@ public class Crop {
                 CropType type, Season season, int value) {
         this.x = x;
         this.z = z;
+        this.stage = GrowthStage.BUD;
         this.type = type;
         this.season = season;
         this.value = value;
@@ -42,6 +44,10 @@ public class Crop {
         return value;
     }
 
+    public GrowthStage getStage() {
+        return stage;
+    }
+
     public int getDaysToGrow() {
         return daysToGrow;
     }
@@ -60,8 +66,13 @@ public class Crop {
         }
 
         this.days++;
+        if (this.days % 2 == 0) {
+            this.stage = stage.next(1);
+        }
+
         if (this.days >= daysToGrow) {
             this.readyToHarvest = true;
+            this.stage = GrowthStage.HARVESTABLE;
         }
     }
 }
