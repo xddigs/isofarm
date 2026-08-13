@@ -11,7 +11,7 @@ public class TimeService {
     private static final int MINUTES_PER_HOUR = 60;
     private static final int HOURS_PER_DAY = 24;
     private static final int DAYS_PER_SEASON = 28;
-    private static final int STARTING_HOUR = 10;
+    private static final int STARTING_HOUR = 8;
 
     private final CropService cropService;
 
@@ -133,5 +133,48 @@ public class TimeService {
         }
 
         return result;
+    }
+
+    public static Vector3f getSunLightColor() {
+        float timeInHours = hour + (minute / 60.0f);
+
+        Vector3f nightColor = new Vector3f(0.4f, 0.5f, 0.7f);
+        Vector3f dawnColor  = new Vector3f(1.0f, 0.6f, 0.3f);
+        Vector3f dayColor   = new Vector3f(1.0f, 0.98f, 0.9f);
+
+        Vector3f result = new Vector3f();
+
+        if (timeInHours >= 6.0f && timeInHours < 8.0f) {
+            float t = (timeInHours - 6.0f) / 2.0f;
+            dawnColor.lerp(dayColor, t, result);
+        } else if (timeInHours >= 8.0f && timeInHours < 18.0f) {
+            result.set(dayColor);
+        } else if (timeInHours >= 18.0f && timeInHours < 20.0f) {
+            float t = (timeInHours - 18.0f) / 2.0f;
+            dayColor.lerp(dawnColor, t, result);
+        } else if (timeInHours >= 20.0f && timeInHours < 22.0f) {
+            float t = (timeInHours - 20.0f) / 2.0f;
+            dawnColor.lerp(nightColor, t, result);
+        } else {
+            result.set(nightColor);
+        }
+
+        return result;
+    }
+
+    public static float getSunIntensity() {
+        float timeInHours = hour + (minute / 60.0f);
+
+        if (timeInHours >= 7.0f && timeInHours < 19.0f) {
+            return 1.0f;
+        } else if (timeInHours >= 19.0f && timeInHours < 22.0f) {
+            float t = (timeInHours - 19.0f) / 3.0f;
+            return 1.0f - (t * 0.8f);
+        } else if (timeInHours >= 5.0f && timeInHours < 7.0f) {
+            float t = (timeInHours - 5.0f) / 2.0f;
+            return 0.2f + (t * 0.8f);
+        } else {
+            return 0.2f;
+        }
     }
 }

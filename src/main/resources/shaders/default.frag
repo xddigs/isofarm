@@ -19,12 +19,15 @@ void main() {
         discard;
     }
 
-    vec3 ambient = 0.3 * uSunColor;
+    vec3 ambient = 0.25 * uSunColor;
 
     vec3 norm = normalize(vNormal);
     vec3 lightDir = normalize(-uLightDirection);
     float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = diff * uSunColor * uLightIntensity;
-    vec3 finalColor = (ambient + diffuse) * objectColor.rgb;
+    vec3 diffuse = diff * uSunColor;
+
+    vec3 totalLight = (ambient + diffuse) * uLightIntensity;
+    vec3 finalColor = totalLight * objectColor.rgb;
+
     FragColor = vec4(finalColor, objectColor.a);
 }
