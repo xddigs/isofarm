@@ -15,8 +15,7 @@ import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_RIGHT;
+import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
@@ -78,9 +77,20 @@ public class GameMaster {
         timeService.update(delta);
         world.update(delta);
 
+        boolean isCtrlDown = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL) ||
+                Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
         if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_RIGHT)) {
-            float panSensitivity = 0.015f;
-            camera.pan(Mouse.getDeltaX(), Mouse.getDeltaY(), panSensitivity);
+            if (isCtrlDown) {
+                float rotSensitivity = 0.2f;
+                camera.rotateYaw(Mouse.getDeltaX() * rotSensitivity);
+            } else {
+                float panSensitivity = 0.015f;
+                camera.pan(Mouse.getDeltaX(), Mouse.getDeltaY(), panSensitivity);
+            }
+        }
+
+        if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_MIDDLE)) {
+            recenter();
         }
 
         Vector2i cell = camera.highlight(Mouse.getX(), Mouse.getY(), windowWidth, windowHeight);
@@ -100,12 +110,6 @@ public class GameMaster {
                     selectedType,
                     timeService.getCurrentSeason(),
                     10
-            );
-
-            log.info("Planted crop {} at cell coordinates: ({}, {})",
-                    plantedCrop.getType().getName(),
-                    hoveredCell.x,
-                    hoveredCell.y
             );
         }
 

@@ -21,11 +21,13 @@ public class CropService implements Service<Crop> {
         if (crop.getCell().hasCrop()) {
             log.warn("Attempted to plant {} at ({}, {}) " +
                     "but cell already has a crop!", type.getName(), x, z);
-            return null;
+            return crop;
         }
 
         log.info("Planted {} at ({}, {}) during season {}",
                 type.getName(), x, z, currentSeason.getName());
+        cell.setCrop(true);
+        world.addCrop(crop);
         return crop;
     }
 
