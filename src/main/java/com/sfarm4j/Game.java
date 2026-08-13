@@ -78,6 +78,7 @@ public class Game {
         glfwMakeContextCurrent(window);
 
         GL.createCapabilities();
+        glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
         log.info("OpenGL context loaded successfully.");
         log.info("GPU Renderer: {}", glGetString(GL_RENDERER));
         log.info("OpenGL Version: {}", glGetString(GL_VERSION));
