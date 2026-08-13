@@ -21,6 +21,7 @@ public class Game {
     private static final int OPENGL_MINOR_VERSION = 3;
     private static final int VSYNC_INTERVAL = 1;
 
+    @SuppressWarnings("unused")
     private static final float FRAMES_PER_SECOND = 60.0f;
 
     private static final float CLEAR_COLOR_RED = 0.15f;
