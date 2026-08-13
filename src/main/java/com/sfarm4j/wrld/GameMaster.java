@@ -92,6 +92,7 @@ public class GameMaster {
         recenter();
 
         ImGui.createContext();
+        ImGui.getIO().setIniFilename(null);
         imGuiGlfw.init(windowHandle, true);
         imGuiGl3.init("#version 330 core");
         log.info("GameMaster initialized with grid size: {}x{}", SIZE, SIZE);
