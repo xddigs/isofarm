@@ -34,13 +34,13 @@ public class CellService {
         shader.setUniform("uLightIntensity", sunlight.getIntensity());
 
         for (Cell cell : cells.values()) {
-            boolean isEven = (cell.x() + cell.z()) % 2 == 0;
+            boolean isEven = (cell.getX() + cell.getZ()) % 2 == 0;
             Vector3f color = isEven ? new Vector3f(0.4f, 0.25f, 0.1f) :
                     new Vector3f(0.37f, 0.23f, 0.09f);
             shader.setUniform("uBaseColor", color);
 
-            float worldX = cell.x() * TILE_SIZE;
-            float worldZ = cell.z() * TILE_SIZE;
+            float worldX = cell.getX() * TILE_SIZE;
+            float worldZ = cell.getZ() * TILE_SIZE;
 
             modelMatrix.identity()
                     .translate(new Vector3f(worldX, 0.0f, worldZ))
