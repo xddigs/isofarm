@@ -15,37 +15,49 @@ import static org.lwjgl.opengl.GL30.*;
 public class Mesh {
     private static final Logger log = LoggerFactory.getLogger(Mesh.class);
     private final int vaoId;
-    private final int vboId;
+    private final int posVboId;
+    private final int normalVboId;
+    private final int uvVboId;
     private final int eboId;
     private final int vertexCount;
 
-    public Mesh(float[] positions, float[] textCoords, int[] indices) {
+    public Mesh(float[] positions, float[] normals, float[] textCoords, int[] indices) {
         this.vertexCount = indices.length;
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
             vaoId = glGenVertexArrays();
             glBindVertexArray(vaoId);
-            vboId = glGenBuffers();
+
+            posVboId = glGenBuffers();
             FloatBuffer posBuffer = stack.mallocFloat(positions.length);
             posBuffer.put(positions).flip();
-            glBindBuffer(GL_ARRAY_BUFFER, vboId);
+            glBindBuffer(GL_ARRAY_BUFFER, posVboId);
             glBufferData(GL_ARRAY_BUFFER, posBuffer, GL_STATIC_DRAW);
             glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
             glEnableVertexAttribArray(0);
 
-            int uvVboId = glGenBuffers();
+            normalVboId = glGenBuffers();
+            FloatBuffer normalBuffer = stack.mallocFloat(normals.length);
+            normalBuffer.put(normals).flip();
+            glBindBuffer(GL_ARRAY_BUFFER, normalVboId);
+            glBufferData(GL_ARRAY_BUFFER, normalBuffer, GL_STATIC_DRAW);
+            glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
+            glEnableVertexAttribArray(1);
+
+            uvVboId = glGenBuffers();
             FloatBuffer texBuffer = stack.mallocFloat(textCoords.length);
             texBuffer.put(textCoords).flip();
             glBindBuffer(GL_ARRAY_BUFFER, uvVboId);
             glBufferData(GL_ARRAY_BUFFER, texBuffer, GL_STATIC_DRAW);
-            glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
-            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(2, 2, GL_FLOAT, false, 0, 0);
+            glEnableVertexAttribArray(2);
 
             eboId = glGenBuffers();
             IntBuffer idxBuffer = stack.mallocInt(indices.length);
             idxBuffer.put(indices).flip();
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboId);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, idxBuffer, GL_STATIC_DRAW);
+
             glBindVertexArray(0);
         }
 
@@ -54,25 +66,62 @@ public class Mesh {
 
     public static Mesh createQuad() {
         float[] positions = new float[] {
-            -0.5f,  0.5f, 0.0f,
-            -0.5f, -0.5f, 0.0f,
-             0.5f, -0.5f, 0.0f,
-             0.5f,  0.5f, 0.0f
+                -0.5f, 0.0f, -0.5f,
+                -0.5f, 0.0f,  0.5f,
+                0.5f, 0.0f,  0.5f,
+                0.5f, 0.0f, -0.5f
+        };
+
+        float[] normals = new float[] {
+                0.0f, 1.0f, 0.0f,
+                0.0f, 1.0f, 0.0f,
+                0.0f, 1.0f, 0.0f,
+                0.0f, 1.0f, 0.0f
         };
 
         float[] textCoords = new float[] {
-            0.0f, 1.0f,
-            0.0f, 0.0f,
-            1.0f, 0.0f,
-            1.0f, 1.0f
+                0.0f, 0.0f,
+                0.0f, 1.0f,
+                1.0f, 1.0f,
+                1.0f, 0.0f
         };
 
         int[] indices = new int[] {
-            0, 1, 3,
-            3, 1, 2
+                0, 1, 3,
+                3, 1, 2
         };
 
-        return new Mesh(positions, textCoords, indices);
+        return new Mesh(positions, normals, textCoords, indices);
+    }
+
+    public static Mesh createVerticalQuad() {
+        float[] positions = new float[] {
+                -0.5f, 1.0f, 0.0f,
+                -0.5f, 0.0f, 0.0f,
+                0.5f, 0.0f, 0.0f,
+                0.5f, 1.0f, 0.0f
+        };
+
+        float[] normals = new float[] {
+                0.0f, 0.0f, 1.0f,
+                0.0f, 0.0f, 1.0f,
+                0.0f, 0.0f, 1.0f,
+                0.0f, 0.0f, 1.0f
+        };
+
+        float[] textCoords = new float[] {
+                0.0f, 0.0f,
+                0.0f, 1.0f,
+                1.0f, 1.0f,
+                1.0f, 0.0f
+        };
+
+        int[] indices = new int[] {
+                0, 1, 3,
+                3, 1, 2
+        };
+
+        return new Mesh(positions, normals, textCoords, indices);
     }
 
     public void render() {
@@ -84,9 +133,12 @@ public class Mesh {
     public void cleanup() {
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
+        glDisableVertexAttribArray(2);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glDeleteBuffers(vboId);
+        glDeleteBuffers(posVboId);
+        glDeleteBuffers(normalVboId);
+        glDeleteBuffers(uvVboId);
         glDeleteBuffers(eboId);
 
         glBindVertexArray(0);

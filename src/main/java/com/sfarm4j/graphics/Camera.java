@@ -20,9 +20,11 @@ public class Camera {
     }
 
     public Matrix4f getViewMatrix() {
-        viewMatrix.identity();
-        viewMatrix.translate(-position.x, -position.y, -position.z);
-        return viewMatrix;
+        return new Matrix4f()
+                .identity()
+                .rotateX((float) Math.toRadians(30))
+                .rotateY((float) Math.toRadians(-45))
+                .translate(-position.x, -position.y, -position.z);
     }
 
     public Matrix4f getProjectionMatrix() {

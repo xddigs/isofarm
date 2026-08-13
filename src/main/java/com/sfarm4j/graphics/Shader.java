@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL20.*;
@@ -112,5 +110,10 @@ public class Shader {
             matrix.get(buffer);
             glUniformMatrix4fv(location, false, buffer);
         }
+    }
+
+    public void setUniform(String name, boolean value) {
+        int location = glGetUniformLocation(programId, name);
+        glUniform1i(location, value ? 1 : 0);
     }
 }
