@@ -3,7 +3,6 @@ package com.sfarm4j.wrld;
 import com.sfarm4j.data.CellType;
 import com.sfarm4j.data.CropType;
 import com.sfarm4j.graphics.*;
-import com.sfarm4j.input.Keyboard;
 import com.sfarm4j.input.Mouse;
 import com.sfarm4j.service.CellService;
 import com.sfarm4j.service.CropService;
@@ -69,17 +68,13 @@ public class GameMaster {
             camera.pan(Mouse.getDeltaX(), Mouse.getDeltaY(), panSensitivity);
         }
 
-        boolean isRotatingWithMouse = Mouse.isButtonDown(GLFW_MOUSE_BUTTON_MIDDLE)
-                || (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_RIGHT)
-                && Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT));
-
-        if (isRotatingWithMouse) {
+        if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_MIDDLE)) {
             float rotateSensitivity = 0.3f;
             camera.rotateYaw(-Mouse.getDeltaX() * rotateSensitivity);
         }
 
         if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
-
+            // TODO
         }
 
         Mouse.clearDeltas();
