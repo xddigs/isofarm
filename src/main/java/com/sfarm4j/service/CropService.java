@@ -1,5 +1,6 @@
 package com.sfarm4j.service;
 
+import com.sfarm4j.data.Cell;
 import com.sfarm4j.data.Crop;
 import com.sfarm4j.data.CropType;
 import com.sfarm4j.data.Season;
@@ -15,9 +16,14 @@ public class CropService implements Service<Crop> {
         this.world = world;
     }
 
-    public Crop plant(int x, int z, CropType type, Season currentSeason, int value) {
-        Crop crop = new Crop(x, z, type, currentSeason, value);
-        world.addCrop(crop);
+    public Crop plant(int x, int z, Cell cell, CropType type, Season currentSeason, int value) {
+        Crop crop = new Crop(x, z, type, cell, currentSeason, value);
+        if (crop.getCell().hasCrop()) {
+            log.warn("Attempted to plant {} at ({}, {}) " +
+                    "but cell already has a crop!", type.getName(), x, z);
+            return null;
+        }
+
         log.info("Planted {} at ({}, {}) during season {}",
                 type.getName(), x, z, currentSeason.getName());
         return crop;

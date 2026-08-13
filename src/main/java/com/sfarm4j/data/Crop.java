@@ -5,6 +5,7 @@ public class Crop {
     private final float x, z;
     private GrowthStage stage;
     private final CropType type;
+    private final Cell cell;
     private final Season season;
     private final int value;
     private final int daysToGrow;
@@ -12,10 +13,11 @@ public class Crop {
     private boolean readyToHarvest;
 
     public Crop(float x, float z,
-                CropType type, Season season, int value) {
+                CropType type, Cell cell, Season season, int value) {
         this.x = x;
         this.z = z;
-        this.stage = GrowthStage.BUD;
+        this.cell = cell;
+        this.stage = GrowthStage.SEED;
         this.type = type;
         this.season = season;
         this.value = value;
@@ -34,6 +36,10 @@ public class Crop {
 
     public CropType getType() {
         return type;
+    }
+
+    public Cell getCell() {
+        return cell;
     }
 
     public Season getSeason() {

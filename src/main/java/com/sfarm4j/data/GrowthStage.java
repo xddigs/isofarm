@@ -1,11 +1,11 @@
 package com.sfarm4j.data;
 
 public enum GrowthStage {
-    SEED(1),
-    BUD(2),
-    GROWING(3),
-    MATURE(4),
-    HARVESTABLE(5);
+    SEED(0),
+    BUD(1),
+    GROWING(2),
+    MATURE(3),
+    HARVESTABLE(4);
 
     private final int frameIndex;
 

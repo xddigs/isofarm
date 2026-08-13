@@ -39,7 +39,7 @@ public class GameMaster {
     private final Matrix4f modelMatrix = new Matrix4f();
     private final Sunlight sunlight;
 
-    private static final int SIZE = 1;
+    private static final int SIZE = 2;
     private Vector2i hoveredCell = null;
 
     private float windowWidth = 1280.0f;
@@ -67,7 +67,7 @@ public class GameMaster {
         this.blockMesh = Mesh.createMesh(0.4f);
         this.selectionMesh = Mesh.selection();
         this.spriteMesh = Mesh.createCrop();
-        this.wheat = new Spritesheet("assets/crops/wheat_crop.png", 6);
+        this.wheat = new Spritesheet("assets/crops/wheat_crop.png", 5);
 
         this.camera = new Camera(16.0f, 8.0f);
         this.camera.setPosition(0.0f, 0.0f, 0.0f);
@@ -96,6 +96,7 @@ public class GameMaster {
             Crop plantedCrop = cropService.plant(
                     hoveredCell.x,
                     hoveredCell.y,
+                    cellService.getCell(hoveredCell.x, hoveredCell.y),
                     selectedType,
                     timeService.getCurrentSeason(),
                     10
@@ -131,9 +132,7 @@ public class GameMaster {
 
         world.getActiveCrops().forEach(crop -> {
             modelMatrix.identity()
-                    .translate(crop.getX(), 0.0f, crop.getZ())
-                    .rotateY((float) Math.toRadians(-camera.getYaw()))
-                    .rotateX((float) Math.toRadians(-camera.getPitch()));
+                    .translate(crop.getX(), 0.0f, crop.getZ());
 
             defaultShader.setUniform("uModel", modelMatrix);
             defaultShader.setUniform("uFrameIndex", crop.getStage().getFrameIndex());
