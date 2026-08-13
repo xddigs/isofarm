@@ -110,10 +110,10 @@ public class Mesh {
         };
 
         float[] textCoords = new float[] {
-                0.0f, 0.0f,
                 0.0f, 1.0f,
-                1.0f, 1.0f,
-                1.0f, 0.0f
+                0.0f, 0.0f,
+                1.0f, 0.0f,
+                1.0f, 1.0f
         };
 
         int[] indices = new int[] {

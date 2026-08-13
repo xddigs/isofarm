@@ -36,9 +36,6 @@ public class GameMaster {
         this.sunlight = new Sunlight(new Vector3f(-0.5f, -1.0f, -0.5f));
 
         cellService.setCell(CellType.TILLED, 0, 0);
-        cellService.setCell(CellType.DIRT, 1, 0);
-        cellService.setCell(CellType.TILLED, 0, 1);
-        cellService.setCell(CellType.DIRT, 1, 1);
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -52,7 +49,7 @@ public class GameMaster {
         this.carrotTexture = new Texture("assets/carrot.png");
 
         this.camera = new Camera(16.0f, 9.0f);
-        this.camera.setPosition(0.5f, -1.0f, 0.5f);
+        this.camera.setPosition(0.5f, 0.0f, 0.5f);
         cropService.plant(CropType.CARROT, timeService.getCurrentSeason(), 10);
     }
 

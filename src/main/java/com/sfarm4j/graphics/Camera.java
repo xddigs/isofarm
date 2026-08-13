@@ -16,7 +16,7 @@ public class Camera {
         float halfWidth = width / 2.0f;
         float halfHeight = height / 2.0f;
         this.projectionMatrix.ortho(-halfWidth, halfWidth,
-                -halfHeight, halfHeight, -1.0f, 100.0f);
+                -halfHeight, halfHeight, -100.0f, 100.0f);
     }
 
     public Matrix4f getViewMatrix() {
