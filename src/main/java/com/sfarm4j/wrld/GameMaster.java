@@ -61,7 +61,8 @@ public class GameMaster {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_DEPTH_TEST);
 
-        this.defaultShader = new Shader("shaders/default.vert", "shaders/default.frag");
+        this.defaultShader = new Shader("shaders/default.vert",
+                                        "shaders/default.frag");
 
         this.blockMesh = Mesh.createMesh(0.4f);
         this.selectionMesh = Mesh.selection();
@@ -70,6 +71,7 @@ public class GameMaster {
 
         this.camera = new Camera(16.0f, 8.0f);
         this.camera.setPosition(0.0f, 0.0f, 0.0f);
+        recenter();
         log.info("GameMaster initialized with grid size: {}x{}", SIZE, SIZE);
     }
 
@@ -124,6 +126,10 @@ public class GameMaster {
         defaultShader.setUniform("uProjection", camera.getProjectionMatrix());
         defaultShader.setUniform("uView", camera.getViewMatrix());
 
+        Vector3f skyColor = TimeService.getSkyColor();
+        defaultShader.setUniform("uSunColor", skyColor);
+        defaultShader.setUniform("uSunDirection", sunlight.getDirection());
+
         defaultShader.setUniform("uUseTexture", false);
         defaultShader.setUniform("uBaseColor", new Vector3f(0.4f, 0.25f, 0.1f));
         cellService.renderAll(defaultShader, blockMesh, modelMatrix, sunlight);
@@ -133,17 +139,12 @@ public class GameMaster {
         defaultShader.setUniform("uTotalFrames", wheat.getTotalFrames());
 
         wheat.bind();
-
         world.getActiveCrops().forEach(crop -> {
-            modelMatrix.identity()
-                    .translate(crop.getX(), 0.0f, crop.getZ());
-
+            modelMatrix.identity().translate(crop.getX(), 0.0f, crop.getZ());
             defaultShader.setUniform("uModel", modelMatrix);
             defaultShader.setUniform("uFrameIndex", crop.getStage().getFrameIndex());
-
             spriteMesh.render();
         });
-
         wheat.unbind();
 
         if (hoveredCell != null) {

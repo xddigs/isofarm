@@ -24,4 +24,8 @@ public class Sunlight {
     public void setDirection(float x, float y, float z) {
         this.direction.set(x, y, z).normalize();
     }
+
+    public void setDirection(Vector3f direction) {
+        this.direction.set(direction).normalize();
+    }
 }

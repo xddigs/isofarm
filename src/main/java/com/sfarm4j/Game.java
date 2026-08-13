@@ -2,7 +2,9 @@ package com.sfarm4j;
 
 import com.sfarm4j.input.Keyboard;
 import com.sfarm4j.input.Mouse;
+import com.sfarm4j.service.TimeService;
 import com.sfarm4j.wrld.GameMaster;
+import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 import org.slf4j.Logger;
@@ -89,8 +91,8 @@ public class Game {
     }
 
     private void loop() {
-        glClearColor(CLEAR_COLOR_RED, CLEAR_COLOR_GREEN, CLEAR_COLOR_BLUE, CLEAR_COLOR_ALPHA);
         double lastTime = glfwGetTime();
+
         while (!glfwWindowShouldClose(window)) {
             double currentTime = glfwGetTime();
             float delta = (float) (currentTime - lastTime);
@@ -100,9 +102,12 @@ public class Game {
                 glfwSetWindowShouldClose(window, true);
             }
 
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            Vector3f skyColor = TimeService.getSkyColor();
+            glClearColor(skyColor.x, skyColor.y, skyColor.z, CLEAR_COLOR_ALPHA);
             master.update(delta);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             master.render();
+
             glfwSwapBuffers(window);
             glfwPollEvents();
         }

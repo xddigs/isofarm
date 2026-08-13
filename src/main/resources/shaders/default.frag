@@ -9,7 +9,7 @@ uniform bool uUseTexture;
 
 uniform vec3 uBaseColor;
 uniform vec3 uLightDirection;
-uniform vec3 uLightColor;
+uniform vec3 uSunColor;
 uniform float uLightIntensity;
 
 void main() {
@@ -19,13 +19,12 @@ void main() {
         discard;
     }
 
-    vec3 ambient = 0.4 * uLightColor;
+    vec3 ambient = 0.3 * uSunColor;
 
     vec3 norm = normalize(vNormal);
     vec3 lightDir = normalize(-uLightDirection);
     float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = diff * uLightColor * uLightIntensity;
-
+    vec3 diffuse = diff * uSunColor * uLightIntensity;
     vec3 finalColor = (ambient + diffuse) * objectColor.rgb;
     FragColor = vec4(finalColor, objectColor.a);
 }
