@@ -1,5 +1,7 @@
 package com.sfarm4j;
 
+import com.sfarm4j.service.CropService;
+import com.sfarm4j.wrld.World;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 import org.slf4j.Logger;
@@ -26,6 +28,8 @@ public class Game {
     private static final float CLEAR_COLOR_ALPHA = 1.0f;
 
     private long window;
+    private World world;
+    private CropService cropService;
 
     public void run() {
         log.info("Starting Java 25 / LWJGL 3 application...");
@@ -74,6 +78,9 @@ public class Game {
         glfwSwapInterval(VSYNC_INTERVAL);
         glfwShowWindow(window);
         log.info("GLFW window successfully initialized.");
+
+        world = new World();
+        cropService = new CropService(world);
     }
 
     private void loop() {
