@@ -6,12 +6,13 @@ import org.joml.Vector3f;
 public class Camera {
     private final Vector3f position;
     private final Matrix4f projectionMatrix;
-    private final Matrix4f viewMatrix;
+
+    private float pitch = 35.264f;
+    private float yaw = -45.0f;
 
     public Camera(float width, float height) {
         this.position = new Vector3f(0.0f, 0.0f, 0.0f);
         this.projectionMatrix = new Matrix4f();
-        this.viewMatrix = new Matrix4f();
 
         float halfWidth = width / 2.0f;
         float halfHeight = height / 2.0f;
@@ -22,9 +23,29 @@ public class Camera {
     public Matrix4f getViewMatrix() {
         return new Matrix4f()
                 .identity()
-                .rotateX((float) Math.toRadians(30))
-                .rotateY((float) Math.toRadians(-45))
+                .rotateX((float) Math.toRadians(pitch))
+                .rotateY((float) Math.toRadians(yaw))
                 .translate(-position.x, -position.y, -position.z);
+    }
+
+    public void rotateYaw(float offsetAngle) {
+        this.yaw += offsetAngle;
+    }
+
+    public float getYaw() {
+        return yaw;
+    }
+
+    public void setYaw(float yaw) {
+        this.yaw = yaw;
+    }
+
+    public float getPitch() {
+        return pitch;
+    }
+
+    public void setPitch(float pitch) {
+        this.pitch = pitch;
     }
 
     public Matrix4f getProjectionMatrix() {
@@ -39,7 +60,10 @@ public class Camera {
         this.position.set(x, y, z);
     }
 
-    public void move(float offsetX, float offsetY, float offsetZ) {
-        this.position.add(offsetX, offsetY, offsetZ);
+    public void pan(float deltaX, float deltaY, float sensitivity) {
+        float rad = (float) Math.toRadians(yaw);
+        float dx = (float) (-Math.cos(rad) * deltaX + Math.sin(rad) * deltaY) * sensitivity;
+        float dz = (float) (-Math.sin(rad) * deltaX - Math.cos(rad) * deltaY) * sensitivity;
+        this.position.add(dx, 0.0f, dz);
     }
 }

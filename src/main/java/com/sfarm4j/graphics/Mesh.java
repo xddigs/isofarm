@@ -64,34 +64,75 @@ public class Mesh {
         log.info("Mesh created successfully [VAO ID: {}, Vertices: {}]", vaoId, vertexCount);
     }
 
-    public static Mesh createQuad() {
-        float[] positions = new float[] {
-                -0.5f, 0.0f, -0.5f,
-                -0.5f, 0.0f,  0.5f,
-                0.5f, 0.0f,  0.5f,
-                0.5f, 0.0f, -0.5f
-        };
+    public static Mesh createMesh(float depth) {
+        float[] positions = getFloats(depth);
 
         float[] normals = new float[] {
-                0.0f, 1.0f, 0.0f,
-                0.0f, 1.0f, 0.0f,
-                0.0f, 1.0f, 0.0f,
-                0.0f, 1.0f, 0.0f
+                0.0f, 1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f, 0.0f,
+                0.0f, 0.0f, 1.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f, 1.0f,
+                1.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,
+                0.0f, 0.0f,-1.0f,  0.0f, 0.0f,-1.0f,  0.0f, 0.0f,-1.0f,  0.0f, 0.0f,-1.0f,
+                -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+                0.0f,-1.0f, 0.0f,  0.0f,-1.0f, 0.0f,  0.0f,-1.0f, 0.0f,  0.0f,-1.0f, 0.0f
         };
 
         float[] textCoords = new float[] {
-                0.0f, 0.0f,
-                0.0f, 1.0f,
-                1.0f, 1.0f,
-                1.0f, 0.0f
+                0,0, 0,1, 1,1, 1,0,
+                0,0, 0,1, 1,1, 1,0,
+                0,0, 0,1, 1,1, 1,0,
+                0,0, 0,1, 1,1, 1,0,
+                0,0, 0,1, 1,1, 1,0,
+                0,0, 0,1, 1,1, 1,0
         };
 
-        int[] indices = new int[] {
-                0, 1, 3,
-                3, 1, 2
-        };
+        int[] indices = new int[36];
+        for (int i = 0; i < 6; i++) {
+            int v = i * 4;
+            int idx = i * 6;
+            indices[idx]     = v;
+            indices[idx + 1] = v + 1;
+            indices[idx + 2] = v + 3;
+            indices[idx + 3] = v + 3;
+            indices[idx + 4] = v + 1;
+            indices[idx + 5] = v + 2;
+        }
 
         return new Mesh(positions, normals, textCoords, indices);
+    }
+
+    private static float[] getFloats(float depth) {
+
+        return new float[] {
+                -0.5f,  0.0f, -0.5f,
+                -0.5f,  0.0f,  0.5f,
+                0.5f,  0.0f,  0.5f,
+                0.5f,  0.0f, -0.5f,
+
+                -0.5f,  0.0f,  0.5f,
+                -0.5f, -depth,     0.5f,
+                0.5f, -depth,     0.5f,
+                0.5f,  0.0f,  0.5f,
+
+                0.5f,  0.0f,  0.5f,
+                0.5f, -depth,     0.5f,
+                0.5f, -depth,    -0.5f,
+                0.5f,  0.0f, -0.5f,
+
+                0.5f,  0.0f, -0.5f,
+                0.5f, -depth,    -0.5f,
+                -0.5f, -depth,    -0.5f,
+                -0.5f,  0.0f, -0.5f,
+
+                -0.5f,  0.0f, -0.5f,
+                -0.5f, -depth,    -0.5f,
+                -0.5f, -depth,     0.5f,
+                -0.5f,  0.0f,  0.5f,
+
+                -0.5f, -depth,     0.5f,
+                -0.5f, -depth,    -0.5f,
+                0.5f, -depth,    -0.5f,
+                0.5f, -depth,     0.5f
+        };
     }
 
     public static Mesh createVerticalQuad() {

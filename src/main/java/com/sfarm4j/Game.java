@@ -1,5 +1,7 @@
 package com.sfarm4j;
 
+import com.sfarm4j.input.Keyboard;
+import com.sfarm4j.input.Mouse;
 import com.sfarm4j.wrld.GameMaster;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
@@ -68,6 +70,9 @@ public class Game {
         if (window == NULL) {
             throw new RuntimeException("Failed to create GLFW window");
         }
+
+        Keyboard.init(window);
+        Mouse.init(window);
 
         glfwSetKeyCallback(window, (win, key, _, action, _) -> {
             if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {

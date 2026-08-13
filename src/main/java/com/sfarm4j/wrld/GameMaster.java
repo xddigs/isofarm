@@ -3,12 +3,15 @@ package com.sfarm4j.wrld;
 import com.sfarm4j.data.CellType;
 import com.sfarm4j.data.CropType;
 import com.sfarm4j.graphics.*;
+import com.sfarm4j.input.Keyboard;
+import com.sfarm4j.input.Mouse;
 import com.sfarm4j.service.CellService;
 import com.sfarm4j.service.CropService;
 import com.sfarm4j.service.TimeService;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
@@ -28,6 +31,8 @@ public class GameMaster {
     private final Matrix4f modelMatrix = new Matrix4f();
     private final Sunlight sunlight;
 
+    private static final int SIZE = 3;
+
     public GameMaster() {
         this.world = new World();
         this.cropService = new CropService(world);
@@ -35,16 +40,19 @@ public class GameMaster {
         this.cellService = new CellService();
         this.sunlight = new Sunlight(new Vector3f(-0.5f, -1.0f, -0.5f));
 
-        cellService.setCell(CellType.TILLED, 0, 0);
+        for (int x = 0; x < SIZE; x++) {
+            for (int z = 0; z < SIZE; z++) {
+                cellService.setCell(CellType.DIRT, x, z);
+            }
+        }
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_DEPTH_TEST);
 
-        this.defaultShader = new Shader("shaders/default.vert",
-                "shaders/default.frag");
+        this.defaultShader = new Shader("shaders/default.vert", "shaders/default.frag");
 
-        this.quadMesh = Mesh.createQuad();
+        this.quadMesh = Mesh.createMesh(0.4f);
         this.spriteMesh = Mesh.createVerticalQuad();
         this.carrotTexture = new Texture("assets/carrot.png");
 
@@ -55,6 +63,26 @@ public class GameMaster {
 
     public void update(float delta) {
         timeService.update(delta);
+
+        if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_RIGHT)) {
+            float panSensitivity = 0.015f;
+            camera.pan(Mouse.getDeltaX(), Mouse.getDeltaY(), panSensitivity);
+        }
+
+        boolean isRotatingWithMouse = Mouse.isButtonDown(GLFW_MOUSE_BUTTON_MIDDLE)
+                || (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_RIGHT)
+                && Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT));
+
+        if (isRotatingWithMouse) {
+            float rotateSensitivity = 0.3f;
+            camera.rotateYaw(-Mouse.getDeltaX() * rotateSensitivity);
+        }
+
+        if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
+
+        }
+
+        Mouse.clearDeltas();
     }
 
     public void render() {
@@ -73,14 +101,13 @@ public class GameMaster {
 
         modelMatrix.identity()
                 .translate(new Vector3f(0.0f, 0.0f, 0.0f))
-                .rotateY((float) Math.toRadians(45))
-                .rotateX((float) Math.toRadians(-30))
+                .rotateY((float) Math.toRadians(-camera.getYaw()))
+                .rotateX((float) Math.toRadians(-camera.getPitch()))
                 .scale(1.0f);
 
         defaultShader.setUniform("uModel", modelMatrix);
         spriteMesh.render();
 
-        defaultShader.setUniform("uModel", modelMatrix);
         carrotTexture.unbind();
         defaultShader.unbind();
     }

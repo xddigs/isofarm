@@ -34,9 +34,10 @@ public class CellService {
         shader.setUniform("uLightIntensity", sunlight.getIntensity());
 
         for (Cell cell : cells.values()) {
-            Vector3f baseColor = colors.getOrDefault(cell.type(),
-                    new Vector3f(1.0f, 0.0f, 1.0f));
-            shader.setUniform("uBaseColor", baseColor);
+            boolean isEven = (cell.x() + cell.z()) % 2 == 0;
+            Vector3f color = isEven ? new Vector3f(0.4f, 0.25f, 0.1f) :
+                    new Vector3f(0.37f, 0.23f, 0.09f);
+            shader.setUniform("uBaseColor", color);
 
             float worldX = cell.x() * TILE_SIZE;
             float worldZ = cell.z() * TILE_SIZE;
@@ -48,6 +49,10 @@ public class CellService {
             shader.setUniform("uModel", modelMatrix);
             cellMesh.render();
         }
+    }
+
+    public Cell getCell(int x, int z) {
+        return cells.get(getCellKey(x, z));
     }
 
     private String getCellKey(int x, int z) {
