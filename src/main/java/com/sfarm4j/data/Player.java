@@ -28,16 +28,28 @@ public class Player {
         return money;
     }
 
-    public void add(Item item) {
-        inventory.add(item);
+    public void add(Item item, int amount) {
+        inventory.add(item, amount);
         log.info("Added x{} of {} to inventory",
                 item.getName(), item.getAmount());
     }
 
-    public void remove(Item item) {
-        inventory.remove(item);
+    public void add(Item item) {
+        inventory.add(item, 1);
+        log.info("Added x1 of {} to inventory",
+                item.getName());
+    }
+
+    public void remove(Item item, int amount) {
+        inventory.remove(item, amount);
         log.info("Removed x{} of {} from inventory",
                 item.getName(), item.getAmount());
+    }
+
+    public void remove(Item item) {
+        inventory.remove(item, 1);
+        log.info("Removed x1 of {} from inventory",
+                item.getName());
     }
 
     public void clear() {

@@ -1,9 +1,6 @@
 package com.sfarm4j.service;
 
-import com.sfarm4j.data.Cell;
-import com.sfarm4j.data.Crop;
-import com.sfarm4j.data.CropType;
-import com.sfarm4j.data.Season;
+import com.sfarm4j.data.*;
 import com.sfarm4j.wrld.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,12 +13,17 @@ public class CropService implements Service<Crop> {
         this.world = world;
     }
 
-    public Crop plant(int x, int z, Cell cell, CropType type, Season currentSeason, int value) {
+    public Crop plant(int x, int z, Player player, Cell cell, CropType type,
+                      Season currentSeason, int value) {
         Crop crop = new Crop(x, z, type, cell, currentSeason, value);
-        if (crop.getCell().hasCrop()) {
+        if (crop.getCell().hasCrop() && !crop.isReadyToHarvest()) {
             log.warn("Attempted to plant {} at ({}, {}) " +
                     "but cell already has a crop!", type.getName(), x, z);
             return crop;
+        } else if (crop.getCell().hasCrop() && crop.isReadyToHarvest()) {
+            world.removeCrop(crop);
+            int yield = harvest(player, crop);
+            player.add(crop, yield);
         }
 
         log.info("Planted {} at ({}, {}) during season {}",
@@ -49,7 +51,7 @@ public class CropService implements Service<Crop> {
         }
     }
 
-    public int harvest(Crop crop) {
+    public int harvest(Player player, Crop crop) {
         if (!crop.isReadyToHarvest()) {
             log.warn("Attempted to harvest {} " +
                     "before it was fully grown.", crop.getType().getName());

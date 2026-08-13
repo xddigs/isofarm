@@ -169,6 +169,7 @@ public class GameMaster {
             Crop plantedCrop = cropService.plant(
                     hoveredCell.x,
                     hoveredCell.y,
+                    player,
                     cellService.getCell(hoveredCell.x, hoveredCell.y),
                     selectedType,
                     timeService.getCurrentSeason(),
