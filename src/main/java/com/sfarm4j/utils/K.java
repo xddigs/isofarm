@@ -60,7 +60,6 @@ public final class K {
         public static final float[] COLOR_BUTTON         = {0.45f, 0.55f, 0.12f, 1.00f};
         public static final float[] COLOR_BUTTON_HOVERED = {0.55f, 0.68f, 0.15f, 1.00f};
         public static final float[] COLOR_BUTTON_ACTIVE  = {0.38f, 0.46f, 0.10f, 1.00f};
-        public static final float[] COLOR_TEXT_HIGHLIGHTED = {1.00f, 1.00f, 0.00f, 1.00f};
         public static final float[] COLOR_TEXT            = {1.00f, 1.00f, 1.00f, 1.00f};
     }
 
@@ -86,7 +85,7 @@ public final class K {
         public static final float HUD_PADDING = 10.0f;
         public static final float COORD_DISPLAY_DURATION = 3.0f;
 
-        public static final int ICON_ATLAS_FRAMES = 2;
+        public static final int ICON_ATLAS_FRAMES = 3;
     }
 
     public static final class Paths {
