@@ -8,13 +8,19 @@ import org.slf4j.LoggerFactory;
 @DataClass
 public class Shop {
     private static final Logger log = LoggerFactory.getLogger(Shop.class);
+    private final String owner;
     private final Inventory stock;
     private int money;
 
     public Shop() {
+        this.owner = getRandomName();
         this.stock = new Inventory();
         this.money = K.World.SHOP_STARTING_CREDIT;
         setUpStock();
+    }
+
+    public String getOwner() {
+        return owner;
     }
 
     public Inventory getStock() {
@@ -53,6 +59,7 @@ public class Shop {
     }
 
     public void buy(Item item, int amount) {
+        if (!hasMoney()) return;
         if (money < item.getValue() * amount) {
             log.warn("Not enough money to buy x{} of {}", amount, item.getName());
             return;
@@ -65,6 +72,10 @@ public class Shop {
     public void clear() {
         stock.clear();
         log.info("Cleared shop stock");
+    }
+
+    public boolean hasMoney() {
+        return money > 0;
     }
 
     public boolean isEmpty() {
@@ -92,5 +103,11 @@ public class Shop {
     public void reset() {
         this.money = K.World.SHOP_STARTING_CREDIT;
         setUpStock();
+    }
+
+    private String getRandomName() {
+        String[] names = {"John", "Michael", "Jeffrey", "Hugh",
+                          "Angela", "Malenia", "Carol", "Ashley"};
+        return names[(int) (Math.random() * names.length)];
     }
 }

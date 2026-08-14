@@ -76,7 +76,9 @@ public final class K {
         public static final float TOOLTIP_OFFSET_Y = 15.0f;
         public static final float TOOLTIP_ITEM_SPACING_X = 4.0f;
 
-        public static final float INVENTORY_POS_X = 10.0f;
+        public static final float HUD_PADDING = 20.0f;
+
+        public static final float INVENTORY_POS_X = HUD_PADDING;
         public static final float INVENTORY_POS_Y_OFFSET = 220.0f;
         public static final float INVENTORY_WIDTH = 250.0f;
         public static final float INVENTORY_HEIGHT = 210.0f;
@@ -87,8 +89,6 @@ public final class K {
         public static final float LARGE_BUTTON_HEIGHT = 40.0f;
         public static final float CENTER_PIVOT = 0.5f;
         public static final float MATCH_PARENT_WIDTH = -1.0f;
-
-        public static final float HUD_PADDING = 10.0f;
         public static final float COORD_DISPLAY_DURATION = 3.0f;
 
         public static final int ICON_ATLAS_FRAMES = 3;

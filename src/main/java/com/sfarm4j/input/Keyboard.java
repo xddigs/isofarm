@@ -27,6 +27,13 @@ public class Keyboard {
         return keyCode >= 0 && keyCode <= GLFW_KEY_LAST && keys[keyCode];
     }
 
+    public static boolean anyKeyPressed() {
+        for (boolean key : keys) {
+            if (key) return true;
+        }
+        return false;
+    }
+
     public static boolean isKeyReleased(int keyCode) {
         return keyCode >= 0 && keyCode <= GLFW_KEY_LAST
                 && !keys[keyCode] && lastKeys[keyCode];

@@ -71,6 +71,9 @@ public class GameMaster {
     private float actionDisplayTimer = 0.0f;
     private Item selectedInventoryItem = null;
 
+    private float hudInactivityTimer = 0.0f;
+    private static final float HUD_FADE_DELAY = 2.0f;
+
     public GameMaster(long windowHandle) {
         this.world = new World();
         this.cropService = new CropService(world);
@@ -107,7 +110,7 @@ public class GameMaster {
 
         cropSpritesheets.put(CropType.WHEAT, wheat);
         cropSpritesheets.put(CropType.CARROT, carrot);
-        cropSpritesheets.put(CropType.POTATO, carrot);
+        cropSpritesheets.put(CropType.POTATO, potato);
 
         this.camera = new Camera(K.Camera.DEFAULT_WIDTH, K.Camera.DEFAULT_HEIGHT);
         this.camera.setPosition(0.0f, 0.0f, 0.0f);
@@ -147,6 +150,14 @@ public class GameMaster {
     public void update(float delta) {
         if (player == null) {
             return;
+        }
+
+        if (Mouse.getDeltaX() != 0.0f || Mouse.getDeltaY() != 0.0f ||
+                Mouse.getScrollY() != 0.0f || Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT) ||
+                Keyboard.anyKeyPressed()) {
+            hudInactivityTimer = HUD_FADE_DELAY;
+        } else if (hudInactivityTimer > 0.0f) {
+            hudInactivityTimer -= delta;
         }
 
         if (actionDisplayTimer > 0.0f) {
@@ -248,7 +259,7 @@ public class GameMaster {
         defaultShader.setUniform("uTotalFrames", wheat.getTotalFrames());
 
         world.getActiveCrops().forEach(crop -> {
-            Spritesheet sheet = (crop.getType() == CropType.WHEAT) ? wheat : carrot;
+            Spritesheet sheet = cropSpritesheets.get(crop.getType());
             sheet.bind();
 
             modelMatrix.identity().translate(crop.getX(), K.World.CROP_ELEVATION_Y, crop.getZ());
@@ -307,8 +318,12 @@ public class GameMaster {
 
         imGuiGlfw.newFrame();
         ImGui.newFrame();
-        renderInv();
-        renderCoordinates();
+
+        if (hudInactivityTimer > 0.0f) {
+            renderInv();
+            renderShop();
+            renderCoordinates();
+        }
 
         if (hoveredCell != null && player != null) {
             Crop crop = world.getCropAt(hoveredCell.x, hoveredCell.y);
@@ -381,11 +396,12 @@ public class GameMaster {
 
     public void renderInv() {
         if (player == null) return;
-        ImGui.setNextWindowPos(K.UI.INVENTORY_POS_X, windowHeight -
-                K.UI.INVENTORY_POS_Y_OFFSET, ImGuiCond.FirstUseEver);
+        ImGui.setNextWindowPos(K.UI.HUD_PADDING,
+                windowHeight - K.UI.INVENTORY_HEIGHT - K.UI.HUD_PADDING,
+                ImGuiCond.Always);
 
         ImGui.setNextWindowSize(K.UI.INVENTORY_WIDTH,
-                K.UI.INVENTORY_HEIGHT, ImGuiCond.FirstUseEver);
+                K.UI.INVENTORY_HEIGHT, ImGuiCond.Always);
 
         int flags = ImGuiWindowFlags.NoTitleBar |
                 ImGuiWindowFlags.NoResize   |
@@ -393,6 +409,8 @@ public class GameMaster {
 
         if (ImGui.begin("Inventory", flags)) {
             Inventory inv = player.getInventory();
+            ImGui.text(player.getName() + "'s Farm, $" + player.getMoney());
+            ImGui.separator();
 
             if (inv.isEmpty()) {
                 ImGui.textDisabled("You're out of stuff!");
@@ -474,11 +492,22 @@ public class GameMaster {
 
                     if (ImGui.button("Sell " + selectedInventoryItem.getName() +
                             " (x" + totalAmount + ")", K.UI.MATCH_PARENT_WIDTH, 0)) {
+
+                        Item targetItem = null;
+                        int cumulativeAmount = 0;
+
                         for (Map.Entry<Item, Integer> entry : new HashMap<>(inv.getItems()).entrySet()) {
                             if (entry.getKey().getName().equals(selectedInventoryItem.getName())) {
+                                targetItem = entry.getKey();
+                                cumulativeAmount += entry.getValue();
                                 player.sell(entry.getKey(), entry.getValue());
                             }
                         }
+
+                        if (targetItem != null && cumulativeAmount > 0) {
+                            shop.buy(targetItem, cumulativeAmount);
+                        }
+
                         selectedInventoryItem = null;
                         currentCrop = null;
                     }
@@ -492,15 +521,86 @@ public class GameMaster {
         ImGui.end();
     }
 
+    public void renderShop() {
+        if (player == null || shop == null) return;
+        ImGui.setNextWindowPos(windowWidth - K.UI.INVENTORY_WIDTH - K.UI.HUD_PADDING,
+                windowHeight - K.UI.INVENTORY_HEIGHT - K.UI.HUD_PADDING,
+                ImGuiCond.Always);
+
+        ImGui.setNextWindowSize(K.UI.INVENTORY_WIDTH,
+                K.UI.INVENTORY_HEIGHT, ImGuiCond.Always);
+
+        int flags = ImGuiWindowFlags.NoTitleBar |
+                ImGuiWindowFlags.NoResize   |
+                ImGuiWindowFlags.NoCollapse;
+
+        if (ImGui.begin("Shop", flags)) {
+            ImGui.text(shop.getOwner() + "'s Shop, $" + shop.getMoney());
+            ImGui.separator();
+
+            Inventory stock = shop.getStock();
+
+            if (stock.isEmpty()) {
+                ImGui.textDisabled("Out of stock!");
+            } else {
+                float iconSize = 32.0f;
+                int totalAtlasColumns = seedIcons.getTotalFrames();
+
+                ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, K.Style.ITEM_SPACING, K.Style.ITEM_SPACING);
+                ImGui.pushStyleVar(ImGuiStyleVar.FrameBorderSize, 1.0f);
+
+                for (Map.Entry<Item, Integer> entry : new HashMap<>(stock.getItems()).entrySet()) {
+                    Item item = entry.getKey();
+                    int amount = entry.getValue();
+
+                    Spritesheet atlas = getItemSpritesheet(item);
+                    int iconIndex = getItemIconIndex(item);
+
+                    float u0 = (float) iconIndex / totalAtlasColumns;
+                    float u1 = (float) (iconIndex + 1) / totalAtlasColumns;
+                    float v0 = 1.0f;
+                    float v1 = 0.0f;
+
+                    setColor(ImGuiCol.Button,        K.Style.COLOR_SLOT_BG);
+                    setColor(ImGuiCol.ButtonHovered, K.Style.COLOR_SLOT_HOVERED);
+                    setColor(ImGuiCol.ButtonActive,  K.Style.COLOR_SLOT_BG);
+                    setColor(ImGuiCol.Border,        K.Style.COLOR_SLOT_BORDER);
+
+                    ImGui.pushID("shop_item_" + item.getName());
+                    if (ImGui.imageButton(atlas.getTextureId(), iconSize, iconSize, u0, v0, u1, v1)) {
+                        if (player.getMoney() >= item.getValue()) {
+                            player.earn(-item.getValue());
+                            shop.earn(item.getValue());
+                            stock.remove(item, 1);
+                            player.getInventory().add(item, 1);
+                            log.info("Player bought {} from shop", item.getName());
+                        } else {
+                            log.warn("Player doesn't have enough money to buy {}", item.getName());
+                        }
+                    }
+                    ImGui.popStyleColor(4);
+
+                    if (ImGui.isItemHovered()) {
+                        ImGui.setTooltip(item.getName() + " - $" + item.getValue() + " (Stock: " + amount + ")");
+                    }
+
+                    ImGui.sameLine();
+                    ImGui.popID();
+                }
+
+                ImGui.popStyleVar(2);
+            }
+        }
+        ImGui.end();
+    }
+
     private void renderCoordinates() {
         if (player == null || actionDisplayTimer <= 0.0f
                 || lastActionCell == null) return;
-        ImGui.setNextWindowPos(
-                windowWidth - K.UI.HUD_PADDING,
+        ImGui.setNextWindowPos(windowWidth - K.UI.HUD_PADDING,
                 K.UI.HUD_PADDING,
                 ImGuiCond.Always,
-                1.0f, 0.0f
-        );
+                1.0f, 0.0f);
 
         int flags = ImGuiWindowFlags.NoTitleBar
                 | ImGuiWindowFlags.NoResize
