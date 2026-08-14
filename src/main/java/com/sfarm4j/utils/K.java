@@ -32,6 +32,31 @@ public final class K {
         public static final float DEFAULT_HEIGHT = 720.0f;
     }
 
+    public static final class Style {
+        public static final float WINDOW_ROUNDING = 12.0f;
+        public static final float FRAME_ROUNDING = 8.0f;
+        public static final float WINDOW_BORDER_SIZE = 0.0f;
+        public static final float FRAME_BORDER_SIZE = 0.0f;
+
+        public static final float WINDOW_PADDING_X = 24.0f;
+        public static final float WINDOW_PADDING_Y = 24.0f;
+        public static final float FRAME_PADDING_X = 12.0f;
+        public static final float FRAME_PADDING_Y = 10.0f;
+        public static final float ITEM_SPACING_X = 0.0f;
+        public static final float ITEM_SPACING_Y = 14.0f;
+
+        public static final float FONT_SIZE = 17.0f;
+
+        public static final float[] COLOR_WINDOW_BG = {0.08f, 0.08f, 0.10f, 0.92f};
+        public static final float[] COLOR_FRAME_BG = {0.15f, 0.15f, 0.18f, 1.00f};
+        public static final float[] COLOR_FRAME_BG_HOVERED = {0.20f, 0.20f, 0.24f, 1.00f};
+        public static final float[] COLOR_FRAME_BG_ACTIVE = {0.22f, 0.22f, 0.26f, 1.00f};
+        public static final float[] COLOR_BUTTON = {0.25f, 0.25f, 0.30f, 1.00f};
+        public static final float[] COLOR_BUTTON_HOVERED = {0.35f, 0.35f, 0.42f, 1.00f};
+        public static final float[] COLOR_BUTTON_ACTIVE = {0.20f, 0.20f, 0.25f, 1.00f};
+        public static final float[] COLOR_TEXT = {0.92f, 0.92f, 0.95f, 1.00f};
+    }
+
     public static final class Paths {
         public static final String DEFAULT_VERT_SHADER = "shaders/default.vert";
         public static final String DEFAULT_FRAG_SHADER = "shaders/default.frag";
