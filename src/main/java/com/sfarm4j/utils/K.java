@@ -26,6 +26,7 @@ public final class K {
         public static final float DEFAULT_BLOCK_DEPTH = 0.4f;
         public static final float EPSILON_RAY_Y = 0.00001f;
         public static final float CROP_ELEVATION_Y = 0.0f;
+        public static final int SHOP_STARTING_CREDIT = 800;
     }
 
     public static final class Sunlight {

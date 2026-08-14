@@ -70,9 +70,9 @@ public class CropService implements Service<Crop> {
         int seeds = crop.getType().getSeeds();
         player.add(crop, yield);
         player.add(new Seed(crop.getType()), seeds);
-        world.removeCrop(crop);
         crop.setHarvested(true);
-
+        player.gain(cropValue);
+        world.removeCrop(crop);
         log.info("Successfully harvested {}" +
                 " giving {} items.", crop.getType().getName(), yield);
         return yield;

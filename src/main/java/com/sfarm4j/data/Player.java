@@ -9,14 +9,14 @@ public class Player {
     private final String name;
     private final Inventory inventory;
     private int money;
+    private int experience;
+    private int level;
 
     public Player(String name) {
         this.name = name;
         this.inventory = new Inventory();
         this.money = 0;
-
         add(new Seed(), 4);
-        add(new Seed(CropType.CARROT));
     }
 
     public String getName() {
@@ -33,6 +33,19 @@ public class Player {
 
     public void setMoney(int money) {
         this.money = money;
+    }
+
+    public void gain(int amount) {
+        experience += amount;
+        if (isLevelUpAvailable()) {
+            level++;
+            experience = 0;
+            log.info("Level up! New level: {}", level);
+        }
+    }
+
+    private boolean isLevelUpAvailable() {
+        return experience >= (10 * level);
     }
 
     public void sell(Item item, int amount) {
@@ -76,6 +89,7 @@ public class Player {
 
     public void clear() {
         inventory.clear();
+        log.info("Cleared inventory");
     }
 
     public boolean isEmpty() {

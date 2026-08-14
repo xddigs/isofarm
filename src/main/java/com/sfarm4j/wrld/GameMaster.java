@@ -59,7 +59,9 @@ public class GameMaster {
 
     private float windowWidth = K.Window.DEFAULT_WIDTH;
     private float windowHeight = K.Window.DEFAULT_HEIGHT;
+
     private Player player;
+    private Shop shop;
 
     private final ImGuiImplGlfw imGuiGlfw = new ImGuiImplGlfw();
     private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
@@ -101,6 +103,7 @@ public class GameMaster {
         this.potato = new Spritesheet(K.Paths.POTATO_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
         this.seedIcons = new Spritesheet(K.Paths.SEED_ICONS, K.UI.ICON_ATLAS_FRAMES);
         this.cropIcons = new Spritesheet(K.Paths.CROP_ICONS, K.UI.ICON_ATLAS_FRAMES);
+        this.shop = new Shop();
 
         cropSpritesheets.put(CropType.WHEAT, wheat);
         cropSpritesheets.put(CropType.CARROT, carrot);
@@ -151,6 +154,7 @@ public class GameMaster {
         }
 
         timeService.update(delta);
+        shop.update(timeService);
         cropService.update(delta);
         camera.update(delta);
 
