@@ -216,31 +216,28 @@ public class GameMaster {
                         }
                     }
                 } else {
-                    if (!Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-                        if (selectedInventoryItem instanceof CellExpansion) {
-                            if (cellService.unlockCell(hoveredCell.x, hoveredCell.y)) {
-                                player.remove(selectedInventoryItem);
-                                selectedInventoryItem = null;
-                                log.info("New cell unlocked at {},{}", hoveredCell.x, hoveredCell.y);
+                    if (selectedInventoryItem instanceof CellExpansion) {
+                        if (cellService.unlockCell(hoveredCell.x, hoveredCell.y)) {
+                            player.remove(selectedInventoryItem);
+                            selectedInventoryItem = null;
+                            log.info("New cell unlocked at {},{}", hoveredCell.x, hoveredCell.y);
+                        }
+                    } else if (selectedInventoryItem instanceof Seed &&
+                            cellService.isUnlocked(hoveredCell.x, hoveredCell.y)) {
+                        if (((Seed) selectedInventoryItem).getType() != null) {
+                            Crop planted = cropService.plant(
+                                    hoveredCell.x,
+                                    hoveredCell.y,
+                                    player,
+                                    cellService.find(hoveredCell.x, hoveredCell.y),
+                                    ((Seed) selectedInventoryItem).getType(),
+                                    timeService.getCurrentSeason()
+                            );
+                            if (planted != null) {
+                                logAction(hoveredCell);
                             }
-                        } else if (selectedInventoryItem instanceof Seed &&
-                                cellService.isUnlocked(hoveredCell.x, hoveredCell.y)) {
-                            if (((Seed) selectedInventoryItem).getType() != null) {
-                                Crop planted = cropService.plant(
-                                        hoveredCell.x,
-                                        hoveredCell.y,
-                                        player,
-                                        cellService.find(hoveredCell.x, hoveredCell.y),
-                                        ((Seed) selectedInventoryItem).getType(),
-                                        timeService.getCurrentSeason()
-                                );
-                                if (planted != null) {
-                                    selectedInventoryItem = null;
-                                    logAction(hoveredCell);
-                                }
-                            } else {
-                                log.warn("No crop was selected");
-                            }
+                        } else {
+                            log.warn("No crop was selected");
                         }
                     }
                 }

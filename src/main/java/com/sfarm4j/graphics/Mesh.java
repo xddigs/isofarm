@@ -120,36 +120,38 @@ public class Mesh {
     }
 
     private static float[] getFloats(float depth) {
+        float height = 1.0f;
+
         return new float[] {
-                -0.5f,  0.0f, -0.5f,
-                -0.5f,  0.0f,  0.5f,
-                0.5f,  0.0f,  0.5f,
-                0.5f,  0.0f, -0.5f,
+                -0.5f,  0.0f,    -0.5f,
+                -0.5f,  0.0f,     0.5f,
+                0.5f,  0.0f,     0.5f,
+                0.5f,  0.0f,    -0.5f,
 
-                -0.5f,  0.0f,  0.5f,
-                -0.5f, -depth,     0.5f,
-                0.5f, -depth,     0.5f,
-                0.5f,  0.0f,  0.5f,
+                -0.5f,  0.0f,     0.5f,
+                -0.5f, -height,   0.5f,
+                0.5f, -height,   0.5f,
+                0.5f,  0.0f,     0.5f,
 
-                0.5f,  0.0f,  0.5f,
-                0.5f, -depth,     0.5f,
-                0.5f, -depth,    -0.5f,
-                0.5f,  0.0f, -0.5f,
+                0.5f,  0.0f,     0.5f,
+                0.5f, -height,   0.5f,
+                0.5f, -height,  -0.5f,
+                0.5f,  0.0f,   -0.5f,
 
-                0.5f,  0.0f, -0.5f,
-                0.5f, -depth,    -0.5f,
-                -0.5f, -depth,    -0.5f,
-                -0.5f,  0.0f, -0.5f,
+                0.5f,  0.0f,   -0.5f,
+                0.5f, -height, -0.5f,
+                -0.5f, -height, -0.5f,
+                -0.5f,  0.0f,   -0.5f,
 
-                -0.5f,  0.0f, -0.5f,
-                -0.5f, -depth,    -0.5f,
-                -0.5f, -depth,     0.5f,
-                -0.5f,  0.0f,  0.5f,
+                -0.5f,  0.0f,   -0.5f,
+                -0.5f, -height, -0.5f,
+                -0.5f, -height,  0.5f,
+                -0.5f,  0.0f,    0.5f,
 
-                -0.5f, -depth,     0.5f,
-                -0.5f, -depth,    -0.5f,
-                0.5f, -depth,    -0.5f,
-                0.5f, -depth,     0.5f
+                -0.5f, -height,  0.5f,
+                -0.5f, -height, -0.5f,
+                0.5f, -height, -0.5f,
+                0.5f, -height,  0.5f
         };
     }
 
