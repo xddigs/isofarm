@@ -1,25 +1,22 @@
 package com.sfarm4j.data;
 
 public enum CropType {
-    WHEAT((byte) 0, "Wheat", 1, 4, 5, 4),
-    CARROT((byte) 1, "Carrot", 4, 3, 8, 6),
-    POTATO((byte) 2, "Potato", 6, 6, 12, 8),
-    CABBAGE((byte) 3, "Cabbage", 8, 4, 16, 2);
+    WHEAT((byte) 0, "Wheat", 4, 5, 4),
+    CARROT((byte) 1, "Carrot", 3, 8, 6),
+    POTATO((byte) 2, "Potato", 6, 12, 8),
+    CABBAGE((byte) 3, "Cabbage", 4, 16, 2);
 
     private final byte id;
     private final String name;
-    private final int daysToGrow;
     private final int yield;
     private final int value;
     private final int seeds;
 
     CropType(byte id,
              String name,
-             int daysToGrow,
              int yield, int value, int seeds) {
         this.id = id;
         this.name = name;
-        this.daysToGrow = daysToGrow;
         this.yield = yield;
         this.value = value;
         this.seeds = seeds;
@@ -31,10 +28,6 @@ public enum CropType {
 
     public String getName() {
         return name;
-    }
-
-    public int getDaysToGrow() {
-        return daysToGrow;
     }
 
     public int getYield() {

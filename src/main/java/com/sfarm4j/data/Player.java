@@ -81,6 +81,7 @@ public class Player {
     }
 
     public void earn(int amount) {
+        log.info("Earned ${}", amount);
         this.money += amount;
     }
 

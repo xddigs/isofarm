@@ -13,18 +13,16 @@ public class TimeService {
     private static final int DAYS_PER_SEASON = 28;
     private static final int STARTING_HOUR = 8;
 
-    private final CropService cropService;
     private Season currentSeason = Season.SPRING;
     private float secondAccumulator = 0.0f;
     private static int minute = 0;
     private static int hour = STARTING_HOUR;
     private int day = 1;
     private int year = 0;
-    private float timeScale = 2.0f;
+    private float timeScale = 5.0f;
 
-    public TimeService(CropService cropService) {
-        this.cropService = cropService;
-        log.info("TimeService initialized. Starting at Year {} {}, Day {} - {}:00", 
+    public TimeService() {
+        log.info("TimeService initialized. Starting at Year {} {}, Day {} - {}:00",
                 year, currentSeason, day, hour);
     }
 
@@ -104,7 +102,6 @@ public class TimeService {
         }
 
         log.info("New day started: Year {} {}, Day {}", year, currentSeason, day);
-        cropService.process(currentSeason);
     }
 
     private void advanceSeason() {

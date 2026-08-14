@@ -1,9 +1,6 @@
 package com.sfarm4j.wrld;
 
-import com.sfarm4j.data.CellType;
-import com.sfarm4j.data.Crop;
-import com.sfarm4j.data.CropType;
-import com.sfarm4j.data.Player;
+import com.sfarm4j.data.*;
 import com.sfarm4j.graphics.*;
 import com.sfarm4j.input.Keyboard;
 import com.sfarm4j.input.Mouse;
@@ -69,7 +66,7 @@ public class GameMaster {
     public GameMaster(long windowHandle) {
         this.world = new World();
         this.cropService = new CropService(world);
-        this.timeService = new TimeService(cropService);
+        this.timeService = new TimeService();
         this.cellService = new CellService();
         this.sunlight = new Sunlight(new Vector3f(-0.5f, -1.0f, -0.5f));
 
@@ -138,6 +135,7 @@ public class GameMaster {
         }
 
         timeService.update(delta);
+        cropService.update(delta);
         camera.update(delta);
 
         boolean isCtrlDown = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL) ||
@@ -169,7 +167,7 @@ public class GameMaster {
 
         if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT) && hoveredCell != null) {
             CropType selectedType = CropType.WHEAT;
-            cropService.plant(
+            Crop newCrop = cropService.plant(
                     hoveredCell.x,
                     hoveredCell.y,
                     player,
@@ -182,8 +180,10 @@ public class GameMaster {
                 Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT) &&
                 hoveredCell != null) {
             Crop crop = world.getCropAt(hoveredCell.x(), hoveredCell.y());
-            if (crop != null) {
+            if (crop != null && !crop.isReadyToHarvest()) {
                 cropService.rip(crop);
+            } else if (crop != null && crop.isReadyToHarvest()){
+                cropService.harvest(player, crop);
             }
         }
 

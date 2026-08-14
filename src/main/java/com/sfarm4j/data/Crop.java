@@ -7,10 +7,10 @@ public class Crop extends Item {
     private final Cell cell;
     private final Season season;
     private final int value;
-    private final int daysToGrow;
     private GrowthStage stage;
-    private int daysGrown;
-    private boolean readyToHarvest;
+
+    private float currentGrowthTime = 0.0f;
+    private final float targetGrowthTime = 8.0f;
 
     public Crop(float x, float z,
                 CropType type, Cell cell, Season season) {
@@ -22,9 +22,6 @@ public class Crop extends Item {
         this.type = type;
         this.season = season;
         this.value = type.getValue();
-        this.daysToGrow = type.getDaysToGrow();
-        this.daysGrown = 0;
-        this.readyToHarvest = false;
     }
 
     public float getX() {
@@ -55,39 +52,26 @@ public class Crop extends Item {
         return stage;
     }
 
-    public int getDaysToGrow() {
-        return daysToGrow;
-    }
-
-    public int getDaysGrown() {
-        return daysGrown;
-    }
-
     public boolean isReadyToHarvest() {
-        return readyToHarvest;
+        return this.stage == GrowthStage.HARVESTABLE;
     }
 
-    public void grow(float multiplier) {
-        if (readyToHarvest) {
-            return;
-        }
+    public void update(float delta) {
+        if (isReadyToHarvest()) return;
 
-        daysGrown += Math.max(1, Math.round(multiplier));
+        currentGrowthTime += delta;
+        float progress = currentGrowthTime / targetGrowthTime;
 
-        if (daysGrown >= daysToGrow) {
-            this.readyToHarvest = true;
+        if (progress >= 1.0f) {
             this.stage = GrowthStage.HARVESTABLE;
+        } else if (progress >= 0.75f) {
+            this.stage = GrowthStage.MATURE;
+        } else if (progress >= 0.50f) {
+            this.stage = GrowthStage.GROWING;
+        } else if (progress >= 0.25f) {
+            this.stage = GrowthStage.BUD;
         } else {
-            float progress = (float) daysGrown / daysToGrow;
-            if (progress >= 0.90f) {
-                this.stage = GrowthStage.MATURE;
-            } else if (progress >= 0.75f) {
-                this.stage = GrowthStage.GROWING;
-            } else if (progress >= 0.50f) {
-                this.stage = GrowthStage.BUD;
-            } else if (progress >= 0.25f) {
-                this.stage = GrowthStage.SEED;
-            }
+            this.stage = GrowthStage.SEED;
         }
     }
 }

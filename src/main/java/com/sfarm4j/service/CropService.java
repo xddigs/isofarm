@@ -25,10 +25,6 @@ public class CropService implements Service<Crop> {
                             type.getName(), x, z);
                     return null;
                 }
-
-                if (crop.isReadyToHarvest()) {
-                    harvest(player, crop);
-                }
             }
         }
 
@@ -46,13 +42,10 @@ public class CropService implements Service<Crop> {
         return newCrop;
     }
 
-    public void process(Season currentSeason) {
-        log.info("Processing daily growth for {} active crops...", world.getActiveCrops().size());
-
+    public void update(float delta) {
+        log.trace("Processing daily growth for {} active crops...", world.getActiveCrops().size());
         for (Crop crop : world.getActiveCrops()) {
-            float multiplier = (crop.getSeason() == currentSeason)
-                    ? (float) currentSeason.getValueMultiplier() : 1.0f;
-            crop.grow(multiplier);
+            crop.update(delta);
         }
     }
 
@@ -65,8 +58,13 @@ public class CropService implements Service<Crop> {
         }
 
         int yield = crop.getType().getYield();
+        int cropValue = crop.getValue();
+        int seeds = crop.getType().getSeeds();
         player.add(crop, yield);
+        for (int i = 0; i <= seeds; i++) { player.add(new Seed()); }
+        player.earn(cropValue);
         world.removeCrop(crop);
+
         log.info("Successfully harvested {}" +
                 " giving {} items.", crop.getType().getName(), yield);
         return yield;
