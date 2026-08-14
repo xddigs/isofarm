@@ -15,9 +15,8 @@ public class Player {
         this.inventory = new Inventory();
         this.money = 0;
 
-        for (int i = 0; i < 4; i++) {
-            add(new Seed());
-        }
+        add(new Seed(), 4);
+        add(new Seed(CropType.CARROT));
     }
 
     public String getName() {

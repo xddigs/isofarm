@@ -49,6 +49,7 @@ public final class K {
         public static final float FRAME_PADDING_Y = 10.0f;
         public static final float ITEM_SPACING_X = 0.0f;
         public static final float ITEM_SPACING_Y = 14.0f;
+        public static final float ITEM_SPACING = 4.0f;
         public static final float LINEHEIGHT = 0.8f;
         public static final float FONT_SIZE = 20.0f;
 
@@ -84,6 +85,8 @@ public final class K {
 
         public static final float HUD_PADDING = 10.0f;
         public static final float COORD_DISPLAY_DURATION = 3.0f;
+
+        public static final int ICON_ATLAS_FRAMES = 2;
     }
 
     public static final class Paths {
@@ -92,7 +95,10 @@ public final class K {
         public static final String OUTLINE_VERT_SHADER = "shaders/outline.vert";
         public static final String OUTLINE_FRAG_SHADER = "shaders/outline.frag";
         public static final String WHEAT_TEXTURE = "assets/crops/wheat_crop.png";
+        public static final String CARROT_TEXTURE = "assets/crops/carrot_crop.png";
         public static final String FONT = "C:/Windows/Fonts/arial.ttf";
+        public static final String SEED_ICONS = "assets/icons/seed_icons.png";
+        public static final String CROP_ICONS = "assets/icons/crop_icons.png";
     }
 
     public static final class Render {

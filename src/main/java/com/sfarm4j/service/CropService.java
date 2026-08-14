@@ -28,8 +28,16 @@ public class CropService implements Service<Crop> {
             }
         }
 
-        var seedOpt = player.getInventory().getItemOfType(Seed.class);
-        if (seedOpt.isEmpty()) return null;
+        var seedOpt = player.getInventory().getItems().keySet().stream()
+                .filter(Seed.class::isInstance)
+                .map(Seed.class::cast)
+                .filter(seed -> seed.getType() == type)
+                .findFirst();
+
+        if (seedOpt.isEmpty()) {
+            log.warn("You don't have seeds of {}", type.getName());
+            return null;
+        }
         player.remove(seedOpt.get(), 1);
 
         Crop newCrop = new Crop(x, z, type, cell, currentSeason);
@@ -61,7 +69,7 @@ public class CropService implements Service<Crop> {
         int cropValue = crop.getValue();
         int seeds = crop.getType().getSeeds();
         player.add(crop, yield);
-        player.add(new Seed(), seeds);
+        player.add(new Seed(crop.getType()), seeds);
         world.removeCrop(crop);
         crop.setHarvested(true);
 

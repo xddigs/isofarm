@@ -32,7 +32,6 @@ import static org.lwjgl.opengl.GL13.glActiveTexture;
 @SuppressWarnings("all")
 public class GameMaster {
     private static final Logger log = LoggerFactory.getLogger(GameMaster.class);
-
     private final World world;
     private final CropService cropService;
     private final TimeService timeService;
@@ -47,12 +46,15 @@ public class GameMaster {
     private Mesh selectionMesh;
     private Mesh spriteMesh;
     private Spritesheet wheat;
+    private Spritesheet carrot;
+    private Spritesheet seedIcons;
     private Spritesheet cropIcons;
     private Camera camera;
     private final Matrix4f modelMatrix = new Matrix4f();
     private final Sunlight sunlight;
 
     private Vector2i hoveredCell = null;
+    private CropType currentCrop = CropType.WHEAT;
 
     private float windowWidth = K.Window.DEFAULT_WIDTH;
     private float windowHeight = K.Window.DEFAULT_HEIGHT;
@@ -93,7 +95,9 @@ public class GameMaster {
         this.selectionMesh = Mesh.selection();
         this.spriteMesh = Mesh.createCrop();
         this.wheat = new Spritesheet(K.Paths.WHEAT_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
-        this.cropIcons = new Spritesheet("assets/icons/crop_icons.png", 2);
+        this.carrot = new Spritesheet(K.Paths.CARROT_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
+        this.seedIcons = new Spritesheet(K.Paths.SEED_ICONS, K.UI.ICON_ATLAS_FRAMES);
+        this.cropIcons = new Spritesheet(K.Paths.CROP_ICONS, K.UI.ICON_ATLAS_FRAMES);
 
         this.camera = new Camera(K.Camera.DEFAULT_WIDTH, K.Camera.DEFAULT_HEIGHT);
         this.camera.setPosition(0.0f, 0.0f, 0.0f);
@@ -192,16 +196,19 @@ public class GameMaster {
                     }
                 } else {
                     if (!Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-                        CropType selectedType = CropType.WHEAT;
-                        cropService.plant(
-                                hoveredCell.x,
-                                hoveredCell.y,
-                                player,
-                                cellService.getCell(hoveredCell.x, hoveredCell.y),
-                                selectedType,
-                                timeService.getCurrentSeason()
-                        );
-                        logAction(hoveredCell);
+                        if (currentCrop != null) {
+                            cropService.plant(
+                                    hoveredCell.x,
+                                    hoveredCell.y,
+                                    player,
+                                    cellService.getCell(hoveredCell.x, hoveredCell.y),
+                                    currentCrop,
+                                    timeService.getCurrentSeason()
+                            );
+                            logAction(hoveredCell);
+                        } else {
+                            log.warn("No crop was selected");
+                        }
                     }
                 }
             }
@@ -233,14 +240,17 @@ public class GameMaster {
         defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
         defaultShader.setUniform("uTotalFrames", wheat.getTotalFrames());
 
-        wheat.bind();
         world.getActiveCrops().forEach(crop -> {
+            Spritesheet sheet = (crop.getType() == CropType.WHEAT) ? wheat : carrot;
+            sheet.bind();
+
             modelMatrix.identity().translate(crop.getX(), K.World.CROP_ELEVATION_Y, crop.getZ());
             defaultShader.setUniform("uModel", modelMatrix);
             defaultShader.setUniform("uFrameIndex", crop.getStage().getFrameIndex());
             spriteMesh.render();
+
+            sheet.unbind();
         });
-        wheat.unbind();
 
         if (hoveredCell != null) {
             defaultShader.setUniform("uUseTexture", false);
@@ -256,20 +266,23 @@ public class GameMaster {
 
             defaultShader.setUniform("uIsMaskPass", true);
             defaultShader.setUniform("uUseTexture", true);
-            wheat.bind();
 
             world.getActiveCrops().stream()
                     .filter(c -> Math.round(c.getX()) == hoveredCell.x
                             && Math.round(c.getZ()) == hoveredCell.y)
                     .findFirst()
                     .ifPresent(crop -> {
+                        Spritesheet sheet = (crop.getType() == CropType.WHEAT) ? wheat : carrot;
+                        sheet.bind();
+
                         modelMatrix.identity().translate(crop.getX(), K.World.CROP_ELEVATION_Y, crop.getZ());
                         defaultShader.setUniform("uModel", modelMatrix);
                         defaultShader.setUniform("uFrameIndex", crop.getStage().getFrameIndex());
                         spriteMesh.render();
-                    });
 
-            wheat.unbind();
+                        sheet.unbind();
+            });
+
             maskFbo.unbind((int) windowWidth, (int) windowHeight);
             glDisable(GL_DEPTH_TEST);
 
@@ -294,37 +307,38 @@ public class GameMaster {
         renderCoordinates();
 
         if (hoveredCell != null && player != null) {
-            ImGui.setNextWindowPos(Mouse.getX() + K.UI.TOOLTIP_OFFSET_X, Mouse.getY() +
-                    K.UI.TOOLTIP_OFFSET_Y, ImGuiCond.Always);
-            int flags = ImGuiWindowFlags.NoTitleBar
-                    | ImGuiWindowFlags.NoResize
-                    | ImGuiWindowFlags.NoMove
-                    | ImGuiWindowFlags.AlwaysAutoResize
-                    | ImGuiWindowFlags.NoFocusOnAppearing;
-
-            ImGui.begin("CropCardTooltip", flags);
-            ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, K.UI.TOOLTIP_ITEM_SPACING_X,
-                    K.Style.LINEHEIGHT);
-
             Crop crop = world.getCropAt(hoveredCell.x, hoveredCell.y);
+            boolean hasCrop = (crop != null);
+            boolean hasSeedSelected = (!hasCrop && selectedInventoryItem instanceof Seed);
 
-            if (crop != null) {
-                ImGui.text(crop.getType().getName());
-                ImGui.textDisabled("Status: " + crop.getStage());
-            } else {
-                Optional<Seed> seedOpt = player.getInventory().getItemOfType(Seed.class);
-                if (seedOpt.isPresent()) {
-                    Seed seed = seedOpt.get();
-                    ImGui.text(seed.getName() + " (x" + player.getInventory()
-                            .getTotalAmountOfType(Seed.class) + ")");
-                    ImGui.textDisabled(seed.getDescription());
+            if (hasCrop || hasSeedSelected) {
+                ImGui.setNextWindowPos(Mouse.getX() + K.UI.TOOLTIP_OFFSET_X,
+                        Mouse.getY() + K.UI.TOOLTIP_OFFSET_Y,
+                        ImGuiCond.Always);
+
+                int flags = ImGuiWindowFlags.NoTitleBar
+                        | ImGuiWindowFlags.NoResize
+                        | ImGuiWindowFlags.NoMove
+                        | ImGuiWindowFlags.AlwaysAutoResize
+                        | ImGuiWindowFlags.NoFocusOnAppearing;
+
+                ImGui.begin("CropCardTooltip", flags);
+                ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing,
+                        K.UI.TOOLTIP_ITEM_SPACING_X, K.Style.LINEHEIGHT);
+
+                if (hasCrop) {
+                    ImGui.text(crop.getType().getName());
+                    ImGui.textDisabled("Status: " + crop.getStage());
                 } else {
-                    ImGui.textDisabled("You're out of seeds!");
+                    Seed seed = (Seed) selectedInventoryItem;
+                    int amount = player.getInventory().getAmount(seed);
+                    ImGui.text(seed.getName() + " (x" + amount + ")");
+                    ImGui.textDisabled(seed.getDescription());
                 }
-            }
 
-            ImGui.popStyleVar();
-            ImGui.end();
+                ImGui.popStyleVar();
+                ImGui.end();
+            }
         }
 
         if (player == null) {
@@ -398,8 +412,12 @@ public class GameMaster {
                     selectedInventoryItem = null;
                 }
 
-                int totalAtlasColumns = cropIcons.getTotalFrames();
+                int totalAtlasColumns = seedIcons.getTotalFrames();
+                int totalCropAtlasColumns = cropIcons.getTotalFrames();
                 float iconSize = 32.0f;
+
+                ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, K.Style.ITEM_SPACING, K.Style.ITEM_SPACING);
+                ImGui.pushStyleVar(ImGuiStyleVar.FrameBorderSize, 1.0f);
 
                 for (Map.Entry<String, Map.Entry<Item, Integer>> entry : aggregated.entrySet()) {
                     Item item = entry.getValue().getKey();
@@ -408,11 +426,11 @@ public class GameMaster {
                     boolean isSelected = (selectedInventoryItem != null &&
                             selectedInventoryItem.getName().equals(item.getName()));
 
+                    Spritesheet atlas = getItemSpritesheet(item);
                     int iconIndex = getItemIconIndex(item);
 
-                    float u0 = (float) (iconIndex + 1) / totalAtlasColumns;
-                    float u1 = (float) iconIndex / totalAtlasColumns;
-
+                    float u0 = (float) iconIndex / totalAtlasColumns;
+                    float u1 = (float) (iconIndex + 1) / totalAtlasColumns;
                     float v0 = 1.0f;
                     float v1 = 0.0f;
 
@@ -430,8 +448,9 @@ public class GameMaster {
                     }
 
                     ImGui.pushID("inv_item_" + item.getName());
-                    if (ImGui.imageButton(cropIcons.getTextureId(), iconSize, iconSize, u0, v0, u1, v1)) {
+                    if (ImGui.imageButton(atlas.getTextureId(), iconSize, iconSize, u0, v0, u1, v1)) {
                         selectedInventoryItem = item;
+                        this.currentCrop = resolveCropType(item);
                     }
 
                     if (isSelected) {
@@ -446,20 +465,22 @@ public class GameMaster {
                     ImGui.popID();
                 }
 
+                ImGui.popStyleVar(2);
                 ImGui.newLine();
                 ImGui.separator();
 
                 if (selectedInventoryItem != null) {
                     int totalAmount = aggregated.get(selectedInventoryItem.getName()).getValue();
 
-                    if (ImGui.button("Sell " + selectedInventoryItem.getName() + " (x" + totalAmount + ")",
-                            K.UI.MATCH_PARENT_WIDTH, 0)) {
+                    if (ImGui.button("Sell " + selectedInventoryItem.getName() +
+                            " (x" + totalAmount + ")", K.UI.MATCH_PARENT_WIDTH, 0)) {
                         for (Map.Entry<Item, Integer> entry : new HashMap<>(inv.getItems()).entrySet()) {
                             if (entry.getKey().getName().equals(selectedInventoryItem.getName())) {
                                 player.sell(entry.getKey(), entry.getValue());
                             }
                         }
                         selectedInventoryItem = null;
+                        currentCrop = null;
                     }
                 } else {
                     ImGui.beginDisabled();
@@ -469,16 +490,6 @@ public class GameMaster {
             }
         }
         ImGui.end();
-    }
-
-    private int getItemIconIndex(Item item) {
-        if (item == null) return 0;
-        for (CropType type : CropType.values()) {
-            if (item.getName().toLowerCase().contains(type.getName().toLowerCase())) {
-                return type.getId();
-            }
-        }
-        return 0;
     }
 
     private void renderCoordinates() {
@@ -502,6 +513,30 @@ public class GameMaster {
         ImGui.end();
     }
 
+    private CropType resolveCropType(Item item) {
+        if (item instanceof Seed seed) {
+            return seed.getType();
+        }
+        return null;
+    }
+
+    private Spritesheet getItemSpritesheet(Item item) {
+        if (item instanceof Crop) {
+            return cropIcons;
+        }
+        return seedIcons;
+    }
+
+    private int getItemIconIndex(Item item) {
+        if (item instanceof Seed seed && seed.getType() != null) {
+            return seed.getType().getId();
+        }
+        if (item instanceof Crop crop && crop.getType() != null) {
+            return crop.getType().getId();
+        }
+        return 0;
+    }
+
     private void logAction(Vector2i cell) {
         this.lastActionCell = new Vector2i(cell);
         this.actionDisplayTimer = K.UI.COORD_DISPLAY_DURATION;
@@ -516,8 +551,12 @@ public class GameMaster {
         selectionMesh.dispose();
         spriteMesh.dispose();
         screenQuadMesh.dispose();
+
         wheat.dispose();
+        carrot.dispose();
         cropIcons.dispose();
+        seedIcons.dispose();
+
         maskFbo.dispose();
         defaultShader.dispose();
         outlineShader.dispose();
