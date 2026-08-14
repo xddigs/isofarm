@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @SuppressWarnings("all")
-public class CellService {
+public class CellService implements Service<Cell> {
     private final Map<String, Cell> cells = new HashMap<>();
     private final Map<CellType, Vector3f> colors = new EnumMap<>(CellType.class);
 
@@ -30,14 +30,16 @@ public class CellService {
 
     public void renderAll(Shader shader, Mesh cellMesh, Matrix4f modelMatrix,
                           Sunlight sunlight) {
-        shader.setUniform("uLightDirection", sunlight.getDirection());
-        shader.setUniform("uLightColor", sunlight.getColor());
-        shader.setUniform("uLightIntensity", sunlight.getIntensity());
-
         for (Cell cell : cells.values()) {
+            if (!cell.isUnlocked()) {
+                shader.setUniform("uBaseColor", K.Colors.CELL_BLOCKED);
+            } else {
+                shader.setUniform("uLightDirection", sunlight.getDirection());
+                shader.setUniform("uLightColor", sunlight.getColor());
+                shader.setUniform("uLightIntensity", sunlight.getIntensity());
+            }
             boolean isEven = (cell.getX() + cell.getZ()) % 2 == 0;
             Vector3f color = isEven ? K.Colors.CELL_EVEN : K.Colors.CELL_ODD;
-            shader.setUniform("uBaseColor", color);
 
             float worldX = cell.getX() * K.World.TILE_SIZE;
             float worldZ = cell.getZ() * K.World.TILE_SIZE;
@@ -51,11 +53,34 @@ public class CellService {
         }
     }
 
-    public Cell getCell(int x, int z) {
+    private Cell getCell(int x, int z) {
         return cells.get(getCellKey(x, z));
+    }
+
+    public Cell find(int x, int z) {
+        return getCell(x, z);
     }
 
     private String getCellKey(int x, int z) {
         return x + "," + z;
+    }
+
+    public boolean isUnlocked(int x, int z) {
+        Cell cell = getCell(x, z);
+        return cell != null && cell.isUnlocked();
+    }
+
+    public boolean unlockCell(int x, int z) {
+        Cell cell = getCell(x, z);
+        if (cell == null || cell.isUnlocked()) return false;
+
+        boolean isAdjacent = isUnlocked(x + 1, z) ||
+                isUnlocked(x - 1, z) ||
+                isUnlocked(x, z + 1) ||
+                isUnlocked(x, z - 1);
+
+        if (!isAdjacent) return false;
+        cell.setUnlocked(true);
+        return true;
     }
 }

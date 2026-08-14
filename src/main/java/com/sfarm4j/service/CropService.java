@@ -73,6 +73,7 @@ public class CropService implements Service<Crop> {
         crop.setHarvested(true);
         player.gain(cropValue);
         world.removeCrop(crop);
+        crop.getCell().setCrop(false);
         log.info("Successfully harvested {}" +
                 " giving {} items.", crop.getType().getName(), yield);
         return yield;
@@ -80,6 +81,7 @@ public class CropService implements Service<Crop> {
 
     public void rip(Crop crop) {
         world.removeCrop(crop);
+        crop.getCell().setCrop(false);
         log.info("Ripped {} from the ground.", crop.getType().getName());
     }
 }

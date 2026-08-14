@@ -55,7 +55,6 @@ public class GameMaster {
     private final Sunlight sunlight;
 
     private Vector2i hoveredCell = null;
-    private CropType currentCrop = CropType.WHEAT;
 
     private float windowWidth = K.Window.DEFAULT_WIDTH;
     private float windowHeight = K.Window.DEFAULT_HEIGHT;
@@ -84,6 +83,10 @@ public class GameMaster {
         for (int x = 0; x < K.World.GRID_SIZE; x++) {
             for (int z = 0; z < K.World.GRID_SIZE; z++) {
                 cellService.setCell(CellType.TILLED, x, z);
+                Cell cell = cellService.find(x, z);
+                if (cell != null) {
+                    cell.setUnlocked(true);
+                }
             }
         }
 
@@ -214,18 +217,30 @@ public class GameMaster {
                     }
                 } else {
                     if (!Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-                        if (currentCrop != null) {
-                            cropService.plant(
-                                    hoveredCell.x,
-                                    hoveredCell.y,
-                                    player,
-                                    cellService.getCell(hoveredCell.x, hoveredCell.y),
-                                    currentCrop,
-                                    timeService.getCurrentSeason()
-                            );
-                            logAction(hoveredCell);
-                        } else {
-                            log.warn("No crop was selected");
+                        if (selectedInventoryItem instanceof CellExpansion) {
+                            if (cellService.unlockCell(hoveredCell.x, hoveredCell.y)) {
+                                player.remove(selectedInventoryItem);
+                                selectedInventoryItem = null;
+                                log.info("New cell unlocked at {},{}", hoveredCell.x, hoveredCell.y);
+                            }
+                        } else if (selectedInventoryItem instanceof Seed &&
+                                cellService.isUnlocked(hoveredCell.x, hoveredCell.y)) {
+                            if (((Seed) selectedInventoryItem).getType() != null) {
+                                Crop planted = cropService.plant(
+                                        hoveredCell.x,
+                                        hoveredCell.y,
+                                        player,
+                                        cellService.find(hoveredCell.x, hoveredCell.y),
+                                        ((Seed) selectedInventoryItem).getType(),
+                                        timeService.getCurrentSeason()
+                                );
+                                if (planted != null) {
+                                    selectedInventoryItem = null;
+                                    logAction(hoveredCell);
+                                }
+                            } else {
+                                log.warn("No crop was selected");
+                            }
                         }
                     }
                 }
@@ -385,6 +400,7 @@ public class GameMaster {
 
             if ((wasEnterPressed || wasButtonClicked) && !nameBuffer.get().isBlank()) {
                 this.player = new Player(nameBuffer.get());
+                this.shop.setPlayer(player);
                 log.info("Player created: {}", player.getName());
             }
             ImGui.end();
@@ -433,10 +449,6 @@ public class GameMaster {
                     selectedInventoryItem = null;
                 }
 
-                int totalAtlasColumns = seedIcons.getTotalFrames();
-                int totalCropAtlasColumns = cropIcons.getTotalFrames();
-                float iconSize = 32.0f;
-
                 ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, K.Style.ITEM_SPACING, K.Style.ITEM_SPACING);
                 ImGui.pushStyleVar(ImGuiStyleVar.FrameBorderSize, 1.0f);
 
@@ -448,12 +460,17 @@ public class GameMaster {
                             selectedInventoryItem.getName().equals(item.getName()));
 
                     Spritesheet atlas = getItemSpritesheet(item);
-                    int iconIndex = getItemIconIndex(item);
+                    int col = getItemIconColumn(item);
+                    int row = getItemIconRow(item);
 
-                    float u0 = (float) iconIndex / totalAtlasColumns;
-                    float u1 = (float) (iconIndex + 1) / totalAtlasColumns;
-                    float v0 = 1.0f;
-                    float v1 = 0.0f;
+                    int totalCols = atlas.getTotalFrames();
+                    int totalRows = getItemIconRows(item);
+                    float iconSize = 32.0f;
+
+                    float u0 = (float) col / totalCols;
+                    float u1 = (float) (col + 1) / totalCols;
+                    float v0 = (float) (row + 1) / totalRows;
+                    float v1 = (float) row / totalRows;
 
                     if (isSelected) {
                         setColor(ImGuiCol.Button,        K.Style.COLOR_BUTTON);
@@ -470,7 +487,6 @@ public class GameMaster {
                     ImGui.pushID("inv_item_" + item.getName());
                     if (ImGui.imageButton(atlas.getTextureId(), iconSize, iconSize, u0, v0, u1, v1)) {
                         selectedInventoryItem = item;
-                        currentCrop = resolveCropType(item);
                     }
 
                     ImGui.popStyleColor(4);
@@ -509,7 +525,6 @@ public class GameMaster {
                         }
 
                         selectedInventoryItem = null;
-                        currentCrop = null;
                     }
                 } else {
                     ImGui.beginDisabled();
@@ -543,9 +558,6 @@ public class GameMaster {
             if (stock.isEmpty()) {
                 ImGui.textDisabled("Out of stock!");
             } else {
-                float iconSize = 32.0f;
-                int totalAtlasColumns = seedIcons.getTotalFrames();
-
                 ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, K.Style.ITEM_SPACING, K.Style.ITEM_SPACING);
                 ImGui.pushStyleVar(ImGuiStyleVar.FrameBorderSize, 1.0f);
 
@@ -554,12 +566,17 @@ public class GameMaster {
                     int amount = entry.getValue();
 
                     Spritesheet atlas = getItemSpritesheet(item);
-                    int iconIndex = getItemIconIndex(item);
+                    int col = getItemIconColumn(item);
+                    int row = getItemIconRow(item);
 
-                    float u0 = (float) iconIndex / totalAtlasColumns;
-                    float u1 = (float) (iconIndex + 1) / totalAtlasColumns;
-                    float v0 = 1.0f;
-                    float v1 = 0.0f;
+                    int totalCols = atlas.getTotalFrames();
+                    int totalRows = getItemIconRows(item);
+                    float iconSize = 32.0f;
+
+                    float u0 = (float) col / totalCols;
+                    float u1 = (float) (col + 1) / totalCols;
+                    float v0 = (float) (row + 1) / totalRows;
+                    float v1 = (float) row / totalRows;
 
                     setColor(ImGuiCol.Button,        K.Style.COLOR_SLOT_BG);
                     setColor(ImGuiCol.ButtonHovered, K.Style.COLOR_SLOT_HOVERED);
@@ -628,10 +645,39 @@ public class GameMaster {
         return null;
     }
 
+    private static int getItemIconColumn(Item item) {
+        if (item instanceof CellExpansion) {
+            return 0;
+        }
+        if (item instanceof Seed seed && seed.getType() != null) {
+            return seed.getType().getId();
+        }
+        if (item instanceof Crop crop && crop.getType() != null) {
+            return crop.getType().getId();
+        }
+        return 0;
+    }
+
+    private static int getItemIconRow(Item item) {
+        if (item instanceof CellExpansion) {
+            return 1;
+        }
+        return 0;
+    }
+
+    private static int getItemIconRows(Item item) {
+        if (item instanceof Crop || item instanceof CellExpansion) {
+            return 2;
+        }
+
+        return 1;
+    }
+
     private Spritesheet getItemSpritesheet(Item item) {
-        if (item instanceof Crop) {
+        if (item instanceof Crop || item instanceof CellExpansion) {
             return cropIcons;
         }
+
         return seedIcons;
     }
 
@@ -643,6 +689,11 @@ public class GameMaster {
             return crop.getType().getId();
         }
         return 0;
+    }
+
+    private void addToStock(Item item, int amount) {
+        if (shop == null) return;
+        shop.add(item, amount);
     }
 
     private void logAction(Vector2i cell) {

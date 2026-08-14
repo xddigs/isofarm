@@ -1,5 +1,7 @@
 package com.sfarm4j.data;
 
+import java.util.Objects;
+
 @DataClass
 public abstract class Item {
     private final byte id;
@@ -36,5 +38,17 @@ public abstract class Item {
 
     public void addAmount(int amount) {
         this.amount += amount;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Item item)) return false;
+        return id == item.id && Objects.equals(name, item.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);
     }
 }
