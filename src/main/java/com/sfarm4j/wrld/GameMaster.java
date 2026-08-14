@@ -103,30 +103,33 @@ public class GameMaster {
 
         ImGuiIO io = ImGui.getIO();
         if (new File(K.Paths.FONT).exists()) {
-            io.getFonts().addFontFromFileTTF(K.Paths.FONT, 17.0f);
+            io.getFonts().addFontFromFileTTF(K.Paths.FONT, K.Style.FONT_SIZE);
         }
 
         ImGuiStyle style = ImGui.getStyle();
-        style.setWindowRounding(12.0f);
-        style.setFrameRounding(8.0f);
-        style.setWindowBorderSize(0.0f);
-        style.setFrameBorderSize(0.0f);
-        style.setWindowPadding(24.0f, 24.0f);
-        style.setFramePadding(12.0f, 10.0f);
-        style.setItemSpacing(0.0f, 14.0f);
-
-        style.setColor(ImGuiCol.WindowBg, 0.08f, 0.08f, 0.10f, 0.92f);
-        style.setColor(ImGuiCol.FrameBg, 0.15f, 0.15f, 0.18f, 1.00f);
-        style.setColor(ImGuiCol.FrameBgHovered, 0.20f, 0.20f, 0.24f, 1.00f);
-        style.setColor(ImGuiCol.FrameBgActive, 0.22f, 0.22f, 0.26f, 1.00f);
-        style.setColor(ImGuiCol.Button, 0.25f, 0.25f, 0.30f, 1.00f);
-        style.setColor(ImGuiCol.ButtonHovered, 0.35f, 0.35f, 0.42f, 1.00f);
-        style.setColor(ImGuiCol.ButtonActive, 0.20f, 0.20f, 0.25f, 1.00f);
-        style.setColor(ImGuiCol.Text, 0.92f, 0.92f, 0.95f, 1.00f);
+        style.setWindowRounding(K.Style.WINDOW_ROUNDING);
+        style.setFrameRounding(K.Style.FRAME_ROUNDING);
+        style.setWindowBorderSize(K.Style.WINDOW_BORDER_SIZE);
+        style.setFrameBorderSize(K.Style.FRAME_BORDER_SIZE);
+        style.setWindowPadding(K.Style.WINDOW_PADDING_X, K.Style.WINDOW_PADDING_Y);
+        style.setFramePadding(K.Style.FRAME_PADDING_X, K.Style.FRAME_PADDING_Y);
+        style.setItemSpacing(K.Style.ITEM_SPACING_X, K.Style.ITEM_SPACING_Y);
+        setColor(style, ImGuiCol.WindowBg,        K.Style.COLOR_WINDOW_BG);
+        setColor(style, ImGuiCol.FrameBg,         K.Style.COLOR_FRAME_BG);
+        setColor(style, ImGuiCol.FrameBgHovered,  K.Style.COLOR_FRAME_BG_HOVERED);
+        setColor(style, ImGuiCol.FrameBgActive,   K.Style.COLOR_FRAME_BG_ACTIVE);
+        setColor(style, ImGuiCol.Button,          K.Style.COLOR_BUTTON);
+        setColor(style, ImGuiCol.ButtonHovered,   K.Style.COLOR_BUTTON_HOVERED);
+        setColor(style, ImGuiCol.ButtonActive,    K.Style.COLOR_BUTTON_ACTIVE);
+        setColor(style, ImGuiCol.Text,            K.Style.COLOR_TEXT);
 
         imGuiGlfw.init(windowHandle, true);
         imGuiGl3.init(K.Render.GLSL_VERSION);
         log.info("GameMaster initialized with grid size: {}x{}", K.World.GRID_SIZE, K.World.GRID_SIZE);
+    }
+
+    private void setColor(ImGuiStyle style, int target, float[] rgba) {
+        style.setColor(target, rgba[0], rgba[1], rgba[2], rgba[3]);
     }
 
     public void update(float delta) {
@@ -164,7 +167,8 @@ public class GameMaster {
             hoveredCell = null;
         }
 
-        if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT) && hoveredCell != null) {
+        if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT) && hoveredCell != null
+                && player.hasSeeds()) {
             CropType selectedType = CropType.WHEAT;
             Crop plantedCrop = cropService.plant(
                     hoveredCell.x,

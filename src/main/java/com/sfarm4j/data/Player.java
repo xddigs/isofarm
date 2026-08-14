@@ -14,6 +14,10 @@ public class Player {
         this.name = name;
         this.inventory = new Inventory();
         this.money = 0;
+
+        for (int i = 0; i < 4; i++) {
+            add(new Seed());
+        }
     }
 
     public String getName() {
@@ -31,7 +35,7 @@ public class Player {
     public void add(Item item, int amount) {
         inventory.add(item, amount);
         log.info("Added x{} of {} to inventory",
-                item.getName(), item.getAmount());
+                amount, item.getName());
     }
 
     public void add(Item item) {
@@ -42,8 +46,8 @@ public class Player {
 
     public void remove(Item item, int amount) {
         inventory.remove(item, amount);
-        log.info("Removed x{} of {} from inventory",
-                item.getName(), item.getAmount());
+        log.info("Removed x{} of {} to inventory",
+                amount, item.getName());
     }
 
     public void remove(Item item) {
@@ -78,5 +82,13 @@ public class Player {
 
     public void earn(int amount) {
         this.money += amount;
+    }
+
+    public boolean hasSeeds() {
+        return inventory.hasItemOfType(Seed.class);
+    }
+
+    public int getSeedCount() {
+        return inventory.getTotalAmountOfType(Seed.class);
     }
 }

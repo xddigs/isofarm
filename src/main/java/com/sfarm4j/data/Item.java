@@ -2,14 +2,20 @@ package com.sfarm4j.data;
 
 @DataClass
 public abstract class Item {
+    private final byte id;
     private final String name;
     private final int value;
     private int amount;
 
-    public Item(String name, int amount, int value) {
+    public Item(byte id, String name, int amount, int value) {
+        this.id = id;
         this.name = name;
         this.amount = amount;
         this.value = value;
+    }
+
+    public byte getId() {
+        return id;
     }
 
     public String getName() {

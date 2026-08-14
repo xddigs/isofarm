@@ -3,18 +3,18 @@ package com.sfarm4j.data;
 @DataClass
 public class Crop extends Item {
     private final float x, z;
-    private GrowthStage stage;
     private final CropType type;
     private final Cell cell;
     private final Season season;
     private final int value;
     private final int daysToGrow;
+    private GrowthStage stage;
     private int daysGrown;
     private boolean readyToHarvest;
 
     public Crop(float x, float z,
                 CropType type, Cell cell, Season season) {
-        super(type.getName(), 1, type.getValue());
+        super(type.getId(), type.getName(), 1, type.getValue());
         this.x = x;
         this.z = z;
         this.cell = cell;
