@@ -157,7 +157,8 @@ public class GameMaster {
         }
 
         Vector2i cell = camera.highlight(Mouse.getX(), Mouse.getY(), windowWidth, windowHeight);
-        if (cell != null && cell.x >= 0 && cell.x < K.World.GRID_SIZE && cell.y >= 0 && cell.y < K.World.GRID_SIZE) {
+        if (cell != null && cell.x >= 0 && cell.x < K.World.GRID_SIZE
+                && cell.y >= 0 && cell.y < K.World.GRID_SIZE) {
             hoveredCell = cell;
         } else {
             hoveredCell = null;
@@ -171,8 +172,16 @@ public class GameMaster {
                     player,
                     cellService.getCell(hoveredCell.x, hoveredCell.y),
                     selectedType,
-                    timeService.getCurrentSeason(),
-                    10);
+                    timeService.getCurrentSeason());
+        }
+
+        if (Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT) &&
+                Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT) &&
+                hoveredCell != null) {
+            Crop crop = world.getCropAt(hoveredCell.x(), hoveredCell.y());
+            if (crop != null) {
+                cropService.rip(crop);
+            }
         }
 
         Mouse.update();
