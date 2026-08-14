@@ -83,4 +83,25 @@ public class CellService implements Service<Cell> {
         cell.setUnlocked(true);
         return true;
     }
+
+    public boolean expandCell(int x, int z) {
+        if (cells.containsKey(getCellKey(x, z))) {
+            return false;
+        }
+
+        boolean isAdjacent =
+                isUnlocked(x + 1, z) ||
+                        isUnlocked(x - 1, z) ||
+                        isUnlocked(x, z + 1) ||
+                        isUnlocked(x, z - 1);
+
+        if (!isAdjacent) {
+            return false;
+        }
+
+        Cell cell = new Cell(CellType.TILLED, x, z);
+        cell.setUnlocked(true);
+        cells.put(getCellKey(x, z), cell);
+        return true;
+    }
 }

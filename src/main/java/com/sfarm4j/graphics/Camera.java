@@ -140,7 +140,8 @@ public class Camera {
         float t = -origin.y / dir.y;
         float worldX = origin.x + t * dir.x;
         float worldZ = origin.z + t * dir.z;
-
-        return new Vector2i(Math.round(worldX), Math.round(worldZ));
+        int cellX = Math.round(worldX / K.World.TILE_SIZE);
+        int cellZ = Math.round(worldZ / K.World.TILE_SIZE);
+        return new Vector2i(cellX, cellZ);
     }
 }

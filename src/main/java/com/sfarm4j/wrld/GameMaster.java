@@ -203,8 +203,7 @@ public class GameMaster {
 
             Vector2i cell = camera.highlight(Mouse.getX(), Mouse.getY(),
                     windowWidth, windowHeight);
-            if (cell != null && cell.x >= 0 && cell.x < K.World.GRID_SIZE
-                    && cell.y >= 0 && cell.y < K.World.GRID_SIZE) {
+            if (cell != null) {
                 hoveredCell = cell;
             } else {
                 hoveredCell = null;
@@ -225,12 +224,15 @@ public class GameMaster {
                 } else {
                     if (selectedInventoryItem instanceof CellExpansion) {
                         log.info("Trying to unlock cell {},{}", hoveredCell.x, hoveredCell.y);
-                        if (cellService.unlockCell(hoveredCell.x, hoveredCell.y)) {
+                        if (cellService.expandCell(hoveredCell.x, hoveredCell.y)) {
                             player.remove(selectedInventoryItem);
                             selectedInventoryItem = null;
-                            log.info("New cell unlocked at {},{}", hoveredCell.x, hoveredCell.y);
+
+                            log.info("New cell unlocked at {},{}",
+                                    hoveredCell.x, hoveredCell.y);
                         } else {
-                            log.warn("Could not unlock cell {},{}", hoveredCell.x, hoveredCell.y);
+                            log.warn("Could not expand cell {},{}",
+                                    hoveredCell.x, hoveredCell.y);
                         }
                     } else if (selectedInventoryItem instanceof Seed &&
                             cellService.isUnlocked(hoveredCell.x, hoveredCell.y)) {
