@@ -10,6 +10,7 @@ public class Shop {
     private static final Logger log = LoggerFactory.getLogger(Shop.class);
     private final String owner;
     private final Inventory stock;
+    private Player player;
     private int money;
 
     public Shop() {
@@ -17,6 +18,13 @@ public class Shop {
         this.stock = new Inventory();
         this.money = K.World.SHOP_STARTING_CREDIT;
         setUpStock();
+    }
+
+    private void setUpStock() {
+        clear();
+        add(new Seed(CropType.CARROT), 64);
+        add(new Seed(CropType.POTATO), 16);
+        add(new CellExpansion(100), 2);
     }
 
     public String getOwner() {
@@ -94,12 +102,6 @@ public class Shop {
         return stock.getAmount(item);
     }
 
-    private void setUpStock() {
-        clear();
-        add(new Seed(CropType.CARROT), 64);
-        add(new Seed(CropType.POTATO), 16);
-    }
-
     public void reset() {
         this.money = K.World.SHOP_STARTING_CREDIT;
         setUpStock();
@@ -109,5 +111,13 @@ public class Shop {
         String[] names = {"John", "Michael", "Jeffrey", "Hugh",
                           "Angela", "Malenia", "Carol", "Ashley"};
         return names[(int) (Math.random() * names.length)];
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 }
