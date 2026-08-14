@@ -15,11 +15,13 @@ public class CropService implements Service<Crop> {
 
     public Crop plant(int x, int z, Player player, Cell cell, CropType type,
                       Season currentSeason) {
+        if (!player.hasSeeds()) return null;
         if (cell.hasCrop()) {
             Crop crop = world.getCropAt(x, z);
             if (crop != null) {
                 if (!crop.isReadyToHarvest()) {
-                    log.warn("Attempted to plant {} at ({}, {}) but cell already has an growing crop!",
+                    log.warn("Attempted to plant {} at ({}, {}) " +
+                                    "but cell already has a growing crop!",
                             type.getName(), x, z);
                     return null;
                 }
@@ -29,6 +31,10 @@ public class CropService implements Service<Crop> {
                 }
             }
         }
+
+        var seedOpt = player.getInventory().getItemOfType(Seed.class);
+        if (seedOpt.isEmpty()) return null;
+        player.remove(seedOpt.get(), 1);
 
         Crop newCrop = new Crop(x, z, type, cell, currentSeason);
         cell.setCrop(true);

@@ -167,10 +167,9 @@ public class GameMaster {
             hoveredCell = null;
         }
 
-        if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT) && hoveredCell != null
-                && player.hasSeeds()) {
+        if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT) && hoveredCell != null) {
             CropType selectedType = CropType.WHEAT;
-            Crop plantedCrop = cropService.plant(
+            cropService.plant(
                     hoveredCell.x,
                     hoveredCell.y,
                     player,
@@ -238,7 +237,8 @@ public class GameMaster {
             wheat.bind();
 
             world.getActiveCrops().stream()
-                    .filter(c -> Math.round(c.getX()) == hoveredCell.x && Math.round(c.getZ()) == hoveredCell.y)
+                    .filter(c -> Math.round(c.getX()) == hoveredCell.x
+                            && Math.round(c.getZ()) == hoveredCell.y)
                     .findFirst()
                     .ifPresent(crop -> {
                         modelMatrix.identity().translate(crop.getX(), 0.0f, crop.getZ());
@@ -263,6 +263,7 @@ public class GameMaster {
             glEnable(GL_DEPTH_TEST);
         }
 
+
         defaultShader.unbind();
 
         imGuiGlfw.newFrame();
@@ -281,7 +282,6 @@ public class GameMaster {
                     | ImGuiWindowFlags.NoCollapse;
 
             ImGui.begin("New Farmer", windowFlags);
-
             ImGui.text("What's your name, kid?");
 
             ImGui.pushItemWidth(-1.0f);
@@ -294,7 +294,6 @@ public class GameMaster {
                     log.info("Player created: {}", player.getName());
                 }
             }
-
             ImGui.end();
         }
 

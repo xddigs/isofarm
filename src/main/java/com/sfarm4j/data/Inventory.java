@@ -66,6 +66,13 @@ public class Inventory {
                 .isInstance(entry.getKey()) && entry.getValue() > 0);
     }
 
+    public <T extends Item> Optional<T> getItemOfType(Class<T> type) {
+        return items.keySet().stream()
+                .filter(entry -> type.isInstance(entry) && items.get(entry) > 0)
+                .map(type::cast)
+                .findFirst();
+    }
+
     public <T extends Item> Optional<Byte> getFirstItemIdOfType(Class<T> type) {
         return items.entrySet().stream()
                 .filter(entry -> type.isInstance(entry.getKey())
