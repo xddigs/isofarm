@@ -11,10 +11,7 @@ import com.sfarm4j.utils.K;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.ImGuiStyle;
-import imgui.flag.ImGuiCol;
-import imgui.flag.ImGuiCond;
-import imgui.flag.ImGuiStyleVar;
-import imgui.flag.ImGuiWindowFlags;
+import imgui.flag.*;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
 import imgui.type.ImString;
@@ -50,6 +47,7 @@ public class GameMaster {
     private Mesh selectionMesh;
     private Mesh spriteMesh;
     private Spritesheet wheat;
+    private Spritesheet cropIcons;
     private Camera camera;
     private final Matrix4f modelMatrix = new Matrix4f();
     private final Sunlight sunlight;
@@ -95,6 +93,7 @@ public class GameMaster {
         this.selectionMesh = Mesh.selection();
         this.spriteMesh = Mesh.createCrop();
         this.wheat = new Spritesheet(K.Paths.WHEAT_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
+        this.cropIcons = new Spritesheet("assets/icons/crop_icons.png", 2);
 
         this.camera = new Camera(K.Camera.DEFAULT_WIDTH, K.Camera.DEFAULT_HEIGHT);
         this.camera.setPosition(0.0f, 0.0f, 0.0f);
@@ -344,14 +343,16 @@ public class GameMaster {
             ImGui.text("What's your name, kid?");
 
             ImGui.pushItemWidth(K.UI.MATCH_PARENT_WIDTH);
-            ImGui.inputText("##PlayerName", nameBuffer);
+            boolean wasEnterPressed = ImGui.inputText("##PlayerName", nameBuffer,
+                    ImGuiInputTextFlags.EnterReturnsTrue);
             ImGui.popItemWidth();
 
-            if (ImGui.button("Start", K.UI.MATCH_PARENT_WIDTH, K.UI.LARGE_BUTTON_HEIGHT)) {
-                if (!nameBuffer.get().isBlank()) {
-                    this.player = new Player(nameBuffer.get());
-                    log.info("Player created: {}", player.getName());
-                }
+            boolean wasButtonClicked = ImGui.button("Start", K.UI.MATCH_PARENT_WIDTH,
+                    K.UI.LARGE_BUTTON_HEIGHT);
+
+            if ((wasEnterPressed || wasButtonClicked) && !nameBuffer.get().isBlank()) {
+                this.player = new Player(nameBuffer.get());
+                log.info("Player created: {}", player.getName());
             }
             ImGui.end();
         }
@@ -363,11 +364,10 @@ public class GameMaster {
     private void renderInv() {
         if (player == null) return;
         ImGui.setNextWindowPos(K.UI.INVENTORY_POS_X, windowHeight -
-                               K.UI.INVENTORY_POS_Y_OFFSET,
-                                ImGuiCond.FirstUseEver);
+                K.UI.INVENTORY_POS_Y_OFFSET, ImGuiCond.FirstUseEver);
+
         ImGui.setNextWindowSize(K.UI.INVENTORY_WIDTH,
-                                K.UI.INVENTORY_HEIGHT,
-                                ImGuiCond.FirstUseEver);
+                K.UI.INVENTORY_HEIGHT, ImGuiCond.FirstUseEver);
 
         int flags = ImGuiWindowFlags.NoTitleBar |
                 ImGuiWindowFlags.NoResize   |
@@ -386,20 +386,20 @@ public class GameMaster {
                     String name = entry.getKey().getName();
                     if (aggregated.containsKey(name)) {
                         int prevAmount = aggregated.get(name).getValue();
-                        aggregated.put(name, new AbstractMap.SimpleEntry<>(entry.getKey(),
-                                prevAmount + entry.getValue()));
+                        aggregated.put(name, new AbstractMap.SimpleEntry<>(
+                                entry.getKey(), prevAmount + entry.getValue()));
                     } else {
                         aggregated.put(name, entry);
                     }
                 }
 
-                if (selectedInventoryItem != null && !aggregated.containsKey(selectedInventoryItem.getName())) {
+                if (selectedInventoryItem != null && !aggregated
+                    .containsKey(selectedInventoryItem.getName())) {
                     selectedInventoryItem = null;
                 }
 
-                ImGui.pushStyleColor(ImGuiCol.Header, 0.0f, 0.0f, 0.0f, 0.0f);
-                ImGui.pushStyleColor(ImGuiCol.HeaderHovered, 1.0f, 1.0f, 1.0f, 0.05f);
-                ImGui.pushStyleColor(ImGuiCol.HeaderActive, 0.0f, 0.0f, 0.0f, 0.0f);
+                int totalAtlasColumns = cropIcons.getTotalFrames();
+                float iconSize = 32.0f;
 
                 for (Map.Entry<String, Map.Entry<Item, Integer>> entry : aggregated.entrySet()) {
                     Item item = entry.getValue().getKey();
@@ -408,24 +408,45 @@ public class GameMaster {
                     boolean isSelected = (selectedInventoryItem != null &&
                             selectedInventoryItem.getName().equals(item.getName()));
 
+                    int iconIndex = getItemIconIndex(item);
+
+                    float u0 = (float) (iconIndex + 1) / totalAtlasColumns;
+                    float u1 = (float) iconIndex / totalAtlasColumns;
+
+                    float v0 = 1.0f;
+                    float v1 = 0.0f;
+
                     if (isSelected) {
-                        ImGui.pushStyleColor(ImGuiCol.Text,
-                                K.Style.COLOR_TEXT_HIGHLIGHTED[0],
-                                K.Style.COLOR_TEXT_HIGHLIGHTED[1],
-                                K.Style.COLOR_TEXT_HIGHLIGHTED[2],
-                                K.Style.COLOR_TEXT_HIGHLIGHTED[3]);
+                        ImGui.pushStyleColor(ImGuiCol.Button,
+                                K.Style.COLOR_BUTTON_HOVERED[0],
+                                K.Style.COLOR_BUTTON_HOVERED[1],
+                                K.Style.COLOR_BUTTON_HOVERED[2],
+                                K.Style.COLOR_BUTTON_HOVERED[3]);
+                        ImGui.pushStyleColor(ImGuiCol.ButtonHovered,
+                                K.Style.COLOR_BUTTON_ACTIVE[0],
+                                K.Style.COLOR_BUTTON_ACTIVE[1],
+                                K.Style.COLOR_BUTTON_ACTIVE[2],
+                                K.Style.COLOR_BUTTON_ACTIVE[3]);
                     }
 
-                    if (ImGui.selectable(item.getName() + " x" + totalAmount, isSelected)) {
+                    ImGui.pushID("inv_item_" + item.getName());
+                    if (ImGui.imageButton(cropIcons.getTextureId(), iconSize, iconSize, u0, v0, u1, v1)) {
                         selectedInventoryItem = item;
                     }
 
                     if (isSelected) {
-                        ImGui.popStyleColor();
+                        ImGui.popStyleColor(2);
                     }
+
+                    if (ImGui.isItemHovered()) {
+                        ImGui.setTooltip(item.getName() + " x" + totalAmount);
+                    }
+
+                    ImGui.sameLine();
+                    ImGui.popID();
                 }
 
-                ImGui.popStyleColor(3);
+                ImGui.newLine();
                 ImGui.separator();
 
                 if (selectedInventoryItem != null) {
@@ -448,6 +469,16 @@ public class GameMaster {
             }
         }
         ImGui.end();
+    }
+
+    private int getItemIconIndex(Item item) {
+        if (item == null) return 0;
+        for (CropType type : CropType.values()) {
+            if (item.getName().toLowerCase().contains(type.getName().toLowerCase())) {
+                return type.getId();
+            }
+        }
+        return 0;
     }
 
     private void renderCoordinates() {
@@ -486,6 +517,7 @@ public class GameMaster {
         spriteMesh.dispose();
         screenQuadMesh.dispose();
         wheat.dispose();
+        cropIcons.dispose();
         maskFbo.dispose();
         defaultShader.dispose();
         outlineShader.dispose();

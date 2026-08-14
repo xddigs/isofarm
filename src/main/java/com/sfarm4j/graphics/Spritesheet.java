@@ -9,6 +9,10 @@ public class Spritesheet {
         this.totalFrames = totalFrames;
     }
 
+    public int getTextureId() {
+        return texture.getId();
+    }
+
     public void bind() {
         texture.bind();
     }
