@@ -61,6 +61,11 @@ public final class K {
         public static final float[] COLOR_BUTTON_HOVERED = {0.55f, 0.68f, 0.15f, 1.00f};
         public static final float[] COLOR_BUTTON_ACTIVE  = {0.38f, 0.46f, 0.10f, 1.00f};
         public static final float[] COLOR_TEXT            = {1.00f, 1.00f, 1.00f, 1.00f};
+
+        public static final float[] COLOR_SLOT_BG         = {0.10f, 0.10f, 0.12f, 0.40f};
+        public static final float[] COLOR_SLOT_HOVERED    = {0.20f, 0.20f, 0.24f, 0.60f};
+        public static final float[] COLOR_SLOT_BORDER     = {0.40f, 0.40f, 0.45f, 0.80f};
+        public static final float[] COLOR_SLOT_BORDER_SEL = {0.65f, 0.80f, 0.20f, 1.00f};
     }
 
     public static final class UI {

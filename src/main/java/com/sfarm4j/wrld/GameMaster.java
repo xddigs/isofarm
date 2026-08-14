@@ -435,16 +435,15 @@ public class GameMaster {
                     float v1 = 0.0f;
 
                     if (isSelected) {
-                        ImGui.pushStyleColor(ImGuiCol.Button,
-                                K.Style.COLOR_BUTTON_HOVERED[0],
-                                K.Style.COLOR_BUTTON_HOVERED[1],
-                                K.Style.COLOR_BUTTON_HOVERED[2],
-                                K.Style.COLOR_BUTTON_HOVERED[3]);
-                        ImGui.pushStyleColor(ImGuiCol.ButtonHovered,
-                                K.Style.COLOR_BUTTON_ACTIVE[0],
-                                K.Style.COLOR_BUTTON_ACTIVE[1],
-                                K.Style.COLOR_BUTTON_ACTIVE[2],
-                                K.Style.COLOR_BUTTON_ACTIVE[3]);
+                        setColor(ImGuiCol.Button,        K.Style.COLOR_BUTTON);
+                        setColor(ImGuiCol.ButtonHovered, K.Style.COLOR_BUTTON_HOVERED);
+                        setColor(ImGuiCol.ButtonActive,  K.Style.COLOR_BUTTON_ACTIVE);
+                        setColor(ImGuiCol.Border,        K.Style.COLOR_SLOT_BORDER_SEL);
+                    } else {
+                        setColor(ImGuiCol.Button,        K.Style.COLOR_SLOT_BG);
+                        setColor(ImGuiCol.ButtonHovered, K.Style.COLOR_SLOT_HOVERED);
+                        setColor(ImGuiCol.ButtonActive,  K.Style.COLOR_SLOT_BG);
+                        setColor(ImGuiCol.Border,        K.Style.COLOR_SLOT_BORDER);
                     }
 
                     ImGui.pushID("inv_item_" + item.getName());
@@ -453,9 +452,7 @@ public class GameMaster {
                         this.currentCrop = resolveCropType(item);
                     }
 
-                    if (isSelected) {
-                        ImGui.popStyleColor(2);
-                    }
+                    ImGui.popStyleColor(4);
 
                     if (ImGui.isItemHovered()) {
                         ImGui.setTooltip(item.getName() + " x" + totalAmount);
@@ -511,6 +508,10 @@ public class GameMaster {
         ImGui.begin("GridActionHUD", flags);
         ImGui.text(String.format("[%d, %d]", lastActionCell.x, lastActionCell.y));
         ImGui.end();
+    }
+
+    private void setColor(int col, float[] rgba) {
+        ImGui.pushStyleColor(col, rgba[0], rgba[1], rgba[2], rgba[3]);
     }
 
     private CropType resolveCropType(Item item) {
