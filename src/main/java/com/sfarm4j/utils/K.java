@@ -25,6 +25,11 @@ public final class K {
         public static final float TILE_SIZE = 1.0f;
         public static final float DEFAULT_BLOCK_DEPTH = 0.4f;
         public static final float EPSILON_RAY_Y = 0.00001f;
+        public static final float CROP_ELEVATION_Y = 0.0f;
+    }
+
+    public static final class Sunlight {
+        public static final Vector3f DEFAULT_DIRECTION = new Vector3f(-0.5f, -1.0f, -0.5f);
     }
 
     public static final class Window {
@@ -54,7 +59,31 @@ public final class K {
         public static final float[] COLOR_BUTTON         = {0.45f, 0.55f, 0.12f, 1.00f};
         public static final float[] COLOR_BUTTON_HOVERED = {0.55f, 0.68f, 0.15f, 1.00f};
         public static final float[] COLOR_BUTTON_ACTIVE  = {0.38f, 0.46f, 0.10f, 1.00f};
+        public static final float[] COLOR_TEXT_HIGHLIGHTED = {1.00f, 1.00f, 0.00f, 1.00f};
         public static final float[] COLOR_TEXT            = {1.00f, 1.00f, 1.00f, 1.00f};
+    }
+
+    public static final class UI {
+        public static final int PLAYER_NAME_MAX_LENGTH = 32;
+
+        public static final float TOOLTIP_OFFSET_X = 15.0f;
+        public static final float TOOLTIP_OFFSET_Y = 15.0f;
+        public static final float TOOLTIP_ITEM_SPACING_X = 4.0f;
+
+        public static final float INVENTORY_POS_X = 10.0f;
+        public static final float INVENTORY_POS_Y_OFFSET = 220.0f;
+        public static final float INVENTORY_WIDTH = 250.0f;
+        public static final float INVENTORY_HEIGHT = 210.0f;
+
+        public static final float NEW_PLAYER_WIDTH = 340.0f;
+        public static final float NEW_PLAYER_HEIGHT = 200.0f;
+
+        public static final float LARGE_BUTTON_HEIGHT = 40.0f;
+        public static final float CENTER_PIVOT = 0.5f;
+        public static final float MATCH_PARENT_WIDTH = -1.0f;
+
+        public static final float HUD_PADDING = 10.0f;
+        public static final float COORD_DISPLAY_DURATION = 3.0f;
     }
 
     public static final class Paths {
@@ -70,6 +99,7 @@ public final class K {
         public static final float LINE_WIDTH = 2.5f;
         public static final float SELECTION_Y_OFFSET = 0.002f;
         public static final int CROP_TOTAL_FRAMES = 5;
+        public static final int PRIMARY_TEXTURE_UNIT = 0;
         public static final String GLSL_VERSION = "#version 330 core";
     }
 

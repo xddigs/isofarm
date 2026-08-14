@@ -32,6 +32,25 @@ public class Player {
         return money;
     }
 
+    public void setMoney(int money) {
+        this.money = money;
+    }
+
+    public void sell(Item item, int amount) {
+        if (item == null || amount <= 0) return;
+
+        int current = inventory.getAmount(item);
+        if (current <= 0) {
+            log.warn("No {} in inventory to sell", item.getName());
+            return;
+        }
+
+        int toSell = Math.min(current, amount);
+        inventory.remove(item, toSell);
+        int earnings = toSell * item.getValue();
+        earn(earnings);
+    }
+
     public void add(Item item, int amount) {
         inventory.add(item, amount);
         log.info("Added x{} of {} to inventory",

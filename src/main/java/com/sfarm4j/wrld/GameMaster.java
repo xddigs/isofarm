@@ -21,12 +21,11 @@ import imgui.type.ImString;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
-import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.Optional;
+import java.util.*;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -63,14 +62,18 @@ public class GameMaster {
 
     private final ImGuiImplGlfw imGuiGlfw = new ImGuiImplGlfw();
     private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
-    private final ImString nameBuffer = new ImString("", 32);
+    private final ImString nameBuffer = new ImString("", K.UI.PLAYER_NAME_MAX_LENGTH);
+
+    private Vector2i lastActionCell = null;
+    private float actionDisplayTimer = 0.0f;
+    private Item selectedInventoryItem = null;
 
     public GameMaster(long windowHandle) {
         this.world = new World();
         this.cropService = new CropService(world);
         this.timeService = new TimeService();
         this.cellService = new CellService();
-        this.sunlight = new Sunlight(new Vector3f(-0.5f, -1.0f, -0.5f));
+        this.sunlight = new Sunlight(K.Sunlight.DEFAULT_DIRECTION);
 
         for (int x = 0; x < K.World.GRID_SIZE; x++) {
             for (int z = 0; z < K.World.GRID_SIZE; z++) {
@@ -137,61 +140,74 @@ public class GameMaster {
             return;
         }
 
+        if (actionDisplayTimer > 0.0f) {
+            actionDisplayTimer -= delta;
+        }
+
         timeService.update(delta);
         cropService.update(delta);
         camera.update(delta);
 
-        boolean isCtrlDown = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL) ||
-                Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
-        if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
-            if (isCtrlDown) {
-                camera.rotateYaw(Mouse.getDeltaX() * K.Camera.ROTATION_SENSITIVITY);
-            } else {
-                camera.pan(Mouse.getDeltaX(), Mouse.getDeltaY(), K.Camera.PAN_SENSITIVITY);
+        ImGuiIO io = ImGui.getIO();
+
+        if (!io.getWantCaptureMouse()) {
+            boolean isCtrlDown = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL) ||
+                    Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
+            if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
+                if (isCtrlDown) {
+                    camera.rotateYaw(Mouse.getDeltaX() * K.Camera.ROTATION_SENSITIVITY);
+                } else {
+                    camera.pan(Mouse.getDeltaX(), Mouse.getDeltaY(), K.Camera.PAN_SENSITIVITY);
+                }
             }
-        }
 
-        float scrollY = Mouse.getScrollY();
-        if (scrollY != 0.0f) {
-            camera.zoom(scrollY);
-        }
+            float scrollY = Mouse.getScrollY();
+            if (scrollY != 0.0f) {
+                camera.zoom(scrollY);
+            }
 
-        if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_MIDDLE)) {
-            recenter();
-        }
+            if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_MIDDLE)) {
+                recenter();
+            }
 
-        Vector2i cell = camera.highlight(Mouse.getX(), Mouse.getY(), windowWidth, windowHeight);
-        if (cell != null && cell.x >= 0 && cell.x < K.World.GRID_SIZE
-                && cell.y >= 0 && cell.y < K.World.GRID_SIZE) {
-            hoveredCell = cell;
-        } else {
-            hoveredCell = null;
-        }
+            Vector2i cell = camera.highlight(Mouse.getX(), Mouse.getY(),
+                    windowWidth, windowHeight);
+            if (cell != null && cell.x >= 0 && cell.x < K.World.GRID_SIZE
+                    && cell.y >= 0 && cell.y < K.World.GRID_SIZE) {
+                hoveredCell = cell;
+            } else {
+                hoveredCell = null;
+            }
 
-        if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT) && hoveredCell != null) {
-            Crop crop = world.getCropAt(hoveredCell.x, hoveredCell.y);
+            if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT) && hoveredCell != null) {
+                Crop crop = world.getCropAt(hoveredCell.x, hoveredCell.y);
 
-            if (crop != null) {
-                if (Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-                    if (crop.isReadyToHarvest()) {
-                        cropService.harvest(player, crop);
-                    } else if (!crop.isReadyToHarvest() || !crop.wasHarvested()) {
-                        cropService.rip(crop);
+                if (crop != null) {
+                    if (Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
+                        if (crop.isReadyToHarvest()) {
+                            cropService.harvest(player, crop);
+                            logAction(hoveredCell);
+                        } else if (!crop.isReadyToHarvest() || !crop.wasHarvested()) {
+                            cropService.rip(crop);
+                        }
+                    }
+                } else {
+                    if (!Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
+                        CropType selectedType = CropType.WHEAT;
+                        cropService.plant(
+                                hoveredCell.x,
+                                hoveredCell.y,
+                                player,
+                                cellService.getCell(hoveredCell.x, hoveredCell.y),
+                                selectedType,
+                                timeService.getCurrentSeason()
+                        );
+                        logAction(hoveredCell);
                     }
                 }
-            } else {
-                if (!Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-                    CropType selectedType = CropType.WHEAT;
-                    cropService.plant(
-                            hoveredCell.x,
-                            hoveredCell.y,
-                            player,
-                            cellService.getCell(hoveredCell.x, hoveredCell.y),
-                            selectedType,
-                            timeService.getCurrentSeason()
-                    );
-                }
             }
+        } else {
+            hoveredCell = null;
         }
 
         Mouse.update();
@@ -215,12 +231,12 @@ public class GameMaster {
         cellService.renderAll(defaultShader, blockMesh, modelMatrix, sunlight);
 
         defaultShader.setUniform("uUseTexture", true);
-        defaultShader.setUniform("uTexture", 0);
+        defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
         defaultShader.setUniform("uTotalFrames", wheat.getTotalFrames());
 
         wheat.bind();
         world.getActiveCrops().forEach(crop -> {
-            modelMatrix.identity().translate(crop.getX(), 0.0f, crop.getZ());
+            modelMatrix.identity().translate(crop.getX(), K.World.CROP_ELEVATION_Y, crop.getZ());
             defaultShader.setUniform("uModel", modelMatrix);
             defaultShader.setUniform("uFrameIndex", crop.getStage().getFrameIndex());
             spriteMesh.render();
@@ -248,7 +264,7 @@ public class GameMaster {
                             && Math.round(c.getZ()) == hoveredCell.y)
                     .findFirst()
                     .ifPresent(crop -> {
-                        modelMatrix.identity().translate(crop.getX(), 0.0f, crop.getZ());
+                        modelMatrix.identity().translate(crop.getX(), K.World.CROP_ELEVATION_Y, crop.getZ());
                         defaultShader.setUniform("uModel", modelMatrix);
                         defaultShader.setUniform("uFrameIndex", crop.getStage().getFrameIndex());
                         spriteMesh.render();
@@ -261,7 +277,7 @@ public class GameMaster {
             outlineShader.bind();
             outlineShader.setUniform("uScreenSize", new Vector2f(windowWidth, windowHeight));
             outlineShader.setUniform("uOutlineColor", K.Colors.OUTLINE_DEFAULT);
-            outlineShader.setUniform("uMaskTexture", 0);
+            outlineShader.setUniform("uMaskTexture", K.Render.PRIMARY_TEXTURE_UNIT);
 
             glBindTexture(GL_TEXTURE_2D, maskFbo.getTextureId());
             screenQuadMesh.render();
@@ -275,8 +291,12 @@ public class GameMaster {
         imGuiGlfw.newFrame();
         ImGui.newFrame();
 
+        renderInv();
+        renderCoordinates();
+
         if (hoveredCell != null && player != null) {
-            ImGui.setNextWindowPos(Mouse.getX() + 15, Mouse.getY() + 15, ImGuiCond.Always);
+            ImGui.setNextWindowPos(Mouse.getX() + K.UI.TOOLTIP_OFFSET_X, Mouse.getY() +
+                    K.UI.TOOLTIP_OFFSET_Y, ImGuiCond.Always);
             int flags = ImGuiWindowFlags.NoTitleBar
                     | ImGuiWindowFlags.NoResize
                     | ImGuiWindowFlags.NoMove
@@ -284,7 +304,9 @@ public class GameMaster {
                     | ImGuiWindowFlags.NoFocusOnAppearing;
 
             ImGui.begin("CropCardTooltip", flags);
-            ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, 4.0f, K.Style.LINEHEIGHT);
+            ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, K.UI.TOOLTIP_ITEM_SPACING_X,
+                    K.Style.LINEHEIGHT);
+
             Crop crop = world.getCropAt(hoveredCell.x, hoveredCell.y);
 
             if (crop != null) {
@@ -307,12 +329,12 @@ public class GameMaster {
         }
 
         if (player == null) {
-            ImGui.setNextWindowPos(windowWidth / 2.0f,
-                    windowHeight / 2.0f,
+            ImGui.setNextWindowPos(windowWidth * K.UI.CENTER_PIVOT,
+                    windowHeight * K.UI.CENTER_PIVOT,
                     ImGuiCond.Always,
-                    0.5f, 0.5f);
+                    K.UI.CENTER_PIVOT, K.UI.CENTER_PIVOT);
 
-            ImGui.setNextWindowSize(340.0f, 200.0f);
+            ImGui.setNextWindowSize(K.UI.NEW_PLAYER_WIDTH, K.UI.NEW_PLAYER_HEIGHT);
             int windowFlags = ImGuiWindowFlags.NoTitleBar
                     | ImGuiWindowFlags.NoResize
                     | ImGuiWindowFlags.NoMove
@@ -321,11 +343,11 @@ public class GameMaster {
             ImGui.begin("New Farmer", windowFlags);
             ImGui.text("What's your name, kid?");
 
-            ImGui.pushItemWidth(-1.0f);
+            ImGui.pushItemWidth(K.UI.MATCH_PARENT_WIDTH);
             ImGui.inputText("##PlayerName", nameBuffer);
             ImGui.popItemWidth();
 
-            if (ImGui.button("Start your journey", -1.0f, 40.0f)) {
+            if (ImGui.button("Start", K.UI.MATCH_PARENT_WIDTH, K.UI.LARGE_BUTTON_HEIGHT)) {
                 if (!nameBuffer.get().isBlank()) {
                     this.player = new Player(nameBuffer.get());
                     log.info("Player created: {}", player.getName());
@@ -336,6 +358,122 @@ public class GameMaster {
 
         ImGui.render();
         imGuiGl3.renderDrawData(ImGui.getDrawData());
+    }
+
+    private void renderInv() {
+        if (player == null) return;
+        ImGui.setNextWindowPos(K.UI.INVENTORY_POS_X, windowHeight -
+                               K.UI.INVENTORY_POS_Y_OFFSET,
+                                ImGuiCond.FirstUseEver);
+        ImGui.setNextWindowSize(K.UI.INVENTORY_WIDTH,
+                                K.UI.INVENTORY_HEIGHT,
+                                ImGuiCond.FirstUseEver);
+
+        int flags = ImGuiWindowFlags.NoTitleBar |
+                ImGuiWindowFlags.NoResize   |
+                ImGuiWindowFlags.NoCollapse |
+                ImGuiWindowFlags.NoMove;
+
+        if (ImGui.begin("Inventory", flags)) {
+            Inventory inv = player.getInventory();
+
+            if (inv.isEmpty()) {
+                ImGui.textDisabled("You're out of stuff!");
+                selectedInventoryItem = null;
+            } else {
+                Map<String, Map.Entry<Item, Integer>> aggregated = new LinkedHashMap<>();
+                for (Map.Entry<Item, Integer> entry : inv.getItems().entrySet()) {
+                    String name = entry.getKey().getName();
+                    if (aggregated.containsKey(name)) {
+                        int prevAmount = aggregated.get(name).getValue();
+                        aggregated.put(name, new AbstractMap.SimpleEntry<>(entry.getKey(),
+                                prevAmount + entry.getValue()));
+                    } else {
+                        aggregated.put(name, entry);
+                    }
+                }
+
+                if (selectedInventoryItem != null && !aggregated.containsKey(selectedInventoryItem.getName())) {
+                    selectedInventoryItem = null;
+                }
+
+                ImGui.pushStyleColor(ImGuiCol.Header, 0.0f, 0.0f, 0.0f, 0.0f);
+                ImGui.pushStyleColor(ImGuiCol.HeaderHovered, 1.0f, 1.0f, 1.0f, 0.05f);
+                ImGui.pushStyleColor(ImGuiCol.HeaderActive, 0.0f, 0.0f, 0.0f, 0.0f);
+
+                for (Map.Entry<String, Map.Entry<Item, Integer>> entry : aggregated.entrySet()) {
+                    Item item = entry.getValue().getKey();
+                    int totalAmount = entry.getValue().getValue();
+
+                    boolean isSelected = (selectedInventoryItem != null &&
+                            selectedInventoryItem.getName().equals(item.getName()));
+
+                    if (isSelected) {
+                        ImGui.pushStyleColor(ImGuiCol.Text,
+                                K.Style.COLOR_TEXT_HIGHLIGHTED[0],
+                                K.Style.COLOR_TEXT_HIGHLIGHTED[1],
+                                K.Style.COLOR_TEXT_HIGHLIGHTED[2],
+                                K.Style.COLOR_TEXT_HIGHLIGHTED[3]);
+                    }
+
+                    if (ImGui.selectable(item.getName() + " x" + totalAmount, isSelected)) {
+                        selectedInventoryItem = item;
+                    }
+
+                    if (isSelected) {
+                        ImGui.popStyleColor();
+                    }
+                }
+
+                ImGui.popStyleColor(3);
+                ImGui.separator();
+
+                if (selectedInventoryItem != null) {
+                    int totalAmount = aggregated.get(selectedInventoryItem.getName()).getValue();
+
+                    if (ImGui.button("Sell " + selectedInventoryItem.getName() + " (x" + totalAmount + ")",
+                            K.UI.MATCH_PARENT_WIDTH, 0)) {
+                        for (Map.Entry<Item, Integer> entry : new HashMap<>(inv.getItems()).entrySet()) {
+                            if (entry.getKey().getName().equals(selectedInventoryItem.getName())) {
+                                player.sell(entry.getKey(), entry.getValue());
+                            }
+                        }
+                        selectedInventoryItem = null;
+                    }
+                } else {
+                    ImGui.beginDisabled();
+                    ImGui.button("Select an item to sell", K.UI.MATCH_PARENT_WIDTH, 0);
+                    ImGui.endDisabled();
+                }
+            }
+        }
+        ImGui.end();
+    }
+
+    private void renderCoordinates() {
+        if (player == null || actionDisplayTimer <= 0.0f
+                || lastActionCell == null) return;
+        ImGui.setNextWindowPos(
+                windowWidth - K.UI.HUD_PADDING,
+                K.UI.HUD_PADDING,
+                ImGuiCond.Always,
+                1.0f, 0.0f
+        );
+
+        int flags = ImGuiWindowFlags.NoTitleBar
+                | ImGuiWindowFlags.NoResize
+                | ImGuiWindowFlags.NoMove
+                | ImGuiWindowFlags.AlwaysAutoResize
+                | ImGuiWindowFlags.NoFocusOnAppearing;
+
+        ImGui.begin("GridActionHUD", flags);
+        ImGui.text(String.format("[%d, %d]", lastActionCell.x, lastActionCell.y));
+        ImGui.end();
+    }
+
+    private void logAction(Vector2i cell) {
+        this.lastActionCell = new Vector2i(cell);
+        this.actionDisplayTimer = K.UI.COORD_DISPLAY_DURATION;
     }
 
     public void dispose() {
