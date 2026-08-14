@@ -80,9 +80,16 @@ public class GameMaster {
         this.cellService = new CellService();
         this.sunlight = new Sunlight(K.Sunlight.DEFAULT_DIRECTION);
 
+        int center = K.World.GRID_SIZE / 2;
+
         for (int x = 0; x < K.World.GRID_SIZE; x++) {
             for (int z = 0; z < K.World.GRID_SIZE; z++) {
                 cellService.setCell(CellType.TILLED, x, z);
+            }
+        }
+
+        for (int x = center - 1; x <= center + 1; x++) {
+            for (int z = center - 1; z <= center + 1; z++) {
                 Cell cell = cellService.find(x, z);
                 if (cell != null) {
                     cell.setUnlocked(true);
@@ -217,10 +224,13 @@ public class GameMaster {
                     }
                 } else {
                     if (selectedInventoryItem instanceof CellExpansion) {
+                        log.info("Trying to unlock cell {},{}", hoveredCell.x, hoveredCell.y);
                         if (cellService.unlockCell(hoveredCell.x, hoveredCell.y)) {
                             player.remove(selectedInventoryItem);
                             selectedInventoryItem = null;
                             log.info("New cell unlocked at {},{}", hoveredCell.x, hoveredCell.y);
+                        } else {
+                            log.warn("Could not unlock cell {},{}", hoveredCell.x, hoveredCell.y);
                         }
                     } else if (selectedInventoryItem instanceof Seed &&
                             cellService.isUnlocked(hoveredCell.x, hoveredCell.y)) {
