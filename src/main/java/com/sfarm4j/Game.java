@@ -63,7 +63,7 @@ public class Game {
         }
 
         glfwDefaultWindowHints();
-        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // Sigue oculta
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, OPENGL_MAJOR_VERSION);
@@ -100,8 +100,7 @@ public class Game {
         glfwMakeContextCurrent(window);
         GL.createCapabilities();
 
-        glfwSetFramebufferSizeCallback(window, (
-                windowHandle, width, height) -> {
+        glfwSetFramebufferSizeCallback(window, (windowHandle, width, height) -> {
             if (width > 0 && height > 0) {
                 glViewport(0, 0, width, height);
                 if (master != null) {
@@ -115,9 +114,14 @@ public class Game {
         log.info("OpenGL Version: {}", glGetString(GL_VERSION));
 
         glfwSwapInterval(VSYNC_INTERVAL);
+        master = new GameMaster(window);
+        Vector3f skyColor = TimeService.getSkyColor();
+        glClearColor(skyColor.x, skyColor.y, skyColor.z, CLEAR_COLOR_ALPHA);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        master.render();
+        glfwSwapBuffers(window);
         glfwShowWindow(window);
         log.info("GLFW window successfully initialized.");
-        master = new GameMaster(window);
     }
 
     private void loop() {
