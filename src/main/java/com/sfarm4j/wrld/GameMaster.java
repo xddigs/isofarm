@@ -44,12 +44,12 @@ public class GameMaster {
     private Mesh blockMesh;
     private Mesh selectionMesh;
     private Mesh spriteMesh;
-    private Spritesheet wheat;
-    private Spritesheet carrot;
-    private Spritesheet potato;
-    private final Map<CropType, Spritesheet> cropSpritesheets;
-    private Spritesheet seedIcons;
-    private Spritesheet cropIcons;
+    private SpriteSheet wheat;
+    private SpriteSheet carrot;
+    private SpriteSheet potato;
+    private final Map<CropType, SpriteSheet> cropSpritesheets;
+    private SpriteSheet seedIcons;
+    private SpriteSheet cropIcons;
     private Camera camera;
     private final Matrix4f modelMatrix = new Matrix4f();
     private final Sunlight sunlight;
@@ -104,11 +104,11 @@ public class GameMaster {
         this.selectionMesh = Mesh.selection();
         this.spriteMesh = Mesh.createCrop();
         this.cropSpritesheets = new EnumMap(CropType.class);
-        this.wheat = new Spritesheet(K.Paths.WHEAT_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
-        this.carrot = new Spritesheet(K.Paths.CARROT_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
-        this.potato = new Spritesheet(K.Paths.POTATO_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
-        this.seedIcons = new Spritesheet(K.Paths.SEED_ICONS, K.UI.ICON_ATLAS_FRAMES);
-        this.cropIcons = new Spritesheet(K.Paths.CROP_ICONS, K.UI.ICON_ATLAS_FRAMES);
+        this.wheat = new SpriteSheet(K.Paths.WHEAT_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
+        this.carrot = new SpriteSheet(K.Paths.CARROT_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
+        this.potato = new SpriteSheet(K.Paths.POTATO_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
+        this.seedIcons = new SpriteSheet(K.Paths.SEED_ICONS, K.UI.ICON_ATLAS_FRAMES);
+        this.cropIcons = new SpriteSheet(K.Paths.CROP_ICONS, K.UI.ICON_ATLAS_FRAMES);
         this.shop = new Shop();
 
         cropSpritesheets.put(CropType.WHEAT, wheat);
@@ -274,7 +274,7 @@ public class GameMaster {
         defaultShader.setUniform("uTotalFrames", wheat.getTotalFrames());
 
         world.getActiveCrops().forEach(crop -> {
-            Spritesheet sheet = cropSpritesheets.get(crop.getType());
+            SpriteSheet sheet = cropSpritesheets.get(crop.getType());
             sheet.bind();
 
             modelMatrix.identity().translate(crop.getX(), K.World.CROP_ELEVATION_Y, crop.getZ());
@@ -305,7 +305,7 @@ public class GameMaster {
                             && Math.round(c.getZ()) == hoveredCell.y)
                     .findFirst()
                     .ifPresent(crop -> {
-                        Spritesheet sheet = cropSpritesheets.get(crop.getType());
+                        SpriteSheet sheet = cropSpritesheets.get(crop.getType());
                         sheet.bind();
                         modelMatrix.identity().translate(crop.getX(), K.World.CROP_ELEVATION_Y, crop.getZ());
                         defaultShader.setUniform("uModel", modelMatrix);
@@ -459,13 +459,13 @@ public class GameMaster {
                     boolean isSelected = (selectedInventoryItem != null &&
                             selectedInventoryItem.getName().equals(item.getName()));
 
-                    Spritesheet atlas = getItemSpritesheet(item);
+                    SpriteSheet atlas = getItemSpritesheet(item);
                     int col = getItemIconColumn(item);
                     int row = getItemIconRow(item);
 
                     int totalCols = atlas.getTotalFrames();
                     int totalRows = getItemIconRows(item);
-                    float iconSize = 32.0f;
+                    float iconSize = K.UI.ICON_SIZE;
 
                     float u0 = (float) col / totalCols;
                     float u1 = (float) (col + 1) / totalCols;
@@ -565,13 +565,13 @@ public class GameMaster {
                     Item item = entry.getKey();
                     int amount = entry.getValue();
 
-                    Spritesheet atlas = getItemSpritesheet(item);
+                    SpriteSheet atlas = getItemSpritesheet(item);
                     int col = getItemIconColumn(item);
                     int row = getItemIconRow(item);
 
                     int totalCols = atlas.getTotalFrames();
                     int totalRows = getItemIconRows(item);
-                    float iconSize = 32.0f;
+                    float iconSize = K.UI.ICON_SIZE;
 
                     float u0 = (float) col / totalCols;
                     float u1 = (float) (col + 1) / totalCols;
@@ -649,19 +649,27 @@ public class GameMaster {
         if (item instanceof CellExpansion) {
             return 0;
         }
+
         if (item instanceof Seed seed && seed.getType() != null) {
             return seed.getType().getId();
         }
+
         if (item instanceof Crop crop && crop.getType() != null) {
             return crop.getType().getId();
         }
+
         return 0;
     }
 
     private static int getItemIconRow(Item item) {
         if (item instanceof CellExpansion) {
+            return 0;
+        }
+
+        if (item instanceof Crop) {
             return 1;
         }
+
         return 0;
     }
 
@@ -673,7 +681,7 @@ public class GameMaster {
         return 1;
     }
 
-    private Spritesheet getItemSpritesheet(Item item) {
+    private SpriteSheet getItemSpritesheet(Item item) {
         if (item instanceof Crop || item instanceof CellExpansion) {
             return cropIcons;
         }

@@ -84,6 +84,8 @@ public final class K {
         public static final float NEW_PLAYER_WIDTH = 340.0f;
         public static final float NEW_PLAYER_HEIGHT = 200.0f;
 
+        public static final float ICON_SIZE = 32.0f;
+
         public static final float LARGE_BUTTON_HEIGHT = 40.0f;
         public static final float CENTER_PIVOT = 0.5f;
         public static final float MATCH_PARENT_WIDTH = -1.0f;

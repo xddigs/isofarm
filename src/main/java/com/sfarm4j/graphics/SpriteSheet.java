@@ -1,10 +1,10 @@
 package com.sfarm4j.graphics;
 
-public class Spritesheet {
+public class SpriteSheet {
     private final Texture texture;
     private final int totalFrames;
 
-    public Spritesheet(String path, int totalFrames) {
+    public SpriteSheet(String path, int totalFrames) {
         this.texture = new Texture(path);
         this.totalFrames = totalFrames;
     }
