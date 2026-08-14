@@ -26,8 +26,7 @@ import java.util.*;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13.glActiveTexture;
+import static org.lwjgl.opengl.GL13.*;
 
 @SuppressWarnings("all")
 public class GameMaster {
@@ -47,6 +46,8 @@ public class GameMaster {
     private Mesh spriteMesh;
     private Spritesheet wheat;
     private Spritesheet carrot;
+    private Spritesheet potato;
+    private final Map<CropType, Spritesheet> cropSpritesheets;
     private Spritesheet seedIcons;
     private Spritesheet cropIcons;
     private Camera camera;
@@ -94,10 +95,16 @@ public class GameMaster {
         this.blockMesh = Mesh.createMesh(K.World.DEFAULT_BLOCK_DEPTH);
         this.selectionMesh = Mesh.selection();
         this.spriteMesh = Mesh.createCrop();
+        this.cropSpritesheets = new EnumMap(CropType.class);
         this.wheat = new Spritesheet(K.Paths.WHEAT_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
         this.carrot = new Spritesheet(K.Paths.CARROT_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
+        this.potato = new Spritesheet(K.Paths.POTATO_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
         this.seedIcons = new Spritesheet(K.Paths.SEED_ICONS, K.UI.ICON_ATLAS_FRAMES);
         this.cropIcons = new Spritesheet(K.Paths.CROP_ICONS, K.UI.ICON_ATLAS_FRAMES);
+
+        cropSpritesheets.put(CropType.WHEAT, wheat);
+        cropSpritesheets.put(CropType.CARROT, carrot);
+        cropSpritesheets.put(CropType.POTATO, carrot);
 
         this.camera = new Camera(K.Camera.DEFAULT_WIDTH, K.Camera.DEFAULT_HEIGHT);
         this.camera.setPosition(0.0f, 0.0f, 0.0f);
@@ -132,10 +139,6 @@ public class GameMaster {
         imGuiGl3.init(K.Render.GLSL_VERSION);
         log.info("GameMaster initialized with grid size: {}x{}",
                 K.World.GRID_SIZE, K.World.GRID_SIZE);
-    }
-
-    private void setColor(ImGuiStyle style, int target, float[] rgba) {
-        style.setColor(target, rgba[0], rgba[1], rgba[2], rgba[3]);
     }
 
     public void update(float delta) {
@@ -272,14 +275,12 @@ public class GameMaster {
                             && Math.round(c.getZ()) == hoveredCell.y)
                     .findFirst()
                     .ifPresent(crop -> {
-                        Spritesheet sheet = (crop.getType() == CropType.WHEAT) ? wheat : carrot;
+                        Spritesheet sheet = cropSpritesheets.get(crop.getType());
                         sheet.bind();
-
                         modelMatrix.identity().translate(crop.getX(), K.World.CROP_ELEVATION_Y, crop.getZ());
                         defaultShader.setUniform("uModel", modelMatrix);
                         defaultShader.setUniform("uFrameIndex", crop.getStage().getFrameIndex());
                         spriteMesh.render();
-
                         sheet.unbind();
             });
 
@@ -302,7 +303,6 @@ public class GameMaster {
 
         imGuiGlfw.newFrame();
         ImGui.newFrame();
-
         renderInv();
         renderCoordinates();
 
@@ -375,7 +375,7 @@ public class GameMaster {
         imGuiGl3.renderDrawData(ImGui.getDrawData());
     }
 
-    private void renderInv() {
+    public void renderInv() {
         if (player == null) return;
         ImGui.setNextWindowPos(K.UI.INVENTORY_POS_X, windowHeight -
                 K.UI.INVENTORY_POS_Y_OFFSET, ImGuiCond.FirstUseEver);
@@ -385,8 +385,7 @@ public class GameMaster {
 
         int flags = ImGuiWindowFlags.NoTitleBar |
                 ImGuiWindowFlags.NoResize   |
-                ImGuiWindowFlags.NoCollapse |
-                ImGuiWindowFlags.NoMove;
+                ImGuiWindowFlags.NoCollapse;
 
         if (ImGui.begin("Inventory", flags)) {
             Inventory inv = player.getInventory();
@@ -408,7 +407,7 @@ public class GameMaster {
                 }
 
                 if (selectedInventoryItem != null && !aggregated
-                    .containsKey(selectedInventoryItem.getName())) {
+                        .containsKey(selectedInventoryItem.getName())) {
                     selectedInventoryItem = null;
                 }
 
@@ -449,7 +448,7 @@ public class GameMaster {
                     ImGui.pushID("inv_item_" + item.getName());
                     if (ImGui.imageButton(atlas.getTextureId(), iconSize, iconSize, u0, v0, u1, v1)) {
                         selectedInventoryItem = item;
-                        this.currentCrop = resolveCropType(item);
+                        currentCrop = resolveCropType(item);
                     }
 
                     ImGui.popStyleColor(4);
@@ -510,6 +509,10 @@ public class GameMaster {
         ImGui.end();
     }
 
+    private void setColor(ImGuiStyle style, int target, float[] rgba) {
+        style.setColor(target, rgba[0], rgba[1], rgba[2], rgba[3]);
+    }
+
     private void setColor(int col, float[] rgba) {
         ImGui.pushStyleColor(col, rgba[0], rgba[1], rgba[2], rgba[3]);
     }
@@ -528,7 +531,7 @@ public class GameMaster {
         return seedIcons;
     }
 
-    private int getItemIconIndex(Item item) {
+    private static int getItemIconIndex(Item item) {
         if (item instanceof Seed seed && seed.getType() != null) {
             return seed.getType().getId();
         }
@@ -555,6 +558,8 @@ public class GameMaster {
 
         wheat.dispose();
         carrot.dispose();
+        potato.dispose();
+
         cropIcons.dispose();
         seedIcons.dispose();
 

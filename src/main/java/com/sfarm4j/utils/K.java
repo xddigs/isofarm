@@ -100,6 +100,7 @@ public final class K {
         public static final String OUTLINE_FRAG_SHADER = "shaders/outline.frag";
         public static final String WHEAT_TEXTURE = "assets/crops/wheat_crop.png";
         public static final String CARROT_TEXTURE = "assets/crops/carrot_crop.png";
+        public static final String POTATO_TEXTURE  = "assets/crops/potato_crop.png";
         public static final String FONT = "C:/Windows/Fonts/arial.ttf";
         public static final String SEED_ICONS = "assets/icons/seed_icons.png";
         public static final String CROP_ICONS = "assets/icons/crop_icons.png";
