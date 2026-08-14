@@ -2,6 +2,7 @@ package com.sfarm4j.data;
 
 import java.util.*;
 
+@DataClass
 public class Inventory {
     private final Map<Item, Integer> items;
 
@@ -57,5 +58,33 @@ public class Inventory {
 
     public int getAmount(Item item) {
         return items.getOrDefault(item, 0);
+    }
+
+    public <T extends Item> boolean hasItemOfType(Class<T> type) {
+        return items.entrySet().stream()
+                .anyMatch(entry -> type
+                .isInstance(entry.getKey()) && entry.getValue() > 0);
+    }
+
+    public <T extends Item> Optional<Byte> getFirstItemIdOfType(Class<T> type) {
+        return items.entrySet().stream()
+                .filter(entry -> type.isInstance(entry.getKey())
+                        && entry.getValue() > 0)
+                .map(entry -> entry.getKey().getId())
+                .findFirst();
+    }
+
+    public <T extends Item> boolean hasItemWithId(Class<T> type, byte id) {
+        return items.entrySet().stream()
+                .anyMatch(entry -> type.isInstance(entry.getKey())
+                        && entry.getKey().getId() == id
+                        && entry.getValue() > 0);
+    }
+
+    public <T extends Item> int getTotalAmountOfType(Class<T> type) {
+        return items.entrySet().stream()
+                .filter(entry -> type.isInstance(entry.getKey()))
+                .mapToInt(Map.Entry::getValue)
+                .sum();
     }
 }
