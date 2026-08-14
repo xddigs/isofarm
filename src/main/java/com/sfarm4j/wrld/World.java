@@ -20,4 +20,16 @@ public class World {
     public List<Crop> getActiveCrops() {
         return Collections.unmodifiableList(crops);
     }
+
+    public Crop getCropAt(int x, int z) {
+        for (int cz = 0; cz < crops.size(); cz++) {
+            for (Crop crop : crops) {
+                if (crop.getX() == x &&
+                    crop.getZ() == z) {
+                    return crop;
+                }
+            }
+        }
+        return null;
+    }
 }
