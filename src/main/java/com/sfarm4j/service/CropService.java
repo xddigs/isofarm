@@ -14,38 +14,39 @@ public class CropService implements Service<Crop> {
     }
 
     public Crop plant(int x, int z, Player player, Cell cell, CropType type,
-                      Season currentSeason, int value) {
-        Crop crop = new Crop(x, z, type, cell, currentSeason, value);
-        if (crop.getCell().hasCrop() && !crop.isReadyToHarvest()) {
-            log.warn("Attempted to plant {} at ({}, {}) " +
-                    "but cell already has a crop!", type.getName(), x, z);
-            return crop;
-        } else if (crop.getCell().hasCrop() && crop.isReadyToHarvest()) {
-            harvest(player, crop);
+                      Season currentSeason) {
+        if (cell.hasCrop()) {
+            Crop crop = world.getCropAt(x, z);
+            if (crop != null) {
+                if (!crop.isReadyToHarvest()) {
+                    log.warn("Attempted to plant {} at ({}, {}) but cell already has an growing crop!",
+                            type.getName(), x, z);
+                    return null;
+                }
+
+                if (crop.isReadyToHarvest()) {
+                    harvest(player, crop);
+                }
+            }
         }
+
+        Crop newCrop = new Crop(x, z, type, cell, currentSeason);
+        cell.setCrop(true);
+        world.addCrop(newCrop);
 
         log.info("Planted {} at ({}, {}) during season {}",
                 type.getName(), x, z, currentSeason.getName());
-        cell.setCrop(true);
-        world.addCrop(crop);
-        return crop;
+
+        return newCrop;
     }
 
     public void process(Season currentSeason) {
-        log.info("Processing daily growth for {} active crops...",
-                world.getActiveCrops().size());
+        log.info("Processing daily growth for {} active crops...", world.getActiveCrops().size());
 
         for (Crop crop : world.getActiveCrops()) {
-            if (crop.getSeason() == currentSeason) {
-                crop.grow();
-                if (crop.isReadyToHarvest()) {
-                    log.info("Crop {} is now fully grown " +
-                            "and ready for harvest!", crop.getType().getName());
-                }
-            } else {
-                log.debug("Crop {} did not grow due to season mismatch (Crop: {}, Current: {})",
-                        crop.getType().getName(), crop.getSeason(), currentSeason);
-            }
+            float multiplier = (crop.getSeason() == currentSeason)
+                    ? (float) currentSeason.getValueMultiplier() : 1.0f;
+            crop.grow(multiplier);
         }
     }
 
@@ -63,5 +64,10 @@ public class CropService implements Service<Crop> {
         log.info("Successfully harvested {}" +
                 " giving {} items.", crop.getType().getName(), yield);
         return yield;
+    }
+
+    public void rip(Crop crop) {
+        world.removeCrop(crop);
+        log.info("Ripped {} from the ground.", crop.getType().getName());
     }
 }

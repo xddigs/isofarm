@@ -13,15 +13,15 @@ public class Crop extends Item {
     private boolean readyToHarvest;
 
     public Crop(float x, float z,
-                CropType type, Cell cell, Season season, int value) {
-        super(type.getName(), 1, value);
+                CropType type, Cell cell, Season season) {
+        super(type.getName(), 1, type.getValue());
         this.x = x;
         this.z = z;
         this.cell = cell;
         this.stage = GrowthStage.SEED;
         this.type = type;
         this.season = season;
-        this.value = value;
+        this.value = type.getValue();
         this.daysToGrow = type.getDaysToGrow();
         this.daysGrown = 0;
         this.readyToHarvest = false;
@@ -67,12 +67,12 @@ public class Crop extends Item {
         return readyToHarvest;
     }
 
-    public void grow() {
+    public void grow(float multiplier) {
         if (readyToHarvest) {
             return;
         }
 
-        daysGrown++;
+        daysGrown += Math.max(1, Math.round(multiplier));
 
         if (daysGrown >= daysToGrow) {
             this.readyToHarvest = true;
