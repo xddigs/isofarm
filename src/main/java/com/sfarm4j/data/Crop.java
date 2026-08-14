@@ -11,6 +11,7 @@ public class Crop extends Item {
 
     private float currentGrowthTime = 0.0f;
     private final float targetGrowthTime = 8.0f;
+    private boolean wasHarvested;
 
     public Crop(float x, float z,
                 CropType type, Cell cell, Season season) {
@@ -22,6 +23,7 @@ public class Crop extends Item {
         this.type = type;
         this.season = season;
         this.value = type.getValue();
+        this.wasHarvested = false;
     }
 
     public float getX() {
@@ -54,6 +56,14 @@ public class Crop extends Item {
 
     public boolean isReadyToHarvest() {
         return this.stage == GrowthStage.HARVESTABLE;
+    }
+
+    public boolean wasHarvested() {
+        return wasHarvested;
+    }
+
+    public void setHarvested(boolean wasHarvested) {
+        this.wasHarvested = wasHarvested;
     }
 
     public void update(float delta) {

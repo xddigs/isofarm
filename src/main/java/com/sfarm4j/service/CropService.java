@@ -54,16 +54,17 @@ public class CropService implements Service<Crop> {
         if (!crop.isReadyToHarvest()) {
             log.warn("Attempted to harvest {} " +
                     "before it was fully grown.", crop.getType().getName());
-            return 0;
+            return 1;
         }
 
         int yield = crop.getType().getYield();
         int cropValue = crop.getValue();
         int seeds = crop.getType().getSeeds();
         player.add(crop, yield);
-        for (int i = 0; i <= seeds; i++) { player.add(new Seed()); }
+        player.add(new Seed(), seeds);
         player.earn(cropValue);
         world.removeCrop(crop);
+        crop.setHarvested(true);
 
         log.info("Successfully harvested {}" +
                 " giving {} items.", crop.getType().getName(), yield);

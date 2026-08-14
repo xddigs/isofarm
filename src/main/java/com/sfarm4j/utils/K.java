@@ -38,23 +38,23 @@ public final class K {
         public static final float WINDOW_BORDER_SIZE = 0.0f;
         public static final float FRAME_BORDER_SIZE = 0.0f;
 
-        public static final float WINDOW_PADDING_X = 24.0f;
-        public static final float WINDOW_PADDING_Y = 24.0f;
+        public static final float WINDOW_PADDING_X = 16.0f;
+        public static final float WINDOW_PADDING_Y = 12.0f;
         public static final float FRAME_PADDING_X = 12.0f;
         public static final float FRAME_PADDING_Y = 10.0f;
         public static final float ITEM_SPACING_X = 0.0f;
         public static final float ITEM_SPACING_Y = 14.0f;
+        public static final float LINEHEIGHT = 0.8f;
+        public static final float FONT_SIZE = 20.0f;
 
-        public static final float FONT_SIZE = 17.0f;
-
-        public static final float[] COLOR_WINDOW_BG = {0.08f, 0.08f, 0.10f, 0.92f};
-        public static final float[] COLOR_FRAME_BG = {0.15f, 0.15f, 0.18f, 1.00f};
+        public static final float[] COLOR_WINDOW_BG        = {0.08f, 0.08f, 0.10f, 0.92f};
+        public static final float[] COLOR_FRAME_BG         = {0.15f, 0.15f, 0.18f, 1.00f};
         public static final float[] COLOR_FRAME_BG_HOVERED = {0.20f, 0.20f, 0.24f, 1.00f};
-        public static final float[] COLOR_FRAME_BG_ACTIVE = {0.22f, 0.22f, 0.26f, 1.00f};
-        public static final float[] COLOR_BUTTON = {0.25f, 0.25f, 0.30f, 1.00f};
-        public static final float[] COLOR_BUTTON_HOVERED = {0.35f, 0.35f, 0.42f, 1.00f};
-        public static final float[] COLOR_BUTTON_ACTIVE = {0.20f, 0.20f, 0.25f, 1.00f};
-        public static final float[] COLOR_TEXT = {0.92f, 0.92f, 0.95f, 1.00f};
+        public static final float[] COLOR_FRAME_BG_ACTIVE  = {0.22f, 0.22f, 0.26f, 1.00f};
+        public static final float[] COLOR_BUTTON         = {0.45f, 0.55f, 0.12f, 1.00f};
+        public static final float[] COLOR_BUTTON_HOVERED = {0.55f, 0.68f, 0.15f, 1.00f};
+        public static final float[] COLOR_BUTTON_ACTIVE  = {0.38f, 0.46f, 0.10f, 1.00f};
+        public static final float[] COLOR_TEXT            = {1.00f, 1.00f, 1.00f, 1.00f};
     }
 
     public static final class Paths {

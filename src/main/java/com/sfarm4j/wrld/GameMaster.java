@@ -13,6 +13,7 @@ import imgui.ImGuiIO;
 import imgui.ImGuiStyle;
 import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiCond;
+import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
@@ -123,7 +124,8 @@ public class GameMaster {
 
         imGuiGlfw.init(windowHandle, true);
         imGuiGl3.init(K.Render.GLSL_VERSION);
-        log.info("GameMaster initialized with grid size: {}x{}", K.World.GRID_SIZE, K.World.GRID_SIZE);
+        log.info("GameMaster initialized with grid size: {}x{}",
+                K.World.GRID_SIZE, K.World.GRID_SIZE);
     }
 
     private void setColor(ImGuiStyle style, int target, float[] rgba) {
@@ -141,7 +143,7 @@ public class GameMaster {
 
         boolean isCtrlDown = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL) ||
                 Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
-        if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_RIGHT)) {
+        if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
             if (isCtrlDown) {
                 camera.rotateYaw(Mouse.getDeltaX() * K.Camera.ROTATION_SENSITIVITY);
             } else {
@@ -167,25 +169,28 @@ public class GameMaster {
         }
 
         if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT) && hoveredCell != null) {
-            CropType selectedType = CropType.WHEAT;
-            Crop newCrop = cropService.plant(
-                    hoveredCell.x,
-                    hoveredCell.y,
-                    player,
-                    cellService.getCell(hoveredCell.x, hoveredCell.y),
-                    selectedType,
-                    timeService.getCurrentSeason());
-        }
+            Crop crop = world.getCropAt(hoveredCell.x, hoveredCell.y);
 
-        if (Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT) &&
-            Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT) &&
-            hoveredCell != null) {
-            Crop crop = world.getCropAt(hoveredCell.x(), hoveredCell.y());
-            if (crop != null && !crop.isReadyToHarvest()) {
-                cropService.rip(crop);
-            } else if (crop != null && crop.isReadyToHarvest()){
-                cropService.harvest(player, crop);
-                return;
+            if (crop != null) {
+                if (Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
+                    if (crop.isReadyToHarvest()) {
+                        cropService.harvest(player, crop);
+                    } else if (!crop.isReadyToHarvest() || !crop.wasHarvested()) {
+                        cropService.rip(crop);
+                    }
+                }
+            } else {
+                if (!Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
+                    CropType selectedType = CropType.WHEAT;
+                    cropService.plant(
+                            hoveredCell.x,
+                            hoveredCell.y,
+                            player,
+                            cellService.getCell(hoveredCell.x, hoveredCell.y),
+                            selectedType,
+                            timeService.getCurrentSeason()
+                    );
+                }
             }
         }
 
@@ -279,6 +284,7 @@ public class GameMaster {
                     | ImGuiWindowFlags.NoFocusOnAppearing;
 
             ImGui.begin("CropCardTooltip", flags);
+            ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, 4.0f, K.Style.LINEHEIGHT);
             Crop crop = world.getCropAt(hoveredCell.x, hoveredCell.y);
 
             if (crop != null) {
@@ -288,13 +294,15 @@ public class GameMaster {
                 Optional<Seed> seedOpt = player.getInventory().getItemOfType(Seed.class);
                 if (seedOpt.isPresent()) {
                     Seed seed = seedOpt.get();
-                    ImGui.text(seed.getName() + " (x" + seed.getAmount() + ")");
+                    ImGui.text(seed.getName() + " (x" + player.getInventory()
+                            .getTotalAmountOfType(Seed.class) + ")");
                     ImGui.textDisabled(seed.getDescription());
                 } else {
                     ImGui.textDisabled("You're out of seeds!");
                 }
             }
 
+            ImGui.popStyleVar();
             ImGui.end();
         }
 
