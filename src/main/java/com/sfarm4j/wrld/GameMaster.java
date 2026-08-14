@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.Optional;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -177,13 +178,14 @@ public class GameMaster {
         }
 
         if (Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT) &&
-                Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT) &&
-                hoveredCell != null) {
+            Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT) &&
+            hoveredCell != null) {
             Crop crop = world.getCropAt(hoveredCell.x(), hoveredCell.y());
             if (crop != null && !crop.isReadyToHarvest()) {
                 cropService.rip(crop);
             } else if (crop != null && crop.isReadyToHarvest()){
                 cropService.harvest(player, crop);
+                return;
             }
         }
 
@@ -263,11 +265,38 @@ public class GameMaster {
             glEnable(GL_DEPTH_TEST);
         }
 
-
         defaultShader.unbind();
 
         imGuiGlfw.newFrame();
         ImGui.newFrame();
+
+        if (hoveredCell != null && player != null) {
+            ImGui.setNextWindowPos(Mouse.getX() + 15, Mouse.getY() + 15, ImGuiCond.Always);
+            int flags = ImGuiWindowFlags.NoTitleBar
+                    | ImGuiWindowFlags.NoResize
+                    | ImGuiWindowFlags.NoMove
+                    | ImGuiWindowFlags.AlwaysAutoResize
+                    | ImGuiWindowFlags.NoFocusOnAppearing;
+
+            ImGui.begin("CropCardTooltip", flags);
+            Crop crop = world.getCropAt(hoveredCell.x, hoveredCell.y);
+
+            if (crop != null) {
+                ImGui.text(crop.getType().getName());
+                ImGui.textDisabled("Status: " + crop.getStage());
+            } else {
+                Optional<Seed> seedOpt = player.getInventory().getItemOfType(Seed.class);
+                if (seedOpt.isPresent()) {
+                    Seed seed = seedOpt.get();
+                    ImGui.text(seed.getName() + " (x" + seed.getAmount() + ")");
+                    ImGui.textDisabled(seed.getDescription());
+                } else {
+                    ImGui.textDisabled("You're out of seeds!");
+                }
+            }
+
+            ImGui.end();
+        }
 
         if (player == null) {
             ImGui.setNextWindowPos(windowWidth / 2.0f,
