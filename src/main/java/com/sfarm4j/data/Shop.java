@@ -24,7 +24,7 @@ public class Shop {
         clear();
         add(new Seed(CropType.CARROT), 64);
         add(new Seed(CropType.POTATO), 16);
-        add(new CellExpansion(100), 2);
+        add(new Block(BlockData.DIRT), 2);
     }
 
     public String getOwner() {

@@ -127,5 +127,6 @@ public final class K {
         public static final Vector3f SUNLIGHT_DEFAULT = new Vector3f(1.0f, 1.0f, 1.0f);
         public static final Vector3f OUTLINE_DEFAULT = new Vector3f(0.0f, 0.0f, 0.0f);
         public static final Vector3f CELL_BLOCKED = new Vector3f(0.8f, 0.1f, 0.04f);
+        public static final Vector3f STONE = new Vector3f(0.4f, 0.4f, 0.4f);
     }
 }

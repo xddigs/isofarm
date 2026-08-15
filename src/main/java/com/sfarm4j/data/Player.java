@@ -17,7 +17,8 @@ public class Player {
         this.inventory = new Inventory();
         this.money = 0;
         add(new Seed(), 4);
-        add(new CellExpansion(100), 1);
+        add(new Block(BlockData.DIRT), 1);
+        add(new Block(BlockData.STONE), 64);
     }
 
     public String getName() {
