@@ -9,7 +9,6 @@ import com.sfarm4j.utils.K;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,8 +32,6 @@ public class CellService implements Service<Cell> {
                 shader.setUniform("uLightColor", sunlight.getColor());
                 shader.setUniform("uLightIntensity", sunlight.getIntensity());
             }
-            boolean isEven = (cell.getX() + cell.getZ()) % 2 == 0;
-            Vector3f color = isEven ? K.Colors.CELL_EVEN : K.Colors.CELL_ODD;
 
             float worldX = cell.getX() * K.World.TILE_SIZE;
             float worldZ = cell.getZ() * K.World.TILE_SIZE;

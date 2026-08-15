@@ -187,7 +187,7 @@ public class GameMaster {
         defaultShader.setUniform("uLightDirection", sunlight.getDirection());
 
         defaultShader.setUniform("uUseTexture", false);
-        defaultShader.setUniform("uBaseColor", K.Colors.CELL_EVEN);
+        defaultShader.setUniform("uBaseColor", K.Colors.DIRT);
         cellService.renderAll(defaultShader, blockMesh, modelMatrix, sunlight);
 
         defaultShader.setUniform("uUseTexture", true);
@@ -210,11 +210,10 @@ public class GameMaster {
         });
 
         defaultShader.setUniform("uUseTexture", false);
-        defaultShader.setUniform("uBaseColor", K.Colors.STONE);
-
         world.getBlocks().values().forEach(block -> {
             modelMatrix.identity()
                     .translate(block.getX(), block.getY(), block.getZ());
+            defaultShader.setUniform("uBaseColor", block.getType().getColor());
             defaultShader.setUniform("uModel", modelMatrix);
             blockMesh.render();
         });

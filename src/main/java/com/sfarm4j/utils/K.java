@@ -120,14 +120,12 @@ public final class K {
     }
 
     public static final class Colors {
-        public static final Vector3f CELL_EVEN = new Vector3f(0.4f, 0.25f, 0.1f);
-        public static final Vector3f CELL_ODD = new Vector3f(0.37f, 0.23f, 0.09f);
-        public static final Vector3f WATERED = new Vector3f(0.45f, 0.28f, 0.24f);
-        public static final Vector3f GRASS = new Vector3f(0.20f, 0.55f, 0.18f);
-        public static final Vector3f TILLED = new Vector3f(0.3f, 0.18f, 0.08f);
+        public static final Vector3f DIRT =  new Vector3f(0.4f, 0.25f, 0.1f);
+        public static final Vector3f STONE = new Vector3f(0.4f, 0.4f, 0.4f);
+        public static final Vector3f GRASS = new Vector3f(0.0f, 0.6f, 0.3f);
+
         public static final Vector3f SUNLIGHT_DEFAULT = new Vector3f(1.0f, 1.0f, 1.0f);
         public static final Vector3f OUTLINE_DEFAULT = new Vector3f(0.0f, 0.0f, 0.0f);
         public static final Vector3f CELL_BLOCKED = new Vector3f(0.8f, 0.1f, 0.04f);
-        public static final Vector3f STONE = new Vector3f(0.4f, 0.4f, 0.4f);
     }
 }

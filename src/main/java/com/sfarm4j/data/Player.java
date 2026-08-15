@@ -23,6 +23,7 @@ public class Player {
         add(new Seed(), 4);
         add(new Block(BlockData.DIRT), 1);
         add(new Block(BlockData.STONE), 64);
+        add(new Block(BlockData.GRASS), 64);
     }
 
     public String getName() {
