@@ -80,7 +80,7 @@ public final class K {
         public static final float HUD_PADDING = 20.0f;
 
         public static final float INVENTORY_WIDTH = 268.0f;
-        public static final float INVENTORY_HEIGHT = 330.0f;
+        public static final float INVENTORY_HEIGHT = 300.0f;
 
         public static final float NEW_PLAYER_WIDTH = 340.0f;
         public static final float NEW_PLAYER_HEIGHT = 200.0f;

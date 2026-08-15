@@ -326,6 +326,8 @@ public class GameUIService implements Service<GameMaster> {
                             selectedInventoryItem = null;
                         }
 
+                        renderSlotCount(totalAmount);
+
                         if (ImGui.isItemHovered()) {
                             ImGui.setTooltip(item.getName() + " x" + totalAmount);
                         }
@@ -372,6 +374,49 @@ public class GameUIService implements Service<GameMaster> {
         if (targetItem != null && cumulativeAmount > 0) {
             shop.buy(targetItem, cumulativeAmount);
         }
+    }
+
+    private void buyItem(Inventory stock, Item item, int amount) {
+        if (amount <= 0) {
+            return;
+        }
+
+        int totalPrice = item.getValue() * amount;
+
+        if (player.getMoney() < totalPrice) {
+            log.warn("Player doesn't have enough money to buy {} x{}",
+                    item.getName(), amount);
+            return;
+        }
+
+        player.earn(-totalPrice);
+        shop.earn(totalPrice);
+
+        stock.remove(item, amount);
+        player.getInventory().add(item, amount);
+
+        log.info("Player bought {} x{} from shop",
+                item.getName(), amount);
+    }
+
+    private void renderSlotCount(int amount) {
+        if (amount <= 0) return;
+
+        float slotX = ImGui.getItemRectMinX();
+        float slotY = ImGui.getItemRectMinY();
+        float slotWidth = ImGui.getItemRectSizeX();
+        float slotHeight = ImGui.getItemRectSizeY();
+
+        String count = String.valueOf(amount);
+        float textWidth = ImGui.calcTextSize(count).x;
+        float textHeight = ImGui.getTextLineHeight();
+
+        float x = slotX + slotWidth - textWidth - 4.0f;
+        float y = slotY + slotHeight - textHeight - 2.0f;
+
+        ImGui.getWindowDrawList().addText(x + 1.0f, y + 1.0f,
+                0xFF000000, count);
+        ImGui.getWindowDrawList().addText(x, y, 0xFFFFFFFF, count);
     }
 
     public void renderShop() {
@@ -431,27 +476,20 @@ public class GameUIService implements Service<GameMaster> {
                         float u0 = (float) col / totalCols;
                         float u1 = (float) (col + 1) / totalCols;
 
-                        if (ImGui.imageButton(
+                        boolean wasClickedOn = ImGui.imageButton(
                                 atlas.getTextureId(),
                                 K.UI.ICON_SIZE,
                                 K.UI.ICON_SIZE,
                                 u0, 1.0f,
-                                u1, 0.0f)) {
+                                u1, 0.0f);
 
-                            if (player.getMoney() >= item.getValue()) {
-                                player.earn(-item.getValue());
-                                shop.earn(item.getValue());
-
-                                stock.remove(item, 1);
-                                player.getInventory().add(item, 1);
-
-                                log.info("Player bought {} from shop",
-                                        item.getName());
-                            } else {
-                                log.warn("Player doesn't have enough money to buy {}",
-                                        item.getName());
-                            }
+                        if (ImGui.isItemHovered() && ImGui.isMouseDoubleClicked(GLFW_MOUSE_BUTTON_LEFT)) {
+                            buyItem(stock, item, stock.getAmount(item));
+                        } else if (wasClickedOn) {
+                            buyItem(stock, item, 1);
                         }
+
+                        renderSlotCount(amount);
 
                         if (ImGui.isItemHovered()) {
                             ImGui.setTooltip(item.getName() + " - $" + item.getValue() +
