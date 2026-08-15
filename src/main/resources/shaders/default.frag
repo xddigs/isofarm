@@ -7,6 +7,9 @@ in vec2 vTexCoord;
 uniform sampler2D uTexture;
 uniform bool uUseTexture;
 
+uniform vec2 uAtlasScale = vec2(1.0, 1.0);
+uniform vec2 uAtlasOffset = vec2(0.0, 0.0);
+
 uniform vec3 uBaseColor;
 uniform vec3 uLightDirection;
 uniform vec3 uSunColor;
@@ -15,7 +18,10 @@ uniform float uLightIntensity;
 uniform bool uIsMaskPass;
 
 void main() {
-    vec4 objectColor = uUseTexture ? texture(uTexture, vTexCoord) : vec4(uBaseColor, 1.0);
+    vec2 clampedTexCoord = clamp(vTexCoord, 0.0001, 0.9999);
+    vec2 uv = clampedTexCoord * uAtlasScale + uAtlasOffset;
+
+    vec4 objectColor = uUseTexture ? texture(uTexture, uv) : vec4(uBaseColor, 1.0);
 
     if (uUseTexture && objectColor.a < 0.1) {
         discard;

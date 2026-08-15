@@ -52,6 +52,7 @@ public class GameMaster {
     private SpriteSheet cropIcons;
     private SpriteSheet toolIcons;
     private SpriteSheet blockIcons;
+    private SpriteSheet blocksTexture;
 
     private Camera camera;
     private final Matrix4f modelMatrix = new Matrix4f();
@@ -71,7 +72,6 @@ public class GameMaster {
         this.cropService = new CropService(world);
         this.timeService = new TimeService();
         this.cellService = new CellService();
-
         this.sunlight = new Sunlight(K.Sunlight.DEFAULT_DIRECTION);
 
         int center = K.World.GRID_SIZE / 2;
@@ -104,6 +104,14 @@ public class GameMaster {
         this.blockMesh = Mesh.createMesh(K.World.DEFAULT_BLOCK_DEPTH);
         this.selectionMesh = Mesh.selection();
         this.spriteMesh = Mesh.createCrop();
+
+        try {
+            this.blocksTexture = new SpriteSheet(K.Paths.BLOCKS, K.UI.ICON_BLOCK_ATLAS_FRAMES);
+        } catch (Exception e) {
+            log.warn("Could not load blocks.png atlas, falling back to base colors: {}", e.getMessage());
+            this.blocksTexture = null;
+        }
+
         this.cropSpritesheets = new EnumMap(CropType.class);
         this.wheat = new SpriteSheet(K.Paths.WHEAT_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
         this.carrot = new SpriteSheet(K.Paths.CARROT_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
@@ -186,37 +194,57 @@ public class GameMaster {
         defaultShader.setUniform("uLightIntensity", TimeService.getSunIntensity());
         defaultShader.setUniform("uLightDirection", sunlight.getDirection());
 
-        defaultShader.setUniform("uUseTexture", false);
-        defaultShader.setUniform("uBaseColor", K.Colors.DIRT);
+        defaultShader.setUniform("uTotalFrames", 1);
+        defaultShader.setUniform("uFrameIndex", 0);
+
+        if (blocksTexture != null) {
+            blocksTexture.bind();
+            defaultShader.setUniform("uUseTexture", true);
+            defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
+
+            defaultShader.setUniform("uAtlasScale", BlockData.DIRT.getAtlasScale());
+            defaultShader.setUniform("uAtlasOffset", BlockData.DIRT.getAtlasOffset());
+        } else {
+            defaultShader.setUniform("uUseTexture", false);
+            defaultShader.setUniform("uBaseColor", K.Colors.DIRT);
+        }
+
         cellService.renderAll(defaultShader, blockMesh, modelMatrix, sunlight);
-
-        defaultShader.setUniform("uUseTexture", true);
-        defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
-
-        defaultShader.setUniform("uUseTexture", true);
-        defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
 
         world.getActiveCrops().forEach(crop -> {
             SpriteSheet sheet = cropSpritesheets.get(crop.getType());
             sheet.bind();
-
+            defaultShader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
+            defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
             defaultShader.setUniform("uTotalFrames", sheet.getTotalFrames());
             modelMatrix.identity().translate(crop.getX(), K.World.CROP_ELEVATION_Y, crop.getZ());
             defaultShader.setUniform("uModel", modelMatrix);
             defaultShader.setUniform("uFrameIndex", crop.getStage().getFrameIndex());
             spriteMesh.render();
-
             sheet.unbind();
         });
 
-        defaultShader.setUniform("uUseTexture", false);
         world.getBlocks().values().forEach(block -> {
             modelMatrix.identity()
                     .translate(block.getX(), block.getY(), block.getZ());
-            defaultShader.setUniform("uBaseColor", block.getType().getColor());
+            BlockData blockData = block.getType();
+            defaultShader.setUniform("uBaseColor", blockData.getColor());
             defaultShader.setUniform("uModel", modelMatrix);
+
+            if (blocksTexture != null) {
+                defaultShader.setUniform("uAtlasScale", blockData.getAtlasScale());
+                defaultShader.setUniform("uAtlasOffset", blockData.getAtlasOffset());
+            } else {
+                defaultShader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
+                defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
+            }
+
             blockMesh.render();
         });
+
+        if (blocksTexture != null) {
+            blocksTexture.unbind();
+        }
 
         if (hoveredCell != null) {
             defaultShader.setUniform("uUseTexture", false);
@@ -229,9 +257,9 @@ public class GameMaster {
                     .orElse(null);
             if (hoveredBlock != null) {
                 modelMatrix.identity().translate(
-                                hoveredBlock.getX(),
-                                hoveredBlock.getY(),
-                                hoveredBlock.getZ());
+                        hoveredBlock.getX(),
+                        hoveredBlock.getY(),
+                        hoveredBlock.getZ());
                 defaultShader.setUniform("uModel", modelMatrix);
                 selectionMesh.renderLines();
 
@@ -250,6 +278,8 @@ public class GameMaster {
 
             defaultShader.setUniform("uIsMaskPass", true);
             defaultShader.setUniform("uUseTexture", true);
+            defaultShader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
+            defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
 
             world.getActiveCrops().stream()
                     .filter(c -> Math.round(c.getX()) == hoveredCell.x
@@ -308,6 +338,10 @@ public class GameMaster {
         selectionMesh.dispose();
         spriteMesh.dispose();
         screenQuadMesh.dispose();
+
+        if (blocksTexture != null) {
+            blocksTexture.dispose();
+        }
 
         wheat.dispose();
         carrot.dispose();

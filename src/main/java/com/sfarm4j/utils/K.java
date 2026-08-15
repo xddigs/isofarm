@@ -94,6 +94,7 @@ public final class K {
 
         public static final int ICON_ATLAS_FRAMES = 3;
         public static final int ICON_BLOCK_ATLAS_FRAMES = 4;
+        public static final int ICON_BLOCK_ATLAS_ROWS = 1;
     }
 
     public static final class Paths {
@@ -109,6 +110,7 @@ public final class K {
         public static final String CROP_ICONS = "assets/icons/crop_icons.png";
         public static final String TOOL_ICONS = "assets/icons/tool_icons.png";
         public static final String BLOCK_ICONS = "assets/icons/block_icons.png";
+        public static final String BLOCKS = "assets/textures/blocks.png";
     }
 
     public static final class Render {
