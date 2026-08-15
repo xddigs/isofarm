@@ -277,51 +277,62 @@ public class GameUIService implements Service<GameMaster> {
                 ImGui.pushStyleVar(ImGuiStyleVar.FrameBorderSize, 1.0f);
 
                 int slotIndex = 0;
+                for (int i = 0; i < K.World.TOTAL_SLOTS; i++) {
+                    Item item = null;
+                    int totalAmount = 0;
+                    if (slotIndex < aggregated.size()) {
+                        Map.Entry<String, Map.Entry<Item, Integer>> entry =
+                                aggregated.entrySet().stream()
+                                        .skip(slotIndex)
+                                        .findFirst()
+                                        .orElse(null);
 
-                for (Map.Entry<String, Map.Entry<Item, Integer>> entry : aggregated.entrySet()) {
-                    Item item = entry.getValue().getKey();
-                    int totalAmount = entry.getValue().getValue();
-
-                    boolean isSelected = selectedInventoryItem != null &&
-                            selectedInventoryItem.getName()
-                                    .equals(item.getName());
-
-                    SpriteSheet atlas = getItemSpritesheet(item);
-                    int col = getItemIconColumn(item);
-                    int totalCols = atlas.getTotalFrames();
-
-                    float iconSize = K.UI.ICON_SIZE;
-
-                    float u0 = (float) col / totalCols;
-                    float u1 = (float) (col + 1) / totalCols;
-                    float v0 = 1.0f;
-                    float v1 = 0.0f;
-
-                    if (isSelected) {
-                        setColor(ImGuiCol.Button, K.Style.COLOR_BUTTON);
-                        setColor(ImGuiCol.ButtonHovered, K.Style.COLOR_BUTTON_HOVERED);
-                        setColor(ImGuiCol.ButtonActive, K.Style.COLOR_BUTTON_ACTIVE);
-                        setColor(ImGuiCol.Border, K.Style.COLOR_SLOT_BORDER_SEL);
-
-                    } else {
-                        setColor(ImGuiCol.Button, K.Style.COLOR_SLOT_BG);
-                        setColor(ImGuiCol.ButtonHovered, K.Style.COLOR_SLOT_HOVERED);
-                        setColor(ImGuiCol.ButtonActive, K.Style.COLOR_SLOT_BG);
-                        setColor(ImGuiCol.Border, K.Style.COLOR_SLOT_BORDER);
+                        if (entry != null) {
+                            item = entry.getValue().getKey();
+                            totalAmount = entry.getValue().getValue();
+                        }
                     }
 
-                    ImGui.pushID("inv_item_" + item.getName());
-                    if (ImGui.imageButton(atlas.getTextureId(), iconSize, iconSize,
-                            u0, v0, u1, v1)) {
-                        selectedInventoryItem = item;
+                    boolean isSelected = item != null &&
+                            selectedInventoryItem != null &&
+                            selectedInventoryItem.getName().equals(item.getName());
+
+                    setColor(ImGuiCol.Button, isSelected ? K.Style.COLOR_BUTTON : K.Style.COLOR_SLOT_BG);
+                    setColor(ImGuiCol.ButtonHovered, isSelected ? K.Style.COLOR_BUTTON_HOVERED : K.Style.COLOR_SLOT_HOVERED);
+                    setColor(ImGuiCol.ButtonActive, isSelected ? K.Style.COLOR_BUTTON_ACTIVE : K.Style.COLOR_SLOT_BG);
+                    setColor(ImGuiCol.Border, isSelected ? K.Style.COLOR_SLOT_BORDER_SEL : K.Style.COLOR_SLOT_BORDER);
+
+                    ImGui.pushID("inv_slot_" + slotIndex);
+
+                    if (item != null) {
+                        SpriteSheet atlas = getItemSpritesheet(item);
+                        int col = getItemIconColumn(item);
+                        int totalCols = atlas.getTotalFrames();
+                        float u0 = (float) col / totalCols;
+                        float u1 = (float) (col + 1) / totalCols;
+
+                        if (ImGui.imageButton(
+                                atlas.getTextureId(),
+                                K.UI.ICON_SIZE,
+                                K.UI.ICON_SIZE, u0, 1.0f,
+                                u1, 0.0f)) {
+                            selectedInventoryItem = item;
+                        }
+
+                        if (ImGui.isItemHovered()) {
+                            ImGui.setTooltip(item.getName() + " x" + totalAmount);
+                        }
+
+                    } else {
+                        ImGui.button(
+                                "##empty",
+                                K.UI.ICON_SIZE + K.Style.FRAME_PADDING_X * 2.0f,
+                                K.UI.ICON_SIZE + K.Style.FRAME_PADDING_Y * 2.0f
+                        );
                     }
 
                     ImGui.popID();
                     ImGui.popStyleColor(4);
-
-                    if (ImGui.isItemHovered()) {
-                        ImGui.setTooltip(item.getName() + " x" + totalAmount);
-                    }
 
                     slotIndex++;
 
@@ -392,51 +403,74 @@ public class GameUIService implements Service<GameMaster> {
 
                 ImGui.pushStyleVar(ImGuiStyleVar.FrameBorderSize, 1.0f);
                 int slotIndex = 0;
-                for (Map.Entry<Item, Integer> entry : new HashMap<>(stock.getItems()).entrySet()) {
-                    Item item = entry.getKey();
-                    int amount = entry.getValue();
+                Map<Item, Integer> stockItems = new LinkedHashMap<>(stock.getItems());
+                for (int i = 0; i < K.World.TOTAL_SLOTS; i++) {
+                    Item item = null;
+                    int amount = 0;
+                    if (slotIndex < stockItems.size()) {
+                        Map.Entry<Item, Integer> entry =
+                                stockItems.entrySet().stream()
+                                        .skip(slotIndex)
+                                        .findFirst()
+                                        .orElse(null);
 
-                    SpriteSheet atlas = getItemSpritesheet(item);
-                    int col = getItemIconColumn(item);
-                    int totalCols = atlas.getTotalFrames();
-
-                    float iconSize = K.UI.ICON_SIZE;
-
-                    float u0 = (float) col / totalCols;
-                    float u1 = (float) (col + 1) / totalCols;
-                    float v0 = 1.0f;
-                    float v1 = 0.0f;
+                        if (entry != null) {
+                            item = entry.getKey();
+                            amount = entry.getValue();
+                        }
+                    }
 
                     setColor(ImGuiCol.Button, K.Style.COLOR_SLOT_BG);
                     setColor(ImGuiCol.ButtonHovered, K.Style.COLOR_SLOT_HOVERED);
                     setColor(ImGuiCol.ButtonActive, K.Style.COLOR_SLOT_BG);
                     setColor(ImGuiCol.Border, K.Style.COLOR_SLOT_BORDER);
 
-                    ImGui.pushID("shop_item_" + item.getName());
+                    ImGui.pushID("shop_slot_" + slotIndex);
 
-                    if (ImGui.imageButton(atlas.getTextureId(), iconSize, iconSize, u0, v0,
-                            u1, v1)) {
-                        if (player.getMoney() >= item.getValue()) {
-                            player.earn(-item.getValue());
-                            shop.earn(item.getValue());
-                            stock.remove(item, 1);
-                            player.getInventory().add(item, 1);
+                    if (item != null) {
+                        SpriteSheet atlas = getItemSpritesheet(item);
+                        int col = getItemIconColumn(item);
+                        int totalCols = atlas.getTotalFrames();
+                        float u0 = (float) col / totalCols;
+                        float u1 = (float) (col + 1) / totalCols;
 
-                            log.info("Player bought {} from shop", item.getName());
+                        if (ImGui.imageButton(
+                                atlas.getTextureId(),
+                                K.UI.ICON_SIZE,
+                                K.UI.ICON_SIZE,
+                                u0, 1.0f,
+                                u1, 0.0f)) {
 
-                        } else {
-                            log.warn("Player doesn't have enough money to buy {}",
-                                    item.getName());
+                            if (player.getMoney() >= item.getValue()) {
+                                player.earn(-item.getValue());
+                                shop.earn(item.getValue());
+
+                                stock.remove(item, 1);
+                                player.getInventory().add(item, 1);
+
+                                log.info("Player bought {} from shop",
+                                        item.getName());
+                            } else {
+                                log.warn("Player doesn't have enough money to buy {}",
+                                        item.getName());
+                            }
                         }
+
+                        if (ImGui.isItemHovered()) {
+                            ImGui.setTooltip(item.getName() + " - $" + item.getValue() +
+                                            " (Stock: " + amount + ")");
+                        }
+
+                    } else {
+                        ImGui.button(
+                                "##empty",
+                                K.UI.ICON_SIZE + K.Style.FRAME_PADDING_X * 2.0f,
+                                K.UI.ICON_SIZE + K.Style.FRAME_PADDING_Y * 2.0f
+                        );
                     }
 
                     ImGui.popID();
                     ImGui.popStyleColor(4);
-
-                    if (ImGui.isItemHovered()) {
-                        ImGui.setTooltip(item.getName() + " - $" +
-                                item.getValue() + " (Stock: " + amount + ")");
-                    }
 
                     slotIndex++;
 
