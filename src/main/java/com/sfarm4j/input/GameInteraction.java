@@ -1,9 +1,6 @@
 package com.sfarm4j.input;
 
-import com.sfarm4j.data.CellExpansion;
-import com.sfarm4j.data.Crop;
-import com.sfarm4j.data.Item;
-import com.sfarm4j.data.Seed;
+import com.sfarm4j.data.*;
 import com.sfarm4j.graphics.Camera;
 import com.sfarm4j.service.*;
 import com.sfarm4j.utils.K;
@@ -71,8 +68,22 @@ public class GameInteraction implements Service<GameInteraction> {
                         cropService.rip(crop);
                     }
                 }
-            } else {
-                if (selectedItem instanceof CellExpansion) {
+            } else if (selectedItem instanceof Block block) {
+                int targetY = 1;
+                if (cellService.isUnlocked(hoveredCell.x, hoveredCell.y)) {
+                    Block newBlock = new Block(block.getType(), hoveredCell.x, targetY, hoveredCell.y);
+                    if (gameMaster.getWorld().addBlock(newBlock)) {
+                        gameMaster.getPlayer().remove(selectedItem);
+                        gameUIservice.logAction(hoveredCell);
+                        log.info("Block placed: {} at {},{},{}", newBlock.getType().getName(),
+                                hoveredCell.x, targetY, hoveredCell.y);
+                    } else {
+                        log.warn("Cannot place block: space occupied at {},{},{}",
+                                hoveredCell.x, targetY, hoveredCell.y);
+                    }
+                }
+
+                if (block.getType() == BlockData.DIRT) {
                     log.info("Trying to unlock cell {},{}", hoveredCell.x, hoveredCell.y);
                     if (cellService.expandCell(hoveredCell.x, hoveredCell.y)) {
                         gameMaster.getPlayer().remove(selectedItem);
@@ -83,7 +94,9 @@ public class GameInteraction implements Service<GameInteraction> {
                         log.warn("Could not expand cell {},{}",
                                 hoveredCell.x, hoveredCell.y);
                     }
-                } else if (selectedItem instanceof Seed &&
+                }
+            } else {
+                if (selectedItem instanceof Seed &&
                         cellService.isUnlocked(hoveredCell.x, hoveredCell.y)) {
                     if (((Seed) selectedItem).getType() != null) {
                         Crop planted = cropService.plant(

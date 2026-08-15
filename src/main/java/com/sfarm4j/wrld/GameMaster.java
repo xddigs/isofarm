@@ -188,16 +188,30 @@ public class GameMaster {
         defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
         defaultShader.setUniform("uTotalFrames", wheat.getTotalFrames());
 
+        defaultShader.setUniform("uUseTexture", true);
+        defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
+
         world.getActiveCrops().forEach(crop -> {
             SpriteSheet sheet = cropSpritesheets.get(crop.getType());
             sheet.bind();
 
+            defaultShader.setUniform("uTotalFrames", sheet.getTotalFrames());
             modelMatrix.identity().translate(crop.getX(), K.World.CROP_ELEVATION_Y, crop.getZ());
             defaultShader.setUniform("uModel", modelMatrix);
             defaultShader.setUniform("uFrameIndex", crop.getStage().getFrameIndex());
             spriteMesh.render();
 
             sheet.unbind();
+        });
+
+        defaultShader.setUniform("uUseTexture", false);
+        defaultShader.setUniform("uBaseColor", K.Colors.STONE);
+
+        world.getBlocks().values().forEach(block -> {
+            modelMatrix.identity()
+                    .translate(block.getX(), block.getY(), block.getZ());
+            defaultShader.setUniform("uModel", modelMatrix);
+            blockMesh.render();
         });
 
         if (hoveredCell != null) {

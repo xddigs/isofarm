@@ -1,12 +1,20 @@
 package com.sfarm4j.data;
 
 @DataClass
-public class Block extends BlockItem {
+public class Block extends Item {
     private final BlockData type;
-    private float x, z;
+    private int x, y, z;
+
+    public Block(BlockData type, int x, int y, int z) {
+        super(type.getId(), type.getName(), 1, type.getValue());
+        this.type = type;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
 
     public Block(BlockData type) {
-        super((byte) 1, type.getName(), type.getValue());
+        super(type.getId(), type.getName(), 1, type.getValue());
         this.type = type;
     }
 
@@ -14,15 +22,15 @@ public class Block extends BlockItem {
         return type;
     }
 
-    public float getX() {
+    public int getX() {
         return x;
     }
 
-    public float getZ() {
-        return z;
+    public int getY() {
+        return y;
     }
 
-    public void update() {
-
+    public int getZ() {
+        return z;
     }
 }

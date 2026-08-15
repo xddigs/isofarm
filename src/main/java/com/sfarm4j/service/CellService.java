@@ -65,6 +65,10 @@ public class CellService implements Service<Cell> {
         return x + "," + z;
     }
 
+    public boolean isEmpty(int x, int z) {
+        return getCell(x, z) == null;
+    }
+
     public boolean isUnlocked(int x, int z) {
         Cell cell = getCell(x, z);
         return cell != null && cell.isUnlocked();

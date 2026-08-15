@@ -2,10 +2,10 @@ package com.sfarm4j.data;
 
 @DataClass
 public enum BlockData {
-    DIRT((byte) 0, "Dirt", 0),
-    GRASS((byte) 1, "Grass", 1),
-    STONE((byte) 2, "Stone", 2),
-    AUTOMATIC_HARVESTER((byte) 3, "Harvester", 3);
+    DIRT((byte) 0, "Dirt", 100),
+    GRASS((byte) 1, "Grass", 120),
+    STONE((byte) 2, "Stone", 150),
+    DISPENSER((byte) 3, "Dispenser", 500);
 
     private final byte id;
     private final String name;

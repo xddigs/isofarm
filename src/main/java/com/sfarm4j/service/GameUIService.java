@@ -480,8 +480,8 @@ public class GameUIService implements Service<GameMaster> {
             return crop.getType().getId();
         }
 
-        if (item instanceof CellExpansion expansion
-                && expansion.getType() != null) {
+        if (item instanceof Block expansion
+                && expansion.getType() == BlockData.DIRT) {
             return expansion.getType().getId();
         }
 
@@ -491,7 +491,7 @@ public class GameUIService implements Service<GameMaster> {
     private SpriteSheet getItemSpritesheet(Item item) {
         if (item instanceof Crop) return cropIcons;
         if (item instanceof Seed) return seedIcons;
-        if (item instanceof CellExpansion) return blockIcons;
+        if (item instanceof Block) return blockIcons;
         return seedIcons;
     }
 }
