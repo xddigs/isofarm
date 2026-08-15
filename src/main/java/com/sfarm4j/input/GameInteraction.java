@@ -62,36 +62,29 @@ public class GameInteraction implements Service<GameInteraction> {
         if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT) && hoveredCell != null) {
             Crop crop = gameMaster.getWorld().getCropAt(hoveredCell.x, hoveredCell.y);
 
-            if (crop != null) {
-                if (Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-                    if (crop.isReadyToHarvest()) {
-                        cropService.harvest(gameMaster.getPlayer(), crop);
-                    } else {
-                        cropService.rip(crop);
-                    }
-                    gameUIservice.logAction(hoveredCell);
+            if (crop != null && Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
+                if (crop.isReadyToHarvest()) {
+                    cropService.harvest(gameMaster.getPlayer(), crop);
+                } else {
+                    cropService.rip(crop);
                 }
+                gameUIservice.logAction(hoveredCell);
             } else if (selectedItem instanceof Block block) {
                 int targetY = 1;
                 if (Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
                     Block b = gameMaster.getWorld().getBlockAt(hoveredCell.x, targetY, hoveredCell.y);
-                    if (gameMaster.getWorld().removeBlock(b)) {
+                    if (b != null && gameMaster.getWorld().removeBlock(b)) {
                         gameMaster.getPlayer().add(b);
                         gameUIservice.logAction(hoveredCell);
                         log.info("Block removed: {}", b.getType().getName());
                     }
-                } else {
-                    if (cellService.isUnlocked(hoveredCell.x, hoveredCell.y)) {
-                        Block newBlock = new Block(block.getType(), hoveredCell.x, targetY, hoveredCell.y);
-                        if (gameMaster.getWorld().addBlock(newBlock)) {
-                            gameMaster.getPlayer().remove(selectedItem);
-                            gameUIservice.logAction(hoveredCell);
-                            log.info("Block placed: {} at {},{},{}", newBlock.getType().getName(),
-                                    hoveredCell.x, targetY, hoveredCell.y);
-                        } else {
-                            log.warn("Cannot place block: space occupied at {},{},{}",
-                                    hoveredCell.x, targetY, hoveredCell.y);
-                        }
+                } else if (cellService.isUnlocked(hoveredCell.x, hoveredCell.y)) {
+                    Block newBlock = new Block(block.getType(), hoveredCell.x, targetY, hoveredCell.y);
+                    if (gameMaster.getWorld().addBlock(newBlock)) {
+                        gameMaster.getPlayer().remove(selectedItem);
+                        gameUIservice.logAction(hoveredCell);
+                        log.info("Block placed: {} at {},{},{}", newBlock.getType().getName(),
+                                hoveredCell.x, targetY, hoveredCell.y);
                     }
                 }
 
@@ -99,7 +92,6 @@ public class GameInteraction implements Service<GameInteraction> {
                     log.info("Trying to unlock cell {},{}", hoveredCell.x, hoveredCell.y);
                     if (cellService.expandCell(hoveredCell.x, hoveredCell.y)) {
                         gameMaster.getPlayer().remove(selectedItem);
-
                         log.info("New cell unlocked at {},{}",
                                 hoveredCell.x, hoveredCell.y);
                     } else {
@@ -107,22 +99,18 @@ public class GameInteraction implements Service<GameInteraction> {
                                 hoveredCell.x, hoveredCell.y);
                     }
                 }
-            } else {
-                if (selectedItem instanceof Seed &&
-                        cellService.isUnlocked(hoveredCell.x, hoveredCell.y)) {
-                    if (((Seed) selectedItem).getType() != null) {
-                        Crop planted = cropService.plant(
-                                hoveredCell.x,
-                                hoveredCell.y,
-                                gameMaster.getPlayer(),
-                                cellService.find(hoveredCell.x, hoveredCell.y),
-                                ((Seed) selectedItem).getType(),
-                                timeService.getCurrentSeason());
-                        if (planted != null) {
-                            gameUIservice.logAction(hoveredCell);
-                        }
-                    } else {
-                        log.warn("No crop was selected");
+            } else if (crop == null && selectedItem instanceof Seed seed &&
+                    cellService.isUnlocked(hoveredCell.x, hoveredCell.y)) {
+                if (seed.getType() != null) {
+                    Crop planted = cropService.plant(
+                            hoveredCell.x,
+                            hoveredCell.y,
+                            gameMaster.getPlayer(),
+                            cellService.find(hoveredCell.x, hoveredCell.y),
+                            seed.getType(),
+                            timeService.getCurrentSeason());
+                    if (planted != null) {
+                        gameUIservice.logAction(hoveredCell);
                     }
                 }
             }

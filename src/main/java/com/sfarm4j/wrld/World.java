@@ -15,16 +15,22 @@ public class World {
     }
 
     public void addCrop(Crop crop) {
-        long key = getCellKey(Math.round(crop.getX()), Math.round(crop.getZ()));
+        long key = getCellKey((int) crop.getX(),
+                              (int) crop.getZ());
         crops.put(key, crop);
         activeCropsCache.add(crop);
     }
 
     public void removeCrop(Crop crop) {
-        long key = getCellKey(Math.round(crop.getX()), Math.round(crop.getZ()));
+        long key = getCellKey((int) crop.getX(),
+                              (int) crop.getZ());
         if (crops.remove(key) != null) {
             activeCropsCache.remove(crop);
         }
+    }
+
+    public Crop getCropAt(int x, int z) {
+        return crops.get(getCellKey(x, z));
     }
 
     public boolean addBlock(Block block) {
@@ -41,19 +47,15 @@ public class World {
         return blocks.remove(key) != null;
     }
 
+    public Block getBlockAt(int x, int y, int z) {
+        return blocks.get(x + "," + y + "," + z);
+    }
+
     public Map<String, Block> getBlocks() {
         return blocks;
     }
 
     public List<Crop> getActiveCrops() {
         return unmodifiableActiveCrops;
-    }
-
-    public Crop getCropAt(int x, int z) {
-        return crops.get(getCellKey(x, z));
-    }
-
-    public Block getBlockAt(int x, int y, int z) {
-        return blocks.get(x + "," + y + "," + z);
     }
 }
