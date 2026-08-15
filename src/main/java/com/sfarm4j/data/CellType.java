@@ -1,7 +1,7 @@
 package com.sfarm4j.data;
 
 public enum CellType {
-    DIRT((byte) 0, "Dirt", 0.4f),
+    GRASS((byte) 0, "Grass", 0.2f),
     TILLED((byte) 1, "Tilled Dirt", 0.5f),
     WATERED((byte) 2, "Watered Dirt", 1.0f);
 

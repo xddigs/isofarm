@@ -34,6 +34,7 @@ public class GameUIService implements Service<GameMaster> {
 
     private final SpriteSheet seedIcons;
     private final SpriteSheet cropIcons;
+    private final SpriteSheet blockIcons;
 
     private Player player;
     private Shop shop;
@@ -49,10 +50,13 @@ public class GameUIService implements Service<GameMaster> {
     private static final float HUD_FADE_DELAY = 2.0f;
 
     public GameUIService(long windowHandle,
-                         SpriteSheet seedIcons, SpriteSheet cropIcons) {
+                         SpriteSheet seedIcons,
+                         SpriteSheet cropIcons,
+                         SpriteSheet blockIcons) {
 
         this.seedIcons = seedIcons;
         this.cropIcons = cropIcons;
+        this.blockIcons = blockIcons;
 
         ImGui.createContext();
         ImGui.getIO().setIniFilename(null);
@@ -266,7 +270,8 @@ public class GameUIService implements Service<GameMaster> {
                     }
                 }
 
-                if (selectedInventoryItem != null && !aggregated.containsKey(selectedInventoryItem.getName())) {
+                if (selectedInventoryItem != null &&
+                        !aggregated.containsKey(selectedInventoryItem.getName())) {
                     selectedInventoryItem = null;
                 }
 
@@ -285,17 +290,14 @@ public class GameUIService implements Service<GameMaster> {
                     SpriteSheet atlas = getItemSpritesheet(item);
 
                     int col = getItemIconColumn(item);
-                    int row = getItemIconRow(item);
-
                     int totalCols = atlas.getTotalFrames();
-                    int totalRows = getItemIconRows(item);
 
                     float iconSize = K.UI.ICON_SIZE;
 
                     float u0 = (float) col / totalCols;
                     float u1 = (float) (col + 1) / totalCols;
-                    float v0 = (float) (row + 1) / totalRows;
-                    float v1 = (float) row / totalRows;
+                    float v0 = 2;
+                    float v1 = 1;
 
                     if (isSelected) {
                         setColor(ImGuiCol.Button, K.Style.COLOR_BUTTON);
@@ -392,17 +394,15 @@ public class GameUIService implements Service<GameMaster> {
                     SpriteSheet atlas = getItemSpritesheet(item);
 
                     int col = getItemIconColumn(item);
-                    int row = getItemIconRow(item);
 
                     int totalCols = atlas.getTotalFrames();
-                    int totalRows = getItemIconRows(item);
 
                     float iconSize = K.UI.ICON_SIZE;
 
                     float u0 = (float) col / totalCols;
                     float u1 = (float) (col + 1) / totalCols;
-                    float v0 = (float) (row + 1) / totalRows;
-                    float v1 = (float) row / totalRows;
+                    float v0 = 2;
+                    float v1 = 1;
 
                     setColor(ImGuiCol.Button, K.Style.COLOR_SLOT_BG);
                     setColor(ImGuiCol.ButtonHovered, K.Style.COLOR_SLOT_HOVERED);
@@ -476,10 +476,6 @@ public class GameUIService implements Service<GameMaster> {
     }
 
     private static int getItemIconColumn(Item item) {
-        if (item instanceof CellExpansion) {
-            return 0;
-        }
-
         if (item instanceof Seed seed && seed.getType() != null) {
             return seed.getType().getId();
         }
@@ -488,31 +484,18 @@ public class GameUIService implements Service<GameMaster> {
             return crop.getType().getId();
         }
 
+        if (item instanceof CellExpansion expansion
+                && expansion.getType() != null) {
+            return expansion.getType().getId();
+        }
+
         return 0;
-    }
-
-    private static int getItemIconRow(Item item) {
-        if (item instanceof CellExpansion) {
-            return 0;
-        }
-
-        if (item instanceof Crop) {
-            return 1;
-        }
-        return 0;
-    }
-
-    private static int getItemIconRows(Item item) {
-        if (item instanceof Crop || item instanceof CellExpansion) {
-            return 2;
-        }
-        return 1;
     }
 
     private SpriteSheet getItemSpritesheet(Item item) {
-        if (item instanceof Crop || item instanceof CellExpansion) {
-            return cropIcons;
-        }
+        if (item instanceof Crop) return cropIcons;
+        if (item instanceof Seed) return seedIcons;
+        if (item instanceof CellExpansion) return blockIcons;
         return seedIcons;
     }
 }

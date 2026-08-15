@@ -105,6 +105,8 @@ public final class K {
         public static final String FONT = "C:/Windows/Fonts/arial.ttf";
         public static final String SEED_ICONS = "assets/icons/seed_icons.png";
         public static final String CROP_ICONS = "assets/icons/crop_icons.png";
+        public static final String TOOL_ICONS = "assets/icons/tool_icons.png";
+        public static final String BLOCK_ICONS = "assets/icons/block_icons.png";
     }
 
     public static final class Render {
@@ -119,7 +121,7 @@ public final class K {
         public static final Vector3f CELL_EVEN = new Vector3f(0.4f, 0.25f, 0.1f);
         public static final Vector3f CELL_ODD = new Vector3f(0.37f, 0.23f, 0.09f);
         public static final Vector3f WATERED = new Vector3f(0.45f, 0.28f, 0.24f);
-        public static final Vector3f DIRT = new Vector3f(0.45f, 0.28f, 0.12f);
+        public static final Vector3f GRASS = new Vector3f(0.20f, 0.55f, 0.18f);
         public static final Vector3f TILLED = new Vector3f(0.3f, 0.18f, 0.08f);
         public static final Vector3f SUNLIGHT_DEFAULT = new Vector3f(1.0f, 1.0f, 1.0f);
         public static final Vector3f OUTLINE_DEFAULT = new Vector3f(0.0f, 0.0f, 0.0f);
