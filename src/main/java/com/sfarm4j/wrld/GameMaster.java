@@ -110,7 +110,7 @@ public class GameMaster {
         this.seedIcons = new SpriteSheet(K.Paths.SEED_ICONS, K.UI.ICON_ATLAS_FRAMES);
         this.cropIcons = new SpriteSheet(K.Paths.CROP_ICONS, K.UI.ICON_ATLAS_FRAMES);
         this.toolIcons = new SpriteSheet(K.Paths.TOOL_ICONS, K.UI.ICON_ATLAS_FRAMES);
-        this.blockIcons = new SpriteSheet(K.Paths.BLOCK_ICONS, K.UI.ICON_ATLAS_FRAMES);
+        this.blockIcons = new SpriteSheet(K.Paths.BLOCK_ICONS, K.UI.ICON_BLOCK_ATLAS_FRAMES);
 
         this.gameUIservice = new GameUIService(windowHandle, seedIcons, cropIcons, blockIcons);
         this.shop = new Shop();

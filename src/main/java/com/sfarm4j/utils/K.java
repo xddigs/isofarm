@@ -92,6 +92,7 @@ public final class K {
         public static final float COORD_DISPLAY_DURATION = 3.0f;
 
         public static final int ICON_ATLAS_FRAMES = 3;
+        public static final int ICON_BLOCK_ATLAS_FRAMES = 4;
     }
 
     public static final class Paths {
