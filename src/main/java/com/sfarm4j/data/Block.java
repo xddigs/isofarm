@@ -1,24 +1,28 @@
 package com.sfarm4j.data;
 
 @DataClass
-public enum Block {
-    DIRT((byte) 0, "Dirt"),
-    GRASS((byte) 1, "Grass"),
-    STONE((byte) 2, "Stone"),;
+public class Block extends BlockItem {
+    private final BlockData type;
+    private float x, z;
 
-    private final byte id;
-    private final String name;
-
-    Block(byte id, String name) {
-        this.id = id;
-        this.name = name;
+    public Block(BlockData type) {
+        super((byte) 1, type.getName(), type.getValue());
+        this.type = type;
     }
 
-    public byte getId() {
-        return id;
+    public BlockData getType() {
+        return type;
     }
 
-    public String getName() {
-        return name;
+    public float getX() {
+        return x;
+    }
+
+    public float getZ() {
+        return z;
+    }
+
+    public void update() {
+
     }
 }

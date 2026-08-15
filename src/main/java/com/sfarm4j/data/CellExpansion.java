@@ -1,14 +1,14 @@
 package com.sfarm4j.data;
 
 public class CellExpansion extends Item {
-    private final Block type;
+    private final BlockData type;
 
     public CellExpansion(int value) {
         super((byte) 999, "Cell Expansion", 1, value);
-        this.type = Block.DIRT;
+        this.type = BlockData.DIRT;
     }
 
-    public Block getType() {
+    public BlockData getType() {
         return type;
     }
 }
