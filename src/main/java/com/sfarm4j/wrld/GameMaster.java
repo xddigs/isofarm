@@ -196,14 +196,19 @@ public class GameMaster {
 
         defaultShader.setUniform("uTotalFrames", 1);
         defaultShader.setUniform("uFrameIndex", 0);
+        defaultShader.setUniform("uUseFaceAtlas", false);
 
         if (blocksTexture != null) {
             blocksTexture.bind();
             defaultShader.setUniform("uUseTexture", true);
             defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
+            defaultShader.setUniform("uUseFaceAtlas", true);
 
-            defaultShader.setUniform("uAtlasScale", BlockData.DIRT.getAtlasScale());
-            defaultShader.setUniform("uAtlasOffset", BlockData.DIRT.getAtlasOffset());
+            BlockData dirt = BlockData.DIRT;
+            defaultShader.setUniform("uAtlasScale", dirt.getAtlasScale());
+            defaultShader.setUniform("uTopAtlasOffset", dirt.getTopAtlasOffset());
+            defaultShader.setUniform("uBottomAtlasOffset", dirt.getBottomAtlasOffset());
+            defaultShader.setUniform("uSideAtlasOffset", dirt.getSideAtlasOffset());
         } else {
             defaultShader.setUniform("uUseTexture", false);
             defaultShader.setUniform("uBaseColor", K.Colors.DIRT);
@@ -214,6 +219,7 @@ public class GameMaster {
         world.getActiveCrops().forEach(crop -> {
             SpriteSheet sheet = cropSpritesheets.get(crop.getType());
             sheet.bind();
+            defaultShader.setUniform("uUseFaceAtlas", false);
             defaultShader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
             defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
             defaultShader.setUniform("uTotalFrames", sheet.getTotalFrames());
@@ -224,16 +230,22 @@ public class GameMaster {
             sheet.unbind();
         });
 
+        if (blocksTexture != null) {
+            defaultShader.setUniform("uUseFaceAtlas", true);
+        }
+
         world.getBlocks().values().forEach(block -> {
-            modelMatrix.identity()
-                    .translate(block.getX(), block.getY(), block.getZ());
+            modelMatrix.identity().translate(block.getX(), block.getY(), block.getZ());
             BlockData blockData = block.getType();
+
             defaultShader.setUniform("uBaseColor", blockData.getColor());
             defaultShader.setUniform("uModel", modelMatrix);
 
             if (blocksTexture != null) {
                 defaultShader.setUniform("uAtlasScale", blockData.getAtlasScale());
-                defaultShader.setUniform("uAtlasOffset", blockData.getAtlasOffset());
+                defaultShader.setUniform("uTopAtlasOffset", blockData.getTopAtlasOffset());
+                defaultShader.setUniform("uBottomAtlasOffset", blockData.getBottomAtlasOffset());
+                defaultShader.setUniform("uSideAtlasOffset", blockData.getSideAtlasOffset());
             } else {
                 defaultShader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
                 defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
@@ -241,6 +253,8 @@ public class GameMaster {
 
             blockMesh.render();
         });
+
+        defaultShader.setUniform("uUseFaceAtlas", false);
 
         if (blocksTexture != null) {
             blocksTexture.unbind();
@@ -278,6 +292,7 @@ public class GameMaster {
 
             defaultShader.setUniform("uIsMaskPass", true);
             defaultShader.setUniform("uUseTexture", true);
+            defaultShader.setUniform("uUseFaceAtlas", false);
             defaultShader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
             defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
 

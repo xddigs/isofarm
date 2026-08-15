@@ -94,7 +94,7 @@ public final class K {
 
         public static final int ICON_ATLAS_FRAMES = 3;
         public static final int ICON_BLOCK_ATLAS_FRAMES = 4;
-        public static final int ICON_BLOCK_ATLAS_ROWS = 1;
+        public static final int ICON_BLOCK_ATLAS_ROWS = 3;
     }
 
     public static final class Paths {
