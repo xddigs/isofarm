@@ -38,6 +38,10 @@ public class GameInteraction implements Service<GameInteraction> {
     public Vector2i update(GameMaster gameMaster, Item selectedItem) {
         boolean isCtrlDown = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL) ||
                 Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
+
+        Vector2i hoveredCell = camera.highlight(Mouse.getX(), Mouse.getY(),
+                gameMaster.getWindowWidth(), gameMaster.getWindowHeight());
+
         if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
             if (isCtrlDown) {
                 camera.rotateYaw(Mouse.getDeltaX() * K.Camera.ROTATION_SENSITIVITY);
@@ -54,9 +58,6 @@ public class GameInteraction implements Service<GameInteraction> {
         if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_MIDDLE)) {
             gameMaster.recenter();
         }
-
-        Vector2i hoveredCell = camera.highlight(Mouse.getX(), Mouse.getY(),
-                gameMaster.getWindowWidth(), gameMaster.getWindowHeight());
 
         if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT) && hoveredCell != null) {
             Crop crop = gameMaster.getWorld().getCropAt(hoveredCell.x, hoveredCell.y);

@@ -1,35 +1,35 @@
 package com.sfarm4j.wrld;
 
 import com.sfarm4j.data.Crop;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class World {
-    private final List<Crop> crops = new ArrayList<>();
+    private final Map<Long, Crop> crops = new HashMap<>();
+    private final List<Crop> activeCropsCache = new ArrayList<>();
+    private final List<Crop> unmodifiableActiveCrops = Collections.unmodifiableList(activeCropsCache);
+
+    private long getCellKey(int x, int z) {
+        return (((long) x) << 32) | (z & 0xFFFFFFFFL);
+    }
 
     public void addCrop(Crop crop) {
-        crops.add(crop);
+        long key = getCellKey(Math.round(crop.getX()), Math.round(crop.getZ()));
+        crops.put(key, crop);
+        activeCropsCache.add(crop);
     }
 
     public void removeCrop(Crop crop) {
-        crops.remove(crop);
+        long key = getCellKey(Math.round(crop.getX()), Math.round(crop.getZ()));
+        if (crops.remove(key) != null) {
+            activeCropsCache.remove(crop);
+        }
     }
 
     public List<Crop> getActiveCrops() {
-        return Collections.unmodifiableList(crops);
+        return unmodifiableActiveCrops;
     }
 
     public Crop getCropAt(int x, int z) {
-        for (int cz = 0; cz < crops.size(); cz++) {
-            for (Crop crop : crops) {
-                if (crop.getX() == x &&
-                    crop.getZ() == z) {
-                    return crop;
-                }
-            }
-        }
-        return null;
+        return crops.get(getCellKey(x, z));
     }
 }

@@ -153,6 +153,7 @@ public class GameUIService implements Service<GameMaster> {
         int flags = ImGuiWindowFlags.NoTitleBar |
                     ImGuiWindowFlags.NoResize |
                     ImGuiWindowFlags.NoMove |
+                    ImGuiWindowFlags.NoInputs |
                     ImGuiWindowFlags.AlwaysAutoResize |
                     ImGuiWindowFlags.NoFocusOnAppearing;
 
