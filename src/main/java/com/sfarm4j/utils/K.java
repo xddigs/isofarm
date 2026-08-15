@@ -95,6 +95,7 @@ public final class K {
         public static final int ICON_ATLAS_FRAMES = 3;
         public static final int ICON_BLOCK_ATLAS_FRAMES = 4;
         public static final int ICON_BLOCK_ATLAS_ROWS = 3;
+        public static final int COMMAND_MAX_LENGTH = 512;
     }
 
     public static final class Paths {

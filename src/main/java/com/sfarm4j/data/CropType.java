@@ -4,7 +4,7 @@ public enum CropType {
     WHEAT((byte) 0, "Wheat", "Your main source of income! Great base crop", 4, 5, 4),
     CARROT((byte) 1, "Carrot", "Such a delicious vegetable, and a good crop at that too!", 3, 8, 6),
     POTATO((byte) 2, "Potato", "Boring! Although, very good as side fries. Great crop!", 6, 12, 8),
-    CABBAGE((byte) 3, "Cabbage", "Ugh I love this one, it's such a treat! Income wise is good!", 4, 16, 2);
+    BEETROOT((byte) 3, "BEETROOT", "Ugh I love this one, it's such a treat! Income wise is good!", 4, 16, 2);
 
     private final byte id;
     private final String name;

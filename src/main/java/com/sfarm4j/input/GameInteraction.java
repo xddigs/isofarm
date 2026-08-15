@@ -34,6 +34,10 @@ public class GameInteraction implements Service<GameInteraction> {
     public Vector2i update(GameMaster gameMaster, Item selectedItem) {
         camera(gameMaster);
 
+        if (Keyboard.isKeyPressed(GLFW_KEY_TAB)) {
+            gameMaster.setPromptingForInput(true);
+        }
+
         Vector2i hoveredCell = camera.highlight(
                 Mouse.getX(),
                 Mouse.getY(),

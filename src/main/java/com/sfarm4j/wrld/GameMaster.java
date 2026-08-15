@@ -5,10 +5,7 @@ import com.sfarm4j.graphics.*;
 import com.sfarm4j.input.GameInteraction;
 import com.sfarm4j.input.Keyboard;
 import com.sfarm4j.input.Mouse;
-import com.sfarm4j.service.CellService;
-import com.sfarm4j.service.CropService;
-import com.sfarm4j.service.GameUIService;
-import com.sfarm4j.service.TimeService;
+import com.sfarm4j.service.*;
 import com.sfarm4j.utils.K;
 import imgui.ImGui;
 import org.joml.Matrix4f;
@@ -34,6 +31,10 @@ public class GameMaster {
     private final CropService cropService;
     private final TimeService timeService;
     private final CellService cellService;
+    private final CommandService commandService;
+
+    private final CommandRegistry commandRegistry;
+    private final ItemRegistry itemRegistry;
 
     private Shader defaultShader;
     private Shader outlineShader;
@@ -65,6 +66,7 @@ public class GameMaster {
 
     private Player player;
     private Shop shop;
+    private boolean isPromptingForInput = false;
 
     public GameMaster(long windowHandle) {
         this.windowHandle = windowHandle;
@@ -72,6 +74,9 @@ public class GameMaster {
         this.cropService = new CropService(world);
         this.timeService = new TimeService();
         this.cellService = new CellService();
+        this.commandRegistry = new CommandRegistry();
+        this.commandService = new CommandService(commandRegistry);
+        this.itemRegistry = new ItemRegistry();
         this.sunlight = new Sunlight(K.Sunlight.DEFAULT_DIRECTION);
 
         int center = K.World.GRID_SIZE / 2;
@@ -122,7 +127,9 @@ public class GameMaster {
         this.toolIcons = new SpriteSheet(K.Paths.TOOL_ICONS, K.UI.ICON_ATLAS_FRAMES);
         this.blockIcons = new SpriteSheet(K.Paths.BLOCK_ICONS, K.UI.ICON_BLOCK_ATLAS_FRAMES);
 
-        this.gameUIservice = new GameUIService(windowHandle, seedIcons, cropIcons, blockIcons);
+        this.gameUIservice = new GameUIService(windowHandle, commandService,
+                seedIcons, cropIcons, blockIcons);
+
         this.shop = new Shop();
         this.gameUIservice.setShop(shop);
 
@@ -158,6 +165,14 @@ public class GameMaster {
 
     public float getWindowHeight() {
         return windowHeight;
+    }
+
+    public boolean isPromptingForInput() {
+        return isPromptingForInput;
+    }
+
+    public void setPromptingForInput(boolean promptingForInput) {
+        isPromptingForInput = promptingForInput;
     }
 
     public void update(float delta) {
@@ -340,6 +355,18 @@ public class GameMaster {
                 gameUIservice.setPlayer(player);
                 this.shop.setPlayer(player);
                 log.info("Player created: {}", player.getName());
+                InitService.initItems(itemRegistry);
+                InitService.initCommands(commandRegistry,
+                        itemRegistry, player);
+            }
+        }
+
+        if (isPromptingForInput()) {
+            String command = gameUIservice.inputCommand();
+
+            if (command != null) {
+                commandService.execute(command);
+                setPromptingForInput(false);
             }
         }
 

@@ -26,34 +26,32 @@ import java.util.Map;
 
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
+@SuppressWarnings("all")
 public class GameUIService implements Service<GameMaster> {
     private static final Logger log = LoggerFactory.getLogger(GameUIService.class);
+    private static final float HUD_FADE_DELAY = 2.0f;
     private final ImGuiImplGlfw imGuiGlfw = new ImGuiImplGlfw();
     private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
     private final ImString nameBuffer = new ImString("", K.UI.PLAYER_NAME_MAX_LENGTH);
-
+    private final ImString commandBuffer = new ImString("", K.UI.COMMAND_MAX_LENGTH);
+    private final CommandService commandService;
     private final SpriteSheet seedIcons;
     private final SpriteSheet cropIcons;
     private final SpriteSheet blockIcons;
-
     private Player player;
     private Shop shop;
-
     private float windowWidth = K.Window.DEFAULT_WIDTH;
     private float windowHeight = K.Window.DEFAULT_HEIGHT;
-
     private Vector2i lastActionCell = null;
     private float actionDisplayTimer = 0.0f;
     private Item selectedInventoryItem = null;
-
     private float hudInactivityTimer = 0.0f;
-    private static final float HUD_FADE_DELAY = 2.0f;
 
-    public GameUIService(long windowHandle,
+    public GameUIService(long windowHandle, CommandService commandService,
                          SpriteSheet seedIcons,
                          SpriteSheet cropIcons,
                          SpriteSheet blockIcons) {
-
+        this.commandService = commandService;
         this.seedIcons = seedIcons;
         this.cropIcons = cropIcons;
         this.blockIcons = blockIcons;
@@ -90,6 +88,23 @@ public class GameUIService implements Service<GameMaster> {
         style.setFramePadding(K.Style.FRAME_PADDING_X, K.Style.FRAME_PADDING_Y);
         style.setItemSpacing(K.Style.ITEM_SPACING_X, K.Style.ITEM_SPACING_Y);
         return style;
+    }
+
+    private static int getItemIconColumn(Item item) {
+        if (item instanceof Seed seed && seed.getType() != null) {
+            return seed.getType().getId();
+        }
+
+        if (item instanceof Crop crop && crop.getType() != null) {
+            return crop.getType().getId();
+        }
+
+        if (item instanceof Block expansion
+                && expansion.getType() == BlockData.DIRT) {
+            return expansion.getType().getId();
+        }
+
+        return 0;
     }
 
     public void setPlayer(Player player) {
@@ -152,11 +167,11 @@ public class GameUIService implements Service<GameMaster> {
                 K.UI.TOOLTIP_OFFSET_Y, ImGuiCond.Always);
 
         int flags = ImGuiWindowFlags.NoTitleBar |
-                    ImGuiWindowFlags.NoResize |
-                    ImGuiWindowFlags.NoMove |
-                    ImGuiWindowFlags.NoInputs |
-                    ImGuiWindowFlags.AlwaysAutoResize |
-                    ImGuiWindowFlags.NoFocusOnAppearing;
+                ImGuiWindowFlags.NoResize |
+                ImGuiWindowFlags.NoMove |
+                ImGuiWindowFlags.NoInputs |
+                ImGuiWindowFlags.AlwaysAutoResize |
+                ImGuiWindowFlags.NoFocusOnAppearing;
 
         ImGui.begin("CropCardTooltip", flags);
         ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing,
@@ -186,9 +201,9 @@ public class GameUIService implements Service<GameMaster> {
         ImGui.setNextWindowSize(K.UI.NEW_PLAYER_WIDTH, K.UI.NEW_PLAYER_HEIGHT);
 
         int windowFlags = ImGuiWindowFlags.NoTitleBar |
-                          ImGuiWindowFlags.NoResize |
-                          ImGuiWindowFlags.NoMove |
-                          ImGuiWindowFlags.NoCollapse;
+                ImGuiWindowFlags.NoResize |
+                ImGuiWindowFlags.NoMove |
+                ImGuiWindowFlags.NoCollapse;
 
         ImGui.begin("New Farmer", windowFlags);
         ImGui.text("What's your name, kid?");
@@ -202,6 +217,48 @@ public class GameUIService implements Service<GameMaster> {
         boolean shouldCreatePlayer = (wasEnterPressed || wasButtonClicked) && !nameBuffer.get().isBlank();
         ImGui.end();
         return shouldCreatePlayer;
+    }
+
+    public String inputCommand() {
+        if (player == null) return null;
+
+        ImGui.setNextWindowPos(windowWidth * K.UI.CENTER_PIVOT, windowHeight * K.UI.CENTER_PIVOT,
+                ImGuiCond.Always, K.UI.CENTER_PIVOT, K.UI.CENTER_PIVOT);
+        ImGui.setNextWindowSize(K.UI.NEW_PLAYER_WIDTH, K.UI.NEW_PLAYER_HEIGHT);
+
+        int windowFlags = ImGuiWindowFlags.NoTitleBar |
+                        ImGuiWindowFlags.NoResize |
+                        ImGuiWindowFlags.NoMove |
+                        ImGuiWindowFlags.NoCollapse;
+
+        ImGui.begin("Command", windowFlags);
+        ImGui.pushItemWidth(K.UI.MATCH_PARENT_WIDTH);
+        int flags = ImGuiInputTextFlags.EnterReturnsTrue;
+
+        boolean enterPressed = ImGui.inputText(
+                "##CommandInput",
+                commandBuffer,
+                flags
+        );
+
+        ImGui.popItemWidth();
+
+        boolean runClicked = ImGui.button(
+                "Run",
+                K.UI.MATCH_PARENT_WIDTH,
+                K.UI.LARGE_BUTTON_HEIGHT
+        );
+
+        String command = null;
+
+        if ((enterPressed || runClicked) &&
+                !commandBuffer.get().isBlank()) {
+            command = commandBuffer.get().trim();
+            commandBuffer.set("");
+        }
+
+        ImGui.end();
+        return command;
     }
 
     public String getEnteredPlayerName() {
@@ -241,8 +298,8 @@ public class GameUIService implements Service<GameMaster> {
                 K.UI.INVENTORY_HEIGHT, ImGuiCond.Always);
 
         int flags = ImGuiWindowFlags.NoTitleBar |
-                    ImGuiWindowFlags.NoResize |
-                    ImGuiWindowFlags.NoCollapse;
+                ImGuiWindowFlags.NoResize |
+                ImGuiWindowFlags.NoCollapse;
 
         if (ImGui.begin("Inventory", flags)) {
             Inventory inv = player.getInventory();
@@ -428,8 +485,8 @@ public class GameUIService implements Service<GameMaster> {
                 K.UI.INVENTORY_HEIGHT, ImGuiCond.Always);
 
         int flags = ImGuiWindowFlags.NoTitleBar |
-                    ImGuiWindowFlags.NoResize |
-                    ImGuiWindowFlags.NoCollapse;
+                ImGuiWindowFlags.NoResize |
+                ImGuiWindowFlags.NoCollapse;
 
         if (ImGui.begin("Shop", flags)) {
             ImGui.text(shop.getOwner() + "'s Shop, $" + shop.getMoney());
@@ -546,23 +603,6 @@ public class GameUIService implements Service<GameMaster> {
 
     private void setColor(int col, float[] rgba) {
         ImGui.pushStyleColor(col, rgba[0], rgba[1], rgba[2], rgba[3]);
-    }
-
-    private static int getItemIconColumn(Item item) {
-        if (item instanceof Seed seed && seed.getType() != null) {
-            return seed.getType().getId();
-        }
-
-        if (item instanceof Crop crop && crop.getType() != null) {
-            return crop.getType().getId();
-        }
-
-        if (item instanceof Block expansion
-                && expansion.getType() == BlockData.DIRT) {
-            return expansion.getType().getId();
-        }
-
-        return 0;
     }
 
     private SpriteSheet getItemSpritesheet(Item item) {
