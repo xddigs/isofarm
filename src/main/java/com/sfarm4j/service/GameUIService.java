@@ -211,10 +211,6 @@ public class GameUIService implements Service<GameMaster> {
         return selectedInventoryItem;
     }
 
-    public void setSelectedInventoryItem(Item item) {
-        this.selectedInventoryItem = item;
-    }
-
     public void logAction(Vector2i cell) {
         this.lastActionCell = new Vector2i(cell);
         this.actionDisplayTimer = K.UI.COORD_DISPLAY_DURATION;
@@ -288,7 +284,6 @@ public class GameUIService implements Service<GameMaster> {
                                                  .equals(item.getName());
 
                     SpriteSheet atlas = getItemSpritesheet(item);
-
                     int col = getItemIconColumn(item);
                     int totalCols = atlas.getTotalFrames();
 
@@ -296,8 +291,8 @@ public class GameUIService implements Service<GameMaster> {
 
                     float u0 = (float) col / totalCols;
                     float u1 = (float) (col + 1) / totalCols;
-                    float v0 = 2;
-                    float v1 = 1;
+                    float v0 = 1.0f;
+                    float v1 = 0.0f;
 
                     if (isSelected) {
                         setColor(ImGuiCol.Button, K.Style.COLOR_BUTTON);
@@ -401,8 +396,8 @@ public class GameUIService implements Service<GameMaster> {
 
                     float u0 = (float) col / totalCols;
                     float u1 = (float) (col + 1) / totalCols;
-                    float v0 = 2;
-                    float v1 = 1;
+                    float v0 = 1.0f;
+                    float v1 = 0.0f;
 
                     setColor(ImGuiCol.Button, K.Style.COLOR_SLOT_BG);
                     setColor(ImGuiCol.ButtonHovered, K.Style.COLOR_SLOT_HOVERED);
