@@ -260,7 +260,8 @@ public class GameUIService implements Service<GameMaster> {
                     String name = entry.getKey().getName();
                     if (aggregated.containsKey(name)) {
                         int prevAmount = aggregated.get(name).getValue();
-                        aggregated.put(name, new AbstractMap.SimpleEntry<>(entry.getKey(), prevAmount + entry.getValue()));
+                        aggregated.put(name, new AbstractMap.SimpleEntry<>(
+                                entry.getKey(), prevAmount + entry.getValue()));
 
                     } else {
                         aggregated.put(name, entry);
@@ -275,14 +276,15 @@ public class GameUIService implements Service<GameMaster> {
                 ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, K.Style.ITEM_SPACING, K.Style.ITEM_SPACING);
                 ImGui.pushStyleVar(ImGuiStyleVar.FrameBorderSize, 1.0f);
 
-                for (Map.Entry<String, Map.Entry<Item, Integer>> entry : aggregated.entrySet()) {
+                int slotIndex = 0;
 
+                for (Map.Entry<String, Map.Entry<Item, Integer>> entry : aggregated.entrySet()) {
                     Item item = entry.getValue().getKey();
                     int totalAmount = entry.getValue().getValue();
 
                     boolean isSelected = selectedInventoryItem != null &&
-                                         selectedInventoryItem.getName()
-                                                 .equals(item.getName());
+                            selectedInventoryItem.getName()
+                                    .equals(item.getName());
 
                     SpriteSheet atlas = getItemSpritesheet(item);
                     int col = getItemIconColumn(item);
@@ -309,17 +311,23 @@ public class GameUIService implements Service<GameMaster> {
                     }
 
                     ImGui.pushID("inv_item_" + item.getName());
-                    if (ImGui.imageButton(atlas.getTextureId(), iconSize, iconSize, u0, v0, u1, v1)) {
+                    if (ImGui.imageButton(atlas.getTextureId(), iconSize, iconSize,
+                            u0, v0, u1, v1)) {
                         selectedInventoryItem = item;
                     }
 
+                    ImGui.popID();
                     ImGui.popStyleColor(4);
+
                     if (ImGui.isItemHovered()) {
                         ImGui.setTooltip(item.getName() + " x" + totalAmount);
                     }
 
-                    ImGui.sameLine();
-                    ImGui.popID();
+                    slotIndex++;
+
+                    if (slotIndex % 4 != 0) {
+                        ImGui.sameLine();
+                    }
                 }
 
                 ImGui.popStyleVar(2);
@@ -383,14 +391,13 @@ public class GameUIService implements Service<GameMaster> {
                         K.Style.ITEM_SPACING);
 
                 ImGui.pushStyleVar(ImGuiStyleVar.FrameBorderSize, 1.0f);
+                int slotIndex = 0;
                 for (Map.Entry<Item, Integer> entry : new HashMap<>(stock.getItems()).entrySet()) {
                     Item item = entry.getKey();
                     int amount = entry.getValue();
 
                     SpriteSheet atlas = getItemSpritesheet(item);
-
                     int col = getItemIconColumn(item);
-
                     int totalCols = atlas.getTotalFrames();
 
                     float iconSize = K.UI.ICON_SIZE;
@@ -406,9 +413,9 @@ public class GameUIService implements Service<GameMaster> {
                     setColor(ImGuiCol.Border, K.Style.COLOR_SLOT_BORDER);
 
                     ImGui.pushID("shop_item_" + item.getName());
-                    if (ImGui.imageButton(atlas.getTextureId(), iconSize,
-                            iconSize, u0, v0, u1, v1)) {
 
+                    if (ImGui.imageButton(atlas.getTextureId(), iconSize, iconSize, u0, v0,
+                            u1, v1)) {
                         if (player.getMoney() >= item.getValue()) {
                             player.earn(-item.getValue());
                             shop.earn(item.getValue());
@@ -418,22 +425,24 @@ public class GameUIService implements Service<GameMaster> {
                             log.info("Player bought {} from shop", item.getName());
 
                         } else {
-
                             log.warn("Player doesn't have enough money to buy {}",
                                     item.getName());
                         }
                     }
 
+                    ImGui.popID();
                     ImGui.popStyleColor(4);
 
                     if (ImGui.isItemHovered()) {
-
                         ImGui.setTooltip(item.getName() + " - $" +
                                 item.getValue() + " (Stock: " + amount + ")");
                     }
 
-                    ImGui.sameLine();
-                    ImGui.popID();
+                    slotIndex++;
+
+                    if (slotIndex % 4 != 0) {
+                        ImGui.sameLine();
+                    }
                 }
 
                 ImGui.popStyleVar(2);
