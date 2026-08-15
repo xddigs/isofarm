@@ -21,8 +21,6 @@ public class Player {
 
     private void setUpInventory() {
         add(new Seed(), 4);
-        add(new Block(BlockData.DIRT), 16);
-        add(new Block(BlockData.STONE), 16);
     }
 
     public String getName() {
