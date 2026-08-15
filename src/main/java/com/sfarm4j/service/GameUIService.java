@@ -314,9 +314,16 @@ public class GameUIService implements Service<GameMaster> {
                         if (ImGui.imageButton(
                                 atlas.getTextureId(),
                                 K.UI.ICON_SIZE,
-                                K.UI.ICON_SIZE, u0, 1.0f,
+                                K.UI.ICON_SIZE,
+                                u0, 1.0f,
                                 u1, 0.0f)) {
                             selectedInventoryItem = item;
+                        }
+
+                        if (ImGui.isItemHovered() &&
+                                ImGui.isMouseDoubleClicked(GLFW_MOUSE_BUTTON_LEFT)) {
+                            sellItem(inv, item);
+                            selectedInventoryItem = null;
                         }
 
                         if (ImGui.isItemHovered()) {
@@ -342,39 +349,29 @@ public class GameUIService implements Service<GameMaster> {
                 }
 
                 ImGui.popStyleVar(2);
-                ImGui.newLine();
-                ImGui.separator();
 
-                if (selectedInventoryItem != null) {
-                    int totalAmount = aggregated.get(selectedInventoryItem.getName()).getValue();
-
-                    if (ImGui.button("Sell " + selectedInventoryItem.getName() +
-                            " (x" + totalAmount + ")", K.UI.MATCH_PARENT_WIDTH, 0)) {
-                        Item targetItem = null;
-                        int cumulativeAmount = 0;
-                        for (Map.Entry<Item, Integer> entry : new HashMap<>(inv.getItems()).entrySet()) {
-                            if (entry.getKey().getName().equals(selectedInventoryItem.getName())) {
-                                targetItem = entry.getKey();
-                                cumulativeAmount += entry.getValue();
-                                player.sell(entry.getKey(), entry.getValue());
-                            }
-                        }
-
-                        if (targetItem != null && cumulativeAmount > 0) {
-                            shop.buy(targetItem, cumulativeAmount);
-                        }
-                        selectedInventoryItem = null;
-                    }
-
-                } else {
-                    ImGui.beginDisabled();
-                    ImGui.button("Select an item to sell", K.UI.MATCH_PARENT_WIDTH, 0);
-                    ImGui.endDisabled();
-                }
             }
         }
 
         ImGui.end();
+    }
+
+    private void sellItem(Inventory inv, Item item) {
+        Item targetItem = null;
+        int cumulativeAmount = 0;
+
+        for (Map.Entry<Item, Integer> entry :
+                new HashMap<>(inv.getItems()).entrySet()) {
+            if (entry.getKey().getName().equals(item.getName())) {
+                targetItem = entry.getKey();
+                cumulativeAmount += entry.getValue();
+                player.sell(entry.getKey(), entry.getValue());
+            }
+        }
+
+        if (targetItem != null && cumulativeAmount > 0) {
+            shop.buy(targetItem, cumulativeAmount);
+        }
     }
 
     public void renderShop() {
