@@ -20,7 +20,7 @@ public class CellService implements Service<Cell> {
 
     public CellService() {
         colors.put(CellType.WATERED, K.Colors.WATERED);
-        colors.put(CellType.DIRT, K.Colors.DIRT);
+        colors.put(CellType.GRASS, K.Colors.GRASS);
         colors.put(CellType.TILLED, K.Colors.TILLED);
     }
 

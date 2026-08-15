@@ -45,9 +45,13 @@ public class GameMaster {
     private SpriteSheet wheat;
     private SpriteSheet carrot;
     private SpriteSheet potato;
+
     private final Map<CropType, SpriteSheet> cropSpritesheets;
     private SpriteSheet seedIcons;
     private SpriteSheet cropIcons;
+    private SpriteSheet toolIcons;
+    private SpriteSheet blockIcons;
+
     private Camera camera;
     private final Matrix4f modelMatrix = new Matrix4f();
     private final Sunlight sunlight;
@@ -102,9 +106,13 @@ public class GameMaster {
         this.wheat = new SpriteSheet(K.Paths.WHEAT_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
         this.carrot = new SpriteSheet(K.Paths.CARROT_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
         this.potato = new SpriteSheet(K.Paths.POTATO_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
+
         this.seedIcons = new SpriteSheet(K.Paths.SEED_ICONS, K.UI.ICON_ATLAS_FRAMES);
         this.cropIcons = new SpriteSheet(K.Paths.CROP_ICONS, K.UI.ICON_ATLAS_FRAMES);
-        this.gameUIservice = new GameUIService(windowHandle, seedIcons, cropIcons);
+        this.toolIcons = new SpriteSheet(K.Paths.TOOL_ICONS, K.UI.ICON_ATLAS_FRAMES);
+        this.blockIcons = new SpriteSheet(K.Paths.BLOCK_ICONS, K.UI.ICON_ATLAS_FRAMES);
+
+        this.gameUIservice = new GameUIService(windowHandle, seedIcons, cropIcons, blockIcons);
         this.shop = new Shop();
         this.gameUIservice.setShop(shop);
 
@@ -271,6 +279,8 @@ public class GameMaster {
 
         cropIcons.dispose();
         seedIcons.dispose();
+        toolIcons.dispose();
+        blockIcons.dispose();
 
         maskFbo.dispose();
         defaultShader.dispose();
