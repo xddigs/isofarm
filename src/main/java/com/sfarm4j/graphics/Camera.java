@@ -6,6 +6,7 @@ import org.joml.Vector2i;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
+@SuppressWarnings("unused")
 public class Camera {
     private final Vector3f position;
     private final Matrix4f projectionMatrix;

@@ -2,6 +2,7 @@ package com.sfarm4j.wrld;
 
 import com.sfarm4j.data.*;
 import com.sfarm4j.graphics.*;
+import com.sfarm4j.input.GameInteraction;
 import com.sfarm4j.input.Keyboard;
 import com.sfarm4j.input.Mouse;
 import com.sfarm4j.service.CellService;
@@ -19,15 +20,16 @@ import org.slf4j.LoggerFactory;
 import java.util.EnumMap;
 import java.util.Map;
 
-import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL13.*;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
 
 @SuppressWarnings("all")
 public class GameMaster {
     private static final Logger log = LoggerFactory.getLogger(GameMaster.class);
     private final World world;
     private final GameUIService gameUIservice;
+    private final GameInteraction gameInteraction;
     private final CropService cropService;
     private final TimeService timeService;
     private final CellService cellService;
@@ -112,10 +114,28 @@ public class GameMaster {
 
         this.camera = new Camera(K.Camera.DEFAULT_WIDTH, K.Camera.DEFAULT_HEIGHT);
         this.camera.setPosition(0.0f, 0.0f, 0.0f);
-        recenter();
+        this.gameInteraction = new GameInteraction(cropService, gameUIservice,
+                cellService, timeService, camera);
 
+        recenter();
         log.info("GameMaster initialized with grid size: {}x{}",
                 K.World.GRID_SIZE, K.World.GRID_SIZE);
+    }
+
+    public World getWorld() {
+        return world;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public float getWindowWidth() {
+        return windowWidth;
+    }
+
+    public float getWindowHeight() {
+        return windowHeight;
     }
 
     public void update(float delta) {
@@ -130,80 +150,8 @@ public class GameMaster {
         gameUIservice.update(delta);
 
         Item selectedInventoryItem = gameUIservice.getSelectedInventoryItem();
-
         if (!ImGui.getIO().getWantCaptureMouse()) {
-            boolean isCtrlDown = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL) ||
-                    Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
-            if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
-                if (isCtrlDown) {
-                    camera.rotateYaw(Mouse.getDeltaX() * K.Camera.ROTATION_SENSITIVITY);
-                } else {
-                    camera.pan(Mouse.getDeltaX(), Mouse.getDeltaY(), K.Camera.PAN_SENSITIVITY);
-                }
-            }
-
-            float scrollY = Mouse.getScrollY();
-            if (scrollY != 0.0f) {
-                camera.zoom(scrollY);
-            }
-
-            if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_MIDDLE)) {
-                recenter();
-            }
-
-            Vector2i cell = camera.highlight(Mouse.getX(), Mouse.getY(),
-                    windowWidth, windowHeight);
-            if (cell != null) {
-                hoveredCell = cell;
-            } else {
-                hoveredCell = null;
-            }
-
-            if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT) && hoveredCell != null) {
-                Crop crop = world.getCropAt(hoveredCell.x, hoveredCell.y);
-
-                if (crop != null) {
-                    if (Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-                        if (crop.isReadyToHarvest()) {
-                            cropService.harvest(player, crop);
-                            gameUIservice.logAction(hoveredCell);
-                        } else if (!crop.isReadyToHarvest() || !crop.wasHarvested()) {
-                            cropService.rip(crop);
-                        }
-                    }
-                } else {
-                    if (selectedInventoryItem instanceof CellExpansion) {
-                        log.info("Trying to unlock cell {},{}", hoveredCell.x, hoveredCell.y);
-                        if (cellService.expandCell(hoveredCell.x, hoveredCell.y)) {
-                            player.remove(selectedInventoryItem);
-                            gameUIservice.setSelectedInventoryItem(null);
-
-                            log.info("New cell unlocked at {},{}",
-                                    hoveredCell.x, hoveredCell.y);
-                        } else {
-                            log.warn("Could not expand cell {},{}",
-                                    hoveredCell.x, hoveredCell.y);
-                        }
-                    } else if (selectedInventoryItem instanceof Seed &&
-                            cellService.isUnlocked(hoveredCell.x, hoveredCell.y)) {
-                        if (((Seed) selectedInventoryItem).getType() != null) {
-                            Crop planted = cropService.plant(
-                                    hoveredCell.x,
-                                    hoveredCell.y,
-                                    player,
-                                    cellService.find(hoveredCell.x, hoveredCell.y),
-                                    ((Seed) selectedInventoryItem).getType(),
-                                    timeService.getCurrentSeason()
-                            );
-                            if (planted != null) {
-                                gameUIservice.logAction(hoveredCell);
-                            }
-                        } else {
-                            log.warn("No crop was selected");
-                        }
-                    }
-                }
-            }
+            hoveredCell = gameInteraction.update(this, selectedInventoryItem);
         } else {
             hoveredCell = null;
         }
