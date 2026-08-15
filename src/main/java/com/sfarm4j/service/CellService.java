@@ -16,13 +16,8 @@ import java.util.Map;
 @SuppressWarnings("all")
 public class CellService implements Service<Cell> {
     private final Map<String, Cell> cells = new HashMap<>();
-    private final Map<CellType, Vector3f> colors = new EnumMap<>(CellType.class);
 
-    public CellService() {
-        colors.put(CellType.WATERED, K.Colors.WATERED);
-        colors.put(CellType.GRASS, K.Colors.GRASS);
-        colors.put(CellType.TILLED, K.Colors.TILLED);
-    }
+    public CellService() {}
 
     public void setCell(CellType type, int x, int z) {
         cells.put(getCellKey(x, z), new Cell(type, x, z));
