@@ -329,7 +329,7 @@ public class GameUIService implements Service<GameMaster> {
                         renderSlotCount(totalAmount);
 
                         if (ImGui.isItemHovered()) {
-                            ImGui.setTooltip(item.getName() + " x" + totalAmount);
+                            ImGui.setTooltip(item.getName());
                         }
 
                     } else {
@@ -492,8 +492,7 @@ public class GameUIService implements Service<GameMaster> {
                         renderSlotCount(amount);
 
                         if (ImGui.isItemHovered()) {
-                            ImGui.setTooltip(item.getName() + " - $" + item.getValue() +
-                                            " (Stock: " + amount + ")");
+                            ImGui.setTooltip(item.getName() + " - $" + item.getValue());
                         }
 
                     } else {
