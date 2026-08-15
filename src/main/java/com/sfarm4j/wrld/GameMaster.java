@@ -27,6 +27,7 @@ import static org.lwjgl.opengl.GL13.glActiveTexture;
 @SuppressWarnings("all")
 public class GameMaster {
     private static final Logger log = LoggerFactory.getLogger(GameMaster.class);
+    private final long windowHandle;
     private final World world;
     private final GameUIService gameUIservice;
     private final GameInteraction gameInteraction;
@@ -65,6 +66,7 @@ public class GameMaster {
     private Shop shop;
 
     public GameMaster(long windowHandle) {
+        this.windowHandle = windowHandle;
         this.world = new World();
         this.cropService = new CropService(world);
         this.timeService = new TimeService();
@@ -128,6 +130,10 @@ public class GameMaster {
         recenter();
         log.info("GameMaster initialized with grid size: {}x{}",
                 K.World.GRID_SIZE, K.World.GRID_SIZE);
+    }
+
+    public long getWindowHandle() {
+        return windowHandle;
     }
 
     public World getWorld() {
@@ -232,7 +238,8 @@ public class GameMaster {
                 selectionMesh.renderLines();
 
             } else {
-                modelMatrix.identity().translate(hoveredCell.x, 0.0f, hoveredCell.y);
+                modelMatrix.identity().translate(hoveredCell.x * K.World.TILE_SIZE, 0.0f,
+                        hoveredCell.y * K.World.TILE_SIZE);
                 defaultShader.setUniform("uModel", modelMatrix);
                 selectionMesh.renderLines();
             }
@@ -321,7 +328,8 @@ public class GameMaster {
 
     public void recenter() {
         float center = (K.World.GRID_SIZE - 1) / 2.0f;
-        this.camera.setPosition(center, 0.0f, center);
+        float worldCenter = center * K.World.TILE_SIZE;
+        this.camera.setPosition(worldCenter, 0.0f, worldCenter);
     }
 
     public void onResize(int newWidth, int newHeight) {

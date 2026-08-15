@@ -115,7 +115,6 @@ public class Camera {
 
     public Vector2i highlight(float mouseX, float mouseY,
                               float windowWidth, float windowHeight) {
-
         float ndcX = (2.0f * mouseX) / windowWidth - 1.0f;
         float ndcY = 1.0f - (2.0f * mouseY) / windowHeight;
 
@@ -124,40 +123,27 @@ public class Camera {
                 .invert();
 
         Vector4f rayStart = new Vector4f(ndcX, ndcY, -1.0f, 1.0f);
-        Vector4f rayEnd = new Vector4f(ndcX, ndcY, 1.0f, 1.0f);
+        Vector4f rayEnd   = new Vector4f(ndcX, ndcY,  1.0f, 1.0f);
 
         invProjView.transform(rayStart);
         invProjView.transform(rayEnd);
 
-        if (rayStart.w != 0.0f) {
-            rayStart.div(rayStart.w);
+        if (rayStart.w != 0.0f) rayStart.div(rayStart.w);
+        if (rayEnd.w != 0.0f)   rayEnd.div(rayEnd.w);
+
+        Vector3f origin = new Vector3f(rayStart.x, rayStart.y, rayStart.z);
+        Vector3f dir = new Vector3f(rayEnd.x - rayStart.x, rayEnd.y - rayStart.y,
+                rayEnd.z - rayStart.z).normalize();
+
+        if (Math.abs(dir.y) < K.World.EPSILON_RAY_Y) {
+            return null;
         }
 
-        if (rayEnd.w != 0.0f) {
-            rayEnd.div(rayEnd.w);
-        }
-
-        Vector3f origin = new Vector3f(
-                rayStart.x,
-                rayStart.y,
-                rayStart.z
-        );
-
-        Vector3f dir = new Vector3f(
-                rayEnd.x - rayStart.x,
-                rayEnd.y - rayStart.y,
-                rayEnd.z - rayStart.z
-        ).normalize();
-
-        if (Math.abs(dir.y) < K.World.EPSILON_RAY_Y) return null;
-        float tGround = -origin.y / dir.y;
-        if (tGround < 0.0f) return null;
-
-        float groundX = origin.x + tGround * dir.x;
-        float groundZ = origin.z + tGround * dir.z;
-
-        int cellX = Math.round(groundX / K.World.TILE_SIZE);
-        int cellZ = Math.round(groundZ / K.World.TILE_SIZE);
+        float t = -origin.y / dir.y;
+        float worldX = origin.x + t * dir.x;
+        float worldZ = origin.z + t * dir.z;
+        int cellX = Math.round(worldX / K.World.TILE_SIZE);
+        int cellZ = Math.round(worldZ / K.World.TILE_SIZE);
         return new Vector2i(cellX, cellZ);
     }
 }

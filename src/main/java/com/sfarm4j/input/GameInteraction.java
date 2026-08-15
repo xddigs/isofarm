@@ -40,8 +40,7 @@ public class GameInteraction implements Service<GameInteraction> {
                 Mouse.getX(),
                 Mouse.getY(),
                 gameMaster.getWindowWidth(),
-                gameMaster.getWindowHeight()
-        );
+                gameMaster.getWindowHeight());
 
         if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
             if (isCtrlDown) {
@@ -62,6 +61,7 @@ public class GameInteraction implements Service<GameInteraction> {
 
         if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT) && hoveredCell != null) {
             Crop crop = gameMaster.getWorld().getCropAt(hoveredCell.x, hoveredCell.y);
+
             if (crop != null) {
                 if (Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
                     if (crop.isReadyToHarvest()) {
