@@ -33,13 +33,16 @@ public class GameInteraction implements Service<GameInteraction> {
 
     public Vector2i update(GameMaster gameMaster, Item selectedItem) {
         camera(gameMaster);
+
         Vector2i hoveredCell = camera.highlight(
                 Mouse.getX(),
                 Mouse.getY(),
                 gameMaster.getWindowWidth(),
                 gameMaster.getWindowHeight());
 
-        if (hoveredCell == null) return null;
+        if (hoveredCell == null) {
+            return null;
+        }
 
         if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
             breakAction(gameMaster, hoveredCell);
@@ -76,7 +79,6 @@ public class GameInteraction implements Service<GameInteraction> {
 
     private void breakAction(GameMaster gameMaster, Vector2i cell) {
         Crop crop = gameMaster.getWorld().getCropAt(cell.x, cell.y);
-
         if (crop != null) {
             if (crop.isReadyToHarvest()) {
                 cropService.harvest(gameMaster.getPlayer(), crop);
@@ -114,7 +116,8 @@ public class GameInteraction implements Service<GameInteraction> {
                     if (gameMaster.getWorld().addBlock(newBlock)) {
                         gameMaster.getPlayer().remove(selectedItem);
                         gameUIservice.logAction(cell);
-                        log.info("Block placed: {} at {},{},{}", newBlock.getType().getName(), cell.x, targetY, cell.y);
+                        log.info("Block placed: {} at {},{},{}",
+                                newBlock.getType().getName(), cell.x, targetY, cell.y);
                     }
                 }
             }

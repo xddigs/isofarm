@@ -192,7 +192,6 @@ public class GameMaster {
 
         defaultShader.setUniform("uUseTexture", true);
         defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
-        defaultShader.setUniform("uTotalFrames", wheat.getTotalFrames());
 
         defaultShader.setUniform("uUseTexture", true);
         defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);

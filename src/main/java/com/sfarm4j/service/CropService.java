@@ -82,6 +82,5 @@ public class CropService implements Service<Crop> {
     public void rip(Crop crop) {
         world.removeCrop(crop);
         crop.getCell().setCrop(false);
-        log.info("Ripped {} from the ground.", crop.getType().getName());
     }
 }
