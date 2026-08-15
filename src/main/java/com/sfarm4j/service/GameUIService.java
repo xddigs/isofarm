@@ -171,7 +171,6 @@ public class GameUIService implements Service<GameMaster> {
             ImGui.text(seed.getName() + " (x" + amount + ")");
             ImGui.textDisabled(seed.getDescription());
         }
-
         ImGui.popStyleVar();
         ImGui.end();
     }

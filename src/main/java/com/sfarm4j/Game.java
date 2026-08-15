@@ -126,24 +126,22 @@ public class Game {
 
     private void loop() {
         double lastTime = glfwGetTime();
-
         while (!glfwWindowShouldClose(window)) {
             double currentTime = glfwGetTime();
             float delta = (float) (currentTime - lastTime);
             lastTime = currentTime;
-
+            glfwPollEvents();
             if (Keyboard.isKeyPressed(GLFW_KEY_ESCAPE)) {
                 glfwSetWindowShouldClose(window, true);
             }
-
             Vector3f skyColor = TimeService.getSkyColor();
             glClearColor(skyColor.x, skyColor.y, skyColor.z, CLEAR_COLOR_ALPHA);
             master.update(delta);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            master.render();
 
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            master.render();
             glfwSwapBuffers(window);
-            glfwPollEvents();
         }
     }
 

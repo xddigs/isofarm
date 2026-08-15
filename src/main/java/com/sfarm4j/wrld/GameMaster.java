@@ -216,9 +216,26 @@ public class GameMaster {
 
         if (hoveredCell != null) {
             defaultShader.setUniform("uUseTexture", false);
-            modelMatrix.identity().translate(hoveredCell.x, 0.0f, hoveredCell.y);
-            defaultShader.setUniform("uModel", modelMatrix);
-            selectionMesh.renderLines();
+            Block hoveredBlock = world.getBlocks().values().stream()
+                    .filter(block ->
+                            Math.round(block.getX()) == hoveredCell.x &&
+                                    Math.round(block.getZ()) == hoveredCell.y
+                    )
+                    .findFirst()
+                    .orElse(null);
+            if (hoveredBlock != null) {
+                modelMatrix.identity().translate(
+                                hoveredBlock.getX(),
+                                hoveredBlock.getY(),
+                                hoveredBlock.getZ());
+                defaultShader.setUniform("uModel", modelMatrix);
+                selectionMesh.renderLines();
+
+            } else {
+                modelMatrix.identity().translate(hoveredCell.x, 0.0f, hoveredCell.y);
+                defaultShader.setUniform("uModel", modelMatrix);
+                selectionMesh.renderLines();
+            }
         }
 
         if (hoveredCell != null) {

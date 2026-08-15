@@ -36,8 +36,12 @@ public class GameInteraction implements Service<GameInteraction> {
         boolean isCtrlDown = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL) ||
                 Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
 
-        Vector2i hoveredCell = camera.highlight(Mouse.getX(), Mouse.getY(),
-                gameMaster.getWindowWidth(), gameMaster.getWindowHeight());
+        Vector2i hoveredCell = camera.highlight(
+                Mouse.getX(),
+                Mouse.getY(),
+                gameMaster.getWindowWidth(),
+                gameMaster.getWindowHeight()
+        );
 
         if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
             if (isCtrlDown) {
@@ -58,28 +62,36 @@ public class GameInteraction implements Service<GameInteraction> {
 
         if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT) && hoveredCell != null) {
             Crop crop = gameMaster.getWorld().getCropAt(hoveredCell.x, hoveredCell.y);
-
             if (crop != null) {
                 if (Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
                     if (crop.isReadyToHarvest()) {
                         cropService.harvest(gameMaster.getPlayer(), crop);
-                        gameUIservice.logAction(hoveredCell);
-                    } else if (!crop.isReadyToHarvest() || !crop.wasHarvested()) {
+                    } else {
                         cropService.rip(crop);
                     }
+                    gameUIservice.logAction(hoveredCell);
                 }
             } else if (selectedItem instanceof Block block) {
                 int targetY = 1;
-                if (cellService.isUnlocked(hoveredCell.x, hoveredCell.y)) {
-                    Block newBlock = new Block(block.getType(), hoveredCell.x, targetY, hoveredCell.y);
-                    if (gameMaster.getWorld().addBlock(newBlock)) {
-                        gameMaster.getPlayer().remove(selectedItem);
+                if (Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
+                    Block b = gameMaster.getWorld().getBlockAt(hoveredCell.x, targetY, hoveredCell.y);
+                    if (gameMaster.getWorld().removeBlock(b)) {
+                        gameMaster.getPlayer().add(b);
                         gameUIservice.logAction(hoveredCell);
-                        log.info("Block placed: {} at {},{},{}", newBlock.getType().getName(),
-                                hoveredCell.x, targetY, hoveredCell.y);
-                    } else {
-                        log.warn("Cannot place block: space occupied at {},{},{}",
-                                hoveredCell.x, targetY, hoveredCell.y);
+                        log.info("Block removed: {}", b.getType().getName());
+                    }
+                } else {
+                    if (cellService.isUnlocked(hoveredCell.x, hoveredCell.y)) {
+                        Block newBlock = new Block(block.getType(), hoveredCell.x, targetY, hoveredCell.y);
+                        if (gameMaster.getWorld().addBlock(newBlock)) {
+                            gameMaster.getPlayer().remove(selectedItem);
+                            gameUIservice.logAction(hoveredCell);
+                            log.info("Block placed: {} at {},{},{}", newBlock.getType().getName(),
+                                    hoveredCell.x, targetY, hoveredCell.y);
+                        } else {
+                            log.warn("Cannot place block: space occupied at {},{},{}",
+                                    hoveredCell.x, targetY, hoveredCell.y);
+                        }
                     }
                 }
 
@@ -105,8 +117,7 @@ public class GameInteraction implements Service<GameInteraction> {
                                 gameMaster.getPlayer(),
                                 cellService.find(hoveredCell.x, hoveredCell.y),
                                 ((Seed) selectedItem).getType(),
-                                timeService.getCurrentSeason()
-                        );
+                                timeService.getCurrentSeason());
                         if (planted != null) {
                             gameUIservice.logAction(hoveredCell);
                         }

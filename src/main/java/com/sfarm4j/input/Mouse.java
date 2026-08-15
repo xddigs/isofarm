@@ -59,6 +59,13 @@ public class Mouse {
                 && buttons[button] && !lastButtons[button];
     }
 
+    public static boolean isButtonReleased(int button) {
+        return button >= 0 &&
+                button <= GLFW_MOUSE_BUTTON_LAST &&
+                !buttons[button] &&
+                lastButtons[button];
+    }
+
     public static float getDeltaX() { return deltaX; }
     public static float getDeltaY() { return deltaY; }
     public static float getX() { return x; }

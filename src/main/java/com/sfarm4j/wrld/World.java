@@ -36,6 +36,11 @@ public class World {
         return true;
     }
 
+    public boolean removeBlock(Block block) {
+        String key = block.getX() + "," + block.getY() + "," + block.getZ();
+        return blocks.remove(key) != null;
+    }
+
     public Map<String, Block> getBlocks() {
         return blocks;
     }

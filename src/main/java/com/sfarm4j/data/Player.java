@@ -16,6 +16,10 @@ public class Player {
         this.name = name;
         this.inventory = new Inventory();
         this.money = 0;
+        setUpInventory();
+    }
+
+    private void setUpInventory() {
         add(new Seed(), 4);
         add(new Block(BlockData.DIRT), 1);
         add(new Block(BlockData.STONE), 64);
