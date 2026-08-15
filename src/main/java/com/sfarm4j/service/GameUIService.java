@@ -101,7 +101,8 @@ public class GameUIService implements Service<GameMaster> {
     }
 
     public void update(float delta) {
-        if (Mouse.getDeltaX() != 0.0f || Mouse.getDeltaY() != 0.0f ||
+        if (Mouse.getDeltaX() != 0.0f ||
+                Mouse.getDeltaY() != 0.0f ||
                 Mouse.getScrollY() != 0.0f ||
                 Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT) ||
                 Keyboard.anyKeyPressed()) {

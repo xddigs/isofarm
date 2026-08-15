@@ -22,11 +22,11 @@ public class SpriteSheet {
     }
 
     public float getWidth() {
-        return (float) texture.getWidth() /(totalFrames);
+        return (float) texture.getWidth();
     }
 
     public float getHeight() {
-        return (float) texture.getHeight() /(totalFrames);
+        return (float) texture.getHeight();
     }
 
     public int getTotalFrames() {
