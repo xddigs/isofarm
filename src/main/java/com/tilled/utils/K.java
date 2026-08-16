@@ -103,6 +103,7 @@ public final class K {
 
         public static final int BLOCK_ATLAS_FRAMES = 5;
         public static final int ICON_BLOCK_ATLAS_ROWS = 3;
+        public static final int WATER_FRAMES = 8;
         public static final int COMMAND_MAX_LENGTH = 512;
     }
 
@@ -122,6 +123,7 @@ public final class K {
         public static final String TOOL_ICONS = "assets/icons/tool_icons.png";
         public static final String BLOCK_ICONS = "assets/icons/block_icons.png";
         public static final String BLOCKS = "assets/textures/blocks.png";
+        public static final String WATER = "assets/textures/water.png";
     }
 
     public static final class Render {

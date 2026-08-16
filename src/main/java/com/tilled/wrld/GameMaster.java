@@ -55,6 +55,7 @@ public class GameMaster {
     private SpriteSheet toolIcons;
     private SpriteSheet blockIcons;
     private SpriteSheet blocksTexture;
+    private SpriteSheet waterTexture;
 
     private Camera camera;
     private final Matrix4f modelMatrix = new Matrix4f();
@@ -115,12 +116,13 @@ public class GameMaster {
         this.spriteMesh = Mesh.createCrop();
 
         try {
-            this.blocksTexture = new SpriteSheet(K.Paths.BLOCKS, K.UI.BLOCK_ATLAS_FRAMES);
+            this.blocksTexture = new SpriteSheet(K.Paths.BLOCKS, K.UI.WATER_FRAMES);
         } catch (Exception e) {
             log.warn("Could not load blocks.png atlas, falling back to base colors: {}", e.getMessage());
             this.blocksTexture = null;
         }
 
+        this.waterTexture = new SpriteSheet(K.Paths.WATER, K.UI.BLOCK_ATLAS_FRAMES);
         this.cropSpritesheets = new EnumMap(CropType.class);
         this.wheat = new SpriteSheet(K.Paths.WHEAT_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
         this.carrot = new SpriteSheet(K.Paths.CARROT_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
@@ -393,8 +395,9 @@ public class GameMaster {
         spriteMesh.dispose();
         screenQuadMesh.dispose();
 
-        if (blocksTexture != null) {
+        if (blocksTexture != null || waterTexture != null) {
             blocksTexture.dispose();
+            waterTexture.dispose();
         }
 
         wheat.dispose();
