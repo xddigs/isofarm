@@ -1,0 +1,53 @@
+package com.tilled.wrld;
+
+import com.tilled.data.DataClass;
+
+@DataClass
+public class Chunk {
+    public static final int SIZE_X = 16;
+    public static final int SIZE_Y = 64;
+    public static final int SIZE_Z = 16;
+
+    private final int chunkX;
+    private final int chunkZ;
+    private final byte[] blocks;
+
+    public Chunk(int chunkX, int chunkZ) {
+        this.chunkX = chunkX;
+        this.chunkZ = chunkZ;
+        this.blocks = new byte[SIZE_X * SIZE_Y * SIZE_Z];
+    }
+
+    public byte getBlock(int x, int y, int z) {
+        if (!isOutOfBounds(x, y, z)) {
+            return blocks[getIndex(x, y, z)];
+        }
+        return 0;
+    }
+
+    public void setBlock(int x, int y, int z, byte blockId) {
+        if (!isOutOfBounds(x, y, z)) {
+            blocks[getIndex(x, y, z)] = blockId;
+        }
+    }
+
+    public byte[] getBlocks() {
+        return blocks;
+    }
+
+    public int getChunkX() {
+        return chunkX;
+    }
+
+    public int getChunkZ() {
+        return chunkZ;
+    }
+
+    private int getIndex(int x, int y, int z) {
+        return x + SIZE_X * (z + SIZE_Z * y);
+    }
+
+    private boolean isOutOfBounds(int x, int y, int z) {
+        return x < 0 || x >= SIZE_X || y < 0 || y >= SIZE_Y || z < 0 || z >= SIZE_Z;
+    }
+}
