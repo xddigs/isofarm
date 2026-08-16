@@ -8,14 +8,14 @@ public class Player {
     private static final Logger log = LoggerFactory.getLogger(Player.class);
     private final String name;
     private final Inventory inventory;
-    private int money;
+    private final Purse purse;
     private int experience;
     private int level;
 
     public Player(String name) {
         this.name = name;
         this.inventory = new Inventory();
-        this.money = 0;
+        this.purse = new Purse();
         setUpInventory();
     }
 
@@ -31,12 +31,8 @@ public class Player {
         return inventory;
     }
 
-    public int getMoney() {
-        return money;
-    }
-
-    public void setMoney(int money) {
-        this.money = money;
+    public Purse getPurse() {
+        return purse;
     }
 
     public void gain(int amount) {
@@ -118,7 +114,13 @@ public class Player {
 
     public void earn(int amount) {
         log.info("Earned ${}", amount);
-        this.money += amount;
+        for (int i = 0; i <= amount; i++) {
+            purse.add(new Coin());
+        }
+    }
+
+    public int purse() {
+        return purse.getAmount();
     }
 
     public boolean hasSeeds() {
