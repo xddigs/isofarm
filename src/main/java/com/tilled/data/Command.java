@@ -6,5 +6,4 @@ import java.util.function.Consumer;
 public record Command(
         String name,
         String[] args,
-        Consumer<String[]> action
-) {}
+        Consumer<String[]> action) {}

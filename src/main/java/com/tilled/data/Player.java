@@ -65,8 +65,8 @@ public class Player {
         int toSell = Math.min(current, amount);
         inventory.remove(item, toSell);
         int earnings = toSell * item.getValue();
-        earn(earnings);
         toastService.sell("You successfully sold " + item.getName() + " for " + earnings + " coins");
+        earn(earnings);
     }
 
     public void add(Item item, int amount) {

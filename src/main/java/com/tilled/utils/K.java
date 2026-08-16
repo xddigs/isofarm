@@ -139,15 +139,13 @@ public final class K {
         public static final float TOAST_MARGIN_RIGHT = 24.0f;
         public static final float TOAST_MARGIN_TOP = 24.0f;
         public static final float TOAST_SPACING = 8.0f;
-        public static final float TOAST_EXIT_X = Window.DEFAULT_WIDTH + TOAST_WIDTH + 50.0f;
-        public static final float TOAST_START_X = K.Window.DEFAULT_WIDTH + TOAST_WIDTH;
         public static final float TOAST_SLIDE_SPEED = 10.0f;
         public static final float TOAST_EXIT_SPEED = 12.0f;
         public static final float TOAST_DURATION = 2.5f;
         public static final float TOAST_PADDING_X = 14.0f;
-        public static final float TOAST_PADDING_Y = 8.0f;
+        public static final float TOAST_PADDING_Y = 10.0f;
         public static final float TOAST_ICON_SIZE = 20.0f;
-        public static final float TOAST_ROUNDING = 6.0f;
+        public static final float TOAST_ROUNDING = 8.0f;
     }
 
     public static final class Paths {

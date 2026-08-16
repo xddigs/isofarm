@@ -3,11 +3,12 @@ package com.tilled.service;
 import com.tilled.data.Command;
 
 public class CommandService implements Service<Command> {
-
     private final CommandRegistry registry;
+    private final ToastService toastService;
 
-    public CommandService(CommandRegistry registry) {
+    public CommandService(CommandRegistry registry, ToastService toastService) {
         this.registry = registry;
+        this.toastService = toastService;
     }
 
     public void execute(String input) {
@@ -30,5 +31,6 @@ public class CommandService implements Service<Command> {
         String[] args = new String[tokens.length - 1];
         System.arraycopy(tokens, 1, args, 0, args.length);
         command.action().accept(args);
+        toastService.success(commandName + " " + String.join(" ", args));
     }
 }

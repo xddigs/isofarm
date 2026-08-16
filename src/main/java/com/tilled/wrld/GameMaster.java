@@ -83,7 +83,8 @@ public class GameMaster {
         this.timeService = new TimeService();
         this.blockService = new BlockService();
         this.commandRegistry = new CommandRegistry();
-        this.commandService = new CommandService(commandRegistry);
+        this.toastService = new ToastService();
+        this.commandService = new CommandService(commandRegistry, toastService);
         this.itemRegistry = new ItemRegistry();
         this.sunlight = new Sunlight(K.Sunlight.DEFAULT_DIRECTION);
         this.particles = new ParticleEngine();
@@ -142,7 +143,6 @@ public class GameMaster {
         this.toolIcons = new SpriteSheet(K.Paths.TOOL_ICONS, K.UI.ICON_TOOL_FRAMES);
         this.blockIcons = new SpriteSheet(K.Paths.BLOCK_ICONS, K.UI.ICON_BLOCK_FRAMES);
 
-        this.toastService = new ToastService();
         this.gameUIservice = new GameUIService(windowHandle, commandService, toastService,
                 seedIcons, cropIcons, blockIcons, toolIcons);
 
@@ -178,6 +178,22 @@ public class GameMaster {
         return player;
     }
 
+    public ToastService getToastService() {
+        return toastService;
+    }
+
+    public CommandRegistry getCommandRegistry() {
+        return commandRegistry;
+    }
+
+    public ItemRegistry getItemRegistry() {
+        return itemRegistry;
+    }
+
+    public WeatherService getWeatherService() {
+        return weatherService;
+    }
+
     public float getWindowWidth() {
         return windowWidth;
     }
@@ -199,6 +215,10 @@ public class GameMaster {
     }
 
     public void update(float delta) {
+        if (weatherService.isRaining()) {
+            rainEngine.update(delta, camera.getPosition());
+        }
+
         if (player == null) {
             return;
         }
@@ -211,10 +231,6 @@ public class GameMaster {
 
         camera.update(delta);
         gameUIservice.update(delta);
-
-        if (weatherService.isRaining()) {
-            rainEngine.update(delta, camera.getPosition());
-        }
 
         Item selectedInventoryItem = gameUIservice.getSelectedInventoryItem();
 
@@ -393,9 +409,9 @@ public class GameMaster {
                 gameUIservice.setPlayer(player);
                 this.shop.setPlayer(player);
                 log.info("Player created: {}", player.getName());
+                toastService.success("Welcome, " + player.getName() + "!");
                 Library.initItems(itemRegistry, player);
-                Library.initCommands(genDelta, commandRegistry,
-                        itemRegistry, weatherService, player);
+                Library.initCommands(genDelta, this);
             }
         }
 

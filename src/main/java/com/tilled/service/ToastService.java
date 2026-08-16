@@ -112,7 +112,6 @@ public class ToastService implements Service<Toast> {
 
     private void rearrange() {
         float targetX = K.Window.DEFAULT_WIDTH - K.UI.TOAST_WIDTH - K.UI.TOAST_MARGIN_RIGHT;
-
         float y = K.UI.TOAST_MARGIN_TOP;
 
         for (Toast toast : toasts) {
@@ -122,7 +121,6 @@ public class ToastService implements Service<Toast> {
 
             toast.setTargetX(targetX);
             toast.setTargetY(y);
-
             y += K.UI.TOAST_HEIGHT + K.UI.TOAST_SPACING;
         }
     }

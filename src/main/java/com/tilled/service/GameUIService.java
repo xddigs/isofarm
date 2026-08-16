@@ -50,11 +50,7 @@ public class GameUIService implements Service<GameMaster> {
     private Item selectedInventoryItem = null;
     private float hudInactivityTimer = 0.0f;
 
-    public GameUIService(long windowHandle, CommandService commandService,
-                         ToastService toastService,
-                         SpriteSheet seedIcons,
-                         SpriteSheet cropIcons,
-                         SpriteSheet blockIcons, SpriteSheet toolIcons) {
+    public GameUIService(long windowHandle, CommandService commandService, ToastService toastService, SpriteSheet seedIcons, SpriteSheet cropIcons, SpriteSheet blockIcons, SpriteSheet toolIcons) {
         this.commandService = commandService;
         this.toastService = toastService;
         this.seedIcons = seedIcons;
@@ -67,8 +63,7 @@ public class GameUIService implements Service<GameMaster> {
 
         ImGuiIO io = ImGui.getIO();
         if (new File(K.Paths.FONT).exists()) {
-            io.getFonts().addFontFromFileTTF(
-                    K.Paths.FONT, K.Style.FONT_SIZE);
+            io.getFonts().addFontFromFileTTF(K.Paths.FONT, K.Style.FONT_SIZE);
         }
 
         ImGuiStyle style = getImGuiStyle();
@@ -121,11 +116,7 @@ public class GameUIService implements Service<GameMaster> {
     }
 
     public void update(float delta) {
-        if (Mouse.getDeltaX() != 0.0f ||
-                Mouse.getDeltaY() != 0.0f ||
-                Mouse.getScrollY() != 0.0f ||
-                Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT) ||
-                Keyboard.anyKeyPressed()) {
+        if (Mouse.getDeltaX() != 0.0f || Mouse.getDeltaY() != 0.0f || Mouse.getScrollY() != 0.0f || Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT) || Keyboard.anyKeyPressed()) {
             hudInactivityTimer = HUD_FADE_DELAY;
 
         } else if (hudInactivityTimer > 0.0f) {
@@ -173,94 +164,57 @@ public class GameUIService implements Service<GameMaster> {
         float y = toast.getY();
 
         float width = K.UI.TOAST_WIDTH;
-        float height = K.UI.TOAST_HEIGHT;
-
         float[] background = getToastBackground(toast.getType());
         float[] accent = getToastAccent(toast.getType());
 
-        ImGui.setNextWindowPos(
-                x,
-                y,
-                ImGuiCond.Always
-        );
+        ImGui.setNextWindowPos(x, y, ImGuiCond.Always);
+        ImGui.setNextWindowSize(width, 0.0f, ImGuiCond.Always);
 
-        ImGui.setNextWindowSize(
-                width,
-                height,
-                ImGuiCond.Always
-        );
+        int flags = ImGuiWindowFlags.NoTitleBar |
+                ImGuiWindowFlags.NoResize |
+                ImGuiWindowFlags.NoMove |
+                ImGuiWindowFlags.NoCollapse |
+                ImGuiWindowFlags.NoScrollbar |
+                ImGuiWindowFlags.NoScrollWithMouse |
+                ImGuiWindowFlags.NoInputs |
+                ImGuiWindowFlags.NoFocusOnAppearing |
+                ImGuiWindowFlags.NoNav |
+                ImGuiWindowFlags.AlwaysAutoResize;
 
-        int flags =     ImGuiWindowFlags.NoTitleBar |
-                        ImGuiWindowFlags.NoResize |
-                        ImGuiWindowFlags.NoMove |
-                        ImGuiWindowFlags.NoCollapse |
-                        ImGuiWindowFlags.NoScrollbar |
-                        ImGuiWindowFlags.NoScrollWithMouse |
-                        ImGuiWindowFlags.NoInputs |
-                        ImGuiWindowFlags.NoFocusOnAppearing |
-                        ImGuiWindowFlags.NoNav;
+        ImGui.pushStyleColor(ImGuiCol.WindowBg, background[0], background[1], background[2], background[3]);
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowRounding, K.UI.TOAST_ROUNDING);
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, K.UI.TOAST_PADDING_X, K.UI.TOAST_PADDING_Y);
 
-        ImGui.pushStyleColor(
-                ImGuiCol.WindowBg,
-                background[0],
-                background[1],
-                background[2],
-                background[3]
-        );
-
-        ImGui.pushStyleVar(
-                ImGuiStyleVar.WindowRounding,
-                K.UI.TOAST_ROUNDING
-        );
-
-        ImGui.pushStyleVar(
-                ImGuiStyleVar.WindowPadding,
-                K.UI.TOAST_PADDING_X,
-                K.UI.TOAST_PADDING_Y
-        );
-
-        String windowId = "Toast##" +
-                System.identityHashCode(toast);
+        String windowId = "Toast##" + System.identityHashCode(toast);
 
         if (ImGui.begin(windowId, flags)) {
-
             float cursorX = ImGui.getCursorPosX();
             float cursorY = ImGui.getCursorPosY();
 
-            // Accent bar
             ImGui.getWindowDrawList().addRectFilled(
-                    x,
-                    y,
-                    x + 4.0f,
-                    y + height,
-                    ImGui.getColorU32(
-                            accent[0],
-                            accent[1],
-                            accent[2],
-                            accent[3]
-                    )
-            );
+                    x, y, x + 4.0f, y,
+                    ImGui.getColorU32(accent[0], accent[1], accent[2], accent[3]));
 
-            ImGui.setCursorPosX(
-                    cursorX + K.UI.TOAST_PADDING_X
-            );
+            ImGui.pushStyleColor(ImGuiCol.Text,
+                    accent[0], accent[1], accent[2], accent[3]);
 
+            ImGui.setCursorPos(cursorX + K.UI.TOAST_PADDING_X, cursorY);
+            ImGui.text(getToastPrefix(toast.getType()));
+            ImGui.popStyleColor();
+
+            ImGui.setCursorPos(cursorX
+                            + K.UI.TOAST_PADDING_X
+                            + K.UI.TOAST_ICON_SIZE
+                            + K.UI.TOAST_PADDING_X, cursorY);
+
+            ImGui.pushStyleColor(ImGuiCol.Text,
+                    accent[0], accent[1], accent[2], accent[3]);
+
+            ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, 0.0f, 2.0f);
             ImGui.text(toast.getType().getTitle());
-
-            ImGui.pushStyleColor(
-                    ImGuiCol.Text,
-                    accent[0],
-                    accent[1],
-                    accent[2],
-                    accent[3]
-            );
-
-            ImGui.setCursorPosY(
-                    ImGui.getCursorPosY() + 2.0f
-            );
-
             ImGui.textWrapped(toast.getMessage());
 
+            ImGui.popStyleVar();
             ImGui.popStyleColor();
         }
 
@@ -297,7 +251,7 @@ public class GameUIService implements Service<GameMaster> {
     private String getToastPrefix(ToastData type) {
         return switch (type) {
             case PURCHASE, SUCCESS -> "+";
-            case SELL -> "-";
+            case SELL -> "**";
             case INFO -> "i";
             case WARNING -> "!";
             case ERROR -> "X";
@@ -319,8 +273,8 @@ public class GameUIService implements Service<GameMaster> {
             return;
         }
 
-        ImGui.setNextWindowPos(Mouse.getX() + K.UI.TOOLTIP_OFFSET_X, Mouse.getY() +
-                K.UI.TOOLTIP_OFFSET_Y, ImGuiCond.Always);
+        ImGui.setNextWindowPos(Mouse.getX() + K.UI.TOOLTIP_OFFSET_X,
+                Mouse.getY() + K.UI.TOOLTIP_OFFSET_Y, ImGuiCond.Always);
 
         int flags = ImGuiWindowFlags.NoTitleBar |
                 ImGuiWindowFlags.NoResize |
@@ -330,8 +284,7 @@ public class GameUIService implements Service<GameMaster> {
                 ImGuiWindowFlags.NoFocusOnAppearing;
 
         ImGui.begin("CropCardTooltip", flags);
-        ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing,
-                K.UI.TOOLTIP_ITEM_SPACING_X, K.Style.LINEHEIGHT);
+        ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, K.UI.TOOLTIP_ITEM_SPACING_X, K.Style.LINEHEIGHT);
 
         if (hasCrop) {
             ImGui.text(crop.getType().getName());
@@ -352,8 +305,8 @@ public class GameUIService implements Service<GameMaster> {
             return false;
         }
 
-        ImGui.setNextWindowPos(windowWidth * K.UI.CENTER_PIVOT, windowHeight *
-                K.UI.CENTER_PIVOT, ImGuiCond.Always, K.UI.CENTER_PIVOT, K.UI.CENTER_PIVOT);
+        ImGui.setNextWindowPos(windowWidth * K.UI.CENTER_PIVOT, windowHeight * K.UI.CENTER_PIVOT,
+                ImGuiCond.Always, K.UI.CENTER_PIVOT, K.UI.CENTER_PIVOT);
         ImGui.setNextWindowSize(K.UI.NEW_PLAYER_WIDTH, K.UI.NEW_PLAYER_HEIGHT);
 
         int windowFlags = ImGuiWindowFlags.NoTitleBar |
@@ -365,12 +318,12 @@ public class GameUIService implements Service<GameMaster> {
         ImGui.text("What's your name, kid?");
         ImGui.pushItemWidth(K.UI.MATCH_PARENT_WIDTH);
         ImGui.setKeyboardFocusHere();
-        boolean wasEnterPressed = ImGui.inputText("##PlayerName", nameBuffer,
-                ImGuiInputTextFlags.EnterReturnsTrue);
+
+        boolean wasEnterPressed = ImGui.inputText("##PlayerName",
+                nameBuffer, ImGuiInputTextFlags.EnterReturnsTrue);
 
         ImGui.popItemWidth();
-        boolean wasButtonClicked = ImGui.button("Start",
-                K.UI.MATCH_PARENT_WIDTH, K.UI.LARGE_BUTTON_HEIGHT);
+        boolean wasButtonClicked = ImGui.button("Start", K.UI.MATCH_PARENT_WIDTH, K.UI.LARGE_BUTTON_HEIGHT);
         boolean shouldCreatePlayer = (wasEnterPressed || wasButtonClicked) && !nameBuffer.get().isBlank();
         ImGui.end();
         return shouldCreatePlayer;
@@ -379,38 +332,30 @@ public class GameUIService implements Service<GameMaster> {
     public String inputCommand() {
         if (player == null) return null;
 
-        ImGui.setNextWindowPos(windowWidth * K.UI.CENTER_PIVOT, windowHeight * K.UI.CENTER_PIVOT,
-                ImGuiCond.Always, K.UI.CENTER_PIVOT, K.UI.CENTER_PIVOT);
+        ImGui.setNextWindowPos(windowWidth * K.UI.CENTER_PIVOT,
+                windowHeight * K.UI.CENTER_PIVOT, ImGuiCond.Always, K.UI.CENTER_PIVOT, K.UI.CENTER_PIVOT);
+
         ImGui.setNextWindowSize(K.UI.INPUT_WIDTH, K.UI.INPUT_HEIGHT);
 
         int windowFlags = ImGuiWindowFlags.NoTitleBar |
-                        ImGuiWindowFlags.NoResize |
-                        ImGuiWindowFlags.NoMove |
-                        ImGuiWindowFlags.NoCollapse;
+                ImGuiWindowFlags.NoResize |
+                ImGuiWindowFlags.NoMove |
+                ImGuiWindowFlags.NoCollapse;
 
         ImGui.begin("Command", windowFlags);
         ImGui.pushItemWidth(K.UI.MATCH_PARENT_WIDTH);
         int flags = ImGuiInputTextFlags.EnterReturnsTrue;
 
         ImGui.setKeyboardFocusHere();
-        boolean enterPressed = ImGui.inputText(
-                "##CommandInput",
-                commandBuffer,
-                flags
-        );
+        boolean enterPressed = ImGui.inputText("##CommandInput", commandBuffer, flags);
 
         ImGui.popItemWidth();
 
-        boolean runClicked = ImGui.button(
-                "Run",
-                K.UI.MATCH_PARENT_WIDTH,
-                K.UI.LARGE_BUTTON_HEIGHT
-        );
+        boolean runClicked = ImGui.button("Run", K.UI.MATCH_PARENT_WIDTH, K.UI.LARGE_BUTTON_HEIGHT);
 
         String command = null;
 
-        if ((enterPressed || runClicked) &&
-                !commandBuffer.get().isBlank()) {
+        if ((enterPressed || runClicked) && !commandBuffer.get().isBlank()) {
             command = commandBuffer.get().trim();
             commandBuffer.set("");
         }
@@ -450,10 +395,9 @@ public class GameUIService implements Service<GameMaster> {
 
     public void renderInv() {
         if (player == null) return;
-        ImGui.setNextWindowPos(K.UI.HUD_PADDING, windowHeight -
-                K.UI.INVENTORY_HEIGHT - K.UI.HUD_PADDING, ImGuiCond.Always);
-        ImGui.setNextWindowSize(K.UI.INVENTORY_WIDTH,
-                K.UI.INVENTORY_HEIGHT, ImGuiCond.Always);
+        ImGui.setNextWindowPos(K.UI.HUD_PADDING,
+                windowHeight - K.UI.INVENTORY_HEIGHT - K.UI.HUD_PADDING, ImGuiCond.Always);
+        ImGui.setNextWindowSize(K.UI.INVENTORY_WIDTH, K.UI.INVENTORY_HEIGHT, ImGuiCond.Always);
 
         int flags = ImGuiWindowFlags.NoTitleBar |
                 ImGuiWindowFlags.NoResize |
@@ -477,16 +421,14 @@ public class GameUIService implements Service<GameMaster> {
                     String name = entry.getKey().getName();
                     if (aggregated.containsKey(name)) {
                         int prevAmount = aggregated.get(name).getValue();
-                        aggregated.put(name, new AbstractMap.SimpleEntry<>(
-                                entry.getKey(), prevAmount + entry.getValue()));
+                        aggregated.put(name, new AbstractMap.SimpleEntry<>(entry.getKey(), prevAmount + entry.getValue()));
 
                     } else {
                         aggregated.put(name, entry);
                     }
                 }
 
-                if (selectedInventoryItem != null &&
-                        !aggregated.containsKey(selectedInventoryItem.getName())) {
+                if (selectedInventoryItem != null && !aggregated.containsKey(selectedInventoryItem.getName())) {
                     selectedInventoryItem = null;
                 }
 
@@ -499,10 +441,7 @@ public class GameUIService implements Service<GameMaster> {
                     int totalAmount = 0;
                     if (slotIndex < aggregated.size()) {
                         Map.Entry<String, Map.Entry<Item, Integer>> entry =
-                                aggregated.entrySet().stream()
-                                        .skip(slotIndex)
-                                        .findFirst()
-                                        .orElse(null);
+                                aggregated.entrySet().stream().skip(slotIndex).findFirst().orElse(null);
 
                         if (entry != null) {
                             item = entry.getValue().getKey();
@@ -510,9 +449,8 @@ public class GameUIService implements Service<GameMaster> {
                         }
                     }
 
-                    boolean isSelected = item != null &&
-                            selectedInventoryItem != null &&
-                            selectedInventoryItem.getName().equals(item.getName());
+                    boolean isSelected = item != null && selectedInventoryItem != null
+                            && selectedInventoryItem.getName().equals(item.getName());
 
                     setColor(ImGuiCol.Button, isSelected ? K.Style.COLOR_BUTTON : K.Style.COLOR_SLOT_BG);
                     setColor(ImGuiCol.ButtonHovered, isSelected ? K.Style.COLOR_BUTTON_HOVERED : K.Style.COLOR_SLOT_HOVERED);
@@ -528,17 +466,11 @@ public class GameUIService implements Service<GameMaster> {
                         float u0 = (float) col / totalCols;
                         float u1 = (float) (col + 1) / totalCols;
 
-                        if (ImGui.imageButton(
-                                atlas.getTextureId(),
-                                K.UI.ICON_SIZE,
-                                K.UI.ICON_SIZE,
-                                u0, 1.0f,
-                                u1, 0.0f)) {
+                        if (ImGui.imageButton(atlas.getTextureId(), K.UI.ICON_SIZE, K.UI.ICON_SIZE, u0, 1.0f, u1, 0.0f)) {
                             selectedInventoryItem = item;
                         }
 
-                        if (ImGui.isItemHovered() &&
-                                ImGui.isMouseDoubleClicked(GLFW_MOUSE_BUTTON_LEFT)) {
+                        if (ImGui.isItemHovered() && ImGui.isMouseDoubleClicked(GLFW_MOUSE_BUTTON_LEFT)) {
                             sellItem(inv, item);
                             selectedInventoryItem = null;
                         }
@@ -550,11 +482,9 @@ public class GameUIService implements Service<GameMaster> {
                         }
 
                     } else {
-                        ImGui.button(
-                                "##empty",
-                                K.UI.ICON_SIZE + K.Style.FRAME_PADDING_X * 2.0f,
-                                K.UI.ICON_SIZE + K.Style.FRAME_PADDING_Y * 2.0f
-                        );
+                        ImGui.button("##empty", K.UI.ICON_SIZE +
+                                K.Style.FRAME_PADDING_X * 2.0f, K.UI.ICON_SIZE +
+                                K.Style.FRAME_PADDING_Y * 2.0f);
                     }
 
                     ImGui.popID();
@@ -579,8 +509,7 @@ public class GameUIService implements Service<GameMaster> {
         Item targetItem = null;
         int cumulativeAmount = 0;
 
-        for (Map.Entry<Item, Integer> entry :
-                new HashMap<>(inv.getItems()).entrySet()) {
+        for (Map.Entry<Item, Integer> entry : new HashMap<>(inv.getItems()).entrySet()) {
             if (entry.getKey().getName().equals(item.getName())) {
                 targetItem = entry.getKey();
                 cumulativeAmount += entry.getValue();
@@ -598,8 +527,7 @@ public class GameUIService implements Service<GameMaster> {
 
         int totalPrice = item.getValue() * amount;
         if (player.purse() < totalPrice) {
-            log.warn("Player doesn't have enough money to buy {} x{}",
-                    item.getName(), amount);
+            log.warn("Player doesn't have enough money to buy {} x{}", item.getName(), amount);
             return;
         }
 
@@ -609,8 +537,7 @@ public class GameUIService implements Service<GameMaster> {
         stock.remove(item, amount);
         player.getInventory().add(item, amount);
 
-        log.info("Player bought {} x{} from shop",
-                item.getName(), amount);
+        log.info("Player bought {} x{} from shop", item.getName(), amount);
     }
 
     private void renderSlotCount(int amount) {
@@ -628,8 +555,7 @@ public class GameUIService implements Service<GameMaster> {
         float x = slotX + slotWidth - textWidth - 4.0f;
         float y = slotY + slotHeight - textHeight - 2.0f;
 
-        ImGui.getWindowDrawList().addText(x + 1.0f, y + 1.0f,
-                0xFF000000, count);
+        ImGui.getWindowDrawList().addText(x + 1.0f, y + 1.0f, 0xFF000000, count);
         ImGui.getWindowDrawList().addText(x, y, 0xFFFFFFFF, count);
     }
 
@@ -637,10 +563,7 @@ public class GameUIService implements Service<GameMaster> {
         if (player == null || shop == null) return;
         ImGui.setNextWindowPos(windowWidth - K.UI.INVENTORY_WIDTH - K.UI.HUD_PADDING,
                 windowHeight - K.UI.INVENTORY_HEIGHT - K.UI.HUD_PADDING, ImGuiCond.Always);
-
-        ImGui.setNextWindowSize(K.UI.INVENTORY_WIDTH,
-                K.UI.INVENTORY_HEIGHT, ImGuiCond.Always);
-
+        ImGui.setNextWindowSize(K.UI.INVENTORY_WIDTH, K.UI.INVENTORY_HEIGHT, ImGuiCond.Always);
         int flags = ImGuiWindowFlags.NoTitleBar |
                 ImGuiWindowFlags.NoResize |
                 ImGuiWindowFlags.NoCollapse;
@@ -654,9 +577,7 @@ public class GameUIService implements Service<GameMaster> {
             if (stock.isEmpty()) {
                 ImGui.textDisabled("Out of stock!");
             } else {
-                ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing,
-                        K.Style.ITEM_SPACING,
-                        K.Style.ITEM_SPACING);
+                ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, K.Style.ITEM_SPACING, K.Style.ITEM_SPACING);
 
                 ImGui.pushStyleVar(ImGuiStyleVar.FrameBorderSize, 1.0f);
                 int slotIndex = 0;
@@ -665,11 +586,8 @@ public class GameUIService implements Service<GameMaster> {
                     Item item = null;
                     int amount = 0;
                     if (slotIndex < stockItems.size()) {
-                        Map.Entry<Item, Integer> entry =
-                                stockItems.entrySet().stream()
-                                        .skip(slotIndex)
-                                        .findFirst()
-                                        .orElse(null);
+                        Map.Entry<Item, Integer> entry = stockItems.entrySet().stream()
+                                .skip(slotIndex).findFirst().orElse(null);
 
                         if (entry != null) {
                             item = entry.getKey();
@@ -691,12 +609,8 @@ public class GameUIService implements Service<GameMaster> {
                         float u0 = (float) col / totalCols;
                         float u1 = (float) (col + 1) / totalCols;
 
-                        boolean wasClickedOn = ImGui.imageButton(
-                                atlas.getTextureId(),
-                                K.UI.ICON_SIZE,
-                                K.UI.ICON_SIZE,
-                                u0, 1.0f,
-                                u1, 0.0f);
+                        boolean wasClickedOn = ImGui.imageButton(atlas.getTextureId(),
+                                K.UI.ICON_SIZE, K.UI.ICON_SIZE, u0, 1.0f, u1, 0.0f);
 
                         if (ImGui.isItemHovered() && ImGui.isMouseDoubleClicked(GLFW_MOUSE_BUTTON_LEFT)) {
                             buyItem(stock, item, stock.getAmount(item));
@@ -711,11 +625,8 @@ public class GameUIService implements Service<GameMaster> {
                         }
 
                     } else {
-                        ImGui.button(
-                                "##empty",
-                                K.UI.ICON_SIZE + K.Style.FRAME_PADDING_X * 2.0f,
-                                K.UI.ICON_SIZE + K.Style.FRAME_PADDING_Y * 2.0f
-                        );
+                        ImGui.button("##empty", K.UI.ICON_SIZE + K.Style.FRAME_PADDING_X * 2.0f,
+                                K.UI.ICON_SIZE + K.Style.FRAME_PADDING_Y * 2.0f);
                     }
 
                     ImGui.popID();
@@ -740,8 +651,8 @@ public class GameUIService implements Service<GameMaster> {
             return;
         }
 
-        ImGui.setNextWindowPos(windowWidth - K.UI.HUD_PADDING,
-                K.UI.HUD_PADDING, ImGuiCond.Always, 1.0f, 0.0f);
+        ImGui.setNextWindowPos(windowWidth - K.UI.HUD_PADDING, K.UI.HUD_PADDING,
+                ImGuiCond.Always, 1.0f, 0.0f);
 
         int flags = ImGuiWindowFlags.NoTitleBar |
                 ImGuiWindowFlags.NoResize |

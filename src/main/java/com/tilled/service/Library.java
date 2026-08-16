@@ -23,8 +23,12 @@ public class Library implements Service<GameMaster> {
         itemR.register(DEFAULT_ID + ":dispenser", () -> new Block(BlockData.DISPENSER));
     }
 
-    public static void initCommands(float delta, CommandRegistry cr, ItemRegistry ir,
-                                    WeatherService weatherService, Player player) {
+    public static void initCommands(float delta, GameMaster gameMaster) {
+        Player player = gameMaster.getPlayer();
+        CommandRegistry cr = gameMaster.getCommandRegistry();
+        ItemRegistry ir = gameMaster.getItemRegistry();
+        WeatherService weatherService = gameMaster.getWeatherService();
+
         cr.register(new Command("add", new String[]{"item", "amount"}, args -> {
             if (player == null) {
                 log.warn("Cannot execute command: player does not exist.");
@@ -102,7 +106,6 @@ public class Library implements Service<GameMaster> {
 
             weatherService.setWeather(delta, WeatherType.RAIN, true, amount);
             log.info("Command rain executed");
-
         }));
     }
 }
