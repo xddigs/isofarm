@@ -10,7 +10,7 @@ public class WeatherService implements Service<WeatherType> {
     private WeatherType weather;
 
     public WeatherService() {
-        this.weather = WeatherType.CLEAR;
+        this.weather = WeatherType.RAIN;
     }
 
     public void setWeather(WeatherType weather) {
@@ -22,13 +22,10 @@ public class WeatherService implements Service<WeatherType> {
     }
 
     public WeatherType nextWeather() {
-        return WeatherType.values()[
-                (int) (Math.random() * WeatherType.values().length)];
-    }
-
-    public void update() {
         if (random.nextFloat() < K.World.WEATHER_CHANGE_PROBABILITY) {
-            setWeather(nextWeather());
+            return WeatherType.values()[
+                    (int) (Math.random() * WeatherType.values().length)];
         }
+        return weather;
     }
 }

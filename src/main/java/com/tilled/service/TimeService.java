@@ -79,13 +79,13 @@ public class TimeService {
         minute++;
         if (minute >= MINUTES_PER_HOUR) {
             minute = 0;
-            advanceHour();
-            weatherService.update();
+            advanceHour(weatherService);
         }
     }
 
-    private void advanceHour() {
+    private void advanceHour(WeatherService weatherService) {
         hour++;
+        weatherService.setWeather(weatherService.nextWeather());
         if (hour >= HOURS_PER_DAY) {
             advanceDay();
         }

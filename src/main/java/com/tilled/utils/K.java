@@ -26,12 +26,26 @@ public final class K {
         public static final float DEFAULT_BLOCK_DEPTH = 0.4f;
         public static final float EPSILON_RAY_Y = 0.00001f;
         public static final float CROP_ELEVATION_Y = 0.0f;
-        public static final float WEATHER_CHANGE_PROBABILITY = 0.001f;
+        public static final float WEATHER_CHANGE_PROBABILITY = 0.01f;
+
         public static final int STARTING_COINS = 100;
         public static final int TOTAL_SLOTS = 16;
         public static final int MAX_STACK = 9999;
         public static final int PARTICLES_COUNT = 16;
         public static final int WATER_LEVEL_MAX = 100;
+
+        public static final int RAIN_MAX_DROPS = 2000;
+        public static final float RAIN_MIN_Y = 0.0f;
+        public static final float RAIN_SLANT_X = 0.08f;
+        public static final float RAIN_SLANT_Z = 0.08f;
+        public static final float RAIN_SPAWN_RADIUS = 15.0f;
+        public static final float RAIN_SPAWN_HEIGHT_OFFSET = 10.0f;
+        public static final float RAIN_SPAWN_HEIGHT_VARIATION = 10.0f;
+        public static final float RAIN_MIN_VELOCITY = 18.0f;
+        public static final float RAIN_VELOCITY_VARIATION = 7.0f;
+        public static final float RAIN_MIN_LENGTH = 0.35f;
+        public static final float RAIN_LENGTH_VARIATION = 0.35f;
+        public static final float RAIN_LINE_WIDTH = 1.5f;
     }
 
     public static final class Sunlight {
@@ -114,6 +128,9 @@ public final class K {
         public static final String DEFAULT_FRAG_SHADER = "shaders/default.frag";
         public static final String OUTLINE_VERT_SHADER = "shaders/outline.vert";
         public static final String OUTLINE_FRAG_SHADER = "shaders/outline.frag";
+        public static final String RAIN_VERT_SHADER = "shaders/rain.vert";
+        public static final String RAIN_FRAG_SHADER = "shaders/rain.frag";
+
         public static final String WHEAT_TEXTURE = "assets/crops/wheat_crop.png";
         public static final String CARROT_TEXTURE = "assets/crops/carrot_crop.png";
         public static final String POTATO_TEXTURE  = "assets/crops/potato_crop.png";
@@ -140,5 +157,6 @@ public final class K {
         public static final Vector3f SUNLIGHT_DEFAULT = new Vector3f(1.0f, 1.0f, 1.0f);
         public static final Vector3f OUTLINE_DEFAULT = new Vector3f(0.0f, 0.0f, 0.0f);
         public static final Vector3f CELL_BLOCKED = new Vector3f(0.8f, 0.1f, 0.04f);
+        public static final Vector3f RAIN = new Vector3f(0.35f, 0.55f, 1.0f);
     }
 }

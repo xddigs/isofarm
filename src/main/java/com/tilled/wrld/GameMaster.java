@@ -33,6 +33,7 @@ public class GameMaster {
     private final BlockService blockService;
     private final CommandService commandService;
     private final ParticleEngine particles;
+    private final RainEngine rainEngine;
     private final WeatherService weatherService;
 
     private final CommandRegistry commandRegistry;
@@ -40,6 +41,7 @@ public class GameMaster {
 
     private Shader defaultShader;
     private Shader outlineShader;
+    private Shader rainShader;
     private Framebuffer maskFbo;
     private Mesh screenQuadMesh;
 
@@ -83,6 +85,7 @@ public class GameMaster {
         this.itemRegistry = new ItemRegistry();
         this.sunlight = new Sunlight(K.Sunlight.DEFAULT_DIRECTION);
         this.particles = new ParticleEngine();
+        this.rainEngine = new RainEngine();
         this.weatherService = new WeatherService();
 
         int center = K.World.STARTING_GRID_SIZE / 2;
@@ -110,6 +113,7 @@ public class GameMaster {
 
         this.defaultShader = new Shader(K.Paths.DEFAULT_VERT_SHADER, K.Paths.DEFAULT_FRAG_SHADER);
         this.outlineShader = new Shader(K.Paths.OUTLINE_VERT_SHADER, K.Paths.OUTLINE_FRAG_SHADER);
+        this.rainShader = new Shader(K.Paths.RAIN_VERT_SHADER, K.Paths.RAIN_FRAG_SHADER);
 
         this.maskFbo = new Framebuffer((int) windowWidth, (int) windowHeight);
         this.screenQuadMesh = Mesh.screenQuad();
@@ -199,10 +203,16 @@ public class GameMaster {
         particles.update(delta);
         shop.update(timeService);
         cropService.update(delta, weatherService.getWeather());
+
         camera.update(delta);
         gameUIservice.update(delta);
 
+        if (weatherService.getWeather() == WeatherType.RAIN) {
+            rainEngine.update(delta, camera.getPosition());
+        }
+
         Item selectedInventoryItem = gameUIservice.getSelectedInventoryItem();
+
         if (!ImGui.getIO().getWantCaptureMouse()) {
             hoveredCell = gameInteraction.update(this, selectedInventoryItem);
         } else {
@@ -359,6 +369,12 @@ public class GameMaster {
 
         defaultShader.unbind();
 
+        if (weatherService.getWeather() == WeatherType.RAIN) {
+            rainEngine.render(rainShader,
+                    camera.getViewMatrix(),
+                    camera.getProjectionMatrix());
+        }
+
         gameUIservice.beginFrame();
         gameUIservice.renderHUD();
 
@@ -398,10 +414,8 @@ public class GameMaster {
         spriteMesh.dispose();
         screenQuadMesh.dispose();
 
-        if (blocksTexture != null || waterTexture != null) {
-            blocksTexture.dispose();
-            waterTexture.dispose();
-        }
+        if (blocksTexture != null) blocksTexture.dispose();
+        if (waterTexture != null) waterTexture.dispose();
 
         wheat.dispose();
         carrot.dispose();
@@ -415,6 +429,8 @@ public class GameMaster {
         maskFbo.dispose();
         defaultShader.dispose();
         outlineShader.dispose();
+        rainShader.dispose();
+        rainEngine.dispose();
         log.info("GameMaster resources successfully cleaned up");
     }
 
