@@ -121,7 +121,7 @@ public final class K {
     }
 
     public static final class Render {
-        public static final float LINE_WIDTH = 2.5f;
+        public static final float LINE_WIDTH = 2.0f;
         public static final int CROP_TOTAL_FRAMES = 5;
         public static final int PRIMARY_TEXTURE_UNIT = 0;
         public static final String GLSL_VERSION = "#version 330 core";
