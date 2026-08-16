@@ -10,9 +10,10 @@ public enum BlockData {
     DIRT((byte) 0, "Dirt", 100, K.Colors.STONE, 0, 0),
     GRASS((byte) 1, "Grass", 120, K.Colors.GRASS, 1, 0, 1, 3, 1, 1),
     STONE((byte) 2, "Stone", 150, K.Colors.STONE, 2, 0),
-    DISPENSER((byte) 3, "Dispenser", 500, K.Colors.STONE, 3, 0);
+    DISPENSER((byte) 3, "Dispenser", 500, K.Colors.STONE, 3, 0),
+    TILLED_DIRT((byte) 4, "Tilled Dirt", 110, K.Colors.DIRT, 4, 0);
 
-    public static final int ATLAS_COLS = K.UI.ICON_BLOCK_ATLAS_FRAMES;
+    public static final int ATLAS_COLS = K.UI.BLOCK_ATLAS_FRAMES;
     public static final int ATLAS_ROWS = K.UI.ICON_BLOCK_ATLAS_ROWS;
 
     private final byte id;
