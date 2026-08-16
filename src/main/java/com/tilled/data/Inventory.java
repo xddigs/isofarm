@@ -39,17 +39,18 @@ public class Inventory {
 
     public void sort() {
         Map<Item, Integer> sorted = items.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey(
-                        Comparator.comparing(Item::getName,
-                                String.CASE_INSENSITIVE_ORDER)
-                ))
-                .collect(Collectors.toMap(
+                .sorted(Map.Entry.comparingByKey((a, b) -> {
+                    boolean aIsCoin = a instanceof Coin;
+                    boolean bIsCoin = b instanceof Coin;
+                    if (aIsCoin && !bIsCoin) return 1;
+                    if (!aIsCoin && bIsCoin) return -1;
+                    return String.CASE_INSENSITIVE_ORDER
+                            .compare(a.getName(), b.getName());
+                })).collect(Collectors.toMap(
                         Map.Entry::getKey,
                         Map.Entry::getValue,
                         (a, b) -> a,
-                        LinkedHashMap::new
-                ));
-
+                        LinkedHashMap::new));
         items.clear();
         items.putAll(sorted);
     }
@@ -76,8 +77,7 @@ public class Inventory {
     public Item get(Item item) {
         return items.keySet().stream()
                 .filter(i -> i.equals(item))
-                .findFirst()
-                .orElse(null);
+                .findFirst().orElse(null);
     }
 
     public int getAmount(Item item) {
@@ -85,37 +85,30 @@ public class Inventory {
     }
 
     public <T extends Item> boolean hasItemOfType(Class<T> type) {
-        return items.entrySet().stream()
-                .anyMatch(entry -> type
-                .isInstance(entry.getKey()) && entry.getValue() > 0);
+        return items.entrySet().stream().anyMatch(entry ->
+                type.isInstance(entry.getKey()) && entry.getValue() > 0);
     }
 
     public <T extends Item> Optional<T> getItemOfType(Class<T> type) {
-        return items.keySet().stream()
-                .filter(entry -> type.isInstance(entry) && items.get(entry) > 0)
-                .map(type::cast)
-                .findFirst();
+        return items.keySet().stream().filter(entry ->
+                type.isInstance(entry) && items.get(entry) > 0)
+                .map(type::cast).findFirst();
     }
 
     public <T extends Item> Optional<Byte> getFirstItemIdOfType(Class<T> type) {
-        return items.entrySet().stream()
-                .filter(entry -> type.isInstance(entry.getKey())
-                        && entry.getValue() > 0)
-                .map(entry -> entry.getKey().getId())
-                .findFirst();
+        return items.entrySet().stream().filter(entry ->
+                type.isInstance(entry.getKey()) && entry.getValue() > 0)
+                .map(entry -> entry.getKey().getId()).findFirst();
     }
 
     public <T extends Item> boolean hasItemWithId(Class<T> type, byte id) {
-        return items.entrySet().stream()
-                .anyMatch(entry -> type.isInstance(entry.getKey())
-                        && entry.getKey().getId() == id
-                        && entry.getValue() > 0);
+        return items.entrySet().stream().anyMatch(entry ->
+                type.isInstance(entry.getKey()) &&
+                entry.getKey().getId() == id && entry.getValue() > 0);
     }
 
     public <T extends Item> int getTotalAmountOfType(Class<T> type) {
-        return items.entrySet().stream()
-                .filter(entry -> type.isInstance(entry.getKey()))
-                .mapToInt(Map.Entry::getValue)
-                .sum();
+        return items.entrySet().stream().filter(entry ->
+                type.isInstance(entry.getKey())).mapToInt(Map.Entry::getValue).sum();
     }
 }
