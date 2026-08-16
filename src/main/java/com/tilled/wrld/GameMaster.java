@@ -83,7 +83,9 @@ public class GameMaster {
 
         for (int x = 0; x < K.World.GRID_SIZE; x++) {
             for (int z = 0; z < K.World.GRID_SIZE; z++) {
-                blockService.setBlock(BlockData.TILLED_DIRT, x, z);
+                Block block = new Block(BlockData.TILLED_DIRT, x, 0, z);
+                blockService.setBlock(block.getType(), block.getX(), block.getZ());
+                world.addBlock(block);
             }
         }
 

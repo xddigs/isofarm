@@ -60,6 +60,10 @@ public class BlockService implements Service<Block> {
         return true;
     }
 
+    public Block removeBlock(int x, int z) {
+        return blocks.remove(getKey(x, z));
+    }
+
     public void renderAll(Shader shader, Mesh blockMesh, Matrix4f modelMatrix, Sunlight sunlight) {
         for (Block block : blocks.values()) {
             BlockData blockData = block.getType();

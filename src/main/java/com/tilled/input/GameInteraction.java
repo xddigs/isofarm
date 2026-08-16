@@ -83,7 +83,10 @@ public class GameInteraction {
     }
 
     private void breakAction(GameMaster gameMaster, Vector2i cell) {
-        Crop crop = gameMaster.getWorld().getCropAt(cell.x, cell.y);
+        int x = cell.x();
+        int z = cell.y();
+
+        Crop crop = gameMaster.getWorld().getCropAt(x, z);
         if (crop != null) {
             if (crop.isReadyToHarvest()) {
                 cropService.harvest(gameMaster.getPlayer(), crop);
@@ -94,22 +97,47 @@ public class GameInteraction {
             return;
         }
 
-        int topY = getTopBlockY(gameMaster.getWorld(), cell.x, cell.y);
-        Block block = gameMaster.getWorld().getBlockAt(cell.x, topY, cell.y);
-        if (block != null && gameMaster.getWorld().removeBlock(block)) {
-            gameMaster.getPlayer().add(block);
-            gameUIservice.logAction(cell);
-            log.info("Block removed: {} at {},{},{}", block.getType().getName(), cell.x, topY, cell.y);
+        int topY = getTopBlockY(gameMaster.getWorld(), x, z);
+        if (topY >= 1) {
+            Block block = gameMaster.getWorld().getBlockAt(x, topY, z);
+            if (block != null && gameMaster.getWorld().removeBlock(block)) {
+                gameMaster.getPlayer().add(block);
+                gameUIservice.logAction(cell);
+
+                log.info("Block removed: {} at {},{},{}", block.getType().getName(),
+                        x, topY, z);
+            }
+            return;
+        }
+
+        Block baseBlock = blockService.find(x, z);
+        if (baseBlock != null && baseBlock.getType() == BlockData.TILLED_DIRT) {
+
+            if (!baseBlock.isUnlocked()) {
+                return;
+            }
+
+            Block removed = blockService.removeBlock(x, z);
+            if (removed != null) {
+                gameMaster.getPlayer().add(removed);
+                gameUIservice.logAction(cell);
+                log.info("TILLED_DIRT removed at {},{}", x, z);
+            }
         }
     }
 
     private void placeAction(GameMaster gameMaster, Vector2i cell, Item selectedItem) {
         if (selectedItem instanceof Block block) {
-            if (!blockService.isUnlocked(cell.x, cell.y)) {
-                if (blockService.unlockBlock(cell.x, cell.y)) {
+            if (block.getType() == BlockData.TILLED_DIRT) {
+                if (blockService.expandBlock(cell.x(), cell.y())) {
                     gameMaster.getPlayer().remove(selectedItem);
-                    log.info("Tile unlocked at {},{}", cell.x, cell.y);
+                    gameUIservice.logAction(cell);
+                    log.info("New TILLED_DIRT placed at {},{}", cell.x(), cell.y());
                 }
+                return;
+            }
+
+            if (!blockService.isUnlocked(cell.x(), cell.y())) {
                 return;
             }
 
@@ -143,18 +171,14 @@ public class GameInteraction {
 
     private int getFirstFreeY(World world, int x, int z) {
         int y = 1;
-        while (world.getBlockAt(x, y, z) != null) {
-            y++;
-        }
+        while (world.getBlockAt(x, y, z) != null) y++;
         return y;
     }
 
     private int getTopBlockY(World world, int x, int z) {
-        int y = 0;
-        if (world.getBlockAt(x, 0, z) == null) return -1;
-        while (world.getBlockAt(x, y + 1, z) != null) {
-            y++;
-        }
+        int y = 1;
+        if (world.getBlockAt(x, y, z) == null) return -1;
+        while (world.getBlockAt(x, y + 1, z) != null) y++;
         return y;
     }
 }
