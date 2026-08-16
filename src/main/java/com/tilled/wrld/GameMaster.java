@@ -228,7 +228,7 @@ public class GameMaster {
             defaultShader.setUniform("uSideAtlasOffset", dirt.getSideAtlasOffset());
         } else {
             defaultShader.setUniform("uUseTexture", false);
-            defaultShader.setUniform("uBaseColor", K.Colors.DIRT);
+            defaultShader.setUniform("uBaseColor", K.Colors.DEFAULT_DIRT);
         }
 
         blockService.renderAll(defaultShader, blockMesh, modelMatrix, sunlight);
@@ -256,8 +256,6 @@ public class GameMaster {
 
             modelMatrix.identity().translate(block.getX(), block.getY(), block.getZ());
             BlockData blockData = block.getType();
-
-            defaultShader.setUniform("uBaseColor", blockData.getColor());
             defaultShader.setUniform("uModel", modelMatrix);
 
             if (blocksTexture != null) {
