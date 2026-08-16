@@ -30,7 +30,7 @@ public class GameMaster {
     private final GameInteraction gameInteraction;
     private final CropService cropService;
     private final TimeService timeService;
-    private final CellService cellService;
+    private final BlockService blockService;
     private final CommandService commandService;
 
     private final CommandRegistry commandRegistry;
@@ -73,7 +73,7 @@ public class GameMaster {
         this.world = new World();
         this.cropService = new CropService(world);
         this.timeService = new TimeService();
-        this.cellService = new CellService();
+        this.blockService = new BlockService();
         this.commandRegistry = new CommandRegistry();
         this.commandService = new CommandService(commandRegistry);
         this.itemRegistry = new ItemRegistry();
@@ -83,15 +83,15 @@ public class GameMaster {
 
         for (int x = 0; x < K.World.GRID_SIZE; x++) {
             for (int z = 0; z < K.World.GRID_SIZE; z++) {
-                cellService.setCell(CellType.TILLED, x, z);
+                blockService.setBlock(BlockData.TILLED_DIRT, x, z);
             }
         }
 
         for (int x = center - 1; x <= center + 1; x++) {
             for (int z = center - 1; z <= center + 1; z++) {
-                Cell cell = cellService.find(x, z);
-                if (cell != null) {
-                    cell.setUnlocked(true);
+                Block block = blockService.find(x, z);
+                if (block != null) {
+                    block.setUnlocked(true);
                 }
             }
         }
@@ -111,7 +111,7 @@ public class GameMaster {
         this.spriteMesh = Mesh.createCrop();
 
         try {
-            this.blocksTexture = new SpriteSheet(K.Paths.BLOCKS, K.UI.ICON_BLOCK_ATLAS_FRAMES);
+            this.blocksTexture = new SpriteSheet(K.Paths.BLOCKS, K.UI.BLOCK_ATLAS_FRAMES);
         } catch (Exception e) {
             log.warn("Could not load blocks.png atlas, falling back to base colors: {}", e.getMessage());
             this.blocksTexture = null;
@@ -125,7 +125,7 @@ public class GameMaster {
         this.seedIcons = new SpriteSheet(K.Paths.SEED_ICONS, K.UI.ICON_ATLAS_FRAMES);
         this.cropIcons = new SpriteSheet(K.Paths.CROP_ICONS, K.UI.ICON_ATLAS_FRAMES);
         this.toolIcons = new SpriteSheet(K.Paths.TOOL_ICONS, K.UI.ICON_ATLAS_FRAMES);
-        this.blockIcons = new SpriteSheet(K.Paths.BLOCK_ICONS, K.UI.ICON_BLOCK_ATLAS_FRAMES);
+        this.blockIcons = new SpriteSheet(K.Paths.BLOCK_ICONS, K.UI.ICON_BLOCK_FRAMES);
 
         this.gameUIservice = new GameUIService(windowHandle, commandService,
                 seedIcons, cropIcons, blockIcons);
@@ -140,7 +140,7 @@ public class GameMaster {
         this.camera = new Camera(K.Camera.DEFAULT_WIDTH, K.Camera.DEFAULT_HEIGHT);
         this.camera.setPosition(0.0f, 0.0f, 0.0f);
         this.gameInteraction = new GameInteraction(cropService, gameUIservice,
-                cellService, timeService, camera);
+                blockService, timeService, camera);
 
         recenter();
         log.info("GameMaster initialized with grid size: {}x{}",
@@ -229,7 +229,7 @@ public class GameMaster {
             defaultShader.setUniform("uBaseColor", K.Colors.DIRT);
         }
 
-        cellService.renderAll(defaultShader, blockMesh, modelMatrix, sunlight);
+        blockService.renderAll(defaultShader, blockMesh, modelMatrix, sunlight);
 
         world.getActiveCrops().forEach(crop -> {
             SpriteSheet sheet = cropSpritesheets.get(crop.getType());
@@ -250,6 +250,8 @@ public class GameMaster {
         }
 
         world.getBlocks().values().forEach(block -> {
+            if (block.getY() == 0) return;
+
             modelMatrix.identity().translate(block.getX(), block.getY(), block.getZ());
             BlockData blockData = block.getType();
 

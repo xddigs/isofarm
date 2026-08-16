@@ -13,18 +13,23 @@ public class CropService implements Service<Crop> {
         this.world = world;
     }
 
-    public Crop plant(int x, int z, Player player, Cell cell, CropType type,
+    public Crop plant(int x, int z, Player player, Block block, CropType type,
                       Season currentSeason) {
+        if (block == null || block.getType() != BlockData.TILLED_DIRT) {
+            log.warn("Attempted to plant {} at ({}, {}) but block is not TILLED_DIRT!",
+                    type.getName(), x, z);
+            return null;
+        }
+
         if (!player.hasSeeds()) return null;
-        if (cell.hasCrop()) {
+
+        if (block.hasCrop()) {
             Crop crop = world.getCropAt(x, z);
-            if (crop != null) {
-                if (!crop.isReadyToHarvest()) {
-                    log.warn("Attempted to plant {} at ({}, {}) " +
-                                    "but cell already has a growing crop!",
-                            type.getName(), x, z);
-                    return null;
-                }
+            if (crop != null && !crop.isReadyToHarvest()) {
+                log.warn("Attempted to plant {} at ({}, {}) " +
+                                "but block already has a growing crop!",
+                        type.getName(), x, z);
+                return null;
             }
         }
 
@@ -40,8 +45,8 @@ public class CropService implements Service<Crop> {
         }
         player.remove(seedOpt.get(), 1);
 
-        Crop newCrop = new Crop(x, z, type, cell, currentSeason);
-        cell.setCrop(true);
+        Crop newCrop = new Crop(x, z, type, block, currentSeason);
+        block.setCrop(true);
         world.addCrop(newCrop);
 
         log.info("Planted {} at ({}, {}) during season {}",
@@ -73,7 +78,9 @@ public class CropService implements Service<Crop> {
         crop.setHarvested(true);
         player.gain(cropValue);
         world.removeCrop(crop);
-        crop.getCell().setCrop(false);
+        if (crop.getBlock() != null) {
+            crop.getBlock().setCrop(false);
+        }
         log.info("Successfully harvested {}" +
                 " giving {} items.", crop.getType().getName(), yield);
         return yield;
@@ -81,6 +88,8 @@ public class CropService implements Service<Crop> {
 
     public void rip(Crop crop) {
         world.removeCrop(crop);
-        crop.getCell().setCrop(false);
+        if (crop.getBlock() != null) {
+            crop.getBlock().setCrop(false);
+        }
     }
 }

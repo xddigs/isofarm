@@ -16,10 +16,6 @@ public class CommandService implements Service<Command> {
         }
 
         input = input.trim();
-        if (input.startsWith("/")) {
-            input = input.substring(1);
-        }
-
         String[] tokens = input.split("\\s+");
         if (tokens.length == 0) {
             return;

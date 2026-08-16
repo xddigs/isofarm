@@ -86,7 +86,7 @@ public final class K {
         public static final float NEW_PLAYER_HEIGHT = 180.0f;
 
         public static final float INPUT_WIDTH = 340.0f;
-        public static final float INPUT_HEIGHT = NEW_PLAYER_HEIGHT;
+        public static final float INPUT_HEIGHT = 120.0f;
 
         public static final float ICON_SIZE = 32.0f;
 
@@ -96,7 +96,8 @@ public final class K {
         public static final float COORD_DISPLAY_DURATION = 3.0f;
 
         public static final int ICON_ATLAS_FRAMES = 3;
-        public static final int ICON_BLOCK_ATLAS_FRAMES = 4;
+        public static final int ICON_BLOCK_FRAMES = 4;
+        public static final int BLOCK_ATLAS_FRAMES = 5;
         public static final int ICON_BLOCK_ATLAS_ROWS = 3;
         public static final int COMMAND_MAX_LENGTH = 512;
     }
@@ -119,7 +120,6 @@ public final class K {
 
     public static final class Render {
         public static final float LINE_WIDTH = 2.5f;
-        public static final float SELECTION_Y_OFFSET = 0.002f;
         public static final int CROP_TOTAL_FRAMES = 5;
         public static final int PRIMARY_TEXTURE_UNIT = 0;
         public static final String GLSL_VERSION = "#version 330 core";

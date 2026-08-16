@@ -15,6 +15,7 @@ public class InitService implements Service<GameMaster> {
         itemR.register("farm:potato_seed", () -> new Seed(CropType.POTATO));
         itemR.register("farm:beetroot", () -> new Seed(CropType.BEETROOT));
         itemR.register("farm:dirt", () -> new Block(BlockData.DIRT));
+        itemR.register("farm:tilled_dirt", () -> new Block(BlockData.TILLED_DIRT));
         itemR.register("farm:grass", () ->  new Block(BlockData.GRASS));
         itemR.register("farm:stone", () -> new Block(BlockData.STONE));
         itemR.register("farm:dispenser", () -> new Block(BlockData.DISPENSER));
