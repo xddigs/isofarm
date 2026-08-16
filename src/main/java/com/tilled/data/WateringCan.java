@@ -16,17 +16,17 @@ public class WateringCan extends Tool {
         return water;
     }
 
-    public void water(World world, int amount) {
-        water -= amount;
+    private void water(World world) {
+        water -= 1;
         for (Block b : world.getBlocks().values()) {
             if (b.getWaterLevel() < MAX_WATER) {
-                b.setWaterLevel(b.getWaterLevel() + amount);
+                b.setWaterLevel(b.getWaterLevel() + MAX_WATER/2);
             }
         }
     }
 
     public void use(World world) {
         super.use();
-        water(world, 1);
+        water(world);
     }
 }

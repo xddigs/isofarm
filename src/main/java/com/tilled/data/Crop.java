@@ -70,7 +70,9 @@ public class Crop extends Item {
         if (isReadyToHarvest()) return;
 
         float soilBonus = (block != null && block.hasWater()) ? 1.5f : 0.5f;
-        float effectiveDelta = delta * weather.getGrowthMultiplier() * soilBonus;
+        float effectiveDelta = delta * weather.getGrowthMultiplier() *
+                soilBonus * block.getWaterLevel() / 10.0f;
+
         currentGrowthTime += effectiveDelta;
         float progress = currentGrowthTime / targetGrowthTime;
 

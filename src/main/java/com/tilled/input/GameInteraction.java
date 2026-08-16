@@ -162,6 +162,7 @@ public class GameInteraction {
             }
         } else if (selectedItem instanceof WateringCan wateringCan) {
             wateringCan.use(gameMaster.getWorld());
+            gameMaster.getToastService().success("You water the crops!");
 
         } else if (selectedItem instanceof Seed seed) {
             Crop crop = gameMaster.getWorld().getCropAt(cell.x, cell.y);
