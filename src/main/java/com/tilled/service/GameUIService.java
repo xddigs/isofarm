@@ -38,6 +38,7 @@ public class GameUIService implements Service<GameMaster> {
     private final SpriteSheet seedIcons;
     private final SpriteSheet cropIcons;
     private final SpriteSheet blockIcons;
+    private final SpriteSheet toolIcons;
     private Player player;
     private Shop shop;
     private float windowWidth = K.Window.DEFAULT_WIDTH;
@@ -50,11 +51,12 @@ public class GameUIService implements Service<GameMaster> {
     public GameUIService(long windowHandle, CommandService commandService,
                          SpriteSheet seedIcons,
                          SpriteSheet cropIcons,
-                         SpriteSheet blockIcons) {
+                         SpriteSheet blockIcons, SpriteSheet toolIcons) {
         this.commandService = commandService;
         this.seedIcons = seedIcons;
         this.cropIcons = cropIcons;
         this.blockIcons = blockIcons;
+        this.toolIcons = toolIcons;
 
         ImGui.createContext();
         ImGui.getIO().setIniFilename(null);
@@ -606,6 +608,7 @@ public class GameUIService implements Service<GameMaster> {
         if (item instanceof Crop) return cropIcons;
         if (item instanceof Seed) return seedIcons;
         if (item instanceof Block) return blockIcons;
+        if (item instanceof Coin) return toolIcons;
         return seedIcons;
     }
 }

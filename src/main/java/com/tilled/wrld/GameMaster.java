@@ -128,7 +128,7 @@ public class GameMaster {
         this.blockIcons = new SpriteSheet(K.Paths.BLOCK_ICONS, K.UI.ICON_BLOCK_FRAMES);
 
         this.gameUIservice = new GameUIService(windowHandle, commandService,
-                seedIcons, cropIcons, blockIcons);
+                seedIcons, cropIcons, blockIcons, toolIcons);
 
         this.shop = new Shop();
         this.gameUIservice.setShop(shop);
