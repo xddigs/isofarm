@@ -16,7 +16,7 @@ public class Shop {
     public Shop() {
         this.owner = getRandomName();
         this.stock = new Inventory();
-        this.purse = new Purse();
+        this.purse = new Purse(stock, new Coin());
         setUpStock();
     }
 
@@ -40,13 +40,11 @@ public class Shop {
     }
 
     public int purse() {
-        return purse.getAmount();
+        return purse.getBalance();
     }
 
     public void earn(int amount) {
-        for (int i = 0; i <= amount; i++) {
-            purse.add(new Coin());
-        }
+        purse.add(amount);
     }
 
     public void update(TimeService timeService) {

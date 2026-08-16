@@ -15,7 +15,7 @@ public class Player {
     public Player(String name) {
         this.name = name;
         this.inventory = new Inventory();
-        this.purse = new Purse();
+        this.purse = new Purse(inventory, new Coin());
         setUpInventory();
     }
 
@@ -114,13 +114,11 @@ public class Player {
 
     public void earn(int amount) {
         log.info("Earned ${}", amount);
-        for (int i = 0; i <= amount; i++) {
-            purse.add(new Coin());
-        }
+        purse.add(amount);
     }
 
     public int purse() {
-        return purse.getAmount();
+        return purse.getBalance();
     }
 
     public boolean hasSeeds() {

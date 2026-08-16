@@ -1,60 +1,33 @@
 package com.tilled.data;
 
-import com.tilled.utils.K;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
-
+@DataClass
 public class Purse {
-    private final Map<Coin, Integer> coins;
+    private final Inventory inventory;
+    private final Item coinItem;
 
-    public Purse() {
-        this.coins = new LinkedHashMap<>();
-        for (int i = 0; i < K.World.STARTING_COINS; i++) {
-            add(new Coin());
-        }
+    public Purse(Inventory inventory, Item coinItem) {
+        this.inventory = inventory;
+        this.coinItem = coinItem;
     }
 
-    public Map<Coin, Integer> getCoins() {
-        return coins;
+    public int getBalance() {
+        return inventory.getAmount(coinItem);
     }
 
-    public void add(Coin coin) {
-        coins.merge(coin, coin.getAmount(), Integer::sum);
+    public void add(int amount) {
+        if (amount <= 0) return;
+        inventory.add(coinItem, amount);
     }
 
-    public void remove(Coin coin) {
-        coins.merge(coin, -coin.getAmount(), Integer::sum);
-    }
-
-    public Coin getCoin(int id) {
-        for (Coin coin : coins.keySet()) {
-            if (coin.getId() == id) {
-                return coin;
-            }
-        }
-        return null;
-    }
-
-    public boolean isEmpty() {
-        return coins.isEmpty();
-    }
-
-    public int getSize() {
-        return coins.size();
-    }
-
-    public int getAmount() {
-        int amount = 0;
-        for (Coin coin : coins.keySet()) {
-            if (coin != null) {
-                amount += coin.getAmount();
-            }
-        }
-        return amount;
+    public void remove(int amount) {
+        if (amount <= 0 || getBalance() < amount) return;
+        inventory.remove(coinItem, amount);
     }
 
     public void clear() {
-        coins.clear();
+        Item coin = inventory.get(coinItem);
+        if (coin != null) {
+            inventory.remove(coin, inventory.getAmount(coin));
+        }
     }
 }
