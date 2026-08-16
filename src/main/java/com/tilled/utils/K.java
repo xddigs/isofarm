@@ -141,7 +141,7 @@ public final class K {
         public static final float TOAST_SPACING = 8.0f;
         public static final float TOAST_SLIDE_SPEED = 10.0f;
         public static final float TOAST_EXIT_SPEED = 12.0f;
-        public static final float TOAST_DURATION = 2.5f;
+        public static final float TOAST_DURATION = 3.0f;
         public static final float TOAST_PADDING_X = 14.0f;
         public static final float TOAST_PADDING_Y = 10.0f;
         public static final float TOAST_ICON_SIZE = 20.0f;

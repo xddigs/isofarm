@@ -9,8 +9,8 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ToastService implements Service<Toast> {
-
     private final List<Toast> toasts;
+    private float windowWidth = K.Window.DEFAULT_WIDTH;
 
     public ToastService() {
         this.toasts = new ArrayList<>();
@@ -18,6 +18,11 @@ public class ToastService implements Service<Toast> {
 
     public List<Toast> getToasts() {
         return toasts;
+    }
+
+    public void setWindowWidth(float windowWidth) {
+        this.windowWidth = windowWidth;
+        rearrange();
     }
 
     public void add(Toast toast) {
@@ -103,15 +108,18 @@ public class ToastService implements Service<Toast> {
             return;
         }
 
-        float startX = K.Window.DEFAULT_WIDTH + K.UI.TOAST_WIDTH + 50.0f;
-        float targetX = K.Window.DEFAULT_WIDTH - K.UI.TOAST_WIDTH - K.UI.TOAST_MARGIN_RIGHT;
+        float startX = windowWidth + K.UI.TOAST_WIDTH + 50.0f;
+        float targetX = windowWidth - K.UI.TOAST_WIDTH - K.UI.TOAST_MARGIN_RIGHT;
         float targetY = K.UI.TOAST_MARGIN_TOP;
-        Toast toast = new Toast(startX, targetY, targetX, targetY, type, message, K.UI.TOAST_DURATION);
+
+        Toast toast = new Toast(startX, targetY,targetX, targetY, type, message,
+                K.UI.TOAST_DURATION);
+        toast.setWindowWidth(windowWidth);
         add(toast);
     }
 
     private void rearrange() {
-        float targetX = K.Window.DEFAULT_WIDTH - K.UI.TOAST_WIDTH - K.UI.TOAST_MARGIN_RIGHT;
+        float targetX = windowWidth - K.UI.TOAST_WIDTH - K.UI.TOAST_MARGIN_RIGHT;
         float y = K.UI.TOAST_MARGIN_TOP;
 
         for (Toast toast : toasts) {

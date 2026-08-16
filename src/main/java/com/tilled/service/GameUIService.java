@@ -393,6 +393,7 @@ public class GameUIService implements Service<GameMaster> {
     public void onResize(int width, int height) {
         this.windowWidth = width;
         this.windowHeight = height;
+        toastService.setWindowWidth(width);
     }
 
     public void dispose() {

@@ -4,7 +4,6 @@ import com.tilled.utils.K;
 
 @DataClass
 public class Toast {
-
     private final ToastData type;
     private final String message;
 
@@ -18,6 +17,8 @@ public class Toast {
 
     private float elapsed;
     private boolean exiting;
+
+    private float windowWidth;
 
     public Toast(
             float startX,
@@ -40,6 +41,12 @@ public class Toast {
 
         this.elapsed = 0.0f;
         this.exiting = false;
+
+        this.windowWidth = K.Window.DEFAULT_WIDTH;
+    }
+
+    public void setWindowWidth(float windowWidth) {
+        this.windowWidth = windowWidth;
     }
 
     public void update(float delta) {
@@ -48,17 +55,13 @@ public class Toast {
         if (!exiting && elapsed >= duration) {
             exiting = true;
 
-            targetX = K.Window.DEFAULT_WIDTH +
-                    K.UI.TOAST_WIDTH +
-                    50.0f;
+            targetX = windowWidth + K.UI.TOAST_WIDTH + 50.0f;
         }
 
-        float speed = exiting
-                ? K.UI.TOAST_EXIT_SPEED
+        float speed = exiting ? K.UI.TOAST_EXIT_SPEED
                 : K.UI.TOAST_SLIDE_SPEED;
 
         float factor = 1.0f - (float) Math.exp(-speed * delta);
-
         x += (targetX - x) * factor;
         y += (targetY - y) * factor;
     }
