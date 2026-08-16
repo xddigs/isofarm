@@ -28,4 +28,9 @@ public class WeatherService implements Service<WeatherType> {
         }
         return weather;
     }
+
+    public boolean isRaining() {
+        return weather == WeatherType.RAIN ||
+               weather == WeatherType.HEAVY_STORM;
+    }
 }

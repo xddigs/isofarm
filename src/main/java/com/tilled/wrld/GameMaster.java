@@ -207,7 +207,7 @@ public class GameMaster {
         camera.update(delta);
         gameUIservice.update(delta);
 
-        if (weatherService.getWeather() == WeatherType.RAIN) {
+        if (weatherService.isRaining()) {
             rainEngine.update(delta, camera.getPosition());
         }
 
@@ -369,7 +369,7 @@ public class GameMaster {
 
         defaultShader.unbind();
 
-        if (weatherService.getWeather() == WeatherType.RAIN) {
+        if (weatherService.isRaining()) {
             rainEngine.render(rainShader,
                     camera.getViewMatrix(),
                     camera.getProjectionMatrix());
