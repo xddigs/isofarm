@@ -29,7 +29,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 @SuppressWarnings("all")
 public class GameUIService implements Service<GameMaster> {
     private static final Logger log = LoggerFactory.getLogger(GameUIService.class);
-    private static final float HUD_FADE_DELAY = 2.0f;
+    private static final float HUD_FADE_DELAY = 4.0f;
     private final ImGuiImplGlfw imGuiGlfw = new ImGuiImplGlfw();
     private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
     private final ImString nameBuffer = new ImString("", K.UI.PLAYER_NAME_MAX_LENGTH);
@@ -151,7 +151,6 @@ public class GameUIService implements Service<GameMaster> {
         if (hudInactivityTimer > 0.0f) {
             renderInv();
             renderShop();
-            renderCoordinates();
         }
 
         renderToasts();
@@ -653,26 +652,6 @@ public class GameUIService implements Service<GameMaster> {
                 ImGui.popStyleVar(2);
             }
         }
-
-        ImGui.end();
-    }
-
-    private void renderCoordinates() {
-        if (player == null || actionDisplayTimer <= 0.0f || lastActionCell == null) {
-            return;
-        }
-
-        ImGui.setNextWindowPos(windowWidth - K.UI.HUD_PADDING, K.UI.HUD_PADDING,
-                ImGuiCond.Always, 1.0f, 0.0f);
-
-        int flags = ImGuiWindowFlags.NoTitleBar |
-                ImGuiWindowFlags.NoResize |
-                ImGuiWindowFlags.NoMove |
-                ImGuiWindowFlags.AlwaysAutoResize |
-                ImGuiWindowFlags.NoFocusOnAppearing;
-
-        ImGui.begin("GridActionHUD", flags);
-        ImGui.text(String.format("[%d, %d]", lastActionCell.x, lastActionCell.y));
 
         ImGui.end();
     }
