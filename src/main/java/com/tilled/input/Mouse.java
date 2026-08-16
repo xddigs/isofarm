@@ -13,7 +13,7 @@ public class Mouse {
     private static float scrollY = 0.0f;
 
     public static void init(long windowId) {
-        glfwSetCursorPosCallback(windowId, (_, xpos, ypos) -> {
+        glfwSetCursorPosCallback(windowId, (window, xpos, ypos) -> {
             float currentX = (float) xpos;
             float currentY = (float) ypos;
 
@@ -32,13 +32,13 @@ public class Mouse {
             y = currentY;
         });
 
-        glfwSetMouseButtonCallback(windowId, (_, button, action, _) -> {
+        glfwSetMouseButtonCallback(windowId, (window, button, action, scanner) -> {
             if (button >= 0 && button <= GLFW_MOUSE_BUTTON_LAST) {
                 buttons[button] = (action != GLFW_RELEASE);
             }
         });
 
-        glfwSetScrollCallback(windowId, (_, _, yoffset) -> {
+        glfwSetScrollCallback(windowId, (window, xoffset, yoffset) -> {
             scrollY = (float) yoffset;
         });
     }

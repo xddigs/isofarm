@@ -6,12 +6,12 @@ import org.joml.Vector2f;
 @SuppressWarnings("all")
 @DataClass
 public enum BlockData {
-    DIRT((byte) 0, "Dirt", 100, 0, 0),
-    GRASS((byte) 1, "Grass", 120, 1, 0, 1, 3, 1, 1),
-    STONE((byte) 2, "Stone", 150, 2, 0),
-    DISPENSER((byte) 3, "Dispenser", 500, 3, 0),
-    TILLED_DIRT((byte) 4, "Tilled Dirt", 110, 4, 0, 0, 0, 0, 0),
-    WATER((byte) 5, "Water", 100, 5, 0);
+    DIRT((byte) 1, "Dirt", 100, 0, 0),
+    GRASS((byte) 2, "Grass", 120, 1, 0, 1, 3, 1, 1),
+    STONE((byte) 3, "Stone", 150, 2, 0),
+    DISPENSER((byte) 4, "Dispenser", 500, 3, 0),
+    TILLED_DIRT((byte) 5, "Tilled Dirt", 110, 4, 0, 0, 0, 0, 0),
+    WATER((byte) 6, "Water", 100, 5, 0);
 
     public static final int ATLAS_COLS = K.UI.BLOCK_ATLAS_FRAMES;
     public static final int ATLAS_ROWS = K.UI.ICON_BLOCK_ATLAS_ROWS;

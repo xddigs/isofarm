@@ -7,7 +7,7 @@ public class Keyboard {
     private static final boolean[] lastKeys = new boolean[GLFW_KEY_LAST + 1];
 
     public static void init(long windowId) {
-        glfwSetKeyCallback(windowId, (_, key, _, action, _) -> {
+        glfwSetKeyCallback(windowId, (unnamed, key, scancode, action, unnamed2) -> {
             if (key >= 0 && key <= GLFW_KEY_LAST) {
                 keys[key] = (action != GLFW_RELEASE);
             }

@@ -2,6 +2,7 @@ package com.tilled.graphics;
 
 import com.tilled.utils.K;
 import org.lwjgl.system.MemoryStack;
+import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,44 +26,58 @@ public class Mesh {
     public Mesh(float[] positions, float[] normals, float[] textCoords, int[] indices) {
         this.vertexCount = indices.length;
 
-        try (MemoryStack stack = MemoryStack.stackPush()) {
+        FloatBuffer posBuffer = null;
+        FloatBuffer normalBuffer = null;
+        FloatBuffer texBuffer = null;
+        IntBuffer idxBuffer = null;
+
+        try {
             vaoId = glGenVertexArrays();
             glBindVertexArray(vaoId);
 
-            posVboId = glGenBuffers();
-            FloatBuffer posBuffer = stack.mallocFloat(positions.length);
+            posBuffer = MemoryUtil.memAllocFloat(positions.length);
             posBuffer.put(positions).flip();
+            posVboId = glGenBuffers();
             glBindBuffer(GL_ARRAY_BUFFER, posVboId);
             glBufferData(GL_ARRAY_BUFFER, posBuffer, GL_STATIC_DRAW);
             glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
             glEnableVertexAttribArray(0);
 
-            normalVboId = glGenBuffers();
-            FloatBuffer normalBuffer = stack.mallocFloat(normals.length);
+            normalBuffer = MemoryUtil.memAllocFloat(normals.length);
             normalBuffer.put(normals).flip();
+            normalVboId = glGenBuffers();
             glBindBuffer(GL_ARRAY_BUFFER, normalVboId);
             glBufferData(GL_ARRAY_BUFFER, normalBuffer, GL_STATIC_DRAW);
             glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
             glEnableVertexAttribArray(1);
 
-            uvVboId = glGenBuffers();
-            FloatBuffer texBuffer = stack.mallocFloat(textCoords.length);
+            texBuffer = MemoryUtil.memAllocFloat(textCoords.length);
             texBuffer.put(textCoords).flip();
+            uvVboId = glGenBuffers();
             glBindBuffer(GL_ARRAY_BUFFER, uvVboId);
             glBufferData(GL_ARRAY_BUFFER, texBuffer, GL_STATIC_DRAW);
             glVertexAttribPointer(2, 2, GL_FLOAT, false, 0, 0);
             glEnableVertexAttribArray(2);
 
-            eboId = glGenBuffers();
-            IntBuffer idxBuffer = stack.mallocInt(indices.length);
+            idxBuffer = MemoryUtil.memAllocInt(indices.length);
             idxBuffer.put(indices).flip();
+            eboId = glGenBuffers();
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboId);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, idxBuffer, GL_STATIC_DRAW);
 
             glBindVertexArray(0);
+        } finally {
+            if (posBuffer != null) MemoryUtil.memFree(posBuffer);
+            if (normalBuffer != null) MemoryUtil.memFree(normalBuffer);
+            if (texBuffer != null) MemoryUtil.memFree(texBuffer);
+            if (idxBuffer != null) MemoryUtil.memFree(idxBuffer);
         }
 
         log.info("Mesh created successfully [VAO ID: {}, Vertices: {}]", vaoId, vertexCount);
+    }
+
+    public int getIndicesCount() {
+        return vertexCount;
     }
 
     public static Mesh createMesh(float depth) {

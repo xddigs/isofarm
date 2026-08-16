@@ -18,7 +18,7 @@ public class WateringCan extends Tool {
 
     private void water(World world) {
         water -= 1;
-        for (Block b : world.getBlocks().values()) {
+        for (Block b : world.getActiveBlocks()) {
             if (b.getWaterLevel() < MAX_WATER) {
                 b.setWaterLevel(b.getWaterLevel() + MAX_WATER/2);
             }

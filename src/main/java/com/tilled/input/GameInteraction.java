@@ -47,11 +47,8 @@ public class GameInteraction {
             gameMaster.toggleInventory();
         }
 
-        Vector2i hoveredCell = camera.highlight(
-                Mouse.getX(),
-                Mouse.getY(),
-                gameMaster.getWindowWidth(),
-                gameMaster.getWindowHeight());
+        Vector2i hoveredCell = camera.highlight(Mouse.getX(), Mouse.getY(),
+                gameMaster.getWindowWidth(), gameMaster.getWindowHeight(), gameMaster.getWorld());
 
         if (hoveredCell == null) {
             return null;
@@ -114,6 +111,7 @@ public class GameInteraction {
         if (topY >= 1) {
             Block block = gameMaster.getWorld().getBlockAt(x, topY, z);
             if (block != null && gameMaster.getWorld().removeBlock(block)) {
+                gameMaster.rebuildChunkMeshAt(x, z);
                 particles.spawn(x, K.World.CROP_ELEVATION_Y, z, block.getType());
                 gameMaster.getPlayer().add(block);
                 gameUIservice.logAction(cell);
@@ -159,6 +157,7 @@ public class GameInteraction {
             int targetY = getFirstFreeY(gameMaster.getWorld(), cell.x, cell.y);
             Block newBlock = new Block(block.getType(), cell.x, targetY, cell.y);
             if (gameMaster.getWorld().addBlock(newBlock)) {
+                gameMaster.rebuildChunkMeshAt(cell.x, cell.y);
                 gameMaster.getPlayer().remove(selectedItem);
                 gameUIservice.logAction(cell);
                 log.info("Block placed: {} at {},{},{}",

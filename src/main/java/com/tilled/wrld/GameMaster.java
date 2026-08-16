@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -26,6 +27,8 @@ public class GameMaster {
     private static final Logger log = LoggerFactory.getLogger(GameMaster.class);
     private final long windowHandle;
     private final World world;
+    private final WorldGenerator generator;
+    private final Map<Chunk, Mesh> chunkMeshes;
     private final GameUIService gameUIservice;
     private final GameInteraction gameInteraction;
     private final CropService cropService;
@@ -81,6 +84,8 @@ public class GameMaster {
     public GameMaster(long windowHandle) {
         this.windowHandle = windowHandle;
         this.world = new World();
+        this.generator = new WorldGenerator(world);
+        this.chunkMeshes = new HashMap<>();
         this.cropService = new CropService(world);
         this.timeService = new TimeService();
         this.blockService = new BlockService();
@@ -92,23 +97,14 @@ public class GameMaster {
         this.particles = new ParticleEngine();
         this.rainEngine = new RainEngine();
 
-        int center = K.World.STARTING_GRID_SIZE / 2;
-
-        for (int x = 0; x < K.World.STARTING_GRID_SIZE; x++) {
-            for (int z = 0; z < K.World.STARTING_GRID_SIZE; z++) {
-                Block block = new Block(BlockData.TILLED_DIRT, x, 0, z);
-                blockService.setBlock(block.getType(), block.getX(), block.getZ());
-                world.addBlock(block);
+        for (int cx = -2; cx < 2; cx++) {
+            for (int cz = -2; cz < 2; cz++) {
+                generator.generateChunk(cx, cz);
             }
         }
 
-        for (int x = center - 1; x <= center + 1; x++) {
-            for (int z = center - 1; z <= center + 1; z++) {
-                Block block = blockService.find(x, z);
-                if (block != null) {
-                    block.setUnlocked(true);
-                }
-            }
+        for (Chunk chunk : world.getChunks().values()) {
+            chunkMeshes.put(chunk, ChunkMeshBuilder.buildMesh(chunk));
         }
 
         glEnable(GL_BLEND);
@@ -303,31 +299,28 @@ public class GameMaster {
             sheet.unbind();
         });
 
+
         if (blocksTexture != null) {
-            defaultShader.setUniform("uUseFaceAtlas", true);
+            blocksTexture.bind();
+            defaultShader.setUniform("uUseTexture", true);
+            defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
+            defaultShader.setUniform("uUseFaceAtlas", false);
+            defaultShader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
+            defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
+        } else {
+            defaultShader.setUniform("uUseTexture", false);
+            defaultShader.setUniform("uBaseColor", K.Colors.DEFAULT_DIRT);
         }
 
-        world.getBlocks().values().forEach(block -> {
-            if (block.getY() == 0) return;
-
-            modelMatrix.identity().translate(block.getX(), block.getY(), block.getZ());
-            BlockData blockData = block.getType();
-            defaultShader.setUniform("uModel", modelMatrix);
-
-            if (blocksTexture != null) {
-                defaultShader.setUniform("uAtlasScale", blockData.getAtlasScale());
-                defaultShader.setUniform("uTopAtlasOffset", blockData.getTopAtlasOffset());
-                defaultShader.setUniform("uBottomAtlasOffset", blockData.getBottomAtlasOffset());
-                defaultShader.setUniform("uSideAtlasOffset", blockData.getSideAtlasOffset());
-            } else {
-                defaultShader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
-                defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
+        chunkMeshes.forEach((chunk, mesh) -> {
+            if (mesh != null && mesh.getIndicesCount() > 0) {
+                modelMatrix.identity().translate(
+                        chunk.getChunkX() * Chunk.SIZE_X, 0,
+                        chunk.getChunkZ() * Chunk.SIZE_Z);
+                defaultShader.setUniform("uModel", modelMatrix);
+                mesh.render();
             }
-
-            blockMesh.render();
         });
-
-        defaultShader.setUniform("uUseFaceAtlas", false);
 
         if (blocksTexture != null) {
             blocksTexture.unbind();
@@ -335,7 +328,7 @@ public class GameMaster {
 
         if (hoveredCell != null) {
             defaultShader.setUniform("uUseTexture", false);
-            Block hoveredBlock = world.getBlocks().values().stream()
+            Block hoveredBlock = world.getActiveBlocks().stream()
                     .filter(block ->
                             Math.round(block.getX()) == hoveredCell.x &&
                                     Math.round(block.getZ()) == hoveredCell.y
@@ -440,6 +433,8 @@ public class GameMaster {
 
     public void dispose() {
         gameUIservice.dispose();
+        chunkMeshes.values().forEach(Mesh::dispose);
+        chunkMeshes.clear();
 
         blockMesh.dispose();
         selectionMesh.dispose();
@@ -452,6 +447,7 @@ public class GameMaster {
         wheat.dispose();
         carrot.dispose();
         potato.dispose();
+        beetroot.dispose();
 
         cropIcons.dispose();
         seedIcons.dispose();
@@ -491,6 +487,20 @@ public class GameMaster {
 
         if (gameUIservice != null) {
             gameUIservice.onResize(newWidth, newHeight);
+        }
+    }
+
+    public void rebuildChunkMeshAt(int worldX, int worldZ) {
+        int chunkX = Math.floorDiv(worldX, Chunk.SIZE_X);
+        int chunkZ = Math.floorDiv(worldZ, Chunk.SIZE_Z);
+
+        Chunk chunk = world.getOrCreateChunk(chunkX, chunkZ);
+        if (chunk != null) {
+            Mesh oldMesh = chunkMeshes.get(chunk);
+            if (oldMesh != null) {
+                oldMesh.dispose();
+            }
+            chunkMeshes.put(chunk, ChunkMeshBuilder.buildMesh(chunk));
         }
     }
 }

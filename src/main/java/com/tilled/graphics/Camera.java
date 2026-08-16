@@ -1,6 +1,7 @@
 package com.tilled.graphics;
 
 import com.tilled.utils.K;
+import com.tilled.wrld.World;
 import org.joml.Matrix4f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
@@ -114,7 +115,7 @@ public class Camera {
     }
 
     public Vector2i highlight(float mouseX, float mouseY,
-                              float windowWidth, float windowHeight) {
+                              float windowWidth, float windowHeight, World world) {
         float ndcX = (2.0f * mouseX) / windowWidth - 1.0f;
         float ndcY = 1.0f - (2.0f * mouseY) / windowHeight;
 
@@ -132,18 +133,26 @@ public class Camera {
         if (rayEnd.w != 0.0f)   rayEnd.div(rayEnd.w);
 
         Vector3f origin = new Vector3f(rayStart.x, rayStart.y, rayStart.z);
-        Vector3f dir = new Vector3f(rayEnd.x - rayStart.x, rayEnd.y - rayStart.y,
-                rayEnd.z - rayStart.z).normalize();
+        Vector3f dir = new Vector3f(rayEnd.x - rayStart.x, rayEnd.y -
+                rayStart.y, rayEnd.z - rayStart.z).normalize();
 
-        if (Math.abs(dir.y) < K.World.EPSILON_RAY_Y) {
-            return null;
+        float stepSize = 0.1f;
+        float maxDistance = 50.0f;
+
+        for (float dist = 0; dist < maxDistance; dist += stepSize) {
+            float px = origin.x + dir.x * dist;
+            float py = origin.y + dir.y * dist;
+            float pz = origin.z + dir.z * dist;
+
+            int bx = Math.round(px / K.World.TILE_SIZE);
+            int by = Math.round(py / K.World.TILE_SIZE);
+            int bz = Math.round(pz / K.World.TILE_SIZE);
+
+            if (world.getBlockAt(bx, by, bz) != null) {
+                return new Vector2i(bx, bz);
+            }
         }
 
-        float t = -origin.y / dir.y;
-        float worldX = origin.x + t * dir.x;
-        float worldZ = origin.z + t * dir.z;
-        int cellX = Math.round(worldX / K.World.TILE_SIZE);
-        int cellZ = Math.round(worldZ / K.World.TILE_SIZE);
-        return new Vector2i(cellX, cellZ);
+        return null;
     }
 }

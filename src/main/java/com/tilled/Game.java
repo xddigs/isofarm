@@ -40,7 +40,7 @@ public class Game {
     private GameMaster master;
 
     public void run() {
-        log.info("Starting Java 25 / LWJGL 3 application...");
+        log.info("Starting LWJGL 3 application...");
         init();
         loop();
 
@@ -145,7 +145,7 @@ public class Game {
         }
     }
 
-    static void main(String[] ignoredArgs) {
+    public static void main(String[] ignoredArgs) {
         new Game().run();
     }
 }
