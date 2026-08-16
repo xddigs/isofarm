@@ -3,7 +3,8 @@ package com.tilled.utils;
 import org.joml.Vector3f;
 
 public final class K {
-    private K() {}
+    private K() {
+    }
 
     public static final class Camera {
         public static final float DEFAULT_PITCH = 35.264f;
@@ -73,19 +74,30 @@ public final class K {
         public static final float LINEHEIGHT = 0.8f;
         public static final float FONT_SIZE = 20.0f;
 
-        public static final float[] COLOR_WINDOW_BG        = {0.08f, 0.08f, 0.10f, 0.92f};
-        public static final float[] COLOR_FRAME_BG         = {0.15f, 0.15f, 0.18f, 1.00f};
+        public static final float[] COLOR_WINDOW_BG = {0.08f, 0.08f, 0.10f, 0.92f};
+        public static final float[] COLOR_FRAME_BG = {0.15f, 0.15f, 0.18f, 1.00f};
         public static final float[] COLOR_FRAME_BG_HOVERED = {0.20f, 0.20f, 0.24f, 1.00f};
-        public static final float[] COLOR_FRAME_BG_ACTIVE  = {0.22f, 0.22f, 0.26f, 1.00f};
-        public static final float[] COLOR_BUTTON         = {0.45f, 0.55f, 0.12f, 1.00f};
+        public static final float[] COLOR_FRAME_BG_ACTIVE = {0.22f, 0.22f, 0.26f, 1.00f};
+        public static final float[] COLOR_BUTTON = {0.45f, 0.55f, 0.12f, 1.00f};
         public static final float[] COLOR_BUTTON_HOVERED = {0.55f, 0.68f, 0.15f, 1.00f};
-        public static final float[] COLOR_BUTTON_ACTIVE  = {0.38f, 0.46f, 0.10f, 1.00f};
-        public static final float[] COLOR_TEXT            = {1.00f, 1.00f, 1.00f, 1.00f};
+        public static final float[] COLOR_BUTTON_ACTIVE = {0.38f, 0.46f, 0.10f, 1.00f};
+        public static final float[] COLOR_TEXT = {1.00f, 1.00f, 1.00f, 1.00f};
 
-        public static final float[] COLOR_SLOT_BG         = {0.10f, 0.10f, 0.12f, 0.40f};
-        public static final float[] COLOR_SLOT_HOVERED    = {0.20f, 0.20f, 0.24f, 0.60f};
-        public static final float[] COLOR_SLOT_BORDER     = {0.40f, 0.40f, 0.45f, 0.80f};
+        public static final float[] COLOR_SLOT_BG = {0.10f, 0.10f, 0.12f, 0.40f};
+        public static final float[] COLOR_SLOT_HOVERED = {0.20f, 0.20f, 0.24f, 0.60f};
+        public static final float[] COLOR_SLOT_BORDER = {0.40f, 0.40f, 0.45f, 0.80f};
         public static final float[] COLOR_SLOT_BORDER_SEL = {0.65f, 0.80f, 0.20f, 1.00f};
+
+        public static final float[] COLOR_TOAST_SUCCESS = {0.30f, 0.85f, 0.40f, 1.0f};
+        public static final float[] COLOR_TOAST_SUCCESS_BG = {0.08f, 0.16f, 0.10f, 0.95f};
+        public static final float[] COLOR_TOAST_INFO = {0.35f, 0.65f, 1.00f, 1.0f};
+        public static final float[] COLOR_TOAST_INFO_BG = {0.07f, 0.11f, 0.18f, 0.95f};
+        public static final float[] COLOR_TOAST_WARNING = {1.00f, 0.75f, 0.25f, 1.0f};
+        public static final float[] COLOR_TOAST_WARNING_BG = {0.18f, 0.14f, 0.05f, 0.95f};
+        public static final float[] COLOR_TOAST_ERROR = {1.00f, 0.35f, 0.35f, 1.0f};
+        public static final float[] COLOR_TOAST_ERROR_BG = {0.20f, 0.07f, 0.07f, 0.95f};
+        public static final float[] COLOR_TOAST_REWARD = {1.00f, 0.85f, 0.30f, 1.0f};
+        public static final float[] COLOR_TOAST_REWARD_BG = {0.18f, 0.15f, 0.05f, 0.95f};
     }
 
     public static final class UI {
@@ -121,6 +133,21 @@ public final class K {
         public static final int ICON_BLOCK_ATLAS_ROWS = 3;
         public static final int WATER_FRAMES = 8;
         public static final int COMMAND_MAX_LENGTH = 512;
+
+        public static final float TOAST_WIDTH = 250.0f;
+        public static final float TOAST_HEIGHT = 64.0f;
+        public static final float TOAST_MARGIN_RIGHT = 24.0f;
+        public static final float TOAST_MARGIN_TOP = 24.0f;
+        public static final float TOAST_SPACING = 8.0f;
+        public static final float TOAST_EXIT_X = Window.DEFAULT_WIDTH + TOAST_WIDTH + 50.0f;
+        public static final float TOAST_START_X = K.Window.DEFAULT_WIDTH + TOAST_WIDTH;
+        public static final float TOAST_SLIDE_SPEED = 10.0f;
+        public static final float TOAST_EXIT_SPEED = 12.0f;
+        public static final float TOAST_DURATION = 2.5f;
+        public static final float TOAST_PADDING_X = 14.0f;
+        public static final float TOAST_PADDING_Y = 8.0f;
+        public static final float TOAST_ICON_SIZE = 20.0f;
+        public static final float TOAST_ROUNDING = 6.0f;
     }
 
     public static final class Paths {
@@ -133,7 +160,7 @@ public final class K {
 
         public static final String WHEAT_TEXTURE = "assets/crops/wheat_crop.png";
         public static final String CARROT_TEXTURE = "assets/crops/carrot_crop.png";
-        public static final String POTATO_TEXTURE  = "assets/crops/potato_crop.png";
+        public static final String POTATO_TEXTURE = "assets/crops/potato_crop.png";
         public static final String BEETROOT_TEXTURE = "assets/crops/beetroot_crop.png";
 
         public static final String FONT = "C:/Windows/Fonts/arial.ttf";
@@ -153,7 +180,7 @@ public final class K {
     }
 
     public static final class Colors {
-        public static final Vector3f DEFAULT_DIRT =  new Vector3f(0.4f, 0.25f, 0.1f);
+        public static final Vector3f DEFAULT_DIRT = new Vector3f(0.4f, 0.25f, 0.1f);
         public static final Vector3f SUNLIGHT_DEFAULT = new Vector3f(1.0f, 1.0f, 1.0f);
         public static final Vector3f OUTLINE_DEFAULT = new Vector3f(0.0f, 0.0f, 0.0f);
         public static final Vector3f CELL_BLOCKED = new Vector3f(0.8f, 0.1f, 0.04f);

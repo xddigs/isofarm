@@ -35,6 +35,7 @@ public class GameMaster {
     private final ParticleEngine particles;
     private final RainEngine rainEngine;
     private final WeatherService weatherService;
+    private final ToastService toastService;
 
     private final CommandRegistry commandRegistry;
     private final ItemRegistry itemRegistry;
@@ -141,7 +142,8 @@ public class GameMaster {
         this.toolIcons = new SpriteSheet(K.Paths.TOOL_ICONS, K.UI.ICON_TOOL_FRAMES);
         this.blockIcons = new SpriteSheet(K.Paths.BLOCK_ICONS, K.UI.ICON_BLOCK_FRAMES);
 
-        this.gameUIservice = new GameUIService(windowHandle, commandService,
+        this.toastService = new ToastService();
+        this.gameUIservice = new GameUIService(windowHandle, commandService, toastService,
                 seedIcons, cropIcons, blockIcons, toolIcons);
 
         this.shop = new Shop();
@@ -387,7 +389,7 @@ public class GameMaster {
 
         if (player == null) {
             if (gameUIservice.renderNewPlayer()) {
-                this.player = new Player(gameUIservice.getEnteredPlayerName());
+                this.player = new Player(gameUIservice.getEnteredPlayerName(), toastService);
                 gameUIservice.setPlayer(player);
                 this.shop.setPlayer(player);
                 log.info("Player created: {}", player.getName());

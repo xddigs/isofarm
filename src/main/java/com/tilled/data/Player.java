@@ -1,5 +1,6 @@
 package com.tilled.data;
 
+import com.tilled.service.ToastService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,8 +13,11 @@ public class Player {
     private int experience;
     private int level;
 
-    public Player(String name) {
+    private final ToastService toastService;
+
+    public Player(String name, ToastService toastService) {
         this.name = name;
+        this.toastService = toastService;
         this.inventory = new Inventory();
         this.purse = new Purse(inventory, new Coin());
         setUpInventory();
@@ -41,6 +45,7 @@ public class Player {
             level++;
             experience = 0;
             log.info("Level up! New level: {}", level);
+            toastService.success("Level up! New level: " + level);
         }
     }
 
@@ -61,6 +66,7 @@ public class Player {
         inventory.remove(item, toSell);
         int earnings = toSell * item.getValue();
         earn(earnings);
+        toastService.sell("You successfully sold " + item.getName() + " for " + earnings + " coins");
     }
 
     public void add(Item item, int amount) {

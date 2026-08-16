@@ -35,6 +35,8 @@ public class GameUIService implements Service<GameMaster> {
     private final ImString nameBuffer = new ImString("", K.UI.PLAYER_NAME_MAX_LENGTH);
     private final ImString commandBuffer = new ImString("", K.UI.COMMAND_MAX_LENGTH);
     private final CommandService commandService;
+    private final ToastService toastService;
+
     private final SpriteSheet seedIcons;
     private final SpriteSheet cropIcons;
     private final SpriteSheet blockIcons;
@@ -49,10 +51,12 @@ public class GameUIService implements Service<GameMaster> {
     private float hudInactivityTimer = 0.0f;
 
     public GameUIService(long windowHandle, CommandService commandService,
+                         ToastService toastService,
                          SpriteSheet seedIcons,
                          SpriteSheet cropIcons,
                          SpriteSheet blockIcons, SpriteSheet toolIcons) {
         this.commandService = commandService;
+        this.toastService = toastService;
         this.seedIcons = seedIcons;
         this.cropIcons = cropIcons;
         this.blockIcons = blockIcons;
@@ -131,6 +135,8 @@ public class GameUIService implements Service<GameMaster> {
         if (actionDisplayTimer > 0.0f) {
             actionDisplayTimer -= delta;
         }
+
+        toastService.update(delta);
     }
 
     public void beginFrame() {
@@ -148,6 +154,155 @@ public class GameUIService implements Service<GameMaster> {
             renderShop();
             renderCoordinates();
         }
+
+        renderToasts();
+    }
+
+    public void renderToasts() {
+        if (toastService.isEmpty()) {
+            return;
+        }
+
+        for (Toast toast : toastService.getToasts()) {
+            renderToast(toast);
+        }
+    }
+
+    private void renderToast(Toast toast) {
+        float x = toast.getX();
+        float y = toast.getY();
+
+        float width = K.UI.TOAST_WIDTH;
+        float height = K.UI.TOAST_HEIGHT;
+
+        float[] background = getToastBackground(toast.getType());
+        float[] accent = getToastAccent(toast.getType());
+
+        ImGui.setNextWindowPos(
+                x,
+                y,
+                ImGuiCond.Always
+        );
+
+        ImGui.setNextWindowSize(
+                width,
+                height,
+                ImGuiCond.Always
+        );
+
+        int flags =     ImGuiWindowFlags.NoTitleBar |
+                        ImGuiWindowFlags.NoResize |
+                        ImGuiWindowFlags.NoMove |
+                        ImGuiWindowFlags.NoCollapse |
+                        ImGuiWindowFlags.NoScrollbar |
+                        ImGuiWindowFlags.NoScrollWithMouse |
+                        ImGuiWindowFlags.NoInputs |
+                        ImGuiWindowFlags.NoFocusOnAppearing |
+                        ImGuiWindowFlags.NoNav;
+
+        ImGui.pushStyleColor(
+                ImGuiCol.WindowBg,
+                background[0],
+                background[1],
+                background[2],
+                background[3]
+        );
+
+        ImGui.pushStyleVar(
+                ImGuiStyleVar.WindowRounding,
+                K.UI.TOAST_ROUNDING
+        );
+
+        ImGui.pushStyleVar(
+                ImGuiStyleVar.WindowPadding,
+                K.UI.TOAST_PADDING_X,
+                K.UI.TOAST_PADDING_Y
+        );
+
+        String windowId = "Toast##" +
+                System.identityHashCode(toast);
+
+        if (ImGui.begin(windowId, flags)) {
+
+            float cursorX = ImGui.getCursorPosX();
+            float cursorY = ImGui.getCursorPosY();
+
+            // Accent bar
+            ImGui.getWindowDrawList().addRectFilled(
+                    x,
+                    y,
+                    x + 4.0f,
+                    y + height,
+                    ImGui.getColorU32(
+                            accent[0],
+                            accent[1],
+                            accent[2],
+                            accent[3]
+                    )
+            );
+
+            ImGui.setCursorPosX(
+                    cursorX + K.UI.TOAST_PADDING_X
+            );
+
+            ImGui.text(toast.getType().getTitle());
+
+            ImGui.pushStyleColor(
+                    ImGuiCol.Text,
+                    accent[0],
+                    accent[1],
+                    accent[2],
+                    accent[3]
+            );
+
+            ImGui.setCursorPosY(
+                    ImGui.getCursorPosY() + 2.0f
+            );
+
+            ImGui.textWrapped(toast.getMessage());
+
+            ImGui.popStyleColor();
+        }
+
+        ImGui.end();
+
+        ImGui.popStyleVar(2);
+        ImGui.popStyleColor();
+    }
+
+    private float[] getToastAccent(ToastData type) {
+        return switch (type) {
+            case SUCCESS -> K.Style.COLOR_TOAST_SUCCESS;
+            case INFO -> K.Style.COLOR_TOAST_INFO;
+            case WARNING -> K.Style.COLOR_TOAST_WARNING;
+            case ERROR -> K.Style.COLOR_TOAST_ERROR;
+            case REWARD -> K.Style.COLOR_TOAST_REWARD;
+            case PURCHASE -> K.Style.COLOR_TOAST_SUCCESS;
+            case SELL -> K.Style.COLOR_TOAST_REWARD;
+        };
+    }
+
+    private float[] getToastBackground(ToastData type) {
+        return switch (type) {
+            case SUCCESS -> K.Style.COLOR_TOAST_SUCCESS_BG;
+            case INFO -> K.Style.COLOR_TOAST_INFO_BG;
+            case WARNING -> K.Style.COLOR_TOAST_WARNING_BG;
+            case ERROR -> K.Style.COLOR_TOAST_ERROR_BG;
+            case REWARD -> K.Style.COLOR_TOAST_REWARD_BG;
+            case PURCHASE -> K.Style.COLOR_TOAST_SUCCESS_BG;
+            case SELL -> K.Style.COLOR_TOAST_REWARD_BG;
+        };
+    }
+
+    private String getToastPrefix(ToastData type) {
+        return switch (type) {
+            case PURCHASE, SUCCESS -> "+";
+            case SELL -> "-";
+            case INFO -> "i";
+            case WARNING -> "!";
+            case ERROR -> "X";
+            case REWARD -> "*";
+        };
     }
 
     public void renderTooltip(Vector2i hoveredCell, World world) {
