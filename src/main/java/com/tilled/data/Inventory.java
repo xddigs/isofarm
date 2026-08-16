@@ -1,8 +1,9 @@
 package com.tilled.data;
 
+import com.tilled.utils.K;
+
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @DataClass
 public class Inventory {
@@ -18,7 +19,10 @@ public class Inventory {
 
     public void add(Item item, int amount) {
         if (item == null || amount <= 0) return;
-        items.merge(item, amount, Integer::sum);
+        int current = items.getOrDefault(item, 0);
+        long newAmount = (long) current + amount;
+        int cappedAmount = (int) Math.min(newAmount, K.World.MAX_STACK);
+        items.put(item, cappedAmount);
         sort();
     }
 
