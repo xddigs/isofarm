@@ -180,7 +180,7 @@ public class GameUIService implements Service<GameMaster> {
 
         if (hasCrop) {
             ImGui.text(crop.getType().getName());
-            ImGui.textDisabled("Status: " + crop.getStage());
+            ImGui.textDisabled("Status: " + crop.getStage().getName());
 
         } else {
             Seed seed = (Seed) selectedInventoryItem;
