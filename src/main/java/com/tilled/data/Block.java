@@ -1,11 +1,16 @@
 package com.tilled.data;
 
+import com.tilled.utils.K;
+
 @DataClass
 public class Block extends Item {
     private final BlockData type;
     private int x, y, z;
     private boolean unlocked = false;
     private boolean hasCrop = false;
+
+    private final int waterLevelMax = K.World.WATER_LEVEL_MAX;
+    private int waterLevel = 0;
 
     public Block(BlockData type, int x, int y, int z) {
         super(type.getId(), type.getName(), 1, type.getValue());
@@ -54,5 +59,21 @@ public class Block extends Item {
 
     public void setCrop(boolean hasCrop) {
         this.hasCrop = hasCrop;
+    }
+
+    public int getWaterLevelMax() {
+        return waterLevelMax;
+    }
+
+    public int getWaterLevel() {
+        return waterLevel;
+    }
+
+    public void setWaterLevel(int waterLevel) {
+        this.waterLevel = waterLevel;
+    }
+
+    public boolean hasWater() {
+        return waterLevel > 0;
     }
 }
