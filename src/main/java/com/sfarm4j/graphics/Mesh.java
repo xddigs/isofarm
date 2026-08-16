@@ -156,19 +156,40 @@ public class Mesh {
     }
 
     public static Mesh selection() {
-        float y = K.Render.SELECTION_Y_OFFSET;
-        float[] positions = new float[] {
-                -0.5f, y, -0.5f,   0.5f, y, -0.5f,
-                0.5f, y, -0.5f,   0.5f, y,  0.5f,
-                0.5f, y,  0.5f,  -0.5f, y,  0.5f,
-                -0.5f, y,  0.5f,  -0.5f, y, -0.5f
-        };
+        float eps = 0.002f;
+        float[] positions = getPositions(eps);
 
         float[] normals = new float[24];
         float[] textCoords = new float[16];
-        int[] indices = new int[] { 0, 1, 2, 3, 4, 5, 6, 7 };
+
+        int[] indices = new int[] {
+                0, 1,  1, 2,  2, 3,  3, 0,
+                4, 5,  5, 6,  6, 7,  7, 4,
+                0, 4,  1, 5,  2, 6,  3, 7
+        };
 
         return new Mesh(positions, normals, textCoords, indices);
+    }
+
+    private static float[] getPositions(float eps) {
+        float minX = -0.5f - eps;
+        float maxX =  0.5f + eps;
+        float minY = -1.0f - eps;
+        float maxY =  0.0f + eps;
+        float minZ = -0.5f - eps;
+        float maxZ =  0.5f + eps;
+
+        return new float[] {
+                minX, maxY, minZ,
+                maxX, maxY, minZ,
+                maxX, maxY, maxZ,
+                minX, maxY, maxZ,
+
+                minX, minY, minZ,
+                maxX, minY, minZ,
+                maxX, minY, maxZ,
+                minX, minY, maxZ
+        };
     }
 
     public void renderLines() {
