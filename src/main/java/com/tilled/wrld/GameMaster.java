@@ -74,6 +74,8 @@ public class GameMaster {
     private Player player;
     private Shop shop;
     private boolean isPromptingForInput = false;
+    private boolean isInventoryOpen = false;
+
     private float genDelta;
 
     public GameMaster(long windowHandle) {
@@ -208,6 +210,14 @@ public class GameMaster {
 
     public void setPromptingForInput(boolean promptingForInput) {
         isPromptingForInput = promptingForInput;
+    }
+
+    public boolean isInventoryOpen() {
+        return isInventoryOpen;
+    }
+
+    public void setInventoryOpen(boolean inventoryOpen) {
+        isInventoryOpen = inventoryOpen;
     }
 
     public SpriteSheet getCropSpriteSheet(CropType type) {
@@ -397,7 +407,7 @@ public class GameMaster {
         }
 
         gameUIservice.beginFrame();
-        gameUIservice.renderHUD();
+        gameUIservice.renderHUD(this);
 
         if (hoveredCell != null && player != null) {
             gameUIservice.renderTooltip(hoveredCell, world);
@@ -409,7 +419,8 @@ public class GameMaster {
                 gameUIservice.setPlayer(player);
                 this.shop.setPlayer(player);
                 log.info("Player created: {}", player.getName());
-                toastService.info("Welcome, " + player.getName() + "!");
+                toastService.success("Welcome, " + player.getName() + "!");
+                toastService.info("Use E to open the inventory");
                 Library.initItems(itemRegistry, player);
                 Library.initCommands(genDelta, this);
             }
@@ -459,6 +470,10 @@ public class GameMaster {
         float center = (K.World.STARTING_GRID_SIZE - 1) / 2.0f;
         float worldCenter = center * K.World.TILE_SIZE;
         this.camera.setPosition(worldCenter, 0.0f, worldCenter);
+    }
+
+    public void toggleInventory() {
+        setInventoryOpen(!isInventoryOpen());
     }
 
     public void onResize(int newWidth, int newHeight) {

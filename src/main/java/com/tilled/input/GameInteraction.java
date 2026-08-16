@@ -43,6 +43,10 @@ public class GameInteraction {
             gameMaster.setPromptingForInput(true);
         }
 
+        if (Keyboard.isKeyPressed(GLFW_KEY_E)) {
+            gameMaster.toggleInventory();
+        }
+
         Vector2i hoveredCell = camera.highlight(
                 Mouse.getX(),
                 Mouse.getY(),

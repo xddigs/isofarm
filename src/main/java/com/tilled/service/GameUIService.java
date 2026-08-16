@@ -29,7 +29,6 @@ import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 @SuppressWarnings("all")
 public class GameUIService implements Service<GameMaster> {
     private static final Logger log = LoggerFactory.getLogger(GameUIService.class);
-    private static final float HUD_FADE_DELAY = 4.0f;
     private final ImGuiImplGlfw imGuiGlfw = new ImGuiImplGlfw();
     private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
     private final ImString nameBuffer = new ImString("", K.UI.PLAYER_NAME_MAX_LENGTH);
@@ -48,7 +47,6 @@ public class GameUIService implements Service<GameMaster> {
     private Vector2i lastActionCell = null;
     private float actionDisplayTimer = 0.0f;
     private Item selectedInventoryItem = null;
-    private float hudInactivityTimer = 0.0f;
 
     public GameUIService(long windowHandle, CommandService commandService,
                          ToastService toastService, SpriteSheet seedIcons,
@@ -123,14 +121,6 @@ public class GameUIService implements Service<GameMaster> {
     }
 
     public void update(float delta) {
-        if (Mouse.getDeltaX() != 0.0f || Mouse.getDeltaY() != 0.0f || Mouse.getScrollY() != 0.0f ||
-                Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT) || Keyboard.anyKeyPressed()) {
-            hudInactivityTimer = HUD_FADE_DELAY;
-
-        } else if (hudInactivityTimer > 0.0f) {
-            hudInactivityTimer -= delta;
-        }
-
         if (actionDisplayTimer > 0.0f) {
             actionDisplayTimer -= delta;
         }
@@ -143,16 +133,15 @@ public class GameUIService implements Service<GameMaster> {
         ImGui.newFrame();
     }
 
-    public void renderHUD() {
+    public void renderHUD(GameMaster gameMaster) {
         if (player == null) {
             return;
         }
 
-        if (hudInactivityTimer > 0.0f) {
+        if (gameMaster.isInventoryOpen()) {
             renderInv();
             renderShop();
         }
-
         renderToasts();
     }
 
