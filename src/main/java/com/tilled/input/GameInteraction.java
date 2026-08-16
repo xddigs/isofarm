@@ -43,7 +43,7 @@ public class GameInteraction {
             gameMaster.setPromptingForInput(true);
         }
 
-        if (Keyboard.isKeyPressed(GLFW_KEY_E)) {
+        if (Keyboard.isKeyPressed(GLFW_KEY_E) && !gameMaster.isPromptingForInput()) {
             gameMaster.toggleInventory();
         }
 
