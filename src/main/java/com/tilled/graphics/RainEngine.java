@@ -26,7 +26,8 @@ public class RainEngine {
     private final List<RainDrop> drops = new ArrayList<>();
     private final int vao;
     private final int vbo;
-    private final float[] vertices = new float[K.World.RAIN_MAX_DROPS * VERTICES_PER_DROP * COMPONENTS_PER_VERTEX];
+    private final float[] vertices = new float[K.World.RAIN_MAX_DROPS *
+            VERTICES_PER_DROP * COMPONENTS_PER_VERTEX];
 
     public RainEngine() {
         vao = glGenVertexArrays();
@@ -39,6 +40,17 @@ public class RainEngine {
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
+    }
+
+    public void update(float delta, Vector3f cameraPosition, int amount) {
+        for (RainDrop drop : drops) {
+            drop.update(delta);
+        }
+
+        drops.removeIf(drop -> drop.isDead(K.World.RAIN_MIN_Y));
+        while (drops.size() < amount) {
+            spawn(cameraPosition);
+        }
     }
 
     public void update(float delta, Vector3f cameraPosition) {
@@ -103,7 +115,9 @@ public class RainEngine {
     private void spawn(Vector3f cameraPosition) {
         float x = cameraPosition.x + (random.nextFloat() - 0.5f) * K.World.RAIN_SPAWN_RADIUS * 2.0f;
         float z = cameraPosition.z + (random.nextFloat() - 0.5f) * K.World.RAIN_SPAWN_RADIUS * 2.0f;
-        float y = cameraPosition.y + K.World.RAIN_SPAWN_HEIGHT_OFFSET + random.nextFloat() * K.World.RAIN_SPAWN_HEIGHT_VARIATION;
+        float y = cameraPosition.y + K.World.RAIN_SPAWN_HEIGHT_OFFSET + random.nextFloat() *
+                K.World.RAIN_SPAWN_HEIGHT_VARIATION;
+
         float velocity = K.World.RAIN_MIN_VELOCITY + random.nextFloat() * K.World.RAIN_VELOCITY_VARIATION;
         float length = K.World.RAIN_MIN_LENGTH + random.nextFloat() * K.World.RAIN_LENGTH_VARIATION;
         drops.add(new RainDrop(x, y, z, velocity, length));

@@ -73,6 +73,7 @@ public class GameMaster {
     private Player player;
     private Shop shop;
     private boolean isPromptingForInput = false;
+    private float genDelta;
 
     public GameMaster(long windowHandle) {
         this.windowHandle = windowHandle;
@@ -86,7 +87,6 @@ public class GameMaster {
         this.sunlight = new Sunlight(K.Sunlight.DEFAULT_DIRECTION);
         this.particles = new ParticleEngine();
         this.rainEngine = new RainEngine();
-        this.weatherService = new WeatherService();
 
         int center = K.World.STARTING_GRID_SIZE / 2;
 
@@ -153,6 +153,8 @@ public class GameMaster {
         cropSpritesheets.put(CropType.BEETROOT, beetroot);
 
         this.camera = new Camera(K.Camera.DEFAULT_WIDTH, K.Camera.DEFAULT_HEIGHT);
+        this.weatherService = new WeatherService(rainEngine, camera);
+
         this.camera.setPosition(0.0f, 0.0f, 0.0f);
         this.gameInteraction = new GameInteraction(cropService, gameUIservice,
                 blockService, timeService, particles, camera);
@@ -199,6 +201,7 @@ public class GameMaster {
             return;
         }
 
+        genDelta = delta;
         timeService.update(delta, weatherService);
         particles.update(delta);
         shop.update(timeService);
@@ -388,9 +391,9 @@ public class GameMaster {
                 gameUIservice.setPlayer(player);
                 this.shop.setPlayer(player);
                 log.info("Player created: {}", player.getName());
-                InitService.initItems(itemRegistry, player);
-                InitService.initCommands(commandRegistry,
-                        itemRegistry, player);
+                Library.initItems(itemRegistry, player);
+                Library.initCommands(genDelta, commandRegistry,
+                        itemRegistry, weatherService, player);
             }
         }
 
