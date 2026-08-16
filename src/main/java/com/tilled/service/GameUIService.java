@@ -102,7 +102,7 @@ public class GameUIService implements Service<GameMaster> {
         }
 
         if (item instanceof Block block && block.getType() != null) {
-            return block.getType().getId();
+            return block.getType().getId() - 1;
         }
 
         if (item instanceof Tool tool) {
