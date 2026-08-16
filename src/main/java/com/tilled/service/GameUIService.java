@@ -307,6 +307,8 @@ public class GameUIService implements Service<GameMaster> {
 
         if (ImGui.begin("Inventory", flags)) {
             Inventory inv = player.getInventory();
+            inv.sort();
+
             ImGui.text(player.getName() + "'s Farm, $" + player.purse());
             ImGui.separator();
 
@@ -493,6 +495,7 @@ public class GameUIService implements Service<GameMaster> {
             ImGui.text(shop.getOwner() + "'s Shop, $" + shop.purse());
             ImGui.separator();
             Inventory stock = shop.getStock();
+            stock.sort();
 
             if (stock.isEmpty()) {
                 ImGui.textDisabled("Out of stock!");

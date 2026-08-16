@@ -1,6 +1,8 @@
 package com.tilled.data;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @DataClass
 public class Inventory {
@@ -17,6 +19,7 @@ public class Inventory {
     public void add(Item item, int amount) {
         if (item == null || amount <= 0) return;
         items.merge(item, amount, Integer::sum);
+        sort();
     }
 
     public void remove(Item item, int amount) {
@@ -28,6 +31,23 @@ public class Inventory {
         } else {
             items.put(item, current - amount);
         }
+    }
+
+    public void sort() {
+        Map<Item, Integer> sorted = items.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey(
+                        Comparator.comparing(Item::getName,
+                                String.CASE_INSENSITIVE_ORDER)
+                ))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (a, b) -> a,
+                        LinkedHashMap::new
+                ));
+
+        items.clear();
+        items.putAll(sorted);
     }
 
     public void clear() {
