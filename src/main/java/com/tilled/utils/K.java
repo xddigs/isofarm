@@ -21,11 +21,12 @@ public final class K {
     }
 
     public static final class World {
-        public static final int GRID_SIZE = 2;
+        public static final int STARTING_GRID_SIZE = 2;
         public static final float TILE_SIZE = 1.0f;
         public static final float DEFAULT_BLOCK_DEPTH = 0.4f;
         public static final float EPSILON_RAY_Y = 0.00001f;
         public static final float CROP_ELEVATION_Y = 0.0f;
+        public static final float WEATHER_CHANGE_PROBABILITY = 0.001f;
         public static final int STARTING_COINS = 100;
         public static final int TOTAL_SLOTS = 16;
         public static final int MAX_STACK = 9999;

@@ -26,11 +26,11 @@ public class TimeService {
                 year, currentSeason, day, hour);
     }
 
-    public void update(float delta) {
+    public void update(float delta, WeatherService weatherService) {
         secondAccumulator += delta * timeScale;
         while (secondAccumulator >= REAL_SECONDS_PER_IN_GAME_MINUTE) {
             secondAccumulator -= REAL_SECONDS_PER_IN_GAME_MINUTE;
-            advanceMinute();
+            advanceMinute(weatherService);
         }
     }
 
@@ -75,11 +75,12 @@ public class TimeService {
         setTimeScale(getTimeScale() * (1.0f - delta));
     }
 
-    private void advanceMinute() {
+    private void advanceMinute(WeatherService weatherService) {
         minute++;
         if (minute >= MINUTES_PER_HOUR) {
             minute = 0;
             advanceHour();
+            weatherService.update();
         }
     }
 

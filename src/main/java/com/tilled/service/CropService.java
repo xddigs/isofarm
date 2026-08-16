@@ -55,10 +55,10 @@ public class CropService implements Service<Crop> {
         return newCrop;
     }
 
-    public void update(float delta) {
+    public void update(float delta, WeatherType weather) {
         log.trace("Processing daily growth for {} active crops...", world.getActiveCrops().size());
         for (Crop crop : world.getActiveCrops()) {
-            crop.update(delta);
+            crop.update(delta, weather);
         }
     }
 

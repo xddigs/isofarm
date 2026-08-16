@@ -33,6 +33,8 @@ public class GameMaster {
     private final BlockService blockService;
     private final CommandService commandService;
     private final ParticleEngine particles;
+    private final WeatherService weatherService;
+
     private final CommandRegistry commandRegistry;
     private final ItemRegistry itemRegistry;
 
@@ -81,11 +83,12 @@ public class GameMaster {
         this.itemRegistry = new ItemRegistry();
         this.sunlight = new Sunlight(K.Sunlight.DEFAULT_DIRECTION);
         this.particles = new ParticleEngine();
+        this.weatherService = new WeatherService();
 
-        int center = K.World.GRID_SIZE / 2;
+        int center = K.World.STARTING_GRID_SIZE / 2;
 
-        for (int x = 0; x < K.World.GRID_SIZE; x++) {
-            for (int z = 0; z < K.World.GRID_SIZE; z++) {
+        for (int x = 0; x < K.World.STARTING_GRID_SIZE; x++) {
+            for (int z = 0; z < K.World.STARTING_GRID_SIZE; z++) {
                 Block block = new Block(BlockData.TILLED_DIRT, x, 0, z);
                 blockService.setBlock(block.getType(), block.getX(), block.getZ());
                 world.addBlock(block);
@@ -152,7 +155,7 @@ public class GameMaster {
 
         recenter();
         log.info("GameMaster initialized with grid size: {}x{}",
-                K.World.GRID_SIZE, K.World.GRID_SIZE);
+                K.World.STARTING_GRID_SIZE, K.World.STARTING_GRID_SIZE);
     }
 
     public long getWindowHandle() {
@@ -192,10 +195,10 @@ public class GameMaster {
             return;
         }
 
-        timeService.update(delta);
+        timeService.update(delta, weatherService);
         particles.update(delta);
         shop.update(timeService);
-        cropService.update(delta);
+        cropService.update(delta, weatherService.getWeather());
         camera.update(delta);
         gameUIservice.update(delta);
 
@@ -416,7 +419,7 @@ public class GameMaster {
     }
 
     public void recenter() {
-        float center = (K.World.GRID_SIZE - 1) / 2.0f;
+        float center = (K.World.STARTING_GRID_SIZE - 1) / 2.0f;
         float worldCenter = center * K.World.TILE_SIZE;
         this.camera.setPosition(worldCenter, 0.0f, worldCenter);
     }

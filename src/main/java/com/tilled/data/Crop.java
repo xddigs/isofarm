@@ -66,10 +66,12 @@ public class Crop extends Item {
         this.wasHarvested = wasHarvested;
     }
 
-    public void update(float delta) {
+    public void update(float delta, WeatherType weather) {
         if (isReadyToHarvest()) return;
 
-        currentGrowthTime += delta;
+        float soilBonus = (block != null && block.hasWater()) ? 1.5f : 0.5f;
+        float effectiveDelta = delta * weather.getGrowthMultiplier() * soilBonus;
+        currentGrowthTime += effectiveDelta;
         float progress = currentGrowthTime / targetGrowthTime;
 
         if (progress >= 1.0f) {
