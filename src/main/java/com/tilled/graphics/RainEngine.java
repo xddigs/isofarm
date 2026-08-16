@@ -48,20 +48,16 @@ public class RainEngine {
         }
 
         drops.removeIf(drop -> drop.isDead(K.World.RAIN_MIN_Y));
-        while (drops.size() < amount) {
+
+        int targetAmount = Math.min(amount, K.World.RAIN_MAX_DROPS);
+
+        while (drops.size() < targetAmount) {
             spawn(cameraPosition);
         }
     }
 
     public void update(float delta, Vector3f cameraPosition) {
-        for (RainDrop drop : drops) {
-            drop.update(delta);
-        }
-
-        drops.removeIf(drop -> drop.isDead(K.World.RAIN_MIN_Y));
-        while (drops.size() < K.World.RAIN_MAX_DROPS) {
-            spawn(cameraPosition);
-        }
+        update(delta, cameraPosition, K.World.RAIN_MAX_DROPS);
     }
 
     public void render(Shader shader, Matrix4f view, Matrix4f projection) {
