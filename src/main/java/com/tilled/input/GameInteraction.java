@@ -2,6 +2,8 @@ package com.tilled.input;
 
 import com.tilled.data.*;
 import com.tilled.graphics.Camera;
+import com.tilled.graphics.ParticleEngine;
+import com.tilled.graphics.SpriteSheet;
 import com.tilled.service.*;
 import com.tilled.utils.K;
 import com.tilled.wrld.GameMaster;
@@ -18,17 +20,19 @@ public class GameInteraction {
     private final GameUIService gameUIservice;
     private final BlockService blockService;
     private final TimeService timeService;
+    private final ParticleEngine particles;
     private final Camera camera;
 
     public GameInteraction(CropService cropService,
                            GameUIService gameUIservice,
                            BlockService blockService,
                            TimeService timeService,
-                           Camera camera) {
+                           ParticleEngine particles, Camera camera) {
         this.cropService = cropService;
         this.gameUIservice = gameUIservice;
         this.blockService = blockService;
         this.timeService = timeService;
+        this.particles = particles;
         this.camera = camera;
     }
 
@@ -93,6 +97,11 @@ public class GameInteraction {
             } else {
                 cropService.rip(crop);
             }
+
+            SpriteSheet sheet = gameMaster.getCropSpriteSheet(crop.getType());
+            particles.spawn(x, K.World.CROP_ELEVATION_Y, z, sheet,
+                    crop.getStage().getFrameIndex());
+
             gameUIservice.logAction(cell);
             return;
         }
@@ -101,6 +110,7 @@ public class GameInteraction {
         if (topY >= 1) {
             Block block = gameMaster.getWorld().getBlockAt(x, topY, z);
             if (block != null && gameMaster.getWorld().removeBlock(block)) {
+                particles.spawn(x, K.World.CROP_ELEVATION_Y, z, block.getType());
                 gameMaster.getPlayer().add(block);
                 gameUIservice.logAction(cell);
 

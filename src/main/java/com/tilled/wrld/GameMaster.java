@@ -32,7 +32,7 @@ public class GameMaster {
     private final TimeService timeService;
     private final BlockService blockService;
     private final CommandService commandService;
-
+    private final ParticleEngine particles;
     private final CommandRegistry commandRegistry;
     private final ItemRegistry itemRegistry;
 
@@ -78,6 +78,7 @@ public class GameMaster {
         this.commandService = new CommandService(commandRegistry);
         this.itemRegistry = new ItemRegistry();
         this.sunlight = new Sunlight(K.Sunlight.DEFAULT_DIRECTION);
+        this.particles = new ParticleEngine();
 
         int center = K.World.GRID_SIZE / 2;
 
@@ -142,7 +143,7 @@ public class GameMaster {
         this.camera = new Camera(K.Camera.DEFAULT_WIDTH, K.Camera.DEFAULT_HEIGHT);
         this.camera.setPosition(0.0f, 0.0f, 0.0f);
         this.gameInteraction = new GameInteraction(cropService, gameUIservice,
-                blockService, timeService, camera);
+                blockService, timeService, particles, camera);
 
         recenter();
         log.info("GameMaster initialized with grid size: {}x{}",
@@ -177,12 +178,17 @@ public class GameMaster {
         isPromptingForInput = promptingForInput;
     }
 
+    public SpriteSheet getCropSpriteSheet(CropType type) {
+        return cropSpritesheets.get(type);
+    }
+
     public void update(float delta) {
         if (player == null) {
             return;
         }
 
         timeService.update(delta);
+        particles.update(delta);
         shop.update(timeService);
         cropService.update(delta);
         camera.update(delta);
@@ -232,6 +238,7 @@ public class GameMaster {
         }
 
         blockService.renderAll(defaultShader, blockMesh, modelMatrix, sunlight);
+        particles.render(defaultShader, blockMesh, blocksTexture, modelMatrix);
 
         world.getActiveCrops().forEach(crop -> {
             SpriteSheet sheet = cropSpritesheets.get(crop.getType());
