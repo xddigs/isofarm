@@ -47,6 +47,7 @@ public class GameMaster {
     private SpriteSheet wheat;
     private SpriteSheet carrot;
     private SpriteSheet potato;
+    private SpriteSheet beetroot;
 
     private final Map<CropType, SpriteSheet> cropSpritesheets;
     private SpriteSheet seedIcons;
@@ -124,6 +125,7 @@ public class GameMaster {
         this.wheat = new SpriteSheet(K.Paths.WHEAT_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
         this.carrot = new SpriteSheet(K.Paths.CARROT_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
         this.potato = new SpriteSheet(K.Paths.POTATO_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
+        this.beetroot = new SpriteSheet(K.Paths.BEETROOT_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
 
         this.seedIcons = new SpriteSheet(K.Paths.SEED_ICONS, K.UI.ICON_SEED_CROPS_FRAMES);
         this.cropIcons = new SpriteSheet(K.Paths.CROP_ICONS, K.UI.ICON_SEED_CROPS_FRAMES);
