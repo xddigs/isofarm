@@ -101,9 +101,8 @@ public class GameUIService implements Service<GameMaster> {
             return crop.getType().getId();
         }
 
-        if (item instanceof Block expansion
-                && expansion.getType() == BlockData.DIRT) {
-            return expansion.getType().getId();
+        if (item instanceof Block block && block.getType() != null) {
+            return block.getType().getId();
         }
 
         return 0;

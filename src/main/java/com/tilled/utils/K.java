@@ -95,8 +95,10 @@ public final class K {
         public static final float MATCH_PARENT_WIDTH = -1.0f;
         public static final float COORD_DISPLAY_DURATION = 3.0f;
 
-        public static final int ICON_ATLAS_FRAMES = 3;
-        public static final int ICON_BLOCK_FRAMES = 4;
+        public static final int ICON_SEED_CROPS_FRAMES = 4;
+        public static final int ICON_BLOCK_FRAMES = 5;
+        public static final int ICON_TOOL_FRAMES = 3;
+
         public static final int BLOCK_ATLAS_FRAMES = 5;
         public static final int ICON_BLOCK_ATLAS_ROWS = 3;
         public static final int COMMAND_MAX_LENGTH = 512;

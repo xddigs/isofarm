@@ -25,6 +25,7 @@ public class Shop {
         clear();
         add(new Seed(CropType.CARROT), 64);
         add(new Seed(CropType.POTATO), 16);
+        add(new Seed(CropType.BEETROOT), 16);
         add(new Block(BlockData.TILLED_DIRT), 2);
     }
 
