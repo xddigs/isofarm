@@ -210,6 +210,7 @@ public class GameUIService implements Service<GameMaster> {
         ImGui.begin("New Farmer", windowFlags);
         ImGui.text("What's your name, kid?");
         ImGui.pushItemWidth(K.UI.MATCH_PARENT_WIDTH);
+        ImGui.setKeyboardFocusHere();
         boolean wasEnterPressed = ImGui.inputText("##PlayerName", nameBuffer,
                 ImGuiInputTextFlags.EnterReturnsTrue);
 
@@ -237,6 +238,7 @@ public class GameUIService implements Service<GameMaster> {
         ImGui.pushItemWidth(K.UI.MATCH_PARENT_WIDTH);
         int flags = ImGuiInputTextFlags.EnterReturnsTrue;
 
+        ImGui.setKeyboardFocusHere();
         boolean enterPressed = ImGui.inputText(
                 "##CommandInput",
                 commandBuffer,
