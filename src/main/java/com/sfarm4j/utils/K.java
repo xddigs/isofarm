@@ -83,7 +83,10 @@ public final class K {
         public static final float INVENTORY_HEIGHT = 300.0f;
 
         public static final float NEW_PLAYER_WIDTH = 340.0f;
-        public static final float NEW_PLAYER_HEIGHT = 200.0f;
+        public static final float NEW_PLAYER_HEIGHT = 180.0f;
+
+        public static final float INPUT_WIDTH = 340.0f;
+        public static final float INPUT_HEIGHT = NEW_PLAYER_HEIGHT;
 
         public static final float ICON_SIZE = 32.0f;
 

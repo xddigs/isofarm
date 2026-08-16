@@ -224,7 +224,7 @@ public class GameUIService implements Service<GameMaster> {
 
         ImGui.setNextWindowPos(windowWidth * K.UI.CENTER_PIVOT, windowHeight * K.UI.CENTER_PIVOT,
                 ImGuiCond.Always, K.UI.CENTER_PIVOT, K.UI.CENTER_PIVOT);
-        ImGui.setNextWindowSize(K.UI.NEW_PLAYER_WIDTH, K.UI.NEW_PLAYER_HEIGHT);
+        ImGui.setNextWindowSize(K.UI.INPUT_WIDTH, K.UI.INPUT_HEIGHT);
 
         int windowFlags = ImGuiWindowFlags.NoTitleBar |
                         ImGuiWindowFlags.NoResize |
