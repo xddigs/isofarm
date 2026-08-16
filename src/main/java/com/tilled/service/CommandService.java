@@ -31,6 +31,7 @@ public class CommandService implements Service<Command> {
         String[] args = new String[tokens.length - 1];
         System.arraycopy(tokens, 1, args, 0, args.length);
         command.action().accept(args);
-        toastService.success(commandName + " " + String.join(" ", args));
+        toastService.success("You ran= " + commandName + " " +
+                String.join(" ", args));
     }
 }
