@@ -50,7 +50,10 @@ public class GameUIService implements Service<GameMaster> {
     private Item selectedInventoryItem = null;
     private float hudInactivityTimer = 0.0f;
 
-    public GameUIService(long windowHandle, CommandService commandService, ToastService toastService, SpriteSheet seedIcons, SpriteSheet cropIcons, SpriteSheet blockIcons, SpriteSheet toolIcons) {
+    public GameUIService(long windowHandle, CommandService commandService,
+                         ToastService toastService, SpriteSheet seedIcons,
+                         SpriteSheet cropIcons, SpriteSheet blockIcons,
+                         SpriteSheet toolIcons) {
         this.commandService = commandService;
         this.toastService = toastService;
         this.seedIcons = seedIcons;
@@ -104,6 +107,10 @@ public class GameUIService implements Service<GameMaster> {
             return block.getType().getId();
         }
 
+        if (item instanceof Tool tool) {
+            return tool.getId();
+        }
+
         return 0;
     }
 
@@ -116,7 +123,8 @@ public class GameUIService implements Service<GameMaster> {
     }
 
     public void update(float delta) {
-        if (Mouse.getDeltaX() != 0.0f || Mouse.getDeltaY() != 0.0f || Mouse.getScrollY() != 0.0f || Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT) || Keyboard.anyKeyPressed()) {
+        if (Mouse.getDeltaX() != 0.0f || Mouse.getDeltaY() != 0.0f || Mouse.getScrollY() != 0.0f ||
+                Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT) || Keyboard.anyKeyPressed()) {
             hudInactivityTimer = HUD_FADE_DELAY;
 
         } else if (hudInactivityTimer > 0.0f) {
@@ -528,6 +536,8 @@ public class GameUIService implements Service<GameMaster> {
         int totalPrice = item.getValue() * amount;
         if (player.purse() < totalPrice) {
             log.warn("Player doesn't have enough money to buy {} x{}", item.getName(), amount);
+            toastService.warning("You don't have enough money to buy " +
+                    amount + " " + item.getName() + "!");
             return;
         }
 
@@ -678,7 +688,7 @@ public class GameUIService implements Service<GameMaster> {
         if (item instanceof Crop) return cropIcons;
         if (item instanceof Seed) return seedIcons;
         if (item instanceof Block) return blockIcons;
-        if (item instanceof Coin) return toolIcons;
+        if (item instanceof Tool) return toolIcons;
         return seedIcons;
     }
 }

@@ -143,6 +143,7 @@ public class GameInteraction {
                     gameMaster.getPlayer().remove(selectedItem);
                     gameUIservice.logAction(cell);
                     log.info("New TILLED_DIRT placed at {},{}", cell.x(), cell.y());
+                    gameMaster.getToastService().success("A new expansion has been created!");
                 }
                 return;
             }
@@ -159,6 +160,8 @@ public class GameInteraction {
                 log.info("Block placed: {} at {},{},{}",
                         newBlock.getType().getName(), cell.x, targetY, cell.y);
             }
+        } else if (selectedItem instanceof WateringCan wateringCan) {
+            wateringCan.use(gameMaster.getWorld());
 
         } else if (selectedItem instanceof Seed seed) {
             Crop crop = gameMaster.getWorld().getCropAt(cell.x, cell.y);

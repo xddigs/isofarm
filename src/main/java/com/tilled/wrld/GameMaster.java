@@ -409,7 +409,7 @@ public class GameMaster {
                 gameUIservice.setPlayer(player);
                 this.shop.setPlayer(player);
                 log.info("Player created: {}", player.getName());
-                toastService.success("Welcome, " + player.getName() + "!");
+                toastService.info("Welcome, " + player.getName() + "!");
                 Library.initItems(itemRegistry, player);
                 Library.initCommands(genDelta, this);
             }
