@@ -297,12 +297,15 @@ public class GameUIService implements Service<GameMaster> {
             ImGui.text(crop.getType().getName());
             ImGui.textDisabled("Status: " + crop.getStage().getName());
 
-        } else {
-            Seed seed = (Seed) selectedInventoryItem;
+        } else if (selectedInventoryItem instanceof Seed seed){
             int amount = player.getInventory().getAmount(seed);
             ImGui.text(seed.getName() + " (x" + amount + ")");
             ImGui.textDisabled(seed.getDescription());
+        } else if (selectedInventoryItem instanceof Tool tool) {
+            int duration = tool.getDurability();
+            ImGui.text(tool.getName() + " (" + duration +")");
         }
+
         ImGui.popStyleVar();
         ImGui.end();
     }
@@ -548,6 +551,7 @@ public class GameUIService implements Service<GameMaster> {
         player.getInventory().add(item, amount);
 
         log.info("Player bought {} x{} from shop", item.getName(), amount);
+        toastService.success("You bought " + amount + " " + item.getName() + "!");
     }
 
     private void renderSlotCount(int amount) {
