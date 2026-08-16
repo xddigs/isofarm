@@ -3,6 +3,7 @@ package com.tilled.graphics;
 import com.tilled.data.BlockData;
 import com.tilled.data.Particle;
 import com.tilled.service.Service;
+import com.tilled.utils.K;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 
@@ -50,7 +51,7 @@ public class ParticleEngine implements Service<Particle> {
 
     public void spawn(float blockX, float blockY, float blockZ,
                                     BlockData blockData) {
-        int count = 16;
+        int count = K.World.PARTICLES_COUNT;
         Vector2f baseOffset = blockData.getSideAtlasOffset();
         Vector2f baseScale = blockData.getAtlasScale();
 
@@ -76,7 +77,7 @@ public class ParticleEngine implements Service<Particle> {
 
     public void spawn(float x, float y, float z,
                       SpriteSheet sheet, int frameIndex) {
-        int count = 16;
+        int count = K.World.PARTICLES_COUNT;
         float frameWidthUV = 1.0f / sheet.getTotalFrames();
         float baseUvX = frameIndex * frameWidthUV;
 

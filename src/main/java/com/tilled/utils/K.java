@@ -28,6 +28,8 @@ public final class K {
         public static final float CROP_ELEVATION_Y = 0.0f;
         public static final int STARTING_COINS = 100;
         public static final int TOTAL_SLOTS = 16;
+        public static final int MAX_STACK = 9999;
+        public static final int PARTICLES_COUNT = 16;
     }
 
     public static final class Sunlight {
