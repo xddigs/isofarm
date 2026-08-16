@@ -24,11 +24,6 @@ uniform vec3 uLightDirection;
 uniform bool uIsMaskPass;
 
 void main() {
-    if (uIsMaskPass) {
-        FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-        return;
-    }
-
     vec4 texColor = vec4(uBaseColor, 1.0);
 
     if (uUseTexture) {
@@ -52,6 +47,11 @@ void main() {
         if (texColor.a < 0.1) {
             discard;
         }
+    }
+
+    if (uIsMaskPass) {
+        FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+        return;
     }
 
     vec3 norm = normalize(vNormal);
