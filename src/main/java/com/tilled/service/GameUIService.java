@@ -2,7 +2,6 @@ package com.tilled.service;
 
 import com.tilled.data.*;
 import com.tilled.graphics.SpriteSheet;
-import com.tilled.input.Keyboard;
 import com.tilled.input.Mouse;
 import com.tilled.utils.K;
 import com.tilled.wrld.GameMaster;
@@ -255,12 +254,12 @@ public class GameUIService implements Service<GameMaster> {
         };
     }
 
-    public void renderTooltip(Vector2i hoveredCell, World world) {
+    public void renderTooltip(Hit hoveredCell, World world) {
         if (hoveredCell == null || player == null) {
             return;
         }
 
-        Crop crop = world.getCropAt(hoveredCell.x, hoveredCell.y);
+        Crop crop = world.getCropAt(hoveredCell.x(), hoveredCell.y());
 
         boolean hasCrop = crop != null;
         boolean hasSeedSelected = !hasCrop && selectedInventoryItem instanceof Seed;
@@ -371,8 +370,8 @@ public class GameUIService implements Service<GameMaster> {
         return selectedInventoryItem;
     }
 
-    public void logAction(Vector2i cell) {
-        this.lastActionCell = new Vector2i(cell);
+    public void logAction(Hit cell) {
+        this.lastActionCell = new Vector2i(cell.x(), cell.y());
         this.actionDisplayTimer = K.UI.COORD_DISPLAY_DURATION;
     }
 

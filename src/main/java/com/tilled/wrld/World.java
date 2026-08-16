@@ -47,12 +47,12 @@ public class World {
     public byte getBlockTypeAt(int x, int y, int z) {
         if (y < 0 || y >= Chunk.SIZE_Y) return 0;
 
-        int chunkX = x >> 4; // x / 16
-        int chunkZ = z >> 4; // z / 16
+        int chunkX = x >> 4;
+        int chunkZ = z >> 4;
         Chunk chunk = chunks.get(get2DKey(chunkX, chunkZ));
         if (chunk == null) return 0;
-        int localX = x & 15; // x % 16
-        int localZ = z & 15; // z % 16
+        int localX = x & 15;
+        int localZ = z & 15;
         return chunk.getBlock(localX, y, localZ);
     }
 

@@ -10,7 +10,6 @@ import com.tilled.utils.K;
 import imgui.ImGui;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
-import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +68,7 @@ public class GameMaster {
     private final Matrix4f modelMatrix = new Matrix4f();
     private final Sunlight sunlight;
 
-    private Vector2i hoveredCell = null;
+    private Hit hoveredCell = null;
 
     private float windowWidth = K.Window.DEFAULT_WIDTH;
     private float windowHeight = K.Window.DEFAULT_HEIGHT;
@@ -327,28 +326,15 @@ public class GameMaster {
         }
 
         if (hoveredCell != null) {
+            glDisable(GL_DEPTH_TEST);
             defaultShader.setUniform("uUseTexture", false);
-            Block hoveredBlock = world.getActiveBlocks().stream()
-                    .filter(block ->
-                            Math.round(block.getX()) == hoveredCell.x &&
-                                    Math.round(block.getZ()) == hoveredCell.y
-                    )
-                    .findFirst()
-                    .orElse(null);
-            if (hoveredBlock != null) {
-                modelMatrix.identity().translate(
-                        hoveredBlock.getX(),
-                        hoveredBlock.getY(),
-                        hoveredBlock.getZ());
-                defaultShader.setUniform("uModel", modelMatrix);
-                selectionMesh.renderLines();
+            defaultShader.setUniform("uUseFaceAtlas", false);
+            defaultShader.setUniform("uBaseColor", K.Colors.OUTLINE_DEFAULT);
 
-            } else {
-                modelMatrix.identity().translate(hoveredCell.x * K.World.TILE_SIZE, 0.0f,
-                        hoveredCell.y * K.World.TILE_SIZE);
-                defaultShader.setUniform("uModel", modelMatrix);
-                selectionMesh.renderLines();
-            }
+            modelMatrix.identity().translate(hoveredCell.x(), hoveredCell.y(), hoveredCell.z());
+            defaultShader.setUniform("uModel", modelMatrix);
+            selectionMesh.renderLines();
+            glEnable(GL_DEPTH_TEST);
         }
 
         if (hoveredCell != null) {
@@ -363,8 +349,8 @@ public class GameMaster {
             defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
 
             world.getActiveCrops().stream()
-                    .filter(c -> Math.round(c.getX()) == hoveredCell.x
-                            && Math.round(c.getZ()) == hoveredCell.y)
+                    .filter(c -> Math.round(c.getX()) == hoveredCell.x()
+                            && Math.round(c.getZ()) == hoveredCell.y())
                     .findFirst()
                     .ifPresent(crop -> {
                         SpriteSheet sheet = cropSpritesheets.get(crop.getType());

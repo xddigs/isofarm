@@ -4,11 +4,13 @@ import com.tilled.data.*;
 import com.tilled.graphics.Camera;
 import com.tilled.graphics.ParticleEngine;
 import com.tilled.graphics.SpriteSheet;
-import com.tilled.service.*;
+import com.tilled.service.BlockService;
+import com.tilled.service.CropService;
+import com.tilled.service.GameUIService;
+import com.tilled.service.TimeService;
 import com.tilled.utils.K;
 import com.tilled.wrld.GameMaster;
 import com.tilled.wrld.World;
-import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +38,7 @@ public class GameInteraction {
         this.camera = camera;
     }
 
-    public Vector2i update(GameMaster gameMaster, Item selectedItem) {
+    public Hit update(GameMaster gameMaster, Item selectedItem) {
         camera(gameMaster);
 
         if (Keyboard.isKeyPressed(GLFW_KEY_TAB)) {
@@ -47,8 +49,9 @@ public class GameInteraction {
             gameMaster.toggleInventory();
         }
 
-        Vector2i hoveredCell = camera.highlight(Mouse.getX(), Mouse.getY(),
-                gameMaster.getWindowWidth(), gameMaster.getWindowHeight(), gameMaster.getWorld());
+        Hit hoveredCell = camera.highlight(Mouse.getX(), Mouse.getY(),
+                gameMaster.getWindowWidth(), gameMaster.getWindowHeight(),
+                gameMaster.getWorld());
 
         if (hoveredCell == null) {
             return null;
@@ -87,7 +90,7 @@ public class GameInteraction {
         }
     }
 
-    private void breakAction(GameMaster gameMaster, Vector2i cell) {
+    private void breakAction(GameMaster gameMaster, Hit cell) {
         int x = cell.x();
         int z = cell.y();
 
@@ -138,7 +141,7 @@ public class GameInteraction {
         }
     }
 
-    private void placeAction(GameMaster gameMaster, Vector2i cell, Item selectedItem) {
+    private void placeAction(GameMaster gameMaster, Hit cell, Item selectedItem) {
         if (selectedItem instanceof Block block) {
             if (block.getType() == BlockData.TILLED_DIRT) {
                 if (blockService.expandBlock(cell.x(), cell.y())) {
@@ -154,27 +157,27 @@ public class GameInteraction {
                 return;
             }
 
-            int targetY = getFirstFreeY(gameMaster.getWorld(), cell.x, cell.y);
-            Block newBlock = new Block(block.getType(), cell.x, targetY, cell.y);
+            int targetY = getFirstFreeY(gameMaster.getWorld(), cell.x(), cell.y());
+            Block newBlock = new Block(block.getType(), cell.x(), targetY, cell.y());
             if (gameMaster.getWorld().addBlock(newBlock)) {
-                gameMaster.rebuildChunkMeshAt(cell.x, cell.y);
+                gameMaster.rebuildChunkMeshAt(cell.x(), cell.y());
                 gameMaster.getPlayer().remove(selectedItem);
                 gameUIservice.logAction(cell);
                 log.info("Block placed: {} at {},{},{}",
-                        newBlock.getType().getName(), cell.x, targetY, cell.y);
+                        newBlock.getType().getName(), cell.x(), targetY, cell.y());
             }
         } else if (selectedItem instanceof WateringCan wateringCan) {
             wateringCan.use(gameMaster.getWorld());
             gameMaster.getToastService().success("You water the crops!");
 
         } else if (selectedItem instanceof Seed seed) {
-            Crop crop = gameMaster.getWorld().getCropAt(cell.x, cell.y);
-            Block baseBlock = blockService.find(cell.x, cell.y);
+            Crop crop = gameMaster.getWorld().getCropAt(cell.x(), cell.y());
+            Block baseBlock = blockService.find(cell.x(), cell.y());
 
-            if (crop == null && blockService.isUnlocked(cell.x, cell.y) && seed.getType() != null) {
+            if (crop == null && blockService.isUnlocked(cell.x(), cell.y()) && seed.getType() != null) {
                 Crop planted = cropService.plant(
-                        cell.x,
-                        cell.y,
+                        cell.x(),
+                        cell.y(),
                         gameMaster.getPlayer(),
                         baseBlock,
                         seed.getType(),
