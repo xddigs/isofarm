@@ -18,6 +18,7 @@ public class Shop {
         this.stock = new Inventory();
         this.purse = new Purse(stock, new Coin());
         setUpStock();
+        this.purse.add(K.World.STARTING_COINS);
     }
 
     private void setUpStock() {
@@ -67,13 +68,13 @@ public class Shop {
     }
 
     public void buy(Item item, int amount) {
-        if (!hasMoney()) return;
-        if (purse() < item.getValue() * amount) {
+        int totalPrice = item.getValue() * amount;
+        if (!hasMoney() || purse() < totalPrice) {
             log.warn("Not enough money to buy x{} of {}", amount, item.getName());
             return;
         }
         stock.add(item, amount);
-        earn(-amount);
+        purse.remove(totalPrice);
         log.info("Bought x{} of {} from player", amount, item.getName());
     }
 
@@ -103,11 +104,8 @@ public class Shop {
     }
 
     public void reset() {
-        purse.clear();
-        for (int i = 0; i < K.World.STARTING_COINS; i++) {
-            earn(1);
-        }
         setUpStock();
+        this.purse.add(K.World.STARTING_COINS);
     }
 
     private String getRandomName() {

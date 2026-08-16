@@ -117,6 +117,12 @@ public class Player {
         purse.add(amount);
     }
 
+    public void spend(int amount) {
+        if (amount <= 0) return;
+        log.info("Spent ${}", amount);
+        purse.remove(amount);
+    }
+
     public int purse() {
         return purse.getBalance();
     }

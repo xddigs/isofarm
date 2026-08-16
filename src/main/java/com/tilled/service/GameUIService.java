@@ -434,18 +434,16 @@ public class GameUIService implements Service<GameMaster> {
     }
 
     private void buyItem(Inventory stock, Item item, int amount) {
-        if (amount <= 0) {
-            return;
-        }
+        if (amount <= 0) return;
 
         int totalPrice = item.getValue() * amount;
-        if ( player.purse() < totalPrice) {
+        if (player.purse() < totalPrice) {
             log.warn("Player doesn't have enough money to buy {} x{}",
                     item.getName(), amount);
             return;
         }
 
-        player.earn(-totalPrice);
+        player.spend(totalPrice);
         shop.earn(totalPrice);
 
         stock.remove(item, amount);
