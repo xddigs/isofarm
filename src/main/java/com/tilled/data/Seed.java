@@ -8,7 +8,7 @@ public class Seed extends Item {
     private final String description;
 
     public Seed(CropType type) {
-        super(type.getId(), "Seed of " + type.getName(), 1, 1);
+        super(type.getId(), "(Seed) " + type.getName(), 1, 1);
         this.type = type;
         this.description = type.getDescription();
     }

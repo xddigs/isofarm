@@ -10,7 +10,7 @@ public class Block extends Item {
     private int waterLevel = 15;
 
     public Block(BlockData type, int x, int y, int z) {
-        super(type.getId(), type.getName(), 1, type.getValue());
+        super(type.getId(), "(Block) " + type.getName(), 1, type.getValue());
         this.type = type;
         this.x = x;
         this.y = y;

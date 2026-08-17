@@ -76,9 +76,12 @@ public class GameInteraction {
         }
 
         float scrollY = Mouse.getScrollY();
-
         if (scrollY != 0.0f) {
-            camera.zoom(scrollY);
+            if (isCtrlDown) {
+                camera.zoom(scrollY);
+            } else {
+                gameUIservice.selectItem(scrollY > 0 ? -1 : 1);
+            }
         }
 
         if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_MIDDLE)) {

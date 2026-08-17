@@ -234,7 +234,6 @@ public class GameMaster {
         gameUIservice.update(delta);
 
         Item selectedInventoryItem = gameUIservice.getSelectedInventoryItem();
-
         if (!ImGui.getIO().getWantCaptureMouse()) {
             hoveredCell = gameInteraction.update(this, selectedInventoryItem);
         } else {

@@ -55,6 +55,12 @@ public class Inventory {
         items.putAll(sorted);
     }
 
+    public List<Item> getHotbarItems() {
+        List<Item> hotbar = new ArrayList<>(items.keySet());
+        int slotCount = Math.min(K.UI.HOTBAR_SLOTS, hotbar.size());
+        return hotbar.subList(0, slotCount);
+    }
+
     public void clear() {
         items.clear();
     }

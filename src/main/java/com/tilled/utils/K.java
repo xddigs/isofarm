@@ -147,6 +147,8 @@ public final class K {
         public static final float TOAST_PADDING_Y = 10.0f;
         public static final float TOAST_ICON_SIZE = 20.0f;
         public static final float TOAST_ROUNDING = 8.0f;
+
+        public static final int HOTBAR_SLOTS = 9;
     }
 
     public static final class Paths {

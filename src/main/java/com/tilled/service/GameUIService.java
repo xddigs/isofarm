@@ -18,10 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.AbstractMap;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
@@ -143,6 +140,7 @@ public class GameUIService implements Service<GameMaster> {
             renderInv();
             renderShop();
         }
+        renderHotbar();
         renderToasts();
     }
 
@@ -154,6 +152,111 @@ public class GameUIService implements Service<GameMaster> {
         for (Toast toast : toastService.getToasts()) {
             renderToast(toast);
         }
+    }
+
+    public void renderHotbar() {
+        if (player == null) return;
+
+        float hotbarWidth = (K.UI.ICON_SIZE + K.Style.FRAME_PADDING_X * 2.0f) * K.UI.HOTBAR_SLOTS
+                + K.Style.ITEM_SPACING * (K.UI.HOTBAR_SLOTS - 1)
+                + K.Style.WINDOW_PADDING_X * 2.0f;
+
+        float hotbarHeight = K.UI.ICON_SIZE
+                + K.Style.FRAME_PADDING_Y * 2.0f
+                + K.Style.WINDOW_PADDING_Y * 2.0f;
+
+        ImGui.setNextWindowPos(windowWidth / 2 - hotbarWidth / 2,
+                windowHeight - hotbarHeight - K.UI.HUD_PADDING, ImGuiCond.Always);
+        ImGui.setNextWindowSize(hotbarWidth, hotbarHeight, ImGuiCond.Always);
+
+        int flags = ImGuiWindowFlags.NoTitleBar |
+                ImGuiWindowFlags.NoResize |
+                ImGuiWindowFlags.NoCollapse |
+                ImGuiWindowFlags.NoBackground;
+
+        if (ImGui.begin("Inventory", flags)) {
+            Inventory inv = player.getInventory();
+            inv.sort();
+            List<Item> hotbarItems = inv.getHotbarItems();
+
+            if (selectedInventoryItem != null && !hotbarItems.contains(selectedInventoryItem)) {
+                selectedInventoryItem = null;
+            }
+
+            ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, K.Style.ITEM_SPACING, K.Style.ITEM_SPACING);
+            ImGui.pushStyleVar(ImGuiStyleVar.FrameBorderSize, 1.0f);
+
+            for (int slotIndex = 0; slotIndex < K.UI.HOTBAR_SLOTS; slotIndex++) {
+                Item item = slotIndex < hotbarItems.size() ? hotbarItems.get(slotIndex) : null;
+                int totalAmount = item != null ? inv.getAmount(item) : 0;
+
+                boolean isSelected = item != null && selectedInventoryItem != null
+                        && selectedInventoryItem.equals(item);
+
+                setColor(ImGuiCol.Button, isSelected ? K.Style.COLOR_BUTTON : K.Style.COLOR_SLOT_BG);
+                setColor(ImGuiCol.ButtonHovered, isSelected ? K.Style.COLOR_BUTTON_HOVERED : K.Style.COLOR_SLOT_HOVERED);
+                setColor(ImGuiCol.ButtonActive, isSelected ? K.Style.COLOR_BUTTON_ACTIVE : K.Style.COLOR_SLOT_BG);
+                setColor(ImGuiCol.Border, isSelected ? K.Style.COLOR_SLOT_BORDER_SEL : K.Style.COLOR_SLOT_BORDER);
+
+                ImGui.pushID("hotbar_slot_" + slotIndex);
+
+                if (item != null) {
+                    SpriteSheet atlas = getItemSpritesheet(item);
+                    int col = getItemIconColumn(item);
+                    int totalCols = atlas.getTotalFrames();
+                    float u0 = (float) col / totalCols;
+                    float u1 = (float) (col + 1) / totalCols;
+
+                    if (ImGui.imageButton(atlas.getTextureId(), K.UI.ICON_SIZE, K.UI.ICON_SIZE,
+                            u0, 1.0f, u1, 0.0f)) {
+                        selectedInventoryItem = item;
+                    }
+
+                    renderSlotCount(totalAmount);
+
+                    if (ImGui.isItemHovered()) {
+                        ImGui.setTooltip(item.getName());
+                    }
+
+                } else {
+                    ImGui.button("##empty", K.UI.ICON_SIZE +
+                            K.Style.FRAME_PADDING_X * 2.0f, K.UI.ICON_SIZE +
+                            K.Style.FRAME_PADDING_Y * 2.0f);
+                }
+
+                ImGui.popID();
+                ImGui.popStyleColor(4);
+
+                if (slotIndex < K.UI.HOTBAR_SLOTS - 1) {
+                    ImGui.sameLine();
+                }
+            }
+
+            ImGui.popStyleVar(2);
+        }
+
+        ImGui.end();
+    }
+
+    public void selectItem(int direction) {
+        if (player == null) return;
+        List<Item> hotbarItems = player.getInventory().getHotbarItems();
+        if (hotbarItems.isEmpty()) {
+            selectedInventoryItem = null;
+            return;
+        }
+
+        int currentIndex = hotbarItems.indexOf(selectedInventoryItem);
+        if (currentIndex < 0) {
+            selectedInventoryItem = hotbarItems.get(direction > 0 ? 0 : hotbarItems.size() - 1);
+            return;
+        }
+
+        int nextIndex = (currentIndex + direction) % hotbarItems.size();
+        if (nextIndex < 0) {
+            nextIndex = hotbarItems.size() - 1;
+        }
+        selectedInventoryItem = hotbarItems.get(nextIndex);
     }
 
     private void renderToast(Toast toast) {
@@ -398,12 +501,15 @@ public class GameUIService implements Service<GameMaster> {
     public void renderInv() {
         if (player == null) return;
         ImGui.setNextWindowPos(K.UI.HUD_PADDING,
-                windowHeight - K.UI.INVENTORY_HEIGHT - K.UI.HUD_PADDING, ImGuiCond.Always);
+                windowHeight - K.UI.INVENTORY_HEIGHT - K.UI.HUD_PADDING,
+                ImGuiCond.Always);
         ImGui.setNextWindowSize(K.UI.INVENTORY_WIDTH, K.UI.INVENTORY_HEIGHT, ImGuiCond.Always);
 
         int flags = ImGuiWindowFlags.NoTitleBar |
                 ImGuiWindowFlags.NoResize |
-                ImGuiWindowFlags.NoCollapse;
+                ImGuiWindowFlags.NoCollapse |
+                ImGuiWindowFlags.NoScrollbar |
+                ImGuiWindowFlags.NoScrollWithMouse;
 
         if (ImGui.begin("Inventory", flags)) {
             Inventory inv = player.getInventory();
