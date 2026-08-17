@@ -17,9 +17,7 @@ import org.slf4j.LoggerFactory;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class GameInteraction {
-
     private static final Logger log = LoggerFactory.getLogger(GameInteraction.class);
-
     private final CropService cropService;
     private final GameUIService gameUIservice;
     private final TimeService timeService;
@@ -94,17 +92,18 @@ public class GameInteraction {
         int y = cell.y();
         int z = cell.z();
 
-        Crop crop = world.getCropAt(x, z);
+        Crop crop = world.getCropAt(x, y, z);
         if (crop != null) {
 
             if (crop.isReadyToHarvest()) {
-                cropService.harvest(gameMaster.getPlayer(), crop);
+                cropService.harvest(gameMaster.getPlayer(), crop,
+                        gameMaster.getToastService());
             } else {
                 cropService.rip(crop);
             }
 
-            SpriteSheet sheet = gameMaster.getCropSpriteSheet(crop.getType());
-            particles.spawn(x, K.World.CROP_ELEVATION_Y, z, sheet, crop.getStage().getFrameIndex());
+            SpriteSheet sheet = gameMaster.getCropSpriteSheet(crop.getCropType());
+            particles.spawn(x, K.World.CROP_Y_OFFSET, z, sheet, crop.getStage().getFrameIndex());
             gameUIservice.logAction(cell);
             return;
         }
@@ -134,13 +133,13 @@ public class GameInteraction {
             int z = cell.z();
             int targetY = getFirstFreeY(world, x, z);
             Block newBlock = new Block(block.getType(), x, targetY, z);
+            byte existingBlock = world.getBlockTypeAt(x, targetY, z);
 
-            if (world.getBlockTypeAt(x, targetY, z) == 0) {
+            if (existingBlock == 0) {
                 world.setBlockTypeAt(x, targetY,z, block.getType().getId());
                 gameMaster.getPlayer().remove(selectedItem);
                 gameMaster.rebuildChunkMeshAt(x, z);
                 gameUIservice.logAction(cell);
-
                 log.info("Block placed: {} at {},{},{}", newBlock.getType().getName(), x, targetY, z);
             }
 
@@ -164,7 +163,7 @@ public class GameInteraction {
             int y = cell.y();
             int z = cell.z();
 
-            Crop crop = world.getCropAt(x, z);
+            Crop crop = world.getCropAt(x, y, z);
             byte blockId = world.getBlockTypeAt(x, y, z);
 
             if (blockId != BlockData.TILLED_DIRT.getId()) {
@@ -177,7 +176,7 @@ public class GameInteraction {
 
             Block tilledDirt = new Block(BlockData.TILLED_DIRT,x,y,z);
             Crop planted = cropService.plant(x, y, z, gameMaster.getPlayer(), tilledDirt,
-                    seed.getType(), timeService.getCurrentSeason());
+                    seed.getType(), timeService.getCurrentSeason(), gameMaster.getToastService());
 
             if (planted != null) {
                 gameUIservice.logAction(cell);

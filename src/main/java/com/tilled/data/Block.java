@@ -26,6 +26,10 @@ public class Block extends Item {
         this.type = type;
     }
 
+    public Block() {
+        this(BlockData.CROP);
+    }
+
     public BlockData getType() {
         return type;
     }

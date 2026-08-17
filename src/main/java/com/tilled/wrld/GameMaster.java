@@ -40,13 +40,14 @@ public class GameMaster {
 
     private final CommandRegistry commandRegistry;
     private final ItemRegistry itemRegistry;
-
+    private final Map<CropType, SpriteSheet> cropSpritesheets;
+    private final Matrix4f modelMatrix = new Matrix4f();
+    private final Sunlight sunlight;
     private Shader defaultShader;
     private Shader outlineShader;
     private Shader rainShader;
     private Framebuffer maskFbo;
     private Mesh screenQuadMesh;
-
     private Mesh blockMesh;
     private Mesh selectionMesh;
     private Mesh spriteMesh;
@@ -54,19 +55,13 @@ public class GameMaster {
     private SpriteSheet carrot;
     private SpriteSheet potato;
     private SpriteSheet beetroot;
-
-    private final Map<CropType, SpriteSheet> cropSpritesheets;
     private SpriteSheet seedIcons;
     private SpriteSheet cropIcons;
     private SpriteSheet toolIcons;
     private SpriteSheet blockIcons;
     private SpriteSheet blocksTexture;
     private SpriteSheet waterTexture;
-
     private Camera camera;
-    private final Matrix4f modelMatrix = new Matrix4f();
-    private final Sunlight sunlight;
-
     private Hit hoveredCell = null;
 
     private float windowWidth = K.Window.DEFAULT_WIDTH;
@@ -120,13 +115,13 @@ public class GameMaster {
         this.spriteMesh = Mesh.createCrop();
 
         try {
-            this.blocksTexture = new SpriteSheet(K.Paths.BLOCKS, K.UI.WATER_FRAMES);
+            this.blocksTexture = new SpriteSheet(K.Paths.BLOCKS, K.UI.BLOCK_ATLAS_FRAMES);
         } catch (Exception e) {
             log.warn("Could not load blocks.png atlas, falling back to base colors: {}", e.getMessage());
             this.blocksTexture = null;
         }
 
-        this.waterTexture = new SpriteSheet(K.Paths.WATER, K.UI.BLOCK_ATLAS_FRAMES);
+        this.waterTexture = new SpriteSheet(K.Paths.WATER, K.UI.WATER_FRAMES);
         this.cropSpritesheets = new EnumMap(CropType.class);
         this.wheat = new SpriteSheet(K.Paths.WHEAT_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
         this.carrot = new SpriteSheet(K.Paths.CARROT_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
@@ -138,8 +133,8 @@ public class GameMaster {
         this.toolIcons = new SpriteSheet(K.Paths.TOOL_ICONS, K.UI.ICON_TOOL_FRAMES);
         this.blockIcons = new SpriteSheet(K.Paths.BLOCK_ICONS, K.UI.ICON_BLOCK_FRAMES);
 
-        this.gameUIservice = new GameUIService(windowHandle, commandService, toastService,
-                seedIcons, cropIcons, blockIcons, toolIcons);
+        this.gameUIservice = new GameUIService(windowHandle, this, commandService,
+                toastService, seedIcons, cropIcons, blockIcons, toolIcons);
 
         this.shop = new Shop();
         this.gameUIservice.setShop(shop);
@@ -156,8 +151,8 @@ public class GameMaster {
         this.gameInteraction = new GameInteraction(cropService, gameUIservice, timeService, particles, camera);
 
         recenter();
-        log.info("GameMaster initialized with grid size: {}x{}",
-                K.World.STARTING_GRID_SIZE, K.World.STARTING_GRID_SIZE);
+        log.info("GameMaster initialized with grid size: {}x{}", K.World.STARTING_GRID_SIZE,
+                K.World.STARTING_GRID_SIZE);
     }
 
     public long getWindowHandle() {
@@ -216,6 +211,10 @@ public class GameMaster {
         return cropSpritesheets.get(type);
     }
 
+    public Season getSeason() {
+        return timeService.getCurrentSeason();
+    }
+
     public void update(float delta) {
         if (weatherService.isRaining()) {
             rainEngine.update(delta, camera.getPosition());
@@ -237,8 +236,7 @@ public class GameMaster {
         Item selectedInventoryItem = gameUIservice.getSelectedInventoryItem();
 
         if (!ImGui.getIO().getWantCaptureMouse()) {
-            hoveredCell = gameInteraction
-                    .update(this, selectedInventoryItem);
+            hoveredCell = gameInteraction.update(this, selectedInventoryItem);
         } else {
             hoveredCell = null;
         }
@@ -268,12 +266,6 @@ public class GameMaster {
             defaultShader.setUniform("uUseTexture", true);
             defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
             defaultShader.setUniform("uUseFaceAtlas", true);
-
-            BlockData dirt = BlockData.DIRT;
-            defaultShader.setUniform("uAtlasScale", dirt.getAtlasScale());
-            defaultShader.setUniform("uTopAtlasOffset", dirt.getTopAtlasOffset());
-            defaultShader.setUniform("uBottomAtlasOffset", dirt.getBottomAtlasOffset());
-            defaultShader.setUniform("uSideAtlasOffset", dirt.getSideAtlasOffset());
         } else {
             defaultShader.setUniform("uUseTexture", false);
             defaultShader.setUniform("uBaseColor", K.Colors.DEFAULT_DIRT);
@@ -281,41 +273,54 @@ public class GameMaster {
 
         particles.render(defaultShader, blockMesh, blocksTexture, modelMatrix);
 
-        world.getActiveCrops().forEach(crop -> {
-            SpriteSheet sheet = cropSpritesheets.get(crop.getType());
-            sheet.bind();
-            defaultShader.setUniform("uUseFaceAtlas", false);
-            defaultShader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
-            defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
-            defaultShader.setUniform("uTotalFrames", sheet.getTotalFrames());
-            modelMatrix.identity().translate(crop.getX(), crop.getY(), crop.getZ());
-            defaultShader.setUniform("uModel", modelMatrix);
-            defaultShader.setUniform("uFrameIndex", crop.getStage().getFrameIndex());
-            spriteMesh.render();
-            sheet.unbind();
-        });
-
-
         if (blocksTexture != null) {
             blocksTexture.bind();
             defaultShader.setUniform("uUseTexture", true);
             defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
             defaultShader.setUniform("uUseFaceAtlas", false);
+            defaultShader.setUniform("uTotalFrames", 1);
+            defaultShader.setUniform("uFrameIndex", 0);
             defaultShader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
             defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
-        } else {
-            defaultShader.setUniform("uUseTexture", false);
-            defaultShader.setUniform("uBaseColor", K.Colors.DEFAULT_DIRT);
         }
 
         chunkMeshes.forEach((chunk, mesh) -> {
             if (mesh != null && mesh.getIndicesCount() > 0) {
-                modelMatrix.identity().translate(
-                        chunk.getChunkX() * Chunk.SIZE_X, 0,
+                modelMatrix.identity().translate(chunk.getChunkX() * Chunk.SIZE_X, 0,
                         chunk.getChunkZ() * Chunk.SIZE_Z);
                 defaultShader.setUniform("uModel", modelMatrix);
                 mesh.render();
             }
+        });
+
+        world.forEach(block -> {
+            if (!(block instanceof Crop crop)) return;
+
+            SpriteSheet sheet = cropSpritesheets.get(crop.getCropType());
+            if (sheet == null) {
+                log.warn("No spritesheet found for crop type: {}", crop.getCropType());
+                return;
+            }
+
+            sheet.bind();
+            defaultShader.setUniform("uUseTexture", true);
+            defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
+            defaultShader.setUniform("uUseFaceAtlas", false);
+
+            defaultShader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
+            defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
+
+            defaultShader.setUniform("uTotalFrames", sheet.getTotalFrames());
+            defaultShader.setUniform("uFrameIndex", crop.getStage().getFrameIndex());
+
+            float renderX = crop.getX() + 0.5f;
+            float renderY = crop.getY() + 1.0f;
+            float renderZ = crop.getZ() + 0.5f;
+
+            modelMatrix.identity().translate(renderX, renderY, renderZ);
+            defaultShader.setUniform("uModel", modelMatrix);
+            spriteMesh.render();
+            sheet.unbind();
         });
 
         if (blocksTexture != null) {
@@ -330,11 +335,7 @@ public class GameMaster {
             defaultShader.setUniform("uUseFaceAtlas", false);
             defaultShader.setUniform("uBaseColor", K.Colors.OUTLINE_DEFAULT);
 
-            modelMatrix.identity().translate(
-                    hoveredCell.x(),
-                    hoveredCell.y(),
-                    hoveredCell.z()
-            );
+            modelMatrix.identity().translate(hoveredCell.x(), hoveredCell.y(), hoveredCell.z());
 
             defaultShader.setUniform("uModel", modelMatrix);
             selectionMesh.renderLines();
@@ -351,21 +352,6 @@ public class GameMaster {
             defaultShader.setUniform("uUseFaceAtlas", false);
             defaultShader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
             defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
-
-            world.getActiveCrops().stream()
-                    .filter(c -> Math.round(c.getX()) == hoveredCell.x()
-                            && Math.round(c.getY()) == hoveredCell.y()
-                            && Math.round(c.getZ()) == hoveredCell.z())
-                    .findFirst()
-                    .ifPresent(crop -> {
-                        SpriteSheet sheet = cropSpritesheets.get(crop.getType());
-                        sheet.bind();
-                        modelMatrix.identity().translate(crop.getX(), crop.getY(), crop.getZ());
-                        defaultShader.setUniform("uModel", modelMatrix);
-                        defaultShader.setUniform("uFrameIndex", crop.getStage().getFrameIndex());
-                        spriteMesh.render();
-                        sheet.unbind();
-                    });
 
             maskFbo.unbind((int) windowWidth, (int) windowHeight);
             glDisable(GL_DEPTH_TEST);
@@ -385,9 +371,7 @@ public class GameMaster {
         defaultShader.unbind();
 
         if (weatherService.isRaining()) {
-            rainEngine.render(rainShader,
-                    camera.getViewMatrix(),
-                    camera.getProjectionMatrix());
+            rainEngine.render(rainShader, camera.getViewMatrix(), camera.getProjectionMatrix());
         }
 
         gameUIservice.beginFrame();

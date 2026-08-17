@@ -1,45 +1,28 @@
 package com.tilled.data;
 
 @DataClass
-public class Crop extends Item {
-    private final float x, y, z;
+public class Crop extends Block {
     private final CropType type;
     private final Block block;
     private final Season season;
     private final int value;
-    private GrowthStage stage;
-
-    private float currentGrowthTime = 0.0f;
     private final float targetGrowthTime = 8.0f;
+    private GrowthStage stage;
+    private float currentGrowthTime = 0.0f;
     private boolean wasHarvested;
 
-    public Crop(float x, float y, float z,
+    public Crop(int x, int y, int z,
                 CropType type, Block block, Season season) {
-        super(type.getId(), type.getName(), 1, type.getValue());
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.block = block;
-        this.stage = GrowthStage.SEED;
+        super(block.getType(), x, y, z);
         this.type = type;
+        this.block = block;
         this.season = season;
         this.value = type.getValue();
+        this.stage = GrowthStage.SEED;
         this.wasHarvested = false;
     }
 
-    public float getX() {
-        return x;
-    }
-
-    public float getY() {
-        return y;
-    }
-
-    public float getZ() {
-        return z;
-    }
-
-    public CropType getType() {
+    public CropType getCropType() {
         return type;
     }
 
@@ -60,7 +43,7 @@ public class Crop extends Item {
     }
 
     public boolean isReadyToHarvest() {
-        return this.stage == GrowthStage.HARVESTABLE;
+        return stage == GrowthStage.HARVESTABLE;
     }
 
     public boolean wasHarvested() {
@@ -72,25 +55,28 @@ public class Crop extends Item {
     }
 
     public void update(float delta, WeatherType weather) {
-        if (isReadyToHarvest()) return;
+        if (isReadyToHarvest()) {
+            return;
+        }
 
-        float soilBonus = (block != null && block.hasWater()) ? 1.5f : 0.5f;
-        float effectiveDelta = delta * weather.getGrowthMultiplier() *
-                soilBonus * block.getWaterLevel() / 10.0f;
+        float soilBonus = block != null && block.hasWater() ? 1.5f : 0.5f;
+
+        float effectiveDelta = delta * weather.getGrowthMultiplier() * soilBonus * block.getWaterLevel() / 10.0f;
 
         currentGrowthTime += effectiveDelta;
+
         float progress = currentGrowthTime / targetGrowthTime;
 
         if (progress >= 1.0f) {
-            this.stage = GrowthStage.HARVESTABLE;
+            stage = GrowthStage.HARVESTABLE;
         } else if (progress >= 0.75f) {
-            this.stage = GrowthStage.MATURE;
+            stage = GrowthStage.MATURE;
         } else if (progress >= 0.50f) {
-            this.stage = GrowthStage.GROWING;
+            stage = GrowthStage.GROWING;
         } else if (progress >= 0.25f) {
-            this.stage = GrowthStage.BUD;
+            stage = GrowthStage.BUD;
         } else {
-            this.stage = GrowthStage.SEED;
+            stage = GrowthStage.SEED;
         }
     }
 }

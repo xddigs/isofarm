@@ -11,7 +11,8 @@ public enum BlockData {
     STONE((byte) 3, "Stone", 150, 2, 0),
     DISPENSER((byte) 4, "Dispenser", 500, 3, 0),
     TILLED_DIRT((byte) 5, "Tilled Dirt", true, 110, 4, 0, 0, 0, 0, 0),
-    WATER((byte) 6, "Water", 100, 5, 0);
+    WATER((byte) 6, "Water", 100, 5, 0),
+    CROP((byte) 7, "Crop", -1, 6, 0);
 
     public static final int ATLAS_COLS = K.UI.BLOCK_ATLAS_FRAMES;
     public static final int ATLAS_ROWS = K.UI.ICON_BLOCK_ATLAS_ROWS;

@@ -23,6 +23,7 @@ public class ChunkMeshBuilder {
 
                     BlockData data = getBlockDataById(blockId);
                     if (data == null) continue;
+                    if (data == BlockData.CROP) continue;
 
                     float vx = x;
                     float vy = y;

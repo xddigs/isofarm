@@ -27,21 +27,23 @@ void main() {
     vec4 texColor = vec4(uBaseColor, 1.0);
 
     if (uUseTexture) {
-        vec2 localUV = vTexCoord;
-        vec2 atlasOffset = uAtlasOffset;
-
+        vec2 finalUV;
         if (uUseFaceAtlas) {
+            vec2 atlasOffset;
+
             if (vNormal.y > 0.5) {
                 atlasOffset = uTopAtlasOffset;
             } else if (vNormal.y < -0.5) {
                 atlasOffset = uBottomAtlasOffset;
             } else {
-                localUV.y = 1.0 - vTexCoord.y;
                 atlasOffset = uSideAtlasOffset;
             }
+            finalUV = atlasOffset + (vTexCoord * uAtlasScale);
+
+        } else {
+            finalUV = vTexCoord;
         }
 
-        vec2 finalUV = atlasOffset + (localUV * uAtlasScale);
         texColor = texture(uTexture, finalUV);
 
         if (texColor.a < 0.1) {
@@ -50,15 +52,18 @@ void main() {
     }
 
     if (uIsMaskPass) {
-        FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+        FragColor = vec4(1.0);
         return;
     }
 
     vec3 norm = normalize(vNormal);
     vec3 lightDir = normalize(-uLightDirection);
+
     float diff = max(dot(norm, lightDir), 0.0);
+
     vec3 diffuse = diff * uSunColor * uLightIntensity;
     vec3 ambient = vec3(0.3) * uSunColor;
     vec3 totalLight = ambient + diffuse;
+
     FragColor = vec4(texColor.rgb * totalLight, texColor.a);
 }

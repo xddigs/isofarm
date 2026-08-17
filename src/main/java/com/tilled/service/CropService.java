@@ -14,10 +14,13 @@ public class CropService implements Service<Crop> {
     }
 
     public Crop plant(int x, int y, int z, Player player, Block block,
-                      CropType type, Season currentSeason) {
+                      CropType type, Season currentSeason, ToastService toastService) {
 
         if (block == null || block.getType() != BlockData.TILLED_DIRT) {
-            log.warn("Attempted to plant {} at ({}, {}) but block is not TILLED_DIRT!", type.getName(), x, z);
+            log.warn("Attempted to plant {} at ({}, {}) but block is not TILLED_DIRT!",
+                    type.getName(), x, z);
+
+            toastService.warning("You can only plant crops on tilled dirt");
             return null;
         }
 
@@ -25,9 +28,11 @@ public class CropService implements Service<Crop> {
             return null;
         }
 
-        Crop existingCrop = world.getCropAt(x, z);
+        Crop existingCrop = world.getCropAt(x, y, z);
         if (existingCrop != null) {
-            log.warn("Attempted to plant {} at ({}, {}) but a crop already exists!", type.getName(), x, z);
+            log.warn("Attempted to plant {} at ({}, {}) but a crop already exists!",
+                    type.getName(), x, z);
+            toastService.warning("A crop is already growing here!");
             return null;
         }
 
@@ -41,43 +46,44 @@ public class CropService implements Service<Crop> {
         }
 
         player.remove(seedOpt.get(), 1);
-        Crop newCrop = new Crop(x, y,  z, type, block, currentSeason);
+        Crop newCrop = new Crop(x, y, z, type, block, currentSeason);
         world.addCrop(newCrop);
         log.info("Planted {} at ({}, {}) during season {}", type.getName(), x, z, currentSeason.getName());
-
         return newCrop;
     }
 
     public void update(float delta, WeatherType weather) {
-        log.trace("Processing daily growth for {} active crops...", world.getActiveCrops().size());
-        for (Crop crop : world.getActiveCrops()) {
-            crop.update(delta, weather);
-        }
+        world.forEach(b -> {
+            if (b instanceof Crop crop) {
+                crop.update(delta, weather);
+            }
+        });
     }
 
     @SuppressWarnings("UnusedReturnValue")
-    public int harvest(Player player, Crop crop) {
+    public int harvest(Player player, Crop crop, ToastService toastService) {
         if (!crop.isReadyToHarvest()) {
             log.warn("Attempted to harvest {} " +
-                    "before it was fully grown.", crop.getType().getName());
+                    "before it was fully grown.", crop.getCropType().getName());
             return 1;
         }
 
-        int yield = crop.getType().getYield();
+        int yield = crop.getCropType().getYield();
         int cropValue = crop.getValue();
-        int seeds = crop.getType().getSeeds();
+        int seeds = crop.getCropType().getSeeds();
         player.add(crop, yield);
-        player.add(new Seed(crop.getType()), seeds);
+        player.add(new Seed(crop.getCropType()), seeds);
         crop.setHarvested(true);
         player.gain(cropValue);
         world.removeCrop(crop);
         log.info("Successfully harvested {}" +
-                " giving {} items.", crop.getType().getName(), yield);
+                " giving {} items.", crop.getCropType().getName(), yield);
+        toastService.success("You harvested " + yield + " " + crop.getCropType().getName());
         return yield;
     }
 
     public void rip(Crop crop) {
         world.removeCrop(crop);
-        log.info("Ripped {} from the ground.", crop.getType().getName());
+        log.info("Ripped {} from the ground.", crop.getCropType().getName());
     }
 }

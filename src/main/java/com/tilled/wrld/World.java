@@ -5,45 +5,96 @@ import com.tilled.data.BlockData;
 import com.tilled.data.Crop;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class World {
-    private final Map<Long, Crop> crops = new HashMap<>();
+    private final Map<Long, Block> blocks = new HashMap<>();
     private final Map<Long, Chunk> chunks = new HashMap<>();
 
     private long get2DKey(int x, int z) {
         return (((long) x) << 32) | (z & 0xFFFFFFFFL);
     }
 
-    public void addCrop(Crop crop) {
-        long key = get2DKey((int) crop.getX(), (int) crop.getZ());
-
-        crops.put(key, crop);
-    }
-
-    public void removeCrop(Crop crop) {
-        long key = get2DKey((int) crop.getX(), (int) crop.getZ());
-
-        if (crops.get(key) == crop) {
-            crops.remove(key);
-        }
-    }
-
-    public Crop getCropAt(int x, int z) {
-        return crops.get(get2DKey(x, z));
-    }
-
-    public List<Crop> getActiveCrops() {
-        return List.copyOf(crops.values());
-    }
-
     public Chunk getOrCreateChunk(int chunkX, int chunkZ) {
         long key = get2DKey(chunkX, chunkZ);
+
         return chunks.computeIfAbsent(key, k -> new Chunk(chunkX, chunkZ));
     }
 
+    public Map<Long, Chunk> getChunks() {
+        return chunks;
+    }
+
+    public Block getBlockAt(int x, int y, int z) {
+        long key = getBlockKey(x, y, z);
+        Block registeredBlock = blocks.get(key);
+
+        if (registeredBlock != null) {
+            return registeredBlock;
+        }
+
+        byte blockId = getBlockTypeAt(x, y, z);
+        if (blockId == 0) {
+            return null;
+        }
+
+        BlockData data = getBlockData(blockId);
+        if (data == null) {
+            return null;
+        }
+
+        return new Block(data, x, y, z);
+    }
+
+    public void addBlock(Block block) {
+        if (block == null) {
+            return;
+        }
+
+        blocks.put(getBlockKey(block.getX(), block.getY(), block.getZ()), block);
+    }
+
+    public void removeBlock(Block block) {
+        if (block == null) {
+            return;
+        }
+
+        long key = getBlockKey(block.getX(), block.getY(), block.getZ());
+
+        if (blocks.get(key) == block) {
+            blocks.remove(key);
+        }
+    }
+
+    public void addCrop(Crop crop) {
+        addBlock(crop);
+    }
+
+    public void removeCrop(Crop crop) {
+        removeBlock(crop);
+    }
+
+    public Crop getCropAt(int x, int y, int z) {
+        Block block = blocks.get(getBlockKey(x, y, z));
+        if (block instanceof Crop crop) {
+            return crop;
+        }
+        return null;
+    }
+
+    public Map<Long, Block> getBlocks() {
+        return blocks;
+    }
+
+    public void forEach(Consumer<Block> consumer) {
+        for (Block block : blocks.values()) {
+            consumer.accept(block);
+        }
+    }
+
     public int getChunkBlockTypeAt(int x, int y, int z) {
+
         int chunkX = Math.floorDiv(x, Chunk.SIZE_X);
         int chunkZ = Math.floorDiv(z, Chunk.SIZE_Z);
 
@@ -56,6 +107,7 @@ public class World {
     }
 
     public byte getBlockTypeAt(int x, int y, int z) {
+
         if (y < 0 || y >= Chunk.SIZE_Y) {
             return 0;
         }
@@ -75,22 +127,8 @@ public class World {
         return chunk.getBlock(localX, y, localZ);
     }
 
-    public Block getBlockAt(int x, int y, int z) {
-        byte blockId = getBlockTypeAt(x, y, z);
-
-        if (blockId == 0) {
-            return null;
-        }
-
-        for (BlockData data : BlockData.values()) {
-            if (data.getId() == blockId) {
-                return new Block(data, x, y, z);
-            }
-        }
-        return null;
-    }
-
     public void setBlockTypeAt(int x, int y, int z, byte blockId) {
+
         if (y < 0 || y >= Chunk.SIZE_Y) {
             return;
         }
@@ -98,8 +136,10 @@ public class World {
         int chunkX = Math.floorDiv(x, Chunk.SIZE_X);
         int chunkZ = Math.floorDiv(z, Chunk.SIZE_Z);
         Chunk chunk = getOrCreateChunk(chunkX, chunkZ);
+
         int localX = Math.floorMod(x, Chunk.SIZE_X);
         int localZ = Math.floorMod(z, Chunk.SIZE_Z);
+
         chunk.setBlock(localX, y, localZ, blockId);
     }
 
@@ -108,16 +148,17 @@ public class World {
             return 0;
         }
 
-        int chunkX = x >> 4;
-        int chunkZ = z >> 4;
+        int chunkX = Math.floorDiv(x, Chunk.SIZE_X);
+        int chunkZ = Math.floorDiv(z, Chunk.SIZE_Z);
+
         Chunk chunk = chunks.get(get2DKey(chunkX, chunkZ));
 
         if (chunk == null) {
             return 0;
         }
 
-        int localX = x & 15;
-        int localZ = z & 15;
+        int localX = Math.floorMod(x, Chunk.SIZE_X);
+        int localZ = Math.floorMod(z, Chunk.SIZE_Z);
 
         return chunk.getWaterLevel(localX, y, localZ);
     }
@@ -127,15 +168,29 @@ public class World {
             return;
         }
 
-        int chunkX = x >> 4;
-        int chunkZ = z >> 4;
+        int chunkX = Math.floorDiv(x, Chunk.SIZE_X);
+        int chunkZ = Math.floorDiv(z, Chunk.SIZE_Z);
+
         Chunk chunk = getOrCreateChunk(chunkX, chunkZ);
-        int localX = x & 15;
-        int localZ = z & 15;
+
+        int localX = Math.floorMod(x, Chunk.SIZE_X);
+        int localZ = Math.floorMod(z, Chunk.SIZE_Z);
+
         chunk.setWaterLevel(localX, y, localZ, waterLevel);
     }
 
-    public Map<Long, Chunk> getChunks() {
-        return chunks;
+    private long getBlockKey(int x, int y, int z) {
+        long keyXZ = get2DKey(x, z);
+        return keyXZ ^ ((long) y * 0x9E3779B97F4A7C15L);
+    }
+
+    private BlockData getBlockData(byte blockId) {
+        for (BlockData data : BlockData.values()) {
+            if (data.getId() == blockId) {
+                return data;
+            }
+        }
+
+        return null;
     }
 }

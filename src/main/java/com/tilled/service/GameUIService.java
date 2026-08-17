@@ -28,6 +28,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 @SuppressWarnings("all")
 public class GameUIService implements Service<GameMaster> {
     private static final Logger log = LoggerFactory.getLogger(GameUIService.class);
+    private final GameMaster gameMaster;
     private final ImGuiImplGlfw imGuiGlfw = new ImGuiImplGlfw();
     private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
     private final ImString nameBuffer = new ImString("", K.UI.PLAYER_NAME_MAX_LENGTH);
@@ -47,10 +48,11 @@ public class GameUIService implements Service<GameMaster> {
     private float actionDisplayTimer = 0.0f;
     private Item selectedInventoryItem = null;
 
-    public GameUIService(long windowHandle, CommandService commandService,
+    public GameUIService(long windowHandle, GameMaster gameMaster, CommandService commandService,
                          ToastService toastService, SpriteSheet seedIcons,
                          SpriteSheet cropIcons, SpriteSheet blockIcons,
                          SpriteSheet toolIcons) {
+        this.gameMaster = gameMaster;
         this.commandService = commandService;
         this.toastService = toastService;
         this.seedIcons = seedIcons;
@@ -96,8 +98,8 @@ public class GameUIService implements Service<GameMaster> {
             return seed.getType().getId();
         }
 
-        if (item instanceof Crop crop && crop.getType() != null) {
-            return crop.getType().getId();
+        if (item instanceof Crop crop && crop.getCropType() != null) {
+            return crop.getCropType().getId();
         }
 
         if (item instanceof Block block && block.getType() != null) {
@@ -259,7 +261,8 @@ public class GameUIService implements Service<GameMaster> {
             return;
         }
 
-        Crop crop = world.getCropAt(hoveredCell.x(), hoveredCell.y());
+        Crop crop = world.getCropAt(hoveredCell.x(),
+                hoveredCell.y(), hoveredCell.z());
 
         boolean hasCrop = crop != null;
         boolean hasSeedSelected = !hasCrop && selectedInventoryItem instanceof Seed;
@@ -282,7 +285,7 @@ public class GameUIService implements Service<GameMaster> {
         ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, K.UI.TOOLTIP_ITEM_SPACING_X, K.Style.LINEHEIGHT);
 
         if (hasCrop) {
-            ImGui.text(crop.getType().getName());
+            ImGui.text(crop.getCropType().getName());
             ImGui.textDisabled("Status: " + crop.getStage().getName());
 
         } else if (selectedInventoryItem instanceof Seed seed){

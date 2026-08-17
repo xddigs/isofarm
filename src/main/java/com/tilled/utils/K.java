@@ -25,7 +25,7 @@ public final class K {
         public static final int STARTING_GRID_SIZE = 2;
         public static final float TILE_SIZE = 1.0f;
         public static final float DEFAULT_BLOCK_DEPTH = 0.4f;
-        public static final float CROP_ELEVATION_Y = 0.0f;
+        public static final float CROP_Y_OFFSET = 1.0f;
         public static final float WEATHER_CHANGE_PROBABILITY = 0.01f;
 
         public static final int STARTING_COINS = 100;
@@ -125,7 +125,7 @@ public final class K {
         public static final float COORD_DISPLAY_DURATION = 3.0f;
 
         public static final int ICON_SEED_CROPS_FRAMES = 4;
-        public static final int ICON_BLOCK_FRAMES = 6;
+        public static final int ICON_BLOCK_FRAMES = 7;
         public static final int ICON_TOOL_FRAMES = 3;
 
         public static final int BLOCK_ATLAS_FRAMES = 5;
