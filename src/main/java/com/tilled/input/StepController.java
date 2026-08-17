@@ -9,30 +9,29 @@ import org.joml.Vector3f;
 
 public class StepController {
     private float stepDistanceAccumulator = 0.0f;
-    private static final float STEP_DISTANCE_THRESHOLD = 1.8f;
+    private static final float STEP_DISTANCE_THRESHOLD = 1.6f;
+    private final Vector3f lastPosition = new Vector3f();
 
     public void update(Player player, World world, SoundService soundService, float delta) {
-        if (!player.isOnGround()) {
-            stepDistanceAccumulator = 0.0f;
+        if (player == null) return;
+        Vector3f currentPos = player.getPosition();
+        float dx = currentPos.x - lastPosition.x;
+        float dz = currentPos.z - lastPosition.z;
+        float distanceMoved = (float) Math.sqrt(dx * dx + dz * dz);
+
+        lastPosition.set(currentPos);
+        if (distanceMoved < 0.001f || distanceMoved > 2.0f) {
             return;
         }
 
-        Vector3f vel = player.getVelocity();
-        float horizontalSpeed = (float) Math.sqrt(vel.x * vel.x + vel.z * vel.z);
+        stepDistanceAccumulator += distanceMoved;
 
-        if (horizontalSpeed < 0.1f) {
-            stepDistanceAccumulator = 0.0f;
-            return;
-        }
-
-        stepDistanceAccumulator += horizontalSpeed * delta;
         if (stepDistanceAccumulator >= STEP_DISTANCE_THRESHOLD) {
             stepDistanceAccumulator -= STEP_DISTANCE_THRESHOLD;
 
-            Vector3f pos = player.getPosition();
-            int blockX = (int) Math.floor(pos.x);
-            int blockY = (int) Math.floor(pos.y - 0.2f);
-            int blockZ = (int) Math.floor(pos.z);
+            int blockX = (int) Math.floor(currentPos.x);
+            int blockY = (int) Math.floor(currentPos.y - 0.5f);
+            int blockZ = (int) Math.floor(currentPos.z);
 
             Block block = world.getBlockAt(blockX, blockY, blockZ);
             if (block != null && block.getType() != null) {
