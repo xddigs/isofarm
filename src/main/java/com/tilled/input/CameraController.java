@@ -4,6 +4,7 @@ import com.tilled.data.Player;
 import com.tilled.graphics.Camera;
 import com.tilled.service.Service;
 import com.tilled.utils.K;
+import com.tilled.utils.Settings;
 import com.tilled.wrld.GameMaster;
 import org.joml.Vector3f;
 
@@ -95,8 +96,8 @@ public class CameraController implements Service<Camera> {
         float dx = Mouse.getDeltaX();
         float dy = Mouse.getDeltaY();
 
-        float newYaw = camera.getYaw() + dx * K.Camera.ROTATION_SENSITIVITY;
-        float newPitch = camera.getPitch() + dy * K.Camera.ROTATION_SENSITIVITY;
+        float newYaw = camera.getYaw() + dx * Settings.mouseSensitivity;
+        float newPitch = camera.getPitch() + dy * Settings.mouseSensitivity;
 
         camera.setYaw(newYaw);
         camera.setPitch(Math.clamp(newPitch, -89.0f, 89.0f));

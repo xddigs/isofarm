@@ -73,7 +73,7 @@ public class Mesh {
             if (idxBuffer != null) MemoryUtil.memFree(idxBuffer);
         }
 
-        log.info("Mesh created successfully [VAO ID: {}, Vertices: {}]", vaoId, vertexCount);
+        log.trace("Mesh created successfully [VAO ID: {}, Vertices: {}]", vaoId, vertexCount);
     }
 
     public int getIndicesCount() {

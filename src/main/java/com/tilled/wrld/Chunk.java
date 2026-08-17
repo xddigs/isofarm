@@ -5,7 +5,7 @@ import com.tilled.data.DataClass;
 @DataClass
 public class Chunk {
     public static final int SIZE_X = 16;
-    public static final int SIZE_Y = 64;
+    public static final int SIZE_Y = 128;
     public static final int SIZE_Z = 16;
 
     private final int chunkX;

@@ -8,7 +8,9 @@ import com.tilled.input.Keyboard;
 import com.tilled.input.Mouse;
 import com.tilled.service.*;
 import com.tilled.utils.K;
+import com.tilled.utils.Settings;
 import imgui.ImGui;
+import org.joml.FrustumIntersection;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.slf4j.Logger;
@@ -42,7 +44,9 @@ public class GameMaster {
     private final CommandRegistry commandRegistry;
     private final ItemRegistry itemRegistry;
     private final Map<CropType, SpriteSheet> cropSpritesheets;
-    private final Matrix4f modelMatrix = new Matrix4f();
+    private final Matrix4f modelMatrix;
+    private final Matrix4f viewProjMatrix;
+    private final FrustumIntersection frustum;
     private final Sunlight sunlight;
     private Shader defaultShader;
     private Shader outlineShader;
@@ -76,9 +80,15 @@ public class GameMaster {
     private boolean isHUDShown = true;
 
     private float genDelta;
+    private int lastPlayerChunkX = Integer.MAX_VALUE;
+    private int lastPlayerChunkZ = Integer.MAX_VALUE;
 
     public GameMaster(long windowHandle) {
         this.windowHandle = windowHandle;
+        this.modelMatrix = new Matrix4f();
+        this.viewProjMatrix = new Matrix4f();
+        this.frustum = new FrustumIntersection();
+
         this.world = new World();
         this.generator = new WorldGenerator(world);
         this.chunkMeshes = new HashMap<>();
@@ -92,7 +102,7 @@ public class GameMaster {
         this.particles = new ParticleEngine();
         this.rainEngine = new RainEngine();
 
-        int chunkAmount = K.World.STARTING_GRID_SIZE;
+        int chunkAmount = K.World.MAP_WORLD_SIZE;
         for (int cx = -chunkAmount; cx < chunkAmount; cx++) {
             for (int cz = -chunkAmount; cz < chunkAmount; cz++) {
                 generator.generateChunk(cx, cz);
@@ -148,7 +158,7 @@ public class GameMaster {
         cropSpritesheets.put(CropType.POTATO, potato);
         cropSpritesheets.put(CropType.BEETROOT, beetroot);
 
-        this.camera = new Camera(K.Camera.DEFAULT_WIDTH, K.Camera.DEFAULT_HEIGHT);
+        this.camera = new Camera(K.Camera.DEFAULT_WIDTH, K.Camera.DEFAULT_HEIGHT, Settings.renderDistance);
         this.camera.setPosition(0.0f, 0.0f, 0.0f);
         this.cameraController = new CameraController(camera);
         this.weatherService = new WeatherService(rainEngine, camera);
@@ -157,8 +167,8 @@ public class GameMaster {
                 timeService, particles, camera, blocksTexture);
 
         recenter();
-        log.info("GameMaster initialized with grid size: {}x{}", K.World.STARTING_GRID_SIZE,
-                K.World.STARTING_GRID_SIZE);
+        log.info("GameMaster initialized with grid size: {}x{}", K.World.MAP_WORLD_SIZE,
+                K.World.MAP_WORLD_SIZE);
     }
 
     public long getWindowHandle() {
@@ -199,6 +209,22 @@ public class GameMaster {
 
     public Camera getCamera() {
         return camera;
+    }
+
+    public int getLastPlayerChunkX() {
+        return lastPlayerChunkX;
+    }
+
+    public int getLastPlayerChunkZ() {
+        return lastPlayerChunkZ;
+    }
+
+    public void setLastPlayerChunkX(int lastPlayerChunkX) {
+        this.lastPlayerChunkX = lastPlayerChunkX;
+    }
+
+    public void setLastPlayerChunkZ(int lastPlayerChunkZ) {
+        this.lastPlayerChunkZ = lastPlayerChunkZ;
     }
 
     public boolean isPromptingForInput() {
@@ -255,13 +281,60 @@ public class GameMaster {
         Item selectedInventoryItem = gameUIservice.getSelectedInventoryItem();
 
         if (!ImGui.getIO().getWantCaptureMouse()) {
-            hoveredCell = gameInteraction.update(this,selectedInventoryItem);
+            hoveredCell = gameInteraction.update(this, selectedInventoryItem);
         } else {
             hoveredCell = null;
         }
 
+        if (player != null) {
+            int playerChunkX = Math.floorDiv((int) player.getPosition().x, Chunk.SIZE_X);
+            int playerChunkZ = Math.floorDiv((int) player.getPosition().z, Chunk.SIZE_Z);
+
+            if (playerChunkX != lastPlayerChunkX || playerChunkZ != lastPlayerChunkZ) {
+                updateLoadedChunks(playerChunkX, playerChunkZ);
+                lastPlayerChunkX = playerChunkX;
+                lastPlayerChunkZ = playerChunkZ;
+            }
+        }
+
         Mouse.update();
         Keyboard.update();
+    }
+
+    private void updateLoadedChunks(int centerChunkX, int centerChunkZ) {
+        int r = Settings.renderDistance;
+        int unloadDist = r + Settings.unloadMargin;
+        chunkMeshes.entrySet().removeIf(entry -> {
+            Chunk chunk = entry.getKey();
+            int dx = Math.abs(chunk.getChunkX() - centerChunkX);
+            int dz = Math.abs(chunk.getChunkZ() - centerChunkZ);
+
+            if (dx > unloadDist || dz > unloadDist) {
+                Mesh mesh = entry.getValue();
+                if (mesh != null) {
+                    mesh.dispose();
+                }
+                world.getChunks().remove(chunk.getChunkX(), chunk.getChunkZ());
+                return true;
+            }
+            return false;
+        });
+
+        for (int cx = centerChunkX - r; cx <= centerChunkX + r; cx++) {
+            for (int cz = centerChunkZ - r; cz <= centerChunkZ + r; cz++) {
+                if ((cx - centerChunkX) * (cx - centerChunkX) + (cz - centerChunkZ) * (cz - centerChunkZ) > r * r) {
+                    continue;
+                }
+
+                Chunk chunk = world.getOrCreateChunk(cx, cz);
+                if (!chunkMeshes.containsKey(chunk)) {
+                    generator.generateChunk(cx, cz);
+
+                    Mesh mesh = ChunkMeshBuilder.buildMesh(chunk);
+                    chunkMeshes.put(chunk, mesh);
+                }
+            }
+        }
     }
 
     public void render() {
@@ -296,12 +369,22 @@ public class GameMaster {
             defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
         }
 
+        viewProjMatrix.set(camera.getProjectionMatrix()).mul(camera.getViewMatrix());
+        frustum.set(viewProjMatrix);
+
         chunkMeshes.forEach((chunk, mesh) -> {
             if (mesh != null && mesh.getIndicesCount() > 0) {
-                modelMatrix.identity().translate(chunk.getChunkX() * Chunk.SIZE_X, 0,
-                        chunk.getChunkZ() * Chunk.SIZE_Z);
-                defaultShader.setUniform("uModel", modelMatrix);
-                mesh.render();
+                float minX = chunk.getChunkX() * Chunk.SIZE_X;
+                float minY = 0;
+                float minZ = chunk.getChunkZ() * Chunk.SIZE_Z;
+                float maxX = minX + Chunk.SIZE_X;
+                float maxY = Chunk.SIZE_Y;
+                float maxZ = minZ + Chunk.SIZE_Z;
+                if (frustum.testAab(minX, minY, minZ, maxX, maxY, maxZ)) {
+                    modelMatrix.identity().translate(minX, 0, minZ);
+                    defaultShader.setUniform("uModel", modelMatrix);
+                    mesh.render();
+                }
             }
         });
 
@@ -399,7 +482,7 @@ public class GameMaster {
                 this.player = new Player(gameUIservice.getEnteredPlayerName(),
                         world, toastService);
 
-                float center = (K.World.STARTING_GRID_SIZE - 1) / 2.0f;
+                float center = (K.World.MAP_WORLD_SIZE - 1) / 2.0f;
                 float worldCenter = center * K.World.TILE_SIZE;
 
                 float spawnY = world.getHighestY(worldCenter, worldCenter) + 1.0f;
@@ -461,7 +544,7 @@ public class GameMaster {
     }
 
     public void recenter() {
-        float center = (K.World.STARTING_GRID_SIZE - 1) / 2.0f;
+        float center = (K.World.MAP_WORLD_SIZE - 1) / 2.0f;
         float worldCenter = center * K.World.TILE_SIZE;
         this.camera.setPosition(worldCenter, 0.0f, worldCenter);
     }
@@ -475,7 +558,8 @@ public class GameMaster {
         this.windowHeight = newHeight;
 
         if (camera != null) {
-            camera.updateProjection(newWidth, newHeight);
+            camera.updateProjection(newWidth, newHeight,
+                    Settings.renderDistance);
         }
 
         if (maskFbo != null) {

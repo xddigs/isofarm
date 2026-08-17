@@ -10,6 +10,10 @@ public class Inventory {
 
     public Inventory() {
         this.slots = new ArrayList<>();
+
+        for (int i = 0; i < K.World.TOTAL_SLOTS; i++) {
+            this.slots.add(new InventorySlot());
+        }
     }
 
     public Map<Item, Integer> getItems() {
@@ -30,9 +34,7 @@ public class Inventory {
             if (!slot.isEmpty() && slot.getItem().equals(item)) {
                 int current = slot.getItem().getAmount();
                 long newAmount = (long) current + amount;
-                int cappedAmount = (int) Math.min(newAmount, K.World.MAX_STACK);
-
-                slot.getItem().setAmount(cappedAmount);
+                slot.getItem().setAmount((int) Math.min(newAmount, K.World.MAX_STACK));
                 return;
             }
         }
@@ -44,8 +46,6 @@ public class Inventory {
                 return;
             }
         }
-
-        slots.add(new InventorySlot(item));
     }
 
 
@@ -67,39 +67,17 @@ public class Inventory {
     }
 
     public void pickAndDrop(int fromIndex, int toIndex) {
-        if (!isValidIndex(fromIndex) || !isValidIndex(toIndex)) {
-            return;
-        }
-
-        if (fromIndex == toIndex) {
+        if (!isValidIndex(fromIndex) || !isValidIndex(toIndex) ||
+                fromIndex == toIndex) {
             return;
         }
 
         InventorySlot from = slots.get(fromIndex);
         InventorySlot to = slots.get(toIndex);
-
-        if (from.isEmpty()) {
-            return;
-        }
-
-        Item fromItem = from.getItem();
-        int fromAmount = from.getItem().getAmount();
-
-        if (to.isEmpty()) {
-            to.setItem(fromItem);
-            to.getItem().setAmount(fromAmount);
-            from.clear();
-            return;
-        }
-
-        Item toItem = to.getItem();
-        int toAmount = to.getItem().getAmount();
-
-        to.setItem(fromItem);
-        to.getItem().setAmount(fromAmount);
-
-        from.setItem(toItem);
-        from.getItem().setAmount(toAmount);
+        if (from.isEmpty()) return;
+        Item temp = from.getItem();
+        from.setItem(to.getItem());
+        to.setItem(temp);
     }
 
 

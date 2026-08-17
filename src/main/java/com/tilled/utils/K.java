@@ -2,17 +2,16 @@ package com.tilled.utils;
 
 import org.joml.Vector3f;
 
+@Utils
 public final class K {
     private K() {
     }
 
     public static final class Camera {
-        public static final float DEFAULT_FOV = 80.0f;
         public static final float DEFAULT_PITCH = 35.264f;
         public static final float DEFAULT_YAW = -45.0f;
         public static final float DEFAULT_WIDTH = 16.0f;
         public static final float DEFAULT_HEIGHT = 8.0f;
-        public static final float ROTATION_SENSITIVITY = 0.40f;
         public static final float MOVEMENT_SPEED = 6.0f;
     }
 
@@ -20,7 +19,7 @@ public final class K {
         public static final float GRAVITY = -25.0f;
         public static final float JUMP_FORCE = 8.0f;
 
-        public static final int STARTING_GRID_SIZE = 24;
+        public static final int MAP_WORLD_SIZE = 96;
         public static final float TILE_SIZE = 1.0f;
         public static final float DEFAULT_BLOCK_DEPTH = 0.4f;
         public static final float WEATHER_CHANGE_PROBABILITY = 0.01f;

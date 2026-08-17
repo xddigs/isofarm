@@ -2,6 +2,7 @@ package com.tilled.graphics;
 
 import com.tilled.data.Hit;
 import com.tilled.utils.K;
+import com.tilled.utils.Settings;
 import com.tilled.wrld.World;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -11,30 +12,39 @@ public class Camera {
     private static final float MAX_RAY_DISTANCE = 100.0f;
     private static final float MIN_PITCH = -89.0f;
     private static final float MAX_PITCH = 89.0f;
-    private static final float FOV = K.Camera.DEFAULT_FOV;
     private static final float ZOOM_FOV = 30.0f;
     private static final float ZOOM_SPEED = 12.0f;
     private final Vector3f position;
     private final Matrix4f projectionMatrix;
     private float pitch = K.Camera.DEFAULT_PITCH;
     private float yaw = K.Camera.DEFAULT_YAW;
-    private float currentFov = FOV;
-    private float targetFov = FOV;
+    private float currentFov = Settings.fov;
+    private float targetFov = Settings.fov;
     private float aspectRatio = 1.0f;
 
-    public Camera(float width, float height) {
+    public Camera(float width, float height, int renderDistanceChunks) {
         this.position = new Vector3f(0.0f, 0.0f, 0.0f);
         this.projectionMatrix = new Matrix4f();
-        updateProjection(width, height);
+        updateProjection(width, height, renderDistanceChunks);
     }
 
-    public void updateProjection(float width, float height) {
+    public float getFov() {
+        return currentFov;
+    }
+
+    public void setFov(float currentFov) {
+        this.currentFov = currentFov;
+    }
+
+    public void updateProjection(float width, float height,
+                                 int renderDistanceChunks) {
         this.aspectRatio = width / Math.max(height, 1.0f);
+        float farPlane = (renderDistanceChunks + 2) * 16.0f;
         this.projectionMatrix.identity().perspective(
                 (float) Math.toRadians(currentFov),
                 aspectRatio,
                 0.1f,
-                1000.0f);
+                farPlane);
     }
 
     public void update(float delta) {
@@ -107,12 +117,8 @@ public class Camera {
         this.position.set(x, y, z);
     }
 
-    public float getFov() {
-        return currentFov;
-    }
-
     public void setZooming(boolean zooming) {
-        targetFov = zooming ? ZOOM_FOV : FOV;
+        targetFov = zooming ? Settings.fov / 2.5f : Settings.fov;
     }
 
     public Hit highlight(World world) {

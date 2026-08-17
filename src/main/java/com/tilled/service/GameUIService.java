@@ -4,10 +4,12 @@ import com.tilled.data.*;
 import com.tilled.graphics.SpriteSheet;
 import com.tilled.input.Mouse;
 import com.tilled.utils.K;
+import com.tilled.utils.Settings;
 import com.tilled.wrld.GameMaster;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.ImGuiStyle;
+import imgui.ImVec2;
 import imgui.flag.*;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
@@ -170,12 +172,83 @@ public class GameUIService implements Service<GameMaster> {
         if (gameMaster.isInventoryOpen()) {
             renderInv();
             renderShop();
+            renderSliders();
         }
 
         renderHotbar();
         renderHotbarLabel();
         renderToasts();
-        renderCrosshair(windowWidth, windowHeight);
+
+        if (!gameMaster.isInventoryOpen()) {
+            renderCrosshair(windowWidth, windowHeight);
+        }
+    }
+
+    private void renderSliders() {
+        if (player == null) return;
+
+        ImGui.setNextWindowPos(20, 20, ImGuiCond.Always);
+        ImGui.setNextWindowSize(300, 260, ImGuiCond.Always);
+
+        int flags = ImGuiWindowFlags.NoTitleBar |
+                ImGuiWindowFlags.NoResize |
+                ImGuiWindowFlags.NoCollapse |
+                ImGuiWindowFlags.NoMove |
+                ImGuiWindowFlags.NoScrollbar |
+                ImGuiWindowFlags.NoScrollWithMouse;
+
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowRounding, K.Style.WINDOW_ROUNDING);
+        ImGui.pushStyleVar(ImGuiStyleVar.FrameRounding, K.Style.FRAME_ROUNDING);
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, K.Style.WINDOW_PADDING_X, K.Style.WINDOW_PADDING_Y);
+        ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, K.Style.ITEM_SPACING, K.Style.ITEM_SPACING_Y);
+
+        ImGui.pushStyleColor(ImGuiCol.WindowBg, K.Style.COLOR_WINDOW_BG[0], K.Style.COLOR_WINDOW_BG[1], K.Style.COLOR_WINDOW_BG[2], K.Style.COLOR_WINDOW_BG[3]);
+        ImGui.pushStyleColor(ImGuiCol.FrameBg, K.Style.COLOR_SLOT_BG[0], K.Style.COLOR_SLOT_BG[1], K.Style.COLOR_SLOT_BG[2], K.Style.COLOR_SLOT_BG[3]);
+        ImGui.pushStyleColor(ImGuiCol.FrameBgHovered, K.Style.COLOR_SLOT_HOVERED[0], K.Style.COLOR_SLOT_HOVERED[1], K.Style.COLOR_SLOT_HOVERED[2], K.Style.COLOR_SLOT_HOVERED[3]);
+        ImGui.pushStyleColor(ImGuiCol.FrameBgActive, K.Style.COLOR_SLOT_BORDER[0], K.Style.COLOR_SLOT_BORDER[1], K.Style.COLOR_SLOT_BORDER[2], K.Style.COLOR_SLOT_BORDER[3]);
+
+        ImGui.pushStyleColor(ImGuiCol.SliderGrab, K.Style.COLOR_SLOT_BORDER_SEL[0], K.Style.COLOR_SLOT_BORDER_SEL[1], K.Style.COLOR_SLOT_BORDER_SEL[2], K.Style.COLOR_SLOT_BORDER_SEL[3]);
+        ImGui.pushStyleColor(ImGuiCol.SliderGrabActive, K.Style.COLOR_BUTTON_HOVERED[0], K.Style.COLOR_BUTTON_HOVERED[1], K.Style.COLOR_BUTTON_HOVERED[2], K.Style.COLOR_BUTTON_HOVERED[3]);
+        ImGui.pushStyleColor(ImGuiCol.Text, K.Style.COLOR_TEXT[0], K.Style.COLOR_TEXT[1], K.Style.COLOR_TEXT[2], K.Style.COLOR_TEXT[3]);
+
+        if (ImGui.begin("HUD_Settings_Panel", flags)) {
+            ImGui.textColored(0.00f, 0.80f, 0.95f, 1.00f, "Settings");
+            ImGui.separator();
+
+            int[] rdBuffer = new int[]{ Settings.renderDistance };
+            ImGui.textDisabled("Render");
+            ImGui.pushItemWidth(-1);
+            if (ImGui.sliderInt("##RenderDistance", rdBuffer, 2, 16, "%d Chunks")) {
+                Settings.renderDistance = rdBuffer[0];
+                if (gameMaster != null && gameMaster.getCamera() != null) {
+                    gameMaster.getCamera().updateProjection(windowWidth, windowHeight, Settings.renderDistance);
+                    gameMaster.setLastPlayerChunkX(Integer.MAX_VALUE);
+                }
+            }
+            ImGui.popItemWidth();
+
+            float[] fovBuffer = new float[]{ Settings.fov };
+            ImGui.textDisabled("FOV");
+            ImGui.pushItemWidth(-1);
+            if (ImGui.sliderFloat("##FOV", fovBuffer, 60.0f, 110.0f, "%.0f°")) {
+                Settings.fov = fovBuffer[0];
+                if (gameMaster != null && gameMaster.getCamera() != null) {
+                    gameMaster.getCamera().setFov(Settings.fov);
+                }
+            }
+            ImGui.popItemWidth();
+
+            float[] sensBuffer = new float[]{ Settings.mouseSensitivity };
+            ImGui.textDisabled("Sensivity");
+            ImGui.pushItemWidth(-1);
+            if (ImGui.sliderFloat("##Sensitivity", sensBuffer, 0.05f, 1.0f, "%.2f")) {
+                Settings.mouseSensitivity = sensBuffer[0];
+            }
+            ImGui.popItemWidth();
+        }
+        ImGui.end();
+        ImGui.popStyleColor(6);
+        ImGui.popStyleVar(4);
     }
 
     public void renderToasts() {
@@ -428,13 +501,10 @@ public class GameUIService implements Service<GameMaster> {
             float cursorX = ImGui.getCursorPosX();
             float cursorY = ImGui.getCursorPosY();
 
-            ImGui.getWindowDrawList().addRectFilled(
-                    x, y, x + 4.0f, y,
-                    ImGui.getColorU32(
-                            accent[0], accent[1], accent[2], accent[3]));
+            ImGui.getWindowDrawList().addRectFilled(x, y, x + 4.0f, y,
+                    ImGui.getColorU32(accent[0], accent[1], accent[2], accent[3]));
 
-            ImGui.pushStyleColor(ImGuiCol.Text,
-                    accent[0], accent[1], accent[2], accent[3]);
+            ImGui.pushStyleColor(ImGuiCol.Text,accent[0], accent[1], accent[2], accent[3]);
 
             ImGui.setCursorPos(cursorX + K.UI.TOAST_PADDING_X, cursorY);
             ImGui.text(getToastPrefix(toast.getType()));
@@ -464,36 +534,36 @@ public class GameUIService implements Service<GameMaster> {
 
     private float[] getToastAccent(ToastData type) {
         return switch (type) {
-            case SUCCESS  -> K.Style.COLOR_TOAST_SUCCESS;
-            case INFO     -> K.Style.COLOR_TOAST_INFO;
-            case WARNING  -> K.Style.COLOR_TOAST_WARNING;
-            case ERROR    -> K.Style.COLOR_TOAST_ERROR;
-            case REWARD   -> K.Style.COLOR_TOAST_REWARD;
+            case SUCCESS -> K.Style.COLOR_TOAST_SUCCESS;
+            case INFO -> K.Style.COLOR_TOAST_INFO;
+            case WARNING -> K.Style.COLOR_TOAST_WARNING;
+            case ERROR -> K.Style.COLOR_TOAST_ERROR;
+            case REWARD -> K.Style.COLOR_TOAST_REWARD;
             case PURCHASE -> K.Style.COLOR_TOAST_SUCCESS;
-            case SELL     -> K.Style.COLOR_TOAST_REWARD;
+            case SELL -> K.Style.COLOR_TOAST_REWARD;
         };
     }
 
     private float[] getToastBackground(ToastData type) {
         return switch (type) {
-            case SUCCESS  -> K.Style.COLOR_TOAST_SUCCESS_BG;
-            case INFO     -> K.Style.COLOR_TOAST_INFO_BG;
-            case WARNING  -> K.Style.COLOR_TOAST_WARNING_BG;
-            case ERROR    -> K.Style.COLOR_TOAST_ERROR_BG;
-            case REWARD   -> K.Style.COLOR_TOAST_REWARD_BG;
+            case SUCCESS -> K.Style.COLOR_TOAST_SUCCESS_BG;
+            case INFO -> K.Style.COLOR_TOAST_INFO_BG;
+            case WARNING -> K.Style.COLOR_TOAST_WARNING_BG;
+            case ERROR -> K.Style.COLOR_TOAST_ERROR_BG;
+            case REWARD -> K.Style.COLOR_TOAST_REWARD_BG;
             case PURCHASE -> K.Style.COLOR_TOAST_SUCCESS_BG;
-            case SELL     -> K.Style.COLOR_TOAST_REWARD_BG;
+            case SELL -> K.Style.COLOR_TOAST_REWARD_BG;
         };
     }
 
     private String getToastPrefix(ToastData type) {
         return switch (type) {
             case PURCHASE, SUCCESS -> "+";
-            case SELL              -> "**";
-            case INFO              -> "i";
-            case WARNING           -> "!";
-            case ERROR             -> "X";
-            case REWARD            -> "*";
+            case SELL -> "**";
+            case INFO -> "i";
+            case WARNING -> "!";
+            case ERROR -> "X";
+            case REWARD -> "*";
         };
     }
 
@@ -603,143 +673,149 @@ public class GameUIService implements Service<GameMaster> {
 
     public void renderInv() {
         if (player == null) return;
-        Inventory inv = player.getInventory();
 
+        Inventory inv = player.getInventory();
         int columns = K.UI.HOTBAR_SLOTS;
         int rows = (int) Math.ceil((double) K.World.TOTAL_SLOTS / columns);
-
-        Map<String, Map.Entry<Item, Integer>> aggregated =
-                new LinkedHashMap<>();
-        for (Map.Entry<Item, Integer> entry : inv.getItems().entrySet()) {
-            String name = entry.getKey().getName();
-            if (aggregated.containsKey(name)) {
-                int previousAmount = aggregated.get(name).getValue();
-                aggregated.put(name, new AbstractMap.SimpleEntry<>(
-                        entry.getKey(), previousAmount + entry.getValue()));
-            } else {
-                aggregated.put(name, entry);
-            }
-        }
 
         float slotWidth = K.UI.ICON_SIZE + K.Style.FRAME_PADDING_X * 2.0f;
         float slotHeight = K.UI.ICON_SIZE + K.Style.FRAME_PADDING_Y * 2.0f;
 
-        float inventoryWidth = columns * slotWidth
-                + (columns - 1) * K.Style.ITEM_SPACING
-                + K.Style.WINDOW_PADDING_X * 2.0f;
-        float inventoryHeight = rows * slotHeight
-                + (rows - 1) * K.Style.ITEM_SPACING
-                + K.Style.WINDOW_PADDING_Y * 3.0f
-                + ImGui.getTextLineHeight() * 2.0f
-                + K.Style.ITEM_SPACING;
+        float inventoryWidth = columns * slotWidth + (columns - 1) * K.Style.ITEM_SPACING +
+                K.Style.WINDOW_PADDING_X * 2.0f;
+        float inventoryHeight = rows * slotHeight + (rows - 1) * K.Style.ITEM_SPACING +
+                K.Style.WINDOW_PADDING_Y * 3.0f + ImGui.getTextLineHeight() * 2.0f + K.Style.ITEM_SPACING;
 
-        ImGui.setNextWindowPos(
-                windowWidth / 2.0f, windowHeight / 2.0f,
-                ImGuiCond.Always, 0.5f, 0.5f);
+        ImGui.setNextWindowPos(windowWidth / 2.0f, windowHeight / 2.0f, ImGuiCond.Always, 0.5f, 0.5f);
+        ImGui.setNextWindowSize(inventoryWidth, inventoryHeight, ImGuiCond.Always);
 
-        ImGui.setNextWindowSize(
-                inventoryWidth, inventoryHeight, ImGuiCond.Always);
-
-        int flags = ImGuiWindowFlags.NoTitleBar
-                | ImGuiWindowFlags.NoResize
-                | ImGuiWindowFlags.NoCollapse
-                | ImGuiWindowFlags.NoScrollbar
-                | ImGuiWindowFlags.NoScrollWithMouse;
+        int flags = ImGuiWindowFlags.NoTitleBar |
+                ImGuiWindowFlags.NoResize |
+                ImGuiWindowFlags.NoCollapse |
+                ImGuiWindowFlags.NoScrollbar |
+                ImGuiWindowFlags.NoScrollWithMouse;
 
         if (ImGui.begin("Inventory", flags)) {
             ImGui.text(player.getName() + "'s Farm, $" + player.purse());
             ImGui.separator();
-            if (inv.isEmpty()) {
-                ImGui.textDisabled("You're out of stuff!");
+
+            List<InventorySlot> slots = inv.getSlots();
+
+            if (selectedInventorySlot >= slots.size()) {
+                selectedInventorySlot = -1;
                 selectedInventoryItem = null;
-            } else {
-                if (selectedInventoryItem != null
-                        && !aggregated.containsKey(
-                        selectedInventoryItem.getName())) {
-                    selectedInventoryItem = null;
-                }
+            }
 
-                ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing,
-                        K.Style.ITEM_SPACING, K.Style.ITEM_SPACING);
-                ImGui.pushStyleVar(ImGuiStyleVar.FrameBorderSize, 1.0f);
+            ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, K.Style.ITEM_SPACING, K.Style.ITEM_SPACING);
 
-                int slotIndex = 0;
-                for (int i = 0; i < K.World.TOTAL_SLOTS; i++) {
-                    Item item = null;
-                    int totalAmount = 0;
+            ImGui.pushStyleVar(ImGuiStyleVar.FrameBorderSize, 1.0f);
 
-                    if (slotIndex < aggregated.size()) {
-                        Map.Entry<String, Map.Entry<Item, Integer>> entry =
-                                aggregated.entrySet().stream()
-                                        .skip(slotIndex).findFirst().orElse(null);
-                        if (entry != null) {
-                            item = entry.getValue().getKey();
-                            totalAmount = entry.getValue().getValue();
-                        }
-                    }
+            for (int slotIndex = 0; slotIndex < K.World.TOTAL_SLOTS; slotIndex++) {
+                InventorySlot slot = slots.get(slotIndex);
+                Item item = !slot.isEmpty() ? slot.getItem() : null;
+                int amount = item != null ? item.getAmount() : 0;
+                boolean isSelected = selectedInventorySlot == slotIndex;
+                setColor(ImGuiCol.Button, isSelected ? K.Style.COLOR_BUTTON : K.Style.COLOR_SLOT_BG);
+                setColor(ImGuiCol.ButtonHovered, isSelected ? K.Style.COLOR_BUTTON_HOVERED : K.Style.COLOR_SLOT_HOVERED);
+                setColor(ImGuiCol.ButtonActive, isSelected ? K.Style.COLOR_BUTTON_ACTIVE : K.Style.COLOR_SLOT_BG);
+                setColor(ImGuiCol.Border, isSelected ? K.Style.COLOR_SLOT_BORDER_SEL : K.Style.COLOR_SLOT_BORDER);
+                ImGui.pushID("inv_slot_" + slotIndex);
 
-                    boolean isSelected = selectedInventorySlot == slotIndex;
-                    setColor(ImGuiCol.Button, isSelected
-                            ? K.Style.COLOR_BUTTON : K.Style.COLOR_SLOT_BG);
-                    setColor(ImGuiCol.ButtonHovered, isSelected
-                            ? K.Style.COLOR_BUTTON_HOVERED
-                            : K.Style.COLOR_SLOT_HOVERED);
-                    setColor(ImGuiCol.ButtonActive, isSelected
-                            ? K.Style.COLOR_BUTTON_ACTIVE : K.Style.COLOR_SLOT_BG);
-                    setColor(ImGuiCol.Border, isSelected
-                            ? K.Style.COLOR_SLOT_BORDER_SEL
-                            : K.Style.COLOR_SLOT_BORDER);
+                if (item != null) {
+                    SpriteSheet atlas = getItemSpritesheet(item);
+                    int col = getItemIconColumn(item);
+                    int totalCols = atlas.getTotalFrames();
 
-                    ImGui.pushID("inv_slot_" + slotIndex);
+                    float u0 = (float) col / totalCols;
+                    float u1 = (float) (col + 1) / totalCols;
 
-                    if (item != null) {
-                        SpriteSheet atlas = getItemSpritesheet(item);
-                        int col = getItemIconColumn(item);
-                        int totalCols = atlas.getTotalFrames();
-                        float u0 = (float) col / totalCols;
-                        float u1 = (float) (col + 1) / totalCols;
+                    if (ImGui.imageButton(atlas.getTextureId(), K.UI.ICON_SIZE,
+                            K.UI.ICON_SIZE, u0, 1.0f, u1, 0.0f)) {
 
-                        if (ImGui.imageButton(atlas.getTextureId(),
-                                K.UI.ICON_SIZE, K.UI.ICON_SIZE,
-                                u0, 1.0f, u1, 0.0f)) {
-                            selectedInventoryItem = item;
+                        if (selectedInventorySlot == -1) {
                             selectedInventorySlot = slotIndex;
-                        }
-
-                        if (ImGui.isItemHovered() && ImGui
-                                .isMouseDoubleClicked(GLFW_MOUSE_BUTTON_LEFT)) {
-                            sellItem(inv, item);
+                            selectedInventoryItem = item;
+                        } else if (selectedInventorySlot == slotIndex) {
+                            selectedInventorySlot = -1;
+                            selectedInventoryItem = null;
+                        } else {
+                            int fromIndex = selectedInventorySlot;
+                            inv.pickAndDrop(fromIndex, slotIndex);
+                            selectedInventorySlot = -1;
                             selectedInventoryItem = null;
                         }
-
-                        renderSlotCount(totalAmount);
-
-                        if (ImGui.isItemHovered()) {
-                            ImGui.setTooltip(item.getName());
-                        }
-
-                    } else if (ImGui.button("##empty",
-                            K.UI.ICON_SIZE + K.Style.FRAME_PADDING_X * 2.0f,
-                            K.UI.ICON_SIZE + K.Style.FRAME_PADDING_Y * 2.0f)) {
-                        selectedInventoryItem = null;
-                        selectedInventorySlot = slotIndex;
                     }
 
-                    ImGui.popID();
-                    ImGui.popStyleColor(4);
+                    renderSlotCount(amount);
 
-                    slotIndex++;
+                    if (ImGui.isItemHovered()) {
+                        ImGui.setTooltip(item.getName());
+                    }
+                } else {
+                    if (ImGui.button("##empty", K.UI.ICON_SIZE +
+                            K.Style.FRAME_PADDING_X * 2.0f, K.UI.ICON_SIZE +
+                            K.Style.FRAME_PADDING_Y * 2.0f)) {
 
-                    if (slotIndex % columns != 0) {
-                        ImGui.sameLine();
+                        if (selectedInventorySlot != -1) {
+                            int fromIndex = selectedInventorySlot;
+                            inv.pickAndDrop(fromIndex, slotIndex);
+                            selectedInventorySlot = -1;
+                            selectedInventoryItem = null;
+                        }
                     }
                 }
 
-                ImGui.popStyleVar(2);
+                ImGui.popID();
+                ImGui.popStyleColor(4);
+
+                if (slotIndex % columns != columns - 1) {
+                    ImGui.sameLine();
+                }
             }
+
+            ImGui.popStyleVar(2);
         }
 
         ImGui.end();
+        renderDraggedItem();
+    }
+
+    private void renderDraggedItem() {
+        if (selectedInventorySlot == -1 || selectedInventoryItem == null) return;
+
+        ImVec2 mousePos = new ImVec2();
+        ImGui.getMousePos(mousePos);
+        ImGui.setNextWindowPos(mousePos.x + 10.0f, mousePos.y + 10.0f);
+
+        int flags = ImGuiWindowFlags.NoTitleBar |
+                ImGuiWindowFlags.NoResize |
+                ImGuiWindowFlags.NoMove |
+                ImGuiWindowFlags.NoInputs |
+                ImGuiWindowFlags.AlwaysAutoResize |
+                ImGuiWindowFlags.NoSavedSettings |
+                ImGuiWindowFlags.NoFocusOnAppearing;
+
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 2.0f, 2.0f);
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowBorderSize, 1.0f);
+        ImGui.pushStyleColor(ImGuiCol.WindowBg, 0.0f, 0.0f, 0.0f, 0.0f);
+
+        if (ImGui.begin("##dragged_item", flags)) {
+            SpriteSheet atlas = getItemSpritesheet(selectedInventoryItem);
+            int col = getItemIconColumn(selectedInventoryItem);
+            int totalCols = atlas.getTotalFrames();
+
+            float u0 = (float) col / totalCols;
+            float u1 = (float) (col + 1) / totalCols;
+
+            ImGui.image(atlas.getTextureId(), K.UI.ICON_SIZE, K.UI.ICON_SIZE, u0, 1.0f, u1, 0.0f);
+            int amount = selectedInventoryItem.getAmount();
+            if (amount > 1) {
+                renderSlotCount(amount);
+            }
+        }
+        ImGui.end();
+        ImGui.popStyleColor(1);
+        ImGui.popStyleVar(2);
     }
 
     private void sellItem(Inventory inv, Item item) {
