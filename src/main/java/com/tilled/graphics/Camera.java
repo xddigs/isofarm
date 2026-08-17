@@ -9,13 +9,18 @@ import org.joml.Vector3f;
 @SuppressWarnings("unused")
 public class Camera {
     private static final float MAX_RAY_DISTANCE = 100.0f;
+    private static final float MIN_PITCH = -89.0f;
+    private static final float MAX_PITCH = 89.0f;
+    private static final float FOV = K.Camera.DEFAULT_FOV;
+    private static final float ZOOM_FOV = 30.0f;
+    private static final float ZOOM_SPEED = 12.0f;
     private final Vector3f position;
     private final Matrix4f projectionMatrix;
     private float pitch = K.Camera.DEFAULT_PITCH;
     private float yaw = K.Camera.DEFAULT_YAW;
-    private static final float MIN_PITCH = -89.0f;
-    private static final float MAX_PITCH = 89.0f;
-    private static final float FOV = 85.0f;
+    private float currentFov = FOV;
+    private float targetFov = FOV;
+    private float aspectRatio = 1.0f;
 
     public Camera(float width, float height) {
         this.position = new Vector3f(0.0f, 0.0f, 0.0f);
@@ -24,16 +29,24 @@ public class Camera {
     }
 
     public void updateProjection(float width, float height) {
-        float aspectRatio = width / Math.max(height, 1.0f);
+        this.aspectRatio = width / Math.max(height, 1.0f);
         this.projectionMatrix.identity().perspective(
-                (float) Math.toRadians(FOV),
+                (float) Math.toRadians(currentFov),
+                aspectRatio,
+                0.1f,
+                1000.0f);
+    }
+
+    public void update(float delta) {
+        float smooth = 1.0f - (float) Math.exp(-ZOOM_SPEED * delta);
+        currentFov += (targetFov - currentFov) * smooth;
+        projectionMatrix.identity().perspective(
+                (float) Math.toRadians(currentFov),
                 aspectRatio,
                 0.1f,
                 1000.0f
         );
     }
-
-    public void update(float delta) {}
 
     public Matrix4f getViewMatrix() {
         return new Matrix4f()
@@ -66,13 +79,41 @@ public class Camera {
         this.pitch = Math.clamp(pitch, MIN_PITCH, MAX_PITCH);
     }
 
-    public float getYaw() { return yaw; }
-    public void setYaw(float yaw) { this.yaw = yaw; }
-    public float getPitch() { return pitch; }
-    public void setPitch(float pitch) { this.pitch = pitch; }
-    public Matrix4f getProjectionMatrix() { return projectionMatrix; }
-    public Vector3f getPosition() { return position; }
-    public void setPosition(float x, float y, float z) { this.position.set(x, y, z); }
+    public float getYaw() {
+        return yaw;
+    }
+
+    public void setYaw(float yaw) {
+        this.yaw = yaw;
+    }
+
+    public float getPitch() {
+        return pitch;
+    }
+
+    public void setPitch(float pitch) {
+        this.pitch = pitch;
+    }
+
+    public Matrix4f getProjectionMatrix() {
+        return projectionMatrix;
+    }
+
+    public Vector3f getPosition() {
+        return position;
+    }
+
+    public void setPosition(float x, float y, float z) {
+        this.position.set(x, y, z);
+    }
+
+    public float getFov() {
+        return currentFov;
+    }
+
+    public void setZooming(boolean zooming) {
+        targetFov = zooming ? ZOOM_FOV : FOV;
+    }
 
     public Hit highlight(World world) {
         Vector3f origin = new Vector3f(this.position);
@@ -115,24 +156,32 @@ public class Camera {
                     x += stepX;
                     distance = tMaxX;
                     tMaxX += tDeltaX;
-                    hitNormalX = -stepX; hitNormalY = 0; hitNormalZ = 0;
+                    hitNormalX = -stepX;
+                    hitNormalY = 0;
+                    hitNormalZ = 0;
                 } else {
                     z += stepZ;
                     distance = tMaxZ;
                     tMaxZ += tDeltaZ;
-                    hitNormalX = 0; hitNormalY = 0; hitNormalZ = -stepZ;
+                    hitNormalX = 0;
+                    hitNormalY = 0;
+                    hitNormalZ = -stepZ;
                 }
             } else {
                 if (tMaxY < tMaxZ) {
                     y += stepY;
                     distance = tMaxY;
                     tMaxY += tDeltaY;
-                    hitNormalX = 0; hitNormalY = -stepY; hitNormalZ = 0;
+                    hitNormalX = 0;
+                    hitNormalY = -stepY;
+                    hitNormalZ = 0;
                 } else {
                     z += stepZ;
                     distance = tMaxZ;
                     tMaxZ += tDeltaZ;
-                    hitNormalX = 0; hitNormalY = 0; hitNormalZ = -stepZ;
+                    hitNormalX = 0;
+                    hitNormalY = 0;
+                    hitNormalZ = -stepZ;
                 }
             }
         }

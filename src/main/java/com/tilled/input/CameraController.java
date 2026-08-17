@@ -35,12 +35,18 @@ public class CameraController implements Service<Camera> {
         Player player = gameMaster.getPlayer();
         if (player != null) {
             movement(gameMaster, delta);
+            if (Keyboard.isKeyPressed(GLFW_KEY_SPACE)) {
+                player.jump();
+            }
+
+            camera.setZooming(Keyboard.isKeyDown(GLFW_KEY_C));
             camera.getPosition().set(player.getEyePosition());
         }
     }
 
     private void movement(GameMaster gameMaster, float delta) {
         Player player = gameMaster.getPlayer();
+
         float speed = K.Camera.MOVEMENT_SPEED;
 
         float yaw = (float) Math.toRadians(camera.getYaw());
@@ -58,35 +64,31 @@ public class CameraController implements Service<Camera> {
             moveX += forwardX;
             moveZ += forwardZ;
         }
+
         if (Keyboard.isKeyDown(GLFW_KEY_S)) {
             moveX -= forwardX;
             moveZ -= forwardZ;
         }
+
         if (Keyboard.isKeyDown(GLFW_KEY_D)) {
             moveX += rightX;
             moveZ += rightZ;
         }
+
         if (Keyboard.isKeyDown(GLFW_KEY_A)) {
             moveX -= rightX;
             moveZ -= rightZ;
         }
 
         float length = (float) Math.sqrt(moveX * moveX + moveZ * moveZ);
+
         if (length > 0.0f) {
             moveX = (moveX / length) * speed;
             moveZ = (moveZ / length) * speed;
         }
 
-        float moveY = 0.0f;
-        if (Keyboard.isKeyDown(GLFW_KEY_SPACE)) {
-            moveY += speed;
-        }
-        if (Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
-            moveY -= speed;
-        }
-
-        targetVelocity.set(moveX, moveY, moveZ);
-        player.moveAndCollide(gameMaster.getWorld(), targetVelocity, delta);
+        targetVelocity.set(moveX, 0.0f, moveZ);
+        player.moveAndCollide(gameMaster.getWorld(),targetVelocity,delta);
     }
 
     private void mouseLook() {

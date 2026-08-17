@@ -399,6 +399,12 @@ public class GameMaster {
                 this.player = new Player(gameUIservice.getEnteredPlayerName(),
                         world, toastService);
 
+                float center = (K.World.STARTING_GRID_SIZE - 1) / 2.0f;
+                float worldCenter = center * K.World.TILE_SIZE;
+
+                float spawnY = world.getHighestY(worldCenter, worldCenter) + 1.0f;
+                player.setPosition(worldCenter + 0.5f, spawnY, worldCenter + 0.5f);
+
                 gameUIservice.setPlayer(player);
                 this.shop.setPlayer(player);
 

@@ -195,8 +195,7 @@ public class World {
     }
 
     public boolean isBlockSolid(int x, int y, int z) {
-        return getBlockTypeAt(x, y, z) != 0 ||
-        getBlockTypeAt(x, y + 1, z) != BlockData.WATER.getId();
+        return getBlockTypeAt(x, y, z) != 0;
     }
 
     public float getHighestY(float spawnX, float spawnZ) {

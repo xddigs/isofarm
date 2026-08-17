@@ -7,6 +7,7 @@ public final class K {
     }
 
     public static final class Camera {
+        public static final float DEFAULT_FOV = 80.0f;
         public static final float DEFAULT_PITCH = 35.264f;
         public static final float DEFAULT_YAW = -45.0f;
         public static final float MIN_ZOOM = 0.3f;
@@ -20,6 +21,9 @@ public final class K {
     }
 
     public static final class World {
+        public static final float GRAVITY = -25.0f;
+        public static final float JUMP_FORCE = 8.0f;
+
         public static final int STARTING_GRID_SIZE = 4;
         public static final float TILE_SIZE = 1.0f;
         public static final float DEFAULT_BLOCK_DEPTH = 0.4f;

@@ -1,6 +1,7 @@
 package com.tilled.data;
 
 import com.tilled.service.ToastService;
+import com.tilled.utils.K;
 import com.tilled.wrld.World;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
@@ -10,36 +11,40 @@ import org.slf4j.LoggerFactory;
 @DataClass
 public class Player {
     private static final Logger log = LoggerFactory.getLogger(Player.class);
-    private Vector3f position;
-    private Vector3f velocity;
-    private Vector3f dimensions;
-    private float eyeHeight = 1.6f;
-
     private final String name;
     private final Inventory inventory;
     private final Purse purse;
+    private final ToastService toastService;
+    private Vector3f position;
+    private Vector3f velocity;
+    private Vector3f dimensions;
     private int experience;
     private int level;
-
-    private final World world;
-    private final ToastService toastService;
+    private boolean onGround;
 
     public Player(String name, World world,
                   ToastService toastService) {
         this.name = name;
-        this.world = world;
         this.toastService = toastService;
         this.inventory = new Inventory();
         this.purse = new Purse(inventory, new Coin());
 
-        float spawnX = 0.0f;
-        float spawnZ = 0.0f;
+        float spawnX = 0.5f;
+        float spawnZ = 0.5f;
         float highestY = world.getHighestY(spawnX, spawnZ);
 
         this.position = new Vector3f(spawnX, highestY, spawnZ);
         this.velocity = new Vector3f();
         this.dimensions = new Vector3f(0.6f, 1.8f, 0.6f);
         setUpInventory();
+
+        log.info(
+                "Player position: {} {} {} | collision: {}",
+                getPosition().x,
+                getPosition().y,
+                getPosition().z,
+                checkCollision(world)
+        );
     }
 
     private void setUpInventory() {
@@ -71,6 +76,23 @@ public class Player {
     public Vector3f getVelocity() {
         return velocity;
     }
+
+    public boolean isOnGround() {
+        return onGround;
+    }
+
+    public void setOnGround(boolean onGround) {
+        this.onGround = onGround;
+    }
+
+    private boolean detectGround(World world) {
+        position.y -= 0.05f;
+        boolean collision = checkCollision(world);
+        position.y += 0.05f;
+        return collision;
+    }
+
+    public void update() {}
 
     public void gain(int amount) {
         experience += amount;
@@ -170,21 +192,39 @@ public class Player {
         return inventory.getTotalAmountOfType(Seed.class);
     }
 
+    public void jump() {
+        if (!onGround) {
+            return;
+        }
+
+        velocity.y = K.World.JUMP_FORCE;
+        onGround = false;
+    }
+
     public void moveAndCollide(World world, Vector3f targetVelocity, float delta) {
         float smooth = 1.0f - (float) Math.exp(-12.0f * delta);
+
         velocity.x += (targetVelocity.x - velocity.x) * smooth;
-        velocity.y += (targetVelocity.y - velocity.y) * smooth;
         velocity.z += (targetVelocity.z - velocity.z) * smooth;
 
+        velocity.y += K.World.GRAVITY * delta;
+        onGround = false;
+
         position.x += velocity.x * delta;
+
         if (checkCollision(world)) {
             position.x -= velocity.x * delta;
             velocity.x = 0;
         }
 
         position.y += velocity.y * delta;
+
         if (checkCollision(world)) {
             position.y -= velocity.y * delta;
+            if (velocity.y < 0) {
+                onGround = true;
+            }
+
             velocity.y = 0;
         }
 
@@ -195,29 +235,46 @@ public class Player {
         }
     }
 
-    private boolean checkCollision(World world) {
-        if (world == null) return false;
+    public boolean isOnGround(Block block) {
+        return position.y <= block.getY();
+    }
 
-        int minX = (int) Math.floor(position.x - dimensions.x / 2.0f);
-        int maxX = (int) Math.floor(position.x + dimensions.x / 2.0f);
-        int minY = (int) Math.floor(position.y);
-        int maxY = (int) Math.floor(position.y + dimensions.y);
-        int minZ = (int) Math.floor(position.z - dimensions.z / 2.0f);
-        int maxZ = (int) Math.floor(position.z + dimensions.z / 2.0f);
+    public boolean checkCollision(World world) {
+        float epsilon = 0.001f;
+        float minX = position.x - dimensions.x / 2.0f + epsilon;
+        float maxX = position.x + dimensions.x / 2.0f - epsilon;
 
-        for (int x = minX; x <= maxX; x++) {
-            for (int y = minY; y <= maxY; y++) {
-                for (int z = minZ; z <= maxZ; z++) {
+        float minY = position.y + epsilon;
+        float maxY = position.y + dimensions.y - epsilon;
+
+        float minZ = position.z - dimensions.z / 2.0f + epsilon;
+        float maxZ = position.z + dimensions.z / 2.0f - epsilon;
+
+        int blockMinX = (int) Math.floor(minX);
+        int blockMaxX = (int) Math.floor(maxX);
+
+        int blockMinY = (int) Math.floor(minY);
+        int blockMaxY = (int) Math.floor(maxY);
+
+        int blockMinZ = (int) Math.floor(minZ);
+        int blockMaxZ = (int) Math.floor(maxZ);
+
+        for (int x = blockMinX; x <= blockMaxX; x++) {
+            for (int y = blockMinY; y <= blockMaxY; y++) {
+                for (int z = blockMinZ; z <= blockMaxZ; z++) {
+
                     if (world.isBlockSolid(x, y, z)) {
                         return true;
                     }
                 }
             }
         }
+
         return false;
     }
 
     public Vector3f getEyePosition() {
+        float eyeHeight = 1.6f;
         return new Vector3f(position.x, position.y + eyeHeight, position.z);
     }
 }
