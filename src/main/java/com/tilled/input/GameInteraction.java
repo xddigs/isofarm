@@ -67,7 +67,7 @@ public class GameInteraction {
         boolean isCtrlDown = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL) ||
                 Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
 
-        if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
+        if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_RIGHT)) {
             if (isCtrlDown) {
                 camera.rotateYaw(Mouse.getDeltaX() * K.Camera.ROTATION_SENSITIVITY);
             } else {
