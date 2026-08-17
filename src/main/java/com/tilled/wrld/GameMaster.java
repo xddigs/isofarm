@@ -102,17 +102,6 @@ public class GameMaster {
         this.particles = new ParticleEngine();
         this.rainEngine = new RainEngine();
 
-        int chunkAmount = K.World.MAP_WORLD_SIZE;
-        for (int cx = -chunkAmount; cx < chunkAmount; cx++) {
-            for (int cz = -chunkAmount; cz < chunkAmount; cz++) {
-                generator.generateChunk(cx, cz);
-            }
-        }
-
-        for (Chunk chunk : world.getChunks().values()) {
-            chunkMeshes.put(chunk, ChunkMeshBuilder.buildMesh(chunk));
-        }
-
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_DEPTH_TEST);
@@ -167,8 +156,6 @@ public class GameMaster {
                 timeService, particles, camera, blocksTexture);
 
         recenter();
-        log.info("GameMaster initialized with grid size: {}x{}", K.World.MAP_WORLD_SIZE,
-                K.World.MAP_WORLD_SIZE);
     }
 
     public long getWindowHandle() {
@@ -482,11 +469,9 @@ public class GameMaster {
                 this.player = new Player(gameUIservice.getEnteredPlayerName(),
                         world, toastService);
 
-                float center = (K.World.MAP_WORLD_SIZE - 1) / 2.0f;
-                float worldCenter = center * K.World.TILE_SIZE;
-
-                float spawnY = world.getHighestY(worldCenter, worldCenter) + 1.0f;
-                player.setPosition(worldCenter + 0.5f, spawnY, worldCenter + 0.5f);
+                updateLoadedChunks(0, 0);
+                float spawnY = world.getHighestY(0.0f, 0.0f) + 1.0f;
+                player.setPosition(0.5f, spawnY, 0.5f);
 
                 gameUIservice.setPlayer(player);
                 this.shop.setPlayer(player);
