@@ -13,6 +13,7 @@ public class Library implements Service<GameMaster> {
     public static void initItems(ItemRegistry itemR, Player player) {
         itemR.register(DEFAULT_ID + ":coin", Coin::new);
         itemR.register(DEFAULT_ID + ":can", WateringCan::new);
+        itemR.register(DEFAULT_ID + ":hoe", Hoe::new);
         itemR.register(DEFAULT_ID + ":wheat_seed", Seed::new);
         itemR.register(DEFAULT_ID + ":carrot_seed", () -> new Seed(CropType.CARROT));
         itemR.register(DEFAULT_ID + ":potato_seed", () -> new Seed(CropType.POTATO));

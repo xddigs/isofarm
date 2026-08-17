@@ -25,6 +25,7 @@ public class Player {
 
     private void setUpInventory() {
         add(new Seed(), 4);
+        add(new Hoe(), 1);
     }
 
     public String getName() {

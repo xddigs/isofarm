@@ -1,5 +1,7 @@
 package com.tilled.wrld;
 
+import com.tilled.data.Block;
+import com.tilled.data.BlockData;
 import com.tilled.data.Crop;
 
 import java.util.HashMap;
@@ -73,6 +75,21 @@ public class World {
         return chunk.getBlock(localX, y, localZ);
     }
 
+    public Block getBlockAt(int x, int y, int z) {
+        byte blockId = getBlockTypeAt(x, y, z);
+
+        if (blockId == 0) {
+            return null;
+        }
+
+        for (BlockData data : BlockData.values()) {
+            if (data.getId() == blockId) {
+                return new Block(data, x, y, z);
+            }
+        }
+        return null;
+    }
+
     public void setBlockTypeAt(int x, int y, int z, byte blockId) {
         if (y < 0 || y >= Chunk.SIZE_Y) {
             return;
@@ -80,12 +97,9 @@ public class World {
 
         int chunkX = Math.floorDiv(x, Chunk.SIZE_X);
         int chunkZ = Math.floorDiv(z, Chunk.SIZE_Z);
-
         Chunk chunk = getOrCreateChunk(chunkX, chunkZ);
-
         int localX = Math.floorMod(x, Chunk.SIZE_X);
         int localZ = Math.floorMod(z, Chunk.SIZE_Z);
-
         chunk.setBlock(localX, y, localZ, blockId);
     }
 
@@ -96,7 +110,6 @@ public class World {
 
         int chunkX = x >> 4;
         int chunkZ = z >> 4;
-
         Chunk chunk = chunks.get(get2DKey(chunkX, chunkZ));
 
         if (chunk == null) {

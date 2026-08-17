@@ -7,10 +7,10 @@ import org.joml.Vector2f;
 @DataClass
 public enum BlockData {
     DIRT((byte) 1, "Dirt", 100, 0, 0),
-    GRASS((byte) 2, "Grass", 120, 1, 0, 1, 3, 1, 1),
+    GRASS((byte) 2, "Grass", true, 120, 1, 0, 1, 3, 1, 1),
     STONE((byte) 3, "Stone", 150, 2, 0),
     DISPENSER((byte) 4, "Dispenser", 500, 3, 0),
-    TILLED_DIRT((byte) 5, "Tilled Dirt", 110, 4, 0, 0, 0, 0, 0),
+    TILLED_DIRT((byte) 5, "Tilled Dirt", true, 110, 4, 0, 0, 0, 0, 0),
     WATER((byte) 6, "Water", 100, 5, 0);
 
     public static final int ATLAS_COLS = K.UI.BLOCK_ATLAS_FRAMES;
@@ -18,6 +18,7 @@ public enum BlockData {
 
     private final byte id;
     private final String name;
+    private final boolean isTillable;
     private final int value;
 
     private final int topTileX;
@@ -32,16 +33,24 @@ public enum BlockData {
     private final Vector2f bottomAtlasOffset;
     private final Vector2f sideAtlasOffset;
 
-    BlockData(byte id, String name, int value, int tileX, int tileY) {
-        this(id, name, value, tileX, tileY, tileX, tileY, tileX, tileY);
+    BlockData(byte id, String name, int value, int tileX, int tileY, boolean isTillable) {
+        this(id, name, isTillable, value, tileX, tileY, tileX, tileY, tileX, tileY);
     }
 
-    BlockData(byte id, String name, int value,
+    BlockData(byte id, String name, int value, int tileX, int tileY) {
+        this(id, name, false, value,
+                tileX, tileY,
+                tileX, tileY,
+                tileX, tileY);
+    }
+
+    BlockData(byte id, String name, boolean isTillable, int value,
               int topTileX, int topTileY,
               int bottomTileX, int bottomTileY,
               int sideTileX, int sideTileY) {
         this.id = id;
         this.name = name;
+        this.isTillable = isTillable;
         this.value = value;
         this.topTileX = topTileX;
         this.topTileY = topTileY;
@@ -111,5 +120,9 @@ public enum BlockData {
             }
         }
         return null;
+    }
+
+    public boolean isTillable() {
+        return isTillable;
     }
 }

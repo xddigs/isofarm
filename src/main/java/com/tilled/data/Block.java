@@ -4,9 +4,9 @@ import com.tilled.utils.K;
 
 @DataClass
 public class Block extends Item {
-    private final BlockData type;
-    private int x, y, z;
     private final int waterLevelMax = K.World.WATER_LEVEL_MAX;
+    private BlockData type;
+    private int x, y, z;
     private int waterLevel = 0;
 
     public Block(BlockData type, int x, int y, int z) {
@@ -28,6 +28,10 @@ public class Block extends Item {
 
     public BlockData getType() {
         return type;
+    }
+
+    public void setType(BlockData type) {
+        this.type = type;
     }
 
     public int getX() {

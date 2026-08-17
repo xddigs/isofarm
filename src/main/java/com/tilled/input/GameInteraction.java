@@ -153,8 +153,11 @@ public class GameInteraction {
             return;
         }
 
-        if (selectedItem instanceof Seed seed) {
+        if (selectedItem instanceof Hoe hoe) {
+            hoe.use(world, world.getBlockAt(cell.x(), cell.y(), cell.z()));
+        }
 
+        if (selectedItem instanceof Seed seed) {
             int x = cell.x();
             int y = cell.y();
             int z = cell.z();
