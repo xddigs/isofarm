@@ -188,7 +188,7 @@ public class GameUIService implements Service<GameMaster> {
         if (player == null) return;
 
         float windowWidth = K.UI.SETTINGS_PANEL_WIDTH;
-        ImGui.setNextWindowPos(K.UI.HUD_PADDING, K.UI.HUD_PADDING, ImGuiCond.Always);
+        ImGui.setNextWindowPos(K.UI.HUD_PADDING, windowHeight / 2, ImGuiCond.Always);
         ImGui.setNextWindowSize(windowWidth, 0.0f, ImGuiCond.Always);
 
         int flags = ImGuiWindowFlags.NoTitleBar |
@@ -217,7 +217,7 @@ public class GameUIService implements Service<GameMaster> {
             int[] rdBuffer = new int[]{ Settings.renderDistance };
             ImGui.textDisabled("Render");
             ImGui.pushItemWidth(-1);
-            if (ImGui.sliderInt("##RenderDistance", rdBuffer, 2, 16, "%d Chunks")) {
+            if (ImGui.sliderInt("##RenderDistance", rdBuffer, 2, 32, "%d Chunks")) {
                 Settings.renderDistance = rdBuffer[0];
                 if (gameMaster != null && gameMaster.getCamera() != null) {
                     gameMaster.getCamera().updateProjection(windowWidth, windowHeight, Settings.renderDistance);
@@ -242,6 +242,15 @@ public class GameUIService implements Service<GameMaster> {
             ImGui.pushItemWidth(-1);
             if (ImGui.sliderFloat("##Sensitivity", sensBuffer, 0.05f, 1.0f, "%.2f")) {
                 Settings.mouseSensitivity = sensBuffer[0];
+            }
+            ImGui.popItemWidth();
+
+            int[] scaleBuffer = new int[]{ Settings.guiScaleIndex };
+            ImGui.textDisabled("GUI Scale");
+            ImGui.pushItemWidth(-1);
+            if (ImGui.sliderInt("##guiScale", scaleBuffer, 0, 
+                    Settings.GUI_SCALES.length - 1, "Scale %dx")) {
+                Settings.guiScaleIndex = scaleBuffer[0];
             }
             ImGui.popItemWidth();
         }
@@ -278,13 +287,12 @@ public class GameUIService implements Service<GameMaster> {
     public void renderHotbar() {
         if (player == null) return;
 
-        float hotbarWidth =
-                (K.UI.ICON_SIZE + K.Style.FRAME_PADDING_X * 2.0f)
+        float hotbarWidth = (Settings.getScaledIconSize() + K.Style.FRAME_PADDING_X * 2.0f)
                         * K.UI.HOTBAR_SLOTS
                         + K.Style.ITEM_SPACING * (K.UI.HOTBAR_SLOTS - 1)
                         + K.Style.WINDOW_PADDING_X * 2.0f;
 
-        float hotbarHeight = K.UI.ICON_SIZE
+        float hotbarHeight = Settings.getScaledIconSize()
                 + K.Style.FRAME_PADDING_Y * 2.0f
                 + K.Style.WINDOW_PADDING_Y * 2.0f;
 
@@ -341,7 +349,7 @@ public class GameUIService implements Service<GameMaster> {
                     float u1 = (float) (col + 1) / totalCols;
 
                     if (ImGui.imageButton(atlas.getTextureId(),
-                            K.UI.ICON_SIZE, K.UI.ICON_SIZE,
+                            Settings.getScaledIconSize(), Settings.getScaledIconSize(),
                             u0, 1.0f, u1, 0.0f)) {
                         selectedInventoryItem = item;
                         selectedHotbarSlot = slotIndex;
@@ -356,8 +364,8 @@ public class GameUIService implements Service<GameMaster> {
 
                 } else {
                     if (ImGui.button("##empty",
-                            K.UI.ICON_SIZE + K.Style.FRAME_PADDING_X * 2.0f,
-                            K.UI.ICON_SIZE + K.Style.FRAME_PADDING_Y * 2.0f)) {
+                            Settings.getScaledIconSize() + K.Style.FRAME_PADDING_X * 2.0f,
+                            Settings.getScaledIconSize() + K.Style.FRAME_PADDING_Y * 2.0f)) {
                         selectedInventoryItem = null;
                         selectedHotbarSlot = slotIndex;
                     }
@@ -677,8 +685,8 @@ public class GameUIService implements Service<GameMaster> {
         int columns = K.UI.HOTBAR_SLOTS;
         int rows = (int) Math.ceil((double) K.World.TOTAL_SLOTS / columns);
 
-        float slotWidth = K.UI.ICON_SIZE + K.Style.FRAME_PADDING_X * 2.0f;
-        float slotHeight = K.UI.ICON_SIZE + K.Style.FRAME_PADDING_Y * 2.0f;
+        float slotWidth = Settings.getScaledIconSize() + K.Style.FRAME_PADDING_X * 2.0f;
+        float slotHeight = Settings.getScaledIconSize() + K.Style.FRAME_PADDING_Y * 2.0f;
 
         float inventoryWidth = columns * slotWidth + (columns - 1) * K.Style.ITEM_SPACING +
                 K.Style.WINDOW_PADDING_X * 2.0f;
@@ -728,8 +736,8 @@ public class GameUIService implements Service<GameMaster> {
                     float u0 = (float) col / totalCols;
                     float u1 = (float) (col + 1) / totalCols;
 
-                    if (ImGui.imageButton(atlas.getTextureId(), K.UI.ICON_SIZE,
-                            K.UI.ICON_SIZE, u0, 1.0f, u1, 0.0f)) {
+                    if (ImGui.imageButton(atlas.getTextureId(), Settings.getScaledIconSize(),
+                            Settings.getScaledIconSize(), u0, 1.0f, u1, 0.0f)) {
 
                         if (selectedInventorySlot == -1) {
                             selectedInventorySlot = slotIndex;
@@ -751,8 +759,8 @@ public class GameUIService implements Service<GameMaster> {
                         ImGui.setTooltip(item.getName());
                     }
                 } else {
-                    if (ImGui.button("##empty", K.UI.ICON_SIZE +
-                            K.Style.FRAME_PADDING_X * 2.0f, K.UI.ICON_SIZE +
+                    if (ImGui.button("##empty", Settings.getScaledIconSize() +
+                            K.Style.FRAME_PADDING_X * 2.0f, Settings.getScaledIconSize() +
                             K.Style.FRAME_PADDING_Y * 2.0f)) {
 
                         if (selectedInventorySlot != -1) {
@@ -806,7 +814,7 @@ public class GameUIService implements Service<GameMaster> {
             float u0 = (float) col / totalCols;
             float u1 = (float) (col + 1) / totalCols;
 
-            ImGui.image(atlas.getTextureId(), K.UI.ICON_SIZE, K.UI.ICON_SIZE, u0, 1.0f, u1, 0.0f);
+            ImGui.image(atlas.getTextureId(), Settings.getScaledIconSize(), Settings.getScaledIconSize(), u0, 1.0f, u1, 0.0f);
             int amount = selectedInventoryItem.getAmount();
             if (amount > 1) {
                 renderSlotCount(amount);
@@ -939,7 +947,7 @@ public class GameUIService implements Service<GameMaster> {
 
                         boolean wasClickedOn = ImGui.imageButton(
                                 atlas.getTextureId(),
-                                K.UI.ICON_SIZE, K.UI.ICON_SIZE,
+                                Settings.getScaledIconSize(), Settings.getScaledIconSize(),
                                 u0, 1.0f, u1, 0.0f);
 
                         if (ImGui.isItemHovered() && ImGui
@@ -958,8 +966,8 @@ public class GameUIService implements Service<GameMaster> {
 
                     } else {
                         ImGui.button("##empty",
-                                K.UI.ICON_SIZE + K.Style.FRAME_PADDING_X * 2.0f,
-                                K.UI.ICON_SIZE + K.Style.FRAME_PADDING_Y * 2.0f);
+                                Settings.getScaledIconSize() + K.Style.FRAME_PADDING_X * 2.0f,
+                                Settings.getScaledIconSize() + K.Style.FRAME_PADDING_Y * 2.0f);
                     }
 
                     ImGui.popID();

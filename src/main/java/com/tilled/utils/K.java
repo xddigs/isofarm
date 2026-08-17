@@ -25,7 +25,7 @@ public final class K {
         public static final float WEATHER_CHANGE_PROBABILITY = 0.01f;
 
         public static final int STARTING_COINS = 100;
-        public static final int TOTAL_SLOTS = 27;
+        public static final int TOTAL_SLOTS = 36;
         public static final int TOTAL_SLOTS_STOCK = 16;
         public static final int MAX_STACK = 9999;
         public static final int WATER_LEVEL_MAX = 100;
@@ -109,8 +109,6 @@ public final class K {
 
         public static final float INPUT_WIDTH = 340.0f;
         public static final float INPUT_HEIGHT = 120.0f;
-
-        public static final float ICON_SIZE = 32.0f;
 
         public static final float LARGE_BUTTON_HEIGHT = 40.0f;
         public static final float CENTER_PIVOT = 0.5f;
