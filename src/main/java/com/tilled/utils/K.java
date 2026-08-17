@@ -20,7 +20,7 @@ public final class K {
     }
 
     public static final class World {
-        public static final int STARTING_GRID_SIZE = 8;
+        public static final int STARTING_GRID_SIZE = 4;
         public static final float TILE_SIZE = 1.0f;
         public static final float DEFAULT_BLOCK_DEPTH = 0.4f;
         public static final float CROP_Y_OFFSET = 1.0f;
@@ -30,7 +30,6 @@ public final class K {
         public static final int TOTAL_SLOTS = 27;
         public static final int TOTAL_SLOTS_STOCK = 16;
         public static final int MAX_STACK = 9999;
-        public static final int PARTICLES_COUNT = 16;
         public static final int WATER_LEVEL_MAX = 100;
 
         public static final int RAIN_MAX_DROPS = 2000;
