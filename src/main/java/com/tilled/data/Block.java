@@ -7,7 +7,7 @@ public class Block extends Item {
     private final int waterLevelMax = K.World.WATER_LEVEL_MAX;
     private BlockData type;
     private int x, y, z;
-    private int waterLevel = 0;
+    private int waterLevel = 15;
 
     public Block(BlockData type, int x, int y, int z) {
         super(type.getId(), type.getName(), 1, type.getValue());
@@ -56,6 +56,10 @@ public class Block extends Item {
 
     public int getWaterLevel() {
         return waterLevel;
+    }
+
+    public void addWater(int amount) {
+        waterLevel = Math.min(waterLevelMax, waterLevel + amount);
     }
 
     public void setWaterLevel(int waterLevel) {
