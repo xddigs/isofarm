@@ -41,14 +41,23 @@ public class GameUIService implements Service<GameMaster> {
     private Shop shop;
     private float windowWidth = K.Window.DEFAULT_WIDTH;
     private float windowHeight = K.Window.DEFAULT_HEIGHT;
+
     private Vector2i lastActionCell = null;
     private float actionDisplayTimer = 0.0f;
-    private Item selectedInventoryItem = null;
 
-    public GameUIService(long windowHandle, GameMaster gameMaster, CommandService commandService,
-                         ToastService toastService, SpriteSheet seedIcons,
-                         SpriteSheet cropIcons, SpriteSheet blockIcons,
+    private Item selectedInventoryItem = null;
+    private int selectedHotbarSlot = -1;
+    private int selectedInventorySlot = -1;
+
+    public GameUIService(long windowHandle,
+                         GameMaster gameMaster,
+                         CommandService commandService,
+                         ToastService toastService,
+                         SpriteSheet seedIcons,
+                         SpriteSheet cropIcons,
+                         SpriteSheet blockIcons,
                          SpriteSheet toolIcons) {
+
         this.gameMaster = gameMaster;
         this.commandService = commandService;
         this.toastService = toastService;
@@ -157,16 +166,15 @@ public class GameUIService implements Service<GameMaster> {
     public void renderHotbar() {
         if (player == null) return;
 
-        float hotbarWidth = (K.UI.ICON_SIZE + K.Style.FRAME_PADDING_X * 2.0f) * K.UI.HOTBAR_SLOTS
-                + K.Style.ITEM_SPACING * (K.UI.HOTBAR_SLOTS - 1)
-                + K.Style.WINDOW_PADDING_X * 2.0f;
+        float hotbarWidth = (K.UI.ICON_SIZE + K.Style.FRAME_PADDING_X * 2.0f) *
+                K.UI.HOTBAR_SLOTS + K.Style.ITEM_SPACING * (K.UI.HOTBAR_SLOTS - 1) + K.Style.WINDOW_PADDING_X * 2.0f;
 
-        float hotbarHeight = K.UI.ICON_SIZE
-                + K.Style.FRAME_PADDING_Y * 2.0f
-                + K.Style.WINDOW_PADDING_Y * 2.0f;
+        float hotbarHeight = K.UI.ICON_SIZE + K.Style.FRAME_PADDING_Y * 2.0f +
+                K.Style.WINDOW_PADDING_Y * 2.0f;
 
         ImGui.setNextWindowPos(windowWidth / 2 - hotbarWidth / 2,
-                windowHeight - hotbarHeight - K.UI.HUD_PADDING, ImGuiCond.Always);
+                windowHeight - hotbarHeight - K.UI.HUD_PADDING,
+                ImGuiCond.Always);
         ImGui.setNextWindowSize(hotbarWidth, hotbarHeight, ImGuiCond.Always);
 
         int flags = ImGuiWindowFlags.NoTitleBar |
@@ -190,8 +198,7 @@ public class GameUIService implements Service<GameMaster> {
                 Item item = slotIndex < hotbarItems.size() ? hotbarItems.get(slotIndex) : null;
                 int totalAmount = item != null ? inv.getAmount(item) : 0;
 
-                boolean isSelected = item != null && selectedInventoryItem != null
-                        && selectedInventoryItem.equals(item);
+                boolean isSelected = selectedHotbarSlot == slotIndex;
 
                 setColor(ImGuiCol.Button, isSelected ? K.Style.COLOR_BUTTON : K.Style.COLOR_SLOT_BG);
                 setColor(ImGuiCol.ButtonHovered, isSelected ? K.Style.COLOR_BUTTON_HOVERED : K.Style.COLOR_SLOT_HOVERED);
@@ -210,6 +217,7 @@ public class GameUIService implements Service<GameMaster> {
                     if (ImGui.imageButton(atlas.getTextureId(), K.UI.ICON_SIZE, K.UI.ICON_SIZE,
                             u0, 1.0f, u1, 0.0f)) {
                         selectedInventoryItem = item;
+                        selectedHotbarSlot = slotIndex;
                     }
 
                     renderSlotCount(totalAmount);
@@ -219,9 +227,11 @@ public class GameUIService implements Service<GameMaster> {
                     }
 
                 } else {
-                    ImGui.button("##empty", K.UI.ICON_SIZE +
-                            K.Style.FRAME_PADDING_X * 2.0f, K.UI.ICON_SIZE +
-                            K.Style.FRAME_PADDING_Y * 2.0f);
+                    if (ImGui.button("##empty", K.UI.ICON_SIZE + K.Style.FRAME_PADDING_X * 2.0f,
+                            K.UI.ICON_SIZE + K.Style.FRAME_PADDING_Y * 2.0f)) {
+                        selectedInventoryItem = null;
+                        selectedHotbarSlot = slotIndex;
+                    }
                 }
 
                 ImGui.popID();
@@ -240,23 +250,24 @@ public class GameUIService implements Service<GameMaster> {
 
     public void selectItem(int direction) {
         if (player == null) return;
+
+        int slots = K.UI.HOTBAR_SLOTS;
+
+        if (selectedHotbarSlot < 0) {
+            selectedHotbarSlot = direction > 0 ? 0 : slots - 1;
+        } else {
+            selectedHotbarSlot = (selectedHotbarSlot + direction) % slots;
+            if (selectedHotbarSlot < 0) {
+                selectedHotbarSlot = slots - 1;
+            }
+        }
+
         List<Item> hotbarItems = player.getInventory().getHotbarItems();
-        if (hotbarItems.isEmpty()) {
+        if (selectedHotbarSlot < hotbarItems.size()) {
+            selectedInventoryItem = hotbarItems.get(selectedHotbarSlot);
+        } else {
             selectedInventoryItem = null;
-            return;
         }
-
-        int currentIndex = hotbarItems.indexOf(selectedInventoryItem);
-        if (currentIndex < 0) {
-            selectedInventoryItem = hotbarItems.get(direction > 0 ? 0 : hotbarItems.size() - 1);
-            return;
-        }
-
-        int nextIndex = (currentIndex + direction) % hotbarItems.size();
-        if (nextIndex < 0) {
-            nextIndex = hotbarItems.size() - 1;
-        }
-        selectedInventoryItem = hotbarItems.get(nextIndex);
     }
 
     private void renderToast(Toast toast) {
@@ -291,24 +302,18 @@ public class GameUIService implements Service<GameMaster> {
             float cursorX = ImGui.getCursorPosX();
             float cursorY = ImGui.getCursorPosY();
 
-            ImGui.getWindowDrawList().addRectFilled(
-                    x, y, x + 4.0f, y,
+            ImGui.getWindowDrawList().addRectFilled(x, y, x + 4.0f, y,
                     ImGui.getColorU32(accent[0], accent[1], accent[2], accent[3]));
 
-            ImGui.pushStyleColor(ImGuiCol.Text,
-                    accent[0], accent[1], accent[2], accent[3]);
+            ImGui.pushStyleColor(ImGuiCol.Text, accent[0], accent[1], accent[2], accent[3]);
 
             ImGui.setCursorPos(cursorX + K.UI.TOAST_PADDING_X, cursorY);
             ImGui.text(getToastPrefix(toast.getType()));
             ImGui.popStyleColor();
 
-            ImGui.setCursorPos(cursorX
-                            + K.UI.TOAST_PADDING_X
-                            + K.UI.TOAST_ICON_SIZE
-                            + K.UI.TOAST_PADDING_X, cursorY);
+            ImGui.setCursorPos(cursorX + K.UI.TOAST_PADDING_X + K.UI.TOAST_ICON_SIZE + K.UI.TOAST_PADDING_X, cursorY);
 
-            ImGui.pushStyleColor(ImGuiCol.Text,
-                    accent[0], accent[1], accent[2], accent[3]);
+            ImGui.pushStyleColor(ImGuiCol.Text, accent[0], accent[1], accent[2], accent[3]);
 
             ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, 0.0f, 2.0f);
             ImGui.text(toast.getType().getTitle());
@@ -364,8 +369,7 @@ public class GameUIService implements Service<GameMaster> {
             return;
         }
 
-        Crop crop = world.getCropAt(hoveredCell.x(),
-                hoveredCell.y(), hoveredCell.z());
+        Crop crop = world.getCropAt(hoveredCell.x(), hoveredCell.y(), hoveredCell.z());
 
         boolean hasCrop = crop != null;
         boolean hasSeedSelected = !hasCrop && selectedInventoryItem instanceof Seed;
@@ -391,13 +395,13 @@ public class GameUIService implements Service<GameMaster> {
             ImGui.text(crop.getCropType().getName());
             ImGui.textDisabled("Status: " + crop.getStage().getName());
 
-        } else if (selectedInventoryItem instanceof Seed seed){
+        } else if (selectedInventoryItem instanceof Seed seed) {
             int amount = player.getInventory().getAmount(seed);
             ImGui.text(seed.getName() + " (x" + amount + ")");
             ImGui.textDisabled(seed.getDescription());
         } else if (selectedInventoryItem instanceof Tool tool) {
             int duration = tool.getDurability();
-            ImGui.text(tool.getName() + " (" + duration +")");
+            ImGui.text(tool.getName() + " (" + duration + ")");
         }
 
         ImGui.popStyleVar();
@@ -409,8 +413,8 @@ public class GameUIService implements Service<GameMaster> {
             return false;
         }
 
-        ImGui.setNextWindowPos(windowWidth * K.UI.CENTER_PIVOT, windowHeight * K.UI.CENTER_PIVOT,
-                ImGuiCond.Always, K.UI.CENTER_PIVOT, K.UI.CENTER_PIVOT);
+        ImGui.setNextWindowPos(windowWidth * K.UI.CENTER_PIVOT,
+                windowHeight * K.UI.CENTER_PIVOT, ImGuiCond.Always, K.UI.CENTER_PIVOT, K.UI.CENTER_PIVOT);
         ImGui.setNextWindowSize(K.UI.NEW_PLAYER_WIDTH, K.UI.NEW_PLAYER_HEIGHT);
 
         int windowFlags = ImGuiWindowFlags.NoTitleBar |
@@ -423,8 +427,7 @@ public class GameUIService implements Service<GameMaster> {
         ImGui.pushItemWidth(K.UI.MATCH_PARENT_WIDTH);
         ImGui.setKeyboardFocusHere();
 
-        boolean wasEnterPressed = ImGui.inputText("##PlayerName",
-                nameBuffer, ImGuiInputTextFlags.EnterReturnsTrue);
+        boolean wasEnterPressed = ImGui.inputText("##PlayerName", nameBuffer, ImGuiInputTextFlags.EnterReturnsTrue);
 
         ImGui.popItemWidth();
         boolean wasButtonClicked = ImGui.button("Start", K.UI.MATCH_PARENT_WIDTH, K.UI.LARGE_BUTTON_HEIGHT);
@@ -436,9 +439,8 @@ public class GameUIService implements Service<GameMaster> {
     public String inputCommand() {
         if (player == null) return null;
 
-        ImGui.setNextWindowPos(windowWidth * K.UI.CENTER_PIVOT,
-                windowHeight * K.UI.CENTER_PIVOT, ImGuiCond.Always, K.UI.CENTER_PIVOT, K.UI.CENTER_PIVOT);
-
+        ImGui.setNextWindowPos(windowWidth * K.UI.CENTER_PIVOT, windowHeight * K.UI.CENTER_PIVOT,
+                ImGuiCond.Always, K.UI.CENTER_PIVOT, K.UI.CENTER_PIVOT);
         ImGui.setNextWindowSize(K.UI.INPUT_WIDTH, K.UI.INPUT_HEIGHT);
 
         int windowFlags = ImGuiWindowFlags.NoTitleBar |
@@ -500,10 +502,37 @@ public class GameUIService implements Service<GameMaster> {
 
     public void renderInv() {
         if (player == null) return;
-        ImGui.setNextWindowPos(K.UI.HUD_PADDING,
-                windowHeight - K.UI.INVENTORY_HEIGHT - K.UI.HUD_PADDING,
-                ImGuiCond.Always);
-        ImGui.setNextWindowSize(K.UI.INVENTORY_WIDTH, K.UI.INVENTORY_HEIGHT, ImGuiCond.Always);
+        Inventory inv = player.getInventory();
+        inv.sort();
+
+        int columns = K.UI.HOTBAR_SLOTS;
+        int rows = (int) Math.ceil((double) K.World.TOTAL_SLOTS / columns);
+
+        Map<String, Map.Entry<Item, Integer>> aggregated = new LinkedHashMap<>();
+        for (Map.Entry<Item, Integer> entry : inv.getItems().entrySet()) {
+            String name = entry.getKey().getName();
+            if (aggregated.containsKey(name)) {
+                int previousAmount = aggregated.get(name).getValue();
+                aggregated.put(name, new AbstractMap.SimpleEntry<>(
+                        entry.getKey(), previousAmount + entry.getValue()));
+            } else {
+                aggregated.put(name, entry);
+            }
+        }
+
+        float slotWidth = K.UI.ICON_SIZE + K.Style.FRAME_PADDING_X * 2.0f;
+        float slotHeight = K.UI.ICON_SIZE + K.Style.FRAME_PADDING_Y * 2.0f;
+
+        float inventoryWidth = columns * slotWidth + (columns - 1) * K.Style.ITEM_SPACING + K.Style.WINDOW_PADDING_X * 2.0f;
+        float inventoryHeight = rows * slotHeight + (rows - 1) * K.Style.ITEM_SPACING
+                + K.Style.WINDOW_PADDING_Y * 3.0f
+                + ImGui.getTextLineHeight() * 2.0f
+                + K.Style.ITEM_SPACING;
+
+        ImGui.setNextWindowPos(windowWidth / 2.0f, windowHeight / 2.0f,
+                ImGuiCond.Always, 0.5f, 0.5f);
+
+        ImGui.setNextWindowSize(inventoryWidth, inventoryHeight, ImGuiCond.Always);
 
         int flags = ImGuiWindowFlags.NoTitleBar |
                 ImGuiWindowFlags.NoResize |
@@ -512,30 +541,12 @@ public class GameUIService implements Service<GameMaster> {
                 ImGuiWindowFlags.NoScrollWithMouse;
 
         if (ImGui.begin("Inventory", flags)) {
-            Inventory inv = player.getInventory();
-            inv.sort();
-
             ImGui.text(player.getName() + "'s Farm, $" + player.purse());
             ImGui.separator();
-
             if (inv.isEmpty()) {
                 ImGui.textDisabled("You're out of stuff!");
                 selectedInventoryItem = null;
-
             } else {
-
-                Map<String, Map.Entry<Item, Integer>> aggregated = new LinkedHashMap<>();
-                for (Map.Entry<Item, Integer> entry : inv.getItems().entrySet()) {
-                    String name = entry.getKey().getName();
-                    if (aggregated.containsKey(name)) {
-                        int prevAmount = aggregated.get(name).getValue();
-                        aggregated.put(name, new AbstractMap.SimpleEntry<>(entry.getKey(), prevAmount + entry.getValue()));
-
-                    } else {
-                        aggregated.put(name, entry);
-                    }
-                }
-
                 if (selectedInventoryItem != null && !aggregated.containsKey(selectedInventoryItem.getName())) {
                     selectedInventoryItem = null;
                 }
@@ -547,19 +558,17 @@ public class GameUIService implements Service<GameMaster> {
                 for (int i = 0; i < K.World.TOTAL_SLOTS; i++) {
                     Item item = null;
                     int totalAmount = 0;
-                    if (slotIndex < aggregated.size()) {
-                        Map.Entry<String, Map.Entry<Item, Integer>> entry =
-                                aggregated.entrySet().stream().skip(slotIndex).findFirst().orElse(null);
 
+                    if (slotIndex < aggregated.size()) {
+                        Map.Entry<String, Map.Entry<Item, Integer>> entry = aggregated
+                                .entrySet().stream().skip(slotIndex).findFirst().orElse(null);
                         if (entry != null) {
                             item = entry.getValue().getKey();
                             totalAmount = entry.getValue().getValue();
                         }
                     }
 
-                    boolean isSelected = item != null && selectedInventoryItem != null
-                            && selectedInventoryItem.getName().equals(item.getName());
-
+                    boolean isSelected = selectedInventorySlot == slotIndex;
                     setColor(ImGuiCol.Button, isSelected ? K.Style.COLOR_BUTTON : K.Style.COLOR_SLOT_BG);
                     setColor(ImGuiCol.ButtonHovered, isSelected ? K.Style.COLOR_BUTTON_HOVERED : K.Style.COLOR_SLOT_HOVERED);
                     setColor(ImGuiCol.ButtonActive, isSelected ? K.Style.COLOR_BUTTON_ACTIVE : K.Style.COLOR_SLOT_BG);
@@ -574,8 +583,10 @@ public class GameUIService implements Service<GameMaster> {
                         float u0 = (float) col / totalCols;
                         float u1 = (float) (col + 1) / totalCols;
 
-                        if (ImGui.imageButton(atlas.getTextureId(), K.UI.ICON_SIZE, K.UI.ICON_SIZE, u0, 1.0f, u1, 0.0f)) {
+                        if (ImGui.imageButton(atlas.getTextureId(), K.UI.ICON_SIZE, K.UI.ICON_SIZE, u0, 1.0f,
+                                u1, 0.0f)) {
                             selectedInventoryItem = item;
+                            selectedInventorySlot = slotIndex;
                         }
 
                         if (ImGui.isItemHovered() && ImGui.isMouseDoubleClicked(GLFW_MOUSE_BUTTON_LEFT)) {
@@ -589,10 +600,10 @@ public class GameUIService implements Service<GameMaster> {
                             ImGui.setTooltip(item.getName());
                         }
 
-                    } else {
-                        ImGui.button("##empty", K.UI.ICON_SIZE +
-                                K.Style.FRAME_PADDING_X * 2.0f, K.UI.ICON_SIZE +
-                                K.Style.FRAME_PADDING_Y * 2.0f);
+                    } else if (ImGui.button("##empty", K.UI.ICON_SIZE + K.Style.FRAME_PADDING_X * 2.0f,
+                                K.UI.ICON_SIZE + K.Style.FRAME_PADDING_Y * 2.0f)) {
+                        selectedInventoryItem = null;
+                        selectedInventorySlot = slotIndex;
                     }
 
                     ImGui.popID();
@@ -600,13 +611,12 @@ public class GameUIService implements Service<GameMaster> {
 
                     slotIndex++;
 
-                    if (slotIndex % 4 != 0) {
+                    if (slotIndex % columns != 0) {
                         ImGui.sameLine();
                     }
                 }
 
                 ImGui.popStyleVar(2);
-
             }
         }
 
@@ -636,8 +646,7 @@ public class GameUIService implements Service<GameMaster> {
         int totalPrice = item.getValue() * amount;
         if (player.purse() < totalPrice) {
             log.warn("Player doesn't have enough money to buy {} x{}", item.getName(), amount);
-            toastService.warning("You don't have enough money to buy " +
-                    amount + " " + item.getName() + "!");
+            toastService.warning("You don't have enough money to buy " + amount + " " + item.getName() + "!");
             return;
         }
 
@@ -675,9 +684,12 @@ public class GameUIService implements Service<GameMaster> {
         ImGui.setNextWindowPos(windowWidth - K.UI.INVENTORY_WIDTH - K.UI.HUD_PADDING,
                 windowHeight - K.UI.INVENTORY_HEIGHT - K.UI.HUD_PADDING, ImGuiCond.Always);
         ImGui.setNextWindowSize(K.UI.INVENTORY_WIDTH, K.UI.INVENTORY_HEIGHT, ImGuiCond.Always);
+
         int flags = ImGuiWindowFlags.NoTitleBar |
                 ImGuiWindowFlags.NoResize |
-                ImGuiWindowFlags.NoCollapse;
+                ImGuiWindowFlags.NoCollapse |
+                ImGuiWindowFlags.NoScrollbar |
+                ImGuiWindowFlags.NoScrollWithMouse;
 
         if (ImGui.begin("Shop", flags)) {
             ImGui.text(shop.getOwner() + "'s Shop, $" + shop.purse());
@@ -693,12 +705,12 @@ public class GameUIService implements Service<GameMaster> {
                 ImGui.pushStyleVar(ImGuiStyleVar.FrameBorderSize, 1.0f);
                 int slotIndex = 0;
                 Map<Item, Integer> stockItems = new LinkedHashMap<>(stock.getItems());
-                for (int i = 0; i < K.World.TOTAL_SLOTS; i++) {
+                for (int i = 0; i < K.World.TOTAL_SLOTS_STOCK; i++) {
                     Item item = null;
                     int amount = 0;
                     if (slotIndex < stockItems.size()) {
-                        Map.Entry<Item, Integer> entry = stockItems.entrySet().stream()
-                                .skip(slotIndex).findFirst().orElse(null);
+                        Map.Entry<Item, Integer> entry = stockItems.entrySet()
+                                .stream().skip(slotIndex).findFirst().orElse(null);
 
                         if (entry != null) {
                             item = entry.getKey();
@@ -736,8 +748,8 @@ public class GameUIService implements Service<GameMaster> {
                         }
 
                     } else {
-                        ImGui.button("##empty", K.UI.ICON_SIZE + K.Style.FRAME_PADDING_X * 2.0f,
-                                K.UI.ICON_SIZE + K.Style.FRAME_PADDING_Y * 2.0f);
+                        ImGui.button("##empty", K.UI.ICON_SIZE +
+                                K.Style.FRAME_PADDING_X * 2.0f, K.UI.ICON_SIZE + K.Style.FRAME_PADDING_Y * 2.0f);
                     }
 
                     ImGui.popID();

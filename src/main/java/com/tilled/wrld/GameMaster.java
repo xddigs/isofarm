@@ -71,6 +71,7 @@ public class GameMaster {
     private Shop shop;
     private boolean isPromptingForInput = false;
     private boolean isInventoryOpen = false;
+    private boolean isHUDShown = true;
 
     private float genDelta;
 
@@ -195,16 +196,24 @@ public class GameMaster {
         return isPromptingForInput;
     }
 
-    public void setPromptingForInput(boolean promptingForInput) {
-        isPromptingForInput = promptingForInput;
+    public void setPromptingForInput(boolean isPromptingForInput) {
+        this.isPromptingForInput = isPromptingForInput;
     }
 
     public boolean isInventoryOpen() {
         return isInventoryOpen;
     }
 
-    public void setInventoryOpen(boolean inventoryOpen) {
-        isInventoryOpen = inventoryOpen;
+    public void setInventoryOpen(boolean isInventoryOpen) {
+        this.isInventoryOpen = isInventoryOpen;
+    }
+
+    public boolean isHUDShown() {
+        return isHUDShown;
+    }
+
+    public void toggleHUD() {
+        this.isHUDShown = !isHUDShown;
     }
 
     public SpriteSheet getCropSpriteSheet(CropType type) {
@@ -374,7 +383,9 @@ public class GameMaster {
         }
 
         gameUIservice.beginFrame();
-        gameUIservice.renderHUD(this);
+        if (isHUDShown()) {
+            gameUIservice.renderHUD(this);
+        }
 
         if (hoveredCell != null && player != null) {
             gameUIservice.renderTooltip(hoveredCell, world);

@@ -29,7 +29,8 @@ public final class K {
         public static final float WEATHER_CHANGE_PROBABILITY = 0.01f;
 
         public static final int STARTING_COINS = 100;
-        public static final int TOTAL_SLOTS = 16;
+        public static final int TOTAL_SLOTS = 27;
+        public static final int TOTAL_SLOTS_STOCK = 16;
         public static final int MAX_STACK = 9999;
         public static final int PARTICLES_COUNT = 16;
         public static final int WATER_LEVEL_MAX = 100;
