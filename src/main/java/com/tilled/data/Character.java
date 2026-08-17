@@ -3,7 +3,7 @@ package com.tilled.data;
 import com.tilled.service.ToastService;
 
 @DataClass
-public class Character extends Entity implements Levelable {
+public abstract class Character extends Entity implements Levelable {
     private final ToastService toastService;
     private final Inventory inventory;
     private final Purse purse;
@@ -72,13 +72,24 @@ public class Character extends Entity implements Levelable {
 
     @Override
     public void gain(int experience) {
-        experience += this.experience;
-        while (experience >= experienceForNextLevel) {
-            experience = 0;
-            levelUp();
-            int levelUpScaling = (int) (level * 0.8);
-            scale(levelUpScaling);
+        if (experience <= 0) {
+            return;
         }
+
+        this.experience += experience;
+        while (this.experience >= experienceForNextLevel) {
+            this.experience -= experienceForNextLevel;
+            levelUp();
+
+            int levelUpScaling = (int) (level * 0.8f);
+            scale(levelUpScaling);
+            experienceForNextLevel = calcNextLevel();
+        }
+    }
+
+    @Override
+    public int calcNextLevel() {
+        return (int) (level * 1.2f);
     }
 
     @Override

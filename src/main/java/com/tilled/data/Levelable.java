@@ -7,6 +7,7 @@ public interface Levelable {
     void setExperience(int experience);
     int getExperienceForNextLevel();
     void setExperienceForNextLevel(int experienceForNextLevel);
+    int calcNextLevel();
     void levelUp();
     void gain(int experience);
 }

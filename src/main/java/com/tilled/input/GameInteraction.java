@@ -77,16 +77,24 @@ public class GameInteraction {
 
         Crop crop = world.getCropAt(x, y, z);
         if (crop != null) {
+            CropType cropType = crop.getCropType();
+            int frameIndex = crop.getStage().getFrameIndex();
+            SpriteSheet sheet = gameMaster.getCropSpriteSheet(cropType);
 
             if (crop.isReadyToHarvest()) {
-                cropService.harvest(gameMaster.getPlayer(), crop,
-                        gameMaster.getToastService());
+                cropService.harvest(
+                        gameMaster.getPlayer(),
+                        crop,
+                        gameMaster.getToastService()
+                );
             } else {
                 cropService.rip(crop);
             }
 
-            SpriteSheet sheet = gameMaster.getCropSpriteSheet(crop.getCropType());
-            particles.spawn(x, K.World.CROP_Y_OFFSET, z, sheet, crop.getStage().getFrameIndex());
+            if (sheet != null) {
+                particles.spawn(x, K.World.CROP_Y_OFFSET, z, sheet, frameIndex);
+            }
+
             gameUIservice.logAction(cell);
             return;
         }
@@ -101,9 +109,12 @@ public class GameInteraction {
 
         world.setBlockTypeAt(x, y, z, (byte) 0);
         gameMaster.rebuildChunkMeshAt(x, z);
+
         particles.spawn(x, y, z, blockData, blocksTexture);
+
         Block removedBlock = new Block(blockData, x, y, z);
         gameMaster.getPlayer().add(removedBlock);
+
         gameUIservice.logAction(cell);
         log.info("Block removed: {} at {},{},{}", blockData.getName(), x, y, z);
     }
