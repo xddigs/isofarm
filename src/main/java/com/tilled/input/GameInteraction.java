@@ -136,18 +136,22 @@ public class GameInteraction {
         World world = gameMaster.getWorld();
 
         if (selectedItem instanceof Block block) {
-            int x = cell.x();
-            int z = cell.z();
-            int targetY = getFirstFreeY(world, x, z);
-            Block newBlock = new Block(block.getType(), x, targetY, z);
-            byte existingBlock = world.getBlockTypeAt(x, targetY, z);
+            int x = cell.x() + cell.normalX();
+            int y = cell.y() + cell.normalY();
+            int z = cell.z() + cell.normalZ();
 
+            if (y < 0 || y >= Chunk.SIZE_Y) {
+                return;
+            }
+
+            byte existingBlock = world.getBlockTypeAt(x, y, z);
             if (existingBlock == 0) {
-                world.setBlockTypeAt(x, targetY,z, block.getType().getId());
+                Block newBlock = new Block(block.getType(), x, y, z);
+                world.setBlockTypeAt(x, y, z, block.getType().getId());
                 gameMaster.getPlayer().remove(selectedItem);
                 gameMaster.rebuildChunkMeshAt(x, z);
-                gameUIservice.logAction(cell);
-                log.info("Block placed: {} at {},{},{}", newBlock.getType().getName(), x, targetY, z);
+                gameUIservice.logAction(new Hit(x, y, z, cell.normalX(), cell.normalY(), cell.normalZ()));
+                log.info("Block placed: {} at {},{},{}", newBlock.getType().getName(), x, y, z);
             }
 
             return;
@@ -190,15 +194,6 @@ public class GameInteraction {
                 log.info("Planted {} at {},{},{}", seed.getType().getName(), x, y, z);
             }
         }
-    }
-
-    private int getFirstFreeY(World world, int x, int z) {
-        int y = 1;
-        while (y < Chunk.SIZE_Y && world.getBlockTypeAt(x, y, z) != 0) {
-            y++;
-        }
-
-        return y;
     }
 
     private BlockData getBlockData(byte blockId) {
