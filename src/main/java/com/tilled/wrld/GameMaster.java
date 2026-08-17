@@ -279,8 +279,6 @@ public class GameMaster {
             defaultShader.setUniform("uBaseColor", K.Colors.DEFAULT_DIRT);
         }
 
-        particles.render(defaultShader, blockMesh, blocksTexture, modelMatrix);
-
         if (blocksTexture != null) {
             blocksTexture.bind();
             defaultShader.setUniform("uUseTexture", true);
@@ -330,6 +328,8 @@ public class GameMaster {
             spriteMesh.render();
             sheet.unbind();
         });
+
+        particles.render(defaultShader, blockMesh, blocksTexture, modelMatrix);
 
         if (blocksTexture != null) {
             blocksTexture.unbind();
