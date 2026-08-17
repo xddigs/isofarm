@@ -187,15 +187,17 @@ public class GameUIService implements Service<GameMaster> {
     private void renderSliders() {
         if (player == null) return;
 
-        ImGui.setNextWindowPos(20, 20, ImGuiCond.Always);
-        ImGui.setNextWindowSize(300, 260, ImGuiCond.Always);
+        float windowWidth = K.UI.SETTINGS_PANEL_WIDTH;
+        ImGui.setNextWindowPos(K.UI.HUD_PADDING, K.UI.HUD_PADDING, ImGuiCond.Always);
+        ImGui.setNextWindowSize(windowWidth, 0.0f, ImGuiCond.Always);
 
         int flags = ImGuiWindowFlags.NoTitleBar |
                 ImGuiWindowFlags.NoResize |
                 ImGuiWindowFlags.NoCollapse |
                 ImGuiWindowFlags.NoMove |
                 ImGuiWindowFlags.NoScrollbar |
-                ImGuiWindowFlags.NoScrollWithMouse;
+                ImGuiWindowFlags.NoScrollWithMouse |
+                ImGuiWindowFlags.AlwaysAutoResize;
 
         ImGui.pushStyleVar(ImGuiStyleVar.WindowRounding, K.Style.WINDOW_ROUNDING);
         ImGui.pushStyleVar(ImGuiStyleVar.FrameRounding, K.Style.FRAME_ROUNDING);
@@ -212,9 +214,6 @@ public class GameUIService implements Service<GameMaster> {
         ImGui.pushStyleColor(ImGuiCol.Text, K.Style.COLOR_TEXT[0], K.Style.COLOR_TEXT[1], K.Style.COLOR_TEXT[2], K.Style.COLOR_TEXT[3]);
 
         if (ImGui.begin("HUD_Settings_Panel", flags)) {
-            ImGui.textColored(0.00f, 0.80f, 0.95f, 1.00f, "Settings");
-            ImGui.separator();
-
             int[] rdBuffer = new int[]{ Settings.renderDistance };
             ImGui.textDisabled("Render");
             ImGui.pushItemWidth(-1);
@@ -247,7 +246,7 @@ public class GameUIService implements Service<GameMaster> {
             ImGui.popItemWidth();
         }
         ImGui.end();
-        ImGui.popStyleColor(6);
+        ImGui.popStyleColor(7);
         ImGui.popStyleVar(4);
     }
 

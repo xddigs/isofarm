@@ -150,6 +150,7 @@ public final class K {
         public static final float HOTBAR_LABEL_OFFSET_Y = 100.0f;
         public static final float CROSSHAIR_SIZE = 10.0f;
         public static final float CROSSHAIR_THICKNESS = 2.0f;
+        public static final float SETTINGS_PANEL_WIDTH = 300f;
     }
 
     public static final class Paths {
