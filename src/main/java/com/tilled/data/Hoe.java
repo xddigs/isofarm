@@ -14,7 +14,8 @@ public class Hoe extends Tool {
         Block target = world.getBlockAt(
                 block.getX(),
                 block.getY(),
-                block.getZ());
+                block.getZ()
+        );
 
         if (target == null) return;
         if (!target.getType().isTillable()) return;

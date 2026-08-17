@@ -154,7 +154,9 @@ public class GameInteraction {
         }
 
         if (selectedItem instanceof Hoe hoe) {
-            hoe.use(world, world.getBlockAt(cell.x(), cell.y(), cell.z()));
+            Block block = world.getBlockAt(cell.x(), cell.y(), cell.z());
+            hoe.use(world, block);
+            gameMaster.rebuildChunkMeshAt(block.getX(), block.getZ());
         }
 
         if (selectedItem instanceof Seed seed) {

@@ -77,6 +77,10 @@ public enum BlockData {
         return value;
     }
 
+    public boolean isTillable() {
+        return isTillable;
+    }
+
     public int getTileX() {
         return sideTileX;
     }
@@ -120,9 +124,5 @@ public enum BlockData {
             }
         }
         return null;
-    }
-
-    public boolean isTillable() {
-        return isTillable;
     }
 }
