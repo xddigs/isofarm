@@ -173,6 +173,10 @@ public class GameMaster {
         return player;
     }
 
+    public SoundService getSoundService() {
+        return soundService;
+    }
+
     public ToastService getToastService() {
         return toastService;
     }
@@ -201,16 +205,20 @@ public class GameMaster {
         return camera;
     }
 
+    public CameraController getCameraController() {
+        return cameraController;
+    }
+
     public int getLastPlayerChunkX() {
         return lastPlayerChunkX;
     }
 
-    public int getLastPlayerChunkZ() {
-        return lastPlayerChunkZ;
-    }
-
     public void setLastPlayerChunkX(int lastPlayerChunkX) {
         this.lastPlayerChunkX = lastPlayerChunkX;
+    }
+
+    public int getLastPlayerChunkZ() {
+        return lastPlayerChunkZ;
     }
 
     public void setLastPlayerChunkZ(int lastPlayerChunkZ) {

@@ -1,6 +1,6 @@
 package com.tilled.service;
 
-import com.tilled.data.StepSoundGroup;
+import com.tilled.data.SoundGroup;
 import org.lwjgl.openal.AL;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.ALC;
@@ -19,7 +19,6 @@ import java.util.Map;
 
 import static org.lwjgl.openal.AL10.*;
 import static org.lwjgl.openal.ALC10.*;
-import static org.lwjgl.stb.STBVorbis.stb_vorbis_decode_filename;
 import static org.lwjgl.stb.STBVorbis.stb_vorbis_decode_memory;
 
 public class SoundService {
@@ -27,19 +26,26 @@ public class SoundService {
     private long device;
     private long context;
     private final Map<String, Integer> soundBuffers = new HashMap<>();
+
     private int stepSource;
+    private int breakSource;
 
     public SoundService() {
         this.init();
-        for (StepSoundGroup type : StepSoundGroup.values()) {
-            int bufferId = loadOgg(type.sound1());
-            int bufferId2 = loadOgg(type.sound2());
-            int bufferId3 = loadOgg(type.sound3());
-            int bufferId4 = loadOgg(type.sound4());
-            soundBuffers.put(type.name(), bufferId);
-            soundBuffers.put(type.name(), bufferId2);
-            soundBuffers.put(type.name(), bufferId3);
-            soundBuffers.put(type.name(), bufferId4);
+
+        for (SoundGroup group : SoundGroup.values()) {
+            loadSoundArray(group.getStepSounds());
+            loadSoundArray(group.getBreakSounds());
+        }
+    }
+
+    private void loadSoundArray(String[] paths) {
+        if (paths == null) return;
+        for (String path : paths) {
+            if (path != null && !soundBuffers.containsKey(path)) {
+                int bufferId = loadOgg(path);
+                soundBuffers.put(path, bufferId);
+            }
         }
     }
 
@@ -53,23 +59,33 @@ public class SoundService {
         context = alcCreateContext(device, (int[]) null);
         alcMakeContextCurrent(context);
         AL.createCapabilities(deviceCaps);
+
         stepSource = alGenSources();
+        breakSource = alGenSources();
+        alSourcef(breakSource, AL_GAIN, 1.0f);
+        alSourcef(stepSource, AL_GAIN, 1.0f);
     }
 
-    public int getStepSource() {
-        return stepSource;
+    public void playStepSound(SoundGroup group) {
+        playSound(stepSource, group != null ? group.getStepSounds() : null, 0.95f, 0.1f);
     }
 
-    public Map<String, Integer> getSoundBuffers() {
-        return soundBuffers;
+    public void playBreakSound(SoundGroup group) {
+        playSound(breakSource, group != null ? group.getBreakSounds() : null, 0.8f, 0.2f);
     }
 
-    public void cleanup() {
-        alDeleteSources(stepSource);
-        soundBuffers.values().forEach(AL10::alDeleteBuffers);
-        alcMakeContextCurrent(MemoryUtil.NULL);
-        alcDestroyContext(context);
-        alcCloseDevice(device);
+    private void playSound(int source, String[] sounds, float basePitch, float pitchVariation) {
+        if (sounds == null || sounds.length == 0) return;
+
+        String selectedSoundPath = sounds[(int) (Math.random() * sounds.length)];
+        Integer bufferId = soundBuffers.get(selectedSoundPath);
+
+        if (bufferId != null && bufferId > 0) {
+            alSourceStop(source);
+            alSourcei(source, AL_BUFFER, bufferId);
+            alSourcef(source, AL_PITCH, basePitch + (float) Math.random() * pitchVariation);
+            alSourcePlay(source);
+        }
     }
 
     public int loadOgg(String resourcePath) {
@@ -89,8 +105,8 @@ public class SoundService {
                 IntBuffer channelsBuffer = stack.mallocInt(1);
                 IntBuffer sampleRateBuffer = stack.mallocInt(1);
 
-                ShortBuffer rawAudioBuffer = stb_vorbis_decode_memory(buffer, channelsBuffer,
-                        sampleRateBuffer);
+                ShortBuffer rawAudioBuffer = stb_vorbis_decode_memory(
+                        buffer, channelsBuffer, sampleRateBuffer);
 
                 MemoryUtil.memFree(buffer);
                 if (rawAudioBuffer == null) {
@@ -114,22 +130,12 @@ public class SoundService {
         }
     }
 
-    public void playStepSound(StepSoundGroup group) {
-        if (group == null || group == StepSoundGroup.SILENT) return;
-        int variant = (int) (Math.random() * 4) + 1;
-        String key = (variant == 1) ? group.name() : group.name() + variant;
-        stepFX(key);
-    }
-
-    public void stepFX(String soundKey) {
-        Integer bufferId = soundBuffers.get(soundKey);
-        if (bufferId == null || bufferId <= 0) {
-            return;
-        }
-
-        alSourceStop(stepSource);
-        alSourcei(stepSource, AL_BUFFER, bufferId);
-        alSourcef(stepSource, AL_PITCH, 0.95f + (float) Math.random() * 0.1f);
-        alSourcePlay(stepSource);
+    public void cleanup() {
+        alDeleteSources(stepSource);
+        alDeleteSources(breakSource);
+        soundBuffers.values().forEach(AL10::alDeleteBuffers);
+        alcMakeContextCurrent(MemoryUtil.NULL);
+        alcDestroyContext(context);
+        alcCloseDevice(device);
     }
 }

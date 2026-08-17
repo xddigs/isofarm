@@ -106,6 +106,11 @@ public class GameInteraction {
         BlockData blockData = getBlockData(blockId);
         if (blockData == null) return;
 
+        if (blockData.getStepSoundGroup() != null) {
+            gameMaster.getSoundService()
+                    .playBreakSound(blockData.getStepSoundGroup());
+        }
+
         world.setBlockTypeAt(x, y, z, (byte) 0);
         gameMaster.rebuildChunkMeshAt(x, z);
 

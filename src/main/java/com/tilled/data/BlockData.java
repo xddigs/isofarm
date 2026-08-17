@@ -6,13 +6,13 @@ import org.joml.Vector2f;
 @SuppressWarnings("all")
 @DataClass
 public enum BlockData {
-    DIRT((byte) 1, "Dirt", true, 100, 0, 0, StepSoundGroup.GRASS),
-    GRASS((byte) 2, "Grass", true, 120, 1, 0, 1, 3, 1, 1, StepSoundGroup.GRASS),
-    STONE((byte) 3, "Stone", 150, 2, 0, StepSoundGroup.SILENT),
-    DISPENSER((byte) 4, "Dispenser", 500, 3, 0, StepSoundGroup.SILENT),
-    TILLED_DIRT((byte) 5, "Tilled Dirt", true, 110, 4, 0, 0, 0, 0, 0, StepSoundGroup.GRASS),
-    WATER((byte) 6, "Water", 100, 5, 0, StepSoundGroup.SILENT),
-    CROP((byte) 7, "Crop", -1, 6, 0, StepSoundGroup.GRASS);
+    DIRT((byte) 1, "Dirt", true, 100, 0, 0, SoundGroup.GRASS),
+    GRASS((byte) 2, "Grass", true, 120, 1, 0, 1, 3, 1, 1, SoundGroup.GRASS),
+    STONE((byte) 3, "Stone", 150, 2, 0, SoundGroup.SILENT),
+    DISPENSER((byte) 4, "Dispenser", 500, 3, 0, SoundGroup.SILENT),
+    TILLED_DIRT((byte) 5, "Tilled Dirt", true, 110, 4, 0, 0, 0, 0, 0, SoundGroup.GRASS),
+    WATER((byte) 6, "Water", 100, 5, 0, SoundGroup.SILENT),
+    CROP((byte) 7, "Crop", -1, 6, 0, SoundGroup.GRASS);
 
     public static final int ATLAS_COLS = K.UI.BLOCK_ATLAS_FRAMES;
     public static final int ATLAS_ROWS = K.UI.ICON_BLOCK_ATLAS_ROWS;
@@ -34,35 +34,35 @@ public enum BlockData {
     private final Vector2f bottomAtlasOffset;
     private final Vector2f sideAtlasOffset;
 
-    private final StepSoundGroup stepSoundGroup;
+    private final SoundGroup soundGroup;
 
     BlockData(byte id, String name, int value, int tileX, int tileY,
-              boolean isTillable, StepSoundGroup stepSoundGroup) {
+              boolean isTillable, SoundGroup soundGroup) {
         this(id, name, isTillable, value, tileX, tileY, tileX, tileY,
-                tileX, tileY, stepSoundGroup);
+                tileX, tileY, soundGroup);
     }
 
     BlockData(byte id, String name, int value, int tileX, int tileY,
-              StepSoundGroup stepSoundGroup) {
+              SoundGroup soundGroup) {
         this(id, name, false, value, tileX, tileY, tileX,
-                tileY, tileX, tileY, stepSoundGroup);
+                tileY, tileX, tileY, soundGroup);
     }
 
     BlockData(byte id, String name, boolean isTillable, int value, int
-            tileX, int tileY, StepSoundGroup stepSoundGroup) {
+            tileX, int tileY, SoundGroup soundGroup) {
         this(id, name, isTillable, value, tileX, tileY, tileX,
-                tileY, tileX, tileY, stepSoundGroup);
+                tileY, tileX, tileY, soundGroup);
     }
 
     BlockData(byte id, String name, int value, boolean isTillable, int topTileX,
-              int topTileY, StepSoundGroup stepSoundGroup) {
+              int topTileY, SoundGroup soundGroup) {
         this(id, name, isTillable, value, topTileX, topTileY,
-                0, 0, 0, 0, stepSoundGroup);
+                0, 0, 0, 0, soundGroup);
     }
 
     BlockData(byte id, String name, boolean isTillable, int value, int topTileX,
               int topTileY, int bottomTileX, int bottomTileY, int sideTileX,
-              int sideTileY, StepSoundGroup stepSoundGroup) {
+              int sideTileY, SoundGroup soundGroup) {
         this.id = id;
         this.name = name;
         this.isTillable = isTillable;
@@ -73,7 +73,7 @@ public enum BlockData {
         this.bottomTileY = bottomTileY;
         this.sideTileX = sideTileX;
         this.sideTileY = sideTileY;
-        this.stepSoundGroup = stepSoundGroup;
+        this.soundGroup = soundGroup;
 
         this.atlasScale = new Vector2f(1.0f / ATLAS_COLS, 1.0f / ATLAS_ROWS);
         this.topAtlasOffset = calculateAtlasOffset(topTileX, topTileY);
@@ -142,7 +142,7 @@ public enum BlockData {
         return sideAtlasOffset;
     }
 
-    public StepSoundGroup getStepSoundGroup() {
-        return stepSoundGroup;
+    public SoundGroup getStepSoundGroup() {
+        return soundGroup;
     }
 }

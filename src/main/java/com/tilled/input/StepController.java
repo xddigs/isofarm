@@ -2,7 +2,7 @@ package com.tilled.input;
 
 import com.tilled.data.Block;
 import com.tilled.data.Player;
-import com.tilled.data.StepSoundGroup;
+import com.tilled.data.SoundGroup;
 import com.tilled.service.SoundService;
 import com.tilled.wrld.World;
 import org.joml.Vector3f;
@@ -35,7 +35,7 @@ public class StepController {
 
             Block block = world.getBlockAt(blockX, blockY, blockZ);
             if (block != null && block.getType() != null) {
-                StepSoundGroup soundGroup = block.getType().getStepSoundGroup();
+                SoundGroup soundGroup = block.getType().getStepSoundGroup();
                 soundService.playStepSound(soundGroup);
             }
         }
