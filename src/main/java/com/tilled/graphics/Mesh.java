@@ -187,19 +187,20 @@ public class Mesh {
     }
 
     private static float[] getPositions(float eps) {
-        float minX = -0.5f - eps;
-        float maxX =  0.5f + eps;
-        float minY = -1.0f - eps;
-        float maxY =  0.0f + eps;
-        float minZ = -0.5f - eps;
-        float maxZ =  0.5f + eps;
+        float minX = -eps;
+        float maxX = 1.0f + eps;
+
+        float minY = -eps;
+        float maxY = 1.0f + eps;
+
+        float minZ = -eps;
+        float maxZ = 1.0f + eps;
 
         return new float[] {
                 minX, maxY, minZ,
                 maxX, maxY, minZ,
                 maxX, maxY, maxZ,
                 minX, maxY, maxZ,
-
                 minX, minY, minZ,
                 maxX, minY, minZ,
                 maxX, minY, maxZ,

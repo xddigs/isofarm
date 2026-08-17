@@ -237,7 +237,8 @@ public class GameMaster {
         Item selectedInventoryItem = gameUIservice.getSelectedInventoryItem();
 
         if (!ImGui.getIO().getWantCaptureMouse()) {
-            hoveredCell = gameInteraction.update(this, selectedInventoryItem);
+            hoveredCell = gameInteraction
+                    .update(this, selectedInventoryItem);
         } else {
             hoveredCell = null;
         }
@@ -287,7 +288,7 @@ public class GameMaster {
             defaultShader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
             defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
             defaultShader.setUniform("uTotalFrames", sheet.getTotalFrames());
-            modelMatrix.identity().translate(crop.getX(), K.World.CROP_ELEVATION_Y, crop.getZ());
+            modelMatrix.identity().translate(crop.getX(), crop.getY(), crop.getZ());
             defaultShader.setUniform("uModel", modelMatrix);
             defaultShader.setUniform("uFrameIndex", crop.getStage().getFrameIndex());
             spriteMesh.render();
@@ -324,9 +325,7 @@ public class GameMaster {
         if (hoveredCell != null) {
             glEnable(GL_DEPTH_TEST);
             glDepthMask(false);
-
             defaultShader.bind();
-
             defaultShader.setUniform("uUseTexture", false);
             defaultShader.setUniform("uUseFaceAtlas", false);
             defaultShader.setUniform("uBaseColor", K.Colors.OUTLINE_DEFAULT);
@@ -361,7 +360,7 @@ public class GameMaster {
                     .ifPresent(crop -> {
                         SpriteSheet sheet = cropSpritesheets.get(crop.getType());
                         sheet.bind();
-                        modelMatrix.identity().translate(crop.getX(), K.World.CROP_ELEVATION_Y, crop.getZ());
+                        modelMatrix.identity().translate(crop.getX(), crop.getY(), crop.getZ());
                         defaultShader.setUniform("uModel", modelMatrix);
                         defaultShader.setUniform("uFrameIndex", crop.getStage().getFrameIndex());
                         spriteMesh.render();
