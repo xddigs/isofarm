@@ -60,11 +60,8 @@ public class Crop extends Block {
         }
 
         float soilBonus = block != null && block.hasWater() ? 1.5f : 0.5f;
-
-        float effectiveDelta = delta * weather.getGrowthMultiplier() * soilBonus * block.getWaterLevel() / 10.0f;
-
+        float effectiveDelta = delta * weather.getGrowthMultiplier() * soilBonus * block.getWaterLevel();
         currentGrowthTime += effectiveDelta;
-
         float progress = currentGrowthTime / targetGrowthTime;
 
         if (progress >= 1.0f) {
