@@ -5,7 +5,6 @@ import com.tilled.graphics.SpriteSheet;
 import com.tilled.input.Mouse;
 import com.tilled.utils.K;
 import com.tilled.wrld.GameMaster;
-import com.tilled.wrld.World;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.ImGuiStyle;
@@ -13,12 +12,11 @@ import imgui.flag.*;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
 import imgui.type.ImString;
-import org.joml.*;
+import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.lang.Math;
 import java.util.*;
 
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
@@ -159,27 +157,6 @@ public class GameUIService implements Service<GameMaster> {
         }
     }
 
-    private Vector2f worldToScreen(Vector3f worldPosition) {
-        Matrix4f view = gameMaster.getCamera().getViewMatrix();
-        Matrix4f projection = gameMaster.getCamera().getProjectionMatrix();
-
-        Vector4f clipSpace = new Vector4f(worldPosition, 1.0f);
-
-        projection.mul(view).transform(clipSpace);
-
-        if (clipSpace.w <= 0.0f) {
-            return null;
-        }
-
-        float ndcX = clipSpace.x / clipSpace.w;
-        float ndcY = clipSpace.y / clipSpace.w;
-
-        float screenX = (ndcX + 1.0f) * 0.5f * windowWidth;
-        float screenY = (1.0f - ndcY) * 0.5f * windowHeight;
-
-        return new Vector2f(screenX, screenY);
-    }
-
     public void beginFrame() {
         imGuiGlfw.newFrame();
         ImGui.newFrame();
@@ -214,8 +191,8 @@ public class GameUIService implements Service<GameMaster> {
     public void renderCrosshair(float windowWidth, float windowHeight) {
         float centerX = windowWidth / 2.0f;
         float centerY = windowHeight / 2.0f;
-        float size = 8.0f;
-        float thickness = 2.0f;
+        float size = K.UI.CROSSHAIR_SIZE;
+        float thickness = K.UI.CROSSHAIR_THICKNESS;
 
         ImGui.getForegroundDrawList().addLine(
                 centerX - size, centerY, centerX + size, centerY,
@@ -519,100 +496,6 @@ public class GameUIService implements Service<GameMaster> {
             case ERROR             -> "X";
             case REWARD            -> "*";
         };
-    }
-
-    private boolean isWorldInteractable(Item item) {
-        return item instanceof Tool || item instanceof Seed;
-    }
-
-    public void renderTooltip(Hit hoveredCell, World world) {
-        if (hoveredCell == null || player == null) {
-            return;
-        }
-
-        String name = null;
-        Crop crop = world.getCropAt(
-                hoveredCell.x(), hoveredCell.y(), hoveredCell.z());
-
-        if (crop != null) {
-            name = crop.getCropType().getName();
-        } else if (selectedInventoryItem != null
-                && isWorldInteractable(selectedInventoryItem)) {
-            name = selectedInventoryItem.getName();
-        }
-
-        if (name == null || name.isBlank()) {
-            return;
-        }
-
-        Vector3f worldPosition = new Vector3f(
-                hoveredCell.x() + 0.5f,
-                hoveredCell.y() + K.UI.WORLD_TOOLTIP_OFFSET_Y,
-                hoveredCell.z() + 0.5f);
-        Vector2f screenPosition = worldToScreen(worldPosition);
-
-        if (screenPosition == null) {
-            return;
-        }
-
-        float distance = getCameraDistance(worldPosition);
-        float scale = getWorldTooltipScale(distance);
-        renderWorldTooltip(name, screenPosition, scale);
-    }
-
-    private void renderWorldTooltip(
-            String text, Vector2f screenPosition, float scale) {
-        float textWidth = ImGui.calcTextSize(text).x;
-        float textHeight = ImGui.getTextLineHeight();
-
-        float width = (textWidth + K.UI.WORLD_TOOLTIP_PADDING_X * 2.0f) * scale;
-        float height =
-                (textHeight + K.UI.WORLD_TOOLTIP_PADDING_Y * 2.0f) * scale;
-
-        float x = screenPosition.x - width * 0.5f;
-        float y = screenPosition.y - height;
-
-        int background = ImGui.getColorU32(
-                K.Colors.COLOR_WORLD_TOOLTIP_BG[0],
-                K.Colors.COLOR_WORLD_TOOLTIP_BG[1],
-                K.Colors.COLOR_WORLD_TOOLTIP_BG[2],
-                K.Colors.COLOR_WORLD_TOOLTIP_BG[3]);
-        int border = ImGui.getColorU32(
-                K.Colors.COLOR_WORLD_TOOLTIP_BORDER[0],
-                K.Colors.COLOR_WORLD_TOOLTIP_BORDER[1],
-                K.Colors.COLOR_WORLD_TOOLTIP_BORDER[2],
-                K.Colors.COLOR_WORLD_TOOLTIP_BORDER[3]);
-        int textColor = ImGui.getColorU32(
-                K.Colors.COLOR_WORLD_TOOLTIP_TEXT[0],
-                K.Colors.COLOR_WORLD_TOOLTIP_TEXT[1],
-                K.Colors.COLOR_WORLD_TOOLTIP_TEXT[2],
-                K.Colors.COLOR_WORLD_TOOLTIP_TEXT[3]);
-
-        ImGui.getForegroundDrawList().addRectFilled(
-                x, y, x + width, y + height,
-                background, K.UI.WORLD_TOOLTIP_ROUNDING * scale);
-        ImGui.getForegroundDrawList().addRect(
-                x, y, x + width, y + height, border,
-                K.UI.WORLD_TOOLTIP_ROUNDING * scale, 0,
-                K.UI.WORLD_TOOLTIP_BORDER * scale);
-
-        float textX = x + K.UI.WORLD_TOOLTIP_PADDING_X * scale;
-        float textY = y + K.UI.WORLD_TOOLTIP_PADDING_Y * scale;
-        ImGui.getForegroundDrawList().addText(textX, textY, textColor, text);
-    }
-
-    private float getWorldTooltipScale(float distance) {
-        float normalized = distance / K.UI.WORLD_TOOLTIP_SCALE_DISTANCE;
-        float scale = K.UI.WORLD_TOOLTIP_MAX_SCALE
-                - normalized * (K.UI.WORLD_TOOLTIP_MAX_SCALE
-                - K.UI.WORLD_TOOLTIP_MIN_SCALE);
-        return Math.max(K.UI.WORLD_TOOLTIP_MIN_SCALE,
-                Math.min(K.UI.WORLD_TOOLTIP_MAX_SCALE, scale));
-    }
-
-    private float getCameraDistance(Vector3f worldPosition) {
-        Vector3f cameraPosition = gameMaster.getCamera().getPosition();
-        return cameraPosition.distance(worldPosition);
     }
 
     public boolean renderNewPlayer() {

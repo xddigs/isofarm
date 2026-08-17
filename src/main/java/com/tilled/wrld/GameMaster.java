@@ -393,10 +393,6 @@ public class GameMaster {
             gameUIservice.renderHUD(this);
         }
 
-        if (hoveredCell != null && player != null) {
-            gameUIservice.renderTooltip(hoveredCell, world);
-        }
-
         if (player == null) {
             if (gameUIservice.renderNewPlayer()) {
 

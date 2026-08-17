@@ -70,7 +70,6 @@ public final class K {
         public static final float ITEM_SPACING_X = 0.0f;
         public static final float ITEM_SPACING_Y = 14.0f;
         public static final float ITEM_SPACING = 4.0f;
-        public static final float LINEHEIGHT = 0.8f;
         public static final float FONT_SIZE = 20.0f;
 
         public static final float[] COLOR_WINDOW_BG = {0.08f, 0.08f, 0.10f, 0.92f};
@@ -101,10 +100,6 @@ public final class K {
 
     public static final class UI {
         public static final int PLAYER_NAME_MAX_LENGTH = 32;
-
-        public static final float TOOLTIP_X = 15.0f;
-        public static final float TOOLTIP_OFFSET_Y = 15.0f;
-        public static final float TOOLTIP_ITEM_SPACING_X = 4.0f;
 
         public static final float HUD_PADDING = 20.0f;
 
@@ -148,17 +143,6 @@ public final class K {
 
         public static final int HOTBAR_SLOTS = 9;
 
-        public static final float WORLD_TOOLTIP_OFFSET_Y = 1.35f;
-        public static final float WORLD_TOOLTIP_WIDTH = 180.0f;
-        public static final float WORLD_TOOLTIP_HEIGHT = 42.0f;
-        public static final float WORLD_TOOLTIP_PADDING_X = 12.0f;
-        public static final float WORLD_TOOLTIP_PADDING_Y = 8.0f;
-        public static final float WORLD_TOOLTIP_ROUNDING = 7.0f;
-        public static final float WORLD_TOOLTIP_BORDER = 1.5f;
-        public static final float WORLD_TOOLTIP_MIN_SCALE = 0.75f;
-        public static final float WORLD_TOOLTIP_MAX_SCALE = 1.15f;
-        public static final float WORLD_TOOLTIP_SCALE_DISTANCE = 8.0f;
-        public static final float WORLD_TOOLTIP_TEXT_SIZE = 20.0f;
         public static final float HOTBAR_LABEL_DURATION = 1.75f;
         public static final float HOTBAR_LABEL_FADE_DURATION = 0.55f;
         public static final float HOTBAR_LABEL_PADDING_X = 10.0f;
@@ -166,6 +150,8 @@ public final class K {
         public static final float HOTBAR_LABEL_ROUNDING = 6.0f;
         public static final float HOTBAR_LABEL_BORDER = 1.0f;
         public static final float HOTBAR_LABEL_OFFSET_Y = 100.0f;
+        public static final float CROSSHAIR_SIZE = 10.0f;
+        public static final float CROSSHAIR_THICKNESS = 2.0f;
     }
 
     public static final class Paths {
@@ -198,13 +184,9 @@ public final class K {
     }
 
     public static final class Colors {
-        public static final Vector3f DEFAULT_DIRT = new Vector3f(0.4f, 0.25f, 0.1f);
         public static final Vector3f SUNLIGHT_DEFAULT = new Vector3f(1.0f, 1.0f, 1.0f);
         public static final Vector3f OUTLINE_DEFAULT = new Vector3f(0.0f, 0.0f, 0.0f);
         public static final Vector3f RAIN = new Vector3f(0.35f, 0.55f, 1.0f);
-        public static final float[] COLOR_WORLD_TOOLTIP_BG = {0.08f, 0.08f, 0.10f, 0.94f};
-        public static final float[] COLOR_WORLD_TOOLTIP_BORDER = {0.65f, 0.80f, 0.20f, 1.00f};
-        public static final float[] COLOR_WORLD_TOOLTIP_TEXT = {1.00f, 1.00f, 1.00f, 1.00f};
         public static final float[] COLOR_HOTBAR_LABEL_BG = {0.08f, 0.08f, 0.10f, 0.90f};
         public static final float[] COLOR_HOTBAR_LABEL_BORDER = {0.65f, 0.80f, 0.20f, 0.85f};
         public static final float[] COLOR_HOTBAR_LABEL_TEXT = {1.00f, 1.00f, 1.00f, 1.00f};
