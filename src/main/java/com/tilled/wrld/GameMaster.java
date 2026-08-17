@@ -2,10 +2,7 @@ package com.tilled.wrld;
 
 import com.tilled.data.*;
 import com.tilled.graphics.*;
-import com.tilled.input.CameraController;
-import com.tilled.input.GameInteraction;
-import com.tilled.input.Keyboard;
-import com.tilled.input.Mouse;
+import com.tilled.input.*;
 import com.tilled.service.*;
 import com.tilled.utils.K;
 import com.tilled.utils.Settings;
@@ -31,6 +28,8 @@ public class GameMaster {
     private final World world;
     private final WorldGenerator generator;
     private final Map<Chunk, Mesh> chunkMeshes;
+    private final SoundService soundService;
+
     private final GameUIService gameUIservice;
     private final GameInteraction gameInteraction;
     private final CropService cropService;
@@ -68,6 +67,7 @@ public class GameMaster {
     private SpriteSheet waterTexture;
     private Camera camera;
     private CameraController cameraController;
+    private StepController stepController;
     private Hit hoveredCell = null;
 
     private float windowWidth = K.Window.DEFAULT_WIDTH;
@@ -92,6 +92,8 @@ public class GameMaster {
         this.world = new World();
         this.generator = new WorldGenerator(world);
         this.chunkMeshes = new HashMap<>();
+        this.soundService = new SoundService();
+
         this.cropService = new CropService(world);
         this.timeService = new TimeService();
         this.commandRegistry = new CommandRegistry();
@@ -150,6 +152,7 @@ public class GameMaster {
         this.camera = new Camera(K.Camera.DEFAULT_WIDTH, K.Camera.DEFAULT_HEIGHT, Settings.renderDistance);
         this.camera.setPosition(0.0f, 0.0f, 0.0f);
         this.cameraController = new CameraController(camera);
+        this.stepController = new StepController();
         this.weatherService = new WeatherService(rainEngine, camera);
 
         this.gameInteraction = new GameInteraction(cropService, gameUIservice,
@@ -264,6 +267,7 @@ public class GameMaster {
         cameraController.update(this, delta);
         camera.update(delta);
         gameUIservice.update(delta);
+        stepController.update(player, world, soundService, delta);
 
         Item selectedInventoryItem = gameUIservice.getSelectedInventoryItem();
 
@@ -525,6 +529,7 @@ public class GameMaster {
         rainShader.dispose();
         rainEngine.dispose();
         cameraController.release(this);
+        soundService.cleanup();
         log.info("GameMaster resources successfully cleaned up");
     }
 

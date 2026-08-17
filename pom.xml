@@ -120,6 +120,15 @@
             <classifier>${lwjgl.natives}</classifier>
         </dependency>
         <dependency>
+            <groupId>org.lwjgl</groupId>
+            <artifactId>lwjgl-openal</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.lwjgl</groupId>
+            <artifactId>lwjgl-openal</artifactId>
+            <classifier>${lwjgl.natives}</classifier>
+        </dependency>
+        <dependency>
             <groupId>io.github.spair</groupId>
             <artifactId>imgui-java-natives-windows</artifactId>
             <version>${imgui-natives}</version>
