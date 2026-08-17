@@ -1,6 +1,7 @@
 package com.tilled.graphics;
 
 import com.tilled.data.BlockData;
+import com.tilled.utils.K;
 import com.tilled.wrld.Chunk;
 
 import java.util.ArrayList;
@@ -29,13 +30,19 @@ public class ChunkMeshBuilder {
                     float vy = y;
                     float vz = z;
 
+                    boolean isTilledSoil = data == BlockData.TILLED_DIRT;
+                    float topY = vy + 1.0f;
+                    if (isTilledSoil) {
+                        topY -= 1.0f / K.World.DEFAULT_TEXTURE_SCALE;
+                    }
+
                     if (isAir(chunk, x, y + 1, z)) {
                         vertexCount = addFace(positions, normals, uvs, indices, vertexCount,
                                 new float[]{
-                                        vx, vy+1, vz+1,   data.getTopAtlasOffset().x, data.getTopAtlasOffset().y + data.getAtlasScale().y,  0, 1, 0,
-                                        vx+1, vy+1, vz+1, data.getTopAtlasOffset().x + data.getAtlasScale().x, data.getTopAtlasOffset().y + data.getAtlasScale().y, 0, 1, 0,
-                                        vx+1, vy+1, vz,   data.getTopAtlasOffset().x + data.getAtlasScale().x, data.getTopAtlasOffset().y, 0, 1, 0,
-                                        vx, vy+1, vz,     data.getTopAtlasOffset().x, data.getTopAtlasOffset().y, 0, 1, 0
+                                        vx, topY, vz+1,   data.getTopAtlasOffset().x, data.getTopAtlasOffset().y + data.getAtlasScale().y,  0, 1, 0,
+                                        vx+1, topY, vz+1, data.getTopAtlasOffset().x + data.getAtlasScale().x, data.getTopAtlasOffset().y + data.getAtlasScale().y, 0, 1, 0,
+                                        vx+1, topY, vz,   data.getTopAtlasOffset().x + data.getAtlasScale().x, data.getTopAtlasOffset().y, 0, 1, 0,
+                                        vx, topY, vz,     data.getTopAtlasOffset().x, data.getTopAtlasOffset().y, 0, 1, 0
                                 });
                     }
 
@@ -54,8 +61,8 @@ public class ChunkMeshBuilder {
                                 new float[]{
                                         vx, vy, vz+1,     data.getSideAtlasOffset().x, data.getSideAtlasOffset().y, 0, 0, 1,
                                         vx+1, vy, vz+1,   data.getSideAtlasOffset().x + data.getAtlasScale().x, data.getSideAtlasOffset().y, 0, 0, 1,
-                                        vx+1, vy+1, vz+1, data.getSideAtlasOffset().x + data.getAtlasScale().x, data.getSideAtlasOffset().y + data.getAtlasScale().y, 0, 0, 1,
-                                        vx, vy+1, vz+1,   data.getSideAtlasOffset().x, data.getSideAtlasOffset().y + data.getAtlasScale().y, 0, 0, 1
+                                        vx+1, topY, vz+1, data.getSideAtlasOffset().x + data.getAtlasScale().x, data.getSideAtlasOffset().y + data.getAtlasScale().y, 0, 0, 1,
+                                        vx, topY, vz+1,   data.getSideAtlasOffset().x, data.getSideAtlasOffset().y + data.getAtlasScale().y, 0, 0, 1
                                 });
                     }
 
@@ -64,8 +71,8 @@ public class ChunkMeshBuilder {
                                 new float[]{
                                         vx+1, vy, vz,     data.getSideAtlasOffset().x, data.getSideAtlasOffset().y, 0, 0, -1,
                                         vx, vy, vz,       data.getSideAtlasOffset().x + data.getAtlasScale().x, data.getSideAtlasOffset().y, 0, 0, -1,
-                                        vx, vy+1, vz,     data.getSideAtlasOffset().x + data.getAtlasScale().x, data.getSideAtlasOffset().y + data.getAtlasScale().y, 0, 0, -1,
-                                        vx+1, vy+1, vz,   data.getSideAtlasOffset().x, data.getSideAtlasOffset().y + data.getAtlasScale().y, 0, 0, -1
+                                        vx, topY, vz,     data.getSideAtlasOffset().x + data.getAtlasScale().x, data.getSideAtlasOffset().y + data.getAtlasScale().y, 0, 0, -1,
+                                        vx+1, topY, vz,   data.getSideAtlasOffset().x, data.getSideAtlasOffset().y + data.getAtlasScale().y, 0, 0, -1
                                 });
                     }
 
@@ -74,8 +81,8 @@ public class ChunkMeshBuilder {
                                 new float[]{
                                         vx+1, vy, vz+1,   data.getSideAtlasOffset().x, data.getSideAtlasOffset().y, 1, 0, 0,
                                         vx+1, vy, vz,     data.getSideAtlasOffset().x + data.getAtlasScale().x, data.getSideAtlasOffset().y, 1, 0, 0,
-                                        vx+1, vy+1, vz,   data.getSideAtlasOffset().x + data.getAtlasScale().x, data.getSideAtlasOffset().y + data.getAtlasScale().y, 1, 0, 0,
-                                        vx+1, vy+1, vz+1, data.getSideAtlasOffset().x, data.getSideAtlasOffset().y + data.getAtlasScale().y, 1, 0, 0
+                                        vx+1, topY, vz,   data.getSideAtlasOffset().x + data.getAtlasScale().x, data.getSideAtlasOffset().y + data.getAtlasScale().y, 1, 0, 0,
+                                        vx+1, topY, vz+1, data.getSideAtlasOffset().x, data.getSideAtlasOffset().y + data.getAtlasScale().y, 1, 0, 0
                                 });
                     }
 
@@ -84,8 +91,8 @@ public class ChunkMeshBuilder {
                                 new float[]{
                                         vx, vy, vz,       data.getSideAtlasOffset().x, data.getSideAtlasOffset().y, -1, 0, 0,
                                         vx, vy, vz+1,     data.getSideAtlasOffset().x + data.getAtlasScale().x, data.getSideAtlasOffset().y, -1, 0, 0,
-                                        vx, vy+1, vz+1,   data.getSideAtlasOffset().x + data.getAtlasScale().x, data.getSideAtlasOffset().y + data.getAtlasScale().y, -1, 0, 0,
-                                        vx, vy+1, vz,     data.getSideAtlasOffset().x, data.getSideAtlasOffset().y + data.getAtlasScale().y, -1, 0, 0
+                                        vx, topY, vz+1,   data.getSideAtlasOffset().x + data.getAtlasScale().x, data.getSideAtlasOffset().y + data.getAtlasScale().y, -1, 0, 0,
+                                        vx, topY, vz,     data.getSideAtlasOffset().x, data.getSideAtlasOffset().y + data.getAtlasScale().y, -1, 0, 0
                                 });
                     }
                 }

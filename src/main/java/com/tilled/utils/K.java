@@ -46,6 +46,8 @@ public final class K {
         public static final float RAIN_MIN_LENGTH = 0.35f;
         public static final float RAIN_LENGTH_VARIATION = 0.35f;
         public static final float RAIN_LINE_WIDTH = 1.5f;
+        public static final float DEFAULT_TEXTURE_SCALE = 16.0f;
+        public static final float SHORTER_BLOCK_HEIGHT = 0.9375f;
     }
 
     public static final class Sunlight {

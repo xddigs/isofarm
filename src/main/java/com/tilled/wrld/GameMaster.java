@@ -314,7 +314,7 @@ public class GameMaster {
             defaultShader.setUniform("uFrameIndex", crop.getStage().getFrameIndex());
 
             float renderX = crop.getX() + 0.5f;
-            float renderY = crop.getY() + 1.0f;
+            float renderY = crop.getY() + K.World.SHORTER_BLOCK_HEIGHT;
             float renderZ = crop.getZ() + 0.5f;
 
             modelMatrix.identity().translate(renderX, renderY, renderZ);
