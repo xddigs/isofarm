@@ -3,6 +3,6 @@ package com.tilled.data;
 public class Hoe extends Tool {
 
     public Hoe() {
-        super((byte) 1, "Hoe", 150, 128);
+        super((byte) 2, "Hoe", 150, 128);
     }
 }
