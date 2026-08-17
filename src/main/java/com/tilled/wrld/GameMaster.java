@@ -355,7 +355,8 @@ public class GameMaster {
 
             world.getActiveCrops().stream()
                     .filter(c -> Math.round(c.getX()) == hoveredCell.x()
-                            && Math.round(c.getZ()) == hoveredCell.y())
+                            && Math.round(c.getY()) == hoveredCell.y()
+                            && Math.round(c.getZ()) == hoveredCell.z())
                     .findFirst()
                     .ifPresent(crop -> {
                         SpriteSheet sheet = cropSpritesheets.get(crop.getType());

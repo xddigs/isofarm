@@ -171,7 +171,7 @@ public class GameInteraction {
             if (seed.getType() == null) return;
 
             Block tilledDirt = new Block(BlockData.TILLED_DIRT,x,y,z);
-            Crop planted = cropService.plant(x, z, gameMaster.getPlayer(), tilledDirt,
+            Crop planted = cropService.plant(x, y, z, gameMaster.getPlayer(), tilledDirt,
                     seed.getType(), timeService.getCurrentSeason());
 
             if (planted != null) {

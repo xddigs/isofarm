@@ -57,11 +57,13 @@ public class Camera {
     private void updateMatrix() {
         float halfWidth = (baseWidth * zoom) / 2.0f;
         float halfHeight = (baseHeight * zoom) / 2.0f;
-        this.projectionMatrix.identity().ortho(-halfWidth, halfWidth, -halfHeight, halfHeight, K.Camera.ORTHO_NEAR, K.Camera.ORTHO_FAR);
+        this.projectionMatrix.identity().ortho(-halfWidth, halfWidth, -halfHeight,
+                halfHeight, K.Camera.ORTHO_NEAR, K.Camera.ORTHO_FAR);
     }
 
     public Matrix4f getViewMatrix() {
-        return new Matrix4f().identity().rotateX((float) Math.toRadians(pitch)).rotateY((float) Math.toRadians(yaw)).translate(-position.x, -position.y, -position.z);
+        return new Matrix4f().identity().rotateX((float) Math.toRadians(pitch))
+                .rotateY((float) Math.toRadians(yaw)).translate(-position.x, -position.y, -position.z);
     }
 
     public void rotateYaw(float offsetAngle) {
@@ -138,6 +140,7 @@ public class Camera {
         }
 
         direction.normalize();
+        origin.add(0.5f, 1.0f, 0.5f);
 
         float tileSize = K.World.TILE_SIZE;
 
@@ -198,8 +201,7 @@ public class Camera {
         while (distance <= MAX_RAY_DISTANCE) {
             byte block = world.getBlockTypeAt(x, y, z);
             if (block != 0) {
-                return new Hit(x, y, z, hitNormalX,
-                        hitNormalY, hitNormalZ);
+                return new Hit(x, y, z, hitNormalX, hitNormalY, hitNormalZ);
             }
 
             if (tMaxX < tMaxY) {

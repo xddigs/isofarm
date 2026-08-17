@@ -2,7 +2,7 @@ package com.tilled.data;
 
 @DataClass
 public class Crop extends Item {
-    private final float x, z;
+    private final float x, y, z;
     private final CropType type;
     private final Block block;
     private final Season season;
@@ -13,10 +13,11 @@ public class Crop extends Item {
     private final float targetGrowthTime = 8.0f;
     private boolean wasHarvested;
 
-    public Crop(float x, float z,
+    public Crop(float x, float y, float z,
                 CropType type, Block block, Season season) {
         super(type.getId(), type.getName(), 1, type.getValue());
         this.x = x;
+        this.y = y;
         this.z = z;
         this.block = block;
         this.stage = GrowthStage.SEED;
@@ -28,6 +29,10 @@ public class Crop extends Item {
 
     public float getX() {
         return x;
+    }
+
+    public float getY() {
+        return y;
     }
 
     public float getZ() {

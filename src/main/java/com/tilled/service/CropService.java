@@ -13,7 +13,7 @@ public class CropService implements Service<Crop> {
         this.world = world;
     }
 
-    public Crop plant(int x, int z, Player player, Block block,
+    public Crop plant(int x, int y, int z, Player player, Block block,
                       CropType type, Season currentSeason) {
 
         if (block == null || block.getType() != BlockData.TILLED_DIRT) {
@@ -41,7 +41,7 @@ public class CropService implements Service<Crop> {
         }
 
         player.remove(seedOpt.get(), 1);
-        Crop newCrop = new Crop(x, z, type, block, currentSeason);
+        Crop newCrop = new Crop(x, y,  z, type, block, currentSeason);
         world.addCrop(newCrop);
         log.info("Planted {} at ({}, {}) during season {}", type.getName(), x, z, currentSeason.getName());
 
