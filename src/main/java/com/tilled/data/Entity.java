@@ -1,0 +1,20 @@
+package com.tilled.data;
+
+@DataClass
+public abstract class Entity {
+    private final byte id;
+    private final String name;
+
+    public Entity(String name) {
+        this.id = (byte) (Math.floor((Math.random() * Math.random()) * 100));
+        this.name = name;
+    }
+
+    public byte getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+}

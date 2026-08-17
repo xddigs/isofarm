@@ -9,27 +9,19 @@ import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("FieldMayBeFinal")
 @DataClass
-public class Player {
+public class Player extends Character {
     private static final Logger log = LoggerFactory.getLogger(Player.class);
     private final String name;
-    private final Inventory inventory;
-    private final Purse purse;
     private final ToastService toastService;
     private Vector3f position;
     private Vector3f velocity;
     private Vector3f dimensions;
-    private int experience;
-    private int level;
     private boolean onGround;
 
-    private int maxHitpoints = 100;
-    private int hitpoints = maxHitpoints;
-
     public Player(String name, World world, ToastService toastService) {
+        super(name, toastService);
         this.name = name;
         this.toastService = toastService;
-        this.inventory = new Inventory();
-        this.purse = new Purse(inventory, new Coin());
 
         float spawnX = 0.5f;
         float spawnZ = 0.5f;
@@ -49,14 +41,6 @@ public class Player {
 
     public String getName() {
         return name;
-    }
-
-    public Inventory getInventory() {
-        return inventory;
-    }
-
-    public Purse getPurse() {
-        return purse;
     }
 
     public Vector3f getPosition() {
@@ -89,118 +73,80 @@ public class Player {
     public void update() {
     }
 
-    public int getHitpoints() {
-        return hitpoints;
-    }
-
-    public void setHitpoints(int hitpoints) {
-        this.hitpoints = hitpoints;
-    }
-
-    public int getMaxHitpoints() {
-        return maxHitpoints;
-    }
-
-    public void setMaxHitpoints(int maxHitpoints) {
-        this.maxHitpoints = maxHitpoints;
-    }
-
-    public void gain(int amount) {
-        experience += amount;
-        if (isLevelUpAvailable()) {
-            level++;
-            experience = 0;
-            log.info("Level up! New level: {}", level);
-            toastService.success("Level up! New level: " + level);
-        }
-    }
-
-    private boolean isLevelUpAvailable() {
-        return experience >= (10 * level);
-    }
-
     public void sell(Item item, int amount) {
         if (item == null || amount <= 0) return;
 
-        int current = inventory.getAmount(item);
+        int current = getInventory().getAmount(item);
         if (current <= 0) {
             log.warn("No {} in inventory to sell", item.getName());
             return;
         }
 
         int toSell = Math.min(current, amount);
-        inventory.remove(item, toSell);
+        getInventory().remove(item, toSell);
         int earnings = toSell * item.getValue();
         toastService.sell("You successfully sold " + item.getName() + " for " + earnings + " coins");
         earn(earnings);
     }
 
     public void add(Item item, int amount) {
-        inventory.add(item, amount);
+        getInventory().add(item, amount);
         log.info("Added x{} of {} to inventory", amount, item.getName());
     }
 
     public void add(Item item) {
-        inventory.add(item, 1);
+        getInventory().add(item, 1);
         log.info("Added x1 of {} to inventory", item.getName());
     }
 
     public void remove(Item item, int amount) {
-        inventory.remove(item, amount);
+        getInventory().remove(item, amount);
         log.info("Removed x{} of {} to inventory", amount, item.getName());
     }
 
     public void remove(Item item) {
-        inventory.remove(item, 1);
+        getInventory().remove(item, 1);
         log.info("Removed x1 of {} from inventory", item.getName());
     }
 
     public void clear() {
-        inventory.clear();
+        getInventory().clear();
         log.info("Cleared inventory");
     }
 
     public boolean isEmpty() {
-        return inventory.isEmpty();
+        return getInventory().isEmpty();
     }
 
     public int size() {
-        return inventory.size();
+        return getInventory().size();
     }
 
     public Item get(int index) {
-        return inventory.get(index);
+        return getInventory().get(index);
     }
 
     public Item get(Item item) {
-        return inventory.get(item);
+        return getInventory().get(item);
     }
 
     public int getAmount(Item item) {
-        return inventory.getAmount(item);
+        return getInventory().getAmount(item);
     }
 
     public void earn(int amount) {
         log.info("Earned ${}", amount);
-        purse.add(amount);
+        getPurse().add(amount);
     }
 
     public void spend(int amount) {
         if (amount <= 0) return;
         log.info("Spent ${}", amount);
-        purse.remove(amount);
-    }
-
-    public int purse() {
-        return purse.getBalance();
+        getPurse().remove(amount);
     }
 
     public boolean hasSeeds() {
-        return inventory.hasItemOfType(Seed.class);
-    }
-
-    public int getSeedCount() {
-        return inventory.getTotalAmountOfType(Seed.class);
+        return getInventory().hasItemOfType(Seed.class);
     }
 
     public void jump() {
