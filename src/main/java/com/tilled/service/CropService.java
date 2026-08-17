@@ -13,44 +13,37 @@ public class CropService implements Service<Crop> {
         this.world = world;
     }
 
-    public Crop plant(int x, int z, Player player, Block block, CropType type,
-                      Season currentSeason) {
+    public Crop plant(int x, int z, Player player, Block block,
+                      CropType type, Season currentSeason) {
+
         if (block == null || block.getType() != BlockData.TILLED_DIRT) {
-            log.warn("Attempted to plant {} at ({}, {}) but block is not TILLED_DIRT!",
-                    type.getName(), x, z);
+            log.warn("Attempted to plant {} at ({}, {}) but block is not TILLED_DIRT!", type.getName(), x, z);
             return null;
         }
 
-        if (!player.hasSeeds()) return null;
-
-        if (block.hasCrop()) {
-            Crop crop = world.getCropAt(x, z);
-            if (crop != null && !crop.isReadyToHarvest()) {
-                log.warn("Attempted to plant {} at ({}, {}) " +
-                                "but block already has a growing crop!",
-                        type.getName(), x, z);
-                return null;
-            }
+        if (!player.hasSeeds()) {
+            return null;
         }
 
-        var seedOpt = player.getInventory().getItems().keySet().stream()
-                .filter(Seed.class::isInstance)
-                .map(Seed.class::cast)
-                .filter(seed -> seed.getType() == type)
-                .findFirst();
+        Crop existingCrop = world.getCropAt(x, z);
+        if (existingCrop != null) {
+            log.warn("Attempted to plant {} at ({}, {}) but a crop already exists!", type.getName(), x, z);
+            return null;
+        }
+
+        var seedOpt = player.getInventory().getItems().keySet().stream().filter(
+                Seed.class::isInstance).map(Seed.class::cast).filter(
+                        seed -> seed.getType() == type).findFirst();
 
         if (seedOpt.isEmpty()) {
             log.warn("You don't have seeds of {}", type.getName());
             return null;
         }
+
         player.remove(seedOpt.get(), 1);
-
         Crop newCrop = new Crop(x, z, type, block, currentSeason);
-        block.setCrop(true);
         world.addCrop(newCrop);
-
-        log.info("Planted {} at ({}, {}) during season {}",
-                type.getName(), x, z, currentSeason.getName());
+        log.info("Planted {} at ({}, {}) during season {}", type.getName(), x, z, currentSeason.getName());
 
         return newCrop;
     }
@@ -78,9 +71,6 @@ public class CropService implements Service<Crop> {
         crop.setHarvested(true);
         player.gain(cropValue);
         world.removeCrop(crop);
-        if (crop.getBlock() != null) {
-            crop.getBlock().setCrop(false);
-        }
         log.info("Successfully harvested {}" +
                 " giving {} items.", crop.getType().getName(), yield);
         return yield;
@@ -88,8 +78,6 @@ public class CropService implements Service<Crop> {
 
     public void rip(Crop crop) {
         world.removeCrop(crop);
-        if (crop.getBlock() != null) {
-            crop.getBlock().setCrop(false);
-        }
+        log.info("Ripped {} from the ground.", crop.getType().getName());
     }
 }

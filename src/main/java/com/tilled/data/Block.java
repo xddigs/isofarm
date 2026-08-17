@@ -6,9 +6,6 @@ import com.tilled.utils.K;
 public class Block extends Item {
     private final BlockData type;
     private int x, y, z;
-    private boolean unlocked = false;
-    private boolean hasCrop = false;
-
     private final int waterLevelMax = K.World.WATER_LEVEL_MAX;
     private int waterLevel = 0;
 
@@ -43,22 +40,6 @@ public class Block extends Item {
 
     public int getZ() {
         return z;
-    }
-
-    public boolean isUnlocked() {
-        return unlocked;
-    }
-
-    public void setUnlocked(boolean unlocked) {
-        this.unlocked = unlocked;
-    }
-
-    public boolean hasCrop() {
-        return hasCrop;
-    }
-
-    public void setCrop(boolean hasCrop) {
-        this.hasCrop = hasCrop;
     }
 
     public int getWaterLevelMax() {

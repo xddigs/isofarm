@@ -322,15 +322,24 @@ public class GameMaster {
         }
 
         if (hoveredCell != null) {
-            glDisable(GL_DEPTH_TEST);
+            glEnable(GL_DEPTH_TEST);
+            glDepthMask(false);
+
+            defaultShader.bind();
+
             defaultShader.setUniform("uUseTexture", false);
             defaultShader.setUniform("uUseFaceAtlas", false);
             defaultShader.setUniform("uBaseColor", K.Colors.OUTLINE_DEFAULT);
 
-            modelMatrix.identity().translate(hoveredCell.x(), hoveredCell.y(), hoveredCell.z());
+            modelMatrix.identity().translate(
+                    hoveredCell.x(),
+                    hoveredCell.y(),
+                    hoveredCell.z()
+            );
+
             defaultShader.setUniform("uModel", modelMatrix);
             selectionMesh.renderLines();
-            glEnable(GL_DEPTH_TEST);
+            glDepthMask(true);
         }
 
         if (hoveredCell != null) {
