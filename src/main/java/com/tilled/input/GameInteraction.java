@@ -23,14 +23,20 @@ public class GameInteraction {
     private final TimeService timeService;
     private final ParticleEngine particles;
     private final Camera camera;
+    private final SpriteSheet blocksTexture;
 
-    public GameInteraction(CropService cropService, GameUIService gameUIservice,
-                           TimeService timeService, ParticleEngine particles, Camera camera) {
+    public GameInteraction(CropService cropService,
+                           GameUIService gameUIservice,
+                           TimeService timeService,
+                           ParticleEngine particles,
+                           Camera camera,
+                           SpriteSheet blocksTexture) {
         this.cropService = cropService;
         this.gameUIservice = gameUIservice;
         this.timeService = timeService;
         this.particles = particles;
         this.camera = camera;
+        this.blocksTexture = blocksTexture;
     }
 
     public Hit update(GameMaster gameMaster, Item selectedItem) {
@@ -125,7 +131,7 @@ public class GameInteraction {
 
         world.setBlockTypeAt(x, y, z, (byte) 0);
         gameMaster.rebuildChunkMeshAt(x, z);
-        particles.spawn(x, y, z, blockData);
+        particles.spawn(x, y, z, blockData, blocksTexture);
         Block removedBlock = new Block(blockData, x, y, z);
         gameMaster.getPlayer().add(removedBlock);
         gameUIservice.logAction(cell);

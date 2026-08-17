@@ -149,7 +149,8 @@ public class GameMaster {
         this.weatherService = new WeatherService(rainEngine, camera);
 
         this.camera.setPosition(0.0f, 0.0f, 0.0f);
-        this.gameInteraction = new GameInteraction(cropService, gameUIservice, timeService, particles, camera);
+        this.gameInteraction = new GameInteraction(cropService, gameUIservice,
+                timeService, particles, camera, blocksTexture);
 
         recenter();
         log.info("GameMaster initialized with grid size: {}x{}", K.World.STARTING_GRID_SIZE,
@@ -272,18 +273,13 @@ public class GameMaster {
         if (blocksTexture != null) {
             blocksTexture.bind();
             defaultShader.setUniform("uUseTexture", true);
-            defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
-            defaultShader.setUniform("uUseFaceAtlas", true);
-        } else {
-            defaultShader.setUniform("uUseTexture", false);
-            defaultShader.setUniform("uBaseColor", K.Colors.DEFAULT_DIRT);
         }
 
         if (blocksTexture != null) {
             blocksTexture.bind();
             defaultShader.setUniform("uUseTexture", true);
+            defaultShader.setUniform("uUseFaceAtlas", true);
             defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
-            defaultShader.setUniform("uUseFaceAtlas", false);
             defaultShader.setUniform("uTotalFrames", 1);
             defaultShader.setUniform("uFrameIndex", 0);
             defaultShader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
@@ -329,7 +325,7 @@ public class GameMaster {
             sheet.unbind();
         });
 
-        particles.render(defaultShader, blockMesh, blocksTexture, modelMatrix);
+        particles.render(defaultShader, spriteMesh);
 
         if (blocksTexture != null) {
             blocksTexture.unbind();

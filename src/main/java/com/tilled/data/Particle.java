@@ -1,5 +1,6 @@
 package com.tilled.data;
 
+import com.tilled.graphics.SpriteSheet;
 import org.joml.Vector2f;
 
 @DataClass
@@ -12,9 +13,11 @@ public class Particle {
 
     private final Vector2f uvOffset;
     private final Vector2f uvScale;
+    private final SpriteSheet texture;
 
-    public Particle(float x, float y, float z, float vx, float vy,
-                    float vz, float size, float maxLife, Vector2f uvOffset, Vector2f uvScale) {
+    public Particle(float x, float y, float z, float vx, float vy, float vz,
+                    float size, float maxLife, Vector2f uvOffset, Vector2f uvScale,
+                    SpriteSheet texture) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -25,7 +28,12 @@ public class Particle {
         this.maxLife = maxLife;
         this.uvOffset = uvOffset;
         this.uvScale = uvScale;
+        this.texture = texture;
         this.life = 0;
+    }
+
+    public SpriteSheet getTexture() {
+        return texture;
     }
 
     public void update(float delta) {
