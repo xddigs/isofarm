@@ -2,6 +2,7 @@ package com.tilled.wrld;
 
 import com.tilled.data.*;
 import com.tilled.graphics.*;
+import com.tilled.input.CameraController;
 import com.tilled.input.GameInteraction;
 import com.tilled.input.Keyboard;
 import com.tilled.input.Mouse;
@@ -62,6 +63,7 @@ public class GameMaster {
     private SpriteSheet blocksTexture;
     private SpriteSheet waterTexture;
     private Camera camera;
+    private CameraController cameraController;
     private Hit hoveredCell = null;
 
     private float windowWidth = K.Window.DEFAULT_WIDTH;
@@ -147,9 +149,10 @@ public class GameMaster {
         cropSpritesheets.put(CropType.BEETROOT, beetroot);
 
         this.camera = new Camera(K.Camera.DEFAULT_WIDTH, K.Camera.DEFAULT_HEIGHT);
+        this.camera.setPosition(0.0f, 0.0f, 0.0f);
+        this.cameraController = new CameraController(camera);
         this.weatherService = new WeatherService(rainEngine, camera);
 
-        this.camera.setPosition(0.0f, 0.0f, 0.0f);
         this.gameInteraction = new GameInteraction(cropService, gameUIservice,
                 timeService, particles, camera, blocksTexture);
 
@@ -243,10 +246,11 @@ public class GameMaster {
 
         camera.update(delta);
         gameUIservice.update(delta);
-
+        cameraController.update(this,delta);
         Item selectedInventoryItem = gameUIservice.getSelectedInventoryItem();
+
         if (!ImGui.getIO().getWantCaptureMouse()) {
-            hoveredCell = gameInteraction.update(this, selectedInventoryItem);
+            hoveredCell = gameInteraction.update(this,selectedInventoryItem);
         } else {
             hoveredCell = null;
         }
@@ -441,6 +445,7 @@ public class GameMaster {
         outlineShader.dispose();
         rainShader.dispose();
         rainEngine.dispose();
+        cameraController.release(this);
         log.info("GameMaster resources successfully cleaned up");
     }
 

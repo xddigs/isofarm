@@ -121,6 +121,7 @@ public class Game {
         master.render();
         glfwSwapBuffers(window);
         glfwShowWindow(window);
+        glfwSetCursorPos(window, K.Window.DEFAULT_WIDTH / 2, K.Window.DEFAULT_HEIGHT / 2);
         log.info("GLFW window successfully initialized.");
     }
 

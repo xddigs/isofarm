@@ -149,8 +149,8 @@ public class ChunkMeshBuilder {
 
     private static float getBlockBottomY(Chunk chunk, int x, int y, int z) {
         if (x < 0 || x >= Chunk.SIZE_X ||
-            y < 0 || y >= Chunk.SIZE_Y ||
-            z < 0 || z >= Chunk.SIZE_Z) {
+                y < 0 || y >= Chunk.SIZE_Y ||
+                z < 0 || z >= Chunk.SIZE_Z) {
             return y;
         }
 
@@ -164,8 +164,8 @@ public class ChunkMeshBuilder {
 
     private static float getBlockTopY(Chunk chunk, int x, int y, int z) {
         if (x < 0 || x >= Chunk.SIZE_X ||
-            y < 0 || y >= Chunk.SIZE_Y ||
-            z < 0 || z >= Chunk.SIZE_Z) return y;
+                y < 0 || y >= Chunk.SIZE_Y ||
+                z < 0 || z >= Chunk.SIZE_Z) return y;
 
         byte blockId = chunk.getBlock(x, y, z);
         if (blockId == 0) return y;

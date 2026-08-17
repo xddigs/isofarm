@@ -17,8 +17,8 @@ public final class K {
         public static final float ORTHO_FAR = 100.0f;
         public static final float DEFAULT_WIDTH = 16.0f;
         public static final float DEFAULT_HEIGHT = 8.0f;
-        public static final float PAN_SENSITIVITY = 0.015f;
-        public static final float ROTATION_SENSITIVITY = 0.10f;
+        public static final float ROTATION_SENSITIVITY = 0.40f;
+        public static final float MOVEMENT_SPEED = 8.0f;
     }
 
     public static final class World {

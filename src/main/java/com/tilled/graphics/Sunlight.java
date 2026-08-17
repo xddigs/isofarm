@@ -18,9 +18,17 @@ public class Sunlight {
         this(direction, K.Colors.SUNLIGHT_DEFAULT, 1.0f);
     }
 
-    public Vector3f getDirection() { return direction; }
-    public Vector3f getColor() { return color; }
-    public float getIntensity() { return intensity; }
+    public Vector3f getDirection() {
+        return direction;
+    }
+
+    public Vector3f getColor() {
+        return color;
+    }
+
+    public float getIntensity() {
+        return intensity;
+    }
 
     public void setDirection(float x, float y, float z) {
         this.direction.set(x, y, z).normalize();

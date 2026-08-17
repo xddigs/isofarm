@@ -14,6 +14,8 @@ public class Camera {
     private final Matrix4f projectionMatrix;
     private float pitch = K.Camera.DEFAULT_PITCH;
     private float yaw = K.Camera.DEFAULT_YAW;
+    private static final float MIN_PITCH = -80.0f;
+    private static final float MAX_PITCH = 80.0f;
     private float baseWidth;
     private float baseHeight;
     private float zoom = 1.0f;
@@ -68,6 +70,14 @@ public class Camera {
 
     public void rotateYaw(float offsetAngle) {
         this.yaw += offsetAngle;
+
+        if (this.yaw >= 360.0f) this.yaw -= 360.0f;
+        if (this.yaw < 0.0f) this.yaw += 360.0f;
+    }
+
+    public void rotatePitch(float offset) {
+        this.pitch += offset;
+        this.pitch = Math.clamp(pitch, MIN_PITCH, MAX_PITCH);
     }
 
     public float getYaw() {
@@ -100,14 +110,6 @@ public class Camera {
 
     public float getZoom() {
         return zoom;
-    }
-
-    public void pan(float deltaX, float deltaY, float sensitivity) {
-        float rad = (float) Math.toRadians(yaw);
-        float adjustedSensitivity = sensitivity * zoom;
-        float dx = (float) (-Math.cos(rad) * deltaX + Math.sin(rad) * deltaY) * adjustedSensitivity;
-        float dz = (float) (-Math.sin(rad) * deltaX - Math.cos(rad) * deltaY) * adjustedSensitivity;
-        this.position.add(dx, 0.0f, dz);
     }
 
     public Hit highlight(float mouseX, float mouseY,

@@ -39,9 +39,7 @@ public class GameInteraction {
         this.blocksTexture = blocksTexture;
     }
 
-    public Hit update(GameMaster gameMaster, Item selectedItem) {
-        camera(gameMaster);
-
+    public Hit update(GameMaster gameMaster,Item selectedItem) {
         if (Keyboard.isKeyPressed(GLFW_KEY_TAB)) {
             gameMaster.setPromptingForInput(true);
         }
@@ -54,49 +52,27 @@ public class GameInteraction {
             gameMaster.toggleInventory();
         }
 
-        Hit hoveredCell = camera.highlight(Mouse.getX(), Mouse.getY(),
-                gameMaster.getWindowWidth(), gameMaster.getWindowHeight(),
-                gameMaster.getWorld());
+        Hit hoveredCell = camera.highlight(
+                Mouse.getX(),
+                Mouse.getY(),
+                gameMaster.getWindowWidth(),
+                gameMaster.getWindowHeight(),
+                gameMaster.getWorld()
+        );
 
         if (hoveredCell == null) {
             return null;
         }
 
         if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
-            breakAction(gameMaster, hoveredCell);
+            breakAction(gameMaster,hoveredCell);
         }
 
         if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
-            placeAction(gameMaster, hoveredCell, selectedItem);
+            placeAction(gameMaster,hoveredCell,selectedItem);
         }
 
         return hoveredCell;
-    }
-
-    private void camera(GameMaster gameMaster) {
-        boolean isCtrlDown = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL) ||
-                Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
-
-        if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_RIGHT)) {
-            if (isCtrlDown) {
-                camera.rotateYaw(Mouse.getDeltaX() * K.Camera.ROTATION_SENSITIVITY);
-            } else {
-                camera.pan(Mouse.getDeltaX(), Mouse.getDeltaY(), K.Camera.PAN_SENSITIVITY);
-            }
-        }
-
-        float scrollY = Mouse.getScrollY();
-        if (scrollY != 0.0f) {
-            if (isCtrlDown) {
-                camera.zoom(scrollY);
-            } else {
-                gameUIservice.selectItem(scrollY > 0 ? -1 : 1);
-            }
-        }
-
-        if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_MIDDLE)) {
-            gameMaster.recenter();
-        }
     }
 
     private void breakAction(GameMaster gameMaster, Hit cell) {

@@ -83,29 +83,29 @@ public class Mesh {
     public static Mesh createMesh(float depth) {
         float[] positions = getFloats(depth);
 
-        float[] normals = new float[] {
-                0.0f, 1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f, 0.0f,
-                0.0f, 0.0f, 1.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f, 1.0f,
-                1.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,
-                0.0f, 0.0f,-1.0f,  0.0f, 0.0f,-1.0f,  0.0f, 0.0f,-1.0f,  0.0f, 0.0f,-1.0f,
+        float[] normals = new float[]{
+                0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+                0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+                1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+                0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f,
                 -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-                0.0f,-1.0f, 0.0f,  0.0f,-1.0f, 0.0f,  0.0f,-1.0f, 0.0f,  0.0f,-1.0f, 0.0f
+                0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f
         };
 
-        float[] textCoords = new float[] {
-                0,0, 0,1, 1,1, 1,0,
-                0,0, 0,1, 1,1, 1,0,
-                0,0, 0,1, 1,1, 1,0,
-                0,0, 0,1, 1,1, 1,0,
-                0,0, 0,1, 1,1, 1,0,
-                0,0, 0,1, 1,1, 1,0
+        float[] textCoords = new float[]{
+                0, 0, 0, 1, 1, 1, 1, 0,
+                0, 0, 0, 1, 1, 1, 1, 0,
+                0, 0, 0, 1, 1, 1, 1, 0,
+                0, 0, 0, 1, 1, 1, 1, 0,
+                0, 0, 0, 1, 1, 1, 1, 0,
+                0, 0, 0, 1, 1, 1, 1, 0
         };
 
         int[] indices = new int[36];
         for (int i = 0; i < 6; i++) {
             int v = i * 4;
             int idx = i * 6;
-            indices[idx]     = v;
+            indices[idx] = v;
             indices[idx + 1] = v + 1;
             indices[idx + 2] = v + 3;
             indices[idx + 3] = v + 3;
@@ -117,56 +117,56 @@ public class Mesh {
     }
 
     public static Mesh screenQuad() {
-        float[] positions = new float[] {
-                -1.0f,  1.0f, 0.0f,
+        float[] positions = new float[]{
+                -1.0f, 1.0f, 0.0f,
                 -1.0f, -1.0f, 0.0f,
                 1.0f, -1.0f, 0.0f,
-                1.0f,  1.0f, 0.0f
+                1.0f, 1.0f, 0.0f
         };
         float[] normals = new float[12];
-        float[] texCoords = new float[] {
+        float[] texCoords = new float[]{
                 0.0f, 1.0f,
                 0.0f, 0.0f,
                 1.0f, 0.0f,
                 1.0f, 1.0f
         };
-        int[] indices = new int[] { 0, 1, 2, 2, 3, 0 };
+        int[] indices = new int[]{0, 1, 2, 2, 3, 0};
         return new Mesh(positions, normals, texCoords, indices);
     }
 
     private static float[] getFloats(float depth) {
         float height = 1.0f;
 
-        return new float[] {
-                -0.5f,  0.0f,    -0.5f,
-                -0.5f,  0.0f,     0.5f,
-                0.5f,  0.0f,     0.5f,
-                0.5f,  0.0f,    -0.5f,
+        return new float[]{
+                -0.5f, 0.0f, -0.5f,
+                -0.5f, 0.0f, 0.5f,
+                0.5f, 0.0f, 0.5f,
+                0.5f, 0.0f, -0.5f,
 
-                -0.5f,  0.0f,     0.5f,
-                -0.5f, -height,   0.5f,
-                0.5f, -height,   0.5f,
-                0.5f,  0.0f,     0.5f,
+                -0.5f, 0.0f, 0.5f,
+                -0.5f, -height, 0.5f,
+                0.5f, -height, 0.5f,
+                0.5f, 0.0f, 0.5f,
 
-                0.5f,  0.0f,     0.5f,
-                0.5f, -height,   0.5f,
-                0.5f, -height,  -0.5f,
-                0.5f,  0.0f,   -0.5f,
+                0.5f, 0.0f, 0.5f,
+                0.5f, -height, 0.5f,
+                0.5f, -height, -0.5f,
+                0.5f, 0.0f, -0.5f,
 
-                0.5f,  0.0f,   -0.5f,
+                0.5f, 0.0f, -0.5f,
                 0.5f, -height, -0.5f,
                 -0.5f, -height, -0.5f,
-                -0.5f,  0.0f,   -0.5f,
+                -0.5f, 0.0f, -0.5f,
 
-                -0.5f,  0.0f,   -0.5f,
+                -0.5f, 0.0f, -0.5f,
                 -0.5f, -height, -0.5f,
-                -0.5f, -height,  0.5f,
-                -0.5f,  0.0f,    0.5f,
+                -0.5f, -height, 0.5f,
+                -0.5f, 0.0f, 0.5f,
 
-                -0.5f, -height,  0.5f,
+                -0.5f, -height, 0.5f,
                 -0.5f, -height, -0.5f,
                 0.5f, -height, -0.5f,
-                0.5f, -height,  0.5f
+                0.5f, -height, 0.5f
         };
     }
 
@@ -177,10 +177,10 @@ public class Mesh {
         float[] normals = new float[24];
         float[] textCoords = new float[16];
 
-        int[] indices = new int[] {
-                0, 1,  1, 2,  2, 3,  3, 0,
-                4, 5,  5, 6,  6, 7,  7, 4,
-                0, 4,  1, 5,  2, 6,  3, 7
+        int[] indices = new int[]{
+                0, 1, 1, 2, 2, 3, 3, 0,
+                4, 5, 5, 6, 6, 7, 7, 4,
+                0, 4, 1, 5, 2, 6, 3, 7
         };
 
         return new Mesh(positions, normals, textCoords, indices);
@@ -196,7 +196,7 @@ public class Mesh {
         float minZ = -eps;
         float maxZ = 1.0f + eps;
 
-        return new float[] {
+        return new float[]{
                 minX, maxY, minZ,
                 maxX, maxY, minZ,
                 maxX, maxY, maxZ,
@@ -216,28 +216,28 @@ public class Mesh {
     }
 
     public static Mesh quadVertical() {
-        float[] positions = new float[] {
+        float[] positions = new float[]{
                 -0.25f, 0.0f, 0.0f,
                 0.25f, 0.0f, 0.0f,
                 0.25f, 1.0f, 0.0f,
                 -0.25f, 1.0f, 0.0f
         };
 
-        float[] normals = new float[] {
+        float[] normals = new float[]{
                 0.0f, 0.0f, 1.0f,
                 0.0f, 0.0f, 1.0f,
                 0.0f, 0.0f, 1.0f,
                 0.0f, 0.0f, 1.0f
         };
 
-        float[] texCoords = new float[] {
+        float[] texCoords = new float[]{
                 0.0f, 1.0f,
                 1.0f, 1.0f,
                 1.0f, 0.0f,
                 0.0f, 0.0f
         };
 
-        int[] indices = new int[] {
+        int[] indices = new int[]{
                 0, 1, 2,
                 2, 3, 0
         };
@@ -246,46 +246,46 @@ public class Mesh {
     }
 
     public static Mesh createCrop() {
-        float[] positions = new float[] {
+        float[] positions = new float[]{
                 -0.4f, 0.0f, -0.25f,
                 0.4f, 0.0f, -0.25f,
                 0.4f, 0.8f, -0.25f,
                 -0.4f, 0.8f, -0.25f,
 
-                -0.4f, 0.0f,  0.25f,
-                0.4f, 0.0f,  0.25f,
-                0.4f, 0.8f,  0.25f,
-                -0.4f, 0.8f,  0.25f,
+                -0.4f, 0.0f, 0.25f,
+                0.4f, 0.0f, 0.25f,
+                0.4f, 0.8f, 0.25f,
+                -0.4f, 0.8f, 0.25f,
 
                 -0.25f, 0.0f, -0.4f,
-                -0.25f, 0.0f,  0.4f,
-                -0.25f, 0.8f,  0.4f,
+                -0.25f, 0.0f, 0.4f,
+                -0.25f, 0.8f, 0.4f,
                 -0.25f, 0.8f, -0.4f,
 
                 0.25f, 0.0f, -0.4f,
-                0.25f, 0.0f,  0.4f,
-                0.25f, 0.8f,  0.4f,
+                0.25f, 0.0f, 0.4f,
+                0.25f, 0.8f, 0.4f,
                 0.25f, 0.8f, -0.4f
         };
 
-        float[] normals = new float[] {
-                0.0f, 0.0f, -1.0f,  0.0f, 0.0f, -1.0f,  0.0f, 0.0f, -1.0f,  0.0f, 0.0f, -1.0f,
-                0.0f, 0.0f,  1.0f,  0.0f, 0.0f,  1.0f,  0.0f, 0.0f,  1.0f,  0.0f, 0.0f,  1.0f,
+        float[] normals = new float[]{
+                0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f,
+                0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
                 -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-                1.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f
+                1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f
         };
 
-        float[] texCoords = new float[] {
-                0.0f, 0.0f,  1.0f, 0.0f,  1.0f, 1.0f,  0.0f, 1.0f,
-                0.0f, 0.0f,  1.0f, 0.0f,  1.0f, 1.0f,  0.0f, 1.0f,
-                0.0f, 0.0f,  1.0f, 0.0f,  1.0f, 1.0f,  0.0f, 1.0f,
-                0.0f, 0.0f,  1.0f, 0.0f,  1.0f, 1.0f,  0.0f, 1.0f
+        float[] texCoords = new float[]{
+                0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+                0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+                0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+                0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f
         };
 
-        int[] indices = new int[] {
-                0, 1, 2,  2, 3, 0,    2, 1, 0,  0, 3, 2,
-                4, 5, 6,  6, 7, 4,    6, 5, 4,  4, 7, 6,
-                8, 9, 10, 10, 11, 8,  10, 9, 8, 8, 11, 10,
+        int[] indices = new int[]{
+                0, 1, 2, 2, 3, 0, 2, 1, 0, 0, 3, 2,
+                4, 5, 6, 6, 7, 4, 6, 5, 4, 4, 7, 6,
+                8, 9, 10, 10, 11, 8, 10, 9, 8, 8, 11, 10,
                 12, 13, 14, 14, 15, 12, 14, 13, 12, 12, 15, 14
         };
 
