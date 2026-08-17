@@ -22,6 +22,9 @@ public class Player {
     private int level;
     private boolean onGround;
 
+    private int maxHitpoints = 100;
+    private int hitpoints = maxHitpoints;
+
     public Player(String name, World world, ToastService toastService) {
         this.name = name;
         this.toastService = toastService;
@@ -84,6 +87,22 @@ public class Player {
     }
 
     public void update() {
+    }
+
+    public int getHitpoints() {
+        return hitpoints;
+    }
+
+    public void setHitpoints(int hitpoints) {
+        this.hitpoints = hitpoints;
+    }
+
+    public int getMaxHitpoints() {
+        return maxHitpoints;
+    }
+
+    public void setMaxHitpoints(int maxHitpoints) {
+        this.maxHitpoints = maxHitpoints;
     }
 
     public void gain(int amount) {
