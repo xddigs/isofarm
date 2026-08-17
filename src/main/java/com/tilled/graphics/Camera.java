@@ -1,14 +1,11 @@
 package com.tilled.graphics;
 
 import com.tilled.data.Hit;
-import com.tilled.input.Keyboard;
 import com.tilled.utils.K;
 import com.tilled.wrld.World;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-
-import static org.lwjgl.glfw.GLFW.*;
 
 @SuppressWarnings("unused")
 public class Camera {
