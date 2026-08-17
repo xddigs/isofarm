@@ -90,8 +90,9 @@ public class GameMaster {
         this.particles = new ParticleEngine();
         this.rainEngine = new RainEngine();
 
-        for (int cx = -2; cx < 2; cx++) {
-            for (int cz = -2; cz < 2; cz++) {
+        int chunkAmount = K.World.STARTING_GRID_SIZE;
+        for (int cx = -chunkAmount; cx < chunkAmount; cx++) {
+            for (int cz = -chunkAmount; cz < chunkAmount; cz++) {
                 generator.generateChunk(cx, cz);
             }
         }

@@ -10,7 +10,7 @@ public final class K {
         public static final float DEFAULT_PITCH = 35.264f;
         public static final float DEFAULT_YAW = -45.0f;
         public static final float MIN_ZOOM = 0.3f;
-        public static final float MAX_ZOOM = 2.5f;
+        public static final float MAX_ZOOM = 4.0f;
         public static final float ZOOM_FACTOR = 1.15f;
         public static final float LERP_SPEED = 12.0f;
         public static final float ORTHO_NEAR = -100.0f;
@@ -18,11 +18,11 @@ public final class K {
         public static final float DEFAULT_WIDTH = 16.0f;
         public static final float DEFAULT_HEIGHT = 8.0f;
         public static final float PAN_SENSITIVITY = 0.015f;
-        public static final float ROTATION_SENSITIVITY = 0.2f;
+        public static final float ROTATION_SENSITIVITY = 0.10f;
     }
 
     public static final class World {
-        public static final int STARTING_GRID_SIZE = 2;
+        public static final int STARTING_GRID_SIZE = 8;
         public static final float TILE_SIZE = 1.0f;
         public static final float DEFAULT_BLOCK_DEPTH = 0.4f;
         public static final float CROP_Y_OFFSET = 1.0f;

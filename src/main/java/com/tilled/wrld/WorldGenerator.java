@@ -7,7 +7,7 @@ public class WorldGenerator {
     private final World world;
     private static final float NOISE_SCALE = 0.03f;
     private static final int BASE_HEIGHT = 20;
-    private static final int HEIGHT_VARIATION = 10;
+    private static final int HEIGHT_VARIATION = 5;
 
     public WorldGenerator(World world) {
         this.world = world;
