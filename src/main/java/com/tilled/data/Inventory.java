@@ -3,118 +3,232 @@ package com.tilled.data;
 import com.tilled.utils.K;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @DataClass
 public class Inventory {
-    private final Map<Item, Integer> items;
+    private final List<InventorySlot> slots;
 
     public Inventory() {
-        this.items = new LinkedHashMap<>();
+        this.slots = new ArrayList<>();
     }
 
     public Map<Item, Integer> getItems() {
-        return Collections.unmodifiableMap(items);
+        Map<Item, Integer> result = new LinkedHashMap<>();
+        for (InventorySlot slot : slots) {
+            if (!slot.isEmpty()) {
+                result.put(slot.getItem(), slot.getItem().getAmount());
+            }
+        }
+
+        return Collections.unmodifiableMap(result);
     }
 
     public void add(Item item, int amount) {
         if (item == null || amount <= 0) return;
-        int current = items.getOrDefault(item, 0);
-        long newAmount = (long) current + amount;
-        int cappedAmount = (int) Math.min(newAmount, K.World.MAX_STACK);
-        items.put(item, cappedAmount);
-        sort();
+
+        for (InventorySlot slot : slots) {
+            if (!slot.isEmpty() && slot.getItem().equals(item)) {
+                int current = slot.getItem().getAmount();
+                long newAmount = (long) current + amount;
+                int cappedAmount = (int) Math.min(newAmount, K.World.MAX_STACK);
+
+                slot.getItem().setAmount(cappedAmount);
+                return;
+            }
+        }
+
+        for (InventorySlot slot : slots) {
+            if (slot.isEmpty()) {
+                slot.setItem(item);
+                slot.getItem().setAmount(Math.min(amount, K.World.MAX_STACK));
+                return;
+            }
+        }
+
+        slots.add(new InventorySlot(item));
     }
+
 
     public void remove(Item item, int amount) {
         if (item == null || amount <= 0) return;
 
-        int current = items.getOrDefault(item, 0);
-        if (current <= amount) {
-            items.remove(item);
-        } else {
-            items.put(item, current - amount);
+        for (InventorySlot slot : slots) {
+            if (!slot.isEmpty() && slot.getItem().equals(item)) {
+                int current = slot.getItem().getAmount();
+
+                if (current <= amount) {
+                    slot.clear();
+                } else {
+                    slot.getItem().setAmount(current - amount);
+                }
+                return;
+            }
         }
     }
 
+    public void pickAndDrop(int fromIndex, int toIndex) {
+        if (!isValidIndex(fromIndex) || !isValidIndex(toIndex)) {
+            return;
+        }
+
+        if (fromIndex == toIndex) {
+            return;
+        }
+
+        InventorySlot from = slots.get(fromIndex);
+        InventorySlot to = slots.get(toIndex);
+
+        if (from.isEmpty()) {
+            return;
+        }
+
+        Item fromItem = from.getItem();
+        int fromAmount = from.getItem().getAmount();
+
+        if (to.isEmpty()) {
+            to.setItem(fromItem);
+            to.getItem().setAmount(fromAmount);
+            from.clear();
+            return;
+        }
+
+        Item toItem = to.getItem();
+        int toAmount = to.getItem().getAmount();
+
+        to.setItem(fromItem);
+        to.getItem().setAmount(fromAmount);
+
+        from.setItem(toItem);
+        from.getItem().setAmount(toAmount);
+    }
+
+
     public void sort() {
-        Map<Item, Integer> sorted = items.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey((a, b) -> {
-                    boolean aIsCoin = a instanceof Coin;
-                    boolean bIsCoin = b instanceof Coin;
-                    if (aIsCoin && !bIsCoin) return 1;
-                    if (!aIsCoin && bIsCoin) return -1;
-                    return String.CASE_INSENSITIVE_ORDER
-                            .compare(a.getName(), b.getName());
-                })).collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (a, b) -> a,
-                        LinkedHashMap::new));
-        items.clear();
-        items.putAll(sorted);
+        slots.sort((a, b) -> {
+            if (a.isEmpty() && b.isEmpty()) return 0;
+            if (a.isEmpty()) return 1;
+            if (b.isEmpty()) return -1;
+
+            Item first = a.getItem();
+            Item second = b.getItem();
+
+            boolean aIsCoin = first instanceof Coin;
+            boolean bIsCoin = second instanceof Coin;
+
+            if (aIsCoin && !bIsCoin) return 1;
+            if (!aIsCoin && bIsCoin) return -1;
+
+            return String.CASE_INSENSITIVE_ORDER.compare(first.getName(), second.getName());
+        });
     }
 
     public List<Item> getHotbarItems() {
-        List<Item> hotbar = new ArrayList<>(items.keySet());
-        int slotCount = Math.min(K.UI.HOTBAR_SLOTS, hotbar.size());
-        return hotbar.subList(0, slotCount);
+        List<Item> hotbar = new ArrayList<>();
+
+        for (InventorySlot slot : slots) {
+            if (slot.isEmpty()) continue;
+
+            hotbar.add(slot.getItem());
+
+            if (hotbar.size() >= K.UI.HOTBAR_SLOTS) {
+                break;
+            }
+        }
+
+        return hotbar;
     }
 
     public void clear() {
-        items.clear();
+        slots.clear();
     }
 
     public boolean isEmpty() {
-        return items.isEmpty();
+        return slots.stream().allMatch(InventorySlot::isEmpty);
     }
 
     public int size() {
-        return items.size();
+        return (int) slots.stream().filter(slot -> !slot.isEmpty()).count();
     }
 
     public Item get(int index) {
-        if (index < 0 || index >= items.size()) {
-            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + items.size());
+        InventorySlot slot = getSlot(index);
+
+        if (slot.isEmpty()) {
+            throw new IndexOutOfBoundsException("Index: " + index);
         }
-        return new ArrayList<>(items.keySet()).get(index);
+
+        return slot.getItem();
     }
 
     public Item get(Item item) {
-        return items.keySet().stream()
-                .filter(i -> i.equals(item))
-                .findFirst().orElse(null);
+        if (item == null) return null;
+
+        for (InventorySlot slot : slots) {
+            if (!slot.isEmpty() && slot.getItem().equals(item)) {
+                return slot.getItem();
+            }
+        }
+
+        return null;
     }
 
     public int getAmount(Item item) {
-        return items.getOrDefault(item, 0);
+        if (item == null) return 0;
+
+        for (InventorySlot slot : slots) {
+            if (!slot.isEmpty() && slot.getItem().equals(item)) {
+                return slot.getItem().getAmount();
+            }
+        }
+
+        return 0;
     }
 
     public <T extends Item> boolean hasItemOfType(Class<T> type) {
-        return items.entrySet().stream().anyMatch(entry ->
-                type.isInstance(entry.getKey()) && entry.getValue() > 0);
+        return slots.stream().filter(slot -> !slot.isEmpty())
+                .anyMatch(slot -> type.isInstance(slot.getItem())
+                        && slot.getItem().getAmount() > 0);
     }
 
     public <T extends Item> Optional<T> getItemOfType(Class<T> type) {
-        return items.keySet().stream().filter(entry ->
-                type.isInstance(entry) && items.get(entry) > 0)
-                .map(type::cast).findFirst();
+        return slots.stream().filter(slot -> !slot.isEmpty())
+                .filter(slot -> type.isInstance(slot.getItem())
+                && slot.getItem().getAmount() > 0)
+                .map(slot -> type.cast(slot.getItem())).findFirst();
     }
 
     public <T extends Item> Optional<Byte> getFirstItemIdOfType(Class<T> type) {
-        return items.entrySet().stream().filter(entry ->
-                type.isInstance(entry.getKey()) && entry.getValue() > 0)
-                .map(entry -> entry.getKey().getId()).findFirst();
+        return slots.stream().filter(slot -> !slot.isEmpty())
+                .filter(slot -> type.isInstance(slot.getItem())
+                && slot.getItem().getAmount() > 0)
+                .map(slot -> slot.getItem().getId()).findFirst();
     }
 
     public <T extends Item> boolean hasItemWithId(Class<T> type, byte id) {
-        return items.entrySet().stream().anyMatch(entry ->
-                type.isInstance(entry.getKey()) &&
-                entry.getKey().getId() == id && entry.getValue() > 0);
+        return slots.stream().filter(slot -> !slot.isEmpty())
+                .anyMatch(slot -> type.isInstance(slot.getItem()) && slot.getItem()
+                        .getId() == id && slot.getItem().getAmount() > 0);
     }
 
     public <T extends Item> int getTotalAmountOfType(Class<T> type) {
-        return items.entrySet().stream().filter(entry ->
-                type.isInstance(entry.getKey())).mapToInt(Map.Entry::getValue).sum();
+        return slots.stream().filter(slot -> !slot.isEmpty())
+                .filter(slot -> type.isInstance(slot.getItem()))
+                .mapToInt(slot -> slot.getItem().getAmount()).sum();
+    }
+
+    public List<InventorySlot> getSlots() {
+        return Collections.unmodifiableList(slots);
+    }
+
+    public InventorySlot getSlot(int index) {
+        if (index < 0 || index >= slots.size()) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + slots.size());
+        }
+
+        return slots.get(index);
+    }
+
+    private boolean isValidIndex(int index) {
+        return index >= 0 && index < slots.size();
     }
 }
