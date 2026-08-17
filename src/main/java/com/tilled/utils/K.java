@@ -126,7 +126,7 @@ public final class K {
 
         public static final int ICON_SEED_CROPS_FRAMES = 4;
         public static final int ICON_BLOCK_FRAMES = 6;
-        public static final int ICON_TOOL_FRAMES = 2;
+        public static final int ICON_TOOL_FRAMES = 3;
 
         public static final int BLOCK_ATLAS_FRAMES = 5;
         public static final int ICON_BLOCK_ATLAS_ROWS = 3;
@@ -180,7 +180,6 @@ public final class K {
         public static final Vector3f DEFAULT_DIRT = new Vector3f(0.4f, 0.25f, 0.1f);
         public static final Vector3f SUNLIGHT_DEFAULT = new Vector3f(1.0f, 1.0f, 1.0f);
         public static final Vector3f OUTLINE_DEFAULT = new Vector3f(0.0f, 0.0f, 0.0f);
-        public static final Vector3f CELL_BLOCKED = new Vector3f(0.8f, 0.1f, 0.04f);
         public static final Vector3f RAIN = new Vector3f(0.35f, 0.55f, 1.0f);
     }
 }
