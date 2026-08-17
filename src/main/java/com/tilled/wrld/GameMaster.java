@@ -138,7 +138,7 @@ public class GameMaster {
         this.blockIcons = new SpriteSheet(K.Paths.BLOCK_ICONS, K.UI.ICON_BLOCK_FRAMES);
 
         this.gameUIservice = new GameUIService(windowHandle, this, commandService,
-                toastService, seedIcons, cropIcons, blockIcons, toolIcons);
+                seedIcons, cropIcons, blockIcons, toolIcons);
 
         this.shop = new Shop();
         this.gameUIservice.setShop(shop);
@@ -195,6 +195,10 @@ public class GameMaster {
 
     public float getWindowHeight() {
         return windowHeight;
+    }
+
+    public Camera getCamera() {
+        return camera;
     }
 
     public boolean isPromptingForInput() {

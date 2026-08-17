@@ -110,6 +110,7 @@ public class GameInteraction {
 
     private void placeAction(GameMaster gameMaster, Hit cell, Item selectedItem) {
         World world = gameMaster.getWorld();
+        if (gameMaster.getPlayer().checkCollision(world)) return;
 
         if (selectedItem instanceof Block block) {
             int x = cell.x() + cell.normalX();
@@ -155,6 +156,7 @@ public class GameInteraction {
 
             if (blockId != BlockData.TILLED_DIRT.getId()) {
                 log.debug("Cannot plant at {},{},{}: selected block is not TILLED_DIRT", x, y, z );
+                gameMaster.getToastService().error("You can only plant seeds on tilled dirt");
                 return;
             }
 

@@ -22,8 +22,7 @@ public class Player {
     private int level;
     private boolean onGround;
 
-    public Player(String name, World world,
-                  ToastService toastService) {
+    public Player(String name, World world, ToastService toastService) {
         this.name = name;
         this.toastService = toastService;
         this.inventory = new Inventory();
@@ -35,16 +34,8 @@ public class Player {
 
         this.position = new Vector3f(spawnX, highestY, spawnZ);
         this.velocity = new Vector3f();
-        this.dimensions = new Vector3f(0.6f, 1.8f, 0.6f);
+        this.dimensions = new Vector3f(0.6f, 1.5f, 0.6f);
         setUpInventory();
-
-        log.info(
-                "Player position: {} {} {} | collision: {}",
-                getPosition().x,
-                getPosition().y,
-                getPosition().z,
-                checkCollision(world)
-        );
     }
 
     private void setUpInventory() {
@@ -92,7 +83,8 @@ public class Player {
         return collision;
     }
 
-    public void update() {}
+    public void update() {
+    }
 
     public void gain(int amount) {
         experience += amount;
