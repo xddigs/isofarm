@@ -193,4 +193,22 @@ public class World {
 
         return null;
     }
+
+    public boolean isBlockSolid(int x, int y, int z) {
+        return getBlockTypeAt(x, y, z) != 0 ||
+        getBlockTypeAt(x, y + 1, z) != BlockData.WATER.getId();
+    }
+
+    public float getHighestY(float spawnX, float spawnZ) {
+        int blockX = (int) Math.floor(spawnX);
+        int blockZ = (int) Math.floor(spawnZ);
+
+        for (int y = Chunk.SIZE_Y - 1; y >= 0; y--) {
+            byte blockId = getBlockTypeAt(blockX, y, blockZ);
+            if (blockId != 0) {
+                return y + 1.0f;
+            }
+        }
+        return 0.0f;
+    }
 }

@@ -151,6 +151,7 @@ public class GameUIService implements Service<GameMaster> {
         }
         renderHotbar();
         renderToasts();
+        renderCrosshair(windowWidth, windowHeight);
     }
 
     public void renderToasts() {
@@ -161,6 +162,25 @@ public class GameUIService implements Service<GameMaster> {
         for (Toast toast : toastService.getToasts()) {
             renderToast(toast);
         }
+    }
+
+    public void renderCrosshair(float windowWidth, float windowHeight) {
+        float centerX = windowWidth / 2.0f;
+        float centerY = windowHeight / 2.0f;
+        float size = 8.0f;
+        float thickness = 2.0f;
+
+        ImGui.getForegroundDrawList().addLine(
+                centerX - size, centerY,
+                centerX + size, centerY,
+                ImGui.getColorU32(1.0f, 1.0f, 1.0f, 0.8f), thickness
+        );
+
+        ImGui.getForegroundDrawList().addLine(
+                centerX, centerY - size,
+                centerX, centerY + size,
+                ImGui.getColorU32(1.0f, 1.0f, 1.0f, 0.8f), thickness
+        );
     }
 
     public void renderHotbar() {

@@ -1,105 +1,114 @@
 package com.tilled.input;
 
+import com.tilled.data.Player;
 import com.tilled.graphics.Camera;
 import com.tilled.service.Service;
 import com.tilled.utils.K;
 import com.tilled.wrld.GameMaster;
+import org.joml.Vector3f;
 
 import static org.lwjgl.glfw.GLFW.*;
 
 public class CameraController implements Service<Camera> {
     private final Camera camera;
     private boolean mouseCaptured = false;
+    private final Vector3f targetVelocity;
 
     public CameraController(Camera camera) {
         this.camera = camera;
+        this.targetVelocity = new Vector3f();
     }
 
-    public Camera get() {
+    public Camera getCamera() {
         return camera;
     }
 
-    public void update(GameMaster gameMaster,float delta) {
+    public void update(GameMaster gameMaster, float delta) {
         if (gameMaster.isInventoryOpen() || gameMaster.isPromptingForInput()) {
             releaseMouse(gameMaster);
             return;
         }
 
         captureMouse(gameMaster);
-        movement(delta);
         mouseLook();
+
+        Player player = gameMaster.getPlayer();
+        if (player != null) {
+            movement(gameMaster, delta);
+            camera.getPosition().set(player.getEyePosition());
+        }
     }
 
-    private void movement(float delta) {
-        float speed = K.Camera.MOVEMENT_SPEED * delta;
-        float yaw = (float)Math.toRadians(camera.getYaw());
+    private void movement(GameMaster gameMaster, float delta) {
+        Player player = gameMaster.getPlayer();
+        float speed = K.Camera.MOVEMENT_SPEED;
 
-        float forwardX = (float)Math.sin(yaw);
-        float forwardZ = (float)Math.cos(yaw);
+        float yaw = (float) Math.toRadians(camera.getYaw());
 
-        float rightX = (float)-Math.cos(yaw);
-        float rightZ = (float)Math.sin(yaw);
+        float forwardX = (float) Math.sin(yaw);
+        float forwardZ = (float) -Math.cos(yaw);
 
-        float x = 0.0f;
-        float z = 0.0f;
+        float rightX = (float) Math.cos(yaw);
+        float rightZ = (float) Math.sin(yaw);
+
+        float moveX = 0.0f;
+        float moveZ = 0.0f;
 
         if (Keyboard.isKeyDown(GLFW_KEY_W)) {
-            x += forwardX;
-            z += forwardZ;
+            moveX += forwardX;
+            moveZ += forwardZ;
         }
-
         if (Keyboard.isKeyDown(GLFW_KEY_S)) {
-            x -= forwardX;
-            z -= forwardZ;
+            moveX -= forwardX;
+            moveZ -= forwardZ;
         }
-
         if (Keyboard.isKeyDown(GLFW_KEY_D)) {
-            x += rightX;
-            z += rightZ;
+            moveX += rightX;
+            moveZ += rightZ;
         }
-
         if (Keyboard.isKeyDown(GLFW_KEY_A)) {
-            x -= rightX;
-            z -= rightZ;
+            moveX -= rightX;
+            moveZ -= rightZ;
         }
 
-        float length = (float)Math.sqrt(x * x + z * z);
-
+        float length = (float) Math.sqrt(moveX * moveX + moveZ * moveZ);
         if (length > 0.0f) {
-            x /= length;
-            z /= length;
-
-            camera.getPosition().add(x * speed,0.0f,z * speed);
+            moveX = (moveX / length) * speed;
+            moveZ = (moveZ / length) * speed;
         }
 
+        float moveY = 0.0f;
         if (Keyboard.isKeyDown(GLFW_KEY_SPACE)) {
-            camera.getPosition().y += speed;
+            moveY += speed;
+        }
+        if (Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
+            moveY -= speed;
         }
 
-        if (Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-            camera.getPosition().y -= speed;
-        }
+        targetVelocity.set(moveX, moveY, moveZ);
+        player.moveAndCollide(gameMaster.getWorld(), targetVelocity, delta);
     }
 
     private void mouseLook() {
         float dx = Mouse.getDeltaX();
         float dy = Mouse.getDeltaY();
 
-        if (dx != 0.0f) camera.rotateYaw(-dx * K.Camera.ROTATION_SENSITIVITY);
-        if (dy != 0.0f) camera.rotatePitch(dy * K.Camera.ROTATION_SENSITIVITY);
+        float newYaw = camera.getYaw() + dx * K.Camera.ROTATION_SENSITIVITY;
+        float newPitch = camera.getPitch() + dy * K.Camera.ROTATION_SENSITIVITY;
+
+        camera.setYaw(newYaw);
+        camera.setPitch(Math.clamp(newPitch, -89.0f, 89.0f));
     }
 
     private void captureMouse(GameMaster gameMaster) {
         if (mouseCaptured) return;
-
-        glfwSetInputMode(gameMaster.getWindowHandle(),GLFW_CURSOR,GLFW_CURSOR_DISABLED);
+        glfwSetInputMode(gameMaster.getWindowHandle(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         mouseCaptured = true;
     }
 
     private void releaseMouse(GameMaster gameMaster) {
         if (!mouseCaptured) return;
-
-        glfwSetInputMode(gameMaster.getWindowHandle(),GLFW_CURSOR,GLFW_CURSOR_NORMAL);
+        glfwSetInputMode(gameMaster.getWindowHandle(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         mouseCaptured = false;
     }
 

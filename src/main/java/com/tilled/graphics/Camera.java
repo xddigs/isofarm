@@ -5,7 +5,6 @@ import com.tilled.utils.K;
 import com.tilled.wrld.World;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 
 @SuppressWarnings("unused")
 public class Camera {
@@ -14,63 +13,50 @@ public class Camera {
     private final Matrix4f projectionMatrix;
     private float pitch = K.Camera.DEFAULT_PITCH;
     private float yaw = K.Camera.DEFAULT_YAW;
-    private static final float MIN_PITCH = -80.0f;
-    private static final float MAX_PITCH = 80.0f;
-    private float baseWidth;
-    private float baseHeight;
-    private float zoom = 1.0f;
-    private float targetZoom = 1.0f;
+    private static final float MIN_PITCH = -89.0f;
+    private static final float MAX_PITCH = 89.0f;
+    private static final float FOV = 85.0f;
 
     public Camera(float width, float height) {
         this.position = new Vector3f(0.0f, 0.0f, 0.0f);
         this.projectionMatrix = new Matrix4f();
-        this.baseWidth = width;
-        this.baseHeight = height;
-
-        updateMatrix();
+        updateProjection(width, height);
     }
 
     public void updateProjection(float width, float height) {
-        float aspectRatio = width / height;
-        this.baseHeight = K.Camera.DEFAULT_HEIGHT;
-        this.baseWidth = this.baseHeight * aspectRatio;
-        updateMatrix();
+        float aspectRatio = width / Math.max(height, 1.0f);
+        this.projectionMatrix.identity().perspective(
+                (float) Math.toRadians(FOV),
+                aspectRatio,
+                0.1f,
+                1000.0f
+        );
     }
 
-    public void update(float delta) {
-        if (Math.abs(zoom - targetZoom) > 0.0001f) {
-            this.zoom += (targetZoom - zoom) * Math.min(delta * K.Camera.LERP_SPEED, 1.0f);
-            updateMatrix();
-        }
-    }
-
-    public void zoom(float scrollOffset) {
-        if (scrollOffset == 0.0f) return;
-
-        if (scrollOffset > 0) {
-            this.targetZoom /= (float) Math.pow(K.Camera.ZOOM_FACTOR, scrollOffset);
-        } else {
-            this.targetZoom *= (float) Math.pow(K.Camera.ZOOM_FACTOR, -scrollOffset);
-        }
-
-        this.targetZoom = Math.clamp(this.targetZoom, K.Camera.MIN_ZOOM, K.Camera.MAX_ZOOM);
-    }
-
-    private void updateMatrix() {
-        float halfWidth = (baseWidth * zoom) / 2.0f;
-        float halfHeight = (baseHeight * zoom) / 2.0f;
-        this.projectionMatrix.identity().ortho(-halfWidth, halfWidth, -halfHeight,
-                halfHeight, K.Camera.ORTHO_NEAR, K.Camera.ORTHO_FAR);
-    }
+    public void update(float delta) {}
 
     public Matrix4f getViewMatrix() {
-        return new Matrix4f().identity().rotateX((float) Math.toRadians(pitch))
-                .rotateY((float) Math.toRadians(yaw)).translate(-position.x, -position.y, -position.z);
+        return new Matrix4f()
+                .identity()
+                .rotateX((float) Math.toRadians(pitch))
+                .rotateY((float) Math.toRadians(yaw))
+                .translate(-position.x, -position.y, -position.z);
+    }
+
+    public Vector3f getForwardVector() {
+        Vector3f dir = new Vector3f();
+        float yawRad = (float) Math.toRadians(yaw);
+        float pitchRad = (float) Math.toRadians(pitch);
+
+        dir.x = (float) (Math.sin(yawRad) * Math.cos(pitchRad));
+        dir.y = (float) (-Math.sin(pitchRad));
+        dir.z = (float) (-Math.cos(yawRad) * Math.cos(pitchRad));
+
+        return dir.normalize();
     }
 
     public void rotateYaw(float offsetAngle) {
         this.yaw += offsetAngle;
-
         if (this.yaw >= 360.0f) this.yaw -= 360.0f;
         if (this.yaw < 0.0f) this.yaw += 360.0f;
     }
@@ -80,69 +66,17 @@ public class Camera {
         this.pitch = Math.clamp(pitch, MIN_PITCH, MAX_PITCH);
     }
 
-    public float getYaw() {
-        return yaw;
-    }
+    public float getYaw() { return yaw; }
+    public void setYaw(float yaw) { this.yaw = yaw; }
+    public float getPitch() { return pitch; }
+    public void setPitch(float pitch) { this.pitch = pitch; }
+    public Matrix4f getProjectionMatrix() { return projectionMatrix; }
+    public Vector3f getPosition() { return position; }
+    public void setPosition(float x, float y, float z) { this.position.set(x, y, z); }
 
-    public void setYaw(float yaw) {
-        this.yaw = yaw;
-    }
-
-    public float getPitch() {
-        return pitch;
-    }
-
-    public void setPitch(float pitch) {
-        this.pitch = pitch;
-    }
-
-    public Matrix4f getProjectionMatrix() {
-        return projectionMatrix;
-    }
-
-    public Vector3f getPosition() {
-        return position;
-    }
-
-    public void setPosition(float x, float y, float z) {
-        this.position.set(x, y, z);
-    }
-
-    public float getZoom() {
-        return zoom;
-    }
-
-    public Hit highlight(float mouseX, float mouseY,
-                         float windowWidth, float windowHeight, World world) {
-
-        float ndcX = (2.0f * mouseX) / windowWidth - 1.0f;
-        float ndcY = 1.0f - (2.0f * mouseY) / windowHeight;
-
-        Matrix4f invProjView = new Matrix4f(projectionMatrix).mul(getViewMatrix()).invert();
-        Vector4f nearPoint = new Vector4f(ndcX, ndcY, -1.0f, 1.0f);
-        Vector4f farPoint = new Vector4f(ndcX, ndcY, 1.0f, 1.0f);
-
-        invProjView.transform(nearPoint);
-        invProjView.transform(farPoint);
-
-        if (nearPoint.w != 0.0f) {
-            nearPoint.div(nearPoint.w);
-        }
-
-        if (farPoint.w != 0.0f) {
-            farPoint.div(farPoint.w);
-        }
-
-        Vector3f origin = new Vector3f(nearPoint.x, nearPoint.y, nearPoint.z);
-        Vector3f direction = new Vector3f(farPoint.x - nearPoint.x,
-                farPoint.y - nearPoint.y, farPoint.z - nearPoint.z);
-
-        if (direction.lengthSquared() < 0.000001f) {
-            return null;
-        }
-
-        direction.normalize();
-        origin.add(0.5f, 1.0f, 0.5f);
+    public Hit highlight(World world) {
+        Vector3f origin = new Vector3f(this.position);
+        Vector3f direction = getForwardVector();
 
         float tileSize = K.World.TILE_SIZE;
 
@@ -158,47 +92,17 @@ public class Camera {
         float tDeltaY = stepY != 0 ? Math.abs(tileSize / direction.y) : Float.POSITIVE_INFINITY;
         float tDeltaZ = stepZ != 0 ? Math.abs(tileSize / direction.z) : Float.POSITIVE_INFINITY;
 
-        float tMaxX;
+        float tMaxX = (stepX > 0) ? ((x + 1) * tileSize - origin.x) / direction.x :
+                (stepX < 0) ? (x * tileSize - origin.x) / direction.x : Float.POSITIVE_INFINITY;
 
-        if (stepX > 0) {
-            float nextBoundary = (x + 1) * tileSize;
-            tMaxX = (nextBoundary - origin.x) / direction.x;
-        } else if (stepX < 0) {
-            float nextBoundary = x * tileSize;
-            tMaxX = (nextBoundary - origin.x) / direction.x;
-        } else {
-            tMaxX = Float.POSITIVE_INFINITY;
-        }
+        float tMaxY = (stepY > 0) ? ((y + 1) * tileSize - origin.y) / direction.y :
+                (stepY < 0) ? (y * tileSize - origin.y) / direction.y : Float.POSITIVE_INFINITY;
 
-        float tMaxY;
-
-        if (stepY > 0) {
-            float nextBoundary = (y + 1) * tileSize;
-            tMaxY = (nextBoundary - origin.y) / direction.y;
-        } else if (stepY < 0) {
-            float nextBoundary = y * tileSize;
-            tMaxY = (nextBoundary - origin.y) / direction.y;
-        } else {
-            tMaxY = Float.POSITIVE_INFINITY;
-        }
-
-        float tMaxZ;
-
-        if (stepZ > 0) {
-            float nextBoundary = (z + 1) * tileSize;
-            tMaxZ = (nextBoundary - origin.z) / direction.z;
-        } else if (stepZ < 0) {
-            float nextBoundary = z * tileSize;
-            tMaxZ = (nextBoundary - origin.z) / direction.z;
-        } else {
-            tMaxZ = Float.POSITIVE_INFINITY;
-        }
+        float tMaxZ = (stepZ > 0) ? ((z + 1) * tileSize - origin.z) / direction.z :
+                (stepZ < 0) ? (z * tileSize - origin.z) / direction.z : Float.POSITIVE_INFINITY;
 
         float distance = 0.0f;
-
-        int hitNormalX = 0;
-        int hitNormalY = 0;
-        int hitNormalZ = 0;
+        int hitNormalX = 0, hitNormalY = 0, hitNormalZ = 0;
 
         while (distance <= MAX_RAY_DISTANCE) {
             byte block = world.getBlockTypeAt(x, y, z);
@@ -211,34 +115,24 @@ public class Camera {
                     x += stepX;
                     distance = tMaxX;
                     tMaxX += tDeltaX;
-                    hitNormalX = -stepX;
-                    hitNormalY = 0;
-                    hitNormalZ = 0;
+                    hitNormalX = -stepX; hitNormalY = 0; hitNormalZ = 0;
                 } else {
                     z += stepZ;
                     distance = tMaxZ;
                     tMaxZ += tDeltaZ;
-
-                    hitNormalX = 0;
-                    hitNormalY = 0;
-                    hitNormalZ = -stepZ;
+                    hitNormalX = 0; hitNormalY = 0; hitNormalZ = -stepZ;
                 }
             } else {
                 if (tMaxY < tMaxZ) {
                     y += stepY;
                     distance = tMaxY;
                     tMaxY += tDeltaY;
-
-                    hitNormalX = 0;
-                    hitNormalY = -stepY;
-                    hitNormalZ = 0;
+                    hitNormalX = 0; hitNormalY = -stepY; hitNormalZ = 0;
                 } else {
                     z += stepZ;
                     distance = tMaxZ;
                     tMaxZ += tDeltaZ;
-                    hitNormalX = 0;
-                    hitNormalY = 0;
-                    hitNormalZ = -stepZ;
+                    hitNormalX = 0; hitNormalY = 0; hitNormalZ = -stepZ;
                 }
             }
         }

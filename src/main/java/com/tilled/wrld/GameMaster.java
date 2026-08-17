@@ -244,9 +244,10 @@ public class GameMaster {
         shop.update(timeService);
         cropService.update(delta, weatherService.getWeather());
 
+        cameraController.update(this, delta);
         camera.update(delta);
         gameUIservice.update(delta);
-        cameraController.update(this,delta);
+
         Item selectedInventoryItem = gameUIservice.getSelectedInventoryItem();
 
         if (!ImGui.getIO().getWantCaptureMouse()) {
@@ -394,9 +395,13 @@ public class GameMaster {
 
         if (player == null) {
             if (gameUIservice.renderNewPlayer()) {
-                this.player = new Player(gameUIservice.getEnteredPlayerName(), toastService);
+
+                this.player = new Player(gameUIservice.getEnteredPlayerName(),
+                        world, toastService);
+
                 gameUIservice.setPlayer(player);
                 this.shop.setPlayer(player);
+
                 log.info("Player created: {}", player.getName());
                 toastService.success("Welcome, " + player.getName() + "!");
                 toastService.info("Use E to open the inventory");

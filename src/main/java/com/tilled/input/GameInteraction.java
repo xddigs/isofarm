@@ -52,13 +52,7 @@ public class GameInteraction {
             gameMaster.toggleInventory();
         }
 
-        Hit hoveredCell = camera.highlight(
-                Mouse.getX(),
-                Mouse.getY(),
-                gameMaster.getWindowWidth(),
-                gameMaster.getWindowHeight(),
-                gameMaster.getWorld()
-        );
+        Hit hoveredCell = camera.highlight(gameMaster.getWorld());
 
         if (hoveredCell == null) {
             return null;
