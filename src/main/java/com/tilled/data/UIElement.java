@@ -2,6 +2,7 @@ package com.tilled.data;
 
 import com.tilled.graphics.SpriteSheet;
 import com.tilled.graphics.Texture;
+import com.tilled.gui.UIRenderer;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 

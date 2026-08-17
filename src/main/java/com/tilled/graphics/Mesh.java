@@ -1,7 +1,6 @@
 package com.tilled.graphics;
 
 import com.tilled.utils.K;
-import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,6 +111,36 @@ public class Mesh {
             indices[idx + 4] = v + 1;
             indices[idx + 5] = v + 2;
         }
+
+        return new Mesh(positions, normals, textCoords, indices);
+    }
+
+    public static Mesh createQuad() {
+        float[] positions = new float[]{
+                0.0f, 0.0f, 0.0f,
+                0.0f, 1.0f, 0.0f,
+                1.0f, 1.0f, 0.0f,
+                1.0f, 0.0f, 0.0f
+        };
+
+        float[] normals = new float[]{
+                0.0f, 0.0f, 1.0f,
+                0.0f, 0.0f, 1.0f,
+                0.0f, 0.0f, 1.0f,
+                0.0f, 0.0f, 1.0f
+        };
+
+        float[] textCoords = new float[]{
+                0.0f, 0.0f,
+                0.0f, 1.0f,
+                1.0f, 1.0f,
+                1.0f, 0.0f
+        };
+
+        int[] indices = new int[]{
+                0, 1, 2,
+                2, 3, 0
+        };
 
         return new Mesh(positions, normals, textCoords, indices);
     }

@@ -2,6 +2,7 @@ package com.tilled.wrld;
 
 import com.tilled.data.*;
 import com.tilled.graphics.*;
+import com.tilled.gui.UIRenderer;
 import com.tilled.input.*;
 import com.tilled.service.*;
 import com.tilled.utils.K;
@@ -10,6 +11,7 @@ import imgui.ImGui;
 import org.joml.FrustumIntersection;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
+import org.joml.Vector4f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +33,7 @@ public class GameMaster {
     private final SoundService soundService;
 
     private final GameUIService gameUIservice;
+    private final UIRenderer uiRenderer;
     private final GameInteraction gameInteraction;
     private final CropService cropService;
     private final TimeService timeService;
@@ -92,6 +95,9 @@ public class GameMaster {
         this.world = new World();
         this.generator = new WorldGenerator(world);
         this.chunkMeshes = new HashMap<>();
+        this.windowWidth = K.Window.DEFAULT_WIDTH;
+        this.windowHeight = K.Window.DEFAULT_HEIGHT;
+        this.uiRenderer = new UIRenderer((int) windowWidth, (int) windowHeight);
         this.soundService = new SoundService();
 
         this.cropService = new CropService(world);
@@ -474,6 +480,18 @@ public class GameMaster {
         if (isHUDShown()) {
             gameUIservice.renderHUD(this);
         }
+
+//        glDisable(GL_DEPTH_TEST);
+//        uiRenderer.begin();
+//        uiRenderer.drawRect(
+//                50.0f,
+//                50.0f,
+//                300.0f,
+//                150.0f,
+//                new Vector4f(0.1f, 0.1f, 0.1f, 0.9f)
+//        );
+//        uiRenderer.end();
+//        glEnable(GL_DEPTH_TEST);
 
         if (player == null) {
             if (gameUIservice.renderNewPlayer()) {

@@ -3,6 +3,7 @@ package com.tilled.graphics;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.system.MemoryStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,6 +98,11 @@ public class Shader {
     public void setUniform(String name, float value) {
         int location = glGetUniformLocation(programId, name);
         glUniform1f(location, value);
+    }
+
+    public void setUniform(String name, Vector4f value) {
+        int location = glGetUniformLocation(programId, name);
+        glUniform4f(location, value.x, value.y, value.z, value.w);
     }
 
     public void setUniform(String name, Vector3f value) {
