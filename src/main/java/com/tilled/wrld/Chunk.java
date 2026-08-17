@@ -11,17 +11,23 @@ public class Chunk {
     private final int chunkX;
     private final int chunkZ;
     private final byte[] blocks;
+    private final byte[] waterLevels;
 
     public Chunk(int chunkX, int chunkZ) {
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
-        this.blocks = new byte[SIZE_X * SIZE_Y * SIZE_Z];
+
+        int size = SIZE_X * SIZE_Y * SIZE_Z;
+
+        this.blocks = new byte[size];
+        this.waterLevels = new byte[size];
     }
 
     public byte getBlock(int x, int y, int z) {
         if (!isOutOfBounds(x, y, z)) {
             return blocks[getIndex(x, y, z)];
         }
+
         return 0;
     }
 
@@ -31,8 +37,26 @@ public class Chunk {
         }
     }
 
+    public byte getWaterLevel(int x, int y, int z) {
+        if (!isOutOfBounds(x, y, z)) {
+            return waterLevels[getIndex(x, y, z)];
+        }
+
+        return 0;
+    }
+
+    public void setWaterLevel(int x, int y, int z, byte waterLevel) {
+        if (!isOutOfBounds(x, y, z)) {
+            waterLevels[getIndex(x, y, z)] = waterLevel;
+        }
+    }
+
     public byte[] getBlocks() {
         return blocks;
+    }
+
+    public byte[] getWaterLevels() {
+        return waterLevels;
     }
 
     public int getChunkX() {
@@ -48,6 +72,8 @@ public class Chunk {
     }
 
     private boolean isOutOfBounds(int x, int y, int z) {
-        return x < 0 || x >= SIZE_X || y < 0 || y >= SIZE_Y || z < 0 || z >= SIZE_Z;
+        return x < 0 || x >= SIZE_X ||
+                y < 0 || y >= SIZE_Y ||
+                z < 0 || z >= SIZE_Z;
     }
 }

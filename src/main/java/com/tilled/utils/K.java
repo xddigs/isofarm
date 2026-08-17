@@ -25,7 +25,6 @@ public final class K {
         public static final int STARTING_GRID_SIZE = 2;
         public static final float TILE_SIZE = 1.0f;
         public static final float DEFAULT_BLOCK_DEPTH = 0.4f;
-        public static final float EPSILON_RAY_Y = 0.00001f;
         public static final float CROP_ELEVATION_Y = 0.0f;
         public static final float WEATHER_CHANGE_PROBABILITY = 0.01f;
 

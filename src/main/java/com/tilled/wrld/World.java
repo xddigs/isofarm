@@ -1,31 +1,28 @@
 package com.tilled.wrld;
 
-import com.tilled.data.Block;
 import com.tilled.data.Crop;
-import java.util.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class World {
     private final Map<Long, Crop> crops = new HashMap<>();
     private final Map<Long, Chunk> chunks = new HashMap<>();
-    private final Map<Long, Block> activeBlocks = new HashMap<>();
 
     private long get2DKey(int x, int z) {
         return (((long) x) << 32) | (z & 0xFFFFFFFFL);
     }
 
-    private long get3DKey(int x, int y, int z) {
-        return (((long) x & 0x1FFFFFL) << 43) |
-                (((long) z & 0x1FFFFFL) << 22) |
-                ((long) y & 0x3FFFFFFL);
-    }
-
     public void addCrop(Crop crop) {
         long key = get2DKey((int) crop.getX(), (int) crop.getZ());
+
         crops.put(key, crop);
     }
 
     public void removeCrop(Crop crop) {
         long key = get2DKey((int) crop.getX(), (int) crop.getZ());
+
         if (crops.get(key) == crop) {
             crops.remove(key);
         }
@@ -44,58 +41,88 @@ public class World {
         return chunks.computeIfAbsent(key, k -> new Chunk(chunkX, chunkZ));
     }
 
-    public byte getBlockTypeAt(int x, int y, int z) {
-        if (y < 0 || y >= Chunk.SIZE_Y) return 0;
+    public int getChunkBlockTypeAt(int x, int y, int z) {
+        int chunkX = Math.floorDiv(x, Chunk.SIZE_X);
+        int chunkZ = Math.floorDiv(z, Chunk.SIZE_Z);
 
-        int chunkX = x >> 4;
-        int chunkZ = z >> 4;
+        Chunk chunk = getOrCreateChunk(chunkX, chunkZ);
+
+        int localX = Math.floorMod(x, Chunk.SIZE_X);
+        int localZ = Math.floorMod(z, Chunk.SIZE_Z);
+
+        return chunk.getBlock(localX, y, localZ);
+    }
+
+    public byte getBlockTypeAt(int x, int y, int z) {
+        if (y < 0 || y >= Chunk.SIZE_Y) {
+            return 0;
+        }
+
+        int chunkX = Math.floorDiv(x, Chunk.SIZE_X);
+        int chunkZ = Math.floorDiv(z, Chunk.SIZE_Z);
+
         Chunk chunk = chunks.get(get2DKey(chunkX, chunkZ));
-        if (chunk == null) return 0;
-        int localX = x & 15;
-        int localZ = z & 15;
+
+        if (chunk == null) {
+            return 0;
+        }
+
+        int localX = Math.floorMod(x, Chunk.SIZE_X);
+        int localZ = Math.floorMod(z, Chunk.SIZE_Z);
+
         return chunk.getBlock(localX, y, localZ);
     }
 
     public void setBlockTypeAt(int x, int y, int z, byte blockId) {
-        if (y < 0 || y >= Chunk.SIZE_Y) return;
+        if (y < 0 || y >= Chunk.SIZE_Y) {
+            return;
+        }
 
-        int chunkX = x >> 4;
-        int chunkZ = z >> 4;
+        int chunkX = Math.floorDiv(x, Chunk.SIZE_X);
+        int chunkZ = Math.floorDiv(z, Chunk.SIZE_Z);
 
         Chunk chunk = getOrCreateChunk(chunkX, chunkZ);
 
-        int localX = x & 15;
-        int localZ = z & 15;
+        int localX = Math.floorMod(x, Chunk.SIZE_X);
+        int localZ = Math.floorMod(z, Chunk.SIZE_Z);
 
         chunk.setBlock(localX, y, localZ, blockId);
     }
 
-    public boolean addBlock(Block block) {
-        long key = get3DKey(block.getX(), block.getY(), block.getZ());
-        if (activeBlocks.containsKey(key)) {
-            return false;
+    public byte getWaterLevelAt(int x, int y, int z) {
+        if (y < 0 || y >= Chunk.SIZE_Y) {
+            return 0;
         }
 
-        setBlockTypeAt(block.getX(), block.getY(), block.getZ(), block.getType().getId());
-        activeBlocks.put(key, block);
-        return true;
+        int chunkX = x >> 4;
+        int chunkZ = z >> 4;
+
+        Chunk chunk = chunks.get(get2DKey(chunkX, chunkZ));
+
+        if (chunk == null) {
+            return 0;
+        }
+
+        int localX = x & 15;
+        int localZ = z & 15;
+
+        return chunk.getWaterLevel(localX, y, localZ);
     }
 
-    public boolean removeBlock(Block block) {
-        long key = get3DKey(block.getX(), block.getY(), block.getZ());
-        setBlockTypeAt(block.getX(), block.getY(), block.getZ(), (byte) 0);
-        return activeBlocks.remove(key) != null;
-    }
+    public void setWaterLevelAt(int x, int y, int z, byte waterLevel) {
+        if (y < 0 || y >= Chunk.SIZE_Y) {
+            return;
+        }
 
-    public Block getBlockAt(int x, int y, int z) {
-        return activeBlocks.get(get3DKey(x, y, z));
+        int chunkX = x >> 4;
+        int chunkZ = z >> 4;
+        Chunk chunk = getOrCreateChunk(chunkX, chunkZ);
+        int localX = x & 15;
+        int localZ = z & 15;
+        chunk.setWaterLevel(localX, y, localZ, waterLevel);
     }
 
     public Map<Long, Chunk> getChunks() {
         return chunks;
-    }
-
-    public Collection<Block> getActiveBlocks() {
-        return activeBlocks.values();
     }
 }

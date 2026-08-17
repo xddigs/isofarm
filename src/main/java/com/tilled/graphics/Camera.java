@@ -196,9 +196,10 @@ public class Camera {
         int hitNormalZ = 0;
 
         while (distance <= MAX_RAY_DISTANCE) {
-
-            if (world.getBlockTypeAt(x, y, z) != 0) {
-                return new Hit(x, y, z, hitNormalX, hitNormalY, hitNormalZ);
+            byte block = world.getBlockTypeAt(x, y, z);
+            if (block != 0) {
+                return new Hit(x, y, z, hitNormalX,
+                        hitNormalY, hitNormalZ);
             }
 
             if (tMaxX < tMaxY) {

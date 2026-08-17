@@ -32,7 +32,6 @@ public class GameMaster {
     private final GameInteraction gameInteraction;
     private final CropService cropService;
     private final TimeService timeService;
-    private final BlockService blockService;
     private final CommandService commandService;
     private final ParticleEngine particles;
     private final RainEngine rainEngine;
@@ -87,7 +86,6 @@ public class GameMaster {
         this.chunkMeshes = new HashMap<>();
         this.cropService = new CropService(world);
         this.timeService = new TimeService();
-        this.blockService = new BlockService();
         this.commandRegistry = new CommandRegistry();
         this.toastService = new ToastService();
         this.commandService = new CommandService(commandRegistry, toastService);
@@ -155,8 +153,7 @@ public class GameMaster {
         this.weatherService = new WeatherService(rainEngine, camera);
 
         this.camera.setPosition(0.0f, 0.0f, 0.0f);
-        this.gameInteraction = new GameInteraction(cropService, gameUIservice,
-                blockService, timeService, particles, camera);
+        this.gameInteraction = new GameInteraction(cropService, gameUIservice, timeService, particles, camera);
 
         recenter();
         log.info("GameMaster initialized with grid size: {}x{}",
@@ -281,7 +278,6 @@ public class GameMaster {
             defaultShader.setUniform("uBaseColor", K.Colors.DEFAULT_DIRT);
         }
 
-        blockService.renderAll(defaultShader, blockMesh, modelMatrix, sunlight);
         particles.render(defaultShader, blockMesh, blocksTexture, modelMatrix);
 
         world.getActiveCrops().forEach(crop -> {

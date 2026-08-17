@@ -4,11 +4,11 @@ import com.tilled.data.*;
 import com.tilled.graphics.Camera;
 import com.tilled.graphics.ParticleEngine;
 import com.tilled.graphics.SpriteSheet;
-import com.tilled.service.BlockService;
 import com.tilled.service.CropService;
 import com.tilled.service.GameUIService;
 import com.tilled.service.TimeService;
 import com.tilled.utils.K;
+import com.tilled.wrld.Chunk;
 import com.tilled.wrld.GameMaster;
 import com.tilled.wrld.World;
 import org.slf4j.Logger;
@@ -17,22 +17,19 @@ import org.slf4j.LoggerFactory;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class GameInteraction {
+
     private static final Logger log = LoggerFactory.getLogger(GameInteraction.class);
+
     private final CropService cropService;
     private final GameUIService gameUIservice;
-    private final BlockService blockService;
     private final TimeService timeService;
     private final ParticleEngine particles;
     private final Camera camera;
 
-    public GameInteraction(CropService cropService,
-                           GameUIService gameUIservice,
-                           BlockService blockService,
-                           TimeService timeService,
-                           ParticleEngine particles, Camera camera) {
+    public GameInteraction(CropService cropService, GameUIService gameUIservice,
+                           TimeService timeService, ParticleEngine particles, Camera camera) {
         this.cropService = cropService;
         this.gameUIservice = gameUIservice;
-        this.blockService = blockService;
         this.timeService = timeService;
         this.particles = particles;
         this.camera = camera;
@@ -81,6 +78,7 @@ public class GameInteraction {
         }
 
         float scrollY = Mouse.getScrollY();
+
         if (scrollY != 0.0f) {
             camera.zoom(scrollY);
         }
@@ -91,11 +89,14 @@ public class GameInteraction {
     }
 
     private void breakAction(GameMaster gameMaster, Hit cell) {
+        World world = gameMaster.getWorld();
         int x = cell.x();
-        int z = cell.y();
+        int y = cell.y();
+        int z = cell.z();
 
-        Crop crop = gameMaster.getWorld().getCropAt(x, z);
+        Crop crop = world.getCropAt(x, z);
         if (crop != null) {
+
             if (crop.isReadyToHarvest()) {
                 cropService.harvest(gameMaster.getPlayer(), crop);
             } else {
@@ -103,102 +104,99 @@ public class GameInteraction {
             }
 
             SpriteSheet sheet = gameMaster.getCropSpriteSheet(crop.getType());
-            particles.spawn(x, K.World.CROP_ELEVATION_Y, z, sheet,
-                    crop.getStage().getFrameIndex());
-
+            particles.spawn(x, K.World.CROP_ELEVATION_Y, z, sheet, crop.getStage().getFrameIndex());
             gameUIservice.logAction(cell);
             return;
         }
 
-        int topY = getTopBlockY(gameMaster.getWorld(), x, z);
-        if (topY >= 1) {
-            Block block = gameMaster.getWorld().getBlockAt(x, topY, z);
-            if (block != null && gameMaster.getWorld().removeBlock(block)) {
-                gameMaster.rebuildChunkMeshAt(x, z);
-                particles.spawn(x, K.World.CROP_ELEVATION_Y, z, block.getType());
-                gameMaster.getPlayer().add(block);
-                gameUIservice.logAction(cell);
-
-                log.info("Block removed: {} at {},{},{}", block.getType().getName(),
-                        x, topY, z);
-            }
+        byte blockId = world.getBlockTypeAt(x, y, z);
+        if (blockId == 0) {
             return;
         }
 
-        Block baseBlock = blockService.find(x, z);
-        if (baseBlock != null && baseBlock.getType() == BlockData.TILLED_DIRT) {
+        BlockData blockData = getBlockData(blockId);
+        if (blockData == null) return;
 
-            if (!baseBlock.isUnlocked()) {
-                return;
-            }
-
-            Block removed = blockService.removeBlock(x, z);
-            if (removed != null) {
-                gameMaster.getPlayer().add(removed);
-                gameUIservice.logAction(cell);
-                log.info("TILLED_DIRT removed at {},{}", x, z);
-            }
-        }
+        world.setBlockTypeAt(x, y, z, (byte) 0);
+        gameMaster.rebuildChunkMeshAt(x, z);
+        particles.spawn(x, y, z, blockData);
+        Block removedBlock = new Block(blockData, x, y, z);
+        gameMaster.getPlayer().add(removedBlock);
+        gameUIservice.logAction(cell);
+        log.info("Block removed: {} at {},{},{}", blockData.getName(), x, y, z);
     }
 
     private void placeAction(GameMaster gameMaster, Hit cell, Item selectedItem) {
+        World world = gameMaster.getWorld();
+
         if (selectedItem instanceof Block block) {
-            if (block.getType() == BlockData.TILLED_DIRT) {
-                if (blockService.expandBlock(cell.x(), cell.y())) {
-                    gameMaster.getPlayer().remove(selectedItem);
-                    gameUIservice.logAction(cell);
-                    log.info("New TILLED_DIRT placed at {},{}", cell.x(), cell.y());
-                    gameMaster.getToastService().success("A new expansion has been created!");
-                }
-                return;
-            }
+            int x = cell.x();
+            int z = cell.z();
+            int targetY = getFirstFreeY(world, x, z);
+            Block newBlock = new Block(block.getType(), x, targetY, z);
 
-            if (!blockService.isUnlocked(cell.x(), cell.y())) {
-                return;
-            }
-
-            int targetY = getFirstFreeY(gameMaster.getWorld(), cell.x(), cell.y());
-            Block newBlock = new Block(block.getType(), cell.x(), targetY, cell.y());
-            if (gameMaster.getWorld().addBlock(newBlock)) {
-                gameMaster.rebuildChunkMeshAt(cell.x(), cell.y());
+            if (world.getBlockTypeAt(x, targetY, z) == 0) {
+                world.setBlockTypeAt(x, targetY,z, block.getType().getId());
                 gameMaster.getPlayer().remove(selectedItem);
+                gameMaster.rebuildChunkMeshAt(x, z);
                 gameUIservice.logAction(cell);
-                log.info("Block placed: {} at {},{},{}",
-                        newBlock.getType().getName(), cell.x(), targetY, cell.y());
+
+                log.info("Block placed: {} at {},{},{}", newBlock.getType().getName(), x, targetY, z);
             }
-        } else if (selectedItem instanceof WateringCan wateringCan) {
-            wateringCan.use(gameMaster.getWorld());
+
+            return;
+        }
+
+        if (selectedItem instanceof WateringCan wateringCan) {
+            wateringCan.use(world);
             gameMaster.getToastService().success("You water the crops!");
+            return;
+        }
 
-        } else if (selectedItem instanceof Seed seed) {
-            Crop crop = gameMaster.getWorld().getCropAt(cell.x(), cell.y());
-            Block baseBlock = blockService.find(cell.x(), cell.y());
+        if (selectedItem instanceof Seed seed) {
 
-            if (crop == null && blockService.isUnlocked(cell.x(), cell.y()) && seed.getType() != null) {
-                Crop planted = cropService.plant(
-                        cell.x(),
-                        cell.y(),
-                        gameMaster.getPlayer(),
-                        baseBlock,
-                        seed.getType(),
-                        timeService.getCurrentSeason());
-                if (planted != null) {
-                    gameUIservice.logAction(cell);
-                }
+            int x = cell.x();
+            int y = cell.y();
+            int z = cell.z();
+
+            Crop crop = world.getCropAt(x, z);
+            byte blockId = world.getBlockTypeAt(x, y, z);
+
+            if (blockId != BlockData.TILLED_DIRT.getId()) {
+                log.debug("Cannot plant at {},{},{}: selected block is not TILLED_DIRT", x, y, z );
+                return;
+            }
+
+            if (crop != null) return;
+            if (seed.getType() == null) return;
+
+            Block tilledDirt = new Block(BlockData.TILLED_DIRT,x,y,z);
+            Crop planted = cropService.plant(x, z, gameMaster.getPlayer(), tilledDirt,
+                    seed.getType(), timeService.getCurrentSeason());
+
+            if (planted != null) {
+                gameUIservice.logAction(cell);
+                log.info("Planted {} at {},{},{}", seed.getType().getName(), x, y, z);
             }
         }
     }
 
     private int getFirstFreeY(World world, int x, int z) {
         int y = 1;
-        while (world.getBlockAt(x, y, z) != null) y++;
+        while (y < Chunk.SIZE_Y && world.getBlockTypeAt(x, y, z) != 0) {
+            y++;
+        }
+
         return y;
     }
 
-    private int getTopBlockY(World world, int x, int z) {
-        int y = 1;
-        if (world.getBlockAt(x, y, z) == null) return -1;
-        while (world.getBlockAt(x, y + 1, z) != null) y++;
-        return y;
+    private BlockData getBlockData(byte blockId) {
+        for (BlockData data : BlockData.values()) {
+            if (data.getId() == blockId) {
+                return data;
+            }
+        }
+
+        return null;
     }
 }

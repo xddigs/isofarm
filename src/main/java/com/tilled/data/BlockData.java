@@ -103,4 +103,13 @@ public enum BlockData {
     public Vector2f getAtlasOffset() {
         return sideAtlasOffset;
     }
+
+    public static BlockData fromId(byte id) {
+        for (BlockData block : values()) {
+            if (block.getId() == id) {
+                return block;
+            }
+        }
+        return null;
+    }
 }
