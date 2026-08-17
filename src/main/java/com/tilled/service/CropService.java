@@ -17,9 +17,8 @@ public class CropService implements Service<Crop> {
                       CropType type, Season currentSeason, ToastService toastService) {
 
         if (block == null || block.getType() != BlockData.TILLED_DIRT) {
-            log.warn("Attempted to plant {} at ({}, {}) but block is not TILLED_DIRT!",
+            log.warn("Attempted to plant {} at ({}, {}) but block is not tilled!",
                     type.getName(), x, z);
-
             toastService.warning("You can only plant crops on tilled dirt");
             return null;
         }
@@ -42,6 +41,7 @@ public class CropService implements Service<Crop> {
 
         if (seedOpt.isEmpty()) {
             log.warn("You don't have seeds of {}", type.getName());
+            toastService.error("You don't have seeds of " + type.getName());
             return null;
         }
 
