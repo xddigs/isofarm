@@ -6,13 +6,12 @@ import org.joml.Vector2f;
 @SuppressWarnings("all")
 @DataClass
 public enum BlockData {
-    DIRT((byte) 1, "Dirt", 100, 0, 0),
+    DIRT((byte) 1, "Dirt", true, 100, 0, 0),
     GRASS((byte) 2, "Grass", true, 120, 1, 0, 1, 3, 1, 1),
     STONE((byte) 3, "Stone", 150, 2, 0),
     DISPENSER((byte) 4, "Dispenser", 500, 3, 0),
     TILLED_DIRT((byte) 5, "Tilled Dirt", true, 110, 4, 0, 0, 0, 0, 0),
-    WATER((byte) 6, "Water", 100, 5, 0),
-    CROP((byte) 7, "Crop", -1, 6, 0);
+    WATER((byte) 6, "Water", 100, 5, 0), CROP((byte) 7, "Crop", -1, 6, 0);
 
     public static final int ATLAS_COLS = K.UI.BLOCK_ATLAS_FRAMES;
     public static final int ATLAS_ROWS = K.UI.ICON_BLOCK_ATLAS_ROWS;
@@ -39,16 +38,19 @@ public enum BlockData {
     }
 
     BlockData(byte id, String name, int value, int tileX, int tileY) {
-        this(id, name, false, value,
-                tileX, tileY,
-                tileX, tileY,
-                tileX, tileY);
+        this(id, name, false, value, tileX, tileY, tileX, tileY, tileX, tileY);
     }
 
-    BlockData(byte id, String name, boolean isTillable, int value,
-              int topTileX, int topTileY,
-              int bottomTileX, int bottomTileY,
-              int sideTileX, int sideTileY) {
+    BlockData(byte id, String name, boolean isTillable, int value, int tileX, int tileY) {
+        this(id, name, isTillable, value, tileX, tileY, tileX, tileY, tileX, tileY);
+    }
+
+    BlockData(byte id, String name, int value, boolean isTillable, int topTileX, int topTileY) {
+        this(id, name, isTillable, value, topTileX, topTileY, 0, 0, 0, 0);
+    }
+
+    BlockData(byte id, String name, boolean isTillable, int value, int topTileX,
+              int topTileY, int bottomTileX, int bottomTileY, int sideTileX, int sideTileY) {
         this.id = id;
         this.name = name;
         this.isTillable = isTillable;
@@ -64,6 +66,15 @@ public enum BlockData {
         this.topAtlasOffset = calculateAtlasOffset(topTileX, topTileY);
         this.bottomAtlasOffset = calculateAtlasOffset(bottomTileX, bottomTileY);
         this.sideAtlasOffset = calculateAtlasOffset(sideTileX, sideTileY);
+    }
+
+    public static BlockData fromId(byte id) {
+        for (BlockData block : values()) {
+            if (block.getId() == id) {
+                return block;
+            }
+        }
+        return null;
     }
 
     public byte getId() {
@@ -116,14 +127,5 @@ public enum BlockData {
 
     public Vector2f getAtlasOffset() {
         return sideAtlasOffset;
-    }
-
-    public static BlockData fromId(byte id) {
-        for (BlockData block : values()) {
-            if (block.getId() == id) {
-                return block;
-            }
-        }
-        return null;
     }
 }
