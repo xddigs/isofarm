@@ -36,7 +36,6 @@ public class Player extends Character {
     private void setUpInventory() {
         add(new Seed(), 4);
         add(new Hoe(), 1);
-        add(new Block(BlockData.STONE), 999);
     }
 
     public String getName() {

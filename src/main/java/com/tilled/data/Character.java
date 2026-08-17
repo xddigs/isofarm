@@ -31,6 +31,11 @@ public abstract class Character extends Entity implements Levelable {
 
         this.hitpoints = 100;
         this.maxHitpoints = 100;
+
+        this.level = 1;
+        this.experience = 0;
+        this.experienceForNextLevel = 100;
+
         this.strength = 8;
         this.intelligence = 8;
         this.dexterity = 8;
@@ -72,10 +77,7 @@ public abstract class Character extends Entity implements Levelable {
 
     @Override
     public void gain(int experience) {
-        if (experience <= 0) {
-            return;
-        }
-
+        if (experience <= 0) return;
         this.experience += experience;
         while (this.experience >= experienceForNextLevel) {
             this.experience -= experienceForNextLevel;

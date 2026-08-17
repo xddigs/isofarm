@@ -229,7 +229,6 @@ public class GameUIService implements Service<GameMaster> {
 
         if (ImGui.begin("Inventory", flags)) {
             Inventory inv = player.getInventory();
-            inv.sort();
             List<Item> hotbarItems = inv.getHotbarItems();
 
             if (selectedInventoryItem != null
@@ -605,7 +604,6 @@ public class GameUIService implements Service<GameMaster> {
     public void renderInv() {
         if (player == null) return;
         Inventory inv = player.getInventory();
-        inv.sort();
 
         int columns = K.UI.HOTBAR_SLOTS;
         int rows = (int) Math.ceil((double) K.World.TOTAL_SLOTS / columns);
@@ -824,7 +822,6 @@ public class GameUIService implements Service<GameMaster> {
             ImGui.text(shop.getOwner() + "'s Shop, $" + shop.purse());
             ImGui.separator();
             Inventory stock = shop.getStock();
-            stock.sort();
 
             if (stock.isEmpty()) {
                 ImGui.textDisabled("Out of stock!");
