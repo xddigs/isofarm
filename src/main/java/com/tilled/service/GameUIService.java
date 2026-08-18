@@ -62,7 +62,15 @@ public class GameUIService implements Service<GameMaster> {
         this.blockIcons = blockIcons;
         this.toolIcons = toolIcons;
 
-        this.inventoryUI = new InventoryUI(windowWidth/2, windowHeight/2);
+        this.inventoryUI = new InventoryUI(windowWidth, windowHeight);
+        this.inventoryUI.setPosition(windowWidth/2.0f - inventoryUI.getWidth()/2,
+                windowHeight/2.0f - inventoryUI.getHeight()/2);
+
+        inventoryUI.setSeedIcons(seedIcons);
+        inventoryUI.setCropIcons(cropIcons);
+        inventoryUI.setBlockIcons(blockIcons);
+        inventoryUI.setToolIcons(toolIcons);
+
         uiManager.getRoot().addChild(inventoryUI);
 
         // add children
@@ -82,22 +90,6 @@ public class GameUIService implements Service<GameMaster> {
         style.setItemSpacing(
                 K.Style.ITEM_SPACING_X, K.Style.ITEM_SPACING_Y);
         return style;
-    }
-
-    private static int getItemIconColumn(Item item) {
-        if (item instanceof Seed seed && seed.getType() != null) {
-            return seed.getType().getId();
-        }
-        if (item instanceof Crop crop && crop.getCropType() != null) {
-            return crop.getCropType().getId();
-        }
-        if (item instanceof Block block && block.getType() != null) {
-            return block.getType().getId() - 1;
-        }
-        if (item instanceof Tool tool) {
-            return tool.getId();
-        }
-        return 0;
     }
 
     public void setPlayer(Player player) {
@@ -130,10 +122,13 @@ public class GameUIService implements Service<GameMaster> {
         }
     }
 
-    public void render() {
+    public void render(GameMaster gameMaster) {
         glDisable(GL_DEPTH_TEST);
         GUI.begin(windowWidth, windowHeight);
-        uiManager.render();
+        if (gameMaster.isInventoryOpen()) {
+            uiManager.render();
+        }
+
         GUI.end();
         glEnable(GL_DEPTH_TEST);
     }
@@ -308,13 +303,5 @@ public class GameUIService implements Service<GameMaster> {
         log.info("Player bought {} x{} from shop", item.getName(), amount);
         gameMaster.getToastService().success(
                 "You bought " + amount + " " + item.getName() + "!");
-    }
-
-    private SpriteSheet getItemSpritesheet(Item item) {
-        if (item instanceof Crop) return cropIcons;
-        if (item instanceof Seed) return seedIcons;
-        if (item instanceof Block) return blockIcons;
-        if (item instanceof Tool) return toolIcons;
-        return seedIcons;
     }
 }

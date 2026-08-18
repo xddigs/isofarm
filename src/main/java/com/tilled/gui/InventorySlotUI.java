@@ -6,6 +6,7 @@ import org.joml.Vector4f;
 
 import java.lang.Character;
 
+@SuppressWarnings("all")
 public class InventorySlotUI extends UIElement {
     private final Vector4f backgroundColor = new Vector4f(0.08f, 0.08f, 0.08f, 1.0f);
     private final Vector4f hoveredColor = new Vector4f(0.12f, 0.12f, 0.12f, 1.0f);

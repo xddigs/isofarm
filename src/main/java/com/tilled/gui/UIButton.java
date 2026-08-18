@@ -3,6 +3,7 @@ package com.tilled.gui;
 import com.tilled.data.UIElement;
 import org.joml.Vector4f;
 
+@SuppressWarnings("all")
 public class UIButton extends UIElement {
     private String text;
     private Vector4f normalColor = new Vector4f(0.15f, 0.15f, 0.15f, 1.0f);

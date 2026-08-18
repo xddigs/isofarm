@@ -3,6 +3,7 @@ package com.tilled.gui;
 import com.tilled.data.UIElement;
 import org.joml.Vector4f;
 
+@SuppressWarnings("unused")
 public class UILabel extends UIElement {
     private final Vector4f color = new Vector4f(1.0f);
     private String text;

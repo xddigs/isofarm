@@ -472,7 +472,7 @@ public class GameMaster {
             rainEngine.render(rainShader, camera.getViewMatrix(), camera.getProjectionMatrix());
         }
 
-        gameUIservice.render();
+        gameUIservice.render(this);
         if (isHUDShown()) {
             // TODO render HUD with GUI API
         }

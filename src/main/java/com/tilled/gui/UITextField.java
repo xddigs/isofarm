@@ -4,6 +4,7 @@ import com.tilled.data.UIElement;
 import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
 
+@SuppressWarnings("all")
 public class UITextField extends UIElement {
     private final Vector4f backgroundColor = new Vector4f(0.08f, 0.08f, 0.08f, 1.0f);
     private final Vector4f focusedColor = new Vector4f(0.12f, 0.12f, 0.12f, 1.0f);

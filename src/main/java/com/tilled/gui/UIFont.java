@@ -14,6 +14,7 @@ import static org.lwjgl.opengl.GL13C.glActiveTexture;
 import static org.lwjgl.system.MemoryUtil.memAlloc;
 import static org.lwjgl.system.MemoryUtil.memFree;
 
+@SuppressWarnings("all")
 public class UIFont {
     private static final int FIRST_CHAR = 32;
     private static final int LAST_CHAR = 126;
