@@ -29,7 +29,7 @@ public class SoundService {
 
     private int stepSource;
     private int breakSource;
-    private int uiSource;
+    private int placeSource;
 
     public SoundService() {
         this.init();
@@ -37,15 +37,7 @@ public class SoundService {
         for (SoundGroup group : SoundGroup.values()) {
             loadSoundArray(group.getStepSounds());
             loadSoundArray(group.getBreakSounds());
-        }
-    }
-
-    private void loadSound(String path) {
-        if (path != null && !soundBuffers.containsKey(path)) {
-            int bufferId = loadOgg("assets/" + path + ".ogg");
-            if (bufferId != -1) {
-                soundBuffers.put(path, bufferId);
-            }
+            loadSoundArray(group.getPlaceSounds());
         }
     }
 
@@ -72,20 +64,11 @@ public class SoundService {
 
         stepSource = alGenSources();
         breakSource = alGenSources();
-        uiSource = alGenSources();
+        placeSource = alGenSources();
+
         alSourcef(breakSource, AL_GAIN, 1.0f);
         alSourcef(stepSource, AL_GAIN, 1.0f);
-        alSourcef(uiSource, AL_GAIN, 1.0f);
-    }
-
-    public void play(String soundName) {
-        Integer bufferId = soundBuffers.get(soundName);
-        if (bufferId != null && bufferId > 0) {
-            alSourceStop(uiSource);
-            alSourcei(uiSource, AL_BUFFER, bufferId);
-            alSourcef(uiSource, AL_PITCH, 1.0f);
-            alSourcePlay(uiSource);
-        }
+        alSourcef(placeSource, AL_GAIN, 1.0f);
     }
 
     public void playStepSound(SoundGroup group) {
@@ -94,6 +77,10 @@ public class SoundService {
 
     public void playBreakSound(SoundGroup group) {
         playSound(breakSource, group != null ? group.getBreakSounds() : null, 0.8f, 0.2f);
+    }
+
+    public void playPlaceSound(SoundGroup group) {
+        playSound(breakSource, group != null ? group.getPlaceSounds() : null, 0.75f, 0.2f);
     }
 
     private void playSound(int source, String[] sounds, float basePitch, float pitchVariation) {
@@ -155,7 +142,7 @@ public class SoundService {
     public void cleanup() {
         alDeleteSources(stepSource);
         alDeleteSources(breakSource);
-        alDeleteSources(uiSource);
+        alDeleteSources(placeSource);
         soundBuffers.values().forEach(AL10::alDeleteBuffers);
         alcMakeContextCurrent(MemoryUtil.NULL);
         alcDestroyContext(context);

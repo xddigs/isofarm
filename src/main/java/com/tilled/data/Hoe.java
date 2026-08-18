@@ -1,5 +1,6 @@
 package com.tilled.data;
 
+import com.tilled.wrld.GameMaster;
 import com.tilled.wrld.World;
 
 public class Hoe extends Tool {
@@ -8,24 +9,16 @@ public class Hoe extends Tool {
         super((byte) 2, "Hoe", 150, 128);
     }
 
-    public void use(World world, Block block) {
+    public void use(GameMaster gameMaster, Block block) {
         super.use();
-
-        Block target = world.getBlockAt(
-                block.getX(),
-                block.getY(),
-                block.getZ()
-        );
+        World world = gameMaster.getWorld();
+        Block target = world.getBlockAt(block.getX(), block.getY(), block.getZ());
 
         if (target == null) return;
         if (!target.getType().isTillable()) return;
-
-        world.setBlockTypeAt(
-                target.getX(),
-                target.getY(),
-                target.getZ(),
-                BlockData.TILLED_DIRT.getId()
-        );
+        world.setBlockTypeAt(target.getX(), target.getY(),
+                target.getZ(), BlockData.TILLED_DIRT.getId());
+        gameMaster.getSoundService().playPlaceSound(SoundGroup.GRASS);
     }
 
     @Override

@@ -160,6 +160,7 @@ public class GameInteraction {
             if (existingBlock == 0) {
                 Block newBlock = new Block(block.getType(), x, y, z);
                 world.setBlockTypeAt(x, y, z, block.getType().getId());
+                gameMaster.getSoundService().playBreakSound(SoundGroup.GRASS);
                 gameMaster.getPlayer().remove(selectedItem);
                 gameMaster.rebuildChunkMeshAt(x, z);
                 gameUIservice.logAction(new Hit(x, y, z, cell.normalX(), cell.normalY(), cell.normalZ()));
@@ -177,7 +178,7 @@ public class GameInteraction {
 
         if (selectedItem instanceof Hoe hoe) {
             Block block = world.getBlockAt(cell.x(), cell.y(), cell.z());
-            hoe.use(world, block);
+            hoe.use(gameMaster, block);
             gameMaster.rebuildChunkMeshAt(block.getX(), block.getZ());
         }
 
