@@ -2,6 +2,7 @@ package com.tilled.gui;
 
 import com.tilled.data.*;
 import com.tilled.graphics.SpriteSheet;
+import com.tilled.utils.Settings;
 import org.joml.Vector4f;
 
 import java.lang.Character;
@@ -57,8 +58,10 @@ public class InventorySlotUI extends UIElement {
     }
 
     private void renderItem() {
-        float padding = 2.0f;
-        float iconSize = Math.min(getAbsoluteWidth() - padding * 2.0f, getAbsoluteHeight() - padding * 2.0f);
+        float iconSize = Math.min(
+                Settings.getScaledGUI(),
+                Math.min(getAbsoluteWidth(), getAbsoluteHeight()) - 4.0f);
+
         float x = getAbsoluteX() + (getAbsoluteWidth() - iconSize) * 0.5f;
         float y = getAbsoluteY() + (getAbsoluteHeight() - iconSize) * 0.5f;
         GUI.drawSprite(spriteSheet, spriteFrame, x, y, iconSize, iconSize,
