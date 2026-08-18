@@ -36,4 +36,11 @@ public class Seed extends Item {
     public int hashCode() {
         return Objects.hash(type);
     }
+
+    @Override
+    public Item copy(int newAmount) {
+        Seed seed = new Seed(type);
+        seed.addAmount(newAmount);
+        return seed;
+    }
 }

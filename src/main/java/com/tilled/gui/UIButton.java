@@ -1,19 +1,38 @@
 package com.tilled.gui;
 
 import com.tilled.data.UIElement;
+import com.tilled.graphics.SpriteSheet;
 import org.joml.Vector4f;
 
 @SuppressWarnings("all")
 public class UIButton extends UIElement {
-    private String text;
+    private SpriteSheet spriteSheet;
+    private int spriteFrame;
+    private Runnable onClick;
+
     private Vector4f normalColor = new Vector4f(0.15f, 0.15f, 0.15f, 1.0f);
     private Vector4f hoverColor = new Vector4f(0.25f, 0.25f, 0.25f, 1.0f);
     private Vector4f pressedColor = new Vector4f(0.1f, 0.1f, 0.1f, 1.0f);
 
-    public UIButton(float x, float y, float width, float height, String text) {
+    public UIButton(float x, float y, float width, float height) {
         super(x, y, width, height);
-        this.text = text;
         setInteractable(true);
+        setFocusable(true);
+    }
+
+    @Override
+    public boolean mouseReleased(float mouseX, float mouseY, int button) {
+        super.mouseReleased(mouseX, mouseY, button);
+
+        if (button != 0 || !isHovered()) {
+            return false;
+        }
+
+        if (onClick != null) {
+            onClick.run();
+        }
+
+        return false;
     }
 
     @Override
@@ -26,41 +45,70 @@ public class UIButton extends UIElement {
             color = hoverColor;
         }
 
-        GUI.drawRect(getAbsoluteX(), getAbsoluteY(),
-                getAbsoluteWidth(), getAbsoluteHeight(), color);
+        GUI.drawRect(getAbsoluteX(), getAbsoluteY(), getAbsoluteWidth(),
+                getAbsoluteHeight(),
+                new Vector4f(color.x, color.y, color.z, color.w * getWorldOpacity()));
+
+        if (spriteSheet != null) {
+            float size = Math.min(getAbsoluteWidth(), getAbsoluteHeight()) * 0.65f;
+            float x = getAbsoluteX() + (getAbsoluteWidth() - size) * 0.5f;
+            float y = getAbsoluteY() + (getAbsoluteHeight() - size) * 0.5f;
+            GUI.drawSprite(spriteSheet, spriteFrame, x, y, size, size,
+                    new Vector4f(1.0f, 1.0f, 1.0f, getWorldOpacity()));
+        }
 
         renderChildren();
     }
 
-    public String getText() {
-        return text;
+    public SpriteSheet getSpriteSheet() {
+        return spriteSheet;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setSpriteSheet(SpriteSheet spriteSheet) {
+        this.spriteSheet = spriteSheet;
+    }
+
+    public int getSpriteFrame() {
+        return spriteFrame;
+    }
+
+    public void setSpriteFrame(int spriteFrame) {
+        this.spriteFrame = Math.max(0, spriteFrame);
+    }
+
+    public Runnable getOnClick() {
+        return onClick;
+    }
+
+    public UIButton setOnClick(Runnable onClick) {
+        this.onClick = onClick;
+        return this;
     }
 
     public Vector4f getNormalColor() {
         return new Vector4f(normalColor);
     }
 
-    public void setNormalColor(float r, float g, float b, float a) {
+    public UIButton setNormalColor(float r, float g, float b, float a) {
         normalColor.set(r, g, b, a);
+        return this;
     }
 
     public Vector4f getHoverColor() {
         return new Vector4f(hoverColor);
     }
 
-    public void setHoverColor(float r, float g, float b, float a) {
+    public UIButton setHoverColor(float r, float g, float b, float a) {
         hoverColor.set(r, g, b, a);
+        return this;
     }
 
     public Vector4f getPressedColor() {
         return new Vector4f(pressedColor);
     }
 
-    public void setPressedColor(float r, float g, float b, float a) {
+    public UIButton setPressedColor(float r, float g, float b, float a) {
         pressedColor.set(r, g, b, a);
+        return this;
     }
 }

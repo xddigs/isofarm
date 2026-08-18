@@ -27,4 +27,11 @@ public class Hoe extends Tool {
                 BlockData.TILLED_DIRT.getId()
         );
     }
+
+    @Override
+    public Item copy(int newAmount) {
+        Hoe hoe = new Hoe();
+        hoe.addAmount(newAmount);
+        return hoe;
+    }
 }

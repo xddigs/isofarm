@@ -5,27 +5,34 @@ import com.tilled.graphics.SpriteSheet;
 import com.tilled.input.Mouse;
 import com.tilled.utils.K;
 import com.tilled.utils.Settings;
-import org.joml.Vector4f;
+import com.tilled.wrld.GameMaster;
 
-@SuppressWarnings("unused")
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_RIGHT;
+
+@SuppressWarnings("all")
 public class InventoryUI extends UIElement {
-    private final InventorySlotUI[] slotUIs = new InventorySlotUI[K.UI.INVENTORY_SLOTS];
-    private Player player;
+    private final InventorySlotUI[] slotUIs;
+    private UIButton sortButton;
+    private UIButton groupButton;
 
+    private Player player;
     private SpriteSheet seedIcons;
     private SpriteSheet cropIcons;
     private SpriteSheet blockIcons;
     private SpriteSheet toolIcons;
+    private SpriteSheet inventoryIcons;
 
     private Item carriedItem;
-    private SpriteSheet carriedSpriteSheet;
-    private int carriedSpriteFrame;
-
-    private int selectedSlot = -1;
+    private HotbarUI hotbarUI;
+    private GameMaster gameMaster;
+    private float hotbarOriginalX, hotbarOriginalY;
 
     public InventoryUI(float x, float y) {
         super(x, y, getInventoryWidth(), getInventoryHeight());
+        this.slotUIs = new InventorySlotUI[K.UI.INVENTORY_SLOTS];
         setFocusable(true);
+        createButtons();
         createSlots();
     }
 
@@ -42,28 +49,18 @@ public class InventoryUI extends UIElement {
                 (K.UI.INVENTORY_ROWS - 1) * Settings.getScaledSpacing();
     }
 
-    private static float getSlotSize() {
-        return Settings.getScaledGUI();
-    }
+    private void createButtons() {
+        float btnWidth = Settings.getScaledButton() * 1.5f;
+        float btnHeight = Settings.getScaledHeader() - Settings.getScaledPadding();
 
-    private static int getItemIconColumn(Item item) {
-        if (item instanceof Seed seed && seed.getType() != null) {
-            return seed.getType().getId();
-        }
+        sortButton = new UIButton(Settings.getScaledPadding(), Settings.getScaledPadding(), btnWidth, btnHeight);
+        groupButton = new UIButton(Settings.getScaledPadding() + btnWidth + Settings.getScaledSpacing(), Settings.getScaledPadding(), btnWidth, btnHeight);
 
-        if (item instanceof Crop crop && crop.getCropType() != null) {
-            return crop.getCropType().getId();
-        }
+        sortButton.setOnClick(this::sortInventory);
+        groupButton.setOnClick(this::groupInventory);
 
-        if (item instanceof Block block && block.getType() != null) {
-            return block.getType().getId() - 1;
-        }
-
-        if (item instanceof Tool tool) {
-            return tool.getId();
-        }
-
-        return 0;
+        addChild(sortButton);
+        addChild(groupButton);
     }
 
     private void createSlots() {
@@ -71,22 +68,24 @@ public class InventoryUI extends UIElement {
             int column = i % K.UI.INVENTORY_COLUMNS;
             int row = i / K.UI.INVENTORY_COLUMNS;
 
-            float x = Settings.getScaledPadding() +
-                    column * (Settings.getScaledSlot() + Settings.getScaledSpacing());
+            float x = Settings.getScaledPadding() + column * (Settings.getScaledSlot() + Settings.getScaledSpacing());
+            float y = Settings.getScaledPadding() + Settings.getScaledHeader() + row * (Settings.getScaledSlot() + Settings.getScaledSpacing());
 
-            float y = Settings.getScaledPadding() +
-                    Settings.getScaledHeader() +
-                    row * (Settings.getScaledSlot() + Settings.getScaledSpacing());
-
-            InventorySlotUI slotUI = new InventorySlotUI(
-                    x,
-                    y,
-                    Settings.getScaledSlot(),
-                    Settings.getScaledSlot()
-            );
-
+            InventorySlotUI slotUI = new InventorySlotUI(x, y, Settings.getScaledSlot(), Settings.getScaledSlot());
             slotUIs[i] = slotUI;
             addChild(slotUI);
+        }
+    }
+
+    public void sortInventory() {
+        if (player != null && player.getInventory() != null) {
+            player.getInventory().sort();
+        }
+    }
+
+    public void groupInventory() {
+        if (player != null && player.getInventory() != null) {
+            player.getInventory().group();
         }
     }
 
@@ -94,252 +93,277 @@ public class InventoryUI extends UIElement {
     public void update(float delta) {
         super.update(delta);
         if (player == null) return;
+
+        boolean wasOpen = isActuallyVisible();
+        boolean isOpen = gameMaster != null && gameMaster.isInventoryOpen();
+
+        if (isOpen && !wasOpen) {
+            onOpen();
+        } else if (!isOpen && wasOpen) {
+            onClose();
+        }
+
         syncInventory();
         updateSlots();
-        interact();
+        handleSlotInteractions();
+    }
+
+    private void onOpen() {
+        if (hotbarUI != null) {
+            hotbarOriginalX = hotbarUI.getX();
+            hotbarOriginalY = hotbarUI.getY();
+
+            if (hotbarUI.getParent() != null) {
+                hotbarUI.getParent().removeChild(hotbarUI);
+            }
+            addChild(hotbarUI);
+
+            float x = getWidth() / 2f - hotbarUI.getWidth() / 2f;
+            float y = getHeight() - hotbarUI.getHeight() - Settings.getScaledPadding();
+            hotbarUI.setPosition(x, y);
+            hotbarUI.setInventoryMode(true);
+        }
+    }
+
+    private void onClose() {
+        if (hotbarUI != null) {
+            if (getParent() != null) {
+                removeChild(hotbarUI);
+                getParent().addChild(hotbarUI);
+            }
+
+            hotbarUI.setPosition(hotbarOriginalX, hotbarOriginalY);
+            hotbarUI.setInventoryMode(false);
+        }
+
+        if (carriedItem != null && player != null) {
+            player.getInventory().add(carriedItem, carriedItem.getAmount());
+            carriedItem = null;
+        }
     }
 
     private void syncInventory() {
         Inventory inventory = player.getInventory();
-
         for (int i = 0; i < K.UI.INVENTORY_SLOTS; i++) {
             InventorySlotUI slotUI = slotUIs[i];
-
             if (i < inventory.getSlots().size()) {
                 slotUI.setSlot(inventory.getSlot(i));
             } else {
                 slotUI.setSlot(null);
             }
-
             updateItemSprite(slotUI);
+        }
+
+        if (sortButton.getSpriteSheet() == null && inventoryIcons != null) {
+            sortButton.setSpriteSheet(inventoryIcons);
+            sortButton.setSpriteFrame(0);
+            groupButton.setSpriteSheet(inventoryIcons);
+            groupButton.setSpriteFrame(1);
         }
     }
 
     private void updateItemSprite(InventorySlotUI slotUI) {
         Item item = slotUI.getItem();
-
         if (item == null) {
             slotUI.setSpriteSheet(null);
-            slotUI.setSpriteFrame(0);
             return;
         }
-
-        SpriteSheet spriteSheet = getItemSpritesheet(item);
-
-        if (spriteSheet == null) {
-            slotUI.setSpriteSheet(null);
-            slotUI.setSpriteFrame(0);
-            return;
-        }
-
-        slotUI.setSpriteSheet(spriteSheet);
+        slotUI.setSpriteSheet(getItemSpritesheet(item));
         slotUI.setSpriteFrame(getItemIconColumn(item));
-        slotUI.tooltip(item.getName());
+    }
+
+    private SpriteSheet getItemSpritesheet(Item item) {
+        if (item instanceof Crop) return cropIcons;
+        if (item instanceof Seed) return seedIcons;
+        if (item instanceof Block) return blockIcons;
+        if (item instanceof Tool) return toolIcons;
+        return null;
+    }
+
+    private static int getItemIconColumn(Item item) {
+        if (item instanceof Seed seed && seed.getType() != null) return seed.getType().getId();
+        if (item instanceof Crop crop && crop.getCropType() != null) return crop.getCropType().getId();
+        if (item instanceof Block block && block.getType() != null) return block.getType().getId() - 1;
+        if (item instanceof Tool tool) return tool.getId();
+        return 0;
     }
 
     private void updateSlots() {
-        for (int i = 0; i < slotUIs.length; i++) {
-            InventorySlotUI slotUI = slotUIs[i];
-            boolean hovered = isSlotHovered(slotUI);
-            slotUI.setSelected(selectedSlot == i);
-            slotUI.setHovered(hovered);
-        }
-    }
-
-    private boolean isSlotHovered(InventorySlotUI slotUI) {
         float mouseX = Mouse.getX();
         float mouseY = Mouse.getY();
-        float x = slotUI.getAbsoluteX();
-        float y = slotUI.getAbsoluteY();
-        float width = slotUI.getAbsoluteWidth();
-        float height = slotUI.getAbsoluteHeight();
 
-        return mouseX >= x && mouseX <= x + width &&
-                mouseY >= y && mouseY <= y + height;
-    }
-
-    private void interact() {
-        if (!Mouse.isButtonPressed(0)) {
-            return;
+        for (InventorySlotUI slotUI : slotUIs) {
+            slotUI.setHovered(slotUI.contains(mouseX, mouseY));
         }
 
-        for (int i = 0; i < slotUIs.length; i++) {
-            InventorySlotUI slotUI = slotUIs[i];
-            if (!slotUI.isHovered()) {
-                continue;
+        if (hotbarUI != null) {
+            for (InventorySlotUI slotUI : hotbarUI.getSlotUIs()) {
+                slotUI.setHovered(slotUI.contains(mouseX, mouseY));
             }
-
-            clickSlot(i);
-            break;
         }
     }
 
-    private void clickSlot(int slotIndex) {
-        Inventory inventory = player.getInventory();
-        if (carriedItem == null) {
-            InventorySlot slot = inventory.getSlot(slotIndex);
+    private void handleSlotInteractions() {
+        InventorySlotUI[] allSlots;
+        if (hotbarUI != null) {
+            InventorySlotUI[] hotbarSlots = hotbarUI.getSlotUIs();
+            allSlots = new InventorySlotUI[slotUIs.length + hotbarSlots.length];
+            System.arraycopy(slotUIs, 0, allSlots, 0, slotUIs.length);
+            System.arraycopy(hotbarSlots, 0, allSlots, slotUIs.length, hotbarSlots.length);
+        } else {
+            allSlots = slotUIs;
+        }
 
-            if (slot.isEmpty()) {
-                return;
+        for (int i = 0; i < allSlots.length; i++) {
+            InventorySlotUI slotUI = allSlots[i];
+            if (!slotUI.isHovered()) continue;
+
+            InventorySlot slot = slotUI.getSlot();
+            if (slot == null) continue;
+
+            if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
+                if (carriedItem == null) {
+                    if (!slot.isEmpty()) {
+                        carriedItem = slot.getItem();
+                        slot.clear();
+                    }
+                } else {
+                    if (slot.isEmpty()) {
+                        slot.setItem(carriedItem);
+                        carriedItem = null;
+                    } else {
+                        Item target = slot.getItem();
+                        if (isSameType(carriedItem, target)) {
+                            int space = K.World.MAX_STACK - target.getAmount();
+                            int add = Math.min(space, carriedItem.getAmount());
+                            target.setAmount(target.getAmount() + add);
+                            carriedItem.setAmount(carriedItem.getAmount() - add);
+
+                            if (carriedItem.getAmount() <= 0) {
+                                carriedItem = null;
+                            }
+                        } else {
+                            Item temp = slot.getItem();
+                            slot.setItem(carriedItem);
+                            carriedItem = temp;
+                        }
+                    }
+                }
+                break;
             }
 
-            carriedItem = slot.getItem();
-            carriedSpriteSheet = getItemSpritesheet(carriedItem);
-            carriedSpriteFrame = getItemIconColumn(carriedItem);
-            selectedSlot = slotIndex;
-            return;
-        }
+            if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
+                if (carriedItem == null) {
+                    if (!slot.isEmpty()) {
+                        Item item = slot.getItem();
+                        int splitAmount = (int) Math.ceil(item.getAmount() / 2.0);
+                        carriedItem = item.copy(splitAmount);
+                        item.setAmount(item.getAmount() - splitAmount);
+                        if (item.getAmount() <= 0) {
+                            slot.clear();
+                        }
+                    }
+                } else {
+                    if (slot.isEmpty()) {
+                        slot.setItem(carriedItem.copy(1));
+                        carriedItem.setAmount(carriedItem.getAmount() - 1);
+                    } else if (isSameType(carriedItem, slot.getItem())) {
+                        Item target = slot.getItem();
+                        if (target.getAmount() < K.World.MAX_STACK) {
+                            target.setAmount(target.getAmount() + 1);
+                            carriedItem.setAmount(carriedItem.getAmount() - 1);
+                        }
+                    }
 
-        if (selectedSlot == slotIndex) {
-            carriedItem = null;
-            carriedSpriteSheet = null;
-            carriedSpriteFrame = 0;
-            selectedSlot = -1;
-            return;
+                    if (carriedItem.getAmount() <= 0) {
+                        carriedItem = null;
+                    }
+                }
+                break;
+            }
         }
+    }
 
-        inventory.pickAndDrop(selectedSlot, slotIndex);
-        carriedItem = null;
-        carriedSpriteSheet = null;
-        carriedSpriteFrame = 0;
-        selectedSlot = -1;
+    private boolean isSameType(Item a, Item b) {
+        if (a == null || b == null) return false;
+        if (a.getClass() != b.getClass()) return false;
+        if (a instanceof Seed s1 && b instanceof Seed s2) return s1.getType() == s2.getType();
+        if (a instanceof Crop c1 && b instanceof Crop c2) return c1.getCropType() == c2.getCropType();
+        if (a instanceof Block b1 && b instanceof Block b2) return b1.getType() == b2.getType();
+        if (a instanceof Tool t1 && b instanceof Tool t2) return t1.getId() == t2.getId();
+        return a.getName().equals(b.getName());
     }
 
     @Override
     public void render() {
-        float x = getAbsoluteX();
-        float y = getAbsoluteY();
-        float width = getAbsoluteWidth();
-        float height = getAbsoluteHeight();
-        Vector4f color = K.UI.UI_BACKGROUND_COLOR;
-        Vector4f borderColor = K.UI.UI_BORDER_COLOR;
-
-        GUI.drawRect(x, y, getAbsoluteWidth(), getAbsoluteHeight(),
-                color, Settings.getScaledCornerRadius(), borderColor,
-                Settings.getScaledThickness());
-
         renderChildren();
-        renderItem();
+        renderCarriedItem();
     }
 
-    private void renderItem() {
-        if (carriedItem == null || carriedSpriteSheet == null) return;
-        float size = Settings.getScaledIcon();
-        float x = Mouse.getX() - size * 0.5f;
-        float y = Mouse.getY() - size * 0.5f;
+    private void renderCarriedItem() {
+        if (carriedItem == null) return;
 
-        GUI.drawSprite(carriedSpriteSheet, carriedSpriteFrame,
-                x, y, size, size, new Vector4f(1.0f, 1.0f, 1.0f, 0.85f));
+        SpriteSheet sheet = getItemSpritesheet(carriedItem);
+        if (sheet == null) return;
+
+        float iconSize = Settings.getScaledIcon();
+        float x = Mouse.getX() - iconSize / 2f;
+        float y = Mouse.getY() - iconSize / 2f;
+
+        GUI.drawSprite(sheet, getItemIconColumn(carriedItem), x, y, iconSize, iconSize, K.UI.UI_ITEM_TINT);
+
+        if (carriedItem.getAmount() > 1) {
+            String amt = String.valueOf(carriedItem.getAmount());
+            GUI.drawString(amt, x + iconSize - 10, y + iconSize - 10, GUI.getNormalFont(), K.UI.UI_TEXT_COLOR);
+        }
     }
 
-    private SpriteSheet getItemSpritesheet(Item item) {
-        if (item instanceof Crop) {
-            return cropIcons;
-        }
-
-        if (item instanceof Seed) {
-            return seedIcons;
-        }
-
-        if (item instanceof Block) {
-            return blockIcons;
-        }
-
-        if (item instanceof Tool) {
-            return toolIcons;
-        }
-
-        return null;
-    }
-
-    public Player getPlayer() {
-        return player;
+    public void setIcons(SpriteSheet seed, SpriteSheet crop, SpriteSheet block, SpriteSheet tool, SpriteSheet inv) {
+        this.seedIcons = seed;
+        this.cropIcons = crop;
+        this.blockIcons = block;
+        this.toolIcons = tool;
+        this.inventoryIcons = inv;
     }
 
     public void setPlayer(Player player) {
         this.player = player;
     }
 
-    public SpriteSheet getSeedIcons() {
-        return seedIcons;
-    }
-
     public void setSeedIcons(SpriteSheet seedIcons) {
         this.seedIcons = seedIcons;
-    }
-
-    public SpriteSheet getCropIcons() {
-        return cropIcons;
+        if (hotbarUI != null) hotbarUI.setSeedIcons(seedIcons);
     }
 
     public void setCropIcons(SpriteSheet cropIcons) {
         this.cropIcons = cropIcons;
-    }
-
-    public SpriteSheet getBlockIcons() {
-        return blockIcons;
+        if (hotbarUI != null) hotbarUI.setCropIcons(cropIcons);
     }
 
     public void setBlockIcons(SpriteSheet blockIcons) {
         this.blockIcons = blockIcons;
-    }
-
-    public SpriteSheet getToolIcons() {
-        return toolIcons;
+        if (hotbarUI != null) hotbarUI.setBlockIcons(blockIcons);
     }
 
     public void setToolIcons(SpriteSheet toolIcons) {
         this.toolIcons = toolIcons;
+        if (hotbarUI != null) hotbarUI.setToolIcons(toolIcons);
     }
 
-    public int getSelectedSlot() {
-        return selectedSlot;
+    public void setInventoryIcons(SpriteSheet inventoryIcons) {
+        this.inventoryIcons = inventoryIcons;
+        if (hotbarUI != null) hotbarUI.setInventoryIcons(inventoryIcons);
     }
 
-    public void setSelectedSlot(int selectedSlot) {
-        if (selectedSlot < -1 || selectedSlot >= K.UI.INVENTORY_SLOTS) {
-            return;
-        }
-
-        this.selectedSlot = selectedSlot;
-    }
-
-    public InventorySlotUI getSlotUI(int index) {
-        if (index < 0 || index >= K.UI.INVENTORY_SLOTS) {
-            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + K.UI.INVENTORY_SLOTS);
-        }
-
-        return slotUIs[index];
-    }
-
-    public InventorySlotUI[] getSlotUIs() {
-        return slotUIs.clone();
+    public void setHotbarUI(GameMaster gameMaster, HotbarUI hotbarUI) {
+        this.gameMaster = gameMaster;
+        this.hotbarUI = hotbarUI;
     }
 
     public Item getSelectedItem() {
-        if (player == null || selectedSlot < 0) {
-            return null;
+        if (hotbarUI != null) {
+            return hotbarUI.getSelectedItem();
         }
-
-        Inventory inventory = player.getInventory();
-        if (selectedSlot >= inventory.getSlots().size()) {
-            return null;
-        }
-
-        InventorySlot slot = inventory.getSlot(selectedSlot);
-        return slot.isEmpty() ? null : slot.getItem();
-    }
-
-    public void setSelectedItem(Item item) {
-        if (player == null || selectedSlot < 0) {
-            return;
-        }
-
-        Inventory inventory = player.getInventory();
-        inventory.getSlot(selectedSlot).setItem(item);
-    }
-
-    public void clearSelection() {
-        selectedSlot = -1;
+        return null;
     }
 }

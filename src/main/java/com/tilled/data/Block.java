@@ -69,4 +69,10 @@ public class Block extends Item {
     public boolean hasWater() {
         return waterLevel > 0;
     }
+
+    @Override
+    public Item copy(int newAmount) {
+        if (newAmount <= 0) return null;
+        return new Block(type, x, y, z);
+    }
 }

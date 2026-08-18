@@ -85,11 +85,7 @@ public class GUI {
         }
 
         float radius = Math.clamp(arc, 0.0f, Math.min(width, height) * 0.5f);
-
-        model.identity()
-                .translate(x, y, 0.0f)
-                .scale(width, height, 1.0f);
-
+        model.identity().translate(x, y, 0.0f).scale(width, height, 1.0f);
         shader.setUniform("uModel", model);
         shader.setUniform("uColor", color);
         shader.setUniform("uBorderColor", color);
@@ -99,8 +95,10 @@ public class GUI {
         shader.setUniform("uUseRoundedRect", true);
         shader.setUniform("uRectSize", width, height);
         shader.setUniform("uCornerRadius", radius);
+        shader.setUniform("uBorderOnly", true);
         mesh.render();
         shader.setUniform("uUseRoundedRect", false);
+        shader.setUniform("uBorderOnly", false);
     }
 
     public static void drawRect(float x, float y, float width, float height,
@@ -125,24 +123,26 @@ public class GUI {
             return;
         }
 
-        float maxRadius = Math.min(width, height) * 0.5f;
-        float radius = Math.clamp(arc, 0.0f, maxRadius);
-        float border = Math.max(0.0f, borderWidth);
-        boolean useShape = radius > 0.0f || border > 0.0f;
-        model.identity().translate(x, y, 0.0f).scale(width, height, 1.0f);
+        float radius = Math.clamp(
+                arc,
+                0.0f,
+                Math.min(width, height) * 0.5f
+        );
 
+        float border = Math.max(0.0f, borderWidth);
+        boolean rounded = radius > 0.0f || border > 0.0f;
+        model.identity().translate(x, y, 0.0f).scale(width, height, 1.0f);
         shader.setUniform("uModel", model);
         shader.setUniform("uColor", color);
         shader.setUniform("uBorderColor", borderColor != null ? borderColor : color);
         shader.setUniform("uBorderWidth", border);
         shader.setUniform("uUseTexture", false);
         shader.setUniform("uUseFont", false);
-        shader.setUniform("uUseRoundedRect", useShape);
+        shader.setUniform("uUseRoundedRect", rounded);
         shader.setUniform("uRectSize", width, height);
         shader.setUniform("uCornerRadius", radius);
-
+        shader.setUniform("uBorderOnly", false);
         mesh.render();
-
         shader.setUniform("uUseRoundedRect", false);
     }
 

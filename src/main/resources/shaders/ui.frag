@@ -64,11 +64,11 @@ void main() {
             float borderAlpha = 1.0 - smoothstep(0.0, aa, borderDist);
 
             if (uBorderOnly) {
-                finalColor = mix(
-                        uBorderColor,
-                        finalColor,
-                        1.0 - borderAlpha
-                );
+                if (dist + uBorderWidth <= 0.0) {
+                    discard;
+                }
+
+                finalColor = uBorderColor;
             } else {
                 finalColor = mix(
                         finalColor,

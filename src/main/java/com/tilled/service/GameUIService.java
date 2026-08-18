@@ -46,8 +46,8 @@ public class GameUIService implements Service<GameMaster> {
             SpriteSheet seedIcons,
             SpriteSheet cropIcons,
             SpriteSheet blockIcons,
-            SpriteSheet toolIcons
-    ) {
+            SpriteSheet toolIcons,
+            SpriteSheet inventoryIcons) {
         this.gameMaster = gameMaster;
         this.uiManager = uiManager;
 
@@ -71,12 +71,16 @@ public class GameUIService implements Service<GameMaster> {
         inventoryUI.setCropIcons(cropIcons);
         inventoryUI.setBlockIcons(blockIcons);
         inventoryUI.setToolIcons(toolIcons);
+        inventoryUI.setInventoryIcons(inventoryIcons);
 
         hotbarUI.setSeedIcons(seedIcons);
         hotbarUI.setCropIcons(cropIcons);
         hotbarUI.setBlockIcons(blockIcons);
         hotbarUI.setToolIcons(toolIcons);
+        hotbarUI.setInventoryIcons(inventoryIcons);
+        inventoryUI.setHotbarUI(gameMaster, hotbarUI);
 
+        uiManager.getRoot().addChild(hotbarUI);
         uiManager.getRoot().addChild(inventoryUI);
     }
 
@@ -110,9 +114,12 @@ public class GameUIService implements Service<GameMaster> {
 
         uiManager.update(delta);
         gameMaster.getToastService().update(delta);
-        float scroll = Mouse.getScrollY();
-        if (scroll != 0) {
-            selectItem(scroll > 0 ? -1 : 1);
+
+        if (!gameMaster.isInventoryOpen()) {
+            float scroll = Mouse.getScrollY();
+            if (scroll != 0) {
+                selectItem(scroll > 0 ? -1 : 1);
+            }
         }
     }
 
@@ -122,10 +129,11 @@ public class GameUIService implements Service<GameMaster> {
         if (isHUDShown) {
             if (gameMaster.isInventoryOpen()) {
                 uiManager.render();
+            } else {
+                hotbarUI.render();
             }
         }
 
-        hotbarUI.render();
         if (!gameMaster.isInventoryOpen()) {
             renderCrosshair(windowWidth, windowHeight);
         }

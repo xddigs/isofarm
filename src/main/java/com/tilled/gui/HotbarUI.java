@@ -17,8 +17,10 @@ public class HotbarUI extends UIElement {
     private SpriteSheet cropIcons;
     private SpriteSheet blockIcons;
     private SpriteSheet toolIcons;
+    private SpriteSheet inventoryIcons;
 
     private int selectedSlot = 0;
+    private boolean inventoryMode = false;
 
     public HotbarUI(float x, float y) {
         super(x, y, getHotbarWidth(), getHotbarHeight());
@@ -83,7 +85,14 @@ public class HotbarUI extends UIElement {
 
         syncInventory();
         updateSlots();
-        interact();
+
+        if (!inventoryMode) {
+            interact();
+        }
+    }
+
+    public void setInventoryMode(boolean inventoryMode) {
+        this.inventoryMode = inventoryMode;
     }
 
     private void syncInventory() {
@@ -211,8 +220,6 @@ public class HotbarUI extends UIElement {
 
     @Override
     public void render() {
-        float x = getAbsoluteX();
-        float y = getAbsoluteY();
         renderChildren();
         renderSelector();
     }
@@ -220,13 +227,14 @@ public class HotbarUI extends UIElement {
     private void renderSelector() {
         InventorySlotUI slot = slotUIs[selectedSlot];
 
-        float thickness = Settings.getScaledThickness();
+        float thickness = Settings.getScaledThickness() + 1f;
         float x = slot.getAbsoluteX() - thickness;
         float y = slot.getAbsoluteY() - thickness;
         float size = slot.getAbsoluteWidth() + thickness * 2.0f;
 
-        GUI.drawBorder(x, y, size, size, K.UI.UI_HOTBAR_SELECTED_COLOR,
-                Settings.getScaledCornerRadius(), thickness);
+        GUI.drawBorder(x, y, size, size,
+                K.UI.UI_HOTBAR_SELECTED_COLOR,
+                thickness);
     }
 
     public Player getPlayer() {
@@ -267,6 +275,14 @@ public class HotbarUI extends UIElement {
 
     public void setToolIcons(SpriteSheet toolIcons) {
         this.toolIcons = toolIcons;
+    }
+
+    public SpriteSheet getInventoryIcons() {
+        return inventoryIcons;
+    }
+
+    public void setInventoryIcons(SpriteSheet inventoryIcons) {
+        this.inventoryIcons = inventoryIcons;
     }
 
     public int getSelectedSlot() {

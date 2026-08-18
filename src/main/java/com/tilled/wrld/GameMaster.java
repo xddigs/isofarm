@@ -69,6 +69,8 @@ public class GameMaster {
     private SpriteSheet cropIcons;
     private SpriteSheet toolIcons;
     private SpriteSheet blockIcons;
+    private SpriteSheet inventoryIcons;
+
     private SpriteSheet blocksTexture;
     private SpriteSheet waterTexture;
     private Camera camera;
@@ -152,10 +154,11 @@ public class GameMaster {
         this.cropIcons = new SpriteSheet(K.Paths.CROP_ICONS, K.UI.ICON_SEED_CROPS_FRAMES);
         this.toolIcons = new SpriteSheet(K.Paths.TOOL_ICONS, K.UI.ICON_TOOL_FRAMES);
         this.blockIcons = new SpriteSheet(K.Paths.BLOCK_ICONS, K.UI.ICON_BLOCK_FRAMES);
+        this.inventoryIcons = new SpriteSheet(K.Paths.INVENTORY_ICONS, 2);
 
         this.uiManager = new UIManager(windowWidth, windowHeight);
         this.gameUIservice = new GameUIService(windowHandle, this,
-                uiManager, seedIcons, cropIcons, blockIcons, toolIcons);
+                uiManager, seedIcons, cropIcons, blockIcons, toolIcons, inventoryIcons);
 
         this.shop = new Shop();
         this.gameUIservice.setShop(shop);

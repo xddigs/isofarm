@@ -43,4 +43,12 @@ public class WateringCan extends Tool {
         super.use();
         water(world);
     }
+
+    @Override
+    public Item copy(int newAmount) {
+        WateringCan wateringCan = new WateringCan();
+        wateringCan.addAmount(newAmount);
+        wateringCan.water = water;
+        return wateringCan;
+    }
 }
