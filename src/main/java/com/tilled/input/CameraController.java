@@ -14,6 +14,7 @@ public class CameraController implements Service<Camera> {
     private final Camera camera;
     private boolean mouseCaptured = false;
     private final Vector3f targetVelocity;
+    private float bobTime = 0.0f;
 
     public CameraController(Camera camera) {
         this.camera = camera;
@@ -40,7 +41,18 @@ public class CameraController implements Service<Camera> {
             }
 
             camera.setZooming(!gameMaster.isInventoryOpen() && !gameMaster.isPromptingForInput() && Keyboard.isKeyDown(GLFW_KEY_C));
-            camera.getPosition().set(player.getEyePosition());
+            
+            Vector3f eyePos = player.getEyePosition();
+            if (player.isOnGround() && targetVelocity.lengthSquared() > 0.1f) {
+                boolean isSprinting = Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT);
+                float speedFactor = isSprinting ? K.Camera.SPRINT_MULTIPLIER : 1.0f;
+                bobTime += delta * K.Camera.BOB_FREQUENCY * speedFactor;
+                float bobOffset = (float) Math.sin(bobTime) * K.Camera.BOB_AMOUNT;
+                eyePos.y += bobOffset;
+            } else {
+                bobTime = 0;
+            }
+            camera.getPosition().set(eyePos);
         }
     }
 
@@ -48,6 +60,11 @@ public class CameraController implements Service<Camera> {
         Player player = gameMaster.getPlayer();
 
         float speed = K.Camera.MOVEMENT_SPEED;
+        if (!gameMaster.isInventoryOpen() && !gameMaster.isPromptingForInput()) {
+            if (Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
+                speed *= K.Camera.SPRINT_MULTIPLIER;
+            }
+        }
 
         float yaw = (float) Math.toRadians(camera.getYaw());
 
