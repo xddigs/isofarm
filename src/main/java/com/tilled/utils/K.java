@@ -96,9 +96,16 @@ public final class K {
         public static final float HOTBAR_LABEL_DURATION = 1.75f;
         public static final float HOTBAR_OFFSET = 20;
 
-        public static final Vector4f UI_BACKGROUND_COLOR = new Vector4f(0.06f, 0.06f, 0.06f, 1.0f);
-        public static final Vector4f UI_BORDER_COLOR = new Vector4f(1.0f);
-        public static final Vector4f UI_TEXT_COLOR = UI_BORDER_COLOR;
+        public static final Vector4f UI_BACKGROUND_COLOR = new Vector4f(0.25f, 0.25f, 0.25f, 1.0f);
+        public static final Vector4f UI_BACKGROUND_COLOR_SLOT = new Vector4f(UI_BACKGROUND_COLOR.x,
+                UI_BACKGROUND_COLOR.y, UI_BACKGROUND_COLOR.z, 0.6f);
+        public static final Vector4f UI_BORDER_COLOR = new Vector4f(0.06f, 0.06f, 0.06f, 1.0f);
+        public static final Vector4f UI_HOVERED_COLOR = new Vector4f(0.12f, 0.12f, 0.12f, 1.0f);
+        public static final Vector4f UI_SELECTED_COLOR = new Vector4f(0.16f, 0.16f, 0.16f, 1.0f);
+        public static final Vector4f UI_SELECTED_BORDER_COLOR = new Vector4f(0.0f);
+        public static final Vector4f UI_ITEM_TINT = new Vector4f(1.0f);
+        public static final Vector4f UI_TEXT_COLOR = new Vector4f(1.0f);
+        public static final Vector4f UI_HOTBAR_SELECTED_COLOR = new Vector4f(0.35f, 0.9f, 0.35f, 1.0f);
     }
 
     public static final class Paths {

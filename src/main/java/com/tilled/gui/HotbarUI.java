@@ -5,15 +5,12 @@ import com.tilled.graphics.SpriteSheet;
 import com.tilled.input.Mouse;
 import com.tilled.utils.K;
 import com.tilled.utils.Settings;
-import org.joml.Vector4f;
 
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
 @SuppressWarnings("all")
 public class HotbarUI extends UIElement {
     private final InventorySlotUI[] slotUIs = new InventorySlotUI[K.UI.INVENTORY_COLUMNS];
-
-    private final Vector4f backgroundColor = new Vector4f(0.06f, 0.06f, 0.06f, 1.0f);
     private Player player;
 
     private SpriteSheet seedIcons;
@@ -129,8 +126,7 @@ public class HotbarUI extends UIElement {
     private void updateSlots() {
         for (int i = 0; i < slotUIs.length; i++) {
             InventorySlotUI slotUI = slotUIs[i];
-
-            slotUI.setSelected(selectedSlot == i);
+            slotUI.setSelected(false);
             slotUI.setHovered(isSlotHovered(slotUI));
         }
     }
@@ -158,8 +154,8 @@ public class HotbarUI extends UIElement {
         float y = slotUI.getAbsoluteY();
         float width = slotUI.getAbsoluteWidth();
         float height = slotUI.getAbsoluteHeight();
-
-        return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
+        return mouseX >= x && mouseX <= x + width
+                && mouseY >= y && mouseY <= y + height;
     }
 
     public void selectSlot(int slot) {
@@ -184,13 +180,11 @@ public class HotbarUI extends UIElement {
         }
 
         Inventory inventory = player.getInventory();
-
         if (selectedSlot < 0 || selectedSlot >= inventory.getSlots().size()) {
             return null;
         }
 
         InventorySlot slot = inventory.getSlot(selectedSlot);
-
         return slot.isEmpty() ? null : slot.getItem();
     }
 
@@ -200,7 +194,6 @@ public class HotbarUI extends UIElement {
         }
 
         Inventory inventory = player.getInventory();
-
         if (selectedSlot < 0 || selectedSlot >= inventory.getSlots().size()) {
             return null;
         }
@@ -220,12 +213,20 @@ public class HotbarUI extends UIElement {
     public void render() {
         float x = getAbsoluteX();
         float y = getAbsoluteY();
-
-        GUI.drawRect(x, y, getAbsoluteWidth(), getAbsoluteHeight(),
-                new Vector4f(backgroundColor.x, backgroundColor.y, backgroundColor.z,
-                        backgroundColor.w * getWorldOpacity()));
-
         renderChildren();
+        renderSelector();
+    }
+
+    private void renderSelector() {
+        InventorySlotUI slot = slotUIs[selectedSlot];
+
+        float thickness = Settings.getScaledThickness();
+        float x = slot.getAbsoluteX() - thickness;
+        float y = slot.getAbsoluteY() - thickness;
+        float size = slot.getAbsoluteWidth() + thickness * 2.0f;
+
+        GUI.drawBorder(x, y, size, size, K.UI.UI_HOTBAR_SELECTED_COLOR,
+                Settings.getScaledCornerRadius(), thickness);
     }
 
     public Player getPlayer() {

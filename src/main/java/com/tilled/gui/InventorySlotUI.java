@@ -2,6 +2,7 @@ package com.tilled.gui;
 
 import com.tilled.data.*;
 import com.tilled.graphics.SpriteSheet;
+import com.tilled.utils.K;
 import com.tilled.utils.Settings;
 import org.joml.Vector4f;
 
@@ -9,14 +10,6 @@ import java.lang.Character;
 
 @SuppressWarnings("all")
 public class InventorySlotUI extends UIElement {
-    private final Vector4f backgroundColor = new Vector4f(0.08f, 0.08f, 0.08f, 1.0f);
-    private final Vector4f hoveredColor = new Vector4f(0.12f, 0.12f, 0.12f, 1.0f);
-    private final Vector4f selectedColor = new Vector4f(0.16f, 0.16f, 0.16f, 1.0f);
-    private final Vector4f borderColor = new Vector4f(0.25f, 0.25f, 0.25f, 1.0f);
-    private final Vector4f selectedBorderColor = new Vector4f(0.4f, 0.6f, 1.0f, 1.0f);
-    private final Vector4f itemTint = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
-    private final Vector4f countColor = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
-
     private InventorySlot slot;
     private SpriteSheet spriteSheet;
     private int spriteFrame;
@@ -24,6 +17,10 @@ public class InventorySlotUI extends UIElement {
 
     private boolean selected;
     private boolean hovered;
+
+    private boolean selectedOutline = false;
+    private Vector4f selectionOutlineColor = K.UI.UI_HOTBAR_SELECTED_COLOR;
+    private float selectionOutlineThickness = Settings.getScaledThickness() * 2f;
 
     public InventorySlotUI(float x, float y, float width, float height) {
         super(x, y, width, height);
@@ -42,13 +39,15 @@ public class InventorySlotUI extends UIElement {
         float width = getAbsoluteWidth();
         float height = getAbsoluteHeight();
 
-        Vector4f background = selected ? selectedColor : hovered ? hoveredColor : backgroundColor;
+        Vector4f background = selected ? K.UI.UI_SELECTED_COLOR : hovered ? K.UI.UI_HOVERED_COLOR : K.UI.UI_BACKGROUND_COLOR_SLOT;
         GUI.drawRect(x, y, width, height, new Vector4f(background.x, background.y, background.z, background.w * getWorldOpacity()));
-        Vector4f border = selected ? selectedBorderColor : borderColor;
-        GUI.drawRect(x, y, width, 1.0f, new Vector4f(border.x, border.y, border.z, border.w * getWorldOpacity()));
-        GUI.drawRect(x, y + height - 1.0f, width, 1.0f, new Vector4f(border.x, border.y, border.z, border.w * getWorldOpacity()));
-        GUI.drawRect(x, y, 1.0f, height, new Vector4f(border.x, border.y, border.z, border.w * getWorldOpacity()));
-        GUI.drawRect(x + width - 1.0f, y, 1.0f, height, new Vector4f(border.x, border.y, border.z, border.w * getWorldOpacity()));
+        Vector4f border = K.UI.UI_SELECTED_BORDER_COLOR;
+        Vector4f borderTint = new Vector4f(border.x, border.y, border.z, border.w * getWorldOpacity());
+
+        GUI.drawRect(x, y, width, 1.0f, borderTint);
+        GUI.drawRect(x, y + height - 1.0f, width, 1.0f, borderTint);
+        GUI.drawRect(x, y, 1.0f, height, borderTint);
+        GUI.drawRect(x + width - 1.0f, y, 1.0f, height, borderTint);
 
         if (!isEmpty() && spriteSheet != null) {
             renderItem();
@@ -65,7 +64,8 @@ public class InventorySlotUI extends UIElement {
         float x = getAbsoluteX() + (getAbsoluteWidth() - iconSize) * 0.5f;
         float y = getAbsoluteY() + (getAbsoluteHeight() - iconSize) * 0.5f;
         GUI.drawSprite(spriteSheet, spriteFrame, x, y, iconSize, iconSize,
-                new Vector4f(itemTint.x, itemTint.y, itemTint.z, itemTint.w * getWorldOpacity()));
+                new Vector4f(K.UI.UI_ITEM_TINT.x, K.UI.UI_ITEM_TINT.y,
+                        K.UI.UI_ITEM_TINT.z, K.UI.UI_ITEM_TINT.w * getWorldOpacity()));
         renderAmount();
     }
 
@@ -87,7 +87,7 @@ public class InventorySlotUI extends UIElement {
                 new Vector4f(0.0f, 0.0f, 0.0f, getWorldOpacity()));
 
         GUI.drawString(amount, x, y + textHeight, countFont,
-                new Vector4f(countColor.x, countColor.y, countColor.z, countColor.w * getWorldOpacity()));
+                new Vector4f(K.UI.UI_TEXT_COLOR.x, K.UI.UI_TEXT_COLOR.y, K.UI.UI_TEXT_COLOR.z, K.UI.UI_TEXT_COLOR.w * getWorldOpacity()));
     }
 
     private float getTextWidth(String value) {
@@ -162,61 +162,5 @@ public class InventorySlotUI extends UIElement {
         if (countFont != null) {
             this.countFont = countFont;
         }
-    }
-
-    public Vector4f getBackgroundColor() {
-        return new Vector4f(backgroundColor);
-    }
-
-    public void setBackgroundColor(float r, float g, float b, float a) {
-        backgroundColor.set(r, g, b, a);
-    }
-
-    public Vector4f getHoveredColor() {
-        return new Vector4f(hoveredColor);
-    }
-
-    public void setHoveredColor(float r, float g, float b, float a) {
-        hoveredColor.set(r, g, b, a);
-    }
-
-    public Vector4f getSelectedColor() {
-        return new Vector4f(selectedColor);
-    }
-
-    public void setSelectedColor(float r, float g, float b, float a) {
-        selectedColor.set(r, g, b, a);
-    }
-
-    public Vector4f getBorderColor() {
-        return new Vector4f(borderColor);
-    }
-
-    public void setBorderColor(float r, float g, float b, float a) {
-        borderColor.set(r, g, b, a);
-    }
-
-    public Vector4f getSelectedBorderColor() {
-        return new Vector4f(selectedBorderColor);
-    }
-
-    public void setSelectedBorderColor(float r, float g, float b, float a) {
-        selectedBorderColor.set(r, g, b, a);
-    }
-
-    public Vector4f getItemTint() {
-        return new Vector4f(itemTint);
-    }
-
-    public void setItemTint(float r, float g, float b, float a) {
-        itemTint.set(r, g, b, a);
-    }
-
-    public Vector4f getCountColor() {
-        return new Vector4f(countColor);
-    }
-
-    public void setCountColor(float r, float g, float b, float a) {
-        countColor.set(r, g, b, a);
     }
 }

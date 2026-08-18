@@ -6,7 +6,6 @@ import com.tilled.graphics.Shader;
 import com.tilled.graphics.SpriteSheet;
 import com.tilled.graphics.Texture;
 import com.tilled.utils.K;
-import com.tilled.utils.Settings;
 import com.tilled.utils.Utils;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
@@ -72,6 +71,36 @@ public class GUI {
         shader.setUniform("uUseFont", false);
 
         mesh.render();
+    }
+
+    public static void drawBorder(float x, float y, float width, float height,
+                                  Vector4f color, float borderWidth) {
+        drawBorder(x, y, width, height, color, borderWidth, 0.0f);
+    }
+
+    public static void drawBorder(float x, float y, float width, float height,
+                                  Vector4f color, float borderWidth, float arc) {
+        if (width <= 0.0f || height <= 0.0f || borderWidth <= 0.0f) {
+            return;
+        }
+
+        float radius = Math.clamp(arc, 0.0f, Math.min(width, height) * 0.5f);
+
+        model.identity()
+                .translate(x, y, 0.0f)
+                .scale(width, height, 1.0f);
+
+        shader.setUniform("uModel", model);
+        shader.setUniform("uColor", color);
+        shader.setUniform("uBorderColor", color);
+        shader.setUniform("uBorderWidth", borderWidth);
+        shader.setUniform("uUseTexture", false);
+        shader.setUniform("uUseFont", false);
+        shader.setUniform("uUseRoundedRect", true);
+        shader.setUniform("uRectSize", width, height);
+        shader.setUniform("uCornerRadius", radius);
+        mesh.render();
+        shader.setUniform("uUseRoundedRect", false);
     }
 
     public static void drawRect(float x, float y, float width, float height,

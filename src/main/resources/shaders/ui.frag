@@ -15,6 +15,7 @@ uniform float uCornerRadius;
 uniform vec4 uColor;
 uniform vec4 uBorderColor;
 uniform float uBorderWidth;
+uniform bool uBorderOnly;
 
 float sdRoundedBox(vec2 p, vec2 b, float r) {
     vec2 q = abs(p) - b + vec2(r);
@@ -24,7 +25,11 @@ float sdRoundedBox(vec2 p, vec2 b, float r) {
 void main() {
     if (uUseFont) {
         float alpha = texture(uTexture, vTexCoord).r;
-        if (alpha <= 0.0) discard;
+
+        if (alpha <= 0.0) {
+            discard;
+        }
+
         FragColor = vec4(uColor.rgb, uColor.a * alpha);
         return;
     }
@@ -39,19 +44,38 @@ void main() {
         vec2 halfSize = uRectSize * 0.5;
         vec2 p = (vTexCoord - vec2(0.5)) * uRectSize;
 
-        float radius = clamp(uCornerRadius, 0.0, min(halfSize.x, halfSize.y));
+        float radius = clamp(
+                uCornerRadius,
+                0.0,
+                min(halfSize.x, halfSize.y)
+        );
 
         float dist = sdRoundedBox(p, halfSize, radius);
         float aa = fwidth(dist);
-        float alpha = 1.0 - smoothstep(-aa, 0.0, dist);
+
+        float alpha = 1.0 - smoothstep(0.0, aa, dist);
 
         if (alpha <= 0.0) {
             discard;
         }
 
         if (uBorderWidth > 0.0) {
-            float borderFactor = smoothstep(-uBorderWidth - aa, -uBorderWidth + aa, dist);
-            finalColor = mix(finalColor, uBorderColor, borderFactor);
+            float borderDist = dist + uBorderWidth;
+            float borderAlpha = 1.0 - smoothstep(0.0, aa, borderDist);
+
+            if (uBorderOnly) {
+                finalColor = mix(
+                        uBorderColor,
+                        finalColor,
+                        1.0 - borderAlpha
+                );
+            } else {
+                finalColor = mix(
+                        finalColor,
+                        uBorderColor,
+                        borderAlpha
+                );
+            }
         }
 
         finalColor.a *= alpha;
