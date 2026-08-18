@@ -1,6 +1,7 @@
 package com.tilled.utils;
 
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 @Utils
 public final class K {
@@ -93,9 +94,11 @@ public final class K {
         public static final float TOAST_DURATION = 3.0f;
 
         public static final float HOTBAR_LABEL_DURATION = 1.75f;
-        public static final float CROSSHAIR_SIZE = 10.0f;
-        public static final float CROSSHAIR_THICKNESS = 2.0f;
         public static final float HOTBAR_OFFSET = 20;
+
+        public static final Vector4f UI_BACKGROUND_COLOR = new Vector4f(0.06f, 0.06f, 0.06f, 1.0f);
+        public static final Vector4f UI_BORDER_COLOR = new Vector4f(1.0f);
+        public static final Vector4f UI_TEXT_COLOR = UI_BORDER_COLOR;
     }
 
     public static final class Paths {

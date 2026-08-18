@@ -13,6 +13,7 @@ uniform int uFrameIndex;
 uniform int uTotalFrames;
 
 uniform bool uUseFont;
+uniform bool uUseTexture;
 uniform vec4 uGlyphUV;
 
 void main() {
@@ -20,8 +21,10 @@ void main() {
 
     if (uUseFont) {
         vTexCoord = mix(uGlyphUV.xy, uGlyphUV.zw, aTexCoord);
-    } else {
+    } else if (uUseTexture) {
         float frameWidth = 1.0 / float(max(uTotalFrames, 1));
         vTexCoord = vec2((float(uFrameIndex) + aTexCoord.x) * frameWidth, 1.0 - aTexCoord.y);
+    } else {
+        vTexCoord = aTexCoord;
     }
 }

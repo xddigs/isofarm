@@ -1,14 +1,17 @@
 package com.tilled.gui;
 
 import com.tilled.data.UIElement;
+import com.tilled.utils.K;
 import com.tilled.utils.Settings;
 import org.joml.Vector4f;
 
+@SuppressWarnings("unused")
 public class UITooltip extends UIElement {
     private String text = "";
     private float padding = Settings.getScaledPadding();
     private float offsetX = Settings.getScaledSpacing();
     private float offsetY = Settings.getScaledSpacing();
+    private static final float OFFSET_PADDING = 2.2f;
 
     public UITooltip() {
         super(0.0f, 0.0f, 0.0f, 0.0f);
@@ -23,13 +26,13 @@ public class UITooltip extends UIElement {
             return;
         }
 
-        Vector4f color = new Vector4f(0.06f, 0.06f, 0.06f, 1.0f);
-        GUI.drawRect(getAbsoluteX(), getAbsoluteY(), getAbsoluteWidth(),
-                getAbsoluteHeight(), color);
+        GUI.drawRect(getAbsoluteX(), getAbsoluteY(), getAbsoluteWidth(), getAbsoluteHeight(),
+                K.UI.UI_BACKGROUND_COLOR, Settings.getScaledCornerRadius(),
+                K.UI.UI_BORDER_COLOR, Settings.getScaledThickness());
 
         GUI.drawString(text, getAbsoluteX() + padding,
-                getAbsoluteY() + padding * 2, GUI.getNormalFont(),
-                new Vector4f(1.0f));
+                getAbsoluteY() + padding * OFFSET_PADDING, GUI.getNormalFont(),
+                K.UI.UI_TEXT_COLOR);
 
         renderChildren();
     }

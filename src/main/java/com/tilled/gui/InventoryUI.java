@@ -10,8 +10,6 @@ import org.joml.Vector4f;
 @SuppressWarnings("unused")
 public class InventoryUI extends UIElement {
     private final InventorySlotUI[] slotUIs = new InventorySlotUI[K.UI.INVENTORY_SLOTS];
-    private final Vector4f backgroundColor = new Vector4f(0.06f, 0.06f, 0.06f, 1.0f);
-    private final Vector4f textColor = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
     private Player player;
 
     private SpriteSheet seedIcons;
@@ -211,10 +209,14 @@ public class InventoryUI extends UIElement {
     public void render() {
         float x = getAbsoluteX();
         float y = getAbsoluteY();
+        float width = getAbsoluteWidth();
+        float height = getAbsoluteHeight();
+        Vector4f color = K.UI.UI_BACKGROUND_COLOR;
+        Vector4f borderColor = K.UI.UI_BORDER_COLOR;
 
         GUI.drawRect(x, y, getAbsoluteWidth(), getAbsoluteHeight(),
-                new Vector4f(backgroundColor.x, backgroundColor.y, backgroundColor.z,
-                        backgroundColor.w * getWorldOpacity()));
+                color, Settings.getScaledCornerRadius(), borderColor,
+                Settings.getScaledThickness());
 
         renderChildren();
         renderItem();

@@ -61,6 +61,14 @@ public class Settings {
         return getScaledIcon() * 0.375f;
     }
 
+    public static float getScaledCornerRadius() {
+        return getScaledIcon() * 0.25f;
+    }
+
+    public static float getScaledThickness() {
+        return getScaledIcon() * 0.050f;
+    }
+
     public static float getScaledHeader() {
         return getScaledIcon();
     }

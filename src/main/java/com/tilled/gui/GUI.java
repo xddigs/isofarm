@@ -6,6 +6,7 @@ import com.tilled.graphics.Shader;
 import com.tilled.graphics.SpriteSheet;
 import com.tilled.graphics.Texture;
 import com.tilled.utils.K;
+import com.tilled.utils.Settings;
 import com.tilled.utils.Utils;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
@@ -32,8 +33,7 @@ public class GUI {
     private static int screenWidth;
     private static int screenHeight;
 
-    private GUI() {
-    }
+    private GUI() {}
 
     public static void begin(float screenWidth, float screenHeight) {
         shader.bind();
@@ -74,16 +74,47 @@ public class GUI {
         mesh.render();
     }
 
-    public static void drawRect(float x, float y, float width, float height, Vector4f color) {
-        model.identity()
-                .translate(x, y, 0.0f)
-                .scale(width, height, 1.0f);
+    public static void drawRect(float x, float y, float width, float height,
+                                Vector4f color) {
+        drawRect(x, y, width, height, color, 0.0f, null, 0.0f);
+    }
+
+    public static void drawRect(float x, float y, float width, float height,
+                                Vector4f color, Vector4f borderColor, float borderWidth) {
+        drawRect(x, y, width, height, color, 0.0f, borderColor, borderWidth);
+    }
+
+    public static void drawRect(float x, float y, float width, float height,
+                                Vector4f color, float arc) {
+        drawRect(x, y, width, height, color, arc, null, 0.0f);
+    }
+
+    public static void drawRect(float x, float y, float width, float height,
+                                Vector4f color, float arc,
+                                Vector4f borderColor, float borderWidth) {
+        if (width <= 0.0f || height <= 0.0f) {
+            return;
+        }
+
+        float maxRadius = Math.min(width, height) * 0.5f;
+        float radius = Math.clamp(arc, 0.0f, maxRadius);
+        float border = Math.max(0.0f, borderWidth);
+        boolean useShape = radius > 0.0f || border > 0.0f;
+        model.identity().translate(x, y, 0.0f).scale(width, height, 1.0f);
 
         shader.setUniform("uModel", model);
         shader.setUniform("uColor", color);
+        shader.setUniform("uBorderColor", borderColor != null ? borderColor : color);
+        shader.setUniform("uBorderWidth", border);
         shader.setUniform("uUseTexture", false);
+        shader.setUniform("uUseFont", false);
+        shader.setUniform("uUseRoundedRect", useShape);
+        shader.setUniform("uRectSize", width, height);
+        shader.setUniform("uCornerRadius", radius);
 
         mesh.render();
+
+        shader.setUniform("uUseRoundedRect", false);
     }
 
     public static void drawTexture(Texture texture, float x, float y,
