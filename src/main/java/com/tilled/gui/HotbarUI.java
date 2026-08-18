@@ -6,16 +6,17 @@ import com.tilled.input.Mouse;
 import com.tilled.utils.K;
 import org.joml.Vector4f;
 
-@SuppressWarnings("unused")
-public class InventoryUI extends UIElement {
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
+
+@SuppressWarnings("all")
+public class HotbarUI extends UIElement {
     private static final float SLOT_SIZE = 48.0f;
     private static final float SLOT_SPACING = 4.0f;
-    private static final float PADDING = 12.0f;
-    private static final float HEADER_HEIGHT = 32.0f;
+    private static final float PADDING = 6.0f;
 
-    private final InventorySlotUI[] slotUIs = new InventorySlotUI[K.UI.INVENTORY_SLOTS];
+    private final InventorySlotUI[] slotUIs = new InventorySlotUI[K.UI.INVENTORY_COLUMNS];
+
     private final Vector4f backgroundColor = new Vector4f(0.06f, 0.06f, 0.06f, 1.0f);
-    private final Vector4f textColor = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
     private Player player;
 
     private SpriteSheet seedIcons;
@@ -23,22 +24,21 @@ public class InventoryUI extends UIElement {
     private SpriteSheet blockIcons;
     private SpriteSheet toolIcons;
 
-    private int selectedSlot = -1;
+    private int selectedSlot = 0;
 
-    public InventoryUI(float x, float y) {
-        super(x, y, getInventoryWidth(), getInventoryHeight());
+    public HotbarUI(float x, float y) {
+        super(x, y, getHotbarWidth(), getHotbarHeight());
+
         setFocusable(true);
         createSlots();
     }
 
-    private static float getInventoryWidth() {
-        return PADDING * 2.0f + K.UI.INVENTORY_COLUMNS * SLOT_SIZE +
-                (K.UI.INVENTORY_COLUMNS - 1) * SLOT_SPACING;
+    private static float getHotbarWidth() {
+        return PADDING * 2.0f + K.UI.INVENTORY_COLUMNS * SLOT_SIZE + (K.UI.INVENTORY_COLUMNS - 1) * SLOT_SPACING;
     }
 
-    private static float getInventoryHeight() {
-        return PADDING * 2.0f + HEADER_HEIGHT + K.UI.INVENTORY_ROWS * SLOT_SIZE +
-                (K.UI.INVENTORY_ROWS - 1) * SLOT_SPACING;
+    private static float getHotbarHeight() {
+        return PADDING * 2.0f + SLOT_SIZE;
     }
 
     private static int getItemIconColumn(Item item) {
@@ -62,11 +62,9 @@ public class InventoryUI extends UIElement {
     }
 
     private void createSlots() {
-        for (int i = 0; i < K.UI.INVENTORY_SLOTS; i++) {
-            int column = i % K.UI.INVENTORY_COLUMNS;
-            int row = i / K.UI.INVENTORY_COLUMNS;
-            float x = PADDING + column * (SLOT_SIZE + SLOT_SPACING);
-            float y = PADDING + HEADER_HEIGHT + row * (SLOT_SIZE + SLOT_SPACING);
+        for (int i = 0; i < K.UI.INVENTORY_COLUMNS; i++) {
+            float x = PADDING + i * (SLOT_SIZE + SLOT_SPACING);
+            float y = PADDING;
             InventorySlotUI slotUI = new InventorySlotUI(x, y, SLOT_SIZE, SLOT_SIZE);
             slotUIs[i] = slotUI;
             addChild(slotUI);
@@ -76,7 +74,11 @@ public class InventoryUI extends UIElement {
     @Override
     public void update(float delta) {
         super.update(delta);
-        if (player == null) return;
+
+        if (player == null) {
+            return;
+        }
+
         syncInventory();
         updateSlots();
         interact();
@@ -85,7 +87,7 @@ public class InventoryUI extends UIElement {
     private void syncInventory() {
         Inventory inventory = player.getInventory();
 
-        for (int i = 0; i < K.UI.INVENTORY_SLOTS; i++) {
+        for (int i = 0; i < K.UI.INVENTORY_COLUMNS; i++) {
             InventorySlotUI slotUI = slotUIs[i];
 
             if (i < inventory.getSlots().size()) {
@@ -122,54 +124,91 @@ public class InventoryUI extends UIElement {
     private void updateSlots() {
         for (int i = 0; i < slotUIs.length; i++) {
             InventorySlotUI slotUI = slotUIs[i];
-            boolean hovered = isSlotHovered(slotUI);
+
             slotUI.setSelected(selectedSlot == i);
-            slotUI.setHovered(hovered);
+            slotUI.setHovered(isSlotHovered(slotUI));
+        }
+    }
+
+    private void interact() {
+        if (!Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
+            return;
+        }
+
+        for (int i = 0; i < slotUIs.length; i++) {
+            if (!slotUIs[i].isHovered()) {
+                continue;
+            }
+
+            selectSlot(i);
+            break;
         }
     }
 
     private boolean isSlotHovered(InventorySlotUI slotUI) {
         float mouseX = Mouse.getX();
         float mouseY = Mouse.getY();
+
         float x = slotUI.getAbsoluteX();
         float y = slotUI.getAbsoluteY();
         float width = slotUI.getAbsoluteWidth();
         float height = slotUI.getAbsoluteHeight();
+
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
     }
 
-    private void interact() {
-        if (!Mouse.isButtonPressed(0)) {
+    public void selectSlot(int slot) {
+        if (slot < 0 || slot >= K.UI.INVENTORY_COLUMNS) {
             return;
         }
 
-        for (int i = 0; i < slotUIs.length; i++) {
-            InventorySlotUI slotUI = slotUIs[i];
-            if (!slotUI.isHovered()) {
-                continue;
-            }
-
-            clickSlot(i);
-            break;
-        }
+        selectedSlot = slot;
     }
 
-    private void clickSlot(int slotIndex) {
+    public void selectNext() {
+        selectSlot((selectedSlot + 1) % K.UI.INVENTORY_COLUMNS);
+    }
+
+    public void selectPrevious() {
+        selectSlot((selectedSlot - 1 + K.UI.INVENTORY_COLUMNS) % K.UI.INVENTORY_COLUMNS);
+    }
+
+    public Item getSelectedItem() {
+        if (player == null) {
+            return null;
+        }
+
         Inventory inventory = player.getInventory();
-        if (selectedSlot == -1) {
-            if (!inventory.getSlot(slotIndex).isEmpty()) {
-                selectedSlot = slotIndex;
-            }
 
-            return;
+        if (selectedSlot < 0 || selectedSlot >= inventory.getSlots().size()) {
+            return null;
         }
 
-        if (selectedSlot == slotIndex) {
-            selectedSlot = -1;
-            return;
+        InventorySlot slot = inventory.getSlot(selectedSlot);
+
+        return slot.isEmpty() ? null : slot.getItem();
+    }
+
+    public InventorySlot getSelectedInventorySlot() {
+        if (player == null) {
+            return null;
         }
-        inventory.pickAndDrop(selectedSlot, slotIndex);
-        selectedSlot = -1;
+
+        Inventory inventory = player.getInventory();
+
+        if (selectedSlot < 0 || selectedSlot >= inventory.getSlots().size()) {
+            return null;
+        }
+
+        return inventory.getSlot(selectedSlot);
+    }
+
+    private SpriteSheet getItemSpritesheet(Item item) {
+        if (item instanceof Crop) return cropIcons;
+        if (item instanceof Seed) return seedIcons;
+        if (item instanceof Block) return blockIcons;
+        if (item instanceof Tool) return toolIcons;
+        return null;
     }
 
     @Override
@@ -181,31 +220,7 @@ public class InventoryUI extends UIElement {
                 new Vector4f(backgroundColor.x, backgroundColor.y, backgroundColor.z,
                         backgroundColor.w * getWorldOpacity()));
 
-        if (player != null) {
-            GUI.drawString(player.getName() + "'s Farm, $" + player.purse(), x + PADDING, y + PADDING + GUI.getNormalFont().getSize(), GUI.getNormalFont(), new Vector4f(textColor.x, textColor.y, textColor.z, textColor.w * getWorldOpacity()));
-        }
-
         renderChildren();
-    }
-
-    private SpriteSheet getItemSpritesheet(Item item) {
-        if (item instanceof Crop) {
-            return cropIcons;
-        }
-
-        if (item instanceof Seed) {
-            return seedIcons;
-        }
-
-        if (item instanceof Block) {
-            return blockIcons;
-        }
-
-        if (item instanceof Tool) {
-            return toolIcons;
-        }
-
-        return null;
     }
 
     public Player getPlayer() {
@@ -252,17 +267,9 @@ public class InventoryUI extends UIElement {
         return selectedSlot;
     }
 
-    public void setSelectedSlot(int selectedSlot) {
-        if (selectedSlot < -1 || selectedSlot >= K.UI.INVENTORY_SLOTS) {
-            return;
-        }
-
-        this.selectedSlot = selectedSlot;
-    }
-
     public InventorySlotUI getSlotUI(int index) {
-        if (index < 0 || index >= K.UI.INVENTORY_SLOTS) {
-            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + K.UI.INVENTORY_SLOTS);
+        if (index < 0 || index >= K.UI.INVENTORY_COLUMNS) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + K.UI.INVENTORY_COLUMNS);
         }
 
         return slotUIs[index];
@@ -270,32 +277,5 @@ public class InventoryUI extends UIElement {
 
     public InventorySlotUI[] getSlotUIs() {
         return slotUIs.clone();
-    }
-
-    public Item getSelectedItem() {
-        if (player == null || selectedSlot < 0) {
-            return null;
-        }
-
-        Inventory inventory = player.getInventory();
-        if (selectedSlot >= inventory.getSlots().size()) {
-            return null;
-        }
-
-        InventorySlot slot = inventory.getSlot(selectedSlot);
-        return slot.isEmpty() ? null : slot.getItem();
-    }
-
-    public void setSelectedItem(Item item) {
-        if (player == null || selectedSlot < 0) {
-            return;
-        }
-
-        Inventory inventory = player.getInventory();
-        inventory.getSlot(selectedSlot).setItem(item);
-    }
-
-    public void clearSelection() {
-        selectedSlot = -1;
     }
 }

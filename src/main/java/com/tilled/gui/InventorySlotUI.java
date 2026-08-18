@@ -19,7 +19,7 @@ public class InventorySlotUI extends UIElement {
     private InventorySlot slot;
     private SpriteSheet spriteSheet;
     private int spriteFrame;
-    private UIFont countFont = GUI.getSmallFont();
+    private UIFont countFont = GUI.getNormalFont();
 
     private boolean selected;
     private boolean hovered;
@@ -57,7 +57,7 @@ public class InventorySlotUI extends UIElement {
     }
 
     private void renderItem() {
-        float padding = 4.0f;
+        float padding = 2.0f;
         float iconSize = Math.min(getAbsoluteWidth() - padding * 2.0f, getAbsoluteHeight() - padding * 2.0f);
         float x = getAbsoluteX() + (getAbsoluteWidth() - iconSize) * 0.5f;
         float y = getAbsoluteY() + (getAbsoluteHeight() - iconSize) * 0.5f;

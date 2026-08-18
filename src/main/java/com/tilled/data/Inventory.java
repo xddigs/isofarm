@@ -105,10 +105,8 @@ public class Inventory {
 
         for (InventorySlot slot : slots) {
             if (slot.isEmpty()) continue;
-
             hotbar.add(slot.getItem());
-
-            if (hotbar.size() >= K.UI.HOTBAR_SLOTS) {
+            if (hotbar.size() >= K.UI.INVENTORY_COLUMNS) {
                 break;
             }
         }

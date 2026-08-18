@@ -19,19 +19,9 @@ void main() {
     gl_Position = uProjection * uModel * vec4(aPos, 1.0);
 
     if (uUseFont) {
-        vTexCoord = mix(
-                uGlyphUV.xy,
-                uGlyphUV.zw,
-                aTexCoord
-        );
-    } else if (uTotalFrames > 1) {
-        float frameWidth = 1.0 / float(uTotalFrames);
-
-        vTexCoord = vec2(
-                (aTexCoord.x + float(uFrameIndex)) * frameWidth,
-                aTexCoord.y
-        );
+        vTexCoord = mix(uGlyphUV.xy, uGlyphUV.zw, aTexCoord);
     } else {
-        vTexCoord = aTexCoord;
+        float frameWidth = 1.0 / float(max(uTotalFrames, 1));
+        vTexCoord = vec2((float(uFrameIndex) + aTexCoord.x) * frameWidth, 1.0 - aTexCoord.y);
     }
 }
