@@ -34,6 +34,8 @@ public final class K {
         public static final int MAX_STACK = 9999;
         public static final int WATER_LEVEL_MAX = 100;
 
+        public static final int MAX_PARTICLES = 24;
+
         public static final int RAIN_MAX_DROPS = 2000;
         public static final float RAIN_MIN_Y = 0.0f;
         public static final float RAIN_SLANT_X = 0.08f;
