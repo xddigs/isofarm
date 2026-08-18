@@ -136,6 +136,7 @@ public class InventoryUI extends UIElement {
 
         slotUI.setSpriteSheet(spriteSheet);
         slotUI.setSpriteFrame(getItemIconColumn(item));
+        slotUI.tooltip(item.getName());
     }
 
     private void updateSlots() {
@@ -155,17 +156,8 @@ public class InventoryUI extends UIElement {
         float width = slotUI.getAbsoluteWidth();
         float height = slotUI.getAbsoluteHeight();
 
-        Item item = slotUI.getItem();
-        if (item != null) {
-            slotUI.tooltip(item.getName());
-        } else {
-            slotUI.tooltip(null);
-        }
-
-        return mouseX >= x &&
-                mouseX <= x + width &&
-                mouseY >= y &&
-                mouseY <= y + height;
+        return mouseX >= x && mouseX <= x + width &&
+                mouseY >= y && mouseY <= y + height;
     }
 
     private void interact() {

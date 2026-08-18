@@ -2,6 +2,7 @@ package com.tilled.gui;
 
 import com.tilled.data.UIElement;
 import com.tilled.utils.Settings;
+import org.joml.Vector4f;
 
 public class UITooltip extends UIElement {
     private String text = "";
@@ -22,6 +23,14 @@ public class UITooltip extends UIElement {
             return;
         }
 
+        Vector4f color = new Vector4f(0.06f, 0.06f, 0.06f, 1.0f);
+        GUI.drawRect(getAbsoluteX(), getAbsoluteY(), getAbsoluteWidth(),
+                getAbsoluteHeight(), color);
+
+        GUI.drawString(text, getAbsoluteX() + padding,
+                getAbsoluteY() + padding * 2, GUI.getNormalFont(),
+                new Vector4f(1.0f));
+
         renderChildren();
     }
 
@@ -35,6 +44,12 @@ public class UITooltip extends UIElement {
 
     public UITooltip text(String text) {
         setText(text);
+        UIFont font = GUI.getNormalFont();
+        float textWidth = GUI.getStringWidth(this.text, font);
+        float textHeight = font.getSize();
+        float totalWidth = textWidth + (padding * 2.0f);
+        float totalHeight = textHeight + (padding * 2.0f);
+        setSize(totalWidth, totalHeight);
         return this;
     }
 
@@ -73,7 +88,8 @@ public class UITooltip extends UIElement {
         return this;
     }
 
-    public void updatePosition(float mouseX, float mouseY, float windowWidth, float windowHeight) {
+    public void updatePosition(float mouseX, float mouseY,
+                               float windowWidth, float windowHeight) {
         float x = mouseX + offsetX;
         float y = mouseY + offsetY;
 

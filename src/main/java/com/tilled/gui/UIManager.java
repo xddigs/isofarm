@@ -13,6 +13,8 @@ public class UIManager {
     public UIManager(float width, float height) {
         root = new UIPanel(0.0f, 0.0f, width, height);
         tooltip = new UITooltip();
+        tooltip.setInteractable(false);
+        tooltip.setLayer(Integer.MAX_VALUE);
         root.addChild(tooltip);
     }
 
@@ -21,14 +23,17 @@ public class UIManager {
         root.mouseMoved(Mouse.getX(), Mouse.getY());
 
         UIElement hovered = root.findElementAt(Mouse.getX(), Mouse.getY());
-        if (hovered != null && hovered != tooltip && hovered.getTooltipText() != null
+        if (hovered != null
+                && hovered != tooltip
+                && hovered.getTooltipText() != null
                 && !hovered.getTooltipText().isBlank()) {
-            tooltip.setText(hovered.getTooltipText());
+            tooltip.text(hovered.getTooltipText());
             tooltip.updatePosition(
                     Mouse.getX(),
                     Mouse.getY(),
                     root.getWidth(),
-                    root.getHeight());
+                    root.getHeight()
+            );
             tooltip.show();
         } else {
             tooltip.hide();

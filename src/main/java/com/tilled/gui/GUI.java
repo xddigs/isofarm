@@ -197,6 +197,24 @@ public class GUI {
         drawString(text, x, y, big, color);
     }
 
+    public static float getStringWidth(String text, UIFont font) {
+        if (text == null || text.isEmpty() || font == null) {
+            return 0.0f;
+        }
+
+        float width = 0.0f;
+        for (int i = 0; i < text.length(); i++) {
+            char character = text.charAt(i);
+            STBTTBakedChar glyph = font.getGlyph(character);
+            if (glyph == null) {
+                width += font.getSize() * 0.5f;
+                continue;
+            }
+            width += glyph.xadvance();
+        }
+        return width;
+    }
+
     public static void pushScissor(float x, float y, float width, float height) {
         int windowHeight = (int) getScreenHeight();
         glEnable(GL_SCISSOR_TEST);
