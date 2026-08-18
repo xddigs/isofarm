@@ -2,7 +2,6 @@ package com.tilled.data;
 
 import com.tilled.graphics.SpriteSheet;
 import com.tilled.graphics.Texture;
-import com.tilled.gui.UIRenderer;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 
@@ -65,7 +64,7 @@ public abstract class UIElement {
         this.height = height;
     }
 
-    public abstract void render(UIRenderer renderer);
+    public abstract void render();
 
     public void update(float delta) {
         if (!visible) {
@@ -102,10 +101,10 @@ public abstract class UIElement {
         }
     }
 
-    public void renderChildren(UIRenderer renderer) {
+    public void renderChildren() {
         for (UIElement child : getSortedChildren()) {
             if (child.isVisible()) {
-                child.render(renderer);
+                child.render();
             }
         }
     }
@@ -807,6 +806,23 @@ public abstract class UIElement {
         }
 
         return false;
+    }
+
+    public boolean mouseScrolled(float mouseX, float mouseY, float scrollX, float scrollY) {
+        if (!visible || !enabled || !interactable) {
+            return false;
+        }
+
+        List<UIElement> sorted = new ArrayList<>(children);
+        sorted.sort(Comparator.comparingInt(UIElement::getZIndex).reversed());
+
+        for (UIElement child : sorted) {
+            if (child.mouseScrolled(mouseX, mouseY, scrollX, scrollY)) {
+                return true;
+            }
+        }
+
+        return contains(mouseX, mouseY);
     }
 
     public boolean keyPressed(int key, int scancode, int modifiers) {
