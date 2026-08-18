@@ -24,7 +24,6 @@ public class HotbarUI extends UIElement {
 
     public HotbarUI(float x, float y) {
         super(x, y, getHotbarWidth(), getHotbarHeight());
-
         setFocusable(true);
         createSlots();
     }
@@ -97,12 +96,14 @@ public class HotbarUI extends UIElement {
 
     private void syncInventory() {
         Inventory inventory = player.getInventory();
+        int hotbarStart = (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
 
         for (int i = 0; i < K.UI.INVENTORY_COLUMNS; i++) {
             InventorySlotUI slotUI = slotUIs[i];
+            int inventoryIndex = hotbarStart + i;
 
-            if (i < inventory.getSlots().size()) {
-                slotUI.setSlot(inventory.getSlot(i));
+            if (inventoryIndex < inventory.getSlots().size()) {
+                slotUI.setSlot(inventory.getSlot(inventoryIndex));
             } else {
                 slotUI.setSlot(null);
             }
@@ -137,6 +138,13 @@ public class HotbarUI extends UIElement {
             InventorySlotUI slotUI = slotUIs[i];
             slotUI.setSelected(false);
             slotUI.setHovered(isSlotHovered(slotUI));
+        }
+
+        if (player != null) {
+            int selected = selectedSlot;
+            if (selected >= 0 && selected < slotUIs.length) {
+                slotUIs[selected].setSelected(true);
+            }
         }
     }
 
@@ -189,11 +197,13 @@ public class HotbarUI extends UIElement {
         }
 
         Inventory inventory = player.getInventory();
-        if (selectedSlot < 0 || selectedSlot >= inventory.getSlots().size()) {
+        int hotbarStart = (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
+        int inventoryIndex = hotbarStart + selectedSlot;
+        if (inventoryIndex < 0 || inventoryIndex >= inventory.getSlots().size()) {
             return null;
         }
 
-        InventorySlot slot = inventory.getSlot(selectedSlot);
+        InventorySlot slot = inventory.getSlot(inventoryIndex);
         return slot.isEmpty() ? null : slot.getItem();
     }
 
@@ -203,11 +213,13 @@ public class HotbarUI extends UIElement {
         }
 
         Inventory inventory = player.getInventory();
-        if (selectedSlot < 0 || selectedSlot >= inventory.getSlots().size()) {
+        int hotbarStart = (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
+        int inventoryIndex = hotbarStart + selectedSlot;
+        if (inventoryIndex < 0 || inventoryIndex >= inventory.getSlots().size()) {
             return null;
         }
 
-        return inventory.getSlot(selectedSlot);
+        return inventory.getSlot(inventoryIndex);
     }
 
     private SpriteSheet getItemSpritesheet(Item item) {

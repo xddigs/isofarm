@@ -274,17 +274,18 @@ public class Inventory {
 
     public List<Item> getHotbarItems() {
         List<Item> hotbar = new ArrayList<>();
+        int hotbarStart = (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
 
-        for (InventorySlot slot : slots) {
+        for (int i = 0; i < K.UI.INVENTORY_COLUMNS; i++) {
+            int index = hotbarStart + i;
+            if (index >= slots.size()) break;
+            
+            InventorySlot slot = slots.get(index);
             if (slot.isEmpty()) {
                 continue;
             }
 
             hotbar.add(slot.getItem());
-
-            if (hotbar.size() >= K.UI.INVENTORY_COLUMNS) {
-                break;
-            }
         }
 
         return hotbar;

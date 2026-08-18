@@ -27,20 +27,19 @@ public class CameraController implements Service<Camera> {
     public void update(GameMaster gameMaster, float delta) {
         if (gameMaster.isInventoryOpen() || gameMaster.isPromptingForInput()) {
             releaseMouse(gameMaster);
-            return;
+        } else {
+            captureMouse(gameMaster);
+            mouseLook();
         }
-
-        captureMouse(gameMaster);
-        mouseLook();
 
         Player player = gameMaster.getPlayer();
         if (player != null) {
             movement(gameMaster, delta);
-            if (Keyboard.isKeyPressed(GLFW_KEY_SPACE)) {
+            if (!gameMaster.isInventoryOpen() && !gameMaster.isPromptingForInput() && Keyboard.isKeyPressed(GLFW_KEY_SPACE)) {
                 player.jump();
             }
 
-            camera.setZooming(Keyboard.isKeyDown(GLFW_KEY_C));
+            camera.setZooming(!gameMaster.isInventoryOpen() && !gameMaster.isPromptingForInput() && Keyboard.isKeyDown(GLFW_KEY_C));
             camera.getPosition().set(player.getEyePosition());
         }
     }
@@ -61,24 +60,26 @@ public class CameraController implements Service<Camera> {
         float moveX = 0.0f;
         float moveZ = 0.0f;
 
-        if (Keyboard.isKeyDown(GLFW_KEY_W)) {
-            moveX += forwardX;
-            moveZ += forwardZ;
-        }
+        if (!gameMaster.isInventoryOpen() && !gameMaster.isPromptingForInput()) {
+            if (Keyboard.isKeyDown(GLFW_KEY_W)) {
+                moveX += forwardX;
+                moveZ += forwardZ;
+            }
 
-        if (Keyboard.isKeyDown(GLFW_KEY_S)) {
-            moveX -= forwardX;
-            moveZ -= forwardZ;
-        }
+            if (Keyboard.isKeyDown(GLFW_KEY_S)) {
+                moveX -= forwardX;
+                moveZ -= forwardZ;
+            }
 
-        if (Keyboard.isKeyDown(GLFW_KEY_D)) {
-            moveX += rightX;
-            moveZ += rightZ;
-        }
+            if (Keyboard.isKeyDown(GLFW_KEY_D)) {
+                moveX += rightX;
+                moveZ += rightZ;
+            }
 
-        if (Keyboard.isKeyDown(GLFW_KEY_A)) {
-            moveX -= rightX;
-            moveZ -= rightZ;
+            if (Keyboard.isKeyDown(GLFW_KEY_A)) {
+                moveX -= rightX;
+                moveZ -= rightZ;
+            }
         }
 
         float length = (float) Math.sqrt(moveX * moveX + moveZ * moveZ);

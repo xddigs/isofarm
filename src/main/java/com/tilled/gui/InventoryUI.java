@@ -67,10 +67,8 @@ public class InventoryUI extends UIElement {
         for (int i = 0; i < K.UI.INVENTORY_SLOTS; i++) {
             int column = i % K.UI.INVENTORY_COLUMNS;
             int row = i / K.UI.INVENTORY_COLUMNS;
-
             float x = Settings.getScaledPadding() + column * (Settings.getScaledSlot() + Settings.getScaledSpacing());
             float y = Settings.getScaledPadding() + Settings.getScaledHeader() + row * (Settings.getScaledSlot() + Settings.getScaledSpacing());
-
             InventorySlotUI slotUI = new InventorySlotUI(x, y, Settings.getScaledSlot(), Settings.getScaledSlot());
             slotUIs[i] = slotUI;
             addChild(slotUI);
@@ -94,12 +92,14 @@ public class InventoryUI extends UIElement {
         super.update(delta);
         if (player == null) return;
 
-        boolean wasOpen = isActuallyVisible();
+        boolean wasOpen = isVisible();
         boolean isOpen = gameMaster != null && gameMaster.isInventoryOpen();
 
         if (isOpen && !wasOpen) {
+            show();
             onOpen();
         } else if (!isOpen && wasOpen) {
+            hide();
             onClose();
         }
 
@@ -110,29 +110,18 @@ public class InventoryUI extends UIElement {
 
     private void onOpen() {
         if (hotbarUI != null) {
-            hotbarOriginalX = hotbarUI.getX();
-            hotbarOriginalY = hotbarUI.getY();
-
-            if (hotbarUI.getParent() != null) {
-                hotbarUI.getParent().removeChild(hotbarUI);
-            }
-            addChild(hotbarUI);
-
-            float x = getWidth() / 2f - hotbarUI.getWidth() / 2f;
-            float y = getHeight() - hotbarUI.getHeight() - Settings.getScaledPadding();
-            hotbarUI.setPosition(x, y);
+            float hotbarX = getAbsoluteX() + getWidth() / 2f - hotbarUI.getWidth() / 2f;
+            float hotbarY = getAbsoluteY() + getHeight() + K.UI.HOTBAR_OFFSET;
+            hotbarUI.setPosition(hotbarX, hotbarY);
             hotbarUI.setInventoryMode(true);
         }
     }
 
     private void onClose() {
         if (hotbarUI != null) {
-            if (getParent() != null) {
-                removeChild(hotbarUI);
-                getParent().addChild(hotbarUI);
+            if (gameMaster != null && gameMaster.getGameUIService() != null) {
+                gameMaster.getGameUIService().resetHotbarPosition();
             }
-
-            hotbarUI.setPosition(hotbarOriginalX, hotbarOriginalY);
             hotbarUI.setInventoryMode(false);
         }
 
@@ -144,13 +133,15 @@ public class InventoryUI extends UIElement {
 
     private void syncInventory() {
         Inventory inventory = player.getInventory();
-        for (int i = 0; i < K.UI.INVENTORY_SLOTS; i++) {
+        for (int i = 0; i < slotUIs.length; i++) {
             InventorySlotUI slotUI = slotUIs[i];
+
             if (i < inventory.getSlots().size()) {
                 slotUI.setSlot(inventory.getSlot(i));
             } else {
                 slotUI.setSlot(null);
             }
+
             updateItemSprite(slotUI);
         }
 
@@ -191,25 +182,29 @@ public class InventoryUI extends UIElement {
     private void updateSlots() {
         float mouseX = Mouse.getX();
         float mouseY = Mouse.getY();
-
         for (InventorySlotUI slotUI : slotUIs) {
-            slotUI.setHovered(slotUI.contains(mouseX, mouseY));
+            if (slotUI != null) {
+                slotUI.setHovered(slotUI.contains(mouseX, mouseY));
+            }
         }
 
         if (hotbarUI != null) {
             for (InventorySlotUI slotUI : hotbarUI.getSlotUIs()) {
-                slotUI.setHovered(slotUI.contains(mouseX, mouseY));
+                if (slotUI != null) {
+                    slotUI.setHovered(slotUI.contains(mouseX, mouseY));
+                }
             }
         }
     }
 
     private void handleSlotInteractions() {
         InventorySlotUI[] allSlots;
+        int hotbarStart = (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
         if (hotbarUI != null) {
             InventorySlotUI[] hotbarSlots = hotbarUI.getSlotUIs();
-            allSlots = new InventorySlotUI[slotUIs.length + hotbarSlots.length];
-            System.arraycopy(slotUIs, 0, allSlots, 0, slotUIs.length);
-            System.arraycopy(hotbarSlots, 0, allSlots, slotUIs.length, hotbarSlots.length);
+            allSlots = new InventorySlotUI[hotbarStart + hotbarSlots.length];
+            System.arraycopy(slotUIs, 0, allSlots, 0, hotbarStart);
+            System.arraycopy(hotbarSlots, 0, allSlots, hotbarStart, hotbarSlots.length);
         } else {
             allSlots = slotUIs;
         }
@@ -296,6 +291,10 @@ public class InventoryUI extends UIElement {
 
     @Override
     public void render() {
+        GUI.drawRect(getAbsoluteX(), getAbsoluteY(), getAbsoluteWidth(), getAbsoluteHeight(),
+                K.UI.UI_BACKGROUND_COLOR, Settings.getScaledCornerRadius(), K.UI.UI_BORDER_COLOR,
+                Settings.getScaledThickness());
+
         renderChildren();
         renderCarriedItem();
     }

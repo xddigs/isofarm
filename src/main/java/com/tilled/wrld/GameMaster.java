@@ -211,6 +211,10 @@ public class GameMaster {
         return itemRegistry;
     }
 
+    public GameUIService getGameUIService() {
+        return gameUIservice;
+    }
+
     public WeatherService getWeatherService() {
         return weatherService;
     }
@@ -261,6 +265,9 @@ public class GameMaster {
 
     public void setInventoryOpen(boolean isInventoryOpen) {
         this.isInventoryOpen = isInventoryOpen;
+        if (!isInventoryOpen) {
+            this.cameraController.release(this);
+        }
     }
 
     public boolean isHUDShown() {

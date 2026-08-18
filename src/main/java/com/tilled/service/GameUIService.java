@@ -57,6 +57,7 @@ public class GameUIService implements Service<GameMaster> {
         this.toolIcons = toolIcons;
 
         this.inventoryUI = new InventoryUI(windowWidth, windowHeight);
+        this.inventoryUI.hide();
         this.hotbarUI = new HotbarUI(windowWidth, windowHeight);
 
         this.inventoryUI.setPosition(
@@ -80,8 +81,8 @@ public class GameUIService implements Service<GameMaster> {
         hotbarUI.setInventoryIcons(inventoryIcons);
         inventoryUI.setHotbarUI(gameMaster, hotbarUI);
 
-        uiManager.getRoot().addChild(hotbarUI);
         uiManager.getRoot().addChild(inventoryUI);
+        uiManager.getRoot().addChild(hotbarUI);
     }
 
     public InventoryUI getInventoryUI() {
@@ -127,18 +128,22 @@ public class GameUIService implements Service<GameMaster> {
         glDisable(GL_DEPTH_TEST);
         GUI.begin(windowWidth, windowHeight);
         if (isHUDShown) {
-            if (gameMaster.isInventoryOpen()) {
-                uiManager.render();
-            } else {
-                hotbarUI.render();
-            }
+            uiManager.render();
         }
 
         if (!gameMaster.isInventoryOpen()) {
             renderCrosshair(windowWidth, windowHeight);
         }
+
         GUI.end();
         glEnable(GL_DEPTH_TEST);
+    }
+
+    public void resetHotbarPosition() {
+        hotbarUI.setPosition(
+                windowWidth / 2.0f - hotbarUI.getWidth() / 2.0f,
+                windowHeight - hotbarUI.getHeight() - K.UI.HOTBAR_OFFSET
+        );
     }
 
     public void renderToasts() {
@@ -259,6 +264,10 @@ public class GameUIService implements Service<GameMaster> {
         this.windowWidth = width;
         this.windowHeight = height;
         gameMaster.getToastService().setWindowWidth(width);
+
+        if (!gameMaster.isInventoryOpen()) {
+            resetHotbarPosition();
+        }
     }
 
     public void renderInv() {
