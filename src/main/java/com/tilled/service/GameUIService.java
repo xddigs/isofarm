@@ -22,13 +22,13 @@ import static org.lwjgl.opengl.GL11.*;
 @SuppressWarnings("all")
 public class GameUIService implements Service<GameMaster> {
     private static final Logger log = LoggerFactory.getLogger(GameUIService.class);
+    private static final float CHAT_HISTORY_DURATION = 3.0f;
     private final GameMaster gameMaster;
     private final UIManager uiManager;
     private final InventoryUI inventoryUI;
     private final HotbarUI hotbarUI;
     private final UITextField chatField;
-    private final List<String> chatHistory = new ArrayList<>();
-
+    private final List<String> chatHistory;
     private final SpriteSheet seedIcons;
     private final SpriteSheet cropIcons;
     private final SpriteSheet blockIcons;
@@ -37,12 +37,11 @@ public class GameUIService implements Service<GameMaster> {
     private Shop shop;
     private float windowWidth = K.Window.DEFAULT_WIDTH;
     private float windowHeight = K.Window.DEFAULT_HEIGHT;
-
     private Vector2i lastActionCell = null;
     private float actionDisplayTimer = 0.0f;
-
     private float hotbarLabelTimer = 0.0f;
     private String hotbarLabel = null;
+    private float chatHistoryTimer = 0.0f;
 
     public GameUIService(
             long windowHandle,
@@ -60,6 +59,7 @@ public class GameUIService implements Service<GameMaster> {
         this.blockIcons = blockIcons;
         this.toolIcons = toolIcons;
 
+        this.chatHistory = new ArrayList<>();
         this.inventoryUI = new InventoryUI(windowWidth, windowHeight);
         this.inventoryUI.setLayer(100);
         this.inventoryUI.hide();
@@ -67,11 +67,11 @@ public class GameUIService implements Service<GameMaster> {
         this.hotbarUI.setLayer(50);
 
         this.inventoryUI.setPosition(
-                windowWidth/2.0f - inventoryUI.getWidth()/2,
-                windowHeight/2.0f - inventoryUI.getHeight()/2);
+                windowWidth / 2.0f - inventoryUI.getWidth() / 2,
+                windowHeight / 2.0f - inventoryUI.getHeight() / 2);
 
         this.hotbarUI.setPosition(
-                windowWidth/2.0f - hotbarUI.getWidth()/2,
+                windowWidth / 2.0f - hotbarUI.getWidth() / 2,
                 windowHeight - hotbarUI.getHeight() - K.UI.HOTBAR_OFFSET);
 
         inventoryUI.setSeedIcons(seedIcons);
@@ -124,11 +124,20 @@ public class GameUIService implements Service<GameMaster> {
             }
         }
 
+        if (chatHistoryTimer > 0.0f) {
+            chatHistoryTimer -= delta;
+
+            if (chatHistoryTimer < 0.0f) {
+                chatHistoryTimer = 0.0f;
+            }
+        }
+
         uiManager.update(delta);
         gameMaster.getToastService().update(delta);
 
         if (!gameMaster.isInventoryOpen()) {
             float scroll = Mouse.getScrollY();
+
             if (scroll != 0) {
                 selectItem(scroll > 0 ? -1 : 1);
             }
@@ -142,14 +151,9 @@ public class GameUIService implements Service<GameMaster> {
             uiManager.render();
             renderHotbarLabel();
             renderToasts();
-        } else {
-            // Si el HUD está escondido, igual queremos ver el chat si está abierto
-            if (chatField.isVisible()) {
-                chatField.render();
-                renderChatHistory();
-            }
-        }
+        } else {}
 
+        renderChatHistory();
         if (!gameMaster.isInventoryOpen()) {
             renderCrosshair(windowWidth, windowHeight);
         }
@@ -159,14 +163,17 @@ public class GameUIService implements Service<GameMaster> {
     }
 
     private void renderChatHistory() {
-        float x = 10;
-        float y = chatField.getY() - 20;
+        if (chatHistoryTimer <= 0.0f || chatHistory.isEmpty()) {
+            return;
+        }
+
+        float x = 10.0f;
+        float y = chatField.getY() - 20.0f;
         Vector4f color = new Vector4f(1, 1, 1, 1);
-        
         int start = Math.max(0, chatHistory.size() - 10);
         for (int i = chatHistory.size() - 1; i >= start; i--) {
             GUI.drawNormalString(chatHistory.get(i), x, y, color);
-            y -= 20;
+            y -= 20.0f;
         }
     }
 
@@ -176,6 +183,8 @@ public class GameUIService implements Service<GameMaster> {
         if (chatHistory.size() > 50) {
             chatHistory.remove(0);
         }
+
+        chatHistoryTimer = CHAT_HISTORY_DURATION;
     }
 
     private void renderHotbarLabel() {

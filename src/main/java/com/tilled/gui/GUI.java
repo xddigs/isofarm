@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import static org.lwjgl.opengl.GL11C.*;
 
-@SuppressWarnings("all")
 @Utils
 public class GUI {
     private static final Shader shader = new Shader(K.Paths.UI_VERTEX_SHADER, K.Paths.UI_FRAG_SHADER);
@@ -207,12 +206,12 @@ public class GUI {
 
         float cursorX = x;
 
-        for (int i = 0; i < text.length(); i++) {
-            char character = text.charAt(i);
-            STBTTBakedChar glyph = font.getGlyph(character);
-
+        for (int i = 0; i < text.length(); ) {
+            int codePoint = text.codePointAt(i);
+            STBTTBakedChar glyph = font.getGlyph(codePoint);
             if (glyph == null) {
                 cursorX += font.getSize() * 0.5f;
+                i += Character.charCount(codePoint);
                 continue;
             }
 
@@ -233,12 +232,16 @@ public class GUI {
                         .scale(width, height, 1.0f);
 
                 shader.setUniform("uModel", model);
-                shader.setUniform("uGlyphUV", new Vector4f(u0, v0, u1, v1));
+                shader.setUniform(
+                        "uGlyphUV",
+                        new Vector4f(u0, v0, u1, v1)
+                );
 
                 mesh.render();
             }
 
             cursorX += glyph.xadvance();
+            i += Character.charCount(codePoint);
         }
 
         font.unbind();
@@ -275,6 +278,39 @@ public class GUI {
         return width;
     }
 
+    public static float getCenteredTextY(String text, UIFont font,
+                                         float boxY, float boxHeight) {
+        if (text == null || text.isEmpty() || font == null) {
+            return boxY;
+        }
+
+        float minY = Float.MAX_VALUE;
+        float maxY = -Float.MAX_VALUE;
+
+        for (int i = 0; i < text.length(); ) {
+            int codePoint = text.codePointAt(i);
+            STBTTBakedChar glyph = font.getGlyph(codePoint);
+
+            if (glyph != null) {
+                float top = glyph.yoff();
+                float bottom = glyph.yoff() + (glyph.y1() - glyph.y0());
+
+                minY = Math.min(minY, top);
+                maxY = Math.max(maxY, bottom);
+            }
+
+            i += Character.charCount(codePoint);
+        }
+
+        if (minY == Float.MAX_VALUE) {
+            return boxY + font.getSize();
+        }
+
+        float textHeight = maxY - minY;
+        float centeredTop = boxY + (boxHeight - textHeight) * 0.5f;
+        return centeredTop - minY;
+    }
+
     public static String[] wrapText(String text, float maxWidth, UIFont font) {
         if (text == null || text.isEmpty()) {
             return new String[0];
@@ -285,9 +321,9 @@ public class GUI {
         StringBuilder currentLine = new StringBuilder();
 
         for (String word : words) {
-            String testLine = currentLine.length() == 0 ? word : currentLine + " " + word;
+            String testLine = currentLine.isEmpty() ? word : currentLine + " " + word;
             if (getStringWidth(testLine, font) > maxWidth) {
-                if (currentLine.length() > 0) {
+                if (!currentLine.isEmpty()) {
                     lines.add(currentLine.toString());
                     currentLine = new StringBuilder(word);
                 } else {
@@ -295,11 +331,11 @@ public class GUI {
                     currentLine = new StringBuilder();
                 }
             } else {
-                currentLine.append(currentLine.length() == 0 ? "" : " ").append(word);
+                currentLine.append(currentLine.isEmpty() ? "" : " ").append(word);
             }
         }
 
-        if (currentLine.length() > 0) {
+        if (!currentLine.isEmpty()) {
             lines.add(currentLine.toString());
         }
 

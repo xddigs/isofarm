@@ -55,7 +55,7 @@ public class UITextField extends UIElement {
                         background.z, background.w * getWorldOpacity()));
 
         float textX = getAbsoluteX() + 8.0f - scrollOffset;
-        float textY = getAbsoluteY() + (getAbsoluteHeight() - font.getSize()) * 0.5f + font.getSize();
+        float textY = GUI.getCenteredTextY(text.toString(), font, getAbsoluteY(), getAbsoluteHeight());
 
         int selectionStart = getSelectionStart();
         int selectionEnd = getSelectionEnd();
