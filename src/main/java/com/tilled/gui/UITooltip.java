@@ -16,11 +16,6 @@ public class UITooltip extends UIElement {
         hide();
     }
 
-    public UITooltip(String text) {
-        this();
-        setText(text);
-    }
-
     @Override
     public void render() {
         if (!isActuallyVisible() || text == null || text.isBlank()) {
