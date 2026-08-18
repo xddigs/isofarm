@@ -275,6 +275,37 @@ public class GUI {
         return width;
     }
 
+    public static String[] wrapText(String text, float maxWidth, UIFont font) {
+        if (text == null || text.isEmpty()) {
+            return new String[0];
+        }
+
+        java.util.List<String> lines = new java.util.ArrayList<>();
+        String[] words = text.split(" ");
+        StringBuilder currentLine = new StringBuilder();
+
+        for (String word : words) {
+            String testLine = currentLine.length() == 0 ? word : currentLine + " " + word;
+            if (getStringWidth(testLine, font) > maxWidth) {
+                if (currentLine.length() > 0) {
+                    lines.add(currentLine.toString());
+                    currentLine = new StringBuilder(word);
+                } else {
+                    lines.add(word);
+                    currentLine = new StringBuilder();
+                }
+            } else {
+                currentLine.append(currentLine.length() == 0 ? "" : " ").append(word);
+            }
+        }
+
+        if (currentLine.length() > 0) {
+            lines.add(currentLine.toString());
+        }
+
+        return lines.toArray(new String[0]);
+    }
+
     public static void pushScissor(float x, float y, float width, float height) {
         int windowHeight = (int) getScreenHeight();
         glEnable(GL_SCISSOR_TEST);

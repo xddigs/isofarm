@@ -71,7 +71,7 @@ public final class K {
 
     public static final class UI {
         public static final int INVENTORY_COLUMNS = 9;
-        public static final int INVENTORY_ROWS = 4;
+        public static final int INVENTORY_ROWS = 5;
         public static final int INVENTORY_SLOTS = INVENTORY_COLUMNS * INVENTORY_ROWS;
 
         public static final float COORD_DISPLAY_DURATION = 3.0f;
@@ -94,7 +94,19 @@ public final class K {
         public static final float TOAST_DURATION = 3.0f;
 
         public static final float HOTBAR_LABEL_DURATION = 1.75f;
+        public static final float HOTBAR_LABEL_OFFSET_Y = 30.0f;
         public static final float HOTBAR_OFFSET = 20;
+
+        public static final float TOAST_ACCENT_WIDTH = 6.0f;
+        public static final float TOAST_PREFIX_OFFSET_X = 15.0f;
+        public static final float TOAST_PREFIX_OFFSET_Y = 10.0f;
+        public static final float TOAST_MESSAGE_OFFSET_X = 20.0f;
+        public static final float TOAST_MESSAGE_OFFSET_Y = 10.0f;
+        public static final float TOAST_LINE_HEIGHT = 18.0f;
+        public static final float TOAST_GAP_X = 8.0f;
+        public static final float TOAST_PADDING_RIGHT = 10.0f;
+        public static final float TOAST_PREFIX_BASELINE_ADJ = 0.35f;
+        public static final float TOAST_MESSAGE_GAP_Y = 0.2f;
 
         public static final Vector4f UI_BACKGROUND_COLOR = new Vector4f(0.25f, 0.25f, 0.25f, 1.0f);
         public static final Vector4f UI_BACKGROUND_COLOR_SLOT = new Vector4f(UI_BACKGROUND_COLOR.x,

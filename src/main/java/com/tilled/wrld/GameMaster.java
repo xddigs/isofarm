@@ -110,14 +110,14 @@ public class GameMaster {
         this.windowHeight = K.Window.DEFAULT_HEIGHT;
         this.soundService = new SoundService();
 
-        this.cropService = new CropService(world);
+        this.particles = new ParticleEngine();
+        this.cropService = new CropService(world, particles);
         this.timeService = new TimeService();
         this.commandRegistry = new CommandRegistry();
         this.toastService = new ToastService();
         this.commandService = new CommandService(commandRegistry, toastService);
         this.itemRegistry = new ItemRegistry();
         this.sunlight = new Sunlight(K.Sunlight.DEFAULT_DIRECTION);
-        this.particles = new ParticleEngine();
         this.rainEngine = new RainEngine();
 
         glEnable(GL_BLEND);

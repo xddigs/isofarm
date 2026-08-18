@@ -1,6 +1,8 @@
 package com.tilled.service;
 
 import com.tilled.data.*;
+import com.tilled.graphics.ParticleEngine;
+import com.tilled.graphics.SpriteSheet;
 import com.tilled.wrld.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,9 +10,11 @@ import org.slf4j.LoggerFactory;
 public class CropService implements Service<Crop> {
     private static final Logger log = LoggerFactory.getLogger(CropService.class);
     private final World world;
+    private final ParticleEngine particles;
 
-    public CropService(World world) {
+    public CropService(World world, ParticleEngine particles) {
         this.world = world;
+        this.particles = particles;
     }
 
     public Crop plant(int x, int y, int z, Player player, Block block,
@@ -61,7 +65,7 @@ public class CropService implements Service<Crop> {
     }
 
     @SuppressWarnings("UnusedReturnValue")
-    public int harvest(Player player, Crop crop, ToastService toastService) {
+    public int harvest(Player player, Crop crop, ToastService toastService, SpriteSheet cropSheet) {
         if (!crop.isReadyToHarvest()) {
             log.warn("Attempted to harvest {} " +
                     "before it was fully grown.", crop.getCropType().getName());
@@ -71,11 +75,16 @@ public class CropService implements Service<Crop> {
         int yield = crop.getCropType().getYield();
         int cropValue = crop.getValue();
         int seeds = crop.getCropType().getSeeds();
-        player.add(crop, yield);
+        player.add(new Produce(crop.getCropType()), yield);
         player.add(new Seed(crop.getCropType()), seeds);
         crop.setHarvested(true);
         player.gain(cropValue);
         world.removeCrop(crop);
+
+        if (particles != null && cropSheet != null) {
+            particles.spawn(crop.getX(), crop.getY(), crop.getZ(), cropSheet, crop.getStage().getFrameIndex());
+        }
+
         log.info("Successfully harvested {}" +
                 " giving {} items.", crop.getCropType().getName(), yield);
         toastService.success("You harvested " + yield + " " + crop.getCropType().getName());

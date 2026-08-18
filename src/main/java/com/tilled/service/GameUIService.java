@@ -57,8 +57,10 @@ public class GameUIService implements Service<GameMaster> {
         this.toolIcons = toolIcons;
 
         this.inventoryUI = new InventoryUI(windowWidth, windowHeight);
+        this.inventoryUI.setLayer(100);
         this.inventoryUI.hide();
         this.hotbarUI = new HotbarUI(windowWidth, windowHeight);
+        this.hotbarUI.setLayer(50);
 
         this.inventoryUI.setPosition(
                 windowWidth/2.0f - inventoryUI.getWidth()/2,
@@ -129,6 +131,8 @@ public class GameUIService implements Service<GameMaster> {
         GUI.begin(windowWidth, windowHeight);
         if (isHUDShown) {
             uiManager.render();
+            renderHotbarLabel();
+            renderToasts();
         }
 
         if (!gameMaster.isInventoryOpen()) {
@@ -137,6 +141,18 @@ public class GameUIService implements Service<GameMaster> {
 
         GUI.end();
         glEnable(GL_DEPTH_TEST);
+    }
+
+    private void renderHotbarLabel() {
+        if (hotbarLabel == null || hotbarLabelTimer <= 0.0f) {
+            return;
+        }
+
+        float alpha = Math.min(1.0f, hotbarLabelTimer * 2.0f);
+        Vector4f color = new Vector4f(1.0f, 1.0f, 1.0f, alpha);
+        float x = windowWidth / 2.0f - GUI.getStringWidth(hotbarLabel, GUI.getNormalFont()) / 2.0f;
+        float y = hotbarUI.getY() - K.UI.HOTBAR_LABEL_OFFSET_Y * Settings.getScale();
+        GUI.drawNormalString(hotbarLabel, x, y, color);
     }
 
     public void resetHotbarPosition() {
@@ -201,19 +217,51 @@ public class GameUIService implements Service<GameMaster> {
 
         hotbarLabel = item.getName();
         hotbarLabelTimer = K.UI.HOTBAR_LABEL_DURATION;
-
-        // TODO showHotbarLabel with GUI API
     }
 
     private void renderToast(Toast toast) {
         float x = toast.getX();
         float y = toast.getY();
 
-        float width = K.UI.TOAST_WIDTH;
+        float width = K.UI.TOAST_WIDTH * Settings.getScale();
+        float height = K.UI.TOAST_HEIGHT * Settings.getScale();
         float[] background = getToastBackground(toast.getType());
         float[] accent = getToastAccent(toast.getType());
 
-        // TODO renderToast with GUI API
+        Vector4f bgColor = new Vector4f(background[0], background[1], background[2], background[3]);
+        Vector4f accentColor = new Vector4f(accent[0], accent[1], accent[2], accent[3]);
+
+        GUI.drawRect(x, y, width, height, bgColor, Settings.getScaledCornerRadius());
+        GUI.drawRect(x, y, K.UI.TOAST_ACCENT_WIDTH * Settings.getScale(), height,
+                accentColor, Settings.getScaledCornerRadius());
+
+        String prefix = getToastPrefix(toast.getType());
+        float gap = K.UI.TOAST_GAP_X * Settings.getScale();
+        float messageX = x + K.UI.TOAST_MESSAGE_OFFSET_X * Settings.getScale();
+
+        float prefixWidth = GUI.getStringWidth(prefix, GUI.getBigFont());
+        float textX = messageX + prefixWidth + gap;
+
+        float maxMessageWidth = width - (textX - x) - K.UI.TOAST_PADDING_RIGHT * Settings.getScale();
+        String[] lines = GUI.wrapText(toast.getMessage(), maxMessageWidth, GUI.getNormalFont());
+
+        float bigFontHeight = GUI.getBigFont().getSize();
+        float normalFontHeight = GUI.getNormalFont().getSize();
+        float lineHeight = K.UI.TOAST_LINE_HEIGHT * Settings.getScale();
+
+        float totalTextHeight = bigFontHeight + (lines.length > 0 ?
+                (lines.length - 1) * lineHeight + normalFontHeight : 0);
+
+        float startY = y + (height - totalTextHeight) / 2.0f;
+
+        float prefixY = y + height / 2.0f + bigFontHeight * K.UI.TOAST_PREFIX_BASELINE_ADJ;
+        GUI.drawBigString(prefix, messageX, prefixY, accentColor);
+
+        float messageStartY = startY + bigFontHeight + normalFontHeight * K.UI.TOAST_MESSAGE_GAP_Y;
+
+        for (int i = 0; i < lines.length; i++) {
+            GUI.drawNormalString(lines[i], textX, messageStartY + i * lineHeight, K.UI.UI_TEXT_COLOR);
+        }
     }
 
     private float[] getToastAccent(ToastData type) {
@@ -252,7 +300,7 @@ public class GameUIService implements Service<GameMaster> {
     }
 
     public String getEnteredPlayerName() {
-        return "";
+        return "Gabi";
     }
 
     public void logAction(Hit cell) {
@@ -265,8 +313,13 @@ public class GameUIService implements Service<GameMaster> {
         this.windowHeight = height;
         gameMaster.getToastService().setWindowWidth(width);
 
-        if (!gameMaster.isInventoryOpen()) {
-            resetHotbarPosition();
+        resetHotbarPosition();
+
+        if (inventoryUI != null) {
+            inventoryUI.setPosition(
+                    (width - inventoryUI.getWidth()) / 2.0f,
+                    (height - inventoryUI.getHeight()) / 2.0f
+            );
         }
     }
 

@@ -86,7 +86,8 @@ public class GameInteraction {
                 cropService.harvest(
                         gameMaster.getPlayer(),
                         crop,
-                        gameMaster.getToastService()
+                        gameMaster.getToastService(),
+                        sheet
                 );
             } else {
                 cropService.rip(crop);

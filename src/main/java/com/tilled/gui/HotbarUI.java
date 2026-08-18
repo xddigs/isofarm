@@ -118,6 +118,7 @@ public class HotbarUI extends UIElement {
         if (item == null) {
             slotUI.setSpriteSheet(null);
             slotUI.setSpriteFrame(0);
+            slotUI.setTooltipText(null);
             return;
         }
 
@@ -126,11 +127,13 @@ public class HotbarUI extends UIElement {
         if (spriteSheet == null) {
             slotUI.setSpriteSheet(null);
             slotUI.setSpriteFrame(0);
+            slotUI.setTooltipText(null);
             return;
         }
 
         slotUI.setSpriteSheet(spriteSheet);
         slotUI.setSpriteFrame(getItemIconColumn(item));
+        slotUI.setTooltipText(item.getName());
     }
 
     private void updateSlots() {

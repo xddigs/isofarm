@@ -30,7 +30,8 @@ public class InventoryUI extends UIElement {
 
     public InventoryUI(float x, float y) {
         super(x, y, getInventoryWidth(), getInventoryHeight());
-        this.slotUIs = new InventorySlotUI[K.UI.INVENTORY_SLOTS];
+        int totalVisualSlots = (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
+        this.slotUIs = new InventorySlotUI[totalVisualSlots];
         setFocusable(true);
         createButtons();
         createSlots();
@@ -59,12 +60,15 @@ public class InventoryUI extends UIElement {
         sortButton.setOnClick(this::sortInventory);
         groupButton.setOnClick(this::groupInventory);
 
+        sortButton.setTooltipText("Sort Inventory");
+        groupButton.setTooltipText("Group Items");
+
         addChild(sortButton);
         addChild(groupButton);
     }
 
     private void createSlots() {
-        for (int i = 0; i < K.UI.INVENTORY_SLOTS; i++) {
+        for (int i = 0; i < slotUIs.length; i++) {
             int column = i % K.UI.INVENTORY_COLUMNS;
             int row = i / K.UI.INVENTORY_COLUMNS;
             float x = Settings.getScaledPadding() + column * (Settings.getScaledSlot() + Settings.getScaledSpacing());
@@ -157,13 +161,16 @@ public class InventoryUI extends UIElement {
         Item item = slotUI.getItem();
         if (item == null) {
             slotUI.setSpriteSheet(null);
+            slotUI.setTooltipText(null);
             return;
         }
         slotUI.setSpriteSheet(getItemSpritesheet(item));
         slotUI.setSpriteFrame(getItemIconColumn(item));
+        slotUI.setTooltipText(item.getName());
     }
 
     private SpriteSheet getItemSpritesheet(Item item) {
+        if (item instanceof Produce) return cropIcons;
         if (item instanceof Crop) return cropIcons;
         if (item instanceof Seed) return seedIcons;
         if (item instanceof Block) return blockIcons;
@@ -172,6 +179,7 @@ public class InventoryUI extends UIElement {
     }
 
     private static int getItemIconColumn(Item item) {
+        if (item instanceof Produce produce && produce.getType() != null) return produce.getType().getId();
         if (item instanceof Seed seed && seed.getType() != null) return seed.getType().getId();
         if (item instanceof Crop crop && crop.getCropType() != null) return crop.getCropType().getId();
         if (item instanceof Block block && block.getType() != null) return block.getType().getId() - 1;
@@ -200,14 +208,10 @@ public class InventoryUI extends UIElement {
     private void handleSlotInteractions() {
         InventorySlotUI[] allSlots;
         int hotbarStart = (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
-        if (hotbarUI != null) {
-            InventorySlotUI[] hotbarSlots = hotbarUI.getSlotUIs();
-            allSlots = new InventorySlotUI[hotbarStart + hotbarSlots.length];
-            System.arraycopy(slotUIs, 0, allSlots, 0, hotbarStart);
-            System.arraycopy(hotbarSlots, 0, allSlots, hotbarStart, hotbarSlots.length);
-        } else {
-            allSlots = slotUIs;
-        }
+        InventorySlotUI[] hotbarSlots = hotbarUI.getSlotUIs();
+        allSlots = new InventorySlotUI[slotUIs.length + hotbarSlots.length];
+        System.arraycopy(slotUIs, 0, allSlots, 0, slotUIs.length);
+        System.arraycopy(hotbarSlots, 0, allSlots, slotUIs.length, hotbarSlots.length);
 
         for (int i = 0; i < allSlots.length; i++) {
             InventorySlotUI slotUI = allSlots[i];
@@ -282,6 +286,7 @@ public class InventoryUI extends UIElement {
     private boolean isSameType(Item a, Item b) {
         if (a == null || b == null) return false;
         if (a.getClass() != b.getClass()) return false;
+        if (a instanceof Produce p1 && b instanceof Produce p2) return p1.getType() == p2.getType();
         if (a instanceof Seed s1 && b instanceof Seed s2) return s1.getType() == s2.getType();
         if (a instanceof Crop c1 && b instanceof Crop c2) return c1.getCropType() == c2.getCropType();
         if (a instanceof Block b1 && b instanceof Block b2) return b1.getType() == b2.getType();

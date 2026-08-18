@@ -18,6 +18,10 @@ public class Library implements Service<GameMaster> {
         itemR.register(DEFAULT_ID + ":carrot_seed", () -> new Seed(CropType.CARROT));
         itemR.register(DEFAULT_ID + ":potato_seed", () -> new Seed(CropType.POTATO));
         itemR.register(DEFAULT_ID + ":beetroot_seed", () -> new Seed(CropType.BEETROOT));
+        itemR.register(DEFAULT_ID + ":wheat", () -> new Produce(CropType.WHEAT));
+        itemR.register(DEFAULT_ID + ":carrot", () -> new Produce(CropType.CARROT));
+        itemR.register(DEFAULT_ID + ":potato", () -> new Produce(CropType.POTATO));
+        itemR.register(DEFAULT_ID + ":beetroot", () -> new Produce(CropType.BEETROOT));
         itemR.register(DEFAULT_ID + ":dirt", () -> new Block(BlockData.DIRT));
         itemR.register(DEFAULT_ID + ":tilled_dirt", () -> new Block(BlockData.TILLED_DIRT));
         itemR.register(DEFAULT_ID + ":grass", () -> new Block(BlockData.GRASS));
