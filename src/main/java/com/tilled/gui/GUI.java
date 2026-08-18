@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.lwjgl.opengl.GL11C.*;
 
+@SuppressWarnings("all")
 @Utils
 public class GUI {
     private static final Shader shader = new Shader(K.Paths.UI_VERTEX_SHADER, K.Paths.UI_FRAG_SHADER);
@@ -46,6 +47,31 @@ public class GUI {
 
     public static void end() {
         shader.unbind();
+    }
+
+    public static void drawLine(float x1, float y1, float x2, float y2,
+                                float thickness, Vector4f color) {
+        float dx = x2 - x1;
+        float dy = y2 - y1;
+        float length = (float) Math.sqrt(dx * dx + dy * dy);
+
+        if (length <= 0.0f || thickness <= 0.0f) {
+            return;
+        }
+
+        float angle = (float) Math.atan2(dy, dx);
+        model.identity()
+                .translate(x1, y1, 0.0f)
+                .rotateZ(angle)
+                .translate(0.0f, -thickness * 0.5f, 0.0f)
+                .scale(length, thickness, 1.0f);
+
+        shader.setUniform("uModel", model);
+        shader.setUniform("uColor", color);
+        shader.setUniform("uUseTexture", false);
+        shader.setUniform("uUseFont", false);
+
+        mesh.render();
     }
 
     public static void drawRect(float x, float y, float width, float height, Vector4f color) {

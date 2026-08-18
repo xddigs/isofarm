@@ -8,8 +8,10 @@ import com.tilled.gui.InventoryUI;
 import com.tilled.gui.UIManager;
 import com.tilled.input.Mouse;
 import com.tilled.utils.K;
+import com.tilled.utils.Settings;
 import com.tilled.wrld.GameMaster;
 import org.joml.Vector2i;
+import org.joml.Vector4f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,6 +129,7 @@ public class GameUIService implements Service<GameMaster> {
         }
 
         hotbarUI.render();
+        renderCrosshair(windowWidth, windowHeight);
         GUI.end();
         glEnable(GL_DEPTH_TEST);
     }
@@ -142,12 +145,18 @@ public class GameUIService implements Service<GameMaster> {
     }
 
     public void renderCrosshair(float windowWidth, float windowHeight) {
-        float centerX = windowWidth / 2.0f;
-        float centerY = windowHeight / 2.0f;
-        float size = K.UI.CROSSHAIR_SIZE;
-        float thickness = K.UI.CROSSHAIR_THICKNESS;
+        float centerX = Math.round(windowWidth * 0.5f);
+        float centerY = Math.round(windowHeight * 0.5f);
 
-        // TODO crosshair rendering
+        float length = 16.0f * Settings.getScale();
+        float thickness = 2.0f;
+        Vector4f color = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+        GUI.drawLine(centerX - length * 0.5f, centerY,
+                centerX + length * 0.5f, centerY, thickness, color);
+
+        GUI.drawLine(centerX, centerY - length * 0.5f,
+                centerX, centerY + length * 0.5f, thickness, color);
     }
 
     public void selectItem(int direction) {

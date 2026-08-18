@@ -514,7 +514,7 @@ public class GameMaster {
         motionBlurShader.bind();
         motionBlurShader.setUniform("uScene", 0);
         motionBlurShader.setUniform("uVelocity", new Vector2f(blurX, blurY));
-        motionBlurShader.setUniform("uStrength", 1.0f);
+        motionBlurShader.setUniform("uStrength", 0.8f);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, sceneFbo.getTextureId());
         screenQuadMesh.render();
