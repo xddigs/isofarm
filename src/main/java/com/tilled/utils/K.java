@@ -4,8 +4,8 @@ import org.joml.Vector3f;
 
 @Utils
 public final class K {
-    private K() {
-    }
+
+    private K() {}
 
     public static final class Camera {
         public static final float DEFAULT_PITCH = 35.264f;
@@ -25,8 +25,6 @@ public final class K {
         public static final float WEATHER_CHANGE_PROBABILITY = 0.01f;
 
         public static final int STARTING_COINS = 100;
-        public static final int TOTAL_SLOTS = 36;
-        public static final int TOTAL_SLOTS_STOCK = 16;
         public static final int MAX_STACK = 9999;
         public static final int WATER_LEVEL_MAX = 100;
 
@@ -67,22 +65,6 @@ public final class K {
         public static final float FRAME_PADDING_Y = 10.0f;
         public static final float ITEM_SPACING_X = 0.0f;
         public static final float ITEM_SPACING_Y = 14.0f;
-        public static final float ITEM_SPACING = 4.0f;
-        public static final float FONT_SIZE = 20.0f;
-
-        public static final float[] COLOR_WINDOW_BG = {0.08f, 0.08f, 0.10f, 0.92f};
-        public static final float[] COLOR_FRAME_BG = {0.15f, 0.15f, 0.18f, 1.00f};
-        public static final float[] COLOR_FRAME_BG_HOVERED = {0.20f, 0.20f, 0.24f, 1.00f};
-        public static final float[] COLOR_FRAME_BG_ACTIVE = {0.22f, 0.22f, 0.26f, 1.00f};
-        public static final float[] COLOR_BUTTON = {0.45f, 0.55f, 0.12f, 1.00f};
-        public static final float[] COLOR_BUTTON_HOVERED = {0.55f, 0.68f, 0.15f, 1.00f};
-        public static final float[] COLOR_BUTTON_ACTIVE = {0.38f, 0.46f, 0.10f, 1.00f};
-        public static final float[] COLOR_TEXT = {1.00f, 1.00f, 1.00f, 1.00f};
-
-        public static final float[] COLOR_SLOT_BG = {0.10f, 0.10f, 0.12f, 0.40f};
-        public static final float[] COLOR_SLOT_HOVERED = {0.20f, 0.20f, 0.24f, 0.60f};
-        public static final float[] COLOR_SLOT_BORDER = {0.40f, 0.40f, 0.45f, 0.80f};
-        public static final float[] COLOR_SLOT_BORDER_SEL = {0.65f, 0.80f, 0.20f, 1.00f};
 
         public static final float[] COLOR_TOAST_SUCCESS = {0.30f, 0.85f, 0.40f, 1.0f};
         public static final float[] COLOR_TOAST_SUCCESS_BG = {0.08f, 0.16f, 0.10f, 0.95f};
@@ -97,22 +79,12 @@ public final class K {
     }
 
     public static final class UI {
-        public static final int PLAYER_NAME_MAX_LENGTH = 32;
+        public static final int INVENTORY_COLUMNS = 9;
+        public static final int INVENTORY_ROWS = 6;
+        public static final int INVENTORY_SLOTS = INVENTORY_COLUMNS * INVENTORY_ROWS;
+        public static final float INVENTORY_SLOT_SIZE = 48.0f;
+        public static final float INVENTORY_SLOT_SPACING = 4.0f;
 
-        public static final float HUD_PADDING = 20.0f;
-
-        public static final float INVENTORY_WIDTH = 268.0f;
-        public static final float INVENTORY_HEIGHT = 300.0f;
-
-        public static final float NEW_PLAYER_WIDTH = 340.0f;
-        public static final float NEW_PLAYER_HEIGHT = 180.0f;
-
-        public static final float INPUT_WIDTH = 340.0f;
-        public static final float INPUT_HEIGHT = 120.0f;
-
-        public static final float LARGE_BUTTON_HEIGHT = 40.0f;
-        public static final float CENTER_PIVOT = 0.5f;
-        public static final float MATCH_PARENT_WIDTH = -1.0f;
         public static final float COORD_DISPLAY_DURATION = 3.0f;
 
         public static final int ICON_SEED_CROPS_FRAMES = 4;
@@ -122,7 +94,6 @@ public final class K {
         public static final int BLOCK_ATLAS_FRAMES = 5;
         public static final int ICON_BLOCK_ATLAS_ROWS = 3;
         public static final int WATER_FRAMES = 8;
-        public static final int COMMAND_MAX_LENGTH = 512;
 
         public static final float TOAST_WIDTH = 250.0f;
         public static final float TOAST_HEIGHT = 64.0f;
@@ -132,23 +103,12 @@ public final class K {
         public static final float TOAST_SLIDE_SPEED = 10.0f;
         public static final float TOAST_EXIT_SPEED = 12.0f;
         public static final float TOAST_DURATION = 3.0f;
-        public static final float TOAST_PADDING_X = 14.0f;
-        public static final float TOAST_PADDING_Y = 10.0f;
-        public static final float TOAST_ICON_SIZE = 20.0f;
-        public static final float TOAST_ROUNDING = 8.0f;
 
         public static final int HOTBAR_SLOTS = 9;
 
         public static final float HOTBAR_LABEL_DURATION = 1.75f;
-        public static final float HOTBAR_LABEL_FADE_DURATION = 0.55f;
-        public static final float HOTBAR_LABEL_PADDING_X = 10.0f;
-        public static final float HOTBAR_LABEL_PADDING_Y = 5.0f;
-        public static final float HOTBAR_LABEL_ROUNDING = 6.0f;
-        public static final float HOTBAR_LABEL_BORDER = 1.0f;
-        public static final float HOTBAR_LABEL_OFFSET_Y = 100.0f;
         public static final float CROSSHAIR_SIZE = 10.0f;
         public static final float CROSSHAIR_THICKNESS = 2.0f;
-        public static final float SETTINGS_PANEL_WIDTH = 300f;
     }
 
     public static final class Paths {
@@ -178,16 +138,12 @@ public final class K {
         public static final float LINE_WIDTH = 2.0f;
         public static final int CROP_TOTAL_FRAMES = 5;
         public static final int PRIMARY_TEXTURE_UNIT = 0;
-        public static final String GLSL_VERSION = "#version 330 core";
     }
 
     public static final class Colors {
         public static final Vector3f SUNLIGHT_DEFAULT = new Vector3f(1.0f, 1.0f, 1.0f);
         public static final Vector3f OUTLINE_DEFAULT = new Vector3f(0.0f, 0.0f, 0.0f);
         public static final Vector3f RAIN = new Vector3f(0.35f, 0.55f, 1.0f);
-        public static final float[] COLOR_HOTBAR_LABEL_BG = {0.08f, 0.08f, 0.10f, 0.90f};
-        public static final float[] COLOR_HOTBAR_LABEL_BORDER = {0.65f, 0.80f, 0.20f, 0.85f};
-        public static final float[] COLOR_HOTBAR_LABEL_TEXT = {1.00f, 1.00f, 1.00f, 1.00f};
 
     }
 }

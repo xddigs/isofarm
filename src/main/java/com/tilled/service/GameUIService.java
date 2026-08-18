@@ -3,6 +3,7 @@ package com.tilled.service;
 import com.tilled.data.*;
 import com.tilled.graphics.SpriteSheet;
 import com.tilled.gui.GUI;
+import com.tilled.gui.InventoryUI;
 import com.tilled.gui.UIManager;
 import com.tilled.input.Mouse;
 import com.tilled.utils.K;
@@ -24,6 +25,7 @@ public class GameUIService implements Service<GameMaster> {
     private static final Logger log = LoggerFactory.getLogger(GameUIService.class);
     private final GameMaster gameMaster;
     private final UIManager uiManager;
+    private final InventoryUI inventoryUI;
 
     private final SpriteSheet seedIcons;
     private final SpriteSheet cropIcons;
@@ -54,10 +56,14 @@ public class GameUIService implements Service<GameMaster> {
     ) {
         this.gameMaster = gameMaster;
         this.uiManager = uiManager;
+
         this.seedIcons = seedIcons;
         this.cropIcons = cropIcons;
         this.blockIcons = blockIcons;
         this.toolIcons = toolIcons;
+
+        this.inventoryUI = new InventoryUI(windowWidth/2, windowHeight/2);
+        uiManager.getRoot().addChild(inventoryUI);
 
         // add children
 //        uiManager.getRoot().addChild(name);

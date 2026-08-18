@@ -11,7 +11,7 @@ public class Inventory {
     public Inventory() {
         this.slots = new ArrayList<>();
 
-        for (int i = 0; i < K.World.TOTAL_SLOTS; i++) {
+        for (int i = 0; i < K.UI.INVENTORY_SLOTS; i++) {
             this.slots.add(new InventorySlot());
         }
     }
