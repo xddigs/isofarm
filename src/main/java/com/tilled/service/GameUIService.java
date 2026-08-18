@@ -167,13 +167,19 @@ public class GameUIService implements Service<GameMaster> {
             return;
         }
 
-        float x = 10.0f;
-        float y = chatField.getY() - 20.0f;
-        Vector4f color = new Vector4f(1, 1, 1, 1);
-        int start = Math.max(0, chatHistory.size() - 10);
+        float x = K.UI.CHAT_HISTORY_X;
+        float y = chatField.getY() - K.UI.CHAT_HISTORY_OFFSET_Y;
+
+        Vector4f color = K.UI.CHAT_HISTORY_TEXT_COLOR;
+
+        int start = Math.max(
+                0,
+                chatHistory.size() - K.UI.CHAT_HISTORY_MAX_MESSAGES
+        );
+
         for (int i = chatHistory.size() - 1; i >= start; i--) {
             GUI.drawNormalString(chatHistory.get(i), x, y, color);
-            y -= 20.0f;
+            y -= K.UI.CHAT_HISTORY_LINE_HEIGHT;
         }
     }
 

@@ -100,6 +100,12 @@ public final class K {
         public static final float HOTBAR_LABEL_OFFSET_Y = 30.0f;
         public static final float HOTBAR_OFFSET = 20;
 
+        public static final float CHAT_HISTORY_X = 10.0f;
+        public static final float CHAT_HISTORY_OFFSET_Y = 20.0f;
+        public static final float CHAT_HISTORY_LINE_HEIGHT = 20.0f;
+        public static final int CHAT_HISTORY_MAX_MESSAGES = 10;
+        public static final Vector4f CHAT_HISTORY_TEXT_COLOR = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+
         public static final float TOAST_ACCENT_WIDTH = 6.0f;
         public static final float TOAST_PREFIX_OFFSET_X = 15.0f;
         public static final float TOAST_PREFIX_OFFSET_Y = 10.0f;
