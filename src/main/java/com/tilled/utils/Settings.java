@@ -72,4 +72,8 @@ public class Settings {
     public static float doEnableMotions() {
         return doEnableMotions ? 0.8f : 0.0f;
     }
+
+    public static void toggleMotionBlur() {
+        doEnableMotions = !doEnableMotions;
+    }
 }
