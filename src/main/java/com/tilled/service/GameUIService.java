@@ -117,11 +117,13 @@ public class GameUIService implements Service<GameMaster> {
         }
     }
 
-    public void render(GameMaster gameMaster) {
+    public void render(boolean isHUDShown, GameMaster gameMaster) {
         glDisable(GL_DEPTH_TEST);
         GUI.begin(windowWidth, windowHeight);
-        if (gameMaster.isInventoryOpen()) {
-            uiManager.render();
+        if (isHUDShown) {
+            if (gameMaster.isInventoryOpen()) {
+                uiManager.render();
+            }
         }
 
         hotbarUI.render();

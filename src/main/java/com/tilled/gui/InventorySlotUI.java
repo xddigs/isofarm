@@ -59,7 +59,7 @@ public class InventorySlotUI extends UIElement {
 
     private void renderItem() {
         float iconSize = Math.min(
-                Settings.getScaledGUI(),
+                Settings.getScaledIcon(),
                 Math.min(getAbsoluteWidth(), getAbsoluteHeight()) - 4.0f);
 
         float x = getAbsoluteX() + (getAbsoluteWidth() - iconSize) * 0.5f;

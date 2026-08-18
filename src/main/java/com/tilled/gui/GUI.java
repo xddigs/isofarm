@@ -17,9 +17,7 @@ import static org.lwjgl.opengl.GL11C.*;
 
 @Utils
 public class GUI {
-    private static final Shader shader = new Shader("shaders/ui.vert",
-            "shaders/ui.frag");
-
+    private static final Shader shader = new Shader(K.Paths.UI_VERTEX_SHADER, K.Paths.UI_FRAG_SHADER);
     private static final Mesh mesh = Mesh.createQuad();
     private static final Matrix4f projection = new Matrix4f();
     private static final Matrix4f model = new Matrix4f();

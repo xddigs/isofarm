@@ -52,7 +52,9 @@ public class GameMaster {
     private Shader defaultShader;
     private Shader outlineShader;
     private Shader rainShader;
+    private Shader motionBlurShader;
     private Framebuffer maskFbo;
+    private Framebuffer sceneFbo;
     private Mesh screenQuadMesh;
     private Mesh blockMesh;
     private Mesh selectionMesh;
@@ -82,6 +84,12 @@ public class GameMaster {
     private boolean isHUDShown = true;
 
     private float genDelta;
+
+    private float previousCameraYaw;
+    private float previousCameraPitch;
+    private float blurX;
+    private float blurY;
+
     private int lastPlayerChunkX = Integer.MAX_VALUE;
     private int lastPlayerChunkZ = Integer.MAX_VALUE;
 
@@ -115,8 +123,10 @@ public class GameMaster {
         this.defaultShader = new Shader(K.Paths.DEFAULT_VERT_SHADER, K.Paths.DEFAULT_FRAG_SHADER);
         this.outlineShader = new Shader(K.Paths.OUTLINE_VERT_SHADER, K.Paths.OUTLINE_FRAG_SHADER);
         this.rainShader = new Shader(K.Paths.RAIN_VERT_SHADER, K.Paths.RAIN_FRAG_SHADER);
+        this.motionBlurShader = new Shader(K.Paths.MOTION_BLUR_VERT_SHADER, K.Paths.MOTION_BLUR_FRAG_SHADER);
 
         this.maskFbo = new Framebuffer((int) windowWidth, (int) windowHeight);
+        this.sceneFbo = new Framebuffer((int) windowWidth, (int) windowHeight);
         this.screenQuadMesh = Mesh.screenQuad();
 
         this.blockMesh = Mesh.createMesh(K.World.DEFAULT_BLOCK_DEPTH);
@@ -156,6 +166,9 @@ public class GameMaster {
 
         this.camera = new Camera(K.Camera.DEFAULT_WIDTH, K.Camera.DEFAULT_HEIGHT, Settings.renderDistance);
         this.camera.setPosition(0.0f, 0.0f, 0.0f);
+        this.previousCameraYaw = camera.getYaw();
+        this.previousCameraPitch = camera.getPitch();
+
         this.cameraController = new CameraController(camera);
         this.stepController = new StepController();
         this.weatherService = new WeatherService(rainEngine, camera);
@@ -339,6 +352,10 @@ public class GameMaster {
     }
 
     public void render() {
+        sceneFbo.bind();
+        glClearColor(0.15f, 0.15f, 0.20f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         glActiveTexture(GL_TEXTURE0);
         defaultShader.bind();
         defaultShader.setUniform("uIsMaskPass", false);
@@ -372,6 +389,20 @@ public class GameMaster {
 
         viewProjMatrix.set(camera.getProjectionMatrix()).mul(camera.getViewMatrix());
         frustum.set(viewProjMatrix);
+
+        float yawDelta = camera.getYaw() - previousCameraYaw;
+
+        if (yawDelta > K.Camera.HALF_DEGREES) {
+            yawDelta -= K.Camera.FULL_DEGREES;
+        } else if (yawDelta < -K.Camera.HALF_DEGREES) {
+            yawDelta += K.Camera.FULL_DEGREES;
+        }
+
+        float pitchDelta = camera.getPitch() - previousCameraPitch;
+        previousCameraYaw = camera.getYaw();
+        previousCameraPitch = camera.getPitch();
+        blurX = yawDelta / K.Camera.FULL_DEGREES;
+        blurY = pitchDelta / K.Camera.HALF_DEGREES;
 
         chunkMeshes.forEach((chunk, mesh) -> {
             if (mesh != null && mesh.getIndicesCount() > 0) {
@@ -442,9 +473,11 @@ public class GameMaster {
 
         if (hoveredCell != null) {
             maskFbo.bind();
+
             glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+            defaultShader.bind();
             defaultShader.setUniform("uIsMaskPass", true);
             defaultShader.setUniform("uUseTexture", true);
             defaultShader.setUniform("uUseFaceAtlas", false);
@@ -452,6 +485,9 @@ public class GameMaster {
             defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
 
             maskFbo.unbind((int) windowWidth, (int) windowHeight);
+
+            sceneFbo.bind();
+
             glDisable(GL_DEPTH_TEST);
 
             outlineShader.bind();
@@ -459,23 +495,37 @@ public class GameMaster {
             outlineShader.setUniform("uOutlineColor", K.Colors.OUTLINE_DEFAULT);
             outlineShader.setUniform("uMaskTexture", K.Render.PRIMARY_TEXTURE_UNIT);
 
+            glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, maskFbo.getTextureId());
+
             screenQuadMesh.render();
 
             outlineShader.unbind();
+
             glEnable(GL_DEPTH_TEST);
+
+            defaultShader.bind();
+            defaultShader.setUniform("uIsMaskPass", false);
         }
 
         defaultShader.unbind();
+        sceneFbo.unbind((int) windowWidth, (int) windowHeight);
+        glDisable(GL_DEPTH_TEST);
+        motionBlurShader.bind();
+        motionBlurShader.setUniform("uScene", 0);
+        motionBlurShader.setUniform("uVelocity", new Vector2f(blurX, blurY));
+        motionBlurShader.setUniform("uStrength", 1.0f);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, sceneFbo.getTextureId());
+        screenQuadMesh.render();
+        motionBlurShader.unbind();
+        glEnable(GL_DEPTH_TEST);
 
         if (weatherService.isRaining()) {
             rainEngine.render(rainShader, camera.getViewMatrix(), camera.getProjectionMatrix());
         }
 
-        gameUIservice.render(this);
-        if (isHUDShown()) {
-            // TODO render HUD with GUI API
-        }
+        gameUIservice.render(isHUDShown(), this);
 
         if (player == null) {
             this.player = new Player(gameUIservice.getEnteredPlayerName(),
@@ -529,10 +579,14 @@ public class GameMaster {
         blockIcons.dispose();
 
         maskFbo.dispose();
+        sceneFbo.dispose();
+
         defaultShader.dispose();
         outlineShader.dispose();
+        motionBlurShader.dispose();
         rainShader.dispose();
         rainEngine.dispose();
+
         cameraController.release(this);
         soundService.cleanup();
         log.info("GameMaster resources successfully cleaned up");
@@ -560,6 +614,11 @@ public class GameMaster {
         if (maskFbo != null) {
             maskFbo.dispose();
             maskFbo = new Framebuffer(newWidth, newHeight);
+        }
+
+        if (sceneFbo != null) {
+            sceneFbo.dispose();
+            sceneFbo = new Framebuffer(newWidth, newHeight);
         }
 
         if (gameUIservice != null) {

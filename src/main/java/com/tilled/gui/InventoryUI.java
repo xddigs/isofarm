@@ -4,15 +4,11 @@ import com.tilled.data.*;
 import com.tilled.graphics.SpriteSheet;
 import com.tilled.input.Mouse;
 import com.tilled.utils.K;
+import com.tilled.utils.Settings;
 import org.joml.Vector4f;
 
 @SuppressWarnings("unused")
 public class InventoryUI extends UIElement {
-    private static final float SLOT_SIZE = 48.0f;
-    private static final float SLOT_SPACING = 4.0f;
-    private static final float PADDING = 12.0f;
-    private static final float HEADER_HEIGHT = 32.0f;
-
     private final InventorySlotUI[] slotUIs = new InventorySlotUI[K.UI.INVENTORY_SLOTS];
     private final Vector4f backgroundColor = new Vector4f(0.06f, 0.06f, 0.06f, 1.0f);
     private final Vector4f textColor = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -23,6 +19,10 @@ public class InventoryUI extends UIElement {
     private SpriteSheet blockIcons;
     private SpriteSheet toolIcons;
 
+    private Item carriedItem;
+    private SpriteSheet carriedSpriteSheet;
+    private int carriedSpriteFrame;
+
     private int selectedSlot = -1;
 
     public InventoryUI(float x, float y) {
@@ -32,13 +32,20 @@ public class InventoryUI extends UIElement {
     }
 
     private static float getInventoryWidth() {
-        return PADDING * 2.0f + K.UI.INVENTORY_COLUMNS * SLOT_SIZE +
-                (K.UI.INVENTORY_COLUMNS - 1) * SLOT_SPACING;
+        return Settings.getScaledPadding() * 2.0f +
+                K.UI.INVENTORY_COLUMNS * Settings.getScaledSlot() +
+                (K.UI.INVENTORY_COLUMNS - 1) * Settings.getScaledSpacing();
     }
 
     private static float getInventoryHeight() {
-        return PADDING * 2.0f + HEADER_HEIGHT + K.UI.INVENTORY_ROWS * SLOT_SIZE +
-                (K.UI.INVENTORY_ROWS - 1) * SLOT_SPACING;
+        return Settings.getScaledPadding() * 2.0f +
+                Settings.getScaledHeader() +
+                K.UI.INVENTORY_ROWS * Settings.getScaledSlot() +
+                (K.UI.INVENTORY_ROWS - 1) * Settings.getScaledSpacing();
+    }
+
+    private static float getSlotSize() {
+        return Settings.getScaledGUI();
     }
 
     private static int getItemIconColumn(Item item) {
@@ -65,9 +72,21 @@ public class InventoryUI extends UIElement {
         for (int i = 0; i < K.UI.INVENTORY_SLOTS; i++) {
             int column = i % K.UI.INVENTORY_COLUMNS;
             int row = i / K.UI.INVENTORY_COLUMNS;
-            float x = PADDING + column * (SLOT_SIZE + SLOT_SPACING);
-            float y = PADDING + HEADER_HEIGHT + row * (SLOT_SIZE + SLOT_SPACING);
-            InventorySlotUI slotUI = new InventorySlotUI(x, y, SLOT_SIZE, SLOT_SIZE);
+
+            float x = Settings.getScaledPadding() +
+                    column * (Settings.getScaledSlot() + Settings.getScaledSpacing());
+
+            float y = Settings.getScaledPadding() +
+                    Settings.getScaledHeader() +
+                    row * (Settings.getScaledSlot() + Settings.getScaledSpacing());
+
+            InventorySlotUI slotUI = new InventorySlotUI(
+                    x,
+                    y,
+                    Settings.getScaledSlot(),
+                    Settings.getScaledSlot()
+            );
+
             slotUIs[i] = slotUI;
             addChild(slotUI);
         }
@@ -156,19 +175,32 @@ public class InventoryUI extends UIElement {
 
     private void clickSlot(int slotIndex) {
         Inventory inventory = player.getInventory();
-        if (selectedSlot == -1) {
-            if (!inventory.getSlot(slotIndex).isEmpty()) {
-                selectedSlot = slotIndex;
+        if (carriedItem == null) {
+            InventorySlot slot = inventory.getSlot(slotIndex);
+
+            if (slot.isEmpty()) {
+                return;
             }
 
+            carriedItem = slot.getItem();
+            carriedSpriteSheet = getItemSpritesheet(carriedItem);
+            carriedSpriteFrame = getItemIconColumn(carriedItem);
+            selectedSlot = slotIndex;
             return;
         }
 
         if (selectedSlot == slotIndex) {
+            carriedItem = null;
+            carriedSpriteSheet = null;
+            carriedSpriteFrame = 0;
             selectedSlot = -1;
             return;
         }
+
         inventory.pickAndDrop(selectedSlot, slotIndex);
+        carriedItem = null;
+        carriedSpriteSheet = null;
+        carriedSpriteFrame = 0;
         selectedSlot = -1;
     }
 
@@ -181,11 +213,18 @@ public class InventoryUI extends UIElement {
                 new Vector4f(backgroundColor.x, backgroundColor.y, backgroundColor.z,
                         backgroundColor.w * getWorldOpacity()));
 
-        if (player != null) {
-            GUI.drawString(player.getName() + "'s Farm, $" + player.purse(), x + PADDING, y + PADDING + GUI.getNormalFont().getSize(), GUI.getNormalFont(), new Vector4f(textColor.x, textColor.y, textColor.z, textColor.w * getWorldOpacity()));
-        }
-
         renderChildren();
+        renderItem();
+    }
+
+    private void renderItem() {
+        if (carriedItem == null || carriedSpriteSheet == null) return;
+        float size = Settings.getScaledIcon();
+        float x = Mouse.getX() - size * 0.5f;
+        float y = Mouse.getY() - size * 0.5f;
+
+        GUI.drawSprite(carriedSpriteSheet, carriedSpriteFrame,
+                x, y, size, size, new Vector4f(1.0f, 1.0f, 1.0f, 0.85f));
     }
 
     private SpriteSheet getItemSpritesheet(Item item) {

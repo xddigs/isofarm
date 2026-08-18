@@ -13,6 +13,8 @@ public final class K {
         public static final float DEFAULT_WIDTH = 16.0f;
         public static final float DEFAULT_HEIGHT = 8.0f;
         public static final float MOVEMENT_SPEED = 6.0f;
+        public static final float FULL_DEGREES = 360.0f;
+        public static final float HALF_DEGREES = 180.0f;
     }
 
     public static final class World {
@@ -54,18 +56,6 @@ public final class K {
     }
 
     public static final class Style {
-        public static final float WINDOW_ROUNDING = 12.0f;
-        public static final float FRAME_ROUNDING = 8.0f;
-        public static final float WINDOW_BORDER_SIZE = 0.0f;
-        public static final float FRAME_BORDER_SIZE = 0.0f;
-
-        public static final float WINDOW_PADDING_X = 16.0f;
-        public static final float WINDOW_PADDING_Y = 12.0f;
-        public static final float FRAME_PADDING_X = 12.0f;
-        public static final float FRAME_PADDING_Y = 10.0f;
-        public static final float ITEM_SPACING_X = 0.0f;
-        public static final float ITEM_SPACING_Y = 14.0f;
-
         public static final float[] COLOR_TOAST_SUCCESS = {0.30f, 0.85f, 0.40f, 1.0f};
         public static final float[] COLOR_TOAST_SUCCESS_BG = {0.08f, 0.16f, 0.10f, 0.95f};
         public static final float[] COLOR_TOAST_INFO = {0.35f, 0.65f, 1.00f, 1.0f};
@@ -82,8 +72,6 @@ public final class K {
         public static final int INVENTORY_COLUMNS = 9;
         public static final int INVENTORY_ROWS = 4;
         public static final int INVENTORY_SLOTS = INVENTORY_COLUMNS * INVENTORY_ROWS;
-        public static final float INVENTORY_SLOT_SIZE = 48.0f;
-        public static final float INVENTORY_SLOT_SPACING = 4.0f;
 
         public static final float COORD_DISPLAY_DURATION = 3.0f;
 
@@ -115,8 +103,16 @@ public final class K {
 
         public static final String DEFAULT_VERT_SHADER = "shaders/default.vert";
         public static final String DEFAULT_FRAG_SHADER = "shaders/default.frag";
+
+        public static final String MOTION_BLUR_VERT_SHADER = "shaders/motion_blur.vert";
+        public static final String MOTION_BLUR_FRAG_SHADER = "shaders/motion_blur.frag";
+
         public static final String OUTLINE_VERT_SHADER = "shaders/outline.vert";
         public static final String OUTLINE_FRAG_SHADER = "shaders/outline.frag";
+
+        public static final String UI_VERTEX_SHADER = "shaders/ui.vert";
+        public static final String UI_FRAG_SHADER ="shaders/ui.frag";
+
         public static final String RAIN_VERT_SHADER = "shaders/rain.vert";
         public static final String RAIN_FRAG_SHADER = "shaders/rain.frag";
 

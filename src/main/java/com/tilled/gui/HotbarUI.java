@@ -4,16 +4,13 @@ import com.tilled.data.*;
 import com.tilled.graphics.SpriteSheet;
 import com.tilled.input.Mouse;
 import com.tilled.utils.K;
+import com.tilled.utils.Settings;
 import org.joml.Vector4f;
 
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
 @SuppressWarnings("all")
 public class HotbarUI extends UIElement {
-    private static final float SLOT_SIZE = 48.0f;
-    private static final float SLOT_SPACING = 4.0f;
-    private static final float PADDING = 6.0f;
-
     private final InventorySlotUI[] slotUIs = new InventorySlotUI[K.UI.INVENTORY_COLUMNS];
 
     private final Vector4f backgroundColor = new Vector4f(0.06f, 0.06f, 0.06f, 1.0f);
@@ -34,11 +31,14 @@ public class HotbarUI extends UIElement {
     }
 
     private static float getHotbarWidth() {
-        return PADDING * 2.0f + K.UI.INVENTORY_COLUMNS * SLOT_SIZE + (K.UI.INVENTORY_COLUMNS - 1) * SLOT_SPACING;
+        return Settings.getScaledPadding() * 2.0f +
+                K.UI.INVENTORY_COLUMNS * Settings.getScaledSlot() +
+                (K.UI.INVENTORY_COLUMNS - 1) * Settings.getScaledSpacing();
     }
 
     private static float getHotbarHeight() {
-        return PADDING * 2.0f + SLOT_SIZE;
+        return Settings.getScaledPadding() * 2.0f +
+                Settings.getScaledSlot();
     }
 
     private static int getItemIconColumn(Item item) {
@@ -63,9 +63,14 @@ public class HotbarUI extends UIElement {
 
     private void createSlots() {
         for (int i = 0; i < K.UI.INVENTORY_COLUMNS; i++) {
-            float x = PADDING + i * (SLOT_SIZE + SLOT_SPACING);
-            float y = PADDING;
-            InventorySlotUI slotUI = new InventorySlotUI(x, y, SLOT_SIZE, SLOT_SIZE);
+            float x = Settings.getScaledPadding() + i * (
+                    Settings.getScaledSlot() +
+                    Settings.getScaledSpacing());
+
+            float y = Settings.getScaledPadding();
+
+            InventorySlotUI slotUI = new InventorySlotUI(x, y,
+                    Settings.getScaledSlot(), Settings.getScaledSlot());
             slotUIs[i] = slotUI;
             addChild(slotUI);
         }
