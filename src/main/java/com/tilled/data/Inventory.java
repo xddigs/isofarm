@@ -117,7 +117,9 @@ public class Inventory {
     }
 
     public void clear() {
-        slots.clear();
+        for (InventorySlot slot : slots) {
+            slot.clear();
+        }
     }
 
     public boolean isEmpty() {

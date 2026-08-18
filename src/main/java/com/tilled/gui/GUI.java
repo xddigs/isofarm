@@ -1,0 +1,261 @@
+package com.tilled.gui;
+
+import com.tilled.data.UIElement;
+import com.tilled.graphics.Mesh;
+import com.tilled.graphics.Shader;
+import com.tilled.graphics.SpriteSheet;
+import com.tilled.graphics.Texture;
+import com.tilled.utils.K;
+import com.tilled.utils.Utils;
+import org.joml.Matrix4f;
+import org.joml.Vector4f;
+import org.lwjgl.stb.STBTTBakedChar;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static org.lwjgl.opengl.GL11C.*;
+
+@Utils
+public class GUI {
+    private static final Shader shader = new Shader("shaders/ui.vert",
+            "shaders/ui.frag");
+
+    private static final Mesh mesh = Mesh.createQuad();
+    private static final Matrix4f projection = new Matrix4f();
+    private static final Matrix4f model = new Matrix4f();
+    private static final Logger log = LoggerFactory.getLogger(GUI.class);
+
+    private static final UIFont small = new UIFont(K.Paths.FONT, 16.0f);
+    private static final UIFont normal = new UIFont(K.Paths.FONT, 24.0f);
+    private static final UIFont big = new UIFont(K.Paths.FONT, 32.0f);
+
+    private static int screenWidth;
+    private static int screenHeight;
+
+    private GUI() {
+    }
+
+    public static void begin(float screenWidth, float screenHeight) {
+        shader.bind();
+        GUI.screenWidth = (int) screenWidth;
+        GUI.screenHeight = (int) screenHeight;
+        updateProjection();
+        shader.setUniform("uProjection", projection);
+        shader.setUniform("uTexture", 0);
+        shader.setUniform("uUseFont", false);
+    }
+
+    public static void end() {
+        shader.unbind();
+    }
+
+    public static void drawRect(float x, float y, float width, float height, Vector4f color) {
+        model.identity()
+                .translate(x, y, 0.0f)
+                .scale(width, height, 1.0f);
+
+        shader.setUniform("uModel", model);
+        shader.setUniform("uColor", color);
+        shader.setUniform("uUseTexture", false);
+
+        mesh.render();
+    }
+
+    public static void drawTexture(Texture texture, float x, float y,
+                                   float width, float height, Vector4f tint) {
+        if (texture == null) {
+            return;
+        }
+
+        texture.bind();
+
+        model.identity()
+                .translate(x + width * 0.5f, y + height * 0.5f, 0.0f)
+                .scale(width, height, 1.0f);
+
+        shader.setUniform("uModel", model);
+        shader.setUniform("uColor", tint);
+        shader.setUniform("uUseTexture", true);
+        shader.setUniform("uFrameIndex", 0);
+        shader.setUniform("uTotalFrames", 1);
+
+        mesh.render();
+
+        texture.unbind();
+    }
+
+    public static void drawSprite(SpriteSheet spriteSheet, int frame, float x, float y,
+                                  float width, float height, Vector4f tint) {
+        if (spriteSheet == null) {
+            return;
+        }
+
+        spriteSheet.bind();
+
+        model.identity()
+                .translate(x + width * 0.5f, y + height * 0.5f, 0.0f)
+                .scale(width, height, 1.0f);
+
+        shader.setUniform("uModel", model);
+        shader.setUniform("uColor", tint);
+        shader.setUniform("uUseTexture", true);
+        shader.setUniform("uFrameIndex", frame);
+        shader.setUniform("uTotalFrames", spriteSheet.getTotalFrames());
+
+        mesh.render();
+
+        spriteSheet.unbind();
+    }
+
+    public static void drawString(String text, float x, float y,
+                                  UIFont font, Vector4f color) {
+        if (text == null || text.isEmpty() || font == null) {
+            return;
+        }
+
+        font.bind();
+        shader.setUniform("uUseTexture", true);
+        shader.setUniform("uUseFont", true);
+        shader.setUniform("uFrameIndex", 0);
+        shader.setUniform("uTotalFrames", 1);
+        shader.setUniform("uColor", color);
+
+        float cursorX = x;
+
+        for (int i = 0; i < text.length(); i++) {
+            char character = text.charAt(i);
+            STBTTBakedChar glyph = font.getGlyph(character);
+
+            if (glyph == null) {
+                cursorX += font.getSize() * 0.5f;
+                continue;
+            }
+
+            float width = glyph.x1() - glyph.x0();
+            float height = glyph.y1() - glyph.y0();
+
+            if (width > 0.0f && height > 0.0f) {
+                float glyphX = cursorX + glyph.xoff();
+                float glyphY = y + glyph.yoff();
+
+                float u0 = (float) glyph.x0() / font.getAtlasWidth();
+                float v0 = (float) glyph.y0() / font.getAtlasHeight();
+                float u1 = (float) glyph.x1() / font.getAtlasWidth();
+                float v1 = (float) glyph.y1() / font.getAtlasHeight();
+
+                model.identity()
+                        .translate(glyphX, glyphY, 0.0f)
+                        .scale(width, height, 1.0f);
+
+                shader.setUniform("uModel", model);
+                shader.setUniform("uGlyphUV", new Vector4f(u0, v0, u1, v1));
+
+                mesh.render();
+            }
+
+            cursorX += glyph.xadvance();
+        }
+
+        font.unbind();
+        shader.setUniform("uUseFont", false);
+    }
+
+    public static void drawSmallString(String text, float x, float y, Vector4f color) {
+        drawString(text, x, y, small, color);
+    }
+
+    public static void drawNormalString(String text, float x, float y, Vector4f color) {
+        drawString(text, x, y, normal, color);
+    }
+
+    public static void drawBigString(String text, float x, float y, Vector4f color) {
+        drawString(text, x, y, big, color);
+    }
+
+    public static void pushScissor(float x, float y, float width, float height) {
+        int windowHeight = (int) getScreenHeight();
+        glEnable(GL_SCISSOR_TEST);
+        glScissor((int) x, windowHeight - (int) (y + height),
+                (int) width, (int) height);
+    }
+
+    public static void popScissor() {
+        glDisable(GL_SCISSOR_TEST);
+    }
+
+    public static void render(UIElement element) {
+        if (element == null || !element.isActuallyVisible()) {
+            return;
+        }
+
+        if (element.hasStaticSprite()) {
+            drawTexture(
+                    element.getSprite(),
+                    element.getAbsoluteX(),
+                    element.getAbsoluteY(),
+                    element.getAbsoluteWidth(),
+                    element.getAbsoluteHeight(),
+                    element.getTint()
+            );
+        }
+
+        if (element.hasSpriteSheet()) {
+            drawSprite(
+                    element.getSpriteSheet(),
+                    element.getSpriteFrame(),
+                    element.getAbsoluteX(),
+                    element.getAbsoluteY(),
+                    element.getAbsoluteWidth(),
+                    element.getAbsoluteHeight(),
+                    element.getTint()
+            );
+        }
+
+        element.render();
+        element.renderChildren();
+    }
+
+    public static void resize(int width, int height) {
+        screenWidth = width;
+        screenHeight = height;
+        updateProjection();
+    }
+
+    private static void updateProjection() {
+        projection.identity().ortho2D(
+                0.0f,
+                screenWidth,
+                screenHeight,
+                0.0f
+        );
+    }
+
+    public static int getScreenWidth() {
+        return screenWidth;
+    }
+
+    public static int getScreenHeight() {
+        return screenHeight;
+    }
+
+    public static Shader getShader() {
+        return shader;
+    }
+
+    public static UIFont getSmallFont() {
+        return small;
+    }
+
+    public static UIFont getNormalFont() {
+        return normal;
+    }
+
+    public static UIFont getBigFont() {
+        return big;
+    }
+
+    public static void dispose() {
+        mesh.dispose();
+        shader.dispose();
+    }
+}

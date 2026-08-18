@@ -2,7 +2,9 @@ package com.tilled.wrld;
 
 import com.tilled.data.*;
 import com.tilled.graphics.*;
-import com.tilled.gui.UIRenderer;
+import com.tilled.gui.GUI;
+import com.tilled.gui.UIManager;
+import com.tilled.gui.UITextField;
 import com.tilled.input.*;
 import com.tilled.service.*;
 import com.tilled.utils.K;
@@ -11,7 +13,6 @@ import imgui.ImGui;
 import org.joml.FrustumIntersection;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
-import org.joml.Vector4f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,8 +33,8 @@ public class GameMaster {
     private final Map<Chunk, Mesh> chunkMeshes;
     private final SoundService soundService;
 
+    private final UIManager uiManager;
     private final GameUIService gameUIservice;
-    private final UIRenderer uiRenderer;
     private final GameInteraction gameInteraction;
     private final CropService cropService;
     private final TimeService timeService;
@@ -97,7 +98,6 @@ public class GameMaster {
         this.chunkMeshes = new HashMap<>();
         this.windowWidth = K.Window.DEFAULT_WIDTH;
         this.windowHeight = K.Window.DEFAULT_HEIGHT;
-        this.uiRenderer = new UIRenderer((int) windowWidth, (int) windowHeight);
         this.soundService = new SoundService();
 
         this.cropService = new CropService(world);
@@ -144,8 +144,9 @@ public class GameMaster {
         this.toolIcons = new SpriteSheet(K.Paths.TOOL_ICONS, K.UI.ICON_TOOL_FRAMES);
         this.blockIcons = new SpriteSheet(K.Paths.BLOCK_ICONS, K.UI.ICON_BLOCK_FRAMES);
 
-        this.gameUIservice = new GameUIService(windowHandle, this, commandService,
-                seedIcons, cropIcons, blockIcons, toolIcons);
+        this.uiManager = new UIManager(windowWidth, windowHeight);
+        this.gameUIservice = new GameUIService(windowHandle, this,
+                uiManager, seedIcons, cropIcons, blockIcons, toolIcons);
 
         this.shop = new Shop();
         this.gameUIservice.setShop(shop);
@@ -268,6 +269,10 @@ public class GameMaster {
             rainEngine.update(delta, camera.getPosition());
         }
 
+        gameUIservice.update(delta);
+        Mouse.update();
+        Keyboard.update();
+
         if (player == null) {
             return;
         }
@@ -280,7 +285,7 @@ public class GameMaster {
 
         cameraController.update(this, delta);
         camera.update(delta);
-        gameUIservice.update(delta);
+
         stepController.update(player, world, soundService, delta);
 
         Item selectedInventoryItem = gameUIservice.getSelectedInventoryItem();
@@ -301,9 +306,6 @@ public class GameMaster {
                 lastPlayerChunkZ = playerChunkZ;
             }
         }
-
-        Mouse.update();
-        Keyboard.update();
     }
 
     private void updateLoadedChunks(int centerChunkX, int centerChunkZ) {
@@ -476,42 +478,27 @@ public class GameMaster {
             rainEngine.render(rainShader, camera.getViewMatrix(), camera.getProjectionMatrix());
         }
 
-        gameUIservice.beginFrame();
+        gameUIservice.render();
         if (isHUDShown()) {
-            gameUIservice.renderHUD(this);
+            // TODO render HUD with GUI API
         }
 
-//        glDisable(GL_DEPTH_TEST);
-//        uiRenderer.begin();
-//        uiRenderer.drawRect(
-//                50.0f,
-//                50.0f,
-//                300.0f,
-//                150.0f,
-//                new Vector4f(0.1f, 0.1f, 0.1f, 0.9f)
-//        );
-//        uiRenderer.end();
-//        glEnable(GL_DEPTH_TEST);
-
         if (player == null) {
-            if (gameUIservice.renderNewPlayer()) {
+            this.player = new Player(gameUIservice.getEnteredPlayerName(),
+                    world, toastService);
 
-                this.player = new Player(gameUIservice.getEnteredPlayerName(),
-                        world, toastService);
+            updateLoadedChunks(0, 0);
+            float spawnY = world.getHighestY(0.0f, 0.0f) + 1.0f;
+            player.setPosition(0.5f, spawnY, 0.5f);
 
-                updateLoadedChunks(0, 0);
-                float spawnY = world.getHighestY(0.0f, 0.0f) + 1.0f;
-                player.setPosition(0.5f, spawnY, 0.5f);
+            gameUIservice.setPlayer(player);
+            this.shop.setPlayer(player);
 
-                gameUIservice.setPlayer(player);
-                this.shop.setPlayer(player);
-
-                log.info("Player created: {}", player.getName());
-                toastService.success("Welcome, " + player.getName() + "!");
-                toastService.info("Use E to open the inventory");
-                Library.initItems(itemRegistry, player);
-                Library.initCommands(genDelta, this);
-            }
+            log.info("Player created: {}", player.getName());
+            toastService.success("Welcome, " + player.getName() + "!");
+            toastService.info("Use E to open the inventory");
+            Library.initItems(itemRegistry, player);
+            Library.initCommands(genDelta, this);
         }
 
         if (isPromptingForInput()) {
@@ -522,12 +509,9 @@ public class GameMaster {
                 setPromptingForInput(false);
             }
         }
-
-        gameUIservice.endFrame();
     }
 
     public void dispose() {
-        gameUIservice.dispose();
         chunkMeshes.values().forEach(Mesh::dispose);
         chunkMeshes.clear();
 
@@ -535,6 +519,7 @@ public class GameMaster {
         selectionMesh.dispose();
         spriteMesh.dispose();
         screenQuadMesh.dispose();
+        GUI.dispose();
 
         if (blocksTexture != null) blocksTexture.dispose();
         if (waterTexture != null) waterTexture.dispose();
@@ -585,6 +570,11 @@ public class GameMaster {
 
         if (gameUIservice != null) {
             gameUIservice.onResize(newWidth, newHeight);
+        }
+
+        if (uiManager != null) {
+            uiManager.resize(newWidth, newHeight);
+            GUI.resize(newWidth, newHeight);
         }
     }
 

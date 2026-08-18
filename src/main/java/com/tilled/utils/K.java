@@ -152,6 +152,8 @@ public final class K {
     }
 
     public static final class Paths {
+        public static final String FONT = "font/Monocraft.ttf";
+
         public static final String DEFAULT_VERT_SHADER = "shaders/default.vert";
         public static final String DEFAULT_FRAG_SHADER = "shaders/default.frag";
         public static final String OUTLINE_VERT_SHADER = "shaders/outline.vert";
@@ -164,7 +166,6 @@ public final class K {
         public static final String POTATO_TEXTURE = "assets/crops/potato_crop.png";
         public static final String BEETROOT_TEXTURE = "assets/crops/beetroot_crop.png";
 
-        public static final String FONT = "C:/Windows/Fonts/arial.ttf";
         public static final String SEED_ICONS = "assets/icons/seed_icons.png";
         public static final String CROP_ICONS = "assets/icons/crop_icons.png";
         public static final String TOOL_ICONS = "assets/icons/tool_icons.png";
