@@ -10,6 +10,7 @@ import com.tilled.service.TimeService;
 import com.tilled.wrld.Chunk;
 import com.tilled.wrld.GameMaster;
 import com.tilled.wrld.World;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +18,7 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class GameInteraction {
     private static final Logger log = LoggerFactory.getLogger(GameInteraction.class);
+    private static final float MAX_INTERACTION_DISTANCE = 5.0f;
     private final CropService cropService;
     private final GameUIService gameUIservice;
     private final TimeService timeService;
@@ -53,9 +55,8 @@ public class GameInteraction {
 
         Hit hoveredCell = camera.highlight(gameMaster.getWorld());
 
-        if (hoveredCell == null) {
-            return null;
-        }
+        if (hoveredCell == null) return null;
+        if (!isWithinRange(gameMaster, hoveredCell)) return null;
 
         if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT)
                 && !gameMaster.isInventoryOpen()) {
@@ -68,6 +69,22 @@ public class GameInteraction {
         }
 
         return hoveredCell;
+    }
+
+    private boolean isWithinRange(GameMaster gameMaster, Hit cell) {
+        if (gameMaster.getPlayer() == null) {
+            return false;
+        }
+
+        Vector3f playerPos = gameMaster.getPlayer().getPosition();
+        float targetX = cell.x() + 0.5f;
+        float targetY = cell.y() + 0.5f;
+        float targetZ = cell.z() + 0.5f;
+        float dx = playerPos.x - targetX;
+        float dy = playerPos.y - targetY;
+        float dz = playerPos.z - targetZ;
+        float distanceSquared = dx * dx + dy * dy + dz * dz;
+        return distanceSquared <= (MAX_INTERACTION_DISTANCE * MAX_INTERACTION_DISTANCE);
     }
 
     private void breakAction(GameMaster gameMaster, Hit cell) {
