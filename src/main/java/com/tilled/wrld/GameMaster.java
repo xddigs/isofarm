@@ -4,12 +4,10 @@ import com.tilled.data.*;
 import com.tilled.graphics.*;
 import com.tilled.gui.GUI;
 import com.tilled.gui.UIManager;
-import com.tilled.gui.UITextField;
 import com.tilled.input.*;
 import com.tilled.service.*;
 import com.tilled.utils.K;
 import com.tilled.utils.Settings;
-import imgui.ImGui;
 import org.joml.FrustumIntersection;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
@@ -270,8 +268,6 @@ public class GameMaster {
         }
 
         gameUIservice.update(delta);
-        Mouse.update();
-        Keyboard.update();
 
         if (player == null) {
             return;
@@ -289,12 +285,7 @@ public class GameMaster {
         stepController.update(player, world, soundService, delta);
 
         Item selectedInventoryItem = gameUIservice.getSelectedInventoryItem();
-
-        if (!ImGui.getIO().getWantCaptureMouse()) {
-            hoveredCell = gameInteraction.update(this, selectedInventoryItem);
-        } else {
-            hoveredCell = null;
-        }
+        hoveredCell = gameInteraction.update(this, selectedInventoryItem);
 
         if (player != null) {
             int playerChunkX = Math.floorDiv((int) player.getPosition().x, Chunk.SIZE_X);
@@ -306,6 +297,9 @@ public class GameMaster {
                 lastPlayerChunkZ = playerChunkZ;
             }
         }
+
+        Mouse.update();
+        Keyboard.update();
     }
 
     private void updateLoadedChunks(int centerChunkX, int centerChunkZ) {
