@@ -7,15 +7,32 @@ import org.lwjgl.glfw.GLFW;
 
 public class UIManager {
     private final UIPanel root;
+    private final UITooltip tooltip;
     private UIElement focusedElement;
 
     public UIManager(float width, float height) {
         root = new UIPanel(0.0f, 0.0f, width, height);
+        tooltip = new UITooltip();
+        root.addChild(tooltip);
     }
 
     public void update(float delta) {
         root.update(delta);
         root.mouseMoved(Mouse.getX(), Mouse.getY());
+
+        UIElement hovered = root.findElementAt(Mouse.getX(), Mouse.getY());
+        if (hovered != null && hovered != tooltip && hovered.getTooltipText() != null
+                && !hovered.getTooltipText().isBlank()) {
+            tooltip.setText(hovered.getTooltipText());
+            tooltip.updatePosition(
+                    Mouse.getX(),
+                    Mouse.getY(),
+                    root.getWidth(),
+                    root.getHeight());
+            tooltip.show();
+        } else {
+            tooltip.hide();
+        }
 
         for (int button = GLFW.GLFW_MOUSE_BUTTON_1;
              button <= GLFW.GLFW_MOUSE_BUTTON_LAST;
@@ -87,6 +104,10 @@ public class UIManager {
 
     public UIPanel getRoot() {
         return root;
+    }
+
+    public UITooltip getTooltip() {
+        return tooltip;
     }
 
     public UIElement getFocusedElement() {

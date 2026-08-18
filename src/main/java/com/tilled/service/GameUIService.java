@@ -2,10 +2,7 @@ package com.tilled.service;
 
 import com.tilled.data.*;
 import com.tilled.graphics.SpriteSheet;
-import com.tilled.gui.GUI;
-import com.tilled.gui.HotbarUI;
-import com.tilled.gui.InventoryUI;
-import com.tilled.gui.UIManager;
+import com.tilled.gui.*;
 import com.tilled.input.Mouse;
 import com.tilled.utils.K;
 import com.tilled.utils.Settings;
@@ -129,7 +126,9 @@ public class GameUIService implements Service<GameMaster> {
         }
 
         hotbarUI.render();
-        renderCrosshair(windowWidth, windowHeight);
+        if (!gameMaster.isInventoryOpen()) {
+            renderCrosshair(windowWidth, windowHeight);
+        }
         GUI.end();
         glEnable(GL_DEPTH_TEST);
     }

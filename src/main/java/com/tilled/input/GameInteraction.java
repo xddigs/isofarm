@@ -57,11 +57,13 @@ public class GameInteraction {
             return null;
         }
 
-        if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
+        if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT)
+                && !gameMaster.isInventoryOpen()) {
             breakAction(gameMaster,hoveredCell);
         }
 
-        if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
+        if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)
+                && !gameMaster.isInventoryOpen()) {
             placeAction(gameMaster,hoveredCell,selectedItem);
         }
 

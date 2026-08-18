@@ -154,7 +154,18 @@ public class InventoryUI extends UIElement {
         float y = slotUI.getAbsoluteY();
         float width = slotUI.getAbsoluteWidth();
         float height = slotUI.getAbsoluteHeight();
-        return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
+
+        Item item = slotUI.getItem();
+        if (item != null) {
+            slotUI.tooltip(item.getName());
+        } else {
+            slotUI.tooltip(null);
+        }
+
+        return mouseX >= x &&
+                mouseX <= x + width &&
+                mouseY >= y &&
+                mouseY <= y + height;
     }
 
     private void interact() {

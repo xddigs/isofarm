@@ -40,6 +40,7 @@ public abstract class UIElement {
     private Anchor anchor = Anchor.TOP_LEFT;
     private Texture sprite;
     private SpriteSheet spriteSheet;
+    private String tooltipText;
     private int spriteFrame;
     private int spriteFrameCount = 1;
     private boolean spriteAnimated;
@@ -345,6 +346,19 @@ public abstract class UIElement {
 
     public UIElement disable() {
         setEnabled(false);
+        return this;
+    }
+
+    public String getTooltipText() {
+        return tooltipText;
+    }
+
+    public void setTooltipText(String tooltipText) {
+        this.tooltipText = tooltipText;
+    }
+
+    public UIElement tooltip(String tooltipText) {
+        this.tooltipText = tooltipText;
         return this;
     }
 
