@@ -28,6 +28,7 @@ public class GUI {
     private static final UIFont small = new UIFont(K.Paths.FONT, 16.0f);
     private static final UIFont normal = new UIFont(K.Paths.FONT, 24.0f);
     private static final UIFont big = new UIFont(K.Paths.FONT, 32.0f);
+    private static final UIFont large = new UIFont(K.Paths.FONT, 48.0f);
 
     private static int screenWidth;
     private static int screenHeight;
@@ -93,7 +94,7 @@ public class GUI {
         spriteSheet.bind();
 
         model.identity()
-                .translate(x + width * 0.5f, y + height * 0.5f, 0.0f)
+                .translate(x, y, 0.0f)
                 .scale(width, height, 1.0f);
 
         shader.setUniform("uModel", model);
@@ -252,6 +253,10 @@ public class GUI {
 
     public static UIFont getBigFont() {
         return big;
+    }
+
+    public static UIFont getLargeFont() {
+        return large;
     }
 
     public static void dispose() {

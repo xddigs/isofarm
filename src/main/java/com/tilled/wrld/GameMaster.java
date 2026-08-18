@@ -284,7 +284,7 @@ public class GameMaster {
 
         stepController.update(player, world, soundService, delta);
 
-        Item selectedInventoryItem = gameUIservice.getSelectedInventoryItem();
+        Item selectedInventoryItem = gameUIservice.getInventoryUI().getSelectedItem();
         hoveredCell = gameInteraction.update(this, selectedInventoryItem);
 
         if (player != null) {
@@ -496,7 +496,7 @@ public class GameMaster {
         }
 
         if (isPromptingForInput()) {
-            String command = gameUIservice.inputCommand();
+            String command = "";
 
             if (command != null) {
                 commandService.execute(command);

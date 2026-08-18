@@ -3,19 +3,17 @@ package com.tilled.service;
 import com.tilled.data.*;
 import com.tilled.graphics.SpriteSheet;
 import com.tilled.gui.GUI;
+import com.tilled.gui.HotbarUI;
 import com.tilled.gui.InventoryUI;
 import com.tilled.gui.UIManager;
 import com.tilled.input.Mouse;
 import com.tilled.utils.K;
 import com.tilled.wrld.GameMaster;
-import imgui.ImGui;
-import imgui.ImGuiStyle;
 import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -26,6 +24,7 @@ public class GameUIService implements Service<GameMaster> {
     private final GameMaster gameMaster;
     private final UIManager uiManager;
     private final InventoryUI inventoryUI;
+    private final HotbarUI hotbarUI;
 
     private final SpriteSheet seedIcons;
     private final SpriteSheet cropIcons;
@@ -38,10 +37,6 @@ public class GameUIService implements Service<GameMaster> {
 
     private Vector2i lastActionCell = null;
     private float actionDisplayTimer = 0.0f;
-
-    private Item selectedInventoryItem = null;
-    private int selectedHotbarSlot = -1;
-    private int selectedInventorySlot = -1;
 
     private float hotbarLabelTimer = 0.0f;
     private String hotbarLabel = null;
@@ -63,37 +58,37 @@ public class GameUIService implements Service<GameMaster> {
         this.toolIcons = toolIcons;
 
         this.inventoryUI = new InventoryUI(windowWidth, windowHeight);
-        this.inventoryUI.setPosition(windowWidth/2.0f - inventoryUI.getWidth()/2,
+        this.hotbarUI = new HotbarUI(windowWidth, windowHeight);
+
+        this.inventoryUI.setPosition(
+                windowWidth/2.0f - inventoryUI.getWidth()/2,
                 windowHeight/2.0f - inventoryUI.getHeight()/2);
+
+        this.hotbarUI.setPosition(
+                windowWidth/2.0f - hotbarUI.getWidth()/2,
+                windowHeight - hotbarUI.getHeight() - K.UI.HOTBAR_OFFSET);
 
         inventoryUI.setSeedIcons(seedIcons);
         inventoryUI.setCropIcons(cropIcons);
         inventoryUI.setBlockIcons(blockIcons);
         inventoryUI.setToolIcons(toolIcons);
 
-        uiManager.getRoot().addChild(inventoryUI);
+        hotbarUI.setSeedIcons(seedIcons);
+        hotbarUI.setCropIcons(cropIcons);
+        hotbarUI.setBlockIcons(blockIcons);
+        hotbarUI.setToolIcons(toolIcons);
 
-        // add children
-//        uiManager.getRoot().addChild(name);
+        uiManager.getRoot().addChild(inventoryUI);
     }
 
-    private static ImGuiStyle getImGuiStyle() {
-        ImGuiStyle style = ImGui.getStyle();
-        style.setWindowRounding(K.Style.WINDOW_ROUNDING);
-        style.setFrameRounding(K.Style.FRAME_ROUNDING);
-        style.setWindowBorderSize(K.Style.WINDOW_BORDER_SIZE);
-        style.setFrameBorderSize(K.Style.FRAME_BORDER_SIZE);
-        style.setWindowPadding(
-                K.Style.WINDOW_PADDING_X, K.Style.WINDOW_PADDING_Y);
-        style.setFramePadding(
-                K.Style.FRAME_PADDING_X, K.Style.FRAME_PADDING_Y);
-        style.setItemSpacing(
-                K.Style.ITEM_SPACING_X, K.Style.ITEM_SPACING_Y);
-        return style;
+    public InventoryUI getInventoryUI() {
+        return inventoryUI;
     }
 
     public void setPlayer(Player player) {
         this.player = player;
+        inventoryUI.setPlayer(player);
+        hotbarUI.setPlayer(player);
     }
 
     public void setShop(Shop shop) {
@@ -129,6 +124,7 @@ public class GameUIService implements Service<GameMaster> {
             uiManager.render();
         }
 
+        hotbarUI.render();
         GUI.end();
         glEnable(GL_DEPTH_TEST);
     }
@@ -148,28 +144,26 @@ public class GameUIService implements Service<GameMaster> {
         float centerY = windowHeight / 2.0f;
         float size = K.UI.CROSSHAIR_SIZE;
         float thickness = K.UI.CROSSHAIR_THICKNESS;
+
+        // TODO crosshair rendering
     }
 
     public void selectItem(int direction) {
-        if (player == null) return;
-
-        int slots = K.UI.HOTBAR_SLOTS;
-
-        if (selectedHotbarSlot < 0) {
-            selectedHotbarSlot = direction > 0 ? 0 : slots - 1;
-        } else {
-            selectedHotbarSlot = (selectedHotbarSlot + direction) % slots;
-            if (selectedHotbarSlot < 0) {
-                selectedHotbarSlot = slots - 1;
-            }
+        if (player == null) {
+            return;
         }
 
-        List<Item> hotbarItems = player.getInventory().getHotbarItems();
-        if (selectedHotbarSlot < hotbarItems.size()) {
-            selectedInventoryItem = hotbarItems.get(selectedHotbarSlot);
-            showHotbarLabel(selectedInventoryItem);
+        if (direction > 0) {
+            hotbarUI.selectNext();
+        } else if (direction < 0) {
+            hotbarUI.selectPrevious();
+        }
+
+        Item item = hotbarUI.getSelectedItem();
+
+        if (item != null) {
+            showHotbarLabel(item);
         } else {
-            selectedInventoryItem = null;
             hotbarLabel = null;
             hotbarLabelTimer = 0.0f;
         }
@@ -238,10 +232,6 @@ public class GameUIService implements Service<GameMaster> {
         return "";
     }
 
-    public Item getSelectedInventoryItem() {
-        return selectedInventoryItem;
-    }
-
     public void logAction(Hit cell) {
         this.lastActionCell = new Vector2i(cell.x(), cell.y());
         this.actionDisplayTimer = K.UI.COORD_DISPLAY_DURATION;
@@ -251,11 +241,6 @@ public class GameUIService implements Service<GameMaster> {
         this.windowWidth = width;
         this.windowHeight = height;
         gameMaster.getToastService().setWindowWidth(width);
-    }
-
-    public String inputCommand() {
-        // TODO implement command input with GUI API
-        return "";
     }
 
     public void renderInv() {

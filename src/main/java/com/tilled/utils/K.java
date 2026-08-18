@@ -104,11 +104,10 @@ public final class K {
         public static final float TOAST_EXIT_SPEED = 12.0f;
         public static final float TOAST_DURATION = 3.0f;
 
-        public static final int HOTBAR_SLOTS = 9;
-
         public static final float HOTBAR_LABEL_DURATION = 1.75f;
         public static final float CROSSHAIR_SIZE = 10.0f;
         public static final float CROSSHAIR_THICKNESS = 2.0f;
+        public static final float HOTBAR_OFFSET = 20;
     }
 
     public static final class Paths {
