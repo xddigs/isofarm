@@ -10,10 +10,13 @@ public class Settings {
     public static int unloadMargin = 2;
 
     public static final float BASE_ICON_SIZE = 32.0f;
-    public static int guiScaleIndex = 0;
-    public static final float[] GUI_SCALES = {1.0f, 1.25f, 1.5f, 2.0f};
+    public static int guiScaleIndex = 1;
+    public static final float[] GUI_SCALES = {0.5f, 1.0f, 1.25f, 1.5f, 2.0f};
 
-    public static float getScaledIconSize() {
+    public static float getScaledGUI() {
         return BASE_ICON_SIZE * GUI_SCALES[guiScaleIndex];
+    }
+    public static float setScaledGUI(int index) {
+        return GUI_SCALES[index];
     }
 }
