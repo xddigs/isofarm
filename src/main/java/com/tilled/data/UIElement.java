@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 
+@SuppressWarnings("unused")
 @DataClass
 public abstract class UIElement {
     private final List<UIElement> children = new ArrayList<>();
