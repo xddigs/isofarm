@@ -68,4 +68,8 @@ public class Settings {
     public static float getScaledGUI() {
         return getScaledIcon() * 1.25f;
     }
+
+    public static float doEnableMotions() {
+        return doEnableMotions ? 0.8f : 0.0f;
+    }
 }

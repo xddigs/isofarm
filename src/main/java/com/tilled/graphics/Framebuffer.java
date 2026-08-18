@@ -19,28 +19,22 @@ public class Framebuffer {
 
         textureId = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, textureId);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureId, 0);
+
         depthBufferId = glGenRenderbuffers();
         glBindRenderbuffer(GL_RENDERBUFFER, depthBufferId);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBufferId);
 
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-            int status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            throw new IllegalStateException("Framebuffer is not complete: 0x" + Integer.toHexString(status));
+            throw new IllegalStateException("Framebuffer is not complete");
         }
 
-        glBindRenderbuffer(GL_RENDERBUFFER, 0);
-        glBindTexture(GL_TEXTURE_2D, 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
@@ -59,8 +53,8 @@ public class Framebuffer {
     }
 
     public void dispose() {
-        glDeleteRenderbuffers(depthBufferId);
         glDeleteTextures(textureId);
+        glDeleteRenderbuffers(depthBufferId);
         glDeleteFramebuffers(fboId);
     }
 }

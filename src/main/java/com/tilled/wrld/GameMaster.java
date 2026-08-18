@@ -49,10 +49,12 @@ public class GameMaster {
     private final Matrix4f viewProjMatrix;
     private final FrustumIntersection frustum;
     private final Sunlight sunlight;
+
     private Shader defaultShader;
     private Shader outlineShader;
     private Shader rainShader;
     private Shader motionBlurShader;
+
     private Framebuffer maskFbo;
     private Framebuffer sceneFbo;
     private Mesh screenQuadMesh;
@@ -124,7 +126,6 @@ public class GameMaster {
         this.outlineShader = new Shader(K.Paths.OUTLINE_VERT_SHADER, K.Paths.OUTLINE_FRAG_SHADER);
         this.rainShader = new Shader(K.Paths.RAIN_VERT_SHADER, K.Paths.RAIN_FRAG_SHADER);
         this.motionBlurShader = new Shader(K.Paths.MOTION_BLUR_VERT_SHADER, K.Paths.MOTION_BLUR_FRAG_SHADER);
-
         this.maskFbo = new Framebuffer((int) windowWidth, (int) windowHeight);
         this.sceneFbo = new Framebuffer((int) windowWidth, (int) windowHeight);
         this.screenQuadMesh = Mesh.screenQuad();
@@ -510,11 +511,12 @@ public class GameMaster {
 
         defaultShader.unbind();
         sceneFbo.unbind((int) windowWidth, (int) windowHeight);
+
         glDisable(GL_DEPTH_TEST);
         motionBlurShader.bind();
         motionBlurShader.setUniform("uScene", 0);
         motionBlurShader.setUniform("uVelocity", new Vector2f(blurX, blurY));
-        motionBlurShader.setUniform("uStrength", 0.8f);
+        motionBlurShader.setUniform("uStrength", Settings.doEnableMotions());
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, sceneFbo.getTextureId());
         screenQuadMesh.render();
