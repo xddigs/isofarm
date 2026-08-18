@@ -8,27 +8,16 @@ import com.tilled.input.*;
 import com.tilled.service.*;
 import com.tilled.utils.K;
 import com.tilled.utils.Settings;
-import org.joml.FrustumIntersection;
-import org.joml.Matrix4f;
-import org.joml.Vector2f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13.glActiveTexture;
 
 @SuppressWarnings("all")
 public class GameMaster {
     private static final Logger log = LoggerFactory.getLogger(GameMaster.class);
     private final long windowHandle;
     private final World world;
-    private final WorldGenerator generator;
-    private final Map<Chunk, Mesh> chunkMeshes;
     private final SoundService soundService;
 
     private final UIManager uiManager;
@@ -44,35 +33,14 @@ public class GameMaster {
 
     private final CommandRegistry commandRegistry;
     private final ItemRegistry itemRegistry;
-    private final Map<CropType, SpriteSheet> cropSpritesheets;
-    private final Matrix4f modelMatrix;
-    private final Matrix4f viewProjMatrix;
-    private final FrustumIntersection frustum;
     private final Sunlight sunlight;
 
-    private Shader defaultShader;
-    private Shader outlineShader;
-    private Shader rainShader;
-    private Shader motionBlurShader;
+    private final ResourceManager resourceManager;
+    private final ChunkManager chunkManager;
+    private final GameRenderer gameRenderer;
 
     private Framebuffer maskFbo;
     private Framebuffer sceneFbo;
-    private Mesh screenQuadMesh;
-    private Mesh blockMesh;
-    private Mesh selectionMesh;
-    private Mesh spriteMesh;
-    private SpriteSheet wheat;
-    private SpriteSheet carrot;
-    private SpriteSheet potato;
-    private SpriteSheet beetroot;
-    private SpriteSheet seedIcons;
-    private SpriteSheet cropIcons;
-    private SpriteSheet toolIcons;
-    private SpriteSheet blockIcons;
-    private SpriteSheet inventoryIcons;
-
-    private SpriteSheet blocksTexture;
-    private SpriteSheet waterTexture;
     private Camera camera;
     private CameraController cameraController;
     private StepController stepController;
@@ -89,23 +57,10 @@ public class GameMaster {
 
     private float genDelta;
 
-    private float previousCameraYaw;
-    private float previousCameraPitch;
-    private float blurX;
-    private float blurY;
-
-    private int lastPlayerChunkX = Integer.MAX_VALUE;
-    private int lastPlayerChunkZ = Integer.MAX_VALUE;
-
     public GameMaster(long windowHandle) {
         this.windowHandle = windowHandle;
-        this.modelMatrix = new Matrix4f();
-        this.viewProjMatrix = new Matrix4f();
-        this.frustum = new FrustumIntersection();
 
         this.world = new World();
-        this.generator = new WorldGenerator(world);
-        this.chunkMeshes = new HashMap<>();
         this.windowWidth = K.Window.DEFAULT_WIDTH;
         this.windowHeight = K.Window.DEFAULT_HEIGHT;
         this.soundService = new SoundService();
@@ -124,64 +79,43 @@ public class GameMaster {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_DEPTH_TEST);
 
-        this.defaultShader = new Shader(K.Paths.DEFAULT_VERT_SHADER, K.Paths.DEFAULT_FRAG_SHADER);
-        this.outlineShader = new Shader(K.Paths.OUTLINE_VERT_SHADER, K.Paths.OUTLINE_FRAG_SHADER);
-        this.rainShader = new Shader(K.Paths.RAIN_VERT_SHADER, K.Paths.RAIN_FRAG_SHADER);
-        this.motionBlurShader = new Shader(K.Paths.MOTION_BLUR_VERT_SHADER, K.Paths.MOTION_BLUR_FRAG_SHADER);
         this.maskFbo = new Framebuffer((int) windowWidth, (int) windowHeight);
         this.sceneFbo = new Framebuffer((int) windowWidth, (int) windowHeight);
-        this.screenQuadMesh = Mesh.screenQuad();
 
-        this.blockMesh = Mesh.createMesh(K.World.DEFAULT_BLOCK_DEPTH);
-        this.selectionMesh = Mesh.selection();
-        this.spriteMesh = Mesh.createCrop();
-
-        try {
-            this.blocksTexture = new SpriteSheet(K.Paths.BLOCKS, K.UI.BLOCK_ATLAS_FRAMES);
-        } catch (Exception e) {
-            log.warn("Could not load blocks.png atlas, falling back to base colors: {}", e.getMessage());
-            this.blocksTexture = null;
-        }
-
-        this.waterTexture = new SpriteSheet(K.Paths.WATER, K.UI.WATER_FRAMES);
-        this.cropSpritesheets = new EnumMap(CropType.class);
-        this.wheat = new SpriteSheet(K.Paths.WHEAT_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
-        this.carrot = new SpriteSheet(K.Paths.CARROT_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
-        this.potato = new SpriteSheet(K.Paths.POTATO_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
-        this.beetroot = new SpriteSheet(K.Paths.BEETROOT_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
-
-        this.seedIcons = new SpriteSheet(K.Paths.SEED_ICONS, K.UI.ICON_SEED_CROPS_FRAMES);
-        this.cropIcons = new SpriteSheet(K.Paths.CROP_ICONS, K.UI.ICON_SEED_CROPS_FRAMES);
-        this.toolIcons = new SpriteSheet(K.Paths.TOOL_ICONS, K.UI.ICON_TOOL_FRAMES);
-        this.blockIcons = new SpriteSheet(K.Paths.BLOCK_ICONS, K.UI.ICON_BLOCK_FRAMES);
-        this.inventoryIcons = new SpriteSheet(K.Paths.INVENTORY_ICONS, 2);
+        this.resourceManager = new ResourceManager();
+        this.chunkManager = new ChunkManager(world);
+        this.gameRenderer = new GameRenderer();
 
         this.uiManager = new UIManager(windowWidth, windowHeight);
         this.gameUIservice = new GameUIService(windowHandle, this,
-                uiManager, seedIcons, cropIcons, blockIcons, toolIcons, inventoryIcons);
+                uiManager, resourceManager.getSeedIcons(), resourceManager.getCropIcons(),
+                resourceManager.getBlockIcons(), resourceManager.getToolIcons(),
+                resourceManager.getInventoryIcons());
+        this.commandService.setGameUIService(gameUIservice);
 
         this.shop = new Shop();
         this.gameUIservice.setShop(shop);
 
-        cropSpritesheets.put(CropType.WHEAT, wheat);
-        cropSpritesheets.put(CropType.CARROT, carrot);
-        cropSpritesheets.put(CropType.POTATO, potato);
-        cropSpritesheets.put(CropType.BEETROOT, beetroot);
-
         this.camera = new Camera(K.Camera.DEFAULT_WIDTH, K.Camera.DEFAULT_HEIGHT, Settings.renderDistance);
         this.camera.setPosition(0.0f, 0.0f, 0.0f);
-        this.previousCameraYaw = camera.getYaw();
-        this.previousCameraPitch = camera.getPitch();
+        this.gameRenderer.initCamera(camera);
 
         this.cameraController = new CameraController(camera);
         this.stepController = new StepController();
         this.weatherService = new WeatherService(rainEngine, camera);
 
         this.gameInteraction = new GameInteraction(cropService, gameUIservice,
-                timeService, particles, camera, blocksTexture);
+                timeService, particles, camera, resourceManager.getBlocksTexture());
 
         recenter();
     }
+
+    public Sunlight getSunlight() { return sunlight; }
+    public ParticleEngine getParticles() { return particles; }
+    public Hit getHoveredCell() { return hoveredCell; }
+    public Framebuffer getMaskFbo() { return maskFbo; }
+    public Framebuffer getSceneFbo() { return sceneFbo; }
+    public RainEngine getRainEngine() { return rainEngine; }
 
     public long getWindowHandle() {
         return windowHandle;
@@ -236,19 +170,19 @@ public class GameMaster {
     }
 
     public int getLastPlayerChunkX() {
-        return lastPlayerChunkX;
+        return chunkManager.getLastPlayerChunkX();
     }
 
     public void setLastPlayerChunkX(int lastPlayerChunkX) {
-        this.lastPlayerChunkX = lastPlayerChunkX;
+        chunkManager.setLastPlayerChunkX(lastPlayerChunkX);
     }
 
     public int getLastPlayerChunkZ() {
-        return lastPlayerChunkZ;
+        return chunkManager.getLastPlayerChunkZ();
     }
 
     public void setLastPlayerChunkZ(int lastPlayerChunkZ) {
-        this.lastPlayerChunkZ = lastPlayerChunkZ;
+        chunkManager.setLastPlayerChunkZ(lastPlayerChunkZ);
     }
 
     public boolean isPromptingForInput() {
@@ -279,7 +213,7 @@ public class GameMaster {
     }
 
     public SpriteSheet getCropSpriteSheet(CropType type) {
-        return cropSpritesheets.get(type);
+        return resourceManager.getCropSpritesheets().get(type);
     }
 
     public Season getSeason() {
@@ -289,6 +223,23 @@ public class GameMaster {
     public void update(float delta) {
         if (weatherService.isRaining()) {
             rainEngine.update(delta, camera.getPosition());
+        }
+
+        if (Keyboard.isKeyPressed(org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER)) {
+            if (!isPromptingForInput()) {
+                setPromptingForInput(true);
+                this.isHUDShown = false;
+                gameUIservice.openChat();
+            } else {
+                String command = gameUIservice.getChatText();
+                if (command != null && !command.isEmpty()) {
+                    gameUIservice.addChatMessage("> " + command);
+                    commandService.execute(command);
+                }
+                setPromptingForInput(false);
+                this.isHUDShown = true;
+                gameUIservice.closeChat();
+            }
         }
 
         gameUIservice.update(delta);
@@ -312,238 +263,22 @@ public class GameMaster {
         hoveredCell = gameInteraction.update(this, selectedInventoryItem);
 
         if (player != null) {
-            int playerChunkX = Math.floorDiv((int) player.getPosition().x, Chunk.SIZE_X);
-            int playerChunkZ = Math.floorDiv((int) player.getPosition().z, Chunk.SIZE_Z);
-
-            if (playerChunkX != lastPlayerChunkX || playerChunkZ != lastPlayerChunkZ) {
-                updateLoadedChunks(playerChunkX, playerChunkZ);
-                lastPlayerChunkX = playerChunkX;
-                lastPlayerChunkZ = playerChunkZ;
-            }
+            chunkManager.update(player.getPosition().x, player.getPosition().z);
         }
 
         Mouse.update();
         Keyboard.update();
     }
 
-    private void updateLoadedChunks(int centerChunkX, int centerChunkZ) {
-        int r = Settings.renderDistance;
-        int unloadDist = r + Settings.unloadMargin;
-        chunkMeshes.entrySet().removeIf(entry -> {
-            Chunk chunk = entry.getKey();
-            int dx = Math.abs(chunk.getChunkX() - centerChunkX);
-            int dz = Math.abs(chunk.getChunkZ() - centerChunkZ);
-
-            if (dx > unloadDist || dz > unloadDist) {
-                Mesh mesh = entry.getValue();
-                if (mesh != null) {
-                    mesh.dispose();
-                }
-                world.getChunks().remove(chunk.getChunkX(), chunk.getChunkZ());
-                return true;
-            }
-            return false;
-        });
-
-        for (int cx = centerChunkX - r; cx <= centerChunkX + r; cx++) {
-            for (int cz = centerChunkZ - r; cz <= centerChunkZ + r; cz++) {
-                if ((cx - centerChunkX) * (cx - centerChunkX) + (cz - centerChunkZ) * (cz - centerChunkZ) > r * r) {
-                    continue;
-                }
-
-                Chunk chunk = world.getOrCreateChunk(cx, cz);
-                if (!chunkMeshes.containsKey(chunk)) {
-                    generator.generateChunk(cx, cz);
-
-                    Mesh mesh = ChunkMeshBuilder.buildMesh(chunk);
-                    chunkMeshes.put(chunk, mesh);
-                }
-            }
-        }
-    }
 
     public void render() {
-        sceneFbo.bind();
-        glClearColor(0.15f, 0.15f, 0.20f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        glActiveTexture(GL_TEXTURE0);
-        defaultShader.bind();
-        defaultShader.setUniform("uIsMaskPass", false);
-
-        defaultShader.setUniform("uProjection", camera.getProjectionMatrix());
-        defaultShader.setUniform("uView", camera.getViewMatrix());
-
-        defaultShader.setUniform("uSunColor", TimeService.getSunLightColor());
-        defaultShader.setUniform("uLightIntensity", TimeService.getSunIntensity());
-        defaultShader.setUniform("uLightDirection", sunlight.getDirection());
-
-        defaultShader.setUniform("uTotalFrames", 1);
-        defaultShader.setUniform("uFrameIndex", 0);
-        defaultShader.setUniform("uUseFaceAtlas", false);
-
-        if (blocksTexture != null) {
-            blocksTexture.bind();
-            defaultShader.setUniform("uUseTexture", true);
-        }
-
-        if (blocksTexture != null) {
-            blocksTexture.bind();
-            defaultShader.setUniform("uUseTexture", true);
-            defaultShader.setUniform("uUseFaceAtlas", true);
-            defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
-            defaultShader.setUniform("uTotalFrames", 1);
-            defaultShader.setUniform("uFrameIndex", 0);
-            defaultShader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
-            defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
-        }
-
-        viewProjMatrix.set(camera.getProjectionMatrix()).mul(camera.getViewMatrix());
-        frustum.set(viewProjMatrix);
-
-        float yawDelta = camera.getYaw() - previousCameraYaw;
-
-        if (yawDelta > K.Camera.HALF_DEGREES) {
-            yawDelta -= K.Camera.FULL_DEGREES;
-        } else if (yawDelta < -K.Camera.HALF_DEGREES) {
-            yawDelta += K.Camera.FULL_DEGREES;
-        }
-
-        float pitchDelta = camera.getPitch() - previousCameraPitch;
-        previousCameraYaw = camera.getYaw();
-        previousCameraPitch = camera.getPitch();
-        blurX = yawDelta / K.Camera.FULL_DEGREES;
-        blurY = pitchDelta / K.Camera.HALF_DEGREES;
-
-        chunkMeshes.forEach((chunk, mesh) -> {
-            if (mesh != null && mesh.getIndicesCount() > 0) {
-                float minX = chunk.getChunkX() * Chunk.SIZE_X;
-                float minY = 0;
-                float minZ = chunk.getChunkZ() * Chunk.SIZE_Z;
-                float maxX = minX + Chunk.SIZE_X;
-                float maxY = Chunk.SIZE_Y;
-                float maxZ = minZ + Chunk.SIZE_Z;
-                if (frustum.testAab(minX, minY, minZ, maxX, maxY, maxZ)) {
-                    modelMatrix.identity().translate(minX, 0, minZ);
-                    defaultShader.setUniform("uModel", modelMatrix);
-                    mesh.render();
-                }
-            }
-        });
-
-        world.forEach(block -> {
-            if (!(block instanceof Crop crop)) return;
-
-            SpriteSheet sheet = cropSpritesheets.get(crop.getCropType());
-            if (sheet == null) {
-                log.warn("No spritesheet found for crop type: {}", crop.getCropType());
-                return;
-            }
-
-            sheet.bind();
-            defaultShader.setUniform("uUseTexture", true);
-            defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
-            defaultShader.setUniform("uUseFaceAtlas", false);
-
-            defaultShader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
-            defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
-
-            defaultShader.setUniform("uTotalFrames", sheet.getTotalFrames());
-            defaultShader.setUniform("uFrameIndex", crop.getStage().getFrameIndex());
-
-            float renderX = crop.getX() + 0.5f;
-            float renderY = crop.getY() + K.World.SHORTER_BLOCK_HEIGHT;
-            float renderZ = crop.getZ() + 0.5f;
-
-            modelMatrix.identity().translate(renderX, renderY, renderZ);
-            defaultShader.setUniform("uModel", modelMatrix);
-            spriteMesh.render();
-            sheet.unbind();
-        });
-
-        particles.render(defaultShader, spriteMesh);
-
-        if (blocksTexture != null) {
-            blocksTexture.unbind();
-        }
-
-        if (hoveredCell != null) {
-            glEnable(GL_DEPTH_TEST);
-            glDepthMask(false);
-            defaultShader.bind();
-            defaultShader.setUniform("uUseTexture", false);
-            defaultShader.setUniform("uUseFaceAtlas", false);
-            defaultShader.setUniform("uBaseColor", K.Colors.OUTLINE_DEFAULT);
-
-            modelMatrix.identity().translate(hoveredCell.x(), hoveredCell.y(), hoveredCell.z());
-
-            defaultShader.setUniform("uModel", modelMatrix);
-            selectionMesh.renderLines();
-            glDepthMask(true);
-        }
-
-        if (hoveredCell != null) {
-            maskFbo.bind();
-
-            glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-            defaultShader.bind();
-            defaultShader.setUniform("uIsMaskPass", true);
-            defaultShader.setUniform("uUseTexture", true);
-            defaultShader.setUniform("uUseFaceAtlas", false);
-            defaultShader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
-            defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
-
-            maskFbo.unbind((int) windowWidth, (int) windowHeight);
-
-            sceneFbo.bind();
-
-            glDisable(GL_DEPTH_TEST);
-
-            outlineShader.bind();
-            outlineShader.setUniform("uScreenSize", new Vector2f(windowWidth, windowHeight));
-            outlineShader.setUniform("uOutlineColor", K.Colors.OUTLINE_DEFAULT);
-            outlineShader.setUniform("uMaskTexture", K.Render.PRIMARY_TEXTURE_UNIT);
-
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, maskFbo.getTextureId());
-
-            screenQuadMesh.render();
-
-            outlineShader.unbind();
-
-            glEnable(GL_DEPTH_TEST);
-
-            defaultShader.bind();
-            defaultShader.setUniform("uIsMaskPass", false);
-        }
-
-        defaultShader.unbind();
-        sceneFbo.unbind((int) windowWidth, (int) windowHeight);
-
-        glDisable(GL_DEPTH_TEST);
-        motionBlurShader.bind();
-        motionBlurShader.setUniform("uScene", 0);
-        motionBlurShader.setUniform("uVelocity", new Vector2f(blurX, blurY));
-        motionBlurShader.setUniform("uStrength", Settings.doEnableMotions());
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, sceneFbo.getTextureId());
-        screenQuadMesh.render();
-        motionBlurShader.unbind();
-        glEnable(GL_DEPTH_TEST);
-
-        if (weatherService.isRaining()) {
-            rainEngine.render(rainShader, camera.getViewMatrix(), camera.getProjectionMatrix());
-        }
-
-        gameUIservice.render(isHUDShown(), this);
+        gameRenderer.render(this, resourceManager, chunkManager.getChunkMeshes());
 
         if (player == null) {
             this.player = new Player(gameUIservice.getEnteredPlayerName(),
                     world, toastService);
 
-            updateLoadedChunks(0, 0);
+            chunkManager.updateLoadedChunks(0, 0);
             float spawnY = world.getHighestY(0.0f, 0.0f) + 1.0f;
             player.setPosition(0.5f, spawnY, 0.5f);
 
@@ -556,47 +291,15 @@ public class GameMaster {
             Library.initItems(itemRegistry, player);
             Library.initCommands(genDelta, this);
         }
-
-        if (isPromptingForInput()) {
-            String command = "";
-
-            if (command != null) {
-                commandService.execute(command);
-                setPromptingForInput(false);
-            }
-        }
     }
 
     public void dispose() {
-        chunkMeshes.values().forEach(Mesh::dispose);
-        chunkMeshes.clear();
+        chunkManager.dispose();
+        resourceManager.dispose();
 
-        blockMesh.dispose();
-        selectionMesh.dispose();
-        spriteMesh.dispose();
-        screenQuadMesh.dispose();
         GUI.dispose();
-
-        if (blocksTexture != null) blocksTexture.dispose();
-        if (waterTexture != null) waterTexture.dispose();
-
-        wheat.dispose();
-        carrot.dispose();
-        potato.dispose();
-        beetroot.dispose();
-
-        cropIcons.dispose();
-        seedIcons.dispose();
-        toolIcons.dispose();
-        blockIcons.dispose();
-
         maskFbo.dispose();
         sceneFbo.dispose();
-
-        defaultShader.dispose();
-        outlineShader.dispose();
-        motionBlurShader.dispose();
-        rainShader.dispose();
         rainEngine.dispose();
 
         cameraController.release(this);
@@ -644,16 +347,6 @@ public class GameMaster {
     }
 
     public void rebuildChunkMeshAt(int worldX, int worldZ) {
-        int chunkX = Math.floorDiv(worldX, Chunk.SIZE_X);
-        int chunkZ = Math.floorDiv(worldZ, Chunk.SIZE_Z);
-
-        Chunk chunk = world.getOrCreateChunk(chunkX, chunkZ);
-        if (chunk != null) {
-            Mesh oldMesh = chunkMeshes.get(chunk);
-            if (oldMesh != null) {
-                oldMesh.dispose();
-            }
-            chunkMeshes.put(chunk, ChunkMeshBuilder.buildMesh(chunk));
-        }
+        chunkManager.rebuildChunkMeshAt(worldX, worldZ);
     }
 }

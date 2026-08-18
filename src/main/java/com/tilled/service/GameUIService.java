@@ -12,7 +12,9 @@ import org.joml.Vector4f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -24,6 +26,8 @@ public class GameUIService implements Service<GameMaster> {
     private final UIManager uiManager;
     private final InventoryUI inventoryUI;
     private final HotbarUI hotbarUI;
+    private final UITextField chatField;
+    private final List<String> chatHistory = new ArrayList<>();
 
     private final SpriteSheet seedIcons;
     private final SpriteSheet cropIcons;
@@ -85,6 +89,11 @@ public class GameUIService implements Service<GameMaster> {
 
         uiManager.getRoot().addChild(inventoryUI);
         uiManager.getRoot().addChild(hotbarUI);
+
+        this.chatField = new UITextField(10, windowHeight - 40, windowWidth - 20, 30);
+        this.chatField.setLayer(1000);
+        this.chatField.hide();
+        uiManager.getRoot().addChild(chatField);
     }
 
     public InventoryUI getInventoryUI() {
@@ -133,6 +142,12 @@ public class GameUIService implements Service<GameMaster> {
             uiManager.render();
             renderHotbarLabel();
             renderToasts();
+        } else {
+            // Si el HUD está escondido, igual queremos ver el chat si está abierto
+            if (chatField.isVisible()) {
+                chatField.render();
+                renderChatHistory();
+            }
         }
 
         if (!gameMaster.isInventoryOpen()) {
@@ -141,6 +156,26 @@ public class GameUIService implements Service<GameMaster> {
 
         GUI.end();
         glEnable(GL_DEPTH_TEST);
+    }
+
+    private void renderChatHistory() {
+        float x = 10;
+        float y = chatField.getY() - 20;
+        Vector4f color = new Vector4f(1, 1, 1, 1);
+        
+        int start = Math.max(0, chatHistory.size() - 10);
+        for (int i = chatHistory.size() - 1; i >= start; i--) {
+            GUI.drawNormalString(chatHistory.get(i), x, y, color);
+            y -= 20;
+        }
+    }
+
+    public void addChatMessage(String message) {
+        if (message == null || message.isBlank()) return;
+        chatHistory.add(message);
+        if (chatHistory.size() > 50) {
+            chatHistory.remove(0);
+        }
     }
 
     private void renderHotbarLabel() {
@@ -321,6 +356,26 @@ public class GameUIService implements Service<GameMaster> {
                     (height - inventoryUI.getHeight()) / 2.0f
             );
         }
+
+        if (chatField != null) {
+            chatField.setPosition(10, height - 40);
+            chatField.setWidth(width - 20);
+        }
+    }
+
+    public void openChat() {
+        chatField.clear();
+        chatField.show();
+        uiManager.setFocusedElement(chatField);
+    }
+
+    public void closeChat() {
+        chatField.hide();
+        uiManager.clearFocus();
+    }
+
+    public String getChatText() {
+        return chatField.getText();
     }
 
     public void renderInv() {
