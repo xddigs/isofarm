@@ -258,9 +258,9 @@ public class GameMaster {
         if (selectedItem != null && !isInventoryOpen() && isHUDShown()) {
             SpriteSheet spriteSheet = resourceManager.getItemSpriteSheet(selectedItem);
             Shader itemShader = resourceManager.getShader("item");
-            boolean isMoving = (player != null) && player.isMoving();
+
             itemRenderer.render(this, selectedItem, spriteSheet,
-                    itemShader, celestialLighting,  isMoving, genDelta);
+                    itemShader, celestialLighting, genDelta);
         }
 
         if (player == null) {
@@ -275,7 +275,6 @@ public class GameMaster {
             this.shop.setPlayer(player);
 
             log.info("Player created: {}", player.getName());
-            toastService.success("Welcome, " + player.getName() + "!");
             toastService.info("Use E to open the inventory");
             Library.initItems(itemRegistry, player);
             Library.initCommands(genDelta, this);

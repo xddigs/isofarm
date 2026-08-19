@@ -20,7 +20,6 @@ public class ItemRenderer {
 
     private final Matrix4f baseModelMatrix;
     private final Mesh quadMesh;
-    private float bobbingTimer = 0.0f;
 
     public ItemRenderer() {
         this.baseModelMatrix = new Matrix4f();
@@ -29,19 +28,9 @@ public class ItemRenderer {
 
     public void render(GameMaster gameMaster, Item item,
                        SpriteSheet spriteSheet, Shader shader,
-                       CelestialLighting lighting,
-                       boolean isMoving, float delta) {
+                       CelestialLighting lighting, float delta) {
         if (item == null || spriteSheet == null || quadMesh == null) return;
         glClear(GL_DEPTH_BUFFER_BIT);
-
-        if (isMoving) {
-            bobbingTimer += delta * 8.0f;
-        } else {
-            bobbingTimer += (0.0f - bobbingTimer) * delta * 5.0f;
-        }
-
-        float bobbingX = (float) Math.cos(bobbingTimer * 0.5f) * 0.015f;
-        float bobbingY = (float) Math.abs(Math.sin(bobbingTimer)) * 0.025f;
 
         float rotateX, rotateY, rotateZ;
         boolean isTool = item instanceof Tool;
@@ -56,9 +45,7 @@ public class ItemRenderer {
         }
 
         baseModelMatrix.identity()
-                .translate(OFFSET_X + bobbingX,
-                        OFFSET_Y + bobbingY,
-                        OFFSET_Z)
+                .translate(OFFSET_X, OFFSET_Y, OFFSET_Z)
                 .rotateX((float) Math.toRadians(rotateX))
                 .rotateY((float) Math.toRadians(rotateY))
                 .rotateZ((float) Math.toRadians(rotateZ))
