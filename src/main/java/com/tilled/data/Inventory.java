@@ -6,6 +6,7 @@ import java.util.*;
 
 @DataClass
 public class Inventory {
+
     private final List<InventorySlot> slots;
 
     public Inventory() {
@@ -21,101 +22,80 @@ public class Inventory {
 
         for (InventorySlot slot : slots) {
             if (!slot.isEmpty()) {
-                result.merge(
-                        slot.getItem(),
-                        slot.getItem().getAmount(),
-                        Integer::sum
-                );
+                result.merge(slot.getItem(), slot.getAmount(), Integer::sum);
             }
         }
 
         return Collections.unmodifiableMap(result);
     }
 
-    public void add(Item item, int amount) {
+    public int add(Item item, int amount) {
         if (item == null || amount <= 0) {
-            return;
+            return amount;
         }
+
         int remaining = amount;
-        int hotbarStart = (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
+        int hotbarStart = getHotbarStart();
 
-        for (int i = hotbarStart; i < slots.size() && remaining > 0; i++) {
+        remaining = addToExistingStacks(item, remaining, hotbarStart, slots.size());
+        remaining = addToEmptySlots(item, remaining, hotbarStart, slots.size());
+
+        if (remaining > 0) {
+            remaining = addToExistingStacks(item, remaining, 0, hotbarStart);
+            remaining = addToEmptySlots(item, remaining, 0, hotbarStart);
+        }
+
+        return remaining;
+    }
+
+    private int addToExistingStacks(Item item, int amount, int start, int end) {
+        int remaining = amount;
+
+        for (int i = start; i < end && remaining > 0; i++) {
             InventorySlot slot = slots.get(i);
 
-            if (slot.isEmpty() || !isSameType(slot.getItem(), item)) {
+            if (slot.isEmpty()) {
                 continue;
             }
 
-            Item stack = slot.getItem();
-            int space = getMaxStack(item) - stack.getAmount();
+            if (!isSameType(slot.getItem(), item)) {
+                continue;
+            }
+
+            int maxStack = getMaxStack(item);
+            int space = maxStack - slot.getAmount();
 
             if (space <= 0) {
                 continue;
             }
 
             int added = Math.min(remaining, space);
-            stack.addAmount(added);
+            slot.addAmount(added);
             remaining -= added;
         }
 
-        for (int i = hotbarStart; i < slots.size() && remaining > 0; i++) {
+        return remaining;
+    }
+
+    private int addToEmptySlots(Item item, int amount, int start, int end) {
+        int remaining = amount;
+
+        for (int i = start; i < end && remaining > 0; i++) {
             InventorySlot slot = slots.get(i);
+
             if (!slot.isEmpty()) {
                 continue;
             }
 
             int added = Math.min(remaining, getMaxStack(item));
-            Item stack;
 
-            try {
-                stack = item.copy(added);
-            } catch (Exception e) {
-                stack = item;
-                stack.setAmount(added);
-            }
+            slot.setItem(item);
+            slot.setAmount(added);
 
-            slot.setItem(stack);
             remaining -= added;
         }
 
-        for (int i = 0; i < hotbarStart && remaining > 0; i++) {
-            InventorySlot slot = slots.get(i);
-
-            if (slot.isEmpty() || !isSameType(slot.getItem(), item)) {
-                continue;
-            }
-
-            Item stack = slot.getItem();
-            int space = getMaxStack(item) - stack.getAmount();
-
-            if (space <= 0) {
-                continue;
-            }
-
-            int added = Math.min(remaining, space);
-            stack.addAmount(added);
-            remaining -= added;
-        }
-
-        for (int i = 0; i < hotbarStart && remaining > 0; i++) {
-            InventorySlot slot = slots.get(i);
-            if (!slot.isEmpty()) {
-                continue;
-            }
-
-            int added = Math.min(remaining, getMaxStack(item));
-            Item stack;
-
-            try {
-                stack = item.copy(added);
-            } catch (Exception e) {
-                stack = item;
-                stack.setAmount(added);
-            }
-
-            slot.setItem(stack);
-            remaining -= added;
-        }
+        return remaining;
     }
 
     public void remove(Item item, int amount) {
@@ -130,26 +110,24 @@ public class Inventory {
                 break;
             }
 
-            if (slot.isEmpty() || !slot.getItem().equals(item)) {
+            if (slot.isEmpty() || !isSameType(slot.getItem(), item)) {
                 continue;
             }
 
-            Item stack = slot.getItem();
-            int current = stack.getAmount();
+            int current = slot.getAmount();
+
             if (current <= remaining) {
                 remaining -= current;
                 slot.clear();
             } else {
-                stack.setAmount(current - remaining);
+                slot.setAmount(current - remaining);
                 remaining = 0;
             }
         }
     }
 
     public void pickAndDrop(int fromIndex, int toIndex) {
-        if (!isValidIndex(fromIndex) ||
-                !isValidIndex(toIndex) ||
-                fromIndex == toIndex) {
+        if (!isValidIndex(fromIndex) || !isValidIndex(toIndex) || fromIndex == toIndex) {
             return;
         }
 
@@ -162,81 +140,109 @@ public class Inventory {
 
         if (to.isEmpty()) {
             to.setItem(from.getItem());
+            to.setAmount(from.getAmount());
             from.clear();
             return;
         }
 
-        if (to.getItem().equals(from.getItem())) {
-            int space = getMaxStack(from.getItem()) - to.getItem().getAmount();
+        if (isSameType(from.getItem(), to.getItem())) {
+            int maxStack = getMaxStack(from.getItem());
+            int space = maxStack - to.getAmount();
 
             if (space > 0) {
-                int moved = Math.min(space, from.getItem().getAmount());
+                int moved = Math.min(space, from.getAmount());
 
-                to.getItem().addAmount(moved);
-                from.getItem().addAmount(-moved);
-
-                if (from.getItem().getAmount() <= 0) {
-                    from.clear();
-                }
+                to.addAmount(moved);
+                from.setAmount(from.getAmount() - moved);
 
                 return;
             }
         }
 
-        Item temp = from.getItem();
+        Item tempItem = from.getItem();
+        int tempAmount = from.getAmount();
+
         from.setItem(to.getItem());
-        to.setItem(temp);
+        from.setAmount(to.getAmount());
+
+        to.setItem(tempItem);
+        to.setAmount(tempAmount);
     }
 
     public void sort() {
         group();
 
-        List<Item> items = new ArrayList<>();
+        List<Stack> stacks = new ArrayList<>();
+
         for (InventorySlot slot : slots) {
             if (!slot.isEmpty()) {
-                items.add(slot.getItem());
+                stacks.add(new Stack(slot.getItem(), slot.getAmount()));
                 slot.clear();
             }
         }
 
-        items.sort(Comparator
-                .comparing((Item item) -> item.getClass().getSimpleName())
-                .thenComparing(Item::getName, Comparator.nullsLast(String::compareTo))
-                .thenComparingInt(Item::getAmount).reversed());
+        stacks.sort(Comparator.comparing((Stack stack) -> stack.item().getClass().getSimpleName())
+                .thenComparing(stack -> stack.item().getName(), Comparator.nullsLast(String::compareTo))
+                .thenComparingInt(Stack::amount).reversed());
 
-        for (int i = 0; i < items.size() && i < slots.size(); i++) {
-            slots.get(i).setItem(items.get(i));
+        int index = 0;
+
+        for (Stack stack : stacks) {
+            int remaining = stack.amount();
+
+            while (remaining > 0 && index < slots.size()) {
+                int amount = Math.min(remaining, getMaxStack(stack.item()));
+
+                InventorySlot slot = slots.get(index++);
+                slot.setItem(stack.item());
+                slot.setAmount(amount);
+
+                remaining -= amount;
+            }
         }
     }
 
     public void group() {
         for (int i = 0; i < slots.size(); i++) {
             InventorySlot currentSlot = slots.get(i);
-            if (currentSlot.isEmpty()) continue;
+
+            if (currentSlot.isEmpty()) {
+                continue;
+            }
 
             Item currentItem = currentSlot.getItem();
 
             for (int j = i + 1; j < slots.size(); j++) {
                 InventorySlot targetSlot = slots.get(j);
-                if (targetSlot.isEmpty()) continue;
 
-                Item targetItem = targetSlot.getItem();
-                if (isSameType(currentItem, targetItem)) {
-                    int spaceLeft = getMaxStack(targetItem) - currentItem.getAmount();
-                    if (spaceLeft > 0) {
-                        int transfer = Math.min(spaceLeft, targetItem.getAmount());
-                        currentItem.setAmount(currentItem.getAmount() + transfer);
-                        targetItem.setAmount(targetItem.getAmount() - transfer);
-
-                        if (targetItem.getAmount() <= 0) {
-                            targetSlot.clear();
-                        }
-                    }
+                if (targetSlot.isEmpty()) {
+                    continue;
                 }
+
+                if (!isSameType(currentItem, targetSlot.getItem())) {
+                    continue;
+                }
+
+                int maxStack = getMaxStack(currentItem);
+                int spaceLeft = maxStack - currentSlot.getAmount();
+
+                if (spaceLeft <= 0) {
+                    continue;
+                }
+
+                int transfer = Math.min(spaceLeft, targetSlot.getAmount());
+
+                currentSlot.addAmount(transfer);
+                targetSlot.setAmount(targetSlot.getAmount() - transfer);
             }
         }
     }
 
+    /**
+     * Takes an amount from a specific slot.
+     *
+     * @return actual amount taken
+     */
     public int take(int index, int amount) {
         if (!isValidIndex(index) || amount <= 0) {
             return 0;
@@ -248,45 +254,46 @@ public class Inventory {
             return 0;
         }
 
-        Item item = slot.getItem();
-        int taken = Math.min(amount, item.getAmount());
+        int taken = Math.min(amount, slot.getAmount());
 
-        item.addAmount(-taken);
-
-        if (item.getAmount() <= 0) {
-            slot.clear();
-        }
+        slot.setAmount(slot.getAmount() - taken);
 
         return taken;
     }
 
+    /**
+     * Adds an amount to a specific slot.
+     *
+     * @return actual amount added
+     */
     public int addToStack(int targetIndex, Item item, int amount) {
         if (!isValidIndex(targetIndex) || item == null || amount <= 0) {
             return 0;
         }
 
         InventorySlot target = slots.get(targetIndex);
+
         if (target.isEmpty()) {
             int added = Math.min(amount, getMaxStack(item));
-            item.setAmount(added);
+
             target.setItem(item);
+            target.setAmount(added);
+
             return added;
         }
 
-        Item targetItem = target.getItem();
-
-        if (!targetItem.equals(item)) {
+        if (!isSameType(target.getItem(), item)) {
             return 0;
         }
 
-        int space = getMaxStack(item) - targetItem.getAmount();
+        int space = getMaxStack(item) - target.getAmount();
 
         if (space <= 0) {
             return 0;
         }
 
         int added = Math.min(amount, space);
-        targetItem.addAmount(added);
+        target.addAmount(added);
 
         return added;
     }
@@ -297,18 +304,21 @@ public class Inventory {
 
     public List<Item> getHotbarItems() {
         List<Item> hotbar = new ArrayList<>();
-        int hotbarStart = (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
+
+        int hotbarStart = getHotbarStart();
 
         for (int i = 0; i < K.UI.INVENTORY_COLUMNS; i++) {
             int index = hotbarStart + i;
-            if (index >= slots.size()) break;
-            
-            InventorySlot slot = slots.get(index);
-            if (slot.isEmpty()) {
-                continue;
+
+            if (index >= slots.size()) {
+                break;
             }
 
-            hotbar.add(slot.getItem());
+            InventorySlot slot = slots.get(index);
+
+            if (!slot.isEmpty()) {
+                hotbar.add(slot.getItem());
+            }
         }
 
         return hotbar;
@@ -325,9 +335,7 @@ public class Inventory {
     }
 
     public int size() {
-        return (int) slots.stream()
-                .filter(slot -> !slot.isEmpty())
-                .count();
+        return (int) slots.stream().filter(slot -> !slot.isEmpty()).count();
     }
 
     public Item get(int index) {
@@ -346,8 +354,7 @@ public class Inventory {
         }
 
         for (InventorySlot slot : slots) {
-            if (!slot.isEmpty() &&
-                    slot.getItem().equals(item)) {
+            if (!slot.isEmpty() && isSameType(slot.getItem(), item)) {
                 return slot.getItem();
             }
         }
@@ -363,9 +370,8 @@ public class Inventory {
         int amount = 0;
 
         for (InventorySlot slot : slots) {
-            if (!slot.isEmpty() &&
-                    slot.getItem().equals(item)) {
-                amount += slot.getItem().getAmount();
+            if (!slot.isEmpty() && isSameType(slot.getItem(), item)) {
+                amount += slot.getAmount();
             }
         }
 
@@ -373,52 +379,31 @@ public class Inventory {
     }
 
     public <T extends Item> boolean hasItemOfType(Class<T> type) {
-        return slots.stream()
-                .filter(slot -> !slot.isEmpty())
-                .anyMatch(slot ->
-                        type.isInstance(slot.getItem()) &&
-                                slot.getItem().getAmount() > 0
-                );
+        return slots.stream().filter(slot -> !slot.isEmpty()).anyMatch(
+                slot -> type.isInstance(slot.getItem()) && slot.getAmount() > 0);
     }
 
     public <T extends Item> Optional<T> getItemOfType(Class<T> type) {
-        return slots.stream()
-                .filter(slot -> !slot.isEmpty())
-                .filter(slot ->
-                        type.isInstance(slot.getItem()) &&
-                                slot.getItem().getAmount() > 0
-                )
-                .map(slot -> type.cast(slot.getItem()))
-                .findFirst();
+        return slots.stream().filter(slot -> !slot.isEmpty()).filter(
+                slot -> type.isInstance(slot.getItem()) && slot.getAmount() > 0).map(
+                        slot -> type.cast(slot.getItem())).findFirst();
     }
 
     public <T extends Item> Optional<Byte> getFirstItemIdOfType(Class<T> type) {
-        return slots.stream()
-                .filter(slot -> !slot.isEmpty())
-                .filter(slot ->
-                        type.isInstance(slot.getItem()) &&
-                                slot.getItem().getAmount() > 0
-                )
-                .map(slot -> slot.getItem().getId())
-                .findFirst();
+        return slots.stream().filter(slot -> !slot.isEmpty()).filter(
+                slot -> type.isInstance(slot.getItem()) && slot.getAmount() > 0).map(
+                        slot -> slot.getItem().getId()).findFirst();
     }
 
     public <T extends Item> boolean hasItemWithId(Class<T> type, byte id) {
-        return slots.stream()
-                .filter(slot -> !slot.isEmpty())
-                .anyMatch(slot ->
-                        type.isInstance(slot.getItem()) &&
-                                slot.getItem().getId() == id &&
-                                slot.getItem().getAmount() > 0
-                );
+        return slots.stream().filter(slot -> !slot.isEmpty()).anyMatch(
+                slot -> type.isInstance(slot.getItem())
+                        && slot.getItem().getId() == id && slot.getAmount() > 0);
     }
 
     public <T extends Item> int getTotalAmountOfType(Class<T> type) {
-        return slots.stream()
-                .filter(slot -> !slot.isEmpty())
-                .filter(slot -> type.isInstance(slot.getItem()))
-                .mapToInt(slot -> slot.getItem().getAmount())
-                .sum();
+        return slots.stream().filter(slot -> !slot.isEmpty()).filter(
+                slot -> type.isInstance(slot.getItem())).mapToInt(InventorySlot::getAmount).sum();
     }
 
     public List<InventorySlot> getSlots() {
@@ -426,28 +411,26 @@ public class Inventory {
     }
 
     public InventorySlot getSlot(int index) {
-        if (index < 0 || index >= slots.size()) {
-            throw new IndexOutOfBoundsException(
-                    "Index: " + index + ", Size: " + slots.size()
-            );
+        if (!isValidIndex(index)) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + slots.size());
         }
 
         return slots.get(index);
     }
 
-    private boolean isSameType(Item a, Item b) {
-        if (a == null || b == null) return false;
-        if (a.getClass() != b.getClass()) return false;
+    public int getSlotAmount(int index) {
+        return getSlot(index).getAmount();
+    }
 
-        if (a instanceof Seed s1 && b instanceof Seed s2) return s1.getType() == s2.getType();
-        if (a instanceof Crop c1 && b instanceof Crop c2) return c1.getCropType() == c2.getCropType();
-        if (a instanceof Block b1 && b instanceof Block b2) return b1.getType() == b2.getType();
-        if (a instanceof Tool t1 && b instanceof Tool t2) return t1.getId() == t2.getId();
-
-        return a.getName().equals(b.getName());
+    public int getHotbarStart() {
+        return (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
     }
 
     public int getMaxStack(Item item) {
+        if (item == null) {
+            return 0;
+        }
+
         return switch (item) {
             case Block ignored -> K.World.MAX_STACK;
             case Coin ignored -> K.World.MAX_STACK * 4;
@@ -457,7 +440,38 @@ public class Inventory {
         };
     }
 
+    private boolean isSameType(Item a, Item b) {
+        if (a == null || b == null) {
+            return false;
+        }
+
+        if (a.getClass() != b.getClass()) {
+            return false;
+        }
+
+        if (a instanceof Seed s1 && b instanceof Seed s2) {
+            return s1.getType() == s2.getType();
+        }
+
+        if (a instanceof Crop c1 && b instanceof Crop c2) {
+            return c1.getCropType() == c2.getCropType();
+        }
+
+        if (a instanceof Block b1 && b instanceof Block b2) {
+            return b1.getType() == b2.getType();
+        }
+
+        if (a instanceof Tool t1 && b instanceof Tool t2) {
+            return t1.getId() == t2.getId();
+        }
+
+        return Objects.equals(a.getName(), b.getName());
+    }
+
     private boolean isValidIndex(int index) {
         return index >= 0 && index < slots.size();
+    }
+
+    private record Stack(Item item, int amount) {
     }
 }

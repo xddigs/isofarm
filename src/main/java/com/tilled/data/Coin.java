@@ -8,9 +8,7 @@ public class Coin extends Tool {
     }
 
     @Override
-    public Item copy(int newAmount) {
-        Coin coin = new Coin();
-        coin.addAmount(newAmount);
-        return coin;
+    public Item copy() {
+        return new Coin();
     }
 }

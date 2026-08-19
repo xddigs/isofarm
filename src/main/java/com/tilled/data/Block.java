@@ -10,7 +10,7 @@ public class Block extends Item {
     private int waterLevel = 15;
 
     public Block(BlockData type, int x, int y, int z) {
-        super(type.getId(), "(Block) " + type.getName(), 1, type.getValue());
+        super(type.getId(), type.getName(), type.getValue());
         this.type = type;
         this.x = x;
         this.y = y;
@@ -22,7 +22,7 @@ public class Block extends Item {
     }
 
     public Block(BlockData type) {
-        super(type.getId(), type.getName(), 1, type.getValue());
+        super(type.getId(), type.getName(), type.getValue());
         this.type = type;
     }
 
@@ -71,11 +71,7 @@ public class Block extends Item {
     }
 
     @Override
-    public Item copy(int newAmount) {
-        if (newAmount <= 0) return null;
-        Block block = new Block(type, x, y, z);
-        block.setAmount(newAmount);
-        block.setWaterLevel(waterLevel);
-        return block;
+    public Item copy() {
+        return new Block(type, x, y, z);
     }
 }

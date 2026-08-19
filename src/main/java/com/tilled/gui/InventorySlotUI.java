@@ -73,13 +73,11 @@ public class InventorySlotUI extends UIElement {
 
     private void renderAmount() {
         Item item = getItem();
-
-        if (item == null || item.getAmount() <= 1) {
+        if (item == null || slot.getAmount() <= 1) {
             return;
         }
 
-        String amount = String.valueOf(item.getAmount());
-
+        String amount = String.valueOf(slot.getAmount());
         float textWidth = getTextWidth(amount);
         float textHeight = countFont.getSize();
         float x = getAbsoluteX() + getAbsoluteWidth() - textWidth - 4.0f;

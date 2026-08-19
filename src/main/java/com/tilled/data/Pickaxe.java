@@ -4,7 +4,7 @@ public class Pickaxe extends Tool {
     private Tier tier;
 
     public Pickaxe(Tier tier) {
-        super((byte)(Math.random() * 100), tier.getName() + " Pickaxe", 100,
+        super((byte) 3, tier.getName() + " Pickaxe", 100,
                 tier.getDurability() + 16);
         this.tier = tier;
     }
@@ -26,9 +26,7 @@ public class Pickaxe extends Tool {
     }
 
     @Override
-    public Item copy(int newAmount) {
-        Pickaxe pickaxe = new Pickaxe(tier);
-        pickaxe.addAmount(newAmount);
-        return pickaxe;
+    public Item copy() {
+        return new Pickaxe(tier);
     }
 }

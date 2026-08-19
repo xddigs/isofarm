@@ -10,7 +10,7 @@ public class Hoe extends Tool {
     private Tier tier;
 
     public Hoe(Tier tier) {
-        super((byte)(Math.random() * 100), tier.getName() + " Hoe", 150,
+        super((byte) 2, tier.getName() + " Hoe", 150,
                 tier.getDurability() + 8);
         this.tier = tier;
     }
@@ -38,10 +38,8 @@ public class Hoe extends Tool {
     }
 
     @Override
-    public Item copy(int newAmount) {
-        Hoe hoe = new Hoe(tier);
-        hoe.addAmount(newAmount);
-        return hoe;
+    public Item copy() {
+        return new Hoe(tier);
     }
 
     public Tier getTier() {

@@ -5,7 +5,7 @@ public abstract class Tool extends Item {
     private int durability;
 
     public Tool(byte id, String name, int value, int durability) {
-        super(id, "(Tool) " + name, 1, value);
+        super(id, name, value);
         this.durability = durability;
     }
 

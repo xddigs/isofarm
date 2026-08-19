@@ -7,12 +7,10 @@ public abstract class Item {
     private final byte id;
     private final String name;
     private final int value;
-    private int amount;
 
-    public Item(byte id, String name, int amount, int value) {
+    public Item(byte id, String name, int value) {
         this.id = id;
         this.name = name;
-        this.amount = amount;
         this.value = value;
     }
 
@@ -24,20 +22,8 @@ public abstract class Item {
         return name;
     }
 
-    public int getAmount() {
-        return amount;
-    }
-
     public int getValue() {
         return value;
-    }
-
-    public void setAmount(int amount) {
-        this.amount = amount;
-    }
-
-    public void addAmount(int amount) {
-        this.amount += amount;
     }
 
     @Override
@@ -51,6 +37,5 @@ public abstract class Item {
     public int hashCode() {
         return Objects.hash(id, name);
     }
-
-    public abstract Item copy(int newAmount);
+    public abstract Item copy();
 }

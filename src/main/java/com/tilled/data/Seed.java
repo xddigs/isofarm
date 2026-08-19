@@ -8,7 +8,7 @@ public class Seed extends Item {
     private final String description;
 
     public Seed(CropType type) {
-        super(type.getId(), "(Seed) " + type.getName(), 1, 1);
+        super(type.getId(), type.getName(), 1);
         this.type = type;
         this.description = type.getDescription();
     }
@@ -38,9 +38,7 @@ public class Seed extends Item {
     }
 
     @Override
-    public Item copy(int newAmount) {
-        Seed seed = new Seed(type);
-        seed.addAmount(newAmount);
-        return seed;
+    public Item copy() {
+        return new Seed(type);
     }
 }

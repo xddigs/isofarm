@@ -7,7 +7,7 @@ public class Produce extends Item {
     private final CropType type;
 
     public Produce(CropType type) {
-        super(type.getId(), type.getName(), 1, type.getValue());
+        super(type.getId(), type.getName(), type.getValue());
         this.type = type;
     }
 
@@ -28,9 +28,7 @@ public class Produce extends Item {
     }
 
     @Override
-    public Item copy(int newAmount) {
-        Produce produce = new Produce(type);
-        produce.setAmount(newAmount);
-        return produce;
+    public Item copy() {
+        return new Produce(type);
     }
 }
