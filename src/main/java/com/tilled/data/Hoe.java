@@ -20,6 +20,8 @@ public class Hoe extends Tool {
 
         if (target == null) return;
         if (!target.getType().isTillable()) return;
+        if (target.getType().equals(BlockData.TILLED_DIRT)) { return; }
+
         world.setBlockTypeAt(target.getX(), target.getY(),
                 target.getZ(), BlockData.TILLED_DIRT.getId());
 
