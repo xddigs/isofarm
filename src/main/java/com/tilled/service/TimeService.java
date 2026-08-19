@@ -19,7 +19,7 @@ public class TimeService {
     private static int hour = STARTING_HOUR;
     private int day = 1;
     private int year = 0;
-    private float timeScale = 5.0f;
+    private float timeScale = 2.0f;
 
     public TimeService() {
         log.info("TimeService initialized. Starting at Year {} {}, Day {} - {}:00",
