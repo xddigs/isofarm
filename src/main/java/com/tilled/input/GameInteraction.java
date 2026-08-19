@@ -28,22 +28,19 @@ public class GameInteraction {
     private final Camera camera;
     private final SpriteSheet blocksTexture;
     private final ItemRenderer itemRenderer;
+    private final Player player;
     private Hit hoveredCell = null;
 
-    public GameInteraction(CropService cropService,
-                           GameUIService gameUIservice,
-                           TimeService timeService,
-                           ParticleEngine particles,
-                           Camera camera,
-                           SpriteSheet blocksTexture,
-                           ItemRenderer itemRenderer) {
-        this.cropService = cropService;
-        this.gameUIservice = gameUIservice;
-        this.timeService = timeService;
-        this.particles = particles;
-        this.camera = camera;
+    public GameInteraction(GameMaster gameMaster,
+                           SpriteSheet blocksTexture) {
+        this.cropService = gameMaster.getCropService();
+        this.gameUIservice = gameMaster.getGameUIService();
+        this.timeService = gameMaster.getTimeService();
+        this.particles = gameMaster.getParticles();
+        this.camera = gameMaster.getCamera();
         this.blocksTexture = blocksTexture;
-        this.itemRenderer = itemRenderer;
+        this.itemRenderer = gameMaster.getItemRenderer();
+        this.player = gameMaster.getPlayer();
     }
 
     public Hit getHoveredCell() {
@@ -61,6 +58,10 @@ public class GameInteraction {
 
         if (Keyboard.isKeyPressed(GLFW_KEY_E) && !gameMaster.isPromptingForInput()) {
             gameMaster.toggleInventory();
+        }
+
+        if (Keyboard.isKeyPressed(GLFW_KEY_Q)) {
+            dropItem(selectedItem);
         }
 
         hoveredCell = camera.highlight(gameMaster.getWorld());
@@ -222,6 +223,14 @@ public class GameInteraction {
             if (planted != null) {
                 gameUIservice.logAction(cell);
                 log.info("Planted {} at {},{},{}", seed.getType().getName(), x, y, z);
+            }
+        }
+    }
+
+    public void dropItem(Item selectedItem) {
+        for (InventorySlot slot : player.getInventory().getSlots()) {
+            if (slot.getItem().equals(selectedItem)) {
+                // TODO drop item
             }
         }
     }

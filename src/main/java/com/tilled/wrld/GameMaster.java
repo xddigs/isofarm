@@ -11,6 +11,8 @@ import com.tilled.utils.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -54,6 +56,8 @@ public class GameMaster {
 
     private float windowWidth;
     private float windowHeight;
+
+    private final List<Entity> entities;
 
     private Player player;
     private Shop shop;
@@ -105,6 +109,7 @@ public class GameMaster {
         this.commandService.setGameUIService(gameUIservice);
 
         this.shop = new Shop();
+        this.entities = new LinkedList<>();
         this.gameUIservice.setShop(shop);
 
         this.camera = new Camera(K.Camera.DEFAULT_WIDTH,
@@ -117,9 +122,8 @@ public class GameMaster {
         this.stepController = new StepController();
         this.weatherService = new WeatherService(rainEngine, camera);
 
-        this.gameInteraction = new GameInteraction(cropService, gameUIservice,
-                timeService, particles, camera, resourceManager.getBlocksTexture(),
-                itemRenderer);
+        this.gameInteraction = new GameInteraction(this,
+                resourceManager.getBlocksTexture());
 
         recenter();
     }
@@ -141,6 +145,7 @@ public class GameMaster {
     public World getWorld() { return world; }
     public Player getPlayer() { return player; }
     public SoundService getSoundService() { return soundService; }
+    public CropService getCropService() { return cropService; }
     public ToastService getToastService() { return toastService; }
     public CommandRegistry getCommandRegistry() { return commandRegistry; }
     public ItemRegistry getItemRegistry() { return itemRegistry; }
@@ -202,6 +207,20 @@ public class GameMaster {
 
     public Season getSeason() {
         return timeService.getCurrentSeason();
+    }
+
+    public List<Entity> getEntities() {
+        return List.copyOf(entities);
+    }
+
+    public void addEntity(Entity entity) {
+        if (entity == null) return;
+        entities.add(entity);
+    }
+
+    public void removeEntity(Entity entity) {
+        if (entity == null) return;
+        entities.remove(entity);
     }
 
     public void update(float delta) {
