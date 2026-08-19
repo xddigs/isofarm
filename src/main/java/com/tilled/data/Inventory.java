@@ -126,49 +126,6 @@ public class Inventory {
         }
     }
 
-    public void pickAndDrop(int fromIndex, int toIndex) {
-        if (!isValidIndex(fromIndex) || !isValidIndex(toIndex) || fromIndex == toIndex) {
-            return;
-        }
-
-        InventorySlot from = slots.get(fromIndex);
-        InventorySlot to = slots.get(toIndex);
-
-        if (from.isEmpty()) {
-            return;
-        }
-
-        if (to.isEmpty()) {
-            to.setItem(from.getItem());
-            to.setAmount(from.getAmount());
-            from.clear();
-            return;
-        }
-
-        if (isSameType(from.getItem(), to.getItem())) {
-            int maxStack = getMaxStack(from.getItem());
-            int space = maxStack - to.getAmount();
-
-            if (space > 0) {
-                int moved = Math.min(space, from.getAmount());
-
-                to.addAmount(moved);
-                from.setAmount(from.getAmount() - moved);
-
-                return;
-            }
-        }
-
-        Item tempItem = from.getItem();
-        int tempAmount = from.getAmount();
-
-        from.setItem(to.getItem());
-        from.setAmount(to.getAmount());
-
-        to.setItem(tempItem);
-        to.setAmount(tempAmount);
-    }
-
     public void sort() {
         group();
 

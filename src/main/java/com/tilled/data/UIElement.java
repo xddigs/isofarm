@@ -89,9 +89,7 @@ public abstract class UIElement {
 
         while (spriteAnimationTimer >= spriteFrameDuration) {
             spriteAnimationTimer -= spriteFrameDuration;
-
             spriteFrame++;
-
             if (spriteFrame >= spriteFrameCount) {
                 if (spriteLoop) {
                     spriteFrame = 0;
