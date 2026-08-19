@@ -30,6 +30,7 @@ public class SoundService {
     private int stepSource;
     private int breakSource;
     private int placeSource;
+    private int useSource;
 
     public SoundService() {
         this.init();
@@ -38,6 +39,7 @@ public class SoundService {
             loadSoundArray(group.getStepSounds());
             loadSoundArray(group.getBreakSounds());
             loadSoundArray(group.getPlaceSounds());
+            loadSoundArray(group.getUseSounds());
         }
     }
 
@@ -65,6 +67,7 @@ public class SoundService {
         stepSource = alGenSources();
         breakSource = alGenSources();
         placeSource = alGenSources();
+        useSource = alGenSources();
 
         alSourcef(breakSource, AL_GAIN, 1.0f);
         alSourcef(stepSource, AL_GAIN, 1.0f);
@@ -87,6 +90,12 @@ public class SoundService {
         float volume = calculateBreakVolume(distance, maxDistance);
         playSound(breakSource, group != null ? group.getPlaceSounds() : null,
                 0.75f, 0.2f, volume);
+    }
+
+    public void playUseSound(SoundGroup group, float distance, float maxDistance) {
+        float volume = calculateBreakVolume(distance, maxDistance);
+        playSound(useSource, group != null ? group.getUseSounds() : null,
+                1.0f, 0.2f, volume);
     }
 
     private float calculateBreakVolume(float distance, float maxDistance) {

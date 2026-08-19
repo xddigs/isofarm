@@ -13,7 +13,7 @@ import org.joml.Vector3f;
 public class WorldItem extends Entity {
     private static final float GRAVITY = -20.0f;
     private static final float GROUND_OFFSET = 0.05f;
-    private static final float PICKUP_DELAY = 0.75f;
+    private static final float PICKUP_DELAY = 0.56f;
     private static final float AIR_DRAG = 2.5f;
 
     private final Item item;

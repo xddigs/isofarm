@@ -124,7 +124,8 @@ public class GameInteraction {
             player.remove(item, amount);
             gameMaster.addEntity(worldItem);
             itemRenderer.playPlaceAnimation();
-
+            gameMaster.getSoundService().playUseSound(SoundGroup.ITEMS,
+                    playerPosition.x, playerPosition.x);
 
             log.info("Dropped x{} {} with velocity ({}, {}, {})", amount,
                     item.getName(), velocity.x, velocity.y, velocity.z);
@@ -164,6 +165,9 @@ public class GameInteraction {
 
             player.add(item, amount);
             iterator.remove();
+            gameMaster.getSoundService().playUseSound(SoundGroup.ITEMS,
+                    distance, player.getPosition().x);
+
             log.info("Picked up x{} {}", amount, item.getName());
         }
     }
