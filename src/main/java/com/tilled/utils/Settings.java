@@ -6,7 +6,7 @@ public class Settings {
     public static final float[] GUI_SCALES = {0.5f, 1.0f, 1.25f, 1.5f, 2.0f};
     public static float fov = 80f;
     public static float mouseSensitivity = 0.4f;
-    public static int renderDistance = 8;
+    public static int renderDistance = 16;
     public static int unloadMargin = 2;
     public static int guiScaleIndex = 2;
     public static boolean doEnableMotions = true;
