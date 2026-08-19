@@ -41,6 +41,10 @@ public class HotbarUI extends UIElement {
     }
 
     private static int getItemIconColumn(Item item) {
+        if (item instanceof Produce produce && produce.getType() != null) {
+            return produce.getType().getId();
+        }
+
         if (item instanceof Seed seed && seed.getType() != null) {
             return seed.getType().getId();
         }
@@ -227,6 +231,7 @@ public class HotbarUI extends UIElement {
     }
 
     private SpriteSheet getItemSpritesheet(Item item) {
+        if (item instanceof Produce) return cropIcons;
         if (item instanceof Crop) return cropIcons;
         if (item instanceof Seed) return seedIcons;
         if (item instanceof Block) return blockIcons;
