@@ -27,7 +27,7 @@ public class Library implements Service<GameMaster> {
         itemR.register(DEFAULT_ID + ":grass", () -> new Block(BlockData.GRASS));
         itemR.register(DEFAULT_ID + ":stone", () -> new Block(BlockData.STONE));
         itemR.register(DEFAULT_ID + ":wood", () -> new Block(BlockData.WOOD));
-        itemR.register(DEFAULT_ID + ":voidStone", () -> new Block(BlockData.VOIDSTONE));
+        itemR.register(DEFAULT_ID + ":voidstone", () -> new Block(BlockData.VOIDSTONE));
         itemR.register(DEFAULT_ID + ":glass", () -> new Block(BlockData.GLASS));
     }
 

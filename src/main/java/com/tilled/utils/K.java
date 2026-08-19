@@ -81,8 +81,8 @@ public final class K {
         public static final int ICON_BLOCK_FRAMES = 7;
         public static final int ICON_TOOL_FRAMES = 3;
 
-        public static final int BLOCK_ATLAS_FRAMES = 5;
-        public static final int ICON_BLOCK_ATLAS_ROWS = 3;
+        public static final int BLOCK_ATLAS_COLUMNS = 7;
+        public static final int BLOCK_ATLAS_ROWS = 3;
         public static final int WATER_FRAMES = 8;
 
         public static final float TOAST_WIDTH = 250.0f;

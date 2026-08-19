@@ -16,8 +16,8 @@ public enum BlockData {
     VOIDSTONE((byte) 6, "Voidstone", 999, 5, 0, SoundGroup.HARD),
     GLASS((byte) 6, "Glass", 800, 6, 0, SoundGroup.GLASS);
 
-    public static final int ATLAS_COLS = K.UI.BLOCK_ATLAS_FRAMES;
-    public static final int ATLAS_ROWS = K.UI.ICON_BLOCK_ATLAS_ROWS;
+    public static final int ATLAS_COLS = K.UI.BLOCK_ATLAS_COLUMNS;
+    public static final int ATLAS_ROWS = K.UI.BLOCK_ATLAS_ROWS;
 
     private final byte id;
     private final String name;
