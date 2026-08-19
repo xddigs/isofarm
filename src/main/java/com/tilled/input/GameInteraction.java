@@ -2,6 +2,7 @@ package com.tilled.input;
 
 import com.tilled.data.*;
 import com.tilled.graphics.Camera;
+import com.tilled.graphics.ItemRenderer;
 import com.tilled.graphics.ParticleEngine;
 import com.tilled.graphics.SpriteSheet;
 import com.tilled.service.CropService;
@@ -26,6 +27,7 @@ public class GameInteraction {
     private final ParticleEngine particles;
     private final Camera camera;
     private final SpriteSheet blocksTexture;
+    private final ItemRenderer itemRenderer;
     private Hit hoveredCell = null;
 
     public GameInteraction(CropService cropService,
@@ -33,13 +35,15 @@ public class GameInteraction {
                            TimeService timeService,
                            ParticleEngine particles,
                            Camera camera,
-                           SpriteSheet blocksTexture) {
+                           SpriteSheet blocksTexture,
+                           ItemRenderer itemRenderer) {
         this.cropService = cropService;
         this.gameUIservice = gameUIservice;
         this.timeService = timeService;
         this.particles = particles;
         this.camera = camera;
         this.blocksTexture = blocksTexture;
+        this.itemRenderer = itemRenderer;
     }
 
     public Hit getHoveredCell() {
@@ -109,17 +113,14 @@ public class GameInteraction {
             SpriteSheet sheet = gameMaster.getCropSpriteSheet(cropType);
 
             if (crop.isReadyToHarvest()) {
-                cropService.harvest(
-                        gameMaster.getPlayer(),
-                        crop,
-                        gameMaster.getToastService(),
-                        sheet
-                );
+                cropService.harvest(gameMaster.getPlayer(),crop,
+                        gameMaster.getToastService(),sheet);
             } else {
                 cropService.rip(crop);
             }
 
             if (sheet != null) {
+                itemRenderer.playBreakAnimation();
                 particles.spawn(x, y + K.World.SHORTER_BLOCK_HEIGHT, z, sheet, frameIndex);
             }
 
@@ -141,7 +142,8 @@ public class GameInteraction {
                             getDistanceToBlock(gameMaster, cell), MAX_INTERACTION_DISTANCE);
         }
 
-        world.setBlockTypeAt(x, y, z, (byte) 0);
+        world.setBlockTypeAt(x, y, z, BlockData.AIR.getId());
+        itemRenderer.playBreakAnimation();
         gameMaster.rebuildChunkMeshAt(x, z);
 
         particles.spawn(x, y, z, blockData, blocksTexture);
@@ -161,6 +163,7 @@ public class GameInteraction {
             int x = cell.x() + cell.normalX();
             int y = cell.y() + cell.normalY();
             int z = cell.z() + cell.normalZ();
+            if (gameMaster.getPlayer().intersectsBlock(x, y, z)) return;
 
             if (y < 0 || y >= Chunk.SIZE_Y) {
                 return;
@@ -170,6 +173,7 @@ public class GameInteraction {
             if (existingBlock == 0) {
                 Block newBlock = new Block(block.getType(), x, y, z);
                 world.setBlockTypeAt(x, y, z, block.getType().getId());
+                itemRenderer.playPlaceAnimation();
                 gameMaster.getSoundService().playBreakSound(newBlock.getType().getSoundGroup(),
                         getDistanceToBlock(gameMaster, cell), MAX_INTERACTION_DISTANCE);
 

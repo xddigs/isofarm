@@ -223,6 +223,35 @@ public class Player extends Character {
         return false;
     }
 
+    public boolean intersectsBlock(int blockX, int blockY, int blockZ) {
+        float epsilon = 0.001f;
+
+        float playerMinX = position.x - dimensions.x / 2.0f + epsilon;
+        float playerMaxX = position.x + dimensions.x / 2.0f - epsilon;
+
+        float playerMinY = position.y + epsilon;
+        float playerMaxY = position.y + dimensions.y - epsilon;
+
+        float playerMinZ = position.z - dimensions.z / 2.0f + epsilon;
+        float playerMaxZ = position.z + dimensions.z / 2.0f - epsilon;
+
+        float blockMinX = blockX;
+        float blockMaxX = blockX + 1.0f;
+
+        float blockMinY = blockY;
+        float blockMaxY = blockY + 1.0f;
+
+        float blockMinZ = blockZ;
+        float blockMaxZ = blockZ + 1.0f;
+
+        return playerMinX < blockMaxX &&
+                playerMaxX > blockMinX &&
+                playerMinY < blockMaxY &&
+                playerMaxY > blockMinY &&
+                playerMinZ < blockMaxZ &&
+                playerMaxZ > blockMinZ;
+    }
+
     public Vector3f getEyePosition() {
         float eyeHeight = 1.6f;
         return new Vector3f(position.x, position.y + eyeHeight, position.z);

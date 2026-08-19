@@ -73,6 +73,9 @@ public class Block extends Item {
     @Override
     public Item copy(int newAmount) {
         if (newAmount <= 0) return null;
-        return new Block(type, x, y, z);
+        Block block = new Block(type, x, y, z);
+        block.setAmount(newAmount);
+        block.setWaterLevel(waterLevel);
+        return block;
     }
 }

@@ -24,7 +24,7 @@ public class Hoe extends Tool {
 
         world.setBlockTypeAt(target.getX(), target.getY(),
                 target.getZ(), BlockData.TILLED_DIRT.getId());
-
+        gameMaster.getItemRenderer().playPlaceAnimation();
         gameMaster.getSoundService().playPlaceSound(block.getType().getSoundGroup(),
                 interaction.getDistanceToBlock(gameMaster, interaction.getHoveredCell()),
                 MAX_INTERACTION_DISTANCE);

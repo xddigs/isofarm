@@ -21,9 +21,80 @@ public class ItemRenderer {
     private final Matrix4f baseModelMatrix;
     private final Mesh quadMesh;
 
+    private enum ActionAnimation {
+        NONE,
+        BREAK,
+        PLACE
+    }
+
+    private ActionAnimation currentAnimation = ActionAnimation.NONE;
+    private float animationTime = 0.0f;
+
+    private static final float ANIMATION_DURATION = 0.14f;
+
     public ItemRenderer() {
         this.baseModelMatrix = new Matrix4f();
         this.quadMesh = Mesh.createCenteredQuad();
+    }
+
+    public void playBreakAnimation() {
+        currentAnimation = ActionAnimation.BREAK;
+        animationTime = 0.0f;
+    }
+
+    public void playPlaceAnimation() {
+        currentAnimation = ActionAnimation.PLACE;
+        animationTime = 0.0f;
+    }
+
+    private float animationProgress() {
+        return Math.min(animationTime / ANIMATION_DURATION, 1.0f);
+    }
+
+    private float easeOut(float t) {
+        return 1.0f - (1.0f - t) * (1.0f - t);
+    }
+
+    public void update(float delta) {
+        if (currentAnimation == ActionAnimation.NONE) {
+            return;
+        }
+
+        animationTime += delta;
+
+        if (animationTime >= ANIMATION_DURATION) {
+            animationTime = ANIMATION_DURATION;
+            currentAnimation = ActionAnimation.NONE;
+        }
+    }
+
+    private Vector3f getAnimationOffset() {
+        float progress = animationProgress();
+        if (currentAnimation == ActionAnimation.BREAK) {
+            float swing = (float) Math.sin(progress * Math.PI);
+            return new Vector3f(0.0f, -0.10f * swing, 0.12f * swing);
+        }
+
+        if (currentAnimation == ActionAnimation.PLACE) {
+            float swing = (float) Math.sin(progress * Math.PI);
+            return new Vector3f(0.0f, -0.12f * swing, 0.0f);
+        }
+
+        return new Vector3f();
+    }
+
+    private float getAnimationRotation() {
+        if (currentAnimation == ActionAnimation.BREAK) {
+            float progress = animationProgress();
+            return (float) Math.sin(progress * Math.PI) * 18.0f;
+        }
+
+        if (currentAnimation == ActionAnimation.PLACE) {
+            float progress = animationProgress();
+            return (float) Math.sin(progress * Math.PI) * 5.0f;
+        }
+
+        return 0.0f;
     }
 
     public void render(GameMaster gameMaster, Item item,
@@ -44,10 +115,18 @@ public class ItemRenderer {
             rotateZ = 0.0f;
         }
 
+        Vector3f animationOffset = getAnimationOffset();
+        float animationRotation = getAnimationRotation();
+
         baseModelMatrix.identity()
-                .translate(OFFSET_X, OFFSET_Y, OFFSET_Z)
+                .translate(
+                        OFFSET_X + animationOffset.x,
+                        OFFSET_Y + animationOffset.y,
+                        OFFSET_Z + animationOffset.z
+                )
                 .rotateX((float) Math.toRadians(rotateX))
-                .rotateY((float) Math.toRadians(rotateY))
+                .rotateY((float) Math.toRadians(
+                        rotateY + animationRotation))
                 .rotateZ((float) Math.toRadians(rotateZ))
                 .scale(ITEM_SCALE, -ITEM_SCALE, ITEM_SCALE);
 

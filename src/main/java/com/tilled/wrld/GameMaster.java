@@ -116,7 +116,8 @@ public class GameMaster {
         this.weatherService = new WeatherService(rainEngine, camera);
 
         this.gameInteraction = new GameInteraction(cropService, gameUIservice,
-                timeService, particles, camera, resourceManager.getBlocksTexture());
+                timeService, particles, camera, resourceManager.getBlocksTexture(),
+                itemRenderer);
 
         recenter();
     }
@@ -237,6 +238,7 @@ public class GameMaster {
 
         cameraController.update(this, delta);
         camera.update(delta);
+        itemRenderer.update(delta);
 
         stepController.update(this, player, soundService, delta);
 
