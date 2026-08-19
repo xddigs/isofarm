@@ -11,7 +11,7 @@ public class TimeService {
     private static final int MINUTES_PER_HOUR = 60;
     private static final int HOURS_PER_DAY = 24;
     private static final int DAYS_PER_SEASON = 28;
-    private static final int STARTING_HOUR = 12;
+    private static final int STARTING_HOUR = 6;
 
     private Season currentSeason = Season.SPRING;
     private float secondAccumulator = 0.0f;

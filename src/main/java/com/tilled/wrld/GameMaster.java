@@ -251,7 +251,6 @@ public class GameMaster {
 
     public void render() {
         gameRenderer.render(this, resourceManager, chunkManager.getChunkMeshes());
-
         Item selectedItem = gameUIservice.getHotbarUI().getSelectedItem();
         if (selectedItem != null && !isInventoryOpen() && isHUDShown()) {
             SpriteSheet spriteSheet = resourceManager.getItemSpriteSheet(selectedItem);

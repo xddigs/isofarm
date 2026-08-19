@@ -50,6 +50,7 @@ public class GameRenderer {
         defaultShader.bind();
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, gameMaster.getShadowMap().getDepthTexture());
+        defaultShader.setUniform("uEnableShadows", true);
         defaultShader.setUniform("uShadowMap", 1);
         defaultShader.setUniform("uIsMaskPass", false);
 
@@ -221,6 +222,22 @@ public class GameRenderer {
             modelMatrix.identity().translate(minX, 0.0f, minZ);
             shadowShader.setUniform("uModel", modelMatrix);
             mesh.render();
+        });
+
+        gameMaster.getWorld().forEach(block -> {
+            if (!(block instanceof Crop crop)) {
+                return;
+            }
+
+            float renderX = crop.getX() + 0.5f;
+            float renderY = crop.getY() + K.World.SHORTER_BLOCK_HEIGHT;
+            float renderZ = crop.getZ() + 0.5f;
+
+            modelMatrix.identity()
+                    .translate(renderX, renderY, renderZ);
+
+            shadowShader.setUniform("uModel", modelMatrix);
+            rm.getSpriteMesh().render();
         });
 
         shadowShader.unbind();
