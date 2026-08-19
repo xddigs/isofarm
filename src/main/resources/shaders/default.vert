@@ -1,18 +1,20 @@
 #version 330 core
 
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec3 aNormal;
-layout (location = 2) in vec2 aTexCoord;
+layout(location = 0) in vec3 aPos;
+layout(location = 1) in vec3 aNormal;
+layout(location = 2) in vec2 aTexCoord;
 
 out vec2 vTexCoord;
 out vec3 vNormal;
 out vec2 vAtlasOffset;
-
+out vec3 vFragPos;
+out vec4 vLightSpacePosition;
 out vec2 TexCoord;
 
 uniform mat4 uProjection;
 uniform mat4 uView;
 uniform mat4 uModel;
+uniform mat4 uLightSpaceMatrix;
 uniform vec4 uUVBounds;
 
 uniform int uFrameIndex;
@@ -25,8 +27,12 @@ uniform vec2 uSideAtlasOffset = vec2(0.0, 0.0);
 uniform bool uUseFaceAtlas = false;
 
 void main() {
-    gl_Position = uProjection * uView * uModel * vec4(aPos, 1.0);
-    vNormal = mat3(transpose(inverse(uModel))) * aNormal;
+    vec4 worldPosition = uModel * vec4(aPos, 1.0);
+
+    gl_Position = uProjection * uView * worldPosition;
+    vFragPos = worldPosition.xyz;
+    vNormal = normalize(mat3(transpose(inverse(uModel))) * aNormal);
+    vLightSpacePosition = uLightSpaceMatrix * worldPosition;
 
     if (uUseFaceAtlas) {
         if (aNormal.y > 0.5) {

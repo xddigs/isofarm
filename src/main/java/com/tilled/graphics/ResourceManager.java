@@ -15,6 +15,7 @@ public class ResourceManager {
     private final Shader outlineShader;
     private final Shader rainShader;
     private final Shader motionBlurShader;
+    private final Shader shadowMapShader;
 
     private final Mesh screenQuadMesh;
     private final Mesh blockMesh;
@@ -40,6 +41,7 @@ public class ResourceManager {
         this.outlineShader = new Shader(K.Paths.OUTLINE_VERT_SHADER, K.Paths.OUTLINE_FRAG_SHADER);
         this.rainShader = new Shader(K.Paths.RAIN_VERT_SHADER, K.Paths.RAIN_FRAG_SHADER);
         this.motionBlurShader = new Shader(K.Paths.MOTION_BLUR_VERT_SHADER, K.Paths.MOTION_BLUR_FRAG_SHADER);
+        this.shadowMapShader = new Shader(K.Paths.SHADOW_VERT_SHADER, K.Paths.SHADOW_FRAG_SHADER);
 
         this.screenQuadMesh = Mesh.screenQuad();
         this.blockMesh = Mesh.createMesh(K.World.DEFAULT_BLOCK_DEPTH);
@@ -97,12 +99,14 @@ public class ResourceManager {
         outlineShader.dispose();
         motionBlurShader.dispose();
         rainShader.dispose();
+        shadowMapShader.dispose();
     }
 
     public Shader getDefaultShader() { return defaultShader; }
     public Shader getOutlineShader() { return outlineShader; }
     public Shader getRainShader() { return rainShader; }
     public Shader getMotionBlurShader() { return motionBlurShader; }
+    public Shader getShadowMapShader() { return shadowMapShader; }
     public Mesh getScreenQuadMesh() { return screenQuadMesh; }
     public Mesh getBlockMesh() { return blockMesh; }
     public Mesh getSelectionMesh() { return selectionMesh; }
@@ -132,6 +136,7 @@ public class ResourceManager {
             case "outline" -> outlineShader;
             case "rain" -> rainShader;
             case "motion_blur" -> motionBlurShader;
+            case "shadow" -> shadowMapShader;
             case "default", "item" -> defaultShader;
             default -> {
                 log.warn("Shader '{}' not found, using defaultShader", name);

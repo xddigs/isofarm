@@ -4,30 +4,36 @@ import com.tilled.data.Crop;
 import com.tilled.data.Hit;
 import com.tilled.service.TimeService;
 import com.tilled.utils.K;
+import com.tilled.utils.Settings;
 import com.tilled.wrld.Chunk;
 import com.tilled.wrld.GameMaster;
-import com.tilled.utils.Settings;
 import org.joml.FrustumIntersection;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
+import org.joml.Vector3f;
 
 import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13.glActiveTexture;
+import static org.lwjgl.opengl.GL13.*;
 
 public class GameRenderer {
     private final Matrix4f modelMatrix = new Matrix4f();
     private final Matrix4f viewProjMatrix = new Matrix4f();
     private final FrustumIntersection frustum = new FrustumIntersection();
-
+    private final Matrix4f lightProjection = new Matrix4f();
+    private final Matrix4f lightView = new Matrix4f();
+    private final Matrix4f lightSpaceMatrix = new Matrix4f();
+    private final Vector3f lightPosition = new Vector3f();
+    private final Vector3f lightTarget = new Vector3f();
+    private final Vector3f upVector = new Vector3f(0.0f, 1.0f, 0.0f);
     private float previousCameraYaw;
     private float previousCameraPitch;
     private float blurX;
     private float blurY;
 
     public void render(GameMaster gameMaster, ResourceManager rm, Map<Chunk, Mesh> chunkMeshes) {
+        renderShadowPass(gameMaster, rm, chunkMeshes);
         Camera camera = gameMaster.getCamera();
         float windowWidth = gameMaster.getWindowWidth();
         float windowHeight = gameMaster.getWindowHeight();
@@ -35,20 +41,28 @@ public class GameRenderer {
         Framebuffer maskFbo = gameMaster.getMaskFbo();
 
         sceneFbo.bind();
-        glClearColor(0.15f, 0.15f, 0.20f, 1.0f);
+        Vector3f skyColor = TimeService.getSkyColor();
+        glClearColor(skyColor.x, skyColor.y, skyColor.z, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glActiveTexture(GL_TEXTURE0);
         Shader defaultShader = rm.getDefaultShader();
         defaultShader.bind();
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, gameMaster.getShadowMap().getDepthTexture());
+        defaultShader.setUniform("uShadowMap", 1);
         defaultShader.setUniform("uIsMaskPass", false);
 
         defaultShader.setUniform("uProjection", camera.getProjectionMatrix());
         defaultShader.setUniform("uView", camera.getViewMatrix());
 
-        defaultShader.setUniform("uSunColor", TimeService.getSunLightColor());
-        defaultShader.setUniform("uLightIntensity", TimeService.getSunIntensity());
-        defaultShader.setUniform("uLightDirection", gameMaster.getSunlight().getDirection());
+        CelestialLighting lighting = gameMaster.getCelestialLighting();
+        defaultShader.setUniform("uSunColor", lighting.getColor());
+        defaultShader.setUniform("uLightIntensity", lighting.getIntensity());
+        defaultShader.setUniform("uLightDirection", lighting.getDirection());
+        defaultShader.setUniform("uAmbientIntensity", lighting.getAmbientIntensity());
+        defaultShader.setUniform("uSkyColor", TimeService.getSkyColor());
+        defaultShader.setUniform("uLightSpaceMatrix", lightSpaceMatrix);
 
         defaultShader.setUniform("uTotalFrames", 1);
         defaultShader.setUniform("uFrameIndex", 0);
@@ -113,7 +127,6 @@ public class GameRenderer {
         });
 
         gameMaster.getParticles().render(defaultShader, rm.getSpriteMesh());
-
         if (blocksTexture != null) blocksTexture.unbind();
 
         Hit hoveredCell = gameMaster.getHoveredCell();
@@ -143,7 +156,6 @@ public class GameRenderer {
             defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
 
             maskFbo.unbind((int) windowWidth, (int) windowHeight);
-
             sceneFbo.bind();
 
             glDisable(GL_DEPTH_TEST);
@@ -187,6 +199,43 @@ public class GameRenderer {
         }
 
         gameMaster.getGameUIService().render(gameMaster.isHUDShown(), gameMaster);
+    }
+
+    private void renderShadowPass(GameMaster gameMaster, ResourceManager rm,
+                                  Map<Chunk, Mesh> chunkMeshes) {
+        ShadowMap shadowMap = gameMaster.getShadowMap();
+        Shader shadowShader = rm.getShadowMapShader();
+
+        updateLightSpaceMatrix(gameMaster);
+        shadowMap.bind();
+        glEnable(GL_DEPTH_TEST);
+        glDepthMask(true);
+        shadowShader.bind();
+        shadowShader.setUniform("uLightSpaceMatrix", lightSpaceMatrix);
+        chunkMeshes.forEach((chunk, mesh) -> {
+            if (mesh == null || mesh.getIndicesCount() <= 0) {
+                return;
+            }
+            float minX = chunk.getChunkX() * Chunk.SIZE_X;
+            float minZ = chunk.getChunkZ() * Chunk.SIZE_Z;
+            modelMatrix.identity().translate(minX, 0.0f, minZ);
+            shadowShader.setUniform("uModel", modelMatrix);
+            mesh.render();
+        });
+
+        shadowShader.unbind();
+        shadowMap.unbind((int) gameMaster.getWindowWidth(), (int) gameMaster.getWindowHeight());
+    }
+
+    private void updateLightSpaceMatrix(GameMaster gameMaster) {
+        Camera camera = gameMaster.getCamera();
+        Vector3f cameraPosition = new Vector3f(camera.getPosition());
+        Vector3f lightDirection = new Vector3f(gameMaster.getCelestialLighting().getDirection()).normalize();
+        lightTarget.set(cameraPosition);
+        lightPosition.set(cameraPosition).sub(new Vector3f(lightDirection).mul(80.0f));
+        lightProjection.identity().ortho(-60.0f, 60.0f, -60.0f, 60.0f, 1.0f, 180.0f);
+        lightView.identity().lookAt(lightPosition, lightTarget, upVector);
+        lightSpaceMatrix.set(lightProjection).mul(lightView);
     }
 
     private void updateBlur(Camera camera) {

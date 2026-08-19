@@ -18,8 +18,11 @@ public class GameMaster {
     private static final Logger log = LoggerFactory.getLogger(GameMaster.class);
     private final long windowHandle;
     private final World world;
+    private final Sun sun;
+    private final Moon moon;
+    private final CelestialLighting celestialLighting;
+    private final ShadowMap shadowMap;
     private final SoundService soundService;
-
     private final UIManager uiManager;
     private final GameUIService gameUIservice;
     private final GameInteraction gameInteraction;
@@ -33,7 +36,6 @@ public class GameMaster {
 
     private final CommandRegistry commandRegistry;
     private final ItemRegistry itemRegistry;
-    private final Sunlight sunlight;
 
     private final ResourceManager resourceManager;
     private final ChunkManager chunkManager;
@@ -62,6 +64,11 @@ public class GameMaster {
         this.windowHandle = windowHandle;
 
         this.world = new World();
+        this.sun = new Sun("Sun");
+        this.moon = new Moon("Moon");
+        this.celestialLighting = new CelestialLighting(sun, moon);
+        this.shadowMap = new ShadowMap(4096, 4096);
+
         this.windowWidth = K.Window.DEFAULT_WIDTH;
         this.windowHeight = K.Window.DEFAULT_HEIGHT;
         this.soundService = new SoundService();
@@ -73,7 +80,6 @@ public class GameMaster {
         this.toastService = new ToastService();
         this.commandService = new CommandService(commandRegistry, toastService);
         this.itemRegistry = new ItemRegistry();
-        this.sunlight = new Sunlight(K.Sunlight.DEFAULT_DIRECTION);
         this.rainEngine = new RainEngine();
 
         glEnable(GL_BLEND);
@@ -112,11 +118,14 @@ public class GameMaster {
         recenter();
     }
 
+    public Sun getSun() { return sun; }
+    public Moon getMoon() { return moon; }
+    public CelestialLighting getCelestialLighting() { return celestialLighting; }
+    public ShadowMap getShadowMap() { return shadowMap; }
     public ResourceManager getResourceManager() { return resourceManager; }
     public ChunkManager getChunkManager() { return chunkManager; }
     public GameRenderer getGameRenderer() { return gameRenderer; }
     public ItemRenderer getItemRenderer() { return itemRenderer; }
-    public Sunlight getSunlight() { return sunlight; }
     public ParticleEngine getParticles() { return particles; }
     public Hit getHoveredCell() { return hoveredCell; }
     public Framebuffer getMaskFbo() { return maskFbo; }
@@ -131,6 +140,7 @@ public class GameMaster {
     public ItemRegistry getItemRegistry() { return itemRegistry; }
     public GameUIService getGameUIService() { return gameUIservice; }
     public WeatherService getWeatherService() { return weatherService; }
+    public TimeService getTimeService() { return timeService; }
     public float getWindowWidth() { return windowWidth; }
     public float getWindowHeight() { return windowHeight; }
     public Camera getCamera() { return camera; }
@@ -218,6 +228,8 @@ public class GameMaster {
 
         genDelta = delta;
         timeService.update(delta, weatherService);
+        float timeOfDay = timeService.getHour() + (timeService.getMinute() / 60.0f);
+        celestialLighting.update(timeOfDay);
         particles.update(delta);
         shop.update(timeService);
         cropService.update(delta, weatherService.getWeather());
@@ -278,6 +290,7 @@ public class GameMaster {
         maskFbo.dispose();
         sceneFbo.dispose();
         rainEngine.dispose();
+        shadowMap.dispose();
 
         cameraController.release(this);
         soundService.cleanup();

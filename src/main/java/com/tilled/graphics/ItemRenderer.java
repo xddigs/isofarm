@@ -11,6 +11,7 @@ public class ItemRenderer {
     private static final float OFFSET_X = 0.60f;
     private static final float OFFSET_Y = -0.35f;
     private static final float OFFSET_Z = -0.55f;
+    private static final float ITEM_SCALE = 0.80f;
 
     private static final int THICKNESS_LAYERS = 24;
     private static final float LAYER_DEPTH = 0.0025f;
@@ -58,7 +59,7 @@ public class ItemRenderer {
                 .rotateX((float) Math.toRadians(rotateX))
                 .rotateY((float) Math.toRadians(rotateY))
                 .rotateZ((float) Math.toRadians(rotateZ))
-                .scale(0.50f, -0.50f, 0.50f);
+                .scale(ITEM_SCALE, -ITEM_SCALE, ITEM_SCALE);
 
         int frameIndex = item.getId();
 

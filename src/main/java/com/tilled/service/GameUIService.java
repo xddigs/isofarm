@@ -28,6 +28,7 @@ public class GameUIService implements Service<GameMaster> {
     private final InventoryUI inventoryUI;
     private final HotbarUI hotbarUI;
     private final UITextField chatField;
+    private final UILabel time;
     private final List<String> chatHistory;
     private final SpriteSheet seedIcons;
     private final SpriteSheet cropIcons;
@@ -45,7 +46,8 @@ public class GameUIService implements Service<GameMaster> {
 
     public GameUIService(
             long windowHandle,
-            GameMaster gameMaster, UIManager uiManager,
+            GameMaster gameMaster,
+            UIManager uiManager,
             SpriteSheet seedIcons,
             SpriteSheet cropIcons,
             SpriteSheet blockIcons,
@@ -94,6 +96,10 @@ public class GameUIService implements Service<GameMaster> {
         this.chatField.setLayer(1000);
         this.chatField.hide();
         uiManager.getRoot().addChild(chatField);
+
+        this.time = new UILabel(20, 40, 100f, 25f, null);
+        this.time.show();
+        uiManager.getRoot().addChild(time);
     }
 
     public InventoryUI getInventoryUI() {
@@ -136,6 +142,7 @@ public class GameUIService implements Service<GameMaster> {
             }
         }
 
+        time.setText(gameMaster.getTimeService().getFormattedTime());
         uiManager.update(delta);
         gameMaster.getToastService().update(delta);
 

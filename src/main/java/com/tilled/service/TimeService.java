@@ -11,7 +11,7 @@ public class TimeService {
     private static final int MINUTES_PER_HOUR = 60;
     private static final int HOURS_PER_DAY = 24;
     private static final int DAYS_PER_SEASON = 28;
-    private static final int STARTING_HOUR = 8;
+    private static final int STARTING_HOUR = 6;
 
     private Season currentSeason = Season.SPRING;
     private float secondAccumulator = 0.0f;
@@ -55,7 +55,7 @@ public class TimeService {
     }
 
     public String getFormattedTime() {
-        return String.format("Year %d %s, Day %02d | %02d:%02d", 
+        return String.format("Year %d %s, Day %02d | %02d:%02d",
                 year, currentSeason, day, hour, minute);
     }
 
@@ -119,34 +119,41 @@ public class TimeService {
     }
 
     public static Vector3f getSkyColor() {
-        float timeInHours = hour + (minute / 60.0f);
-        Vector3f night  = new Vector3f(0.05f, 0.05f, 0.12f);
-        Vector3f dawn   = new Vector3f(0.85f, 0.45f, 0.30f);
-        Vector3f day    = new Vector3f(0.35f, 0.65f, 0.95f);
-        Vector3f dusk   = new Vector3f(0.75f, 0.30f, 0.35f);
+        float time = hour + minute / 60.0f;
+        Vector3f night = new Vector3f(0.025f, 0.035f, 0.09f);
+        Vector3f dawn = new Vector3f(0.85f, 0.40f, 0.22f);
+        Vector3f day = new Vector3f(0.35f, 0.65f, 0.95f);
+        Vector3f dusk = new Vector3f(0.70f, 0.25f, 0.30f);
         Vector3f result = new Vector3f();
 
-        if (timeInHours >= 0.0f && timeInHours < 5.0f) {
+        if (time < 5.0f) {
             result.set(night);
-        } else if (timeInHours >= 5.0f && timeInHours < 7.0f) {
-            float t = (timeInHours - 5.0f) / 2.0f;
+        } else if (time < 7.0f) {
+            float t = smoothStep(5.0f, 7.0f, time);
             night.lerp(dawn, t, result);
-        } else if (timeInHours >= 7.0f && timeInHours < 12.0f) {
-            float t = (timeInHours - 7.0f) / 5.0f;
+        } else if (time < 12.0f) {
+            float t = smoothStep(7.0f, 12.0f, time);
             dawn.lerp(day, t, result);
-        } else if (timeInHours >= 12.0f && timeInHours < 17.0f) {
-            result.set(day);
-        } else if (timeInHours >= 17.0f && timeInHours < 20.0f) {
-            float t = (timeInHours - 17.0f) / 3.0f;
+        } else if (time < 17.0f) {
+            float t = smoothStep(12.0f, 17.0f, time);
+            day.lerp(day, t, result);
+        } else if (time < 20.0f) {
+            float t = smoothStep(17.0f, 20.0f, time);
             day.lerp(dusk, t, result);
-        } else if (timeInHours >= 20.0f && timeInHours < 22.0f) {
-            float t = (timeInHours - 20.0f) / 2.0f;
+        } else if (time < 22.0f) {
+            float t = smoothStep(20.0f, 22.0f, time);
             dusk.lerp(night, t, result);
         } else {
             result.set(night);
         }
 
         return result;
+    }
+
+    private static float smoothStep(float start, float end, float value) {
+        float t = (value - start) / (end - start);
+        t = Math.clamp(t, 0.0f, 1.0f);
+        return t * t * (3.0f - 2.0f * t);
     }
 
     public static Vector3f getSunLightColor() {

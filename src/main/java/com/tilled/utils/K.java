@@ -52,10 +52,6 @@ public final class K {
         public static final float SHORTER_BLOCK_HEIGHT = 0.9375f;
     }
 
-    public static final class Sunlight {
-        public static final Vector3f DEFAULT_DIRECTION = new Vector3f(-0.5f, -1.0f, -0.5f);
-    }
-
     public static final class Window {
         public static final float DEFAULT_WIDTH = 1280.0f;
         public static final float DEFAULT_HEIGHT = 720.0f;
@@ -148,6 +144,9 @@ public final class K {
 
         public static final String RAIN_VERT_SHADER = "shaders/rain.vert";
         public static final String RAIN_FRAG_SHADER = "shaders/rain.frag";
+
+        public static final String SHADOW_FRAG_SHADER = "shaders/shadow.frag";
+        public static final String SHADOW_VERT_SHADER = "shaders/shadow.vert";
 
         public static final String WHEAT_TEXTURE = "assets/crops/wheat_crop.png";
         public static final String CARROT_TEXTURE = "assets/crops/carrot_crop.png";
