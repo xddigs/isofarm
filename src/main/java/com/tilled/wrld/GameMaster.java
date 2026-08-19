@@ -259,7 +259,8 @@ public class GameMaster {
             SpriteSheet spriteSheet = resourceManager.getItemSpriteSheet(selectedItem);
             Shader itemShader = resourceManager.getShader("item");
             boolean isMoving = (player != null) && player.isMoving();
-            itemRenderer.render(this, selectedItem, spriteSheet, itemShader, isMoving, genDelta);
+            itemRenderer.render(this, selectedItem, spriteSheet,
+                    itemShader, celestialLighting,  isMoving, genDelta);
         }
 
         if (player == null) {

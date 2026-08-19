@@ -29,6 +29,8 @@ uniform float uAmbientIntensity;
 uniform bool uIsMaskPass;
 uniform float uParticleAlpha;
 
+uniform bool uEnableShadows = false;
+
 float calculateShadow(vec4 lightSpacePosition, vec3 normal) {
     vec3 projectionCoordinates = lightSpacePosition.xyz / lightSpacePosition.w;
     projectionCoordinates = projectionCoordinates * 0.5 + 0.5;
@@ -97,7 +99,10 @@ void main() {
     vec3 lightDir = normalize(-uLightDirection);
     float diffuse = max(dot(normal, lightDir), 0.0);
 
-    float shadow = calculateShadow(vLightSpacePosition, normal);
+    float shadow = 0.0;
+    if (uEnableShadows) {
+        shadow = calculateShadow(vLightSpacePosition, normal);
+    }
 
     vec3 ambient = uSkyColor * uAmbientIntensity;
     vec3 directLight = uSunColor * diffuse * uLightIntensity * (1.0 - shadow);

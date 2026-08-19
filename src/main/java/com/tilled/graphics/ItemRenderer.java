@@ -4,6 +4,7 @@ import com.tilled.data.Item;
 import com.tilled.data.Tool;
 import com.tilled.wrld.GameMaster;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -27,6 +28,7 @@ public class ItemRenderer {
 
     public void render(GameMaster gameMaster, Item item,
                        SpriteSheet spriteSheet, Shader shader,
+                       CelestialLighting lighting,
                        boolean isMoving, float delta) {
         if (item == null || spriteSheet == null || quadMesh == null) return;
         glClear(GL_DEPTH_BUFFER_BIT);
@@ -69,6 +71,14 @@ public class ItemRenderer {
         shader.setUniform("uView", new Matrix4f().identity());
         shader.setUniform("uFrameIndex", frameIndex);
         shader.setUniform("uTotalFrames", spriteSheet.getTotalFrames());
+        Vector3f viewLightDir = new Vector3f(lighting.getDirection());
+        gameMaster.getCamera().getViewMatrix().transformDirection(viewLightDir);
+        shader.setUniform("uLightDirection", viewLightDir);
+        shader.setUniform("uSunColor", lighting.getColor());
+        shader.setUniform("uSkyColor", lighting.getColor());
+        shader.setUniform("uLightIntensity", lighting.getIntensity());
+        shader.setUniform("uAmbientIntensity", lighting.getAmbientIntensity());
+        shader.setUniform("uEnableShadows", false);
 
         for (int i = THICKNESS_LAYERS - 1; i >= 0; i--) {
             Matrix4f layerMatrix = new Matrix4f(baseModelMatrix)
