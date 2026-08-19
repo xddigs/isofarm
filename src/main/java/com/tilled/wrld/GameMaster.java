@@ -169,6 +169,10 @@ public class GameMaster {
         return cameraController;
     }
 
+    public GameInteraction getGameInteraction() {
+        return gameInteraction;
+    }
+
     public int getLastPlayerChunkX() {
         return chunkManager.getLastPlayerChunkX();
     }
@@ -257,7 +261,7 @@ public class GameMaster {
         cameraController.update(this, delta);
         camera.update(delta);
 
-        stepController.update(player, world, soundService, delta);
+        stepController.update(this, player, soundService, delta);
 
         Item selectedInventoryItem = gameUIservice.getInventoryUI().getSelectedItem();
         hoveredCell = gameInteraction.update(this, selectedInventoryItem);

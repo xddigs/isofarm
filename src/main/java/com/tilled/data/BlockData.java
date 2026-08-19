@@ -142,7 +142,7 @@ public enum BlockData {
         return sideAtlasOffset;
     }
 
-    public SoundGroup getStepSoundGroup() {
+    public SoundGroup getSoundGroup() {
         return soundGroup;
     }
 }

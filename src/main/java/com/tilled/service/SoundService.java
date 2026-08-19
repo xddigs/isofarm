@@ -71,21 +71,37 @@ public class SoundService {
         alSourcef(placeSource, AL_GAIN, 1.0f);
     }
 
-    public void playStepSound(SoundGroup group) {
-        playSound(stepSource, group != null ? group.getStepSounds() : null, 0.95f, 0.1f);
+    public void playStepSound(SoundGroup group, float distance, float maxDistance) {
+        float volume = calculateBreakVolume(distance, maxDistance);
+        playSound(stepSource, group != null ? group.getStepSounds() : null,
+                0.95f, 0.1f, volume);
     }
 
-    public void playBreakSound(SoundGroup group) {
-        playSound(breakSource, group != null ? group.getBreakSounds() : null, 0.8f, 0.2f);
+    public void playBreakSound(SoundGroup group, float distance, float maxDistance) {
+        float volume = calculateBreakVolume(distance, maxDistance);
+        playSound(breakSource, group != null ? group.getBreakSounds() : null,
+                0.8f, 0.2f, volume);
     }
 
-    public void playPlaceSound(SoundGroup group) {
-        playSound(breakSource, group != null ? group.getPlaceSounds() : null, 0.75f, 0.2f);
+    public void playPlaceSound(SoundGroup group, float distance, float maxDistance) {
+        float volume = calculateBreakVolume(distance, maxDistance);
+        playSound(breakSource, group != null ? group.getPlaceSounds() : null,
+                0.75f, 0.2f, volume);
     }
 
-    private void playSound(int source, String[] sounds, float basePitch, float pitchVariation) {
+    private float calculateBreakVolume(float distance, float maxDistance) {
+        if (maxDistance <= 0.0f) {
+            return 1.0f;
+        }
+
+        float normalizedDistance = Math.min(distance / maxDistance, 1.0f);
+        float volume = 1.1f - (normalizedDistance * normalizedDistance) * 0.95f;
+        return Math.clamp(volume, 0.05f, 1.1f);
+    }
+
+    private void playSound(int source, String[] sounds, float basePitch,
+                           float pitchVariation, float volume) {
         if (sounds == null || sounds.length == 0) return;
-
         String selectedSoundPath = sounds[(int) (Math.random() * sounds.length)];
         Integer bufferId = soundBuffers.get(selectedSoundPath);
 
@@ -93,6 +109,7 @@ public class SoundService {
             alSourceStop(source);
             alSourcei(source, AL_BUFFER, bufferId);
             alSourcef(source, AL_PITCH, basePitch + (float) Math.random() * pitchVariation);
+            alSourcef(source, AL_GAIN, volume);
             alSourcePlay(source);
         }
     }

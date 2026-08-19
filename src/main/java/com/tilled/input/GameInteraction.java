@@ -17,14 +17,15 @@ import org.slf4j.LoggerFactory;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class GameInteraction {
+    public static final float MAX_INTERACTION_DISTANCE = 5.0f;
     private static final Logger log = LoggerFactory.getLogger(GameInteraction.class);
-    private static final float MAX_INTERACTION_DISTANCE = 5.0f;
     private final CropService cropService;
     private final GameUIService gameUIservice;
     private final TimeService timeService;
     private final ParticleEngine particles;
     private final Camera camera;
     private final SpriteSheet blocksTexture;
+    private Hit hoveredCell = null;
 
     public GameInteraction(CropService cropService,
                            GameUIService gameUIservice,
@@ -40,7 +41,11 @@ public class GameInteraction {
         this.blocksTexture = blocksTexture;
     }
 
-    public Hit update(GameMaster gameMaster,Item selectedItem) {
+    public Hit getHoveredCell() {
+        return hoveredCell;
+    }
+
+    public Hit update(GameMaster gameMaster, Item selectedItem) {
         if (Keyboard.isKeyPressed(GLFW_KEY_TAB)) {
             gameMaster.setPromptingForInput(true);
         }
@@ -53,38 +58,42 @@ public class GameInteraction {
             gameMaster.toggleInventory();
         }
 
-        Hit hoveredCell = camera.highlight(gameMaster.getWorld());
-
+        hoveredCell = camera.highlight(gameMaster.getWorld());
         if (hoveredCell == null) return null;
         if (!isWithinRange(gameMaster, hoveredCell)) return null;
 
         if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT)
                 && !gameMaster.isInventoryOpen()) {
-            breakAction(gameMaster,hoveredCell);
+            breakAction(gameMaster, hoveredCell);
         }
 
         if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)
                 && !gameMaster.isInventoryOpen()) {
-            placeAction(gameMaster,hoveredCell,selectedItem);
+            placeAction(gameMaster, hoveredCell, selectedItem);
         }
 
         return hoveredCell;
     }
 
     private boolean isWithinRange(GameMaster gameMaster, Hit cell) {
+        float distance = getDistanceToBlock(gameMaster, cell);
+        return distance <= MAX_INTERACTION_DISTANCE;
+    }
+
+    public float getDistanceToBlock(GameMaster gameMaster, Hit cell) {
         if (gameMaster.getPlayer() == null) {
-            return false;
+            return Float.MAX_VALUE;
         }
 
         Vector3f playerPos = gameMaster.getPlayer().getPosition();
         float targetX = cell.x() + 0.5f;
         float targetY = cell.y() + 0.5f;
         float targetZ = cell.z() + 0.5f;
+
         float dx = playerPos.x - targetX;
         float dy = playerPos.y - targetY;
         float dz = playerPos.z - targetZ;
-        float distanceSquared = dx * dx + dy * dy + dz * dz;
-        return distanceSquared <= (MAX_INTERACTION_DISTANCE * MAX_INTERACTION_DISTANCE);
+        return (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
 
     private void breakAction(GameMaster gameMaster, Hit cell) {
@@ -126,9 +135,10 @@ public class GameInteraction {
         BlockData blockData = getBlockData(blockId);
         if (blockData == null) return;
 
-        if (blockData.getStepSoundGroup() != null) {
+        if (blockData.getSoundGroup() != null) {
             gameMaster.getSoundService()
-                    .playBreakSound(blockData.getStepSoundGroup());
+                    .playBreakSound(blockData.getSoundGroup(),
+                            getDistanceToBlock(gameMaster, cell), MAX_INTERACTION_DISTANCE);
         }
 
         world.setBlockTypeAt(x, y, z, (byte) 0);
@@ -160,7 +170,9 @@ public class GameInteraction {
             if (existingBlock == 0) {
                 Block newBlock = new Block(block.getType(), x, y, z);
                 world.setBlockTypeAt(x, y, z, block.getType().getId());
-                gameMaster.getSoundService().playBreakSound(SoundGroup.GRASS);
+                gameMaster.getSoundService().playBreakSound(newBlock.getType().getSoundGroup(),
+                        getDistanceToBlock(gameMaster, cell), MAX_INTERACTION_DISTANCE);
+
                 gameMaster.getPlayer().remove(selectedItem);
                 gameMaster.rebuildChunkMeshAt(x, z);
                 gameUIservice.logAction(new Hit(x, y, z, cell.normalX(), cell.normalY(), cell.normalZ()));
@@ -191,7 +203,7 @@ public class GameInteraction {
             byte blockId = world.getBlockTypeAt(x, y, z);
 
             if (blockId != BlockData.TILLED_DIRT.getId()) {
-                log.debug("Cannot plant at {},{},{}: selected block is not TILLED_DIRT", x, y, z );
+                log.debug("Cannot plant at {},{},{}: selected block is not TILLED_DIRT", x, y, z);
                 gameMaster.getToastService().error("You can only plant seeds on tilled dirt");
                 return;
             }
@@ -199,7 +211,7 @@ public class GameInteraction {
             if (crop != null) return;
             if (seed.getType() == null) return;
 
-            Block tilledDirt = new Block(BlockData.TILLED_DIRT,x,y,z);
+            Block tilledDirt = new Block(BlockData.TILLED_DIRT, x, y, z);
             Crop planted = cropService.plant(x, y, z, gameMaster.getPlayer(), tilledDirt,
                     seed.getType(), timeService.getCurrentSeason(), gameMaster.getToastService());
 
