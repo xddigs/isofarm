@@ -110,7 +110,9 @@ public class ItemRenderer {
         renderWorldItemMesh(gameMaster, item, spriteSheet, shader, lighting, position);
     }
 
-    private void renderWorldItemMesh(GameMaster gameMaster, Item item, SpriteSheet spriteSheet, Shader shader, CelestialLighting lighting, Vector3f position) {
+    private void renderWorldItemMesh(GameMaster gameMaster, Item item,
+                                     SpriteSheet spriteSheet, Shader shader,
+                                     CelestialLighting lighting, Vector3f position) {
 
         if (item == null || spriteSheet == null || quadMesh == null) {
             return;
@@ -150,8 +152,6 @@ public class ItemRenderer {
                        SpriteSheet spriteSheet, Shader shader,
                        CelestialLighting lighting, float delta) {
         if (item == null || spriteSheet == null || quadMesh == null) return;
-        glClear(GL_DEPTH_BUFFER_BIT);
-
         float rotateX, rotateY, rotateZ;
         boolean isTool = item instanceof Tool;
         if (isTool) {
