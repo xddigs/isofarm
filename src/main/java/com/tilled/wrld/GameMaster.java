@@ -206,7 +206,6 @@ public class GameMaster {
         if (Keyboard.isKeyPressed(org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER)) {
             if (!isPromptingForInput()) {
                 setPromptingForInput(true);
-                this.isHUDShown = false;
                 gameUIservice.openChat();
             } else {
                 String command = gameUIservice.getChatText();
@@ -215,7 +214,6 @@ public class GameMaster {
                     commandService.execute(command);
                 }
                 setPromptingForInput(false);
-                this.isHUDShown = true;
                 gameUIservice.closeChat();
             }
         }
@@ -255,7 +253,7 @@ public class GameMaster {
         gameRenderer.render(this, resourceManager, chunkManager.getChunkMeshes());
 
         Item selectedItem = gameUIservice.getHotbarUI().getSelectedItem();
-        if (selectedItem != null) {
+        if (selectedItem != null && !isInventoryOpen() && isHUDShown()) {
             SpriteSheet spriteSheet = resourceManager.getItemSpriteSheet(selectedItem);
             Shader itemShader = resourceManager.getShader("item");
             boolean isMoving = (player != null) && player.isMoving();

@@ -57,12 +57,13 @@ public class InventorySlotUI extends UIElement {
     }
 
     private void renderItem() {
-        float iconSize = Math.min(
-                Settings.getScaledIcon(),
-                Math.min(getAbsoluteWidth(), getAbsoluteHeight()) - 4.0f);
+        float availableSpace = Math.min(getAbsoluteWidth(), getAbsoluteHeight()) - 4.0f;
+        int baseTextureSize = 16;
+        int scaleMultiplier = Math.max(1, (int) Math.floor(availableSpace / baseTextureSize));
+        float iconSize = scaleMultiplier * baseTextureSize;
+        float x = Math.round(getAbsoluteX() + (getAbsoluteWidth() - iconSize) * 0.5f);
+        float y = Math.round(getAbsoluteY() + (getAbsoluteHeight() - iconSize) * 0.5f);
 
-        float x = getAbsoluteX() + (getAbsoluteWidth() - iconSize) * 0.5f;
-        float y = getAbsoluteY() + (getAbsoluteHeight() - iconSize) * 0.5f;
         GUI.drawSprite(spriteSheet, spriteFrame, x, y, iconSize, iconSize,
                 new Vector4f(K.UI.UI_ITEM_TINT.x, K.UI.UI_ITEM_TINT.y,
                         K.UI.UI_ITEM_TINT.z, K.UI.UI_ITEM_TINT.w * getWorldOpacity()));

@@ -1,5 +1,6 @@
 package com.tilled.graphics;
 
+import com.tilled.data.Block;
 import com.tilled.data.Item;
 import com.tilled.data.Tool;
 import com.tilled.wrld.GameMaster;
@@ -12,7 +13,7 @@ public class ItemRenderer {
     private static final float OFFSET_X = 0.60f;
     private static final float OFFSET_Y = -0.35f;
     private static final float OFFSET_Z = -0.55f;
-    private static final float ITEM_SCALE = 0.80f;
+    private static final float ITEM_SCALE = 0.60f;
 
     private static final int THICKNESS_LAYERS = 24;
     private static final float LAYER_DEPTH = 0.0025f;
@@ -63,8 +64,7 @@ public class ItemRenderer {
                 .rotateZ((float) Math.toRadians(rotateZ))
                 .scale(ITEM_SCALE, -ITEM_SCALE, ITEM_SCALE);
 
-        int frameIndex = item.getId();
-
+        int frameIndex = item instanceof Block ? item.getId() - 1 : item.getId();
         shader.bind();
         glBindTexture(GL_TEXTURE_2D, spriteSheet.getTextureId());
         shader.setUniform("uProjection", gameMaster.getCamera().getProjectionMatrix());

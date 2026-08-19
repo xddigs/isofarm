@@ -175,7 +175,6 @@ public class GUI {
         }
 
         spriteSheet.bind();
-
         model.identity()
                 .translate(x, y, 0.0f)
                 .scale(width, height, 1.0f);
@@ -187,7 +186,6 @@ public class GUI {
         shader.setUniform("uTotalFrames", spriteSheet.getTotalFrames());
 
         mesh.render();
-
         spriteSheet.unbind();
     }
 

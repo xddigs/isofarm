@@ -315,7 +315,6 @@ public class InventoryUI extends UIElement {
         float y = Mouse.getY() - iconSize / 2f;
 
         GUI.drawSprite(sheet, getItemIconColumn(carriedItem), x, y, iconSize, iconSize, K.UI.UI_ITEM_TINT);
-
         if (carriedItem.getAmount() > 1) {
             String amt = String.valueOf(carriedItem.getAmount());
             GUI.drawString(amt, x + iconSize - 10, y + iconSize - 10, GUI.getNormalFont(), K.UI.UI_TEXT_COLOR);
