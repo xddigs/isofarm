@@ -4,12 +4,10 @@ import com.tilled.data.Command;
 
 public class CommandService implements Service<Command> {
     private final CommandRegistry registry;
-    private final ToastService toastService;
     private GameUIService gameUIService;
 
-    public CommandService(CommandRegistry registry, ToastService toastService) {
+    public CommandService(CommandRegistry registry) {
         this.registry = registry;
-        this.toastService = toastService;
     }
 
     public void setGameUIService(GameUIService gameUIService) {
@@ -17,15 +15,12 @@ public class CommandService implements Service<Command> {
     }
 
     public void execute(String input) {
-        if (input == null || input.isBlank()) {
-            return;
-        }
+        if (input == null || input.isBlank()) return;
+        if (!input.startsWith("/")) return;
 
         input = input.trim();
         String[] tokens = input.split("\\s+");
-        if (tokens.length == 0) {
-            return;
-        }
+        if (tokens.length == 0) return;
 
         String commandName = tokens[0];
         Command command = registry.get(commandName);
@@ -41,7 +36,6 @@ public class CommandService implements Service<Command> {
         command.action().accept(args);
         
         String result = "You ran: " + commandName + " " + String.join(" ", args);
-        toastService.success(result);
         if (gameUIService != null) {
             gameUIService.addChatMessage(result);
         }

@@ -11,11 +11,14 @@ import com.tilled.utils.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Random;
+
 import static org.lwjgl.opengl.GL11.*;
 
 @SuppressWarnings("all")
 public class GameMaster {
     private static final Logger log = LoggerFactory.getLogger(GameMaster.class);
+    private static final Random random = new Random();
     private final long windowHandle;
     private final World world;
     private final Sun sun;
@@ -49,8 +52,8 @@ public class GameMaster {
     private StepController stepController;
     private Hit hoveredCell = null;
 
-    private float windowWidth = K.Window.DEFAULT_WIDTH;
-    private float windowHeight = K.Window.DEFAULT_HEIGHT;
+    private float windowWidth;
+    private float windowHeight;
 
     private Player player;
     private Shop shop;
@@ -63,7 +66,7 @@ public class GameMaster {
     public GameMaster(long windowHandle) {
         this.windowHandle = windowHandle;
 
-        this.world = new World();
+        this.world = new World(getSeed());
         this.sun = new Sun("Sun");
         this.moon = new Moon("Moon");
         this.celestialLighting = new CelestialLighting(sun, moon);
@@ -78,7 +81,7 @@ public class GameMaster {
         this.timeService = new TimeService();
         this.commandRegistry = new CommandRegistry();
         this.toastService = new ToastService();
-        this.commandService = new CommandService(commandRegistry, toastService);
+        this.commandService = new CommandService(commandRegistry);
         this.itemRegistry = new ItemRegistry();
         this.rainEngine = new RainEngine();
 
@@ -336,5 +339,9 @@ public class GameMaster {
 
     public void rebuildChunkMeshAt(int worldX, int worldZ) {
         chunkManager.rebuildChunkMeshAt(worldX, worldZ);
+    }
+
+    public static long getSeed() {
+        return random.nextLong(1111111111111L, 9999999999999L);
     }
 }

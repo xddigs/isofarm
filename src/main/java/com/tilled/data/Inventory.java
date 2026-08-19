@@ -36,15 +36,13 @@ public class Inventory {
         if (item == null || amount <= 0) {
             return;
         }
-
         int remaining = amount;
+        int hotbarStart = (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
 
-        for (InventorySlot slot : slots) {
-            if (remaining <= 0) {
-                break;
-            }
+        for (int i = hotbarStart; i < slots.size() && remaining > 0; i++) {
+            InventorySlot slot = slots.get(i);
 
-            if (slot.isEmpty() || !slot.getItem().equals(item)) {
+            if (slot.isEmpty() || !isSameType(slot.getItem(), item)) {
                 continue;
             }
 
@@ -60,34 +58,62 @@ public class Inventory {
             remaining -= added;
         }
 
-        while (remaining > 0) {
-            InventorySlot emptySlot = null;
-
-            for (InventorySlot slot : slots) {
-                if (slot.isEmpty()) {
-                    emptySlot = slot;
-                    break;
-                }
-            }
-
-            if (emptySlot == null) {
-                break;
+        for (int i = hotbarStart; i < slots.size() && remaining > 0; i++) {
+            InventorySlot slot = slots.get(i);
+            if (!slot.isEmpty()) {
+                continue;
             }
 
             int added = Math.min(remaining, K.World.MAX_STACK);
+            Item stack;
 
-            Item stack = item;
-
-            if (added < remaining) {
-                try {
-                    stack = item.getClass().getDeclaredConstructor().newInstance();
-                } catch (Exception e) {
-                    stack = item;
-                }
+            try {
+                stack = item.copy(added);
+            } catch (Exception e) {
+                stack = item;
+                stack.setAmount(added);
             }
 
-            stack.setAmount(added);
-            emptySlot.setItem(stack);
+            slot.setItem(stack);
+            remaining -= added;
+        }
+
+        for (int i = 0; i < hotbarStart && remaining > 0; i++) {
+            InventorySlot slot = slots.get(i);
+
+            if (slot.isEmpty() || !isSameType(slot.getItem(), item)) {
+                continue;
+            }
+
+            Item stack = slot.getItem();
+            int space = K.World.MAX_STACK - stack.getAmount();
+
+            if (space <= 0) {
+                continue;
+            }
+
+            int added = Math.min(remaining, space);
+            stack.addAmount(added);
+            remaining -= added;
+        }
+
+        for (int i = 0; i < hotbarStart && remaining > 0; i++) {
+            InventorySlot slot = slots.get(i);
+            if (!slot.isEmpty()) {
+                continue;
+            }
+
+            int added = Math.min(remaining, K.World.MAX_STACK);
+            Item stack;
+
+            try {
+                stack = item.copy(added);
+            } catch (Exception e) {
+                stack = item;
+                stack.setAmount(added);
+            }
+
+            slot.setItem(stack);
             remaining -= added;
         }
     }
@@ -110,7 +136,6 @@ public class Inventory {
 
             Item stack = slot.getItem();
             int current = stack.getAmount();
-
             if (current <= remaining) {
                 remaining -= current;
                 slot.clear();

@@ -15,7 +15,6 @@ public class WorldGenerator {
 
     public void generateChunk(int chunkX, int chunkZ) {
         Chunk chunk = world.getOrCreateChunk(chunkX, chunkZ);
-
         for (int x = 0; x < Chunk.SIZE_X; x++) {
             for (int z = 0; z < Chunk.SIZE_Z; z++) {
                 int worldX = chunkX * Chunk.SIZE_X + x;

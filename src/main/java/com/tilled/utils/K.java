@@ -78,10 +78,10 @@ public final class K {
         public static final float COORD_DISPLAY_DURATION = 3.0f;
 
         public static final int ICON_SEED_CROPS_FRAMES = 4;
-        public static final int ICON_BLOCK_FRAMES = 7;
+        public static final int ICON_BLOCK_FRAMES = 9;
         public static final int ICON_TOOL_FRAMES = 3;
 
-        public static final int BLOCK_ATLAS_COLUMNS = 7;
+        public static final int BLOCK_ATLAS_COLUMNS = ICON_BLOCK_FRAMES;
         public static final int BLOCK_ATLAS_ROWS = 3;
         public static final int WATER_FRAMES = 8;
 
@@ -105,10 +105,7 @@ public final class K {
         public static final Vector4f CHAT_HISTORY_TEXT_COLOR = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 
         public static final float TOAST_ACCENT_WIDTH = 6.0f;
-        public static final float TOAST_PREFIX_OFFSET_X = 15.0f;
-        public static final float TOAST_PREFIX_OFFSET_Y = 10.0f;
         public static final float TOAST_MESSAGE_OFFSET_X = 20.0f;
-        public static final float TOAST_MESSAGE_OFFSET_Y = 10.0f;
         public static final float TOAST_LINE_HEIGHT = 18.0f;
         public static final float TOAST_GAP_X = 8.0f;
         public static final float TOAST_PADDING_RIGHT = 10.0f;

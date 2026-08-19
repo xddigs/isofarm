@@ -6,15 +6,19 @@ import org.joml.Vector2f;
 @SuppressWarnings("all")
 @DataClass
 public enum BlockData {
+    AIR((byte) 0, "Air", 0, 0, 0, SoundGroup.SILENT),
     DIRT((byte) 1, "Dirt", true, 100, 0, 0, SoundGroup.SOIL),
     GRASS((byte) 2, "Grass", true, 120, 1, 0, 1, 3, 1, 1, SoundGroup.SOIL),
     STONE((byte) 3, "Stone", 150, 2, 0, SoundGroup.HARD),
-    WOOD((byte) 4, "Wood", 500, 3, 0, SoundGroup.HARD),
-    TILLED_DIRT((byte) 5, "Tilled Dirt", true, 110, 4, 0, 0, 0, 0, 0, SoundGroup.SOIL),
-    WATER((byte) -1, "Water", 100, 5, 0, SoundGroup.SILENT),
-    CROP((byte) -1, "Crop", -1, 6, 0, SoundGroup.SOIL),
-    VOIDSTONE((byte) 6, "Voidstone", 999, 5, 0, SoundGroup.HARD),
-    GLASS((byte) 6, "Glass", 800, 6, 0, SoundGroup.GLASS);
+    TILLED_DIRT((byte) 4, "Tilled Dirt", true, 110, 4, 0, 0, 0, 0, 0, SoundGroup.SOIL),
+    VOIDSTONE((byte) 5, "Voidstone", 999, 5, 0, SoundGroup.HARD),
+    GLASS((byte) 6, "Glass", 200, 6, 0, SoundGroup.GLASS),
+    OAK_LOG((byte) 7, "Log", false, 100, 6, 0, 6, 2, 6, 1, SoundGroup.HARD),
+    OAK_WOOD((byte) 8, "Oak Wood", 100, 7, 0, SoundGroup.HARD),
+    LEAVES((byte) 9, "Leaves", 100, 8, 0, SoundGroup.SOIL),
+
+    WATER((byte) -1, "Water", 100, 0, 0, SoundGroup.SILENT),
+    CROP((byte) -1, "Crop", -1, 0, 0, SoundGroup.SOIL);
 
     public static final int ATLAS_COLS = K.UI.BLOCK_ATLAS_COLUMNS;
     public static final int ATLAS_ROWS = K.UI.BLOCK_ATLAS_ROWS;

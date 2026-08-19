@@ -9,8 +9,19 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class World {
-    private final Map<Long, Block> blocks = new HashMap<>();
-    private final Map<Long, Chunk> chunks = new HashMap<>();
+    private final long seed;
+    private final Map<Long, Block> blocks;
+    private final Map<Long, Chunk> chunks;
+
+    public World(long seed) {
+        this.seed = seed;
+        this.blocks = new HashMap<>();
+        this.chunks = new HashMap<>();
+    }
+
+    public long getSeed() {
+        return seed;
+    }
 
     public long get2DKey(int x, int z) {
         return (((long) x) << 32) | (z & 0xFFFFFFFFL);
