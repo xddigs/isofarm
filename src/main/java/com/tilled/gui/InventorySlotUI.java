@@ -67,6 +67,7 @@ public class InventorySlotUI extends UIElement {
         GUI.drawSprite(spriteSheet, spriteFrame, x, y, iconSize, iconSize,
                 new Vector4f(K.UI.UI_ITEM_TINT.x, K.UI.UI_ITEM_TINT.y,
                         K.UI.UI_ITEM_TINT.z, K.UI.UI_ITEM_TINT.w * getWorldOpacity()));
+
         renderAmount();
     }
 

@@ -31,7 +31,7 @@ public final class K {
         public static final float WEATHER_CHANGE_PROBABILITY = 0.01f;
 
         public static final int STARTING_COINS = 100;
-        public static final int MAX_STACK = 64;
+        public static final int MAX_STACK = 128;
         public static final int WATER_LEVEL_MAX = 100;
 
         public static final int MAX_PARTICLES = 24;
@@ -79,7 +79,7 @@ public final class K {
 
         public static final int ICON_SEED_CROPS_FRAMES = 4;
         public static final int ICON_BLOCK_FRAMES = 9;
-        public static final int ICON_TOOL_FRAMES = 3;
+        public static final int ICON_TOOL_FRAMES = 4;
 
         public static final int BLOCK_ATLAS_COLUMNS = ICON_BLOCK_FRAMES;
         public static final int BLOCK_ATLAS_ROWS = 3;

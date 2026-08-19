@@ -107,7 +107,9 @@ public class GameMaster {
         this.shop = new Shop();
         this.gameUIservice.setShop(shop);
 
-        this.camera = new Camera(K.Camera.DEFAULT_WIDTH, K.Camera.DEFAULT_HEIGHT, Settings.renderDistance);
+        this.camera = new Camera(K.Camera.DEFAULT_WIDTH,
+                K.Camera.DEFAULT_HEIGHT, Settings.renderDistance);
+
         this.camera.setPosition(0.0f, 0.0f, 0.0f);
         this.gameRenderer.initCamera(camera);
 

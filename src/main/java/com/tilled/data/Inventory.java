@@ -47,7 +47,7 @@ public class Inventory {
             }
 
             Item stack = slot.getItem();
-            int space = K.World.MAX_STACK - stack.getAmount();
+            int space = getMaxStack(item) - stack.getAmount();
 
             if (space <= 0) {
                 continue;
@@ -64,7 +64,7 @@ public class Inventory {
                 continue;
             }
 
-            int added = Math.min(remaining, K.World.MAX_STACK);
+            int added = Math.min(remaining, getMaxStack(item));
             Item stack;
 
             try {
@@ -86,7 +86,7 @@ public class Inventory {
             }
 
             Item stack = slot.getItem();
-            int space = K.World.MAX_STACK - stack.getAmount();
+            int space = getMaxStack(item) - stack.getAmount();
 
             if (space <= 0) {
                 continue;
@@ -103,7 +103,7 @@ public class Inventory {
                 continue;
             }
 
-            int added = Math.min(remaining, K.World.MAX_STACK);
+            int added = Math.min(remaining, getMaxStack(item));
             Item stack;
 
             try {
@@ -167,7 +167,7 @@ public class Inventory {
         }
 
         if (to.getItem().equals(from.getItem())) {
-            int space = K.World.MAX_STACK - to.getItem().getAmount();
+            int space = getMaxStack(from.getItem()) - to.getItem().getAmount();
 
             if (space > 0) {
                 int moved = Math.min(space, from.getItem().getAmount());
@@ -221,9 +221,8 @@ public class Inventory {
                 if (targetSlot.isEmpty()) continue;
 
                 Item targetItem = targetSlot.getItem();
-
                 if (isSameType(currentItem, targetItem)) {
-                    int spaceLeft = K.World.MAX_STACK - currentItem.getAmount();
+                    int spaceLeft = getMaxStack(targetItem) - currentItem.getAmount();
                     if (spaceLeft > 0) {
                         int transfer = Math.min(spaceLeft, targetItem.getAmount());
                         currentItem.setAmount(currentItem.getAmount() + transfer);
@@ -267,9 +266,8 @@ public class Inventory {
         }
 
         InventorySlot target = slots.get(targetIndex);
-
         if (target.isEmpty()) {
-            int added = Math.min(amount, K.World.MAX_STACK);
+            int added = Math.min(amount, getMaxStack(item));
             item.setAmount(added);
             target.setItem(item);
             return added;
@@ -281,7 +279,7 @@ public class Inventory {
             return 0;
         }
 
-        int space = K.World.MAX_STACK - targetItem.getAmount();
+        int space = getMaxStack(item) - targetItem.getAmount();
 
         if (space <= 0) {
             return 0;
@@ -447,6 +445,16 @@ public class Inventory {
         if (a instanceof Tool t1 && b instanceof Tool t2) return t1.getId() == t2.getId();
 
         return a.getName().equals(b.getName());
+    }
+
+    public int getMaxStack(Item item) {
+        return switch (item) {
+            case Block ignored -> K.World.MAX_STACK;
+            case Coin ignored -> K.World.MAX_STACK * 4;
+            case Tool ignored -> 1;
+            case Seed ignored -> K.World.MAX_STACK * 2;
+            default -> K.World.MAX_STACK / 2;
+        };
     }
 
     private boolean isValidIndex(int index) {

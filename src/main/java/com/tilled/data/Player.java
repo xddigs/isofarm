@@ -37,6 +37,7 @@ public class Player extends Character {
         add(new Seed(), 4);
         add(new Seed(CropType.CARROT), 4);
         add(new Hoe(), 1);
+        add(new Pickaxe(), 1);
     }
 
     public String getName() {

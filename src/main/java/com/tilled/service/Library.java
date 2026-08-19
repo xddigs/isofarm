@@ -13,7 +13,8 @@ public class Library implements Service<GameMaster> {
     public static void initItems(ItemRegistry itemR, Player player) {
         itemR.register(DEFAULT_ID + ".coin", Coin::new);
         itemR.register(DEFAULT_ID + ".can", WateringCan::new);
-        itemR.register(DEFAULT_ID + ".hoe", Hoe::new);
+        itemR.register(DEFAULT_ID + ".copper_hoe", () -> new Hoe());
+        itemR.register(DEFAULT_ID + ".copper_pickaxe", () -> new Pickaxe());
         itemR.register(DEFAULT_ID + ".wheat_seed", Seed::new);
         itemR.register(DEFAULT_ID + ".carrot_seed", () -> new Seed(CropType.CARROT));
         itemR.register(DEFAULT_ID + ".potato_seed", () -> new Seed(CropType.POTATO));
@@ -76,7 +77,7 @@ public class Library implements Service<GameMaster> {
                 return;
             }
 
-            if (itemId.equals(DEFAULT_ID + ":coin")) {
+            if (itemId.equals(DEFAULT_ID + ".coin")) {
                 player.earn(amount);
             } else {
                 player.add(item, amount);

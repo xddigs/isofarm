@@ -7,9 +7,16 @@ import com.tilled.wrld.World;
 import static com.tilled.input.GameInteraction.MAX_INTERACTION_DISTANCE;
 
 public class Hoe extends Tool {
+    private Tier tier;
+
+    public Hoe(Tier tier) {
+        super((byte)(Math.random() * 100), tier.getName() + " Hoe", 150,
+                tier.getDurability() + 8);
+        this.tier = tier;
+    }
 
     public Hoe() {
-        super((byte) 2, "Hoe", 150, 128);
+        this(Tier.COPPER);
     }
 
     public void use(GameMaster gameMaster, Block block) {
@@ -32,8 +39,20 @@ public class Hoe extends Tool {
 
     @Override
     public Item copy(int newAmount) {
-        Hoe hoe = new Hoe();
+        Hoe hoe = new Hoe(tier);
         hoe.addAmount(newAmount);
         return hoe;
+    }
+
+    public Tier getTier() {
+        return tier;
+    }
+
+    public void upgrade(Tier tier) {
+        Tier[] tiers = Tier.values();
+        int index = tier.ordinal();
+        if (index < tiers.length - 1) {
+            this.tier = tiers[index + 1];
+        }
     }
 }

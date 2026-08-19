@@ -109,7 +109,7 @@ public class InventoryUI extends UIElement {
 
         syncInventory();
         updateSlots();
-        handleSlotInteractions();
+        slotInteract();
     }
 
     private void onOpen() {
@@ -205,7 +205,7 @@ public class InventoryUI extends UIElement {
         }
     }
 
-    private void handleSlotInteractions() {
+    private void slotInteract() {
         InventorySlotUI[] allSlots;
         int hotbarStart = (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
         InventorySlotUI[] hotbarSlots = hotbarUI.getSlotUIs();
@@ -233,7 +233,7 @@ public class InventoryUI extends UIElement {
                     } else {
                         Item target = slot.getItem();
                         if (isSameType(carriedItem, target)) {
-                            int space = K.World.MAX_STACK - target.getAmount();
+                            int space = player.getInventory().getMaxStack(carriedItem) - target.getAmount();
                             int add = Math.min(space, carriedItem.getAmount());
                             target.setAmount(target.getAmount() + add);
                             carriedItem.setAmount(carriedItem.getAmount() - add);
@@ -268,7 +268,7 @@ public class InventoryUI extends UIElement {
                         carriedItem.setAmount(carriedItem.getAmount() - 1);
                     } else if (isSameType(carriedItem, slot.getItem())) {
                         Item target = slot.getItem();
-                        if (target.getAmount() < K.World.MAX_STACK) {
+                        if (target.getAmount() < player.getInventory().getMaxStack(target)) {
                             target.setAmount(target.getAmount() + 1);
                             carriedItem.setAmount(carriedItem.getAmount() - 1);
                         }
