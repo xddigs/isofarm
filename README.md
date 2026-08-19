@@ -24,16 +24,19 @@ Explore a voxel-based world generated through chunk management, cultivate crops 
 real-time seasonal and weather cycles, manage your inventory, and trade items in a dynamic 
 environment driven by custom 3D mesh rendering, particle systems, and dynamic day-night lighting.
 
-## Features
-- 3D voxel-based world generation
-- Custom mesh rendering
-- Dynamic day-night lighting
-- Real-time seasonal and weather cycles
-- Customizable crops
-- Customizable inventory
-- Customizable trading system
-- Customizable particle systems
-- Customizable weather patterns
+## Featured Controls
+| Action | Key / Input |
+| --- | --- |
+| **Movement** | `W` `A` `S` `D`<br> |
+| **Sprint** | `Left Shift`<br> |
+| **Jump** | `Space`<br> |
+| **Look around** | `Mouse Movement`<br> |
+| **Zoom Camera** | `C`<br> |
+| **Break Block / Harvest** | `Left Mouse Button`<br> |
+| **Place Block / Use Tool / Plant** | `Right Mouse Button`<br> |
+| **Open / Close Inventory** | `E`<br> |
+| **Toggle Chat / Console** | `Enter` or `Tab`<br> |
+| **Toggle HUD (F1 mode)** | `F1`<br> |
 
 ## Getting Started
 To run the game, clone the repository and run the `tilled.jar` file.
