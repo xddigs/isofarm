@@ -91,11 +91,11 @@ public final class K {
 
         public static final float TOAST_WIDTH = 250.0f;
         public static final float TOAST_HEIGHT = 64.0f;
-        public static final float TOAST_MARGIN_RIGHT = 24.0f;
+        public static final float TOAST_MARGIN_RIGHT = 96.0f;
         public static final float TOAST_MARGIN_TOP = 24.0f;
         public static final float TOAST_SPACING = 8.0f;
-        public static final float TOAST_SLIDE_SPEED = 10.0f;
-        public static final float TOAST_EXIT_SPEED = 12.0f;
+        public static final float TOAST_SLIDE_SPEED = 8.0f;
+        public static final float TOAST_EXIT_SPEED = 10.0f;
         public static final float TOAST_DURATION = 3.0f;
 
         public static final float HOTBAR_LABEL_DURATION = 1.75f;
