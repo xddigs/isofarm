@@ -3,6 +3,7 @@ package com.tilled.graphics;
 import com.tilled.data.Block;
 import com.tilled.data.Item;
 import com.tilled.data.Tool;
+import com.tilled.entity.WorldItem;
 import com.tilled.wrld.GameMaster;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -95,6 +96,54 @@ public class ItemRenderer {
         }
 
         return 0.0f;
+    }
+
+    public void renderWorldItem(GameMaster gameMaster, WorldItem worldItem, CelestialLighting lighting) {
+        if (worldItem == null) return;
+        Item item = worldItem.getItem();
+        if (item == null) return;
+        SpriteSheet spriteSheet = gameMaster.getResourceManager().getItemSpriteSheet(item);
+        if (spriteSheet == null) return;
+        Shader shader = gameMaster.getResourceManager().getShader("item");
+        if (shader == null) return;
+        Vector3f position = worldItem.getPosition();
+        renderWorldItemMesh(gameMaster, item, spriteSheet, shader, lighting, position);
+    }
+
+    private void renderWorldItemMesh(GameMaster gameMaster, Item item, SpriteSheet spriteSheet, Shader shader, CelestialLighting lighting, Vector3f position) {
+
+        if (item == null || spriteSheet == null || quadMesh == null) {
+            return;
+        }
+
+        float scale = 0.45f;
+        baseModelMatrix.identity().translate(position.x, position.y, position.z).rotateY((float)
+                Math.toRadians(45.0f)).scale(scale, -scale, scale);
+
+        int frameIndex = item instanceof Block ? item.getId() - 1 : item.getId();
+        shader.bind();
+        glBindTexture(GL_TEXTURE_2D, spriteSheet.getTextureId());
+        shader.setUniform("uProjection", gameMaster.getCamera().getProjectionMatrix());
+        shader.setUniform("uView", gameMaster.getCamera().getViewMatrix());
+        shader.setUniform("uFrameIndex", frameIndex);
+        shader.setUniform("uTotalFrames", spriteSheet.getTotalFrames());
+
+        Vector3f viewLightDir = new Vector3f(lighting.getDirection());
+        gameMaster.getCamera().getViewMatrix().transformDirection(viewLightDir);
+        shader.setUniform("uLightDirection", viewLightDir);
+        shader.setUniform("uSunColor", lighting.getColor());
+        shader.setUniform("uSkyColor", lighting.getColor());
+        shader.setUniform("uLightIntensity", lighting.getIntensity());
+        shader.setUniform("uAmbientIntensity", lighting.getAmbientIntensity());
+        shader.setUniform("uEnableShadows", false);
+        for (int i = THICKNESS_LAYERS - 1; i >= 0; i--) {
+            Matrix4f layerMatrix = new Matrix4f(baseModelMatrix).translate(0.0f, 0.0f, -i * LAYER_DEPTH);
+            shader.setUniform("uModel", layerMatrix);
+            quadMesh.render();
+        }
+
+        shader.unbind();
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     public void render(GameMaster gameMaster, Item item,

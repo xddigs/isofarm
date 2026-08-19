@@ -3,6 +3,7 @@ package com.tilled.entity;
 import com.tilled.data.*;
 import com.tilled.service.ToastService;
 import com.tilled.utils.K;
+import com.tilled.wrld.GameMaster;
 import com.tilled.wrld.World;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
@@ -30,7 +31,7 @@ public class Player extends Character {
 
         this.position = new Vector3f(spawnX, highestY, spawnZ);
         this.velocity = new Vector3f();
-        this.dimensions = new Vector3f(0.6f, 1.5f, 0.6f);
+        this.dimensions = new Vector3f(0.6f, 1.0f, 0.6f);
         setUpInventory();
     }
 
@@ -43,6 +44,11 @@ public class Player extends Character {
 
     @Override
     public void update(float delta) {
+
+    }
+
+    @Override
+    public void render(GameMaster gameMaster) {
 
     }
 
@@ -259,5 +265,9 @@ public class Player extends Character {
     public Vector3f getEyePosition() {
         float eyeHeight = 1.6f;
         return new Vector3f(position.x, position.y + eyeHeight, position.z);
+    }
+
+    public float getForward() {
+        return (float) Math.atan2(velocity.z, velocity.x);
     }
 }

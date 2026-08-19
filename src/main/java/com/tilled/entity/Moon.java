@@ -1,5 +1,6 @@
 package com.tilled.entity;
 
+import com.tilled.wrld.GameMaster;
 import org.joml.Vector3f;
 
 public class Moon extends Entity {
@@ -43,5 +44,10 @@ public class Moon extends Entity {
         } else {
             intensity = 0.0f;
         }
+    }
+
+    @Override
+    public void render(GameMaster gameMaster) {
+
     }
 }

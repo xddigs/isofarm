@@ -1,6 +1,7 @@
 package com.tilled.entity;
 
 import com.tilled.data.DataClass;
+import com.tilled.wrld.GameMaster;
 
 @DataClass
 public abstract class Entity {
@@ -21,4 +22,5 @@ public abstract class Entity {
     }
 
     public abstract void update(float delta);
+    public abstract void render(GameMaster gameMaster);
 }

@@ -1,10 +1,7 @@
 package com.tilled.wrld;
 
 import com.tilled.data.*;
-import com.tilled.entity.Entity;
-import com.tilled.entity.Moon;
-import com.tilled.entity.Player;
-import com.tilled.entity.Sun;
+import com.tilled.entity.*;
 import com.tilled.graphics.*;
 import com.tilled.gui.GUI;
 import com.tilled.gui.UIManager;
@@ -213,12 +210,19 @@ public class GameMaster {
         return timeService.getCurrentSeason();
     }
 
-    public List<Entity> getEntities() {
+    public List<Entity> getEntitiesImmutable() {
         return List.copyOf(entities);
+    }
+
+    public List<Entity> getEntities() {
+        return entities;
     }
 
     public void addEntity(Entity entity) {
         if (entity == null) return;
+        if (entity instanceof WorldItem worldItem) {
+            worldItem.setWorld(world);
+        }
         entities.add(entity);
     }
 
@@ -230,6 +234,12 @@ public class GameMaster {
     private void updateEntities(float delta) {
         for (Entity entity : entities) {
             entity.update(delta);
+        }
+    }
+
+    private void renderEntities() {
+        for (Entity entity : entities) {
+            entity.render(this);
         }
     }
 
@@ -266,7 +276,7 @@ public class GameMaster {
         particles.update(delta);
         shop.update(timeService);
         cropService.update(delta, weatherService.getWeather());
-
+        updateEntities(delta);
         cameraController.update(this, delta);
         camera.update(delta);
         itemRenderer.update(delta);
@@ -287,6 +297,7 @@ public class GameMaster {
 
     public void render() {
         gameRenderer.render(this, resourceManager, chunkManager.getChunkMeshes());
+        renderEntities();
         Item selectedItem = gameUIservice.getHotbarUI().getSelectedItem();
         if (selectedItem != null && !isInventoryOpen() && isHUDShown()) {
             SpriteSheet spriteSheet = resourceManager.getItemSpriteSheet(selectedItem);

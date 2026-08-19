@@ -1,7 +1,9 @@
 package com.tilled.input;
 
 import com.tilled.data.*;
+import com.tilled.entity.Entity;
 import com.tilled.entity.Player;
+import com.tilled.entity.WorldItem;
 import com.tilled.graphics.Camera;
 import com.tilled.graphics.ItemRenderer;
 import com.tilled.graphics.ParticleEngine;
@@ -17,10 +19,14 @@ import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Iterator;
+
 import static org.lwjgl.glfw.GLFW.*;
 
 public class GameInteraction {
     public static final float MAX_INTERACTION_DISTANCE = 5.0f;
+    private static final float PICKUP_DISTANCE = 1.5f;
+
     private static final Logger log = LoggerFactory.getLogger(GameInteraction.class);
     private final CropService cropService;
     private final GameUIService gameUIservice;
@@ -29,7 +35,6 @@ public class GameInteraction {
     private final Camera camera;
     private final SpriteSheet blocksTexture;
     private final ItemRenderer itemRenderer;
-    private final Player player;
     private Hit hoveredCell = null;
 
     public GameInteraction(GameMaster gameMaster,
@@ -41,7 +46,6 @@ public class GameInteraction {
         this.camera = gameMaster.getCamera();
         this.blocksTexture = blocksTexture;
         this.itemRenderer = gameMaster.getItemRenderer();
-        this.player = gameMaster.getPlayer();
     }
 
     public Hit getHoveredCell() {
@@ -62,8 +66,10 @@ public class GameInteraction {
         }
 
         if (Keyboard.isKeyPressed(GLFW_KEY_Q)) {
-            dropItem(selectedItem);
+            dropItem(gameMaster, selectedItem);
         }
+
+        pickUp(gameMaster);
 
         hoveredCell = camera.highlight(gameMaster.getWorld());
         if (hoveredCell == null) return null;
@@ -80,6 +86,86 @@ public class GameInteraction {
         }
 
         return hoveredCell;
+    }
+
+    public void dropItem(GameMaster gameMaster, Item selectedItem) {
+        if (selectedItem == null) return;
+        Player player = gameMaster.getPlayer();
+        if (player == null) return;
+
+        for (InventorySlot slot : player.getInventory().getSlots()) {
+            if (slot.isEmpty()) continue;
+
+            Item item = slot.getItem();
+            if (item == null) continue;
+            if (!item.equals(selectedItem)) continue;
+            int amount = slot.getAmount();
+            if (amount <= 0) continue;
+            Vector3f playerPosition = player.getPosition();
+            Vector3f dropPosition = new Vector3f(playerPosition.x, playerPosition.y + 0.8f, playerPosition.z);
+            WorldItem worldItem = new WorldItem(item, amount, dropPosition);
+
+            Vector3f forward = new Vector3f(player.getForward()).normalize();
+            Vector3f playerVelocity = new Vector3f(player.getVelocity());
+            float inheritedVelocity = 0.35f;
+            float throwStrength = 2.5f;
+            float verticalStrength = 4.5f;
+
+            Vector3f velocity = new Vector3f(playerVelocity)
+                    .mul(inheritedVelocity);
+
+            velocity.x += forward.x * throwStrength;
+            velocity.z += forward.z * throwStrength;
+            velocity.y += verticalStrength;
+
+            worldItem.setVelocity(velocity);
+            worldItem.setWorld(gameMaster.getWorld());
+
+            player.remove(item, amount);
+            gameMaster.addEntity(worldItem);
+            itemRenderer.playPlaceAnimation();
+
+
+            log.info("Dropped x{} {} with velocity ({}, {}, {})", amount,
+                    item.getName(), velocity.x, velocity.y, velocity.z);
+
+            break;
+        }
+    }
+
+    private void pickUp(GameMaster gameMaster) {
+        Player player = gameMaster.getPlayer();
+        if (player == null) return;
+        Iterator<Entity> iterator = gameMaster.getEntities().iterator();
+        while (iterator.hasNext()) {
+            Entity entity = iterator.next();
+            if (!(entity instanceof WorldItem worldItem)) {
+                continue;
+            }
+
+            if (!worldItem.canBePickedUp()) {
+                continue;
+            }
+
+            float distance = worldItem.getPosition()
+                    .distance(player.getPosition());
+
+            if (distance > PICKUP_DISTANCE) {
+                continue;
+            }
+
+            Item item = worldItem.getItem();
+            int amount = worldItem.getAmount();
+
+            if (item == null || amount <= 0) {
+                iterator.remove();
+                continue;
+            }
+
+            player.add(item, amount);
+            iterator.remove();
+            log.info("Picked up x{} {}", amount, item.getName());
+        }
     }
 
     private boolean isWithinRange(GameMaster gameMaster, Hit cell) {
@@ -150,9 +236,10 @@ public class GameInteraction {
 
         particles.spawn(x, y, z, blockData, blocksTexture);
 
+        Vector3f position = new Vector3f(x + 0.5f, y + 0.5f, z + 0.5f);
         Block removedBlock = new Block(blockData, x, y, z);
-        gameMaster.getPlayer().add(removedBlock);
-
+        WorldItem item = new WorldItem(removedBlock, 1, position);
+        gameMaster.addEntity(item);
         gameUIservice.logAction(cell);
         log.info("Block removed: {} at {},{},{}", blockData.getName(), x, y, z);
     }
@@ -224,14 +311,6 @@ public class GameInteraction {
             if (planted != null) {
                 gameUIservice.logAction(cell);
                 log.info("Planted {} at {},{},{}", seed.getType().getName(), x, y, z);
-            }
-        }
-    }
-
-    public void dropItem(Item selectedItem) {
-        for (InventorySlot slot : player.getInventory().getSlots()) {
-            if (slot.getItem().equals(selectedItem)) {
-                // TODO drop item
             }
         }
     }
