@@ -127,6 +127,7 @@ public class GameRenderer {
             sheet.unbind();
         });
 
+        gameMaster.getEntities().forEach(entity -> entity.render(gameMaster));
         gameMaster.getParticles().render(defaultShader, rm.getSpriteMesh());
         if (blocksTexture != null) blocksTexture.unbind();
 

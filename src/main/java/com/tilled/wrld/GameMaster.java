@@ -237,16 +237,6 @@ public class GameMaster {
         }
     }
 
-    private void renderEntities() {
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LESS);
-        glDepthMask(true);
-
-        for (Entity entity : entities) {
-            entity.render(this);
-        }
-    }
-
     public void update(float delta) {
         if (weatherService.isRaining()) {
             rainEngine.update(delta, camera.getPosition());
@@ -300,7 +290,6 @@ public class GameMaster {
 
     public void render() {
         gameRenderer.render(this, resourceManager, chunkManager.getChunkMeshes());
-        renderEntities();
         Item selectedItem = gameUIservice.getHotbarUI().getSelectedItem();
         if (selectedItem != null && !isInventoryOpen() && isHUDShown()) {
             SpriteSheet spriteSheet = resourceManager.getItemSpriteSheet(selectedItem);
