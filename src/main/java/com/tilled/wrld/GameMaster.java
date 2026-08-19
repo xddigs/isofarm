@@ -238,6 +238,10 @@ public class GameMaster {
     }
 
     private void renderEntities() {
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
+        glDepthMask(true);
+
         for (Entity entity : entities) {
             entity.render(this);
         }
@@ -294,7 +298,6 @@ public class GameMaster {
         Keyboard.update();
     }
 
-
     public void render() {
         gameRenderer.render(this, resourceManager, chunkManager.getChunkMeshes());
         renderEntities();
@@ -306,6 +309,8 @@ public class GameMaster {
             itemRenderer.render(this, selectedItem, spriteSheet,
                     itemShader, celestialLighting, genDelta);
         }
+
+        gameUIservice.render(isHUDShown(), this);
 
         if (player == null) {
             this.player = new Player(gameUIservice.getEnteredPlayerName(),

@@ -196,10 +196,9 @@ public class GameRenderer {
         glEnable(GL_DEPTH_TEST);
 
         if (gameMaster.getWeatherService().isRaining()) {
-            gameMaster.getRainEngine().render(rm.getRainShader(), camera.getViewMatrix(), camera.getProjectionMatrix());
+            gameMaster.getRainEngine().render(rm.getRainShader(),
+                    camera.getViewMatrix(), camera.getProjectionMatrix());
         }
-
-        gameMaster.getGameUIService().render(gameMaster.isHUDShown(), gameMaster);
     }
 
     private void renderShadowPass(GameMaster gameMaster, ResourceManager rm,

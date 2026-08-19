@@ -33,41 +33,21 @@ public class WorldItem extends Entity {
     private int amount;
     private boolean onGround;
     private World world;
-
-    /*
-     * Visual state.
-     */
     private float rotation;
     private float bobTime;
-
-    /*
-     * Used to prevent immediate pickup.
-     */
     private float pickupTimer;
-
-    /*
-     * Y position of the item when resting on the ground.
-     * We keep this separate from position.y because the bob animation
-     * temporarily modifies position.y.
-     */
     private float groundY;
 
     public WorldItem(Item item, int amount, Vector3f position) {
         super(item.getName());
-
         this.item = item;
         this.amount = amount;
-
         this.position = new Vector3f(position);
         this.velocity = new Vector3f();
-
         this.onGround = false;
-
         this.rotation = 0.0f;
         this.bobTime = 0.0f;
-
         this.pickupTimer = PICKUP_DELAY;
-
         this.groundY = position.y;
     }
 
