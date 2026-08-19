@@ -1,6 +1,6 @@
 package com.tilled.input;
 
-import com.tilled.data.Player;
+import com.tilled.entity.Player;
 import com.tilled.graphics.Camera;
 import com.tilled.service.Service;
 import com.tilled.utils.K;

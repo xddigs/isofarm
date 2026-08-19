@@ -1,6 +1,10 @@
 package com.tilled.wrld;
 
 import com.tilled.data.*;
+import com.tilled.entity.Entity;
+import com.tilled.entity.Moon;
+import com.tilled.entity.Player;
+import com.tilled.entity.Sun;
 import com.tilled.graphics.*;
 import com.tilled.gui.GUI;
 import com.tilled.gui.UIManager;
@@ -221,6 +225,12 @@ public class GameMaster {
     public void removeEntity(Entity entity) {
         if (entity == null) return;
         entities.remove(entity);
+    }
+
+    private void updateEntities(float delta) {
+        for (Entity entity : entities) {
+            entity.update(delta);
+        }
     }
 
     public void update(float delta) {

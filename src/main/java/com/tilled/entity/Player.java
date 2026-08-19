@@ -1,5 +1,6 @@
-package com.tilled.data;
+package com.tilled.entity;
 
+import com.tilled.data.*;
 import com.tilled.service.ToastService;
 import com.tilled.utils.K;
 import com.tilled.wrld.World;
@@ -40,6 +41,11 @@ public class Player extends Character {
         add(new Pickaxe(), 1);
     }
 
+    @Override
+    public void update(float delta) {
+
+    }
+
     public String getName() {
         return name;
     }
@@ -62,9 +68,6 @@ public class Player extends Character {
 
     public void setOnGround(boolean onGround) {
         this.onGround = onGround;
-    }
-
-    public void update() {
     }
 
     public void sell(Item item, int amount) {

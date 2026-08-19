@@ -1,5 +1,6 @@
-package com.tilled.data;
+package com.tilled.entity;
 
+import com.tilled.data.*;
 import com.tilled.service.ToastService;
 
 @DataClass

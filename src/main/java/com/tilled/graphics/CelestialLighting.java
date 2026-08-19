@@ -1,5 +1,7 @@
 package com.tilled.graphics;
 
+import com.tilled.entity.Moon;
+import com.tilled.entity.Sun;
 import org.joml.Vector3f;
 
 public class CelestialLighting {

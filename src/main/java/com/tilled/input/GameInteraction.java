@@ -1,6 +1,7 @@
 package com.tilled.input;
 
 import com.tilled.data.*;
+import com.tilled.entity.Player;
 import com.tilled.graphics.Camera;
 import com.tilled.graphics.ItemRenderer;
 import com.tilled.graphics.ParticleEngine;

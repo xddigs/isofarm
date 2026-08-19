@@ -1,6 +1,7 @@
 package com.tilled.service;
 
 import com.tilled.data.*;
+import com.tilled.entity.Player;
 import com.tilled.wrld.GameMaster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

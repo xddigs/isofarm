@@ -1,7 +1,7 @@
 package com.tilled.input;
 
 import com.tilled.data.Block;
-import com.tilled.data.Player;
+import com.tilled.entity.Player;
 import com.tilled.data.SoundGroup;
 import com.tilled.service.SoundService;
 import com.tilled.wrld.GameMaster;

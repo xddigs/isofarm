@@ -1,4 +1,6 @@
-package com.tilled.data;
+package com.tilled.entity;
+
+import com.tilled.data.DataClass;
 
 @DataClass
 public abstract class Entity {
@@ -17,4 +19,6 @@ public abstract class Entity {
     public String getName() {
         return name;
     }
+
+    public abstract void update(float delta);
 }

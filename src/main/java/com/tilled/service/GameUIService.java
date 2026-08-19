@@ -1,6 +1,7 @@
 package com.tilled.service;
 
 import com.tilled.data.*;
+import com.tilled.entity.Player;
 import com.tilled.graphics.SpriteSheet;
 import com.tilled.gui.*;
 import com.tilled.input.Mouse;

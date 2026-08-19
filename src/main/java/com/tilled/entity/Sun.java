@@ -1,6 +1,5 @@
-package com.tilled.graphics;
+package com.tilled.entity;
 
-import com.tilled.data.Entity;
 import org.joml.Vector3f;
 
 public class Sun extends Entity {
@@ -27,6 +26,7 @@ public class Sun extends Entity {
         return intensity;
     }
 
+    @Override
     public void update(float timeOfDay) {
         float angle = ((timeOfDay - 6.0f) / 24.0f) * ((float) Math.PI * 2.0f);
         float x = (float) Math.cos(angle);

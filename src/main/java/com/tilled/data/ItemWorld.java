@@ -1,5 +1,6 @@
 package com.tilled.data;
 
+import com.tilled.entity.Entity;
 import org.joml.Vector3f;
 
 @DataClass
@@ -16,6 +17,7 @@ public class ItemWorld extends Entity {
         this.position = position;
     }
 
+    @Override
     public void update(float delta) {
 
     }
@@ -42,5 +44,21 @@ public class ItemWorld extends Entity {
 
     public void setPosition(float x, float y, float z) {
         this.position.set(x, y, z);
+    }
+
+    public Vector3f getVelocity() {
+        return velocity;
+    }
+
+    public void setVelocity(Vector3f velocity) {
+        this.velocity = velocity;
+    }
+
+    public void setVelocity(float x, float y, float z) {
+        this.velocity.set(x, y, z);
+    }
+
+    public void addVelocity(float x, float y, float z) {
+        this.velocity.add(x, y, z);
     }
 }
