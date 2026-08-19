@@ -7,6 +7,7 @@ import com.tilled.graphics.SpriteSheet;
 import com.tilled.service.CropService;
 import com.tilled.service.GameUIService;
 import com.tilled.service.TimeService;
+import com.tilled.utils.K;
 import com.tilled.wrld.Chunk;
 import com.tilled.wrld.GameMaster;
 import com.tilled.wrld.World;
@@ -119,7 +120,7 @@ public class GameInteraction {
             }
 
             if (sheet != null) {
-                particles.spawn(x, y, z, sheet, frameIndex);
+                particles.spawn(x, y + K.World.SHORTER_BLOCK_HEIGHT, z, sheet, frameIndex);
             }
 
             gameUIservice.logAction(cell);

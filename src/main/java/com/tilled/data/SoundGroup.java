@@ -1,7 +1,7 @@
 package com.tilled.data;
 
 public enum SoundGroup {
-    GRASS(
+    SOIL(
         new String[]{"fx/steps/steps_grass_01.ogg", "fx/steps/steps_grass_02.ogg", "fx/steps/steps_grass_03.ogg", "fx/steps/steps_grass_04.ogg"},
         new String[]{"fx/blocks/dig.ogg", "fx/blocks/dirt.ogg"},
         new String[]{"fx/blocks/dirt.ogg"}),

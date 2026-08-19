@@ -80,11 +80,6 @@ public class CropService implements Service<Crop> {
         crop.setHarvested(true);
         player.gain(cropValue);
         world.removeCrop(crop);
-
-        if (particles != null && cropSheet != null) {
-            particles.spawn(crop.getX(), crop.getY(), crop.getZ(), cropSheet, crop.getStage().getFrameIndex());
-        }
-
         log.info("Successfully harvested {}" +
                 " giving {} items.", crop.getCropType().getName(), yield);
         toastService.success("You harvested " + yield + " " + crop.getCropType().getName());

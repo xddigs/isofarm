@@ -6,13 +6,13 @@ import org.joml.Vector2f;
 @SuppressWarnings("all")
 @DataClass
 public enum BlockData {
-    DIRT((byte) 1, "Dirt", true, 100, 0, 0, SoundGroup.GRASS),
-    GRASS((byte) 2, "Grass", true, 120, 1, 0, 1, 3, 1, 1, SoundGroup.GRASS),
+    DIRT((byte) 1, "Dirt", true, 100, 0, 0, SoundGroup.SOIL),
+    GRASS((byte) 2, "Grass", true, 120, 1, 0, 1, 3, 1, 1, SoundGroup.SOIL),
     STONE((byte) 3, "Stone", 150, 2, 0, SoundGroup.SILENT),
     DISPENSER((byte) 4, "Dispenser", 500, 3, 0, SoundGroup.SILENT),
-    TILLED_DIRT((byte) 5, "Tilled Dirt", true, 110, 4, 0, 0, 0, 0, 0, SoundGroup.GRASS),
+    TILLED_DIRT((byte) 5, "Tilled Dirt", true, 110, 4, 0, 0, 0, 0, 0, SoundGroup.SOIL),
     WATER((byte) 6, "Water", 100, 5, 0, SoundGroup.SILENT),
-    CROP((byte) 7, "Crop", -1, 6, 0, SoundGroup.GRASS);
+    CROP((byte) 7, "Crop", -1, 6, 0, SoundGroup.SOIL);
 
     public static final int ATLAS_COLS = K.UI.BLOCK_ATLAS_FRAMES;
     public static final int ATLAS_ROWS = K.UI.ICON_BLOCK_ATLAS_ROWS;

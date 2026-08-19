@@ -78,7 +78,8 @@ public class ParticleEngine implements Service<Particle> {
         shader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
     }
 
-    public void spawn(float blockX, float blockY, float blockZ, BlockData blockData, SpriteSheet blocksTexture) {
+    public void spawn(float blockX, float blockY, float blockZ,
+                      BlockData blockData, SpriteSheet blocksTexture) {
         Vector2f baseOffset = blockData.getSideAtlasOffset();
         Vector2f baseScale = blockData.getAtlasScale();    
 
@@ -111,36 +112,31 @@ public class ParticleEngine implements Service<Particle> {
     }
 
     public void spawn(float x, float y, float z, SpriteSheet cropSheet, int frameIndex) {
+        int totalParticles = K.World.MAX_PARTICLES;
         float frameWidthUV = 1.0f / cropSheet.getTotalFrames();
         float baseUvX = frameIndex * frameWidthUV;
 
-        int gridX = 4;
-        int gridY = 4;
-        float subScaleX = frameWidthUV / gridX;
-        float subScaleY = 1.0f / gridY;
+        float particleUvWidth = frameWidthUV / 4.0f;
+        float particleUvHeight = 1.0f / 4.0f;
 
-        for (int ix = 0; ix < gridX; ix++) {
-            for (int iy = 0; iy < gridY; iy++) {
-                float px = x + (random.nextFloat() - 0.5f) * 0.6f;
-                float py = y + random.nextFloat() * 0.4f;
-                float pz = z + (random.nextFloat() - 0.5f) * 0.6f;
+        for (int i = 0; i < totalParticles; i++) {
+            float px = x + random.nextFloat();
+            float py = y + random.nextFloat();
+            float pz = z + random.nextFloat();
 
-                float vx = (random.nextFloat() - 0.5f) * 2.0f;
-                float vy = random.nextFloat() * 2.5f + 0.5f;
-                float vz = (random.nextFloat() - 0.5f) * 2.0f;
+            float vx = (random.nextFloat() - 0.5f) * 2.5f;
+            float vy = random.nextFloat() * 2.5f + 1.0f;
+            float vz = (random.nextFloat() - 0.5f) * 2.5f;
 
-                float size = 0.08f + random.nextFloat() * 0.04f;
-                float maxLife = 0.3f + random.nextFloat() * 0.3f;
+            float randomU = baseUvX + random.nextFloat() * (frameWidthUV - particleUvWidth);
+            float randomV = random.nextFloat() * (1.0f - particleUvHeight);
 
-                Vector2f uvOffset = new Vector2f(
-                        baseUvX + ix * subScaleX,
-                        iy * subScaleY
-                );
-                Vector2f uvScale = new Vector2f(subScaleX, subScaleY);
-
-                add(new Particle(px, py, pz, vx, vy, vz, size,
-                        maxLife, uvOffset, uvScale, cropSheet));
-            }
+            Vector2f particleOffset = new Vector2f(randomU, randomV);
+            Vector2f particleScale = new Vector2f(particleUvWidth, particleUvHeight);
+            float size = 0.08f + random.nextFloat() * 0.06f;
+            float maxLife = 0.3f + random.nextFloat() * 0.3f;
+            add(new Particle(px, py, pz, vx, vy, vz, size, maxLife,
+                    particleOffset, particleScale, cropSheet));
         }
     }
 
