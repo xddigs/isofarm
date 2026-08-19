@@ -122,11 +122,12 @@ public class ResourceManager {
 
     public SpriteSheet getItemSpriteSheet(Item item) {
         return switch (item) {
-            case null -> null;
             case Crop crop -> cropSpritesheets.get(crop.getCropType());
+            case Produce ignored -> cropIcons;
             case Seed ignored -> seedIcons;
             case Tool ignored -> toolIcons;
-            default -> blockIcons;
+            case Block ignored -> blockIcons;
+            case null, default -> null;
         };
     }
 
