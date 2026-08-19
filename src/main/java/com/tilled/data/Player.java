@@ -63,13 +63,6 @@ public class Player extends Character {
         this.onGround = onGround;
     }
 
-    private boolean detectGround(World world) {
-        position.y -= 0.05f;
-        boolean collision = checkCollision(world);
-        position.y += 0.05f;
-        return collision;
-    }
-
     public void update() {
     }
 
@@ -194,10 +187,6 @@ public class Player extends Character {
             position.z -= velocity.z * delta;
             velocity.z = 0;
         }
-    }
-
-    public boolean isOnGround(Block block) {
-        return position.y <= block.getY();
     }
 
     public boolean checkCollision(World world) {
