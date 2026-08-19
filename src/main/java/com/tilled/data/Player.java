@@ -148,6 +148,10 @@ public class Player extends Character {
         return getInventory().hasItemOfType(Seed.class);
     }
 
+    public boolean isMoving() {
+        return (velocity.x * velocity.x + velocity.z * velocity.z) > 0.01f;
+    }
+
     public void jump() {
         if (!onGround) {
             return;

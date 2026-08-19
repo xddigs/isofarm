@@ -115,6 +115,35 @@ public class Mesh {
         return new Mesh(positions, normals, textCoords, indices);
     }
 
+    public static Mesh createCenteredQuad() {
+        float[] positions = new float[]{
+                -0.5f, -0.5f, 0.0f,
+                0.5f, -0.5f, 0.0f,
+                0.5f,  0.5f, 0.0f,
+                -0.5f,  0.5f, 0.0f
+        };
+
+        float[] normals = new float[]{
+                0.0f, 0.0f, 1.0f,
+                0.0f, 0.0f, 1.0f,
+                0.0f, 0.0f, 1.0f,
+                0.0f, 0.0f, 1.0f
+        };
+
+        float[] texCoords = new float[]{
+                0.0f, 1.0f,
+                1.0f, 1.0f,
+                1.0f, 0.0f,
+                0.0f, 0.0f
+        };
+
+        int[] indices = new int[]{
+                0, 1, 2,
+                2, 3, 0
+        };
+        return new Mesh(positions, normals, texCoords, indices);
+    }
+
     public static Mesh createQuad() {
         float[] positions = new float[]{
                 0.0f, 0.0f, 0.0f,

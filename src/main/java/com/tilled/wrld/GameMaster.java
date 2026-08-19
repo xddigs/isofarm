@@ -38,6 +38,7 @@ public class GameMaster {
     private final ResourceManager resourceManager;
     private final ChunkManager chunkManager;
     private final GameRenderer gameRenderer;
+    private final ItemRenderer itemRenderer;
 
     private Framebuffer maskFbo;
     private Framebuffer sceneFbo;
@@ -85,6 +86,7 @@ public class GameMaster {
         this.resourceManager = new ResourceManager();
         this.chunkManager = new ChunkManager(world);
         this.gameRenderer = new GameRenderer();
+        this.itemRenderer = new ItemRenderer();
 
         this.uiManager = new UIManager(windowWidth, windowHeight);
         this.gameUIservice = new GameUIService(windowHandle, this,
@@ -110,68 +112,30 @@ public class GameMaster {
         recenter();
     }
 
+    public ResourceManager getResourceManager() { return resourceManager; }
+    public ChunkManager getChunkManager() { return chunkManager; }
+    public GameRenderer getGameRenderer() { return gameRenderer; }
+    public ItemRenderer getItemRenderer() { return itemRenderer; }
     public Sunlight getSunlight() { return sunlight; }
     public ParticleEngine getParticles() { return particles; }
     public Hit getHoveredCell() { return hoveredCell; }
     public Framebuffer getMaskFbo() { return maskFbo; }
     public Framebuffer getSceneFbo() { return sceneFbo; }
     public RainEngine getRainEngine() { return rainEngine; }
-
-    public long getWindowHandle() {
-        return windowHandle;
-    }
-
-    public World getWorld() {
-        return world;
-    }
-
-    public Player getPlayer() {
-        return player;
-    }
-
-    public SoundService getSoundService() {
-        return soundService;
-    }
-
-    public ToastService getToastService() {
-        return toastService;
-    }
-
-    public CommandRegistry getCommandRegistry() {
-        return commandRegistry;
-    }
-
-    public ItemRegistry getItemRegistry() {
-        return itemRegistry;
-    }
-
-    public GameUIService getGameUIService() {
-        return gameUIservice;
-    }
-
-    public WeatherService getWeatherService() {
-        return weatherService;
-    }
-
-    public float getWindowWidth() {
-        return windowWidth;
-    }
-
-    public float getWindowHeight() {
-        return windowHeight;
-    }
-
-    public Camera getCamera() {
-        return camera;
-    }
-
-    public CameraController getCameraController() {
-        return cameraController;
-    }
-
-    public GameInteraction getGameInteraction() {
-        return gameInteraction;
-    }
+    public long getWindowHandle() { return windowHandle; }
+    public World getWorld() { return world; }
+    public Player getPlayer() { return player; }
+    public SoundService getSoundService() { return soundService; }
+    public ToastService getToastService() { return toastService; }
+    public CommandRegistry getCommandRegistry() { return commandRegistry; }
+    public ItemRegistry getItemRegistry() { return itemRegistry; }
+    public GameUIService getGameUIService() { return gameUIservice; }
+    public WeatherService getWeatherService() { return weatherService; }
+    public float getWindowWidth() { return windowWidth; }
+    public float getWindowHeight() { return windowHeight; }
+    public Camera getCamera() { return camera; }
+    public CameraController getCameraController() { return cameraController; }
+    public GameInteraction getGameInteraction() { return gameInteraction; }
 
     public int getLastPlayerChunkX() {
         return chunkManager.getLastPlayerChunkX();
@@ -278,6 +242,14 @@ public class GameMaster {
     public void render() {
         gameRenderer.render(this, resourceManager, chunkManager.getChunkMeshes());
 
+        Item selectedItem = gameUIservice.getHotbarUI().getSelectedItem();
+        if (selectedItem != null) {
+            SpriteSheet spriteSheet = resourceManager.getItemSpriteSheet(selectedItem);
+            Shader itemShader = resourceManager.getShader("item");
+            boolean isMoving = (player != null) && player.isMoving();
+            itemRenderer.render(this, selectedItem, spriteSheet, itemShader, isMoving, genDelta);
+        }
+
         if (player == null) {
             this.player = new Player(gameUIservice.getEnteredPlayerName(),
                     world, toastService);
@@ -300,6 +272,7 @@ public class GameMaster {
     public void dispose() {
         chunkManager.dispose();
         resourceManager.dispose();
+        itemRenderer.dispose();
 
         GUI.dispose();
         maskFbo.dispose();

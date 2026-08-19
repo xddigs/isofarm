@@ -100,6 +100,10 @@ public class GameUIService implements Service<GameMaster> {
         return inventoryUI;
     }
 
+    public HotbarUI getHotbarUI() {
+        return hotbarUI;
+    }
+
     public void setPlayer(Player player) {
         this.player = player;
         inventoryUI.setPlayer(player);

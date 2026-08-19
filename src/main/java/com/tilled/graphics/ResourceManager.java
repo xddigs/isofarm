@@ -1,6 +1,6 @@
 package com.tilled.graphics;
 
-import com.tilled.data.CropType;
+import com.tilled.data.*;
 import com.tilled.utils.K;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,4 +115,28 @@ public class ResourceManager {
     public SpriteSheet getBlockIcons() { return blockIcons; }
     public SpriteSheet getInventoryIcons() { return inventoryIcons; }
     public Map<CropType, SpriteSheet> getCropSpritesheets() { return cropSpritesheets; }
+
+    public SpriteSheet getItemSpriteSheet(Item item) {
+        return switch (item) {
+            case null -> null;
+            case Crop crop -> cropSpritesheets.get(crop.getCropType());
+            case Seed ignored -> seedIcons;
+            case Tool ignored -> toolIcons;
+            default -> blockIcons;
+        };
+    }
+
+    public Shader getShader(String name) {
+        if (name == null)  return defaultShader;
+        return switch (name.toLowerCase()) {
+            case "outline" -> outlineShader;
+            case "rain" -> rainShader;
+            case "motion_blur" -> motionBlurShader;
+            case "default", "item" -> defaultShader;
+            default -> {
+                log.warn("Shader '{}' not found, using defaultShader", name);
+                yield defaultShader;
+            }
+        };
+    }
 }

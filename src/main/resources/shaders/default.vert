@@ -8,9 +8,12 @@ out vec2 vTexCoord;
 out vec3 vNormal;
 out vec2 vAtlasOffset;
 
-uniform mat4 uModel;
-uniform mat4 uView;
+out vec2 TexCoord;
+
 uniform mat4 uProjection;
+uniform mat4 uView;
+uniform mat4 uModel;
+uniform vec4 uUVBounds;
 
 uniform int uFrameIndex;
 uniform int uTotalFrames;
@@ -43,4 +46,7 @@ void main() {
     } else {
         vTexCoord = aTexCoord;
     }
+
+    TexCoord.x = mix(uUVBounds.x, uUVBounds.z, aTexCoord.x);
+    TexCoord.y = mix(uUVBounds.y, uUVBounds.w, aTexCoord.y);
 }

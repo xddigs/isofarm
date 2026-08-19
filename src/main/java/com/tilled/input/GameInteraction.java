@@ -81,9 +81,8 @@ public class GameInteraction {
     }
 
     public float getDistanceToBlock(GameMaster gameMaster, Hit cell) {
-        if (gameMaster.getPlayer() == null) {
-            return Float.MAX_VALUE;
-        }
+        if (cell == null) return Float.MAX_VALUE;
+        if (gameMaster.getPlayer() == null) return Float.MAX_VALUE;
 
         Vector3f playerPos = gameMaster.getPlayer().getPosition();
         float targetX = cell.x() + 0.5f;
