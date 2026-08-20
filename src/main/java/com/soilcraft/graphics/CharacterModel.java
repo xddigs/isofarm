@@ -45,6 +45,8 @@ public class CharacterModel {
 
         rightLeg.getSize().set(legX, legY, legX);
         rightLeg.getPosition().set(halfBody * 0.4f, legCenterY, 0.0f);
+
+        saveBaseTransforms();
     }
 
     public BodyPart getBody() { return body; }
@@ -52,4 +54,12 @@ public class CharacterModel {
     public BodyPart getRightArm() { return rightArm; }
     public BodyPart getLeftLeg() { return leftLeg; }
     public BodyPart getRightLeg() { return rightLeg; }
+
+    private void saveBaseTransforms() {
+        body.saveBaseTransform();
+        leftArm.saveBaseTransform();
+        rightArm.saveBaseTransform();
+        leftLeg.saveBaseTransform();
+        rightLeg.saveBaseTransform();
+    }
 }

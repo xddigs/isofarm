@@ -18,7 +18,9 @@ public abstract class Entity {
     private float standingHeight;
     private float crouchingHeight;
     private boolean onGround;
-    private boolean isCrunching;
+    private boolean isCrounching;
+
+    private float currentEyeHeight = 1.6f;
 
     public Entity(String name) {
         this.id = (byte) (Math.floor((Math.random() * Math.random()) * 100));
@@ -28,9 +30,9 @@ public abstract class Entity {
         this.velocity = new Vector3f();
         this.dimensions = new Vector3f();
 
-        this.isCrunching = false;
-        this.standingHeight = 0.0f;
-        this.crouchingHeight = 0.0f;
+        this.isCrounching = false;
+        this.standingHeight = 2.0f;
+        this.crouchingHeight = 1.4f;
 
         this.onGround = false;
     }
@@ -99,12 +101,12 @@ public abstract class Entity {
         this.crouchingHeight = crouchingHeight;
     }
 
-    public boolean isCrunching() {
-        return isCrunching;
+    public boolean isCrounching() {
+        return isCrounching;
     }
 
-    public void setCrunching(boolean crunching) {
-        this.isCrunching = crunching;
+    public void setCrounching(boolean crounching) {
+        this.isCrounching = crounching;
     }
 
     public boolean isOnGround() {
@@ -217,22 +219,15 @@ public abstract class Entity {
     }
 
     public void crunch() {
-        isCrunching = true;
+        isCrounching = true;
     }
 
-    public void uncrunch(World world) {
-        if (!isCrunching) {
-            return;
-        }
+    public void uncrouch(World world) {
+        if (!isCrounching) return;
 
-        float previousHeight = dimensions.y;
-        dimensions.y = standingHeight;
-        if (checkCollision(world)) {
-            dimensions.y = previousHeight;
-            return;
+        if (canStandUp(world)) {
+            isCrounching = false;
         }
-
-        isCrunching = false;
     }
 
     public void lerp(Vector3f target, float delta) {
@@ -241,14 +236,51 @@ public abstract class Entity {
         dimensions.lerp(target, amount);
     }
 
-    public void updateCrouching(float delta) {
-        float targetHeight = isCrunching
-                ? crouchingHeight
-                : standingHeight;
+    public boolean canStandUp(World world) {
+        float epsilon = 0.001f;
+        float minX = position.x - dimensions.x / 2.0f + epsilon;
+        float maxX = position.x + dimensions.x / 2.0f - epsilon;
+        float minY = position.y + epsilon;
+        float maxY = position.y + standingHeight - epsilon;
 
-        float speed = 12.0f;
-        float amount = 1.0f - (float) Math.exp(-speed * delta);
-        dimensions.y += (targetHeight - dimensions.y) * amount;
+        float minZ = position.z - dimensions.z / 2.0f + epsilon;
+        float maxZ = position.z + dimensions.z / 2.0f - epsilon;
+
+        int blockMinX = (int) Math.floor(minX);
+        int blockMaxX = (int) Math.floor(maxX);
+        int blockMinY = (int) Math.floor(minY);
+        int blockMaxY = (int) Math.floor(maxY);
+        int blockMinZ = (int) Math.floor(minZ);
+        int blockMaxZ = (int) Math.floor(maxZ);
+
+        for (int x = blockMinX; x <= blockMaxX; x++) {
+            for (int y = blockMinY; y <= blockMaxY; y++) {
+                for (int z = blockMinZ; z <= blockMaxZ; z++) {
+                    if (world.isBlockSolid(x, y, z)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    public void updateCrouching(float delta) {
+        float targetHeight = isCrounching ? crouchingHeight : standingHeight;
+        if (Math.abs(dimensions.y - targetHeight) < 0.001f) {
+            dimensions.y = targetHeight;
+        } else {
+            float smoothFactor = 1.0f - (float) Math.exp(-14.0f * delta);
+            dimensions.y += (targetHeight - dimensions.y) * smoothFactor;
+        }
+
+        float targetEyeHeight = isCrounching ? (crouchingHeight * 0.85f) : (standingHeight * 0.85f);
+        float eyeSmooth = 1.0f - (float) Math.exp(-14.0f * delta);
+        currentEyeHeight += (targetEyeHeight - currentEyeHeight) * eyeSmooth;
+    }
+
+    public float getCurrentEyeHeight() {
+        return currentEyeHeight;
     }
 
     public abstract void update(float delta);

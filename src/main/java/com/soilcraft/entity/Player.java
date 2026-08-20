@@ -1,6 +1,7 @@
 package com.soilcraft.entity;
 
 import com.soilcraft.data.*;
+import com.soilcraft.graphics.CharacterAnimator;
 import com.soilcraft.graphics.CharacterModel;
 import com.soilcraft.graphics.CharacterRenderer;
 import com.soilcraft.service.SoundService;
@@ -19,6 +20,7 @@ public class Player extends Character {
     private final ToastService toastService;
     private final CharacterModel characterModel;
     private final CharacterRenderer characterRenderer;
+    private final CharacterAnimator characterAnimator;
     private final SoundService soundService;
 
     public Player(String name, World world, ToastService toastService,
@@ -30,6 +32,7 @@ public class Player extends Character {
 
         this.characterModel = new CharacterModel();
         this.characterRenderer = new CharacterRenderer();
+        this.characterAnimator = new CharacterAnimator(characterModel);
 
         float spawnX = 0.5f;
         float spawnZ = 0.5f;
@@ -37,12 +40,12 @@ public class Player extends Character {
         setPosition(new Vector3f(spawnX, highestY, spawnZ));
         setVelocity(new Vector3f(0.0f, 0.0f, 0.0f));
         setDimensions(new Vector3f(0.6f, 2.0f, 0.6f));
-        setCrouchingHeight(1.8f);
         setUpInventory();
     }
 
     @Override
     public void update(float delta) {
+        characterAnimator.update(this, delta);
         updateCrouching(delta);
         for (InventorySlot slot : getInventory().getSlots()) {
             if (slot.getItem() instanceof Tool tool) {
@@ -155,10 +158,9 @@ public class Player extends Character {
     }
 
     public Vector3f getEyePosition() {
-        float eyeHeight = isCrunching() ? 0.85f : 1.6f;
         return new Vector3f(
                 position.x,
-                position.y + eyeHeight,
+                position.y + getCurrentEyeHeight(),
                 position.z
         );
     }

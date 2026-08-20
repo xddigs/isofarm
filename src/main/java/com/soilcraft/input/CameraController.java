@@ -6,7 +6,6 @@ import com.soilcraft.service.Service;
 import com.soilcraft.utils.K;
 import com.soilcraft.utils.Settings;
 import com.soilcraft.wrld.GameMaster;
-import com.soilcraft.wrld.World;
 import org.joml.Vector3f;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -45,7 +44,7 @@ public class CameraController implements Service<Camera> {
             if (Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
                 player.crunch();
             } else {
-                player.uncrunch(gameMaster.getWorld());
+                player.uncrouch(gameMaster.getWorld());
             }
 
             camera.setZooming(!gameMaster.isInventoryOpen() &&

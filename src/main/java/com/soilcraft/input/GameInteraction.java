@@ -331,7 +331,7 @@ public class GameInteraction {
                     block.getType().getId())) {
                 hoe.misuse();
             } else {
-                hoe.use();
+                hoe.use(gameMaster, block);
             }
             gameMaster.rebuildChunkMeshAt(block.getX(), block.getZ());
         }
