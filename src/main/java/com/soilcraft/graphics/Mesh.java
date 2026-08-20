@@ -370,6 +370,6 @@ public class Mesh {
         glBindVertexArray(0);
         glDeleteVertexArrays(vaoId);
 
-        log.info("Mesh resources cleaned up [VAO ID: {}]", vaoId);
+        log.trace("Mesh resources cleaned up [VAO ID: {}]", vaoId);
     }
 }
