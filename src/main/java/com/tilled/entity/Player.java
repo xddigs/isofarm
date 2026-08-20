@@ -249,21 +249,16 @@ public class Player extends Character {
         float playerMinZ = position.z - dimensions.z / 2.0f + epsilon;
         float playerMaxZ = position.z + dimensions.z / 2.0f - epsilon;
 
-        float blockMinX = blockX;
         float blockMaxX = blockX + 1.0f;
-
-        float blockMinY = blockY;
         float blockMaxY = blockY + 1.0f;
-
-        float blockMinZ = blockZ;
         float blockMaxZ = blockZ + 1.0f;
 
         return playerMinX < blockMaxX &&
-                playerMaxX > blockMinX &&
+                playerMaxX > (float) blockX &&
                 playerMinY < blockMaxY &&
-                playerMaxY > blockMinY &&
+                playerMaxY > (float) blockY &&
                 playerMinZ < blockMaxZ &&
-                playerMaxZ > blockMinZ;
+                playerMaxZ > (float) blockZ;
     }
 
     public Vector3f getEyePosition() {

@@ -66,7 +66,11 @@ public class GameInteraction {
             dropItem(gameMaster, selectedItem);
         }
 
-        pickUp(gameMaster);
+        if (!gameMaster.isOrthographicCamera()) {
+            pickUp(gameMaster);
+        } else {
+            addItem(gameMaster);
+        }
 
         if (Keyboard.isKeyPressed(GLFW_KEY_V)) {
             gameMaster.changeCamera();
@@ -94,6 +98,30 @@ public class GameInteraction {
         }
 
         return hoveredCell;
+    }
+
+    private void addItem(GameMaster gameMaster) {
+        Player player = gameMaster.getPlayer();
+        if (player == null) return;
+        Iterator<Entity> iterator = gameMaster.getEntities().iterator();
+        while (iterator.hasNext()) {
+            Entity entity = iterator.next();
+            if (!(entity instanceof WorldItem worldItem)) continue;
+            Item item = worldItem.getItem();
+            int amount = worldItem.getAmount();
+
+            if (item == null || amount <= 0) {
+                iterator.remove();
+                continue;
+            }
+
+            player.add(item, amount);
+            iterator.remove();
+            gameMaster.getSoundService().playUseSound(SoundGroup.ITEMS,
+                    1.0f, player.getPosition().x);
+
+            log.info("Added x{} {}", amount, item.getName());
+        }
     }
 
     public void dropItem(GameMaster gameMaster, Item selectedItem) {
@@ -148,21 +176,13 @@ public class GameInteraction {
         Iterator<Entity> iterator = gameMaster.getEntities().iterator();
         while (iterator.hasNext()) {
             Entity entity = iterator.next();
-            if (!(entity instanceof WorldItem worldItem)) {
-                continue;
-            }
+            if (!(entity instanceof WorldItem worldItem)) continue;
 
-            if (!worldItem.canBePickedUp()) {
-                continue;
-            }
-
+            if (!worldItem.canBePickedUp()) continue;
             float distance = worldItem.getPosition()
                     .distance(player.getPosition());
 
-            if (distance > PICKUP_DISTANCE) {
-                continue;
-            }
-
+            if (distance > PICKUP_DISTANCE) continue;
             Item item = worldItem.getItem();
             int amount = worldItem.getAmount();
 

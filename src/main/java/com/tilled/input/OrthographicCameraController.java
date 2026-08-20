@@ -15,6 +15,7 @@ public record OrthographicCameraController(OrthographicCamera camera)
     private static boolean mouseCaptured = false;
     private static final float NORMAL_ZOOM = 18.0f;
     private static final float ZOOMED_ZOOM = NORMAL_ZOOM / 2.5f;
+    private static float verticalOffset = 0.0f;
 
     public void update(GameMaster gameMaster, float delta) {
         if (gameMaster.isInventoryOpen() || gameMaster.isPromptingForInput()) return;
@@ -36,7 +37,7 @@ public record OrthographicCameraController(OrthographicCamera camera)
         Player player = gameMaster.getPlayer();
         if (player == null) return;
 
-        float speed = K.Camera.MOVEMENT_SPEED;
+        float speed = K.Camera.MOVEMENT_SPEED * 1.5f;
         if (Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
             speed *= K.Camera.SPRINT_MULTIPLIER;
         }
@@ -60,17 +61,20 @@ public record OrthographicCameraController(OrthographicCamera camera)
         Vector3f playerPos = player.getPosition();
         Vector3f camForward = camera.getForwardVector();
 
+        if (Keyboard.isKeyDown(GLFW_KEY_SPACE)) {
+            verticalOffset += speed * delta;
+        }
+
+        if (Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
+            verticalOffset -= speed * delta;
+        }
+
         camera.getPosition().set(
                 playerPos.x - camForward.x * distance,
                 playerPos.y - camForward.y * distance,
-                playerPos.z - camForward.z * distance
-        );
-    }
+                playerPos.z - camForward.z * distance);
 
-    public void captureMouse(GameMaster gameMaster) {
-        if (mouseCaptured) return;
-        glfwSetInputMode(gameMaster.getWindowHandle(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        mouseCaptured = true;
+        camera.getPosition().add(0.0f, verticalOffset, 0.0f);
     }
 
     private void releaseMouse(GameMaster gameMaster) {
