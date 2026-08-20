@@ -21,7 +21,6 @@ import static org.lwjgl.opengl.GL11.*;
 @SuppressWarnings("all")
 public class GameMaster {
     private static final Logger log = LoggerFactory.getLogger(GameMaster.class);
-    private static final Random random = new Random();
     private final long windowHandle;
     private final World world;
     private final Sun sun;
@@ -73,7 +72,7 @@ public class GameMaster {
     public GameMaster(long windowHandle) {
         this.windowHandle = windowHandle;
 
-        this.world = new World(getSeed());
+        this.world = new World();
         this.sun = new Sun("Sun");
         this.moon = new Moon("Moon");
         this.celestialLighting = new CelestialLighting(sun, moon);
@@ -414,9 +413,5 @@ public class GameMaster {
 
     public void rebuildChunkMeshAt(int worldX, int worldZ) {
         chunkManager.rebuildChunkMeshAt(worldX, worldZ);
-    }
-
-    public static long getSeed() {
-        return random.nextLong(1111111111111L, 9999999999999L);
     }
 }
