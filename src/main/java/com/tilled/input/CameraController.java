@@ -36,7 +36,8 @@ public class CameraController implements Service<Camera> {
         Player player = gameMaster.getPlayer();
         if (player != null) {
             movement(gameMaster, delta);
-            if (!gameMaster.isInventoryOpen() && !gameMaster.isPromptingForInput() && Keyboard.isKeyPressed(GLFW_KEY_SPACE)) {
+            if (!gameMaster.isInventoryOpen() && !gameMaster.isPromptingForInput()
+                    && Keyboard.isKeyPressed(GLFW_KEY_SPACE)) {
                 player.jump();
             }
 
