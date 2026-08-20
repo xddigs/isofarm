@@ -328,7 +328,8 @@ public class GameMaster {
         hoveredCell = gameInteraction.update(this, selectedInventoryItem);
 
         if (player != null) {
-            chunkManager.update(player.getPosition().x, player.getPosition().z);
+            chunkManager.update(player.getPosition().x,
+                    player.getPosition().z, delta);
         }
 
         Mouse.update();

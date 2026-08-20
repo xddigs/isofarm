@@ -26,7 +26,7 @@ public class WorldGenerator {
 
                 for (int y = 0; y <= height; y++) {
                     byte blockId;
-                    
+
                     if (y == height) {
                         blockId = BlockData.GRASS.getId();
                     } else if (y > height - 3) {

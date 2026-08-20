@@ -53,20 +53,13 @@ public class World {
     }
 
     public void addBlock(Block block) {
-        if (block == null) {
-            return;
-        }
-
+        if (block == null) return;
         blocks.put(getBlockKey(block.getX(), block.getY(), block.getZ()), block);
     }
 
     public void removeBlock(Block block) {
-        if (block == null) {
-            return;
-        }
-
+        if (block == null) return;
         long key = getBlockKey(block.getX(), block.getY(), block.getZ());
-
         if (blocks.get(key) == block) {
             blocks.remove(key);
         }
@@ -99,7 +92,6 @@ public class World {
     }
 
     public int getChunkBlockTypeAt(int x, int y, int z) {
-
         int chunkX = Math.floorDiv(x, Chunk.SIZE_X);
         int chunkZ = Math.floorDiv(z, Chunk.SIZE_Z);
 
@@ -112,20 +104,12 @@ public class World {
     }
 
     public byte getBlockTypeAt(int x, int y, int z) {
-
-        if (y < 0 || y >= Chunk.SIZE_Y) {
-            return 0;
-        }
-
+        if (y < 0 || y >= Chunk.SIZE_Y) return 0;
         int chunkX = Math.floorDiv(x, Chunk.SIZE_X);
         int chunkZ = Math.floorDiv(z, Chunk.SIZE_Z);
 
         Chunk chunk = chunks.get(get2DKey(chunkX, chunkZ));
-
-        if (chunk == null) {
-            return 0;
-        }
-
+        if (chunk == null) return 0;
         int localX = Math.floorMod(x, Chunk.SIZE_X);
         int localZ = Math.floorMod(z, Chunk.SIZE_Z);
 
@@ -133,18 +117,13 @@ public class World {
     }
 
     public void setBlockTypeAt(int x, int y, int z, byte blockId) {
-
-        if (y < 0 || y >= Chunk.SIZE_Y) {
-            return;
-        }
-
+        if (y < 0 || y >= Chunk.SIZE_Y) return;
         int chunkX = Math.floorDiv(x, Chunk.SIZE_X);
         int chunkZ = Math.floorDiv(z, Chunk.SIZE_Z);
         Chunk chunk = getOrCreateChunk(chunkX, chunkZ);
 
         int localX = Math.floorMod(x, Chunk.SIZE_X);
         int localZ = Math.floorMod(z, Chunk.SIZE_Z);
-
         chunk.setBlock(localX, y, localZ, blockId);
     }
 
@@ -184,7 +163,7 @@ public class World {
         chunk.setWaterLevel(localX, y, localZ, waterLevel);
     }
 
-    private long getBlockKey(int x, int y, int z) {
+    public long getBlockKey(int x, int y, int z) {
         long keyXZ = get2DKey(x, z);
         return keyXZ ^ ((long) y * 0x9E3779B97F4A7C15L);
     }

@@ -33,6 +33,7 @@ public final class K {
         public static final int STARTING_COINS = 100;
         public static final int MAX_STACK = 128;
         public static final int WATER_LEVEL_MAX = 100;
+        public static final long TILLED_DIRT_DURATION = 10_000L;
 
         public static final int MAX_PARTICLES = 24;
 
