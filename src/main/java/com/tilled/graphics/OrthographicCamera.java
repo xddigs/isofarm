@@ -71,17 +71,8 @@ public class OrthographicCamera implements CameraView {
 
     public Vector3f getMovementForwardVector() {
         float yawRad = (float) Math.toRadians(YAW);
-
-        return new Vector3f(
-                (float) Math.sin(yawRad),
-                0.0f,
-                (float) -Math.cos(yawRad)
-        ).normalize();
-    }
-
-    public void move(float x, float z) {
-        position.x += x;
-        position.z += z;
+        return new Vector3f((float) Math.sin(yawRad),
+                0.0f, (float) -Math.cos(yawRad)).normalize();
     }
 
     public void setPosition(float x, float z) {

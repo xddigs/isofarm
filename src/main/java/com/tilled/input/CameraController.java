@@ -40,7 +40,8 @@ public class CameraController implements Service<Camera> {
                 player.jump();
             }
 
-            camera.setZooming(!gameMaster.isInventoryOpen() && !gameMaster.isPromptingForInput() && Keyboard.isKeyDown(GLFW_KEY_C));
+            camera.setZooming(!gameMaster.isInventoryOpen() &&
+                    !gameMaster.isPromptingForInput() && Keyboard.isKeyDown(GLFW_KEY_C));
             
             Vector3f eyePos = player.getEyePosition();
             if (player.isOnGround() && targetVelocity.lengthSquared() > 0.1f) {
@@ -107,7 +108,8 @@ public class CameraController implements Service<Camera> {
         }
 
         targetVelocity.set(moveX, 0.0f, moveZ);
-        player.moveAndCollide(gameMaster.getWorld(),targetVelocity,delta);
+        player.moveAndCollide(gameMaster.getWorld(), targetVelocity, delta,
+                gameMaster.isOrthographicCamera());
     }
 
     private void mouseLook() {

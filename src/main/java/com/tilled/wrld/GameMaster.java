@@ -235,8 +235,10 @@ public class GameMaster {
         } else {
             camera.setPosition(orthoCamera.getPosition().x,
                     camera.getPosition().y, orthoCamera.getPosition().z);
+            orthoCameraController.release(this);
         }
-        this.gameRenderer.initCamera(getActiveCamera());
+
+        gameRenderer.initCamera(getActiveCamera());
     }
 
     public boolean isOrthographicCamera() {

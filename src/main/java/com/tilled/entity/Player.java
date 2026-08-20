@@ -165,36 +165,39 @@ public class Player extends Character {
         onGround = false;
     }
 
-    public void moveAndCollide(World world, Vector3f targetVelocity, float delta,
-                               boolean isOrthographic) {
+    public void moveAndCollide(World world, Vector3f targetVelocity, float delta, boolean isOrthographic) {
         float smooth = 1.0f - (float) Math.exp(-12.0f * delta);
 
         velocity.x += (targetVelocity.x - velocity.x) * smooth;
         velocity.z += (targetVelocity.z - velocity.z) * smooth;
 
+        if (isOrthographic) {
+            velocity.y = 0.0f;
+            position.x += velocity.x * delta;
+            position.z += velocity.z * delta;
+            return;
+        }
+
         velocity.y += K.World.GRAVITY * delta;
         onGround = false;
 
         position.x += velocity.x * delta;
-
-        if (checkCollision(world) && !isOrthographic) {
+        if (checkCollision(world)) {
             position.x -= velocity.x * delta;
             velocity.x = 0;
         }
 
         position.y += velocity.y * delta;
-
-        if (checkCollision(world) && !isOrthographic) {
+        if (checkCollision(world)) {
             position.y -= velocity.y * delta;
             if (velocity.y < 0) {
                 onGround = true;
             }
-
             velocity.y = 0;
         }
 
         position.z += velocity.z * delta;
-        if (checkCollision(world) && !isOrthographic) {
+        if (checkCollision(world)) {
             position.z -= velocity.z * delta;
             velocity.z = 0;
         }
