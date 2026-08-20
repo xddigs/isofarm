@@ -123,7 +123,6 @@ public class GameMaster {
                 K.Camera.DEFAULT_HEIGHT, Settings.renderDistance);
 
         this.camera.setPosition(0.0f, 0.0f, 0.0f);
-        this.gameRenderer.initCamera(camera);
 
         this.cameraController = new CameraController(camera);
         this.orthoCameraController = new OrthographicCameraController(orthoCamera);
@@ -230,11 +229,14 @@ public class GameMaster {
     public void changeCamera() {
         isOrthographic = !isOrthographic;
         if (isOrthographic) {
-            orthoCamera.setPosition(camera.getPosition().x, orthoCamera.getPosition().y, camera.getPosition().z);
+            orthoCamera.setPosition(camera.getPosition().x,
+                    orthoCamera.getPosition().y, camera.getPosition().z);
             cameraController.release(this);
         } else {
-            camera.setPosition(orthoCamera.getPosition().x, camera.getPosition().y, orthoCamera.getPosition().z);
+            camera.setPosition(orthoCamera.getPosition().x,
+                    camera.getPosition().y, orthoCamera.getPosition().z);
         }
+        this.gameRenderer.initCamera(getActiveCamera());
     }
 
     public boolean isOrthographicCamera() {
@@ -363,6 +365,7 @@ public class GameMaster {
         shadowMap.dispose();
 
         cameraController.release(this);
+        orthoCameraController.release(this);
         soundService.cleanup();
         log.info("GameMaster resources successfully cleaned up");
     }
@@ -383,6 +386,11 @@ public class GameMaster {
 
         if (camera != null) {
             camera.updateProjection(newWidth, newHeight,
+                    Settings.renderDistance);
+        }
+
+        if (orthoCamera != null) {
+            orthoCamera.updateProjection(newWidth, newHeight,
                     Settings.renderDistance);
         }
 

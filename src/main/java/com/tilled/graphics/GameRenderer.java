@@ -34,7 +34,7 @@ public class GameRenderer {
 
     public void render(GameMaster gameMaster, ResourceManager rm, Map<Chunk, Mesh> chunkMeshes) {
         renderShadowPass(gameMaster, rm, chunkMeshes);
-        Camera camera = gameMaster.getCamera();
+        CameraView camera = gameMaster.getActiveCamera();
         float windowWidth = gameMaster.getWindowWidth();
         float windowHeight = gameMaster.getWindowHeight();
         Framebuffer sceneFbo = gameMaster.getSceneFbo();
@@ -255,7 +255,7 @@ public class GameRenderer {
         lightSpaceMatrix.set(lightProjection).mul(lightView);
     }
 
-    private void updateBlur(Camera camera) {
+    private void updateBlur(CameraView camera) {
         float yawDelta = camera.getYaw() - previousCameraYaw;
         if (yawDelta > K.Camera.HALF_DEGREES) yawDelta -= K.Camera.FULL_DEGREES;
         else if (yawDelta < -K.Camera.HALF_DEGREES) yawDelta += K.Camera.FULL_DEGREES;
@@ -267,7 +267,7 @@ public class GameRenderer {
         blurY = pitchDelta / K.Camera.HALF_DEGREES;
     }
 
-    public void initCamera(Camera camera) {
+    public void initCamera(CameraView camera) {
         previousCameraYaw = camera.getYaw();
         previousCameraPitch = camera.getPitch();
     }

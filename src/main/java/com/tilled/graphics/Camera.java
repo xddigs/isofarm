@@ -47,6 +47,16 @@ public class Camera implements CameraView {
         return position;
     }
 
+    @Override
+    public float getPitch() {
+        return pitch;
+    }
+
+    @Override
+    public float getYaw() {
+        return yaw;
+    }
+
     public float getFov() {
         return currentFov;
     }
@@ -100,17 +110,8 @@ public class Camera implements CameraView {
         this.pitch = Math.clamp(pitch, MIN_PITCH, MAX_PITCH);
     }
 
-
-    public float getYaw() {
-        return yaw;
-    }
-
     public void setYaw(float yaw) {
         this.yaw = yaw;
-    }
-
-    public float getPitch() {
-        return pitch;
     }
 
     public void setPitch(float pitch) {

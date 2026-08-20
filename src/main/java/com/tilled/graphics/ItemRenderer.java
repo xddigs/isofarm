@@ -152,6 +152,7 @@ public class ItemRenderer {
                        SpriteSheet spriteSheet, Shader shader,
                        CelestialLighting lighting, float delta) {
         if (item == null || spriteSheet == null || quadMesh == null) return;
+        if (gameMaster.isOrthographicCamera()) return;
         float rotateX, rotateY, rotateZ;
         boolean isTool = item instanceof Tool;
         if (isTool) {

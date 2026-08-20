@@ -32,7 +32,6 @@ public class GameInteraction {
     private final GameUIService gameUIservice;
     private final TimeService timeService;
     private final ParticleEngine particles;
-    private final Camera camera;
     private final SpriteSheet blocksTexture;
     private final ItemRenderer itemRenderer;
     private Hit hoveredCell = null;
@@ -43,7 +42,6 @@ public class GameInteraction {
         this.gameUIservice = gameMaster.getGameUIService();
         this.timeService = gameMaster.getTimeService();
         this.particles = gameMaster.getParticles();
-        this.camera = gameMaster.getCamera();
         this.blocksTexture = blocksTexture;
         this.itemRenderer = gameMaster.getItemRenderer();
     }
@@ -75,7 +73,14 @@ public class GameInteraction {
             gameMaster.changeCamera();
         }
 
-        hoveredCell = camera.highlight(gameMaster.getWorld());
+        if (gameMaster.isOrthographicCamera()) {
+            hoveredCell = gameMaster.getOrthoCamera().highlight(gameMaster.getWorld(),
+                    Mouse.getX(), Mouse.getY(),
+                    gameMaster.getWindowWidth(), gameMaster.getWindowHeight());
+        } else {
+            hoveredCell = gameMaster.getCamera().highlight(gameMaster.getWorld());
+        }
+
         if (hoveredCell == null) return null;
         if (!isWithinRange(gameMaster, hoveredCell)) return null;
 

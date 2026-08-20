@@ -10,8 +10,8 @@ import org.joml.Vector3f;
 
 @SuppressWarnings("unused")
 public class OrthographicCamera implements CameraView {
-    private static final float MIN_ZOOM = 10.0f;
-    private static final float MAX_ZOOM = 200.0f;
+    private static final float MIN_ZOOM = 5.0f;
+    private static final float MAX_ZOOM = 80.0f;
 
     private static final float YAW = 45.0f;
     private static final float PITCH = 35.2643897f;
@@ -24,7 +24,7 @@ public class OrthographicCamera implements CameraView {
     private final Vector3f position;
     private final Matrix4f projectionMatrix;
 
-    private float zoom = 80.0f;
+    private float zoom = 18.0f;
     private float aspectRatio = 1.0f;
 
     public OrthographicCamera(float width, float height, int renderDistanceChunks) {
@@ -47,13 +47,26 @@ public class OrthographicCamera implements CameraView {
 
     @Override
     public Matrix4f getViewMatrix() {
-        return new Matrix4f().identity().rotateX((float) Math.toRadians(PITCH))
-                .rotateY((float) Math.toRadians(YAW)).translate(-position.x, -position.y, -position.z);
+        return new Matrix4f()
+                .identity()
+                .rotateX((float) Math.toRadians(PITCH))
+                .rotateY((float) Math.toRadians(YAW))
+                .translate(-position.x, -position.y, -position.z);
     }
 
     @Override
     public Vector3f getPosition() {
         return position;
+    }
+
+    @Override
+    public float getPitch() {
+        return PITCH;
+    }
+
+    @Override
+    public float getYaw() {
+        return YAW;
     }
 
     public Vector3f getMovementForwardVector() {
@@ -78,14 +91,6 @@ public class OrthographicCamera implements CameraView {
 
     public void setPosition(float x, float y, float z) {
         position.set(x, y, z);
-    }
-
-    public float getYaw() {
-        return YAW;
-    }
-
-    public float getPitch() {
-        return PITCH;
     }
 
     public Vector3f getForwardVector() {
