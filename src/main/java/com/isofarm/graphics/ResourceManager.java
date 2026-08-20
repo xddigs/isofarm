@@ -16,6 +16,7 @@ public class ResourceManager {
     private final Shader rainShader;
     private final Shader motionBlurShader;
     private final Shader shadowMapShader;
+    private final Shader blurShader;
 
     private final Mesh screenQuadMesh;
     private final Mesh blockMesh;
@@ -43,6 +44,7 @@ public class ResourceManager {
         this.rainShader = new Shader(K.Paths.RAIN_VERT_SHADER, K.Paths.RAIN_FRAG_SHADER);
         this.motionBlurShader = new Shader(K.Paths.MOTION_BLUR_VERT_SHADER, K.Paths.MOTION_BLUR_FRAG_SHADER);
         this.shadowMapShader = new Shader(K.Paths.SHADOW_VERT_SHADER, K.Paths.SHADOW_FRAG_SHADER);
+        this.blurShader = new Shader(K.Paths.BLUR_VERT_SHADER, K.Paths.BLUR_FRAG_SHADER);
 
         this.screenQuadMesh = Mesh.screenQuad();
         this.blockMesh = Mesh.createMesh(K.World.DEFAULT_BLOCK_DEPTH);
@@ -103,6 +105,7 @@ public class ResourceManager {
         motionBlurShader.dispose();
         rainShader.dispose();
         shadowMapShader.dispose();
+        blurShader.dispose();
     }
 
     public Shader getDefaultShader() { return defaultShader; }
@@ -110,6 +113,7 @@ public class ResourceManager {
     public Shader getRainShader() { return rainShader; }
     public Shader getMotionBlurShader() { return motionBlurShader; }
     public Shader getShadowMapShader() { return shadowMapShader; }
+    public Shader getBlurShader() { return blurShader; }
     public Mesh getScreenQuadMesh() { return screenQuadMesh; }
     public Mesh getBlockMesh() { return blockMesh; }
     public Mesh getCharacterCubeMesh() { return characterCubeMesh; }
@@ -141,6 +145,7 @@ public class ResourceManager {
             case "outline" -> outlineShader;
             case "rain" -> rainShader;
             case "motion_blur" -> motionBlurShader;
+            case "blur" -> blurShader;
             case "shadow" -> shadowMapShader;
             case "default", "item" -> defaultShader;
             default -> {

@@ -464,10 +464,6 @@ public class InventoryUI extends UIElement {
 
     @Override
     public void render() {
-        GUI.drawRect(getAbsoluteX(), getAbsoluteY(), getAbsoluteWidth(),
-                getAbsoluteHeight(), K.UI.UI_BACKGROUND_COLOR, Settings.getScaledCornerRadius(),
-                K.UI.UI_BORDER_COLOR, Settings.getScaledThickness());
-
         renderChildren();
         renderCarriedItem();
     }

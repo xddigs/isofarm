@@ -185,17 +185,57 @@ public class GameRenderer {
         defaultShader.unbind();
         sceneFbo.unbind((int) windowWidth, (int) windowHeight);
 
-        glDisable(GL_DEPTH_TEST);
-        Shader motionBlurShader = rm.getMotionBlurShader();
-        motionBlurShader.bind();
-        motionBlurShader.setUniform("uScene", 0);
-        motionBlurShader.setUniform("uVelocity", new Vector2f(blurX, blurY));
-        motionBlurShader.setUniform("uStrength", Settings.doEnableMotions());
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, sceneFbo.getTextureId());
-        rm.getScreenQuadMesh().render();
-        motionBlurShader.unbind();
-        glEnable(GL_DEPTH_TEST);
+        if (gameMaster.isInventoryOpen()) {
+            glDisable(GL_DEPTH_TEST);
+            Shader blurShader = rm.getBlurShader();
+            Vector2f resolution = new Vector2f(windowWidth, windowHeight);
+
+            Framebuffer blurFbo = gameMaster.getBlurFbo();
+            blurFbo.bind();
+            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT);
+
+            blurShader.bind();
+            blurShader.setUniform("uResolution", resolution);
+            blurShader.setUniform("uDirection", new Vector2f(1.0f, 0.0f));
+            blurShader.setUniform("uBlurRadius", 5.0f);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, sceneFbo.getTextureId());
+            blurShader.setUniform("screenTexture", 0);
+            rm.getScreenQuadMesh().render();
+            blurShader.unbind();
+            blurFbo.unbind((int) windowWidth,(int) windowHeight);
+
+            glClear(GL_COLOR_BUFFER_BIT);
+            blurShader.bind();
+            blurShader.setUniform("uResolution", resolution);
+            blurShader.setUniform("uDirection", new Vector2f(0.0f, 1.0f));
+            blurShader.setUniform("uBlurRadius", 3.0f);
+
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, blurFbo.getTextureId());
+            blurShader.setUniform("screenTexture", 0);
+
+            rm.getScreenQuadMesh().render();
+            blurShader.unbind();
+            glEnable(GL_DEPTH_TEST);
+
+        } else {
+            glDisable(GL_DEPTH_TEST);
+            Shader motionBlurShader = rm.getMotionBlurShader();
+            motionBlurShader.bind();
+            motionBlurShader.setUniform("uScene", 0);
+            motionBlurShader.setUniform("uVelocity", new Vector2f(blurX, blurY));
+            motionBlurShader.setUniform("uStrength", Settings.doEnableMotions());
+
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, sceneFbo.getTextureId());
+
+            rm.getScreenQuadMesh().render();
+
+            motionBlurShader.unbind();
+            glEnable(GL_DEPTH_TEST);
+        }
 
         if (gameMaster.getWeatherService().isRaining()) {
             gameMaster.getRainEngine().render(rm.getRainShader(),

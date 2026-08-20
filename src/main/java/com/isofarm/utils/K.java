@@ -148,6 +148,9 @@ public final class K {
         public static final String SHADOW_FRAG_SHADER = "shaders/shadow.frag";
         public static final String SHADOW_VERT_SHADER = "shaders/shadow.vert";
 
+        public static final String BLUR_VERT_SHADER = "shaders/blur.vert";
+        public static final String BLUR_FRAG_SHADER = "shaders/blur.frag";
+
         public static final String WHEAT_TEXTURE = "assets/crops/wheat_crop.png";
         public static final String CARROT_TEXTURE = "assets/crops/carrot_crop.png";
         public static final String POTATO_TEXTURE = "assets/crops/potato_crop.png";

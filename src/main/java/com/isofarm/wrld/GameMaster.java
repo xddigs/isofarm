@@ -48,6 +48,7 @@ public class GameMaster {
 
     private Framebuffer maskFbo;
     private Framebuffer sceneFbo;
+    private Framebuffer blurFbo;
     private OrthographicCamera orthoCamera;
     private Camera camera;
     private CameraController cameraController;
@@ -96,7 +97,7 @@ public class GameMaster {
 
         this.maskFbo = new Framebuffer((int) windowWidth, (int) windowHeight);
         this.sceneFbo = new Framebuffer((int) windowWidth, (int) windowHeight);
-
+        this.blurFbo = new Framebuffer((int) windowWidth, (int) windowHeight);
         this.resourceManager = new ResourceManager();
         this.chunkManager = new ChunkManager(world);
         this.gameRenderer = new GameRenderer();
@@ -178,6 +179,9 @@ public class GameMaster {
     public OrthographicCamera getOrthoCamera() { return orthoCamera; }
     public OrthographicCameraController getOrthoCameraController() { return orthoCameraController; }
     public GameInteraction getGameInteraction() { return gameInteraction; }
+    public Framebuffer getBlurFbo() {
+        return blurFbo;
+    }
 
     public int getLastPlayerChunkX() {
         return chunkManager.getLastPlayerChunkX();
@@ -359,6 +363,8 @@ public class GameMaster {
         GUI.dispose();
         maskFbo.dispose();
         sceneFbo.dispose();
+        blurFbo.dispose();
+
         rainEngine.dispose();
         shadowMap.dispose();
 

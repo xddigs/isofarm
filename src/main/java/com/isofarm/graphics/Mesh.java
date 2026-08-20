@@ -15,7 +15,7 @@ import static org.lwjgl.opengl.GL30.*;
 
 public class Mesh {
     private static final Logger log = LoggerFactory.getLogger(Mesh.class);
-    private final int vaoId;
+    private int vaoId;
     private final int posVboId;
     private final int normalVboId;
     private final int uvVboId;
