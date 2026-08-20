@@ -130,8 +130,22 @@ public class GameMaster {
 
         this.gameInteraction = new GameInteraction(this,
                 resourceManager.getBlocksTexture());
-
         recenter();
+
+        this.player = new Player(gameUIservice.getEnteredPlayerName(),
+                world, toastService);
+
+        chunkManager.updateLoadedChunks(0, 0);
+        float spawnY = world.getHighestY(0.0f, 0.0f) + 1.0f;
+
+        player.setPosition(0.5f, spawnY, 0.5f);
+        gameUIservice.setPlayer(player);
+        shop.setPlayer(player);
+
+        log.info("Player created: {}", player.getName());
+        toastService.info("Use E to open the inventory");
+        Library.initItems(itemRegistry, player);
+        Library.initCommands(genDelta, this);
     }
 
     public Sun getSun() { return sun; }
@@ -335,23 +349,6 @@ public class GameMaster {
         }
 
         gameUIservice.render(isHUDShown(), this);
-
-        if (player == null) {
-            this.player = new Player(gameUIservice.getEnteredPlayerName(),
-                    world, toastService);
-
-            chunkManager.updateLoadedChunks(0, 0);
-            float spawnY = world.getHighestY(0.0f, 0.0f) + 1.0f;
-            player.setPosition(0.5f, spawnY, 0.5f);
-
-            gameUIservice.setPlayer(player);
-            this.shop.setPlayer(player);
-
-            log.info("Player created: {}", player.getName());
-            toastService.info("Use E to open the inventory");
-            Library.initItems(itemRegistry, player);
-            Library.initCommands(genDelta, this);
-        }
     }
 
     public void dispose() {
