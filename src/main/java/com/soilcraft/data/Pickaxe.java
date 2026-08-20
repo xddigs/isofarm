@@ -1,32 +1,18 @@
 package com.soilcraft.data;
 
 public class Pickaxe extends Tool {
-    private Tier tier;
 
     public Pickaxe(Tier tier) {
         super((byte) 3, tier.getName() + " Pickaxe", 100, ToolType.PICKAXE,
                 tier,tier.getDurability() + ToolType.PICKAXE.getBaseDurability());
-        this.tier = tier;
     }
 
     public Pickaxe() {
-        this(Tier.COPPER);
-    }
-
-    public Tier getTier() {
-        return tier;
-    }
-
-    public void upgrade(Tier tier) {
-        Tier[] tiers = Tier.values();
-        int index = tier.ordinal();
-        if (index < tiers.length - 1) {
-            this.tier = tiers[index + 1];
-        }
+        this(Tier.WOOD);
     }
 
     @Override
     public Item copy() {
-        return new Pickaxe(tier);
+        return new Pickaxe(getTier());
     }
 }

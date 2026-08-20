@@ -6,16 +6,14 @@ import com.soilcraft.wrld.GameMaster;
 import com.soilcraft.wrld.World;
 
 public class Hoe extends Tool {
-    private Tier tier;
 
     public Hoe(Tier tier) {
         super((byte) 2, tier.getName() + " Hoe", 150, ToolType.HOE,
                 tier, tier.getDurability() + ToolType.HOE.getBaseDurability());
-        this.tier = tier;
     }
 
     public Hoe() {
-        this(Tier.COPPER);
+        this(Tier.WOOD);
     }
 
     public void use(GameMaster gameMaster, Block block) {
@@ -38,10 +36,6 @@ public class Hoe extends Tool {
 
     @Override
     public Item copy() {
-        return new Hoe(tier);
-    }
-
-    public Tier getTier() {
-        return tier;
+        return new Hoe(getTier());
     }
 }
