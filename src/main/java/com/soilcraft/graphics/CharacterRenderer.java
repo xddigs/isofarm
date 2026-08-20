@@ -18,20 +18,27 @@ public class CharacterRenderer {
         shader.setUniform("uUseTexture", false);
         shader.setUniform("uUseFaceAtlas", false);
         shader.setUniform("uBaseColor", WHITE);
-        renderPart(shader, cubeMesh, model.getBody(), worldPosition);
-        renderPart(shader, cubeMesh, model.getLeftArm(), worldPosition);
-        renderPart(shader, cubeMesh, model.getRightArm(), worldPosition);
-        renderPart(shader, cubeMesh, model.getLeftLeg(), worldPosition);
-        renderPart(shader, cubeMesh, model.getRightLeg(), worldPosition);
+
+        float modelRotY = model.getRotationY();
+        renderPart(shader, cubeMesh, model.getBody(), worldPosition, modelRotY);
+        renderPart(shader, cubeMesh, model.getLeftArm(), worldPosition, modelRotY);
+        renderPart(shader, cubeMesh, model.getRightArm(), worldPosition, modelRotY);
+        renderPart(shader, cubeMesh, model.getLeftLeg(), worldPosition, modelRotY);
+        renderPart(shader, cubeMesh, model.getRightLeg(), worldPosition, modelRotY);
     }
 
-    private void renderPart(Shader shader, Mesh mesh, BodyPart part,
-                            Vector3f worldPosition) {
-        Vector3f position = new Vector3f(worldPosition).add(part.getPosition());
-        Vector3f rotation = part.getRotation();
+    private void renderPart(Shader shader, Mesh mesh,
+                            BodyPart part, Vector3f worldPosition, float modelRotY) {
+        Vector3f localPosition = part.getPosition();
+        Vector3f localRotation = part.getRotation();
         Vector3f size = part.getSize();
-        modelMatrix.identity().translate(position).rotateXYZ(
-                rotation.x, rotation.y, rotation.z).scale(size);
+
+        modelMatrix.identity()
+                .translate(worldPosition)
+                .rotateY(modelRotY)
+                .translate(localPosition)
+                .rotateXYZ(localRotation.x, localRotation.y, localRotation.z)
+                .scale(size);
 
         shader.setUniform("uModel", modelMatrix);
         mesh.render();

@@ -44,8 +44,8 @@ public class Player extends Character {
     }
 
     @Override
-    public void update(float delta) {
-        characterAnimator.update(this, delta);
+    public void update(Hit hit, float delta) {
+        characterAnimator.update(this, hit, delta);
         updateCrouching(delta);
         for (InventorySlot slot : getInventory().getSlots()) {
             if (slot.getItem() instanceof Tool tool) {
@@ -158,11 +158,7 @@ public class Player extends Character {
     }
 
     public Vector3f getEyePosition() {
-        return new Vector3f(
-                position.x,
-                position.y + getCurrentEyeHeight(),
-                position.z
-        );
+        return new Vector3f(position.x, position.y + getCurrentEyeHeight(), position.z);
     }
 
     public float getForward() {

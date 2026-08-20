@@ -1,6 +1,7 @@
 package com.soilcraft.entity;
 
 import com.soilcraft.data.DataClass;
+import com.soilcraft.data.Hit;
 import com.soilcraft.data.Item;
 import com.soilcraft.graphics.Shader;
 import com.soilcraft.graphics.SpriteSheet;
@@ -50,7 +51,7 @@ public class WorldItem extends Entity {
     }
 
     @Override
-    public void update(float delta) {
+    public void update(Hit hit, float delta) {
         if (world == null || delta <= 0.0f) return;
         if (pickupTimer > 0.0f) pickupTimer -= delta;
 

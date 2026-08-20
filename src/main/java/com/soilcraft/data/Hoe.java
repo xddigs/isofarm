@@ -31,7 +31,7 @@ public class Hoe extends Tool {
 
         gameMaster.getItemRenderer().playPlaceAnimation();
         gameMaster.getSoundService().playPlaceSound(block.getType().getSoundGroup(),
-                interaction.getDistanceToBlock(gameMaster, interaction.getHoveredCell()),
+                interaction.getDistanceToBlock(gameMaster, interaction.getHoveredCell(gameMaster)),
                 Settings.getMaxInteractionDistance());
     }
 

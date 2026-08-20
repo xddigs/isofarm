@@ -6,6 +6,7 @@ public class CharacterModel {
     private final BodyPart rightArm;
     private final BodyPart leftLeg;
     private final BodyPart rightLeg;
+    private float rotationY = 0.0f;
 
     public CharacterModel() {
         this.body = new BodyPart();
@@ -47,6 +48,14 @@ public class CharacterModel {
         rightLeg.getPosition().set(halfBody * 0.4f, legCenterY, 0.0f);
 
         saveBaseTransforms();
+    }
+
+    public float getRotationY() {
+        return rotationY;
+    }
+
+    public void setRotationY(float rotationY) {
+        this.rotationY = rotationY;
     }
 
     public BodyPart getBody() { return body; }

@@ -276,7 +276,7 @@ public class GameMaster {
 
     private void updateEntities(float delta) {
         for (Entity entity : entities) {
-            entity.update(delta);
+            entity.update(gameInteraction.getHoveredCell(this), delta);
         }
     }
 
@@ -309,7 +309,7 @@ public class GameMaster {
         genDelta = delta;
         timeService.update(delta, weatherService);
         float timeOfDay = timeService.getHour() + (timeService.getMinute() / 60.0f);
-        celestialLighting.update(timeOfDay);
+        celestialLighting.update(hoveredCell, timeOfDay);
         particles.update(delta);
         shop.update(timeService);
         cropService.update(delta, weatherService.getWeather());

@@ -34,7 +34,6 @@ public class GameInteraction {
     private final ParticleEngine particles;
     private final SpriteSheet blocksTexture;
     private final ItemRenderer itemRenderer;
-    private Hit hoveredCell = null;
 
     public GameInteraction(GameMaster gameMaster,
                            SpriteSheet blocksTexture) {
@@ -46,8 +45,10 @@ public class GameInteraction {
         this.itemRenderer = gameMaster.getItemRenderer();
     }
 
-    public Hit getHoveredCell() {
-        return hoveredCell;
+    public Hit getHoveredCell(GameMaster gameMaster) {
+        return gameMaster.getOrthoCamera().highlight(gameMaster.getWorld(),
+                Mouse.getX(), Mouse.getY(),
+                gameMaster.getWindowWidth(), gameMaster.getWindowHeight());
     }
 
     public Hit update(GameMaster gameMaster, Item selectedItem) {
@@ -78,10 +79,9 @@ public class GameInteraction {
             gameMaster.changeCamera();
         }
 
+        Hit hoveredCell;
         if (gameMaster.isOrthographicCamera()) {
-            hoveredCell = gameMaster.getOrthoCamera().highlight(gameMaster.getWorld(),
-                    Mouse.getX(), Mouse.getY(),
-                    gameMaster.getWindowWidth(), gameMaster.getWindowHeight());
+            hoveredCell = getHoveredCell(gameMaster);
         } else {
             hoveredCell = gameMaster.getCamera().highlight(gameMaster.getWorld());
         }

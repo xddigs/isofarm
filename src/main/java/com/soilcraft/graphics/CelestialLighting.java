@@ -1,5 +1,6 @@
 package com.soilcraft.graphics;
 
+import com.soilcraft.data.Hit;
 import com.soilcraft.entity.Moon;
 import com.soilcraft.entity.Sun;
 import org.joml.Vector3f;
@@ -21,9 +22,9 @@ public class CelestialLighting {
         this.color = new Vector3f();
     }
 
-    public void update(float timeOfDay) {
-        sun.update(timeOfDay);
-        moon.update(timeOfDay);
+    public void update(Hit hoveredCell, float timeOfDay) {
+        sun.update(hoveredCell, timeOfDay);
+        moon.update(hoveredCell, timeOfDay);
 
         float sunIntensity = sun.getIntensity();
         float moonIntensity = moon.getIntensity();

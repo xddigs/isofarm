@@ -1,6 +1,7 @@
 package com.soilcraft.entity;
 
 import com.soilcraft.data.DataClass;
+import com.soilcraft.data.Hit;
 import com.soilcraft.utils.K;
 import com.soilcraft.wrld.GameMaster;
 import com.soilcraft.wrld.World;
@@ -105,8 +106,8 @@ public abstract class Entity {
         return isCrounching;
     }
 
-    public void setCrounching(boolean crounching) {
-        this.isCrounching = crounching;
+    public void setCrounching(boolean isCrounching) {
+        this.isCrounching = isCrounching;
     }
 
     public boolean isOnGround() {
@@ -283,7 +284,7 @@ public abstract class Entity {
         return currentEyeHeight;
     }
 
-    public abstract void update(float delta);
+    public abstract void update(Hit hit, float delta);
 
     public abstract void render(GameMaster gameMaster);
 }
