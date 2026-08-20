@@ -19,12 +19,13 @@ public class OrthographicCamera implements CameraView {
     private static final float NEAR_PLANE = 0.1f;
     private static final float FAR_PLANE = 2000.0f;
 
-    private static final float MAX_RAY_DISTANCE = 100.0f;
+    private static final float MAX_RAY_DISTANCE =
+            Settings.getMaxInteractionDistance();
 
     private final Vector3f position;
     private final Matrix4f projectionMatrix;
 
-    private float zoom = 18.0f;
+    private float zoom = 25.0f;
     private float aspectRatio = 1.0f;
 
     public OrthographicCamera(float width, float height, int renderDistanceChunks) {
@@ -110,20 +111,24 @@ public class OrthographicCamera implements CameraView {
         updateProjection(aspectRatio, 1.0f, Settings.renderDistance);
     }
 
+    public Vector3f getUpVector() {
+        Vector3f forward = getForwardVector();
+        Vector3f right = getRightVector();
+        Vector3f up = new Vector3f();
+        right.cross(forward, up);
+        return up.normalize();
+    }
+
     public Ray getMouseRay(float mouseX, float mouseY, float screenWidth, float screenHeight) {
         float ndcX = (2.0f * mouseX / screenWidth) - 1.0f;
         float ndcY = 1.0f - (2.0f * mouseY / screenHeight);
 
-        Vector3f right = getRightVector();
-        Vector3f up = new Vector3f(0.0f, 1.0f, 0.0f);
-        Vector3f forward = getForwardVector();
+        Matrix4f invVP = new Matrix4f();
+        projectionMatrix.mul(getViewMatrix(), invVP).invert();
 
-        Vector3f origin = new Vector3f(position);
-        origin.fma(ndcX * zoom * aspectRatio, right);
-        origin.fma(ndcY * zoom, up);
-
-        origin.fma(-FAR_PLANE * 0.5f, forward);
-        return new Ray(origin, forward);
+        Vector3f rayOrigin = new Vector3f();
+        invVP.transformProject(ndcX, ndcY, -1.0f, rayOrigin);
+        return new Ray(rayOrigin, getForwardVector());
     }
 
     public Hit highlight(World world, float mouseX, float mouseY, float screenWidth, float screenHeight) {
@@ -133,6 +138,7 @@ public class OrthographicCamera implements CameraView {
 
     private Hit raycast(World world, Vector3f origin, Vector3f direction) {
         float tileSize = K.World.TILE_SIZE;
+
         int x = (int) Math.floor(origin.x / tileSize);
         int y = (int) Math.floor(origin.y / tileSize);
         int z = (int) Math.floor(origin.z / tileSize);
@@ -147,13 +153,13 @@ public class OrthographicCamera implements CameraView {
         float tMaxX = stepX > 0 ? ((x + 1) * tileSize - origin.x) / direction.x : stepX < 0 ? (x * tileSize - origin.x) / direction.x : Float.POSITIVE_INFINITY;
         float tMaxY = stepY > 0 ? ((y + 1) * tileSize - origin.y) / direction.y : stepY < 0 ? (y * tileSize - origin.y) / direction.y : Float.POSITIVE_INFINITY;
         float tMaxZ = stepZ > 0 ? ((z + 1) * tileSize - origin.z) / direction.z : stepZ < 0 ? (z * tileSize - origin.z) / direction.z : Float.POSITIVE_INFINITY;
-
         float distance = 0.0f;
+
         int hitNormalX = 0;
         int hitNormalY = 0;
         int hitNormalZ = 0;
 
-        while (distance <= MAX_RAY_DISTANCE) {
+        while (distance <= Settings.getMaxInteractionDistance()) {
             byte block = world.getBlockTypeAt(x, y, z);
             if (block != 0) {
                 return new Hit(x, y, z, hitNormalX, hitNormalY, hitNormalZ);
@@ -164,6 +170,7 @@ public class OrthographicCamera implements CameraView {
                     x += stepX;
                     distance = tMaxX;
                     tMaxX += tDeltaX;
+
                     hitNormalX = -stepX;
                     hitNormalY = 0;
                     hitNormalZ = 0;
@@ -176,7 +183,6 @@ public class OrthographicCamera implements CameraView {
                     hitNormalY = 0;
                     hitNormalZ = -stepZ;
                 }
-
             } else {
                 if (tMaxY < tMaxZ) {
                     y += stepY;
@@ -190,6 +196,7 @@ public class OrthographicCamera implements CameraView {
                     z += stepZ;
                     distance = tMaxZ;
                     tMaxZ += tDeltaZ;
+
                     hitNormalX = 0;
                     hitNormalY = 0;
                     hitNormalZ = -stepZ;

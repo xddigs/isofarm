@@ -144,6 +144,7 @@ public class GameRenderer {
             rm.getSelectionMesh().renderLines();
             glDepthMask(true);
         }
+
         if (hoveredCell != null) {
             maskFbo.bind();
 
@@ -245,7 +246,7 @@ public class GameRenderer {
     }
 
     private void updateLightSpaceMatrix(GameMaster gameMaster) {
-        Camera camera = gameMaster.getCamera();
+        CameraView camera = gameMaster.getActiveCamera();
         Vector3f cameraPosition = new Vector3f(camera.getPosition());
         Vector3f lightDirection = new Vector3f(gameMaster.getCelestialLighting().getDirection()).normalize();
         lightTarget.set(cameraPosition);

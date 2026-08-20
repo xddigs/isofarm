@@ -67,7 +67,6 @@ public class GameMaster {
     private boolean isPromptingForInput = false;
     private boolean isInventoryOpen = false;
     private boolean isHUDShown = true;
-    private boolean isOrthographic = false;
 
     private float genDelta;
 
@@ -227,8 +226,8 @@ public class GameMaster {
     }
 
     public void changeCamera() {
-        isOrthographic = !isOrthographic;
-        if (isOrthographic) {
+        Settings.toggleOrthographic();
+        if (Settings.isOrthographic()) {
             orthoCamera.setPosition(camera.getPosition().x,
                     orthoCamera.getPosition().y, camera.getPosition().z);
             cameraController.release(this);
@@ -242,11 +241,11 @@ public class GameMaster {
     }
 
     public boolean isOrthographicCamera() {
-        return isOrthographic;
+        return Settings.isOrthographic();
     }
 
     public CameraView getActiveCamera() {
-        return isOrthographic ? orthoCamera : camera;
+        return Settings.isOrthographic() ? orthoCamera : camera;
     }
 
     public void addEntity(Entity entity) {
@@ -303,7 +302,7 @@ public class GameMaster {
         cropService.update(delta, weatherService.getWeather());
         updateEntities(delta);
 
-        if (isOrthographic) {
+        if (Settings.isOrthographic()) {
             orthoCameraController.update(this, delta);
         } else {
             cameraController.update(this, delta);

@@ -10,6 +10,8 @@ public class Settings {
     public static int unloadMargin = 2;
     public static int guiScaleIndex = 2;
     public static boolean doEnableMotions = true;
+    public static boolean isOrthographic = false;
+    public static float maxInteractionDistance = 5.0f;
 
     private Settings() {}
 
@@ -77,11 +79,23 @@ public class Settings {
         return getScaledIcon() * 1.25f;
     }
 
+    public static boolean isOrthographic() {
+        return isOrthographic;
+    }
+
+    public static float getMaxInteractionDistance() {
+        return isOrthographic() ? 1500f : maxInteractionDistance;
+    }
+
     public static float doEnableMotions() {
         return doEnableMotions ? 0.8f : 0.0f;
     }
 
     public static void toggleMotionBlur() {
         doEnableMotions = !doEnableMotions;
+    }
+
+    public static void toggleOrthographic() {
+        isOrthographic = !isOrthographic;
     }
 }

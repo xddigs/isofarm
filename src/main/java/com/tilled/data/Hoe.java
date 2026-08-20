@@ -1,10 +1,9 @@
 package com.tilled.data;
 
 import com.tilled.input.GameInteraction;
+import com.tilled.utils.Settings;
 import com.tilled.wrld.GameMaster;
 import com.tilled.wrld.World;
-
-import static com.tilled.input.GameInteraction.MAX_INTERACTION_DISTANCE;
 
 public class Hoe extends Tool {
     private Tier tier;
@@ -34,7 +33,7 @@ public class Hoe extends Tool {
         gameMaster.getItemRenderer().playPlaceAnimation();
         gameMaster.getSoundService().playPlaceSound(block.getType().getSoundGroup(),
                 interaction.getDistanceToBlock(gameMaster, interaction.getHoveredCell()),
-                MAX_INTERACTION_DISTANCE);
+                Settings.getMaxInteractionDistance());
     }
 
     @Override

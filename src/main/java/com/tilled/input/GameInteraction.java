@@ -4,7 +4,6 @@ import com.tilled.data.*;
 import com.tilled.entity.Entity;
 import com.tilled.entity.Player;
 import com.tilled.entity.WorldItem;
-import com.tilled.graphics.Camera;
 import com.tilled.graphics.ItemRenderer;
 import com.tilled.graphics.ParticleEngine;
 import com.tilled.graphics.SpriteSheet;
@@ -12,6 +11,7 @@ import com.tilled.service.CropService;
 import com.tilled.service.GameUIService;
 import com.tilled.service.TimeService;
 import com.tilled.utils.K;
+import com.tilled.utils.Settings;
 import com.tilled.wrld.Chunk;
 import com.tilled.wrld.GameMaster;
 import com.tilled.wrld.World;
@@ -24,7 +24,6 @@ import java.util.Iterator;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class GameInteraction {
-    public static final float MAX_INTERACTION_DISTANCE = 5.0f;
     private static final float PICKUP_DISTANCE = 1.5f;
 
     private static final Logger log = LoggerFactory.getLogger(GameInteraction.class);
@@ -183,7 +182,7 @@ public class GameInteraction {
 
     private boolean isWithinRange(GameMaster gameMaster, Hit cell) {
         float distance = getDistanceToBlock(gameMaster, cell);
-        return distance <= MAX_INTERACTION_DISTANCE;
+        return distance <= Settings.getMaxInteractionDistance();
     }
 
     public float getDistanceToBlock(GameMaster gameMaster, Hit cell) {
@@ -240,7 +239,7 @@ public class GameInteraction {
         if (blockData.getSoundGroup() != null) {
             gameMaster.getSoundService()
                     .playBreakSound(blockData.getSoundGroup(),
-                            getDistanceToBlock(gameMaster, cell), MAX_INTERACTION_DISTANCE);
+                            getDistanceToBlock(gameMaster, cell), Settings.maxInteractionDistance);
         }
 
         world.setBlockTypeAt(x, y, z, BlockData.AIR.getId());
@@ -277,7 +276,7 @@ public class GameInteraction {
                 world.setBlockTypeAt(x, y, z, block.getType().getId());
                 itemRenderer.playPlaceAnimation();
                 gameMaster.getSoundService().playBreakSound(newBlock.getType().getSoundGroup(),
-                        getDistanceToBlock(gameMaster, cell), MAX_INTERACTION_DISTANCE);
+                        getDistanceToBlock(gameMaster, cell), Settings.maxInteractionDistance);
 
                 gameMaster.getPlayer().remove(selectedItem);
                 gameMaster.rebuildChunkMeshAt(x, z);

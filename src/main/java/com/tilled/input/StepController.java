@@ -4,11 +4,10 @@ import com.tilled.data.Block;
 import com.tilled.entity.Player;
 import com.tilled.data.SoundGroup;
 import com.tilled.service.SoundService;
+import com.tilled.utils.Settings;
 import com.tilled.wrld.GameMaster;
 import com.tilled.wrld.World;
 import org.joml.Vector3f;
-
-import static com.tilled.input.GameInteraction.MAX_INTERACTION_DISTANCE;
 
 public class StepController {
     private float stepDistanceAccumulator = 0.0f;
@@ -17,6 +16,7 @@ public class StepController {
 
     public void update(GameMaster gameMaster, Player player, SoundService soundService, float delta) {
         if (player == null) return;
+        if (gameMaster.isOrthographicCamera()) return;
         Vector3f currentPos = player.getPosition();
         float dx = currentPos.x - lastPosition.x;
         float dz = currentPos.z - lastPosition.z;
@@ -41,7 +41,7 @@ public class StepController {
             if (block != null && block.getType() != null) {
                 SoundGroup soundGroup = block.getType().getSoundGroup();
                 soundService.playStepSound(soundGroup, gameMaster.getGameInteraction().getDistanceToBlock(gameMaster,
-                        gameMaster.getGameInteraction().getHoveredCell()), MAX_INTERACTION_DISTANCE);
+                        gameMaster.getGameInteraction().getHoveredCell()), Settings.maxInteractionDistance);
             }
         }
     }

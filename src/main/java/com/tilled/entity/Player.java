@@ -31,7 +31,7 @@ public class Player extends Character {
 
         this.position = new Vector3f(spawnX, highestY, spawnZ);
         this.velocity = new Vector3f();
-        this.dimensions = new Vector3f(0.6f, 1.0f, 0.6f);
+        this.dimensions = new Vector3f(0.6f, 2.0f, 0.6f);
         setUpInventory();
     }
 

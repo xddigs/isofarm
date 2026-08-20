@@ -167,7 +167,7 @@ public class GameUIService implements Service<GameMaster> {
         } else {}
 
         renderChatHistory();
-        if (!gameMaster.isInventoryOpen()) {
+        if (!gameMaster.isInventoryOpen() && !gameMaster.isOrthographicCamera()) {
             renderCrosshair(windowWidth, windowHeight);
         }
 
