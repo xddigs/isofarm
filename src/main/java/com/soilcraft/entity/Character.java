@@ -8,6 +8,7 @@ public abstract class Character extends Entity implements Levelable {
     private final ToastService toastService;
     private final Inventory inventory;
     private final Purse purse;
+    private Reputation reputation;
 
     private int level;
     private int experience;
@@ -29,6 +30,7 @@ public abstract class Character extends Entity implements Levelable {
         this.toastService = toastService;
         this.inventory = new Inventory();
         this.purse = new Purse(inventory, new Coin());
+        this.reputation = Reputation.NEUTRAL;
 
         this.hitpoints = 100;
         this.maxHitpoints = 100;
@@ -208,5 +210,13 @@ public abstract class Character extends Entity implements Levelable {
 
     public void setLuck(int luck) {
         this.luck = luck;
+    }
+
+    public Reputation getReputation() {
+        return reputation;
+    }
+
+    public void setReputation(Reputation reputation) {
+        this.reputation = reputation;
     }
 }
