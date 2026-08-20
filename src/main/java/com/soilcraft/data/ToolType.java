@@ -1,7 +1,7 @@
 package com.soilcraft.data;
 
 public enum ToolType {
-    HOE(new BlockData[]{BlockData.TILLED_DIRT}, 8),
+    HOE(new BlockData[]{BlockData.GRASS, BlockData.DIRT}, 8),
     AXE(new BlockData[]{BlockData.OAK_LOG, BlockData.OAK_WOOD}, 10),
     PICKAXE(new BlockData[]{BlockData.STONE, BlockData.VOIDSTONE}, 7),
     SHOVEL(new BlockData[]{BlockData.GRASS, BlockData.DIRT}, 5),
