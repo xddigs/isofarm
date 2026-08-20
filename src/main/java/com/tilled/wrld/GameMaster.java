@@ -50,8 +50,10 @@ public class GameMaster {
 
     private Framebuffer maskFbo;
     private Framebuffer sceneFbo;
+    private OrthographicCamera orthoCamera;
     private Camera camera;
     private CameraController cameraController;
+    private OrthographicCameraController orthoCameraController;
     private StepController stepController;
     private Hit hoveredCell = null;
 
@@ -65,6 +67,7 @@ public class GameMaster {
     private boolean isPromptingForInput = false;
     private boolean isInventoryOpen = false;
     private boolean isHUDShown = true;
+    private boolean isOrthographic = false;
 
     private float genDelta;
 
@@ -116,10 +119,14 @@ public class GameMaster {
         this.camera = new Camera(K.Camera.DEFAULT_WIDTH,
                 K.Camera.DEFAULT_HEIGHT, Settings.renderDistance);
 
+        this.orthoCamera = new OrthographicCamera(K.Camera.DEFAULT_WIDTH,
+                K.Camera.DEFAULT_HEIGHT, Settings.renderDistance);
+
         this.camera.setPosition(0.0f, 0.0f, 0.0f);
         this.gameRenderer.initCamera(camera);
 
         this.cameraController = new CameraController(camera);
+        this.orthoCameraController = new OrthographicCameraController(orthoCamera);
         this.stepController = new StepController();
         this.weatherService = new WeatherService(rainEngine, camera);
 
@@ -157,6 +164,8 @@ public class GameMaster {
     public float getWindowHeight() { return windowHeight; }
     public Camera getCamera() { return camera; }
     public CameraController getCameraController() { return cameraController; }
+    public OrthographicCamera getOrthoCamera() { return orthoCamera; }
+    public OrthographicCameraController getOrthoCameraController() { return orthoCameraController; }
     public GameInteraction getGameInteraction() { return gameInteraction; }
 
     public int getLastPlayerChunkX() {
@@ -218,6 +227,24 @@ public class GameMaster {
         return entities;
     }
 
+    public void changeCamera() {
+        isOrthographic = !isOrthographic;
+        if (isOrthographic) {
+            orthoCamera.setPosition(camera.getPosition().x, orthoCamera.getPosition().y, camera.getPosition().z);
+            cameraController.release(this);
+        } else {
+            camera.setPosition(orthoCamera.getPosition().x, camera.getPosition().y, orthoCamera.getPosition().z);
+        }
+    }
+
+    public boolean isOrthographicCamera() {
+        return isOrthographic;
+    }
+
+    public CameraView getActiveCamera() {
+        return isOrthographic ? orthoCamera : camera;
+    }
+
     public void addEntity(Entity entity) {
         if (entity == null) return;
         if (entity instanceof WorldItem worldItem) {
@@ -239,7 +266,7 @@ public class GameMaster {
 
     public void update(float delta) {
         if (weatherService.isRaining()) {
-            rainEngine.update(delta, camera.getPosition());
+            rainEngine.update(delta, getActiveCamera().getPosition());
         }
 
         if (Keyboard.isKeyPressed(org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER)) {
@@ -271,10 +298,15 @@ public class GameMaster {
         shop.update(timeService);
         cropService.update(delta, weatherService.getWeather());
         updateEntities(delta);
-        cameraController.update(this, delta);
-        camera.update(delta);
-        itemRenderer.update(delta);
 
+        if (isOrthographic) {
+            orthoCameraController.update(this, delta);
+        } else {
+            cameraController.update(this, delta);
+            camera.update(delta);
+        }
+
+        itemRenderer.update(delta);
         stepController.update(this, player, soundService, delta);
 
         Item selectedInventoryItem = gameUIservice.getInventoryUI().getSelectedItem();

@@ -71,6 +71,10 @@ public class GameInteraction {
 
         pickUp(gameMaster);
 
+        if (Keyboard.isKeyPressed(GLFW_KEY_V)) {
+            gameMaster.changeCamera();
+        }
+
         hoveredCell = camera.highlight(gameMaster.getWorld());
         if (hoveredCell == null) return null;
         if (!isWithinRange(gameMaster, hoveredCell)) return null;

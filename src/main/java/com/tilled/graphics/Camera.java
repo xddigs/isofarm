@@ -8,7 +8,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 @SuppressWarnings("unused")
-public class Camera {
+public class Camera implements CameraView {
     private static final float MAX_RAY_DISTANCE = 100.0f;
     private static final float MIN_PITCH = -89.0f;
     private static final float MAX_PITCH = 89.0f;
@@ -26,6 +26,25 @@ public class Camera {
         this.position = new Vector3f(0.0f, 0.0f, 0.0f);
         this.projectionMatrix = new Matrix4f();
         updateProjection(width, height, renderDistanceChunks);
+    }
+
+    @Override
+    public Matrix4f getProjectionMatrix() {
+        return projectionMatrix;
+    }
+
+    @Override
+    public Matrix4f getViewMatrix() {
+        return new Matrix4f()
+                .identity()
+                .rotateX((float) Math.toRadians(pitch))
+                .rotateY((float) Math.toRadians(yaw))
+                .translate(-position.x, -position.y, -position.z);
+    }
+
+    @Override
+    public Vector3f getPosition() {
+        return position;
     }
 
     public float getFov() {
@@ -58,14 +77,6 @@ public class Camera {
         );
     }
 
-    public Matrix4f getViewMatrix() {
-        return new Matrix4f()
-                .identity()
-                .rotateX((float) Math.toRadians(pitch))
-                .rotateY((float) Math.toRadians(yaw))
-                .translate(-position.x, -position.y, -position.z);
-    }
-
     public Vector3f getForwardVector() {
         Vector3f dir = new Vector3f();
         float yawRad = (float) Math.toRadians(yaw);
@@ -89,6 +100,7 @@ public class Camera {
         this.pitch = Math.clamp(pitch, MIN_PITCH, MAX_PITCH);
     }
 
+
     public float getYaw() {
         return yaw;
     }
@@ -103,14 +115,6 @@ public class Camera {
 
     public void setPitch(float pitch) {
         this.pitch = pitch;
-    }
-
-    public Matrix4f getProjectionMatrix() {
-        return projectionMatrix;
-    }
-
-    public Vector3f getPosition() {
-        return position;
     }
 
     public void setPosition(float x, float y, float z) {
