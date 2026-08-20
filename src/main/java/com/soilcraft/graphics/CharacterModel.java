@@ -17,7 +17,7 @@ public class CharacterModel {
     }
 
     private void configure() {
-        float bodyScale = 1.2f;
+        float bodyScale = 1.0f;
         float armRatio = 0.5f;
         float legRatio = 0.3f;
 

@@ -8,6 +8,11 @@ public class CharacterAnimator {
     private final CharacterModel model;
     private float animationTime = 0.0f;
 
+    private float currentLeftArmRot = 0.0f;
+    private float currentRightArmRot = 0.0f;
+    private float currentLeftLegRot = 0.0f;
+    private float currentRightLegRot = 0.0f;
+
     public CharacterAnimator(CharacterModel model) {
         this.model = model;
     }
@@ -16,21 +21,52 @@ public class CharacterAnimator {
         animationTime += delta;
 
         resetModel();
-
         float horizontalSpeed = (float) Math.sqrt(
                 entity.getVelocity().x * entity.getVelocity().x +
                         entity.getVelocity().z * entity.getVelocity().z
         );
 
+        float targetLeftArm, targetRightArm;
+        float targetLeftLeg, targetRightLeg;
+
         if (!entity.isOnGround()) {
-            animateAirborne(entity, delta);
+            boolean rising = entity.getVelocity().y > 0.0f;
+            targetLeftArm = rising ? -0.35f : 0.25f;
+            targetRightArm = rising ? -0.35f : 0.25f;
+            targetLeftLeg = rising ? 0.15f : -0.1f;
+            targetRightLeg = rising ? -0.15f : 0.1f;
         } else if (entity.isCrounching()) {
-            animateCrouch(entity, delta);
+            model.getBody().getPosition().y -= 0.25f;
+            targetLeftArm = -0.2f;
+            targetRightArm = -0.2f;
+            targetLeftLeg = 0.15f;
+            targetRightLeg = -0.15f;
         } else if (horizontalSpeed > 0.05f) {
-            animateWalk(entity, horizontalSpeed, delta);
+            float animationSpeed = WALK_SPEED * Math.min(horizontalSpeed / 3.0f, 1.5f);
+            float swing = (float) Math.sin(animationTime * animationSpeed) * WALK_ROTATION;
+            targetLeftArm = -swing;
+            targetRightArm = swing;
+            targetLeftLeg = swing;
+            targetRightLeg = -swing;
         } else {
-            animateIdle(entity, delta);
+            float breathing = (float) Math.sin(animationTime * 2.0f);
+            model.getBody().getPosition().y += breathing * 0.015f;
+            targetLeftArm = breathing * 0.02f;
+            targetRightArm = breathing * 0.02f;
+            targetLeftLeg = 0.0f;
+            targetRightLeg = 0.0f;
         }
+
+        float lerpSpeed = delta * 15.0f;
+        currentLeftArmRot = lerp(currentLeftArmRot, targetLeftArm, lerpSpeed);
+        currentRightArmRot = lerp(currentRightArmRot, targetRightArm, lerpSpeed);
+        currentLeftLegRot = lerp(currentLeftLegRot, targetLeftLeg, lerpSpeed);
+        currentRightLegRot = lerp(currentRightLegRot, targetRightLeg, lerpSpeed);
+
+        model.getLeftArm().getRotation().x = currentLeftArmRot;
+        model.getRightArm().getRotation().x = currentRightArmRot;
+        model.getLeftLeg().getRotation().x = currentLeftLegRot;
+        model.getRightLeg().getRotation().x = currentRightLegRot;
     }
 
     private void resetModel() {
@@ -41,63 +77,7 @@ public class CharacterAnimator {
         model.getRightLeg().resetTransform();
     }
 
-    private void animateIdle(Entity entity, float delta) {
-        BodyPart body = model.getBody();
-        BodyPart leftArm = model.getLeftArm();
-        BodyPart rightArm = model.getRightArm();
-
-        float breathing = (float) Math.sin(animationTime * 2.0f);
-
-        body.getPosition().y += breathing * 0.015f;
-
-        leftArm.getRotation().x = breathing * 0.02f;
-        rightArm.getRotation().x = breathing * 0.02f;
-    }
-
-    private void animateWalk(Entity entity, float speed, float delta) {
-        float animationSpeed = WALK_SPEED * Math.min(speed / 3.0f, 1.5f);
-        float swing = (float) Math.sin(animationTime * animationSpeed) * WALK_ROTATION;
-
-        model.getLeftArm().getRotation().x = -swing;
-        model.getRightArm().getRotation().x = swing;
-
-        model.getLeftLeg().getRotation().x = swing;
-        model.getRightLeg().getRotation().x = -swing;
-    }
-
-    private void animateCrouch(Entity entity, float delta) {
-        BodyPart body = model.getBody();
-        BodyPart leftArm = model.getLeftArm();
-        BodyPart rightArm = model.getRightArm();
-        BodyPart leftLeg = model.getLeftLeg();
-        BodyPart rightLeg = model.getRightLeg();
-
-        body.getPosition().y -= 0.25f;
-        leftArm.getRotation().x = -0.2f;
-        rightArm.getRotation().x = -0.2f;
-        leftLeg.getRotation().x = 0.15f;
-        rightLeg.getRotation().x = -0.15f;
-    }
-
-    private void animateAirborne(Entity entity, float delta) {
-        BodyPart leftArm = model.getLeftArm();
-        BodyPart rightArm = model.getRightArm();
-        BodyPart leftLeg = model.getLeftLeg();
-        BodyPart rightLeg = model.getRightLeg();
-        boolean rising = entity.getVelocity().y > 0.0f;
-
-        if (rising) {
-            leftArm.getRotation().x = -0.35f;
-            rightArm.getRotation().x = -0.35f;
-
-            leftLeg.getRotation().x = 0.15f;
-            rightLeg.getRotation().x = -0.15f;
-        } else {
-            leftArm.getRotation().x = 0.25f;
-            rightArm.getRotation().x = 0.25f;
-
-            leftLeg.getRotation().x = -0.1f;
-            rightLeg.getRotation().x = 0.1f;
-        }
+    private float lerp(float start, float end, float alpha) {
+        return start + alpha * (end - start);
     }
 }
