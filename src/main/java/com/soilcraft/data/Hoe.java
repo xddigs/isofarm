@@ -9,8 +9,8 @@ public class Hoe extends Tool {
     private Tier tier;
 
     public Hoe(Tier tier) {
-        super((byte) 2, tier.getName() + " Hoe", 150,
-                tier.getDurability() + 8);
+        super((byte) 2, tier.getName() + " Hoe", 150, ToolType.HOE,
+                tier, tier.getDurability() + ToolType.HOE.getBaseDurability());
         this.tier = tier;
     }
 
@@ -43,13 +43,5 @@ public class Hoe extends Tool {
 
     public Tier getTier() {
         return tier;
-    }
-
-    public void upgrade(Tier tier) {
-        Tier[] tiers = Tier.values();
-        int index = tier.ordinal();
-        if (index < tiers.length - 1) {
-            this.tier = tiers[index + 1];
-        }
     }
 }

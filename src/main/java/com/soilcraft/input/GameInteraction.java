@@ -19,6 +19,7 @@ import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -227,6 +228,7 @@ public class GameInteraction {
         int y = cell.y();
         int z = cell.z();
 
+        Item i = gameMaster.getGameUIService().getHotbarUI().getSelectedItem();
         Crop crop = world.getCropAt(x, y, z);
         if (crop != null) {
             CropType cropType = crop.getCropType();
@@ -265,8 +267,17 @@ public class GameInteraction {
 
         world.setBlockTypeAt(x, y, z, BlockData.AIR.getId());
         itemRenderer.playBreakAnimation();
-        gameMaster.rebuildChunkMeshAt(x, z);
 
+        if (i instanceof Tool tool) {
+            if (Arrays.stream(tool.getType().getUsableOn())
+                    .noneMatch(b -> b.getId() != blockId)) {
+               tool.misuse();
+            } else {
+                tool.use();
+            }
+        }
+
+        gameMaster.rebuildChunkMeshAt(x, z);
         particles.spawn(x, y, z, blockData, blocksTexture);
 
         Vector3f position = new Vector3f(x + 0.5f, y + 0.5f, z + 0.5f);
@@ -316,7 +327,12 @@ public class GameInteraction {
 
         if (selectedItem instanceof Hoe hoe) {
             Block block = world.getBlockAt(cell.x(), cell.y(), cell.z());
-            hoe.use(gameMaster, block);
+            if (Arrays.stream(hoe.getType().getUsableOn()).noneMatch(b -> b.getId() ==
+                    block.getType().getId())) {
+                hoe.misuse();
+            } else {
+                hoe.use();
+            }
             gameMaster.rebuildChunkMeshAt(block.getX(), block.getZ());
         }
 

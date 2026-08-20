@@ -4,7 +4,8 @@ package com.soilcraft.data;
 public class Coin extends Tool {
 
     public Coin() {
-        super((byte) 0, "Coin", 1, -1);
+        super((byte) 0, "Coin", 1,
+                ToolType.ELSE, Tier.COPPER, ToolType.ELSE.getBaseDurability());
     }
 
     @Override

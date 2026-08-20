@@ -4,8 +4,8 @@ public class Pickaxe extends Tool {
     private Tier tier;
 
     public Pickaxe(Tier tier) {
-        super((byte) 3, tier.getName() + " Pickaxe", 100,
-                tier.getDurability() + 16);
+        super((byte) 3, tier.getName() + " Pickaxe", 100, ToolType.PICKAXE,
+                tier,tier.getDurability() + ToolType.PICKAXE.getBaseDurability());
         this.tier = tier;
     }
 

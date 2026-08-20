@@ -9,7 +9,8 @@ public class WateringCan extends Tool {
     private int water;
 
     public WateringCan() {
-        super((byte) 1, "Watering Can", 100, 128);
+        super((byte) 1, "Watering Can", 100,
+                ToolType.ELSE, Tier.COPPER, 128);
         this.water = MAX_WATER;
     }
 
