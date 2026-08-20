@@ -76,6 +76,8 @@ public final class K {
         public static final int INVENTORY_ROWS = 5;
         public static final int INVENTORY_SLOTS = INVENTORY_COLUMNS * INVENTORY_ROWS;
 
+        public static final float SQUISH_DURATION = 0.25f;
+
         public static final float COORD_DISPLAY_DURATION = 3.0f;
 
         public static final int ICON_SEED_CROPS_FRAMES = 4;

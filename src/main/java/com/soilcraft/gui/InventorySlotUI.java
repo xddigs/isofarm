@@ -22,6 +22,10 @@ public class InventorySlotUI extends UIElement {
     private Vector4f selectionOutlineColor = K.UI.UI_HOTBAR_SELECTED_COLOR;
     private float selectionOutlineThickness = Settings.getScaledThickness() * 2f;
 
+    private int lastAmount = 0;
+    private Item lastItem = null;
+    private float squishTimer = 0.0f;
+
     public InventorySlotUI(float x, float y, float width, float height) {
         super(x, y, width, height);
         setFocusable(true);
@@ -30,6 +34,27 @@ public class InventorySlotUI extends UIElement {
     @Override
     public void update(float delta) {
         super.update(delta);
+        int currentAmount = slot != null ? slot.getAmount() : 0;
+        Item currentItem = getItem();
+
+        if (currentAmount != lastAmount || currentItem != lastItem) {
+            if (currentAmount > 0) {
+                triggerSquish();
+            }
+            lastAmount = currentAmount;
+            lastItem = currentItem;
+        }
+
+        if (squishTimer > 0.0f) {
+            squishTimer -= delta;
+            if (squishTimer < 0.0f) {
+                squishTimer = 0.0f;
+            }
+        }
+    }
+
+    public void triggerSquish() {
+        this.squishTimer = K.UI.SQUISH_DURATION;
     }
 
     @Override
@@ -41,6 +66,7 @@ public class InventorySlotUI extends UIElement {
 
         Vector4f background = selected ? K.UI.UI_SELECTED_COLOR : hovered ? K.UI.UI_HOVERED_COLOR : K.UI.UI_BACKGROUND_COLOR_SLOT;
         GUI.drawRect(x, y, width, height, new Vector4f(background.x, background.y, background.z, background.w * getWorldOpacity()));
+
         Vector4f border = K.UI.UI_SELECTED_BORDER_COLOR;
         Vector4f borderTint = new Vector4f(border.x, border.y, border.z, border.w * getWorldOpacity());
 
@@ -60,11 +86,24 @@ public class InventorySlotUI extends UIElement {
         float availableSpace = Math.min(getAbsoluteWidth(), getAbsoluteHeight()) - 4.0f;
         int baseTextureSize = 16;
         int scaleMultiplier = Math.max(1, (int) Math.floor(availableSpace / baseTextureSize));
-        float iconSize = scaleMultiplier * baseTextureSize;
-        float x = Math.round(getAbsoluteX() + (getAbsoluteWidth() - iconSize) * 0.5f);
-        float y = Math.round(getAbsoluteY() + (getAbsoluteHeight() - iconSize) * 0.5f);
+        float baseIconSize = scaleMultiplier * baseTextureSize;
 
-        GUI.drawSprite(spriteSheet, spriteFrame, x, y, iconSize, iconSize,
+        float scaleX = 1.0f;
+        float scaleY = 1.0f;
+
+        if (squishTimer > 0.0f) {
+            float progress = squishTimer / K.UI.SQUISH_DURATION;
+            float deformation = (float) Math.sin(progress * Math.PI * 2.0) * progress * 0.25f;
+            scaleX = 1.0f + deformation;
+            scaleY = 1.0f - deformation;
+        }
+
+        float renderWidth = baseIconSize * scaleX;
+        float renderHeight = baseIconSize * scaleY;
+        float x = Math.round(getAbsoluteX() + (getAbsoluteWidth() - renderWidth) * 0.5f);
+        float y = Math.round(getAbsoluteY() + (getAbsoluteHeight() - renderHeight) * 0.5f);
+
+        GUI.drawSprite(spriteSheet, spriteFrame, x, y, renderWidth, renderHeight,
                 new Vector4f(K.UI.UI_ITEM_TINT.x, K.UI.UI_ITEM_TINT.y,
                         K.UI.UI_ITEM_TINT.z, K.UI.UI_ITEM_TINT.w * getWorldOpacity()));
 
@@ -87,7 +126,8 @@ public class InventorySlotUI extends UIElement {
                 new Vector4f(0.0f, 0.0f, 0.0f, getWorldOpacity()));
 
         GUI.drawString(amount, x, y + textHeight, countFont,
-                new Vector4f(K.UI.UI_TEXT_COLOR.x, K.UI.UI_TEXT_COLOR.y, K.UI.UI_TEXT_COLOR.z, K.UI.UI_TEXT_COLOR.w * getWorldOpacity()));
+                new Vector4f(K.UI.UI_TEXT_COLOR.x, K.UI.UI_TEXT_COLOR.y, K.UI.UI_TEXT_COLOR.z,
+                        K.UI.UI_TEXT_COLOR.w * getWorldOpacity()));
     }
 
     private float getTextWidth(String value) {
