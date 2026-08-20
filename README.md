@@ -25,18 +25,19 @@ real-time seasonal and weather cycles, manage your inventory, and trade items in
 environment driven by custom 3D mesh rendering, particle systems, and dynamic day-night lighting.
 
 ## Featured Controls
-| Action | Key / Input |
-| --- | --- |
-| **Movement** | `W` `A` `S` `D`<br> |
-| **Sprint** | `Left Shift`<br> |
-| **Jump** | `Space`<br> |
-| **Look around** | `Mouse Movement`<br> |
-| **Zoom Camera** | `C`<br> |
-| **Break Block / Harvest** | `Left Mouse Button`<br> |
+| Action                             | Key / Input              |
+|------------------------------------|--------------------------|
+| **Change View**                    | `V`<br>                  |
+| **Movement**                       | `W` `A` `S` `D`<br>      |
+| **Sprint**                         | `Left Shift`<br>         |
+| **Jump**                           | `Space`<br>              |
+| **Look around**                    | `Mouse Movement`<br>     |
+| **Zoom Camera**                    | `C`<br>                  |
+| **Break Block / Harvest**          | `Left Mouse Button`<br>  |
 | **Place Block / Use Tool / Plant** | `Right Mouse Button`<br> |
-| **Open / Close Inventory** | `E`<br> |
-| **Toggle Chat / Console** | `Enter` or `Tab`<br> |
-| **Toggle HUD (F1 mode)** | `F1`<br> |
+| **Open / Close Inventory**         | `E`<br>                  |
+| **Toggle Chat / Console**          | `Enter` or `Tab`<br>     |
+| **Toggle HUD (F1 mode)**           | `F1`<br>                 |
 
 ## Getting Started
 To run the game, clone the repository and run the `tilled.jar` file.
