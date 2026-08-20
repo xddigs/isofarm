@@ -8,9 +8,11 @@ import com.isofarm.wrld.World;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+import static org.joml.Math.lerp;
+
 @SuppressWarnings("unused")
 public class OrthographicCamera implements CameraView {
-    private static final float MIN_ZOOM = 5.0f;
+    private static final float MIN_ZOOM = 1.0f;
     private static final float MAX_ZOOM = 80.0f;
 
     private static final float YAW = 45.0f;
@@ -106,7 +108,7 @@ public class OrthographicCamera implements CameraView {
     }
 
     public void setZoom(float zoom) {
-        this.zoom = Math.clamp(zoom, MIN_ZOOM, MAX_ZOOM);
+        this.zoom = lerp(this.zoom, Math.clamp(zoom, MIN_ZOOM, MAX_ZOOM), .2f);
         updateProjection(aspectRatio, 1.0f, Settings.renderDistance);
     }
 
