@@ -16,6 +16,7 @@ public record OrthographicCameraController(OrthographicCamera camera)
     private static final float NORMAL_ZOOM = 18.0f;
     private static final float ZOOMED_ZOOM = NORMAL_ZOOM / 2.5f;
     private static float verticalOffset = 0.0f;
+    private static final float distance = 500.0f;
 
     public void update(GameMaster gameMaster, float delta) {
         if (gameMaster.isInventoryOpen() || gameMaster.isPromptingForInput()) return;
@@ -45,6 +46,7 @@ public record OrthographicCameraController(OrthographicCamera camera)
         Vector3f moveForward = camera.getMovementForwardVector();
         Vector3f right = new Vector3f(-moveForward.z, 0.0f, moveForward.x);
         Vector3f moveDir = new Vector3f();
+
         if (Keyboard.isKeyDown(GLFW_KEY_W)) moveDir.add(moveForward);
         if (Keyboard.isKeyDown(GLFW_KEY_S)) moveDir.sub(moveForward);
         if (Keyboard.isKeyDown(GLFW_KEY_D)) moveDir.add(right);
@@ -57,10 +59,6 @@ public record OrthographicCameraController(OrthographicCamera camera)
         player.moveAndCollide(gameMaster.getWorld(), moveDir, delta,
                 gameMaster.isOrthographicCamera());
 
-        float distance = 500.0f;
-        Vector3f playerPos = player.getPosition();
-        Vector3f camForward = camera.getForwardVector();
-
         if (Keyboard.isKeyDown(GLFW_KEY_SPACE)) {
             verticalOffset += speed * delta;
         }
@@ -69,12 +67,13 @@ public record OrthographicCameraController(OrthographicCamera camera)
             verticalOffset -= speed * delta;
         }
 
-        camera.getPosition().set(
-                playerPos.x - camForward.x * distance,
-                playerPos.y - camForward.y * distance,
-                playerPos.z - camForward.z * distance);
-
-        camera.getPosition().add(0.0f, verticalOffset, 0.0f);
+        Vector3f playerPos = player.getPosition();
+        Vector3f camForward = camera.getForwardVector();
+        Vector3f camUp = camera.getUpVector();
+        Vector3f cameraPos = new Vector3f(playerPos)
+                .sub(new Vector3f(camForward).mul(distance))
+                .add(new Vector3f(camUp).mul(verticalOffset));
+        camera.getPosition().set(cameraPos);
     }
 
     private void releaseMouse(GameMaster gameMaster) {
