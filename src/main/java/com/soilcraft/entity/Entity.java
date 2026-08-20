@@ -15,7 +15,10 @@ public abstract class Entity {
     protected Vector3f velocity;
     protected Vector3f dimensions;
 
+    private float standingHeight;
+    private float crouchingHeight;
     private boolean onGround;
+    private boolean isCrunching;
 
     public Entity(String name) {
         this.id = (byte) (Math.floor((Math.random() * Math.random()) * 100));
@@ -24,6 +27,10 @@ public abstract class Entity {
         this.position = new Vector3f();
         this.velocity = new Vector3f();
         this.dimensions = new Vector3f();
+
+        this.isCrunching = false;
+        this.standingHeight = 0.0f;
+        this.crouchingHeight = 0.0f;
 
         this.onGround = false;
     }
@@ -70,6 +77,34 @@ public abstract class Entity {
 
     public void setDimensions(float width, float height, float depth) {
         this.dimensions.set(width, height, depth);
+
+        if (standingHeight <= 0.0f) {
+            standingHeight = height;
+        }
+    }
+
+    public float getStandingHeight() {
+        return standingHeight;
+    }
+
+    public void setStandingHeight(float standingHeight) {
+        this.standingHeight = standingHeight;
+    }
+
+    public float getCrouchingHeight() {
+        return crouchingHeight;
+    }
+
+    public void setCrouchingHeight(float crouchingHeight) {
+        this.crouchingHeight = crouchingHeight;
+    }
+
+    public boolean isCrunching() {
+        return isCrunching;
+    }
+
+    public void setCrunching(boolean crunching) {
+        this.isCrunching = crunching;
     }
 
     public boolean isOnGround() {
@@ -179,6 +214,41 @@ public abstract class Entity {
 
         velocity.y = K.World.JUMP_FORCE;
         setOnGround(false);
+    }
+
+    public void crunch() {
+        isCrunching = true;
+    }
+
+    public void uncrunch(World world) {
+        if (!isCrunching) {
+            return;
+        }
+
+        float previousHeight = dimensions.y;
+        dimensions.y = standingHeight;
+        if (checkCollision(world)) {
+            dimensions.y = previousHeight;
+            return;
+        }
+
+        isCrunching = false;
+    }
+
+    public void lerp(Vector3f target, float delta) {
+        float speed = 12.0f;
+        float amount = 1.0f - (float) Math.exp(-speed * delta);
+        dimensions.lerp(target, amount);
+    }
+
+    public void updateCrouching(float delta) {
+        float targetHeight = isCrunching
+                ? crouchingHeight
+                : standingHeight;
+
+        float speed = 12.0f;
+        float amount = 1.0f - (float) Math.exp(-speed * delta);
+        dimensions.y += (targetHeight - dimensions.y) * amount;
     }
 
     public abstract void update(float delta);

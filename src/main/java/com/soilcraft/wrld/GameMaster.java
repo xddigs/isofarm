@@ -131,7 +131,7 @@ public class GameMaster {
         recenter();
 
         this.player = new Player(gameUIservice.getEnteredPlayerName(),
-                world, toastService);
+                world, toastService, soundService);
         addEntity(player);
 
         chunkManager.updateLoadedChunks(0, 0);

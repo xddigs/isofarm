@@ -3,7 +3,9 @@ package com.soilcraft.entity;
 import com.soilcraft.data.*;
 import com.soilcraft.graphics.CharacterModel;
 import com.soilcraft.graphics.CharacterRenderer;
+import com.soilcraft.service.SoundService;
 import com.soilcraft.service.ToastService;
+import com.soilcraft.utils.Settings;
 import com.soilcraft.wrld.GameMaster;
 import com.soilcraft.wrld.World;
 import org.joml.Vector3f;
@@ -17,11 +19,14 @@ public class Player extends Character {
     private final ToastService toastService;
     private final CharacterModel characterModel;
     private final CharacterRenderer characterRenderer;
+    private final SoundService soundService;
 
-    public Player(String name, World world, ToastService toastService) {
+    public Player(String name, World world, ToastService toastService,
+                  SoundService soundService) {
         super(name, toastService);
         this.name = name;
         this.toastService = toastService;
+        this.soundService = soundService;
 
         this.characterModel = new CharacterModel();
         this.characterRenderer = new CharacterRenderer();
@@ -31,13 +36,24 @@ public class Player extends Character {
         float highestY = world.getHighestY(spawnX, spawnZ);
         setPosition(new Vector3f(spawnX, highestY, spawnZ));
         setVelocity(new Vector3f(0.0f, 0.0f, 0.0f));
-        setDimensions(new Vector3f(0.6f, 1.8f, 0.6f));
+        setDimensions(new Vector3f(0.6f, 2.0f, 0.6f));
+        setCrouchingHeight(1.8f);
         setUpInventory();
     }
 
     @Override
     public void update(float delta) {
-
+        updateCrouching(delta);
+        for (InventorySlot slot : getInventory().getSlots()) {
+            if (slot.getItem() instanceof Tool tool) {
+                if (tool.getDurability() <= 0) {
+                    remove(tool);
+                    toastService.error("Your " + tool.getName() + " broke!");
+                    soundService.playBreakSound(SoundGroup.ITEMS,
+                            1.0f, Settings.maxInteractionDistance);
+                }
+            }
+        }
     }
 
     @Override
@@ -139,8 +155,12 @@ public class Player extends Character {
     }
 
     public Vector3f getEyePosition() {
-        float eyeHeight = 1.6f;
-        return new Vector3f(position.x, position.y + eyeHeight, position.z);
+        float eyeHeight = isCrunching() ? 0.85f : 1.6f;
+        return new Vector3f(
+                position.x,
+                position.y + eyeHeight,
+                position.z
+        );
     }
 
     public float getForward() {
