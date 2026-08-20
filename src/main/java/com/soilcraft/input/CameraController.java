@@ -109,8 +109,7 @@ public class CameraController implements Service<Camera> {
         }
 
         targetVelocity.set(moveX, 0.0f, moveZ);
-        player.moveAndCollide(gameMaster.getWorld(), targetVelocity, delta,
-                gameMaster.isOrthographicCamera());
+        player.moveAndCollide(gameMaster.getWorld(), targetVelocity, delta);
     }
 
     private void mouseLook() {

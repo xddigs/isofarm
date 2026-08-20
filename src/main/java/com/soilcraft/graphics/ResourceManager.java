@@ -21,6 +21,7 @@ public class ResourceManager {
     private final Mesh blockMesh;
     private final Mesh selectionMesh;
     private final Mesh spriteMesh;
+    private final Mesh characterCubeMesh;
 
     private final SpriteSheet blocksTexture;
     private final SpriteSheet waterTexture;
@@ -47,6 +48,7 @@ public class ResourceManager {
         this.blockMesh = Mesh.createMesh(K.World.DEFAULT_BLOCK_DEPTH);
         this.selectionMesh = Mesh.selection();
         this.spriteMesh = Mesh.createCrop();
+        this.characterCubeMesh = Mesh.createCube();
 
         SpriteSheet blocks = null;
         try {
@@ -80,6 +82,7 @@ public class ResourceManager {
         selectionMesh.dispose();
         spriteMesh.dispose();
         screenQuadMesh.dispose();
+        characterCubeMesh.dispose();
 
         if (blocksTexture != null) blocksTexture.dispose();
         if (waterTexture != null) waterTexture.dispose();
@@ -109,6 +112,7 @@ public class ResourceManager {
     public Shader getShadowMapShader() { return shadowMapShader; }
     public Mesh getScreenQuadMesh() { return screenQuadMesh; }
     public Mesh getBlockMesh() { return blockMesh; }
+    public Mesh getCharacterCubeMesh() { return characterCubeMesh; }
     public Mesh getSelectionMesh() { return selectionMesh; }
     public Mesh getSpriteMesh() { return spriteMesh; }
     public SpriteSheet getBlocksTexture() { return blocksTexture; }

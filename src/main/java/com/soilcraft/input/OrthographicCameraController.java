@@ -39,40 +39,47 @@ public record OrthographicCameraController(OrthographicCamera camera)
         if (player == null) return;
 
         float speed = K.Camera.MOVEMENT_SPEED * 1.5f;
+
         if (Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
             speed *= K.Camera.SPRINT_MULTIPLIER;
         }
 
         Vector3f moveForward = camera.getMovementForwardVector();
-        Vector3f right = new Vector3f(-moveForward.z, 0.0f, moveForward.x);
-        Vector3f moveDir = new Vector3f();
+        moveForward.y = 0.0f;
 
+        if (moveForward.lengthSquared() > 0.0f) {
+            moveForward.normalize();
+        }
+
+        Vector3f right = new Vector3f(
+                -moveForward.z,
+                0.0f,
+                moveForward.x
+        );
+
+        Vector3f moveDir = new Vector3f();
         if (Keyboard.isKeyDown(GLFW_KEY_W)) moveDir.add(moveForward);
         if (Keyboard.isKeyDown(GLFW_KEY_S)) moveDir.sub(moveForward);
         if (Keyboard.isKeyDown(GLFW_KEY_D)) moveDir.add(right);
         if (Keyboard.isKeyDown(GLFW_KEY_A)) moveDir.sub(right);
-
-        if (moveDir.lengthSquared() > 0) {
-            moveDir.normalize().mul(speed);
-        }
-
-        player.moveAndCollide(gameMaster.getWorld(), moveDir, delta,
-                gameMaster.isOrthographicCamera());
+        if (moveDir.lengthSquared() > 0.0f) moveDir.normalize().mul(speed);
+        player.move(gameMaster.getWorld(), moveDir, delta);
 
         if (Keyboard.isKeyDown(GLFW_KEY_SPACE)) {
-            verticalOffset += speed * delta;
+            player.jump();
         }
 
-        if (Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
-            verticalOffset -= speed * delta;
-        }
+        followPlayer(player);
+    }
 
+    private void followPlayer(Player player) {
         Vector3f playerPos = player.getPosition();
         Vector3f camForward = camera.getForwardVector();
         Vector3f camUp = camera.getUpVector();
         Vector3f cameraPos = new Vector3f(playerPos)
                 .sub(new Vector3f(camForward).mul(distance))
                 .add(new Vector3f(camUp).mul(verticalOffset));
+
         camera.getPosition().set(cameraPos);
     }
 

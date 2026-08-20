@@ -11,7 +11,6 @@ import org.joml.Vector3f;
 @SuppressWarnings("unused")
 @DataClass
 public class WorldItem extends Entity {
-
     private static final float GRAVITY = -20.0f;
     private static final float GROUND_OFFSET = 0.20f;
 
@@ -28,10 +27,7 @@ public class WorldItem extends Entity {
     private static final float GROUND_BOB_HEIGHT = 0.08f;
 
     private final Item item;
-    private final Vector3f position;
-    private final Vector3f velocity;
     private int amount;
-    private boolean onGround;
     private World world;
     private float rotation;
     private float bobTime;
@@ -42,9 +38,11 @@ public class WorldItem extends Entity {
         super(item.getName());
         this.item = item;
         this.amount = amount;
-        this.position = new Vector3f(position);
-        this.velocity = new Vector3f();
-        this.onGround = false;
+
+        setPosition(new Vector3f(position));
+        setVelocity(new Vector3f());
+        setOnGround(false);
+
         this.rotation = 0.0f;
         this.bobTime = 0.0f;
         this.pickupTimer = PICKUP_DELAY;
@@ -62,7 +60,7 @@ public class WorldItem extends Entity {
             rotation -= 360.0f;
         }
 
-        if (!onGround) {
+        if (!isOnGround()) {
             velocity.y += GRAVITY * delta;
             position.x += velocity.x * delta;
             position.y += velocity.y * delta;
@@ -78,13 +76,13 @@ public class WorldItem extends Entity {
                 groundY = position.y;
                 if (Math.abs(velocity.y) > MIN_BOUNCE_VELOCITY) {
                     velocity.y *= -BOUNCE_FACTOR;
-                    onGround = false;
+                    setOnGround(false);
 
                 } else {
                     velocity.y = 0.0f;
                     velocity.x = 0.0f;
                     velocity.z = 0.0f;
-                    onGround = true;
+                    setOnGround(true);
                     bobTime = 0.0f;
                 }
             }
@@ -139,36 +137,8 @@ public class WorldItem extends Entity {
         this.amount = Math.max(0, amount);
     }
 
-    public Vector3f getPosition() {
-        return position;
-    }
-
-    public void setPosition(Vector3f position) {
-        this.position.set(position);
-    }
-
-    public void setPosition(float x, float y, float z) {
-        this.position.set(x, y, z);
-    }
-
-    public Vector3f getVelocity() {
-        return velocity;
-    }
-
-    public void setVelocity(Vector3f velocity) {
-        this.velocity.set(velocity);
-    }
-
-    public void setVelocity(float x, float y, float z) {
-        this.velocity.set(x, y, z);
-    }
-
     public void addVelocity(float x, float y, float z) {
         this.velocity.add(x, y, z);
-    }
-
-    public boolean isOnGround() {
-        return onGround;
     }
 
     public World getWorld() {

@@ -63,7 +63,8 @@ public class GameInteraction {
         }
 
         if (Keyboard.isKeyPressed(GLFW_KEY_Q)) {
-            dropItem(gameMaster, selectedItem);
+            boolean dropAll = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL);
+            dropItem(gameMaster, selectedItem,dropAll);
         }
 
         if (!gameMaster.isOrthographicCamera()) {
@@ -124,7 +125,7 @@ public class GameInteraction {
         }
     }
 
-    public void dropItem(GameMaster gameMaster, Item selectedItem) {
+    public void dropItem(GameMaster gameMaster, Item selectedItem, boolean dropAll) {
         if (selectedItem == null) return;
         Player player = gameMaster.getPlayer();
         if (player == null) return;
@@ -135,7 +136,7 @@ public class GameInteraction {
             Item item = slot.getItem();
             if (item == null) continue;
             if (!item.equals(selectedItem)) continue;
-            int amount = slot.getAmount();
+            int amount = dropAll ? slot.getAmount() : 1;
             if (amount <= 0) continue;
             Vector3f playerPosition = player.getPosition();
             Vector3f dropPosition = new Vector3f(playerPosition.x, playerPosition.y + 0.8f, playerPosition.z);
@@ -144,8 +145,8 @@ public class GameInteraction {
             Vector3f forward = new Vector3f(player.getForward()).normalize();
             Vector3f playerVelocity = new Vector3f(player.getVelocity());
             float inheritedVelocity = 0.35f;
-            float throwStrength = 2.5f;
-            float verticalStrength = 4.5f;
+            float throwStrength = 8.0f;
+            float verticalStrength = 4.7f;
 
             Vector3f velocity = new Vector3f(playerVelocity)
                     .mul(inheritedVelocity);
@@ -163,7 +164,7 @@ public class GameInteraction {
             gameMaster.getSoundService().playUseSound(SoundGroup.ITEMS,
                     playerPosition.x, playerPosition.x);
 
-            log.info("Dropped x{} {} with velocity ({}, {}, {})", amount,
+            log.trace("Dropped x{} {} with velocity ({}, {}, {})", amount,
                     item.getName(), velocity.x, velocity.y, velocity.z);
 
             break;

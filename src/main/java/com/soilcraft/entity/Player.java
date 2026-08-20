@@ -1,45 +1,38 @@
 package com.soilcraft.entity;
 
 import com.soilcraft.data.*;
+import com.soilcraft.graphics.CharacterModel;
+import com.soilcraft.graphics.CharacterRenderer;
 import com.soilcraft.service.ToastService;
-import com.soilcraft.utils.K;
 import com.soilcraft.wrld.GameMaster;
 import com.soilcraft.wrld.World;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressWarnings("FieldMayBeFinal")
 @DataClass
 public class Player extends Character {
     private static final Logger log = LoggerFactory.getLogger(Player.class);
     private final String name;
     private final ToastService toastService;
-    private Vector3f position;
-    private Vector3f velocity;
-    private Vector3f dimensions;
-    private boolean onGround;
+    private final CharacterModel characterModel;
+    private final CharacterRenderer characterRenderer;
 
     public Player(String name, World world, ToastService toastService) {
         super(name, toastService);
         this.name = name;
         this.toastService = toastService;
 
+        this.characterModel = new CharacterModel();
+        this.characterRenderer = new CharacterRenderer();
+
         float spawnX = 0.5f;
         float spawnZ = 0.5f;
         float highestY = world.getHighestY(spawnX, spawnZ);
-
-        this.position = new Vector3f(spawnX, highestY, spawnZ);
-        this.velocity = new Vector3f();
-        this.dimensions = new Vector3f(0.6f, 2.0f, 0.6f);
+        setPosition(new Vector3f(spawnX, highestY, spawnZ));
+        setVelocity(new Vector3f(0.0f, 0.0f, 0.0f));
+        setDimensions(new Vector3f(0.6f, 1.8f, 0.6f));
         setUpInventory();
-    }
-
-    private void setUpInventory() {
-        add(new Seed(), 4);
-        add(new Seed(CropType.CARROT), 4);
-        add(new Hoe(), 1);
-        add(new Pickaxe(), 1);
     }
 
     @Override
@@ -49,31 +42,24 @@ public class Player extends Character {
 
     @Override
     public void render(GameMaster gameMaster) {
+        if (gameMaster.isOrthographicCamera()) {
+            characterRenderer.render(gameMaster, characterModel, position);
+        }
+    }
 
+    public void move(World world, Vector3f direction, float delta) {
+        moveAndCollide(world, direction, delta);
     }
 
     public String getName() {
         return name;
     }
 
-    public Vector3f getPosition() {
-        return position;
-    }
-
-    public void setPosition(float x, float y, float z) {
-        position.set(x, y, z);
-    }
-
-    public Vector3f getVelocity() {
-        return velocity;
-    }
-
-    public boolean isOnGround() {
-        return onGround;
-    }
-
-    public void setOnGround(boolean onGround) {
-        this.onGround = onGround;
+    private void setUpInventory() {
+        add(new Seed(), 4);
+        add(new Seed(CropType.CARROT), 4);
+        add(new Hoe(), 1);
+        add(new Pickaxe(), 1);
     }
 
     public void sell(Item item, int amount) {
@@ -150,115 +136,6 @@ public class Player extends Character {
 
     public boolean hasSeeds() {
         return getInventory().hasItemOfType(Seed.class);
-    }
-
-    public boolean isMoving() {
-        return (velocity.x * velocity.x + velocity.z * velocity.z) > 0.01f;
-    }
-
-    public void jump() {
-        if (!onGround) {
-            return;
-        }
-
-        velocity.y = K.World.JUMP_FORCE;
-        onGround = false;
-    }
-
-    public void moveAndCollide(World world, Vector3f targetVelocity, float delta, boolean isOrthographic) {
-        float smooth = 1.0f - (float) Math.exp(-12.0f * delta);
-
-        velocity.x += (targetVelocity.x - velocity.x) * smooth;
-        velocity.z += (targetVelocity.z - velocity.z) * smooth;
-
-        if (isOrthographic) {
-            velocity.y = 0.0f;
-            position.x += velocity.x * delta;
-            position.z += velocity.z * delta;
-            return;
-        }
-
-        velocity.y += K.World.GRAVITY * delta;
-        onGround = false;
-
-        position.x += velocity.x * delta;
-        if (checkCollision(world)) {
-            position.x -= velocity.x * delta;
-            velocity.x = 0;
-        }
-
-        position.y += velocity.y * delta;
-        if (checkCollision(world)) {
-            position.y -= velocity.y * delta;
-            if (velocity.y < 0) {
-                onGround = true;
-            }
-            velocity.y = 0;
-        }
-
-        position.z += velocity.z * delta;
-        if (checkCollision(world)) {
-            position.z -= velocity.z * delta;
-            velocity.z = 0;
-        }
-    }
-
-    public boolean checkCollision(World world) {
-        float epsilon = 0.001f;
-        float minX = position.x - dimensions.x / 2.0f + epsilon;
-        float maxX = position.x + dimensions.x / 2.0f - epsilon;
-
-        float minY = position.y + epsilon;
-        float maxY = position.y + dimensions.y - epsilon;
-
-        float minZ = position.z - dimensions.z / 2.0f + epsilon;
-        float maxZ = position.z + dimensions.z / 2.0f - epsilon;
-
-        int blockMinX = (int) Math.floor(minX);
-        int blockMaxX = (int) Math.floor(maxX);
-
-        int blockMinY = (int) Math.floor(minY);
-        int blockMaxY = (int) Math.floor(maxY);
-
-        int blockMinZ = (int) Math.floor(minZ);
-        int blockMaxZ = (int) Math.floor(maxZ);
-
-        for (int x = blockMinX; x <= blockMaxX; x++) {
-            for (int y = blockMinY; y <= blockMaxY; y++) {
-                for (int z = blockMinZ; z <= blockMaxZ; z++) {
-
-                    if (world.isBlockSolid(x, y, z)) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-
-    public boolean intersectsBlock(int blockX, int blockY, int blockZ) {
-        float epsilon = 0.001f;
-
-        float playerMinX = position.x - dimensions.x / 2.0f + epsilon;
-        float playerMaxX = position.x + dimensions.x / 2.0f - epsilon;
-
-        float playerMinY = position.y + epsilon;
-        float playerMaxY = position.y + dimensions.y - epsilon;
-
-        float playerMinZ = position.z - dimensions.z / 2.0f + epsilon;
-        float playerMaxZ = position.z + dimensions.z / 2.0f - epsilon;
-
-        float blockMaxX = blockX + 1.0f;
-        float blockMaxY = blockY + 1.0f;
-        float blockMaxZ = blockZ + 1.0f;
-
-        return playerMinX < blockMaxX &&
-                playerMaxX > (float) blockX &&
-                playerMinY < blockMaxY &&
-                playerMaxY > (float) blockY &&
-                playerMinZ < blockMaxZ &&
-                playerMaxZ > (float) blockZ;
     }
 
     public Vector3f getEyePosition() {

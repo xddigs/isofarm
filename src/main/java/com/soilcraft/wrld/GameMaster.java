@@ -132,6 +132,7 @@ public class GameMaster {
 
         this.player = new Player(gameUIservice.getEnteredPlayerName(),
                 world, toastService);
+        addEntity(player);
 
         chunkManager.updateLoadedChunks(0, 0);
         float spawnY = world.getHighestY(0.0f, 0.0f) + 1.0f;
