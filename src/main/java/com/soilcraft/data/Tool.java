@@ -34,6 +34,10 @@ public abstract class Tool extends Item {
         return durability;
     }
 
+    public float getMaxDurability() {
+        return tier.getDurability() + type.getBaseDurability();
+    }
+
     public void setDurability(int durability) {
         this.durability = durability;
     }
