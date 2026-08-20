@@ -1,9 +1,6 @@
 package com.soilcraft.entity;
 
 import com.soilcraft.data.*;
-import com.soilcraft.graphics.CharacterAnimator;
-import com.soilcraft.graphics.CharacterModel;
-import com.soilcraft.graphics.CharacterRenderer;
 import com.soilcraft.service.SoundService;
 import com.soilcraft.service.ToastService;
 import com.soilcraft.utils.Settings;
@@ -18,9 +15,6 @@ public class Player extends Character {
     private static final Logger log = LoggerFactory.getLogger(Player.class);
     private final String name;
     private final ToastService toastService;
-    private final CharacterModel characterModel;
-    private final CharacterRenderer characterRenderer;
-    private final CharacterAnimator characterAnimator;
     private final SoundService soundService;
 
     public Player(String name, World world, ToastService toastService,
@@ -29,10 +23,6 @@ public class Player extends Character {
         this.name = name;
         this.toastService = toastService;
         this.soundService = soundService;
-
-        this.characterModel = new CharacterModel();
-        this.characterRenderer = new CharacterRenderer();
-        this.characterAnimator = new CharacterAnimator(characterModel);
 
         float spawnX = 0.5f;
         float spawnZ = 0.5f;
@@ -46,7 +36,6 @@ public class Player extends Character {
 
     @Override
     public void update(Hit hit, float delta) {
-        characterAnimator.update(this, hit, delta);
         updateCrouching(delta);
         for (InventorySlot slot : getInventory().getSlots()) {
             if (slot.getItem() instanceof Tool tool) {
@@ -61,11 +50,7 @@ public class Player extends Character {
     }
 
     @Override
-    public void render(GameMaster gameMaster) {
-        if (gameMaster.isOrthographicCamera()) {
-            characterRenderer.render(gameMaster, characterModel, position);
-        }
-    }
+    public void render(GameMaster gameMaster) {}
 
     public void move(World world, Vector3f direction, float delta) {
         moveAndCollide(world, direction, delta);
