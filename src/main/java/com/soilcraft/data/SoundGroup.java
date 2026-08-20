@@ -7,9 +7,8 @@ public enum SoundGroup {
         new String[]{"fx/blocks/dirt.ogg"}, new String[]{}),
     HARD(new String[]{}, new String[]{"fx/blocks/wood.ogg"}, new String[]{}, new String[]{}),
     GLASS(new String[]{}, new String[]{"fx/blocks/fragile_break.ogg", "fx/blocks/fragile_break2.ogg"}, new String[]{}, new String[]{}),
-    ITEMS(new String[]{}, new String[]{}, new String[]{}, new String[]{"fx/extra/drop.ogg", "fx/extra/pickup.ogg"}),
+    ITEMS(new String[]{}, new String[]{"fx/items/broke.ogg"}, new String[]{}, new String[]{"fx/items/drop.ogg", "fx/items/pickup.ogg"}),
     SILENT(new String[]{}, new String[]{}, new String[]{}, new String[]{});
-
 
     private final String[] stepSounds;
     private final String[] breakSounds;
