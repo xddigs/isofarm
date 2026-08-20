@@ -29,7 +29,7 @@ public class Player extends Character {
         float highestY = world.getHighestY(spawnX, spawnZ);
         setPosition(new Vector3f(spawnX, highestY, spawnZ));
         setVelocity(new Vector3f(0.0f, 0.0f, 0.0f));
-        setDimensions(new Vector3f(0.6f, 1.2f, 0.6f));
+        setDimensions(new Vector3f(0.6f, 1.0f, 0.6f));
         setUpInventory();
         setReputation(Reputation.NEUTRAL);
     }
