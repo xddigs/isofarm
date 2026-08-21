@@ -6,8 +6,6 @@ import com.isofarm.wrld.GameMaster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Locale;
-
 @SuppressWarnings("all")
 public class Library implements Service<GameMaster> {
     private static final Logger log = LoggerFactory.getLogger(Library.class);
@@ -172,6 +170,70 @@ public class Library implements Service<GameMaster> {
             log.info("Command gm executed");
             gameMaster.getToastService().success("You changed gamemode to " +
                     args[0].toLowerCase());
+        }));
+
+        cr.register(new Command("/gamerule", new String[]{"rule", "value"}, args -> {
+
+            if (player == null) {
+                log.warn("Cannot execute command: player does not exist.");
+                return;
+            }
+
+            if (args.length == 0) {
+                gameMaster.getToastService().info("Available gamerules:");
+                GameRules.getRules().forEach((rule, value) ->
+                        gameMaster.getToastService().info(rule + " = " + value));
+                return;
+            }
+
+            String rule = args[0];
+
+            if (!GameRules.exists(rule)) {
+                log.warn("Unknown gamerule: {}", rule);
+                gameMaster.getToastService().error("Unknown gamerule: " + rule);
+                return;
+            }
+
+            if (args.length == 1) {
+                Object value = GameRules.get(rule);
+                log.info("Gamerule {} = {}", rule, value);
+                gameMaster.getToastService().info(rule + " = " + value);
+                return;
+            }
+
+            String valueString = args[1];
+            Object currentValue = GameRules.get(rule);
+            Object newValue;
+
+            try {
+                if (currentValue instanceof Boolean) {
+                    if (!valueString.equalsIgnoreCase("true") &&
+                            !valueString.equalsIgnoreCase("false")) {
+                        throw new IllegalArgumentException("Expected true or false");
+                    }
+                    newValue = Boolean.parseBoolean(valueString);
+                } else if (currentValue instanceof Integer) {
+                    newValue = Integer.parseInt(valueString);
+                } else if (currentValue instanceof Float) {
+                    newValue = Float.parseFloat(valueString);
+                } else {
+                    throw new IllegalArgumentException("Unsupported gamerule type");
+                }
+
+            } catch (IllegalArgumentException e) {
+                log.warn("Invalid value for gamerule {}: {}", rule, valueString);
+                gameMaster.getToastService().error("Invalid value for " + rule);
+                return;
+            }
+
+            try {
+                GameRules.set(rule, newValue);
+                log.info("Gamerule changed: {} = {}", rule, newValue);
+                gameMaster.getToastService().success("Gamerule " + rule + " was set to " + newValue);
+            } catch (IllegalArgumentException e) {
+                log.warn("Could not set gamerule {}: {}", rule, e.getMessage());
+                gameMaster.getToastService().error(e.getMessage());
+            }
         }));
     }
 }
