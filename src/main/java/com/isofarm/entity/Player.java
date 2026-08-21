@@ -83,18 +83,27 @@ public class Player extends Character {
         shader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
         shader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
 
+        shader.setUniform("uUVBounds", new org.joml.Vector4f(0.0f, 0.0f, 1.0f, 1.0f));
+
         CelestialLighting lighting = gameMaster.getCelestialLighting();
         if (lighting != null) {
             shader.setUniform("uSunColor", lighting.getColor());
             shader.setUniform("uLightIntensity", lighting.getIntensity());
             shader.setUniform("uLightDirection", lighting.getDirection());
-            shader.setUniform("uAmbientIntensity", Math.max(0.4f, lighting.getAmbientIntensity()));
+            shader.setUniform("uAmbientIntensity", Math.max(0.6f, lighting.getAmbientIntensity()));
+        } else {
+            shader.setUniform("uSunColor", new Vector3f(1.0f, 1.0f, 1.0f));
+            shader.setUniform("uLightIntensity", 1.0f);
+            shader.setUniform("uLightDirection", new Vector3f(-0.5f, -1.0f, -0.5f));
+            shader.setUniform("uAmbientIntensity", 0.8f);
         }
+
         shader.setUniform("uSkyColor", TimeService.getSkyColor());
         shader.setUniform("uParticleAlpha", 1.0f);
         shader.setUniform("uIsMaskPass", false);
         shader.setUniform("uEnableShadows", false);
 
+        shader.setUniform("uLightSpaceMatrix", new Matrix4f());
         shader.setUniform("uProjection", camera.getProjectionMatrix());
         shader.setUniform("uView", camera.getViewMatrix());
 
@@ -113,7 +122,6 @@ public class Player extends Character {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_DEPTH_TEST);
         glDepthMask(true);
-
         rm.getPlayerMesh().render();
         sheet.unbind();
     }
