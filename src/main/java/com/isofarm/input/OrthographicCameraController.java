@@ -1,10 +1,13 @@
 package com.isofarm.input;
 
+import com.isofarm.data.BlockData;
+import com.isofarm.data.GridPos;
 import com.isofarm.entity.Player;
 import com.isofarm.graphics.OrthographicCamera;
 import com.isofarm.service.Service;
 import com.isofarm.utils.K;
 import com.isofarm.wrld.GameMaster;
+import com.isofarm.wrld.World;
 import org.joml.Vector3f;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -15,7 +18,7 @@ public record OrthographicCameraController(OrthographicCamera camera)
     private static boolean mouseCaptured = false;
     private static final float NORMAL_ZOOM = 18.0f;
     private static final float ZOOMED_ZOOM = NORMAL_ZOOM / 2.5f;
-    private static float verticalOffset = 0.0f;
+    private static final float verticalOffset = 0.0f;
     private static final float distance = 500.0f;
 
     public void update(GameMaster gameMaster, float delta) {
@@ -36,6 +39,8 @@ public record OrthographicCameraController(OrthographicCamera camera)
 
     private void movement(GameMaster gameMaster, float delta) {
         Player player = gameMaster.getPlayer();
+        World world = gameMaster.getWorld();
+
         if (player == null) return;
 
         float speed = K.Camera.MOVEMENT_SPEED * 1.5f;
@@ -63,9 +68,10 @@ public record OrthographicCameraController(OrthographicCamera camera)
         if (Keyboard.isKeyDown(GLFW_KEY_D)) moveDir.add(right);
         if (Keyboard.isKeyDown(GLFW_KEY_A)) moveDir.sub(right);
         if (moveDir.lengthSquared() > 0.0f) moveDir.normalize().mul(speed);
-        player.move(gameMaster.getWorld(), moveDir, delta);
+        player.move(world, moveDir, delta);
 
-        if (Keyboard.isKeyDown(GLFW_KEY_SPACE)) {
+        if (Keyboard.isKeyDown(GLFW_KEY_SPACE) ||
+                shouldAutoJump(player, world, moveDir)) {
             player.jump();
         }
 
@@ -81,6 +87,24 @@ public record OrthographicCameraController(OrthographicCamera camera)
                 .add(new Vector3f(camUp).mul(verticalOffset));
 
         camera.getPosition().set(cameraPos);
+    }
+
+    private boolean shouldAutoJump(Player player, World world, Vector3f moveDir) {
+        if (moveDir.lengthSquared() == 0.0f) {
+            return false;
+        }
+
+        Vector3f direction = new Vector3f(moveDir).normalize();
+        Vector3f playerPos = player.getPosition();
+
+        float checkDistance = 0.6f;
+        int checkX = (int) Math.floor(playerPos.x + direction.x * checkDistance);
+        int checkZ = (int) Math.floor(playerPos.z + direction.z * checkDistance);
+        int playerY = (int) Math.floor(playerPos.y);
+
+        byte blockAtFeet = world.getBlockTypeAt(checkX, playerY, checkZ);
+        byte blockAtHead = world.getBlockTypeAt(checkX, playerY + 1, checkZ);
+        return blockAtFeet != BlockData.AIR.getId() && blockAtHead == BlockData.AIR.getId();
     }
 
     private void releaseMouse(GameMaster gameMaster) {

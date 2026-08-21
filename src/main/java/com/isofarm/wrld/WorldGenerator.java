@@ -48,37 +48,45 @@ public class WorldGenerator {
     }
 
     private void generateTree(int x, int groundY, int z) {
+        boolean hasGrown = false;
+        boolean isLarge = random.nextBoolean();
         int treeHeight = random.nextInt(3) + 3;
-        boolean largeTree = random.nextDouble() < 0.25;
-        if (largeTree) treeHeight += random.nextInt(3) + 2;
+        if (isLarge) treeHeight += random.nextInt(2);
         for (int y = 1; y <= treeHeight; y++) {
             world.setBlockTypeAt(x, groundY + y, z, BlockData.OAK_LOG.getId());
+            if (y == treeHeight) {
+                hasGrown = true;
+            }
         }
 
-        generateLeaves(x, groundY + treeHeight, z, largeTree);
+        if (hasGrown) {
+            generateLeaves(x, groundY + treeHeight, z,
+                    treeHeight, isLarge);
+        }
     }
 
-    private void generateLeaves(int x, int topY, int z, boolean largeTree) {
-        int radius = largeTree ? 2 : 1;
+    private void generateLeaves(int x, int topY, int z,
+                                int treeHeight, boolean isLarge) {
+        int radius = isLarge ? 2 : 1;
 
-        for (int y = -2; y <= 1; y++) {
-            int currentRadius = radius;
-            if (y == 1) {
-                currentRadius = 1;
-            }
+        for (int y = -treeHeight; y <= 0; y++) {
+            int distanceFromTop = -y;
+            int currentRadius = Math.min(radius, distanceFromTop / 2 + 1);
 
             for (int dx = -currentRadius; dx <= currentRadius; dx++) {
                 for (int dz = -currentRadius; dz <= currentRadius; dz++) {
-                    if (Math.abs(dx) == currentRadius && Math.abs(dz) == currentRadius
-                            && random.nextDouble() < 0.5) {
+                    int distance = Math.abs(dx) + Math.abs(dz);
+                    if (distance > currentRadius + 1) continue;
+
+                    if (Math.abs(dx) == currentRadius &&
+                            Math.abs(dz) == currentRadius &&
+                            random.nextDouble() < 0.4) {
                         continue;
                     }
 
-                    if (dx == 0 && dz == 0 && y <= 0) continue;
-                    if (random.nextDouble() < 0.10) continue;
-
-                    world.setBlockTypeAt(x + dx, topY + y, z + dz,
-                            BlockData.LEAVES.getId());
+                    if (random.nextDouble() < 0.008) continue;
+                    if (dx == 0 && dz == 0 && y < 0) continue;
+                    world.setBlockTypeAt(x + dx, topY + y, z + dz, BlockData.LEAVES.getId());
                 }
             }
         }

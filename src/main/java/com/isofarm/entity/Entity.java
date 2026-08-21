@@ -211,10 +211,7 @@ public abstract class Entity {
     }
 
     public void jump() {
-        if (!isOnGround()) {
-            return;
-        }
-
+        if (!isOnGround()) return;
         velocity.y = K.World.JUMP_FORCE;
         setOnGround(false);
     }

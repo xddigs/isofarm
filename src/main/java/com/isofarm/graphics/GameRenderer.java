@@ -138,11 +138,15 @@ public class GameRenderer {
             sheet.unbind();
         });
 
-        gameMaster.getEntities().forEach(entity -> entity.render(gameMaster));
+        gameMaster.getEntities().forEach(entity -> {
+            if (entity instanceof Player && !gameMaster.isOrthographicCamera()) {
+                return;
+            }
+            entity.render(gameMaster);
+        });
         gameMaster.getParticles().render(defaultShader, rm.getSpriteMesh());
 
         if (blocksTexture != null) blocksTexture.unbind();
-
         if (hoveredCell != null) {
             glEnable(GL_DEPTH_TEST);
             glDepthMask(false);
