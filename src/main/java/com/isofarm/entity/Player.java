@@ -5,7 +5,7 @@ import com.isofarm.graphics.CameraView;
 import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.Shader;
 import com.isofarm.graphics.SpriteSheet;
-import com.isofarm.paths.GridPos;
+import com.isofarm.pathfinding.GridPos;
 import com.isofarm.service.SoundService;
 import com.isofarm.service.ToastService;
 import com.isofarm.utils.K;

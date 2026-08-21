@@ -88,29 +88,22 @@ public class Library implements Service<GameMaster> {
                     item.getName() + " to your inventory!");
         }));
 
-        cr.register(new Command("/rain", new String[]{"start", "amount"}, args -> {
+        cr.register(new Command("/rain", new String[]{"start"}, args -> {
             if (player == null) {
                 log.warn("Cannot execute command: player does not exist.");
                 return;
             }
 
             if (args.length < 1) {
-                log.warn("Usage: /rain start/stop <amount>");
+                log.warn("Usage: /rain start/stop");
                 return;
             }
 
-            int amount = 0;
-            if (args.length == 2 && args[0].equals("start")) {
-                try {
-                    amount = Integer.parseInt(args[1]);
-                } catch (NumberFormatException e) {
-                    log.warn("Invalid amount: {}", args[1]);
-                    return;
-                }
-
-                if (amount <= 0) {
-                    log.warn("Amount must be greater than zero.");
-                    return;
+            if (args[0].equals("start")) {
+                if (args.length == 1) {
+                    weatherService.setWeather(WeatherType.RAIN);
+                    log.info("Command rain executed");
+                    gameMaster.getToastService().success("You started the rain.");
                 }
             } else if (args.length == 1 && args[0].equals("stop")) {
                 weatherService.setWeather(WeatherType.CLEAR);
@@ -118,10 +111,6 @@ public class Library implements Service<GameMaster> {
                 gameMaster.getToastService().success("You stopped the rain.");
                 return;
             }
-
-            weatherService.setWeather(delta, WeatherType.RAIN, true, amount);
-            log.info("Command rain executed");
-            gameMaster.getToastService().success("You started the rain.");
         }));
 
         cr.register(new Command("/time", new String[]{"set", "amount"}, args -> {

@@ -1,4 +1,4 @@
-package com.isofarm.paths;
+package com.isofarm.pathfinding;
 
 import com.isofarm.wrld.World;
 

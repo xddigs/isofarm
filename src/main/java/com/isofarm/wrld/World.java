@@ -3,7 +3,7 @@ package com.isofarm.wrld;
 import com.isofarm.data.Block;
 import com.isofarm.data.BlockData;
 import com.isofarm.data.Crop;
-import com.isofarm.paths.GridPos;
+import com.isofarm.pathfinding.GridPos;
 
 import java.util.HashMap;
 import java.util.Map;

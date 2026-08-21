@@ -5,7 +5,7 @@ import com.isofarm.data.Hit;
 import com.isofarm.data.Item;
 import com.isofarm.graphics.Shader;
 import com.isofarm.graphics.SpriteSheet;
-import com.isofarm.paths.GridPos;
+import com.isofarm.pathfinding.GridPos;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
 import org.joml.Vector3f;

@@ -6,7 +6,7 @@ import com.isofarm.graphics.*;
 import com.isofarm.gui.GUI;
 import com.isofarm.gui.UIManager;
 import com.isofarm.input.*;
-import com.isofarm.paths.GridPos;
+import com.isofarm.pathfinding.GridPos;
 import com.isofarm.service.*;
 import com.isofarm.utils.HoveredCell;
 import com.isofarm.utils.K;
@@ -289,8 +289,7 @@ public class GameMaster {
 
     public void update(float delta) {
         if (weatherService.isRaining()) {
-            rainEngine.update(delta, getActiveCamera().getPosition(),
-                    world, chunkManager);
+            rainEngine.update(delta, getActiveCamera().getPosition(),world);
         }
 
         gameUIservice.update(delta);

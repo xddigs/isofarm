@@ -4,6 +4,7 @@ import com.isofarm.data.WeatherType;
 import com.isofarm.graphics.Camera;
 import com.isofarm.graphics.RainEngine;
 import com.isofarm.utils.K;
+import com.isofarm.wrld.World;
 
 import java.util.Random;
 
@@ -17,14 +18,6 @@ public class WeatherService implements Service<WeatherType> {
         this.rainEngine = rainEngine;
         this.camera = camera;
         this.weather = WeatherType.CLEAR;
-    }
-
-    public void setWeather(float delta, WeatherType weather,
-                           boolean isRaining, int amount) {
-        this.weather = weather;
-        if (isRaining) {
-            rainEngine.update(delta, camera.getPosition(), amount);
-        }
     }
 
     public void setWeather(WeatherType weather) {
