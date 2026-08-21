@@ -17,6 +17,8 @@ public class Player extends Character {
     private final ToastService toastService;
     private final SoundService soundService;
 
+    private Direction direction = Direction.SOUTH;
+
     public Player(String name, World world, ToastService toastService,
                   SoundService soundService) {
         super(name, toastService);
@@ -54,6 +56,17 @@ public class Player extends Character {
 
     public void move(World world, Vector3f direction, float delta) {
         moveAndCollide(world, direction, delta);
+    }
+
+    public void lookAt(float targetX, float targetZ) {
+        float dx = targetX - position.x;
+        float dz = targetZ - position.z;
+
+        if (dx * dx + dz * dz < 0.0001f) {
+            return;
+        }
+
+        direction = Direction.fromVector(dx, dz);
     }
 
     public String getName() {
@@ -149,5 +162,9 @@ public class Player extends Character {
 
     public float getForward() {
         return (float) Math.atan2(velocity.z, velocity.x);
+    }
+
+    public Direction getDirection() {
+        return direction;
     }
 }
