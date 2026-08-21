@@ -123,5 +123,49 @@ public class Library implements Service<GameMaster> {
             log.info("Command rain executed");
             gameMaster.getToastService().success("You started the rain.");
         }));
+
+        cr.register(new Command("/time", new String[]{"set", "amount"}, args -> {
+            if (player == null) {
+                log.warn("Cannot execute command: player does not exist.");
+                return;
+            }
+
+            if (args.length < 2) {
+                log.warn("Usage: /time set <amount>");
+            }
+
+            int amount = 0;
+            try {
+                amount = Integer.parseInt(args[1]);
+            } catch (NumberFormatException e) {
+                log.warn("Invalid amount: {}", args[1]);
+                return;
+            }
+
+            if (amount < 0 || amount > 24000) {
+                log.warn("Amount must be between 0 and 24000.");
+            }
+
+            gameMaster.getTimeService().setTimeScale(amount / 24000.0f);
+        }));
+
+        cr.register(new Command("/gm", new String[]{"mode"}, args -> {
+            if (player == null) {
+                log.warn("Cannot execute command: player does not exist.");
+                return;
+            }
+
+            if (args.length < 1) {
+                log.warn("Usage: /gm mode");
+            }
+
+            if (args[0].equalsIgnoreCase("SURVIVAL")) {
+                gameMaster.getPlayer().setGamemode(Gamemode.SURVIVAL);
+            } else if (args[0].equalsIgnoreCase("GODMODE")) {
+                gameMaster.getPlayer().setGamemode(Gamemode.GODMODE);
+            } else {
+                log.warn("Invalid gamemode: {}", args[0]);
+            }
+        }));
     }
 }

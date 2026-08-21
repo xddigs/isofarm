@@ -15,10 +15,10 @@ public enum Gamemode {
     }
 
     public boolean isSurvival() {
-        return this == SURVIVAL;
+        return this.equals(SURVIVAL);
     }
 
     public boolean isGodmode() {
-        return this == GODMODE;
+        return this.equals(GODMODE);
     }
 }

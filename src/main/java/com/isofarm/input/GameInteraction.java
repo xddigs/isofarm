@@ -36,6 +36,13 @@ public class GameInteraction {
     private final SpriteSheet blocksTexture;
     private final ItemRenderer itemRenderer;
 
+    private int breakingX = Integer.MIN_VALUE;
+    private int breakingY = Integer.MIN_VALUE;
+    private int breakingZ = Integer.MIN_VALUE;
+
+    private float breakProgress = 0.0f;
+    private long lastBreakTime = 0L;
+
     public GameInteraction(GameMaster gameMaster,
                            SpriteSheet blocksTexture) {
         this.cropService = gameMaster.getCropService();
@@ -84,9 +91,11 @@ public class GameInteraction {
         if (hoveredCell == null) return null;
         if (!isWithinRange(gameMaster, hoveredCell)) return null;
 
-        if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT)
+        if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT)
                 && !gameMaster.isInventoryOpen()) {
             breakAction(gameMaster, hoveredCell);
+        } else {
+            resetBreaking();
         }
 
         if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)
@@ -223,16 +232,22 @@ public class GameInteraction {
         int y = cell.y();
         int z = cell.z();
 
-        Item i = gameMaster.getGameUIService().getHotbarUI().getSelectedItem();
+        Item selectedItem = gameMaster.getGameUIService()
+                .getHotbarUI()
+                .getSelectedItem();
+
         Crop crop = world.getCropAt(x, y, z);
         if (crop != null) {
             CropType cropType = crop.getCropType();
             int frameIndex = crop.getStage().getFrameIndex();
             SpriteSheet sheet = gameMaster.getCropSpriteSheet(cropType);
-
             if (crop.isReadyToHarvest()) {
-                cropService.harvest(gameMaster.getPlayer(),crop,
-                        gameMaster.getToastService(),sheet);
+                cropService.harvest(
+                        gameMaster.getPlayer(),
+                        crop,
+                        gameMaster.getToastService(),
+                        sheet
+                );
             } else {
                 cropService.rip(crop);
             }
@@ -248,25 +263,70 @@ public class GameInteraction {
 
         byte blockId = world.getBlockTypeAt(x, y, z);
         if (blockId == 0) {
+            resetBreaking();
             return;
         }
 
         BlockData blockData = getBlockData(blockId);
-        if (blockData == null) return;
+
+        if (blockData == null) {
+            resetBreaking();
+            return;
+        }
+
+        if (breakingX != x || breakingY != y || breakingZ != z) {
+            breakingX = x;
+            breakingY = y;
+            breakingZ = z;
+            breakProgress = 0.0f;
+            lastBreakTime = System.nanoTime();
+        }
+
+        Gamemode gamemode = gameMaster.getPlayer().getGamemode();
+        if (gamemode.isGodmode()) {
+            breakBlock(gameMaster, cell, blockData, blockId, selectedItem);
+            resetBreaking();
+            return;
+        }
+
+        float destroyTime = blockData.getDestroyTime();
+        if (destroyTime <= 0.0f) {
+            resetBreaking();
+            return;
+        }
+
+        long now = System.nanoTime();
+
+        float deltaTime = (now - lastBreakTime) / 1_000_000_000.0f;
+        lastBreakTime = now;
+        breakProgress += deltaTime / destroyTime;
+
+        if (breakProgress >= 1.0f) {
+            breakBlock(gameMaster, cell, blockData, blockId, selectedItem);
+            resetBreaking();
+        }
+    }
+
+    private void breakBlock(GameMaster gameMaster, Hit cell, BlockData blockData,
+                            byte blockId, Item selectedItem) {
+        World world = gameMaster.getWorld();
+        int x = cell.x();
+        int y = cell.y();
+        int z = cell.z();
 
         if (blockData.getSoundGroup() != null) {
-            gameMaster.getSoundService()
-                    .playBreakSound(blockData.getSoundGroup(),
-                            getDistanceToBlock(gameMaster, cell), Settings.maxInteractionDistance);
+            gameMaster.getSoundService().playBreakSound(blockData.getSoundGroup(),
+                    getDistanceToBlock(gameMaster, cell), Settings.maxInteractionDistance);
         }
 
         world.setBlockTypeAt(x, y, z, BlockData.AIR.getId());
         itemRenderer.playBreakAnimation();
 
-        if (i instanceof Tool tool) {
-            if (Arrays.stream(tool.getType().getUsableOn())
-                    .noneMatch(b -> b.getId() != blockId)) {
-               tool.misuse();
+        if (selectedItem instanceof Tool tool) {
+            boolean usable = Arrays.stream(tool.getType().getUsableOn())
+                    .anyMatch(b -> b.getId() == blockId);
+            if (!usable) {
+                tool.misuse();
             } else {
                 tool.use();
             }
@@ -281,6 +341,15 @@ public class GameInteraction {
         gameMaster.addEntity(item);
         gameUIservice.logAction(cell);
         log.info("Block removed: {} at {},{},{}", blockData.getName(), x, y, z);
+    }
+
+    private void resetBreaking() {
+        breakingX = Integer.MIN_VALUE;
+        breakingY = Integer.MIN_VALUE;
+        breakingZ = Integer.MIN_VALUE;
+
+        breakProgress = 0.0f;
+        lastBreakTime = 0L;
     }
 
     private void placeAction(GameMaster gameMaster, Hit cell, Item selectedItem) {

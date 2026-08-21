@@ -7,15 +7,15 @@ import org.joml.Vector2f;
 @DataClass
 public enum BlockData {
     AIR((byte) 0, "Air", 0, 0, 0, SoundGroup.SILENT, 0f),
-    DIRT((byte) 1, "Dirt", true, 100, 0, 0, SoundGroup.SOIL, 0.75f),
-    GRASS((byte) 2, "Grass", true, 120, 1, 0, 1, 3, 1, 1, SoundGroup.SOIL, 1f),
-    STONE((byte) 3, "Stone", 150, 2, 0, SoundGroup.HARD, 0.6f),
-    TILLED_DIRT((byte) 4, "Tilled Dirt", true, 110, 3, 0, 0, 0, 0, 0, SoundGroup.SOIL, 1f),
-    VOIDSTONE((byte) 5, "Voidstone", 999, 4, 0, SoundGroup.HARD, 0.000001f),
-    GLASS((byte) 6, "Glass", 200, 5, 0, SoundGroup.GLASS, 1f),
-    OAK_LOG((byte) 7, "Log", false, 100, 6, 0, 6, 2, 6, 1, SoundGroup.HARD, 1f),
-    OAK_WOOD((byte) 8, "Oak Wood", 100, 7, 0, SoundGroup.HARD, 0.8f),
-    LEAVES((byte) 9, "Leaves", 100, 8, 0, SoundGroup.SOIL, 0.9f),
+    DIRT((byte) 1, "Dirt", true, 100, 0, 0, SoundGroup.SOIL, 1.2f),
+    GRASS((byte) 2, "Grass", true, 120, 1, 0, 1, 3, 1, 1, SoundGroup.SOIL, 1.2f),
+    STONE((byte) 3, "Stone", 150, 2, 0, SoundGroup.HARD, 3.0f),
+    TILLED_DIRT((byte) 4, "Tilled Dirt", true, 110, 3, 0, 0, 0, 0, 0, SoundGroup.SOIL, 1.2f),
+    VOIDSTONE((byte) 5, "Voidstone", 999, 4, 0, SoundGroup.HARD, 9999.0f),
+    GLASS((byte) 6, "Glass", 200, 5, 0, SoundGroup.GLASS, 1.5f),
+    OAK_LOG((byte) 7, "Log", false, 100, 6, 0, 6, 2, 6, 1, SoundGroup.HARD, 1.2f),
+    OAK_WOOD((byte) 8, "Oak Wood", 100, 7, 0, SoundGroup.HARD, 2.0f),
+    LEAVES((byte) 9, "Leaves", 100, 8, 0, SoundGroup.SOIL, 1.8f),
 
     WATER((byte) -1, "Water", 100, 0, 0, SoundGroup.SILENT, 0f),
     CROP((byte) -1, "Crop", -1, 0, 0, SoundGroup.SOIL, 1f);
@@ -42,35 +42,35 @@ public enum BlockData {
 
     private final SoundGroup soundGroup;
 
-    private final float destroySpeed;
+    private final float destroyTime;
 
     BlockData(byte id, String name, int value, int tileX, int tileY,
-              boolean isTillable, SoundGroup soundGroup, float destroySpeed) {
+              boolean isTillable, SoundGroup soundGroup, float destroyTime) {
         this(id, name, isTillable, value, tileX, tileY, tileX, tileY,
-                tileX, tileY, soundGroup, destroySpeed);
+                tileX, tileY, soundGroup, destroyTime);
     }
 
     BlockData(byte id, String name, int value, int tileX, int tileY,
-              SoundGroup soundGroup, float destroySpeed) {
+              SoundGroup soundGroup, float destroyTime) {
         this(id, name, false, value, tileX, tileY, tileX,
-                tileY, tileX, tileY, soundGroup, destroySpeed);
+                tileY, tileX, tileY, soundGroup, destroyTime);
     }
 
     BlockData(byte id, String name, boolean isTillable, int value, int
-            tileX, int tileY, SoundGroup soundGroup, float destroySpeed) {
+            tileX, int tileY, SoundGroup soundGroup, float destroyTime) {
         this(id, name, isTillable, value, tileX, tileY, tileX,
-                tileY, tileX, tileY, soundGroup, destroySpeed);
+                tileY, tileX, tileY, soundGroup, destroyTime);
     }
 
     BlockData(byte id, String name, int value, boolean isTillable, int topTileX,
-              int topTileY, SoundGroup soundGroup, float destroySpeed) {
+              int topTileY, SoundGroup soundGroup, float destroyTime) {
         this(id, name, isTillable, value, topTileX, topTileY,
-                0, 0, 0, 0, soundGroup, destroySpeed);
+                0, 0, 0, 0, soundGroup, destroyTime);
     }
 
     BlockData(byte id, String name, boolean isTillable, int value, int topTileX,
               int topTileY, int bottomTileX, int bottomTileY, int sideTileX,
-              int sideTileY, SoundGroup soundGroup, float destroySpeed) {
+              int sideTileY, SoundGroup soundGroup, float destroyTime) {
         this.id = id;
         this.name = name;
         this.isTillable = isTillable;
@@ -82,7 +82,7 @@ public enum BlockData {
         this.sideTileX = sideTileX;
         this.sideTileY = sideTileY;
         this.soundGroup = soundGroup;
-        this.destroySpeed = destroySpeed;
+        this.destroyTime = destroyTime;
 
         this.atlasScale = new Vector2f(1.0f / ATLAS_COLS, 1.0f / ATLAS_ROWS);
         this.topAtlasOffset = calculateAtlasOffset(topTileX, topTileY);
@@ -155,7 +155,7 @@ public enum BlockData {
         return soundGroup;
     }
 
-    public float getDestroySpeed() {
-        return destroySpeed;
+    public float getDestroyTime() {
+        return destroyTime;
     }
 }
