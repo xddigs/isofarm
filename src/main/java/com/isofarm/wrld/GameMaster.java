@@ -290,6 +290,9 @@ public class GameMaster {
     public void update(float delta) {
         if (weatherService.isRaining()) {
             rainEngine.update(delta);
+            soundService.setBackgroundSound(SoundGroup.RAIN);
+        } else {
+            soundService.setBackgroundSound(SoundGroup.NATURE);
         }
 
         gameUIservice.update(delta);

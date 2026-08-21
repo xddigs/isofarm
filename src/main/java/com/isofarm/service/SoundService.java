@@ -33,6 +33,8 @@ public class SoundService {
     private int useSource;
     private int backgroundSource;
 
+    private String currentBackgroundSound;
+
     public SoundService() {
         this.init();
         for (SoundGroup group : SoundGroup.values()) {
@@ -102,10 +104,42 @@ public class SoundService {
                 1.0f, 0.2f, volume);
     }
 
-    public void playBackgroundSound(SoundGroup group, float distance, float maxDistance) {
-        float volume = calc(distance, maxDistance);
-        playSound(useSource, group != null ? group.getUseSounds() : null,
-                0.8f, 0.2f, volume);
+    public void setBackgroundSound(SoundGroup group) {
+        if (group == null) {
+            stopBackgroundSound();
+            return;
+        }
+
+        String[] sounds = group.getBackgroundSounds();
+
+        if (sounds == null || sounds.length == 0) {
+            stopBackgroundSound();
+            return;
+        }
+
+        String soundPath = sounds[0];
+
+        if (soundPath.equals(currentBackgroundSound)
+                && alGetSourcei(backgroundSource, AL_SOURCE_STATE) == AL_PLAYING) {
+            return;
+        }
+
+        Integer bufferId = soundBuffers.get(soundPath);
+
+        if (bufferId == null || bufferId <= 0) {
+            return;
+        }
+
+        alSourceStop(backgroundSource);
+
+        alSourcei(backgroundSource, AL_BUFFER, bufferId);
+        alSourcei(backgroundSource, AL_LOOPING, AL_TRUE);
+        alSourcef(backgroundSource, AL_PITCH, 1.0f);
+        alSourcef(backgroundSource, AL_GAIN, 0.8f);
+
+        currentBackgroundSound = soundPath;
+
+        alSourcePlay(backgroundSource);
     }
 
     private float calc(float distance, float maxDistance) {
@@ -131,6 +165,15 @@ public class SoundService {
             alSourcef(source, AL_GAIN, volume);
             alSourcePlay(source);
         }
+    }
+
+    public void stopBackgroundSound() {
+        if (alGetSourcei(backgroundSource, AL_SOURCE_STATE) == AL_PLAYING) {
+            alSourceStop(backgroundSource);
+        }
+
+        alSourcei(backgroundSource, AL_BUFFER, 0);
+        currentBackgroundSound = null;
     }
 
     public int loadOgg(String resourcePath) {
