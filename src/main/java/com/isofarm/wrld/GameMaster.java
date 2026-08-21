@@ -6,6 +6,7 @@ import com.isofarm.graphics.*;
 import com.isofarm.gui.GUI;
 import com.isofarm.gui.UIManager;
 import com.isofarm.input.*;
+import com.isofarm.paths.GridPos;
 import com.isofarm.service.*;
 import com.isofarm.utils.HoveredCell;
 import com.isofarm.utils.K;
@@ -136,9 +137,9 @@ public class GameMaster {
         addEntity(player);
 
         chunkManager.updateLoadedChunks(0, 0);
-        float spawnY = world.getHighestY(0.0f, 0.0f) + 1.0f;
+        GridPos spawn = world.getHighestY(0.0f, 0.0f);
 
-        player.setPosition(0.5f, spawnY, 0.5f);
+        player.setPosition(0.5f, spawn.y() + 1.0f, 0.5f);
         gameUIservice.setPlayer(player);
         shop.setPlayer(player);
 

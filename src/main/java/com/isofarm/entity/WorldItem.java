@@ -5,6 +5,7 @@ import com.isofarm.data.Hit;
 import com.isofarm.data.Item;
 import com.isofarm.graphics.Shader;
 import com.isofarm.graphics.SpriteSheet;
+import com.isofarm.paths.GridPos;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
 import org.joml.Vector3f;
@@ -71,9 +72,9 @@ public class WorldItem extends Entity {
             velocity.x *= airDamping;
             velocity.z *= airDamping;
 
-            float terrainY = world.getHighestY(position.x, position.z);
-            if (position.y <= terrainY + GROUND_OFFSET) {
-                position.y = terrainY + GROUND_OFFSET;
+            GridPos terrain = world.getHighestY(position.x, position.z);
+            if (position.y <= terrain.y() + GROUND_OFFSET) {
+                position.y = terrain.y() + GROUND_OFFSET;
                 groundY = position.y;
                 if (Math.abs(velocity.y) > MIN_BOUNCE_VELOCITY) {
                     velocity.y *= -BOUNCE_FACTOR;
@@ -91,9 +92,8 @@ public class WorldItem extends Entity {
             return;
         }
 
-        float terrainY = world.getHighestY(position.x, position.z);
-
-        groundY = terrainY + GROUND_OFFSET;
+        GridPos terrain = world.getHighestY(position.x, position.z);
+        groundY = terrain.y() + GROUND_OFFSET;
         bobTime += delta * GROUND_BOB_SPEED;
 
         float bobOffset = (float) Math.sin(bobTime) * GROUND_BOB_HEIGHT;

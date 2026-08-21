@@ -1,13 +1,14 @@
 package com.isofarm.entity;
 
-import com.isofarm.Game;
 import com.isofarm.data.*;
 import com.isofarm.graphics.CameraView;
 import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.Shader;
 import com.isofarm.graphics.SpriteSheet;
+import com.isofarm.paths.GridPos;
 import com.isofarm.service.SoundService;
 import com.isofarm.service.ToastService;
+import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
@@ -16,6 +17,9 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.lwjgl.opengl.GL13.*;
 
@@ -28,6 +32,8 @@ public class Player extends Character {
     private final Matrix4f modelMatrix;
 
     private Direction direction = Direction.SOUTH_WEST;
+    private List<GridPos> path;
+    private int pathIndex = 0;
 
     public Player(String name, World world, ToastService toastService,
                   SoundService soundService) {
@@ -36,11 +42,12 @@ public class Player extends Character {
         this.toastService = toastService;
         this.soundService = soundService;
         this.modelMatrix = new Matrix4f();
+        this.path = new LinkedList<>();
 
         float spawnX = 0.5f;
         float spawnZ = 0.5f;
-        float highestY = world.getHighestY(spawnX, spawnZ);
-        setPosition(new Vector3f(spawnX, highestY, spawnZ));
+        GridPos highestAltitude = world.getHighestY(spawnX, spawnZ);
+        setPosition(new Vector3f(spawnX, highestAltitude.y(), spawnZ));
         setVelocity(new Vector3f(0.0f, 0.0f, 0.0f));
         setDimensions(new Vector3f(1.0f, 1.0f, 1.0f));
         setUpInventory();
@@ -130,6 +137,48 @@ public class Player extends Character {
 
     public void move(World world, Vector3f direction, float delta) {
         moveAndCollide(world, direction, delta);
+    }
+
+    public void move(World world, float delta) {
+        if (!isFollowingPath()) {
+            return;
+        }
+
+        GridPos target = path.get(pathIndex);
+        float targetX = target.x() + 0.5f;
+        float targetY = target.y();
+        float targetZ = target.z() + 0.5f;
+
+        Vector3f position = getPosition();
+
+        float dx = targetX - position.x;
+        float dz = targetZ - position.z;
+
+        float distanceSquared = dx * dx + dz * dz;
+        if (distanceSquared < 0.01f) {
+            position.x = targetX;
+            position.z = targetZ;
+            position.y = targetY;
+
+            pathIndex++;
+
+            if (!isFollowingPath()) {
+                setVelocity(new Vector3f(0.0f, 0.0f, 0.0f));
+            }
+
+            return;
+        }
+
+        Vector3f direction = new Vector3f(dx, 0.0f, dz);
+        if (direction.lengthSquared() > 0.0f) {
+            direction.normalize();
+        }
+
+        Vector3f velocity = new Vector3f(direction).mul(K.Camera.MOVEMENT_SPEED);
+        setVelocity(velocity);
+        lookAt(targetX, targetZ, 45.0f);
+        move(world, velocity, delta);
+        position.y = targetY;
     }
 
     public void lookAt(float targetX, float targetZ, float cameraYaw) {
@@ -240,5 +289,14 @@ public class Player extends Character {
 
     public Direction getDirection() {
         return direction;
+    }
+
+    public void setPath(List<GridPos> path) {
+        this.path = path != null ? path : List.of();
+        this.pathIndex = 0;
+    }
+
+    public boolean isFollowingPath() {
+        return pathIndex < path.size();
     }
 }

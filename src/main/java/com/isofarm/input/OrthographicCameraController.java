@@ -1,9 +1,11 @@
 package com.isofarm.input;
 
 import com.isofarm.data.BlockData;
-import com.isofarm.data.GridPos;
+import com.isofarm.data.Hit;
 import com.isofarm.entity.Player;
 import com.isofarm.graphics.OrthographicCamera;
+import com.isofarm.paths.AStar;
+import com.isofarm.paths.GridPos;
 import com.isofarm.service.Service;
 import com.isofarm.utils.K;
 import com.isofarm.wrld.GameMaster;
@@ -42,40 +44,40 @@ public record OrthographicCameraController(OrthographicCamera camera)
         World world = gameMaster.getWorld();
 
         if (player == null) return;
-
-        float speed = K.Camera.MOVEMENT_SPEED * 1.5f;
-
-        if (Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-            speed *= K.Camera.SPRINT_MULTIPLIER;
-        }
-
-        Vector3f moveForward = camera.getMovementForwardVector();
-        moveForward.y = 0.0f;
-
-        if (moveForward.lengthSquared() > 0.0f) {
-            moveForward.normalize();
-        }
-
-        Vector3f right = new Vector3f(
-                -moveForward.z,
-                0.0f,
-                moveForward.x
-        );
-
-        Vector3f moveDir = new Vector3f();
-        if (Keyboard.isKeyDown(GLFW_KEY_W)) moveDir.add(moveForward);
-        if (Keyboard.isKeyDown(GLFW_KEY_S)) moveDir.sub(moveForward);
-        if (Keyboard.isKeyDown(GLFW_KEY_D)) moveDir.add(right);
-        if (Keyboard.isKeyDown(GLFW_KEY_A)) moveDir.sub(right);
-        if (moveDir.lengthSquared() > 0.0f) moveDir.normalize().mul(speed);
-        player.move(world, moveDir, delta);
-
-        if (Keyboard.isKeyDown(GLFW_KEY_SPACE) ||
-                shouldAutoJump(player, world, moveDir)) {
-            player.jump();
-        }
-
+        click(gameMaster, player, world);
+        player.move(world, delta);
         followPlayer(player);
+    }
+
+    private void click(GameMaster gameMaster, Player player, World world) {
+        if (!Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
+            return;
+        }
+
+        float mouseX = Mouse.getX();
+        float mouseY = Mouse.getY();
+
+        float screenWidth = gameMaster.getWindowWidth();
+        float screenHeight = gameMaster.getWindowHeight();
+
+        Hit hit = camera.highlight(world, mouseX, mouseY, screenWidth, screenHeight);
+        if (hit == null) return;
+
+        GridPos start = getPlayerGridPosition(player);
+        GridPos goal = getGoalPosition(world, hit);
+
+        if (goal == null) {
+            return;
+        }
+
+        if (start.equals(goal)) {
+            return;
+        }
+
+        var path = AStar.findPath(world, start, goal);
+        if (!path.isEmpty()) {
+            player.setPath(path);
+        }
     }
 
     private void followPlayer(Player player) {
@@ -87,6 +89,25 @@ public record OrthographicCameraController(OrthographicCamera camera)
                 .add(new Vector3f(camUp).mul(verticalOffset));
 
         camera.getPosition().set(cameraPos);
+    }
+
+    private GridPos getPlayerGridPosition(Player player) {
+        Vector3f position = player.getPosition();
+
+        return new GridPos(
+                (int) Math.floor(position.x),
+                (int) Math.floor(position.y),
+                (int) Math.floor(position.z)
+        );
+    }
+
+    private GridPos getGoalPosition(World world, Hit hit) {
+        int x = hit.x();
+        int y = hit.y();
+        int z = hit.z();
+
+        if (hit.normalY() > 0) return new GridPos(x, y + 1, z);
+        return world.getHighestY(x, z);
     }
 
     private boolean shouldAutoJump(Player player, World world, Vector3f moveDir) {
