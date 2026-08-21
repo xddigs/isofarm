@@ -32,4 +32,4 @@ environment driven by custom 3D mesh rendering, particle systems, and dynamic da
 | **Toggle HUD (F1 mode)**           | `F1`<br>                 |
 
 ## Getting Started
-To run the game, clone the repository and run the `soil.jar` file.
+To run the game, clone the repository and run the game on your favorite IDE!
