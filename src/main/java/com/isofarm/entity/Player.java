@@ -22,8 +22,9 @@ public class Player extends Character {
     private final String name;
     private final ToastService toastService;
     private final SoundService soundService;
+    private final Matrix4f modelMatrix;
 
-    private Direction direction = Direction.SOUTH;
+    private Direction direction = Direction.SOUTH_WEST;
 
     public Player(String name, World world, ToastService toastService,
                   SoundService soundService) {
@@ -31,6 +32,7 @@ public class Player extends Character {
         this.name = name;
         this.toastService = toastService;
         this.soundService = soundService;
+        this.modelMatrix = new Matrix4f();
 
         float spawnX = 0.5f;
         float spawnZ = 0.5f;
@@ -62,14 +64,11 @@ public class Player extends Character {
         ResourceManager rm = gameMaster.getResourceManager();
         CameraView camera = gameMaster.getActiveCamera();
         SpriteSheet sheet = rm.getPlayerSpriteSheet();
-        Matrix4f modelMatrix = gameMaster.getGameRenderer().getModelMatrix();
 
         if (sheet == null || rm.getPlayerMesh() == null) return;
+
         Shader shader = rm.getDefaultShader();
         shader.bind();
-
-        shader.setUniform("uProjection", camera.getProjectionMatrix());
-        shader.setUniform("uView", camera.getViewMatrix());
 
         glActiveTexture(GL_TEXTURE0);
         sheet.bind();
@@ -81,7 +80,6 @@ public class Player extends Character {
         int frameIndex = direction != null ? direction.frame() : 0;
         shader.setUniform("uTotalFrames", totalFrames);
         shader.setUniform("uFrameIndex", frameIndex);
-
         shader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
         shader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
 
@@ -92,22 +90,21 @@ public class Player extends Character {
             shader.setUniform("uLightDirection", lighting.getDirection());
             shader.setUniform("uAmbientIntensity", Math.max(0.4f, lighting.getAmbientIntensity()));
         }
-
         shader.setUniform("uSkyColor", TimeService.getSkyColor());
         shader.setUniform("uParticleAlpha", 1.0f);
         shader.setUniform("uIsMaskPass", false);
         shader.setUniform("uEnableShadows", false);
 
+        shader.setUniform("uProjection", camera.getProjectionMatrix());
+        shader.setUniform("uView", camera.getViewMatrix());
+
         float scaleX = (dimensions == null || dimensions.x <= 0) ? 1.0f : dimensions.x;
         float scaleY = (dimensions == null || dimensions.y <= 0) ? 1.0f : dimensions.y;
         float scaleZ = (dimensions == null || dimensions.z <= 0) ? 1.0f : dimensions.z;
-        Vector3f scale = new Vector3f(scaleX, scaleY, scaleZ);
 
-        float yawRad = (float) Math.toRadians(camera.getYaw());
         modelMatrix.identity()
                 .translate(position)
-                .rotateY(yawRad)
-                .scale(scale);
+                .scale(scaleX, scaleY, scaleZ);
 
         shader.setUniform("uModel", modelMatrix);
 
@@ -132,7 +129,6 @@ public class Player extends Character {
         if (dx * dx + dz * dz < 0.0001f) {
             return;
         }
-
         direction = Direction.fromVector(dx, dz);
     }
 

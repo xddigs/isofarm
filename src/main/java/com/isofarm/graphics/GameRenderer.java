@@ -1,7 +1,6 @@
 package com.isofarm.graphics;
 
 import com.isofarm.data.Crop;
-import com.isofarm.data.Direction;
 import com.isofarm.data.Hit;
 import com.isofarm.entity.Player;
 import com.isofarm.service.TimeService;
@@ -321,9 +320,5 @@ public class GameRenderer {
     public void initCamera(CameraView camera) {
         previousCameraYaw = camera.getYaw();
         previousCameraPitch = camera.getPitch();
-    }
-
-    public Matrix4f getModelMatrix() {
-        return modelMatrix;
     }
 }
