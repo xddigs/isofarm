@@ -7,15 +7,15 @@ import org.joml.Vector2f;
 @DataClass
 public enum BlockData {
     AIR((byte) 0, "Air", 0, 0, 0, SoundGroup.SILENT, 0f),
-    DIRT((byte) 1, "Dirt", true, 100, 0, 0, SoundGroup.SOIL, 1.2f),
-    GRASS((byte) 2, "Grass", true, 120, 1, 0, 1, 3, 1, 1, SoundGroup.SOIL, 1.2f),
-    STONE((byte) 3, "Stone", 150, 2, 0, SoundGroup.HARD, 3.0f),
-    TILLED_DIRT((byte) 4, "Tilled Dirt", true, 110, 3, 0, 0, 0, 0, 0, SoundGroup.SOIL, 1.2f),
-    VOIDSTONE((byte) 5, "Voidstone", 999, 4, 0, SoundGroup.HARD, 9999.0f),
-    GLASS((byte) 6, "Glass", 200, 5, 0, SoundGroup.GLASS, 1.5f),
+    DIRT((byte) 1, "Dirt", true, 100, 0, 0, SoundGroup.SOIL, 0.9f),
+    GRASS((byte) 2, "Grass", true, 120, 1, 0, 1, 3, 1, 1, SoundGroup.SOIL, 1.0f),
+    STONE((byte) 3, "Stone", 150, 2, 0, SoundGroup.HARD, 6.0f),
+    TILLED_DIRT((byte) 4, "Tilled Dirt", true, 110, 3, 0, 0, 0, 0, 0, SoundGroup.SOIL, 0.9f),
+    VOIDSTONE((byte) 5, "Voidstone", 999, 4, 0, SoundGroup.HARD, 999999.0f),
+    GLASS((byte) 6, "Glass", 200, 5, 0, SoundGroup.GLASS, 1.2f),
     OAK_LOG((byte) 7, "Log", false, 100, 6, 0, 6, 2, 6, 1, SoundGroup.HARD, 1.2f),
-    OAK_WOOD((byte) 8, "Oak Wood", 100, 7, 0, SoundGroup.HARD, 2.0f),
-    LEAVES((byte) 9, "Leaves", 100, 8, 0, SoundGroup.SOIL, 1.8f),
+    OAK_WOOD((byte) 8, "Oak Wood", 100, 7, 0, SoundGroup.HARD, 4.0f),
+    LEAVES((byte) 9, "Leaves", 100, 8, 0, SoundGroup.SOIL, 1.1f),
 
     WATER((byte) -1, "Water", 100, 0, 0, SoundGroup.SILENT, 0f),
     CROP((byte) -1, "Crop", -1, 0, 0, SoundGroup.SOIL, 1f);

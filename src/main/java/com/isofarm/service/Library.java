@@ -6,6 +6,8 @@ import com.isofarm.wrld.GameMaster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Locale;
+
 @SuppressWarnings("all")
 public class Library implements Service<GameMaster> {
     private static final Logger log = LoggerFactory.getLogger(Library.class);
@@ -166,6 +168,10 @@ public class Library implements Service<GameMaster> {
             } else {
                 log.warn("Invalid gamemode: {}", args[0]);
             }
+
+            log.info("Command gm executed");
+            gameMaster.getToastService().success("You changed gamemode to " +
+                    args[0].toLowerCase());
         }));
     }
 }
