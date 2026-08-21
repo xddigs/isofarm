@@ -1,9 +1,16 @@
 #version 330 core
 
-out vec4 FragColor;
+in float vYPos;
+in float vMinY;
 
 uniform vec3 uRainColor;
 
+out vec4 FragColor;
+
 void main() {
-    FragColor = vec4(uRainColor, 0.45);
+    if (vYPos < vMinY) {
+        discard;
+    }
+
+    FragColor = vec4(uRainColor, 0.4);
 }

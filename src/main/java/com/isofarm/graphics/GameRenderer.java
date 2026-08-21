@@ -146,6 +146,12 @@ public class GameRenderer {
         });
         gameMaster.getParticles().render(defaultShader, rm.getSpriteMesh());
 
+        if (gameMaster.getWeatherService().isRaining()) {
+            gameMaster.getRainEngine().render(rm.getRainShader(),
+                    camera.getViewMatrix(), camera.getProjectionMatrix(),
+                    camera.getPosition(), gameMaster.getWorld());
+        }
+
         if (blocksTexture != null) blocksTexture.unbind();
         if (hoveredCell != null) {
             glEnable(GL_DEPTH_TEST);
@@ -250,11 +256,6 @@ public class GameRenderer {
 
             motionBlurShader.unbind();
             glEnable(GL_DEPTH_TEST);
-        }
-
-        if (gameMaster.getWeatherService().isRaining()) {
-            gameMaster.getRainEngine().render(rm.getRainShader(),
-                    camera.getViewMatrix(), camera.getProjectionMatrix());
         }
     }
 
