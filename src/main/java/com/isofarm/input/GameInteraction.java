@@ -77,8 +77,10 @@ public class GameInteraction {
             addItem(gameMaster);
         }
 
-        if (Keyboard.isKeyPressed(GLFW_KEY_V)) {
-            gameMaster.changeCamera();
+        if (!gameMaster.isPromptingForInput()) {
+            if (Keyboard.isKeyPressed(GLFW_KEY_V)) {
+                gameMaster.changeCamera();
+            }
         }
 
         Hit hoveredCell;
