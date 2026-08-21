@@ -128,14 +128,15 @@ public class Player extends Character {
         moveAndCollide(world, direction, delta);
     }
 
-    public void lookAt(float targetX, float targetZ) {
+    public void lookAt(float targetX, float targetZ, float cameraYaw) {
         float dx = targetX - position.x;
         float dz = targetZ - position.z;
 
-        if (dx * dx + dz * dz < 0.0001f) {
+        if (dx * dx + dz * dz < 0.09f) {
             return;
         }
-        direction = Direction.fromVector(dx, dz);
+        this.direction = Direction.fromVector(
+                dx, dz, cameraYaw);
     }
 
     public String getName() {

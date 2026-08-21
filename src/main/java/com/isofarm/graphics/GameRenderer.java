@@ -109,7 +109,8 @@ public class GameRenderer {
         Hit hoveredCell = gameMaster.getGameInteraction().getHoveredCell(gameMaster);
 
         if (hoveredCell != null && player != null) {
-            player.lookAt(hoveredCell.x() + 0.5f, hoveredCell.z() + 0.5f);
+            player.lookAt(hoveredCell.x() + 0.5f, hoveredCell.z() + 0.5f,
+                    gameMaster.getActiveCamera().getYaw());
         }
 
         gameMaster.getWorld().forEach(block -> {
