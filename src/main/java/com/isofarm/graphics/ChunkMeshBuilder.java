@@ -36,7 +36,7 @@ public class ChunkMeshBuilder {
                     float topY = getBlockTopY(data, vy);
 
                     float aboveBottomY = getBlockBottomY(chunk, x, y + 1, z);
-                    if (isAir(chunk, x, y + 1, z) || aboveBottomY > topY) {
+                    if (shouldRenderFace(chunk, x, y + 1, z, data) || aboveBottomY > topY) {
                         vertexCount = addFace(positions, normals, uvs, indices, vertexCount, new float[]{vx, topY, vz + 1, data.getTopAtlasOffset().x, data.getTopAtlasOffset().y + data.getAtlasScale().y, 0, 1, 0,
                                 vx + 1, topY, vz + 1, data.getTopAtlasOffset().x + data.getAtlasScale().x, data.getTopAtlasOffset().y + data.getAtlasScale().y, 0, 1, 0,
                                 vx + 1, topY, vz, data.getTopAtlasOffset().x + data.getAtlasScale().x, data.getTopAtlasOffset().y, 0, 1, 0,
@@ -44,7 +44,7 @@ public class ChunkMeshBuilder {
                     }
 
                     float belowTopY = getBlockTopY(chunk, x, y - 1, z);
-                    if (isAir(chunk, x, y - 1, z) || belowTopY < bottomY) {
+                    if (shouldRenderFace(chunk, x, y - 1, z, data) || belowTopY < bottomY) {
                         vertexCount = addFace(positions, normals, uvs, indices, vertexCount, new float[]{vx, bottomY, vz, data.getBottomAtlasOffset().x, data.getBottomAtlasOffset().y, 0, -1, 0,
                                 vx + 1, bottomY, vz, data.getBottomAtlasOffset().x + data.getAtlasScale().x, data.getBottomAtlasOffset().y, 0, -1, 0,
                                 vx + 1, bottomY, vz + 1, data.getBottomAtlasOffset().x + data.getAtlasScale().x, data.getBottomAtlasOffset().y + data.getAtlasScale().y, 0, -1, 0,
@@ -52,7 +52,7 @@ public class ChunkMeshBuilder {
                     }
 
                     float neighborTop = getBlockTopY(chunk, x, y, z + 1);
-                    if (isAir(chunk, x, y, z + 1)) {
+                    if (shouldRenderFace(chunk, x, y, z + 1, data)) {
                         vertexCount = addSideFace(positions, normals, uvs, indices, vertexCount,
                                 vx, vx + 1,
                                 bottomY, topY,
@@ -72,7 +72,7 @@ public class ChunkMeshBuilder {
                     }
 
                     neighborTop = getBlockTopY(chunk, x, y, z - 1);
-                    if (isAir(chunk, x, y, z - 1)) {
+                    if (shouldRenderFace(chunk, x, y, z - 1, data)) {
                         vertexCount = addSideFace(positions, normals, uvs, indices, vertexCount,
                                 vx + 1, vx,
                                 bottomY, topY,
@@ -92,7 +92,7 @@ public class ChunkMeshBuilder {
                     }
 
                     neighborTop = getBlockTopY(chunk, x + 1, y, z);
-                    if (isAir(chunk, x + 1, y, z)) {
+                    if (shouldRenderFace(chunk, x + 1, y, z, data)) {
                         vertexCount = addSideFace(positions, normals, uvs, indices, vertexCount,
                                 vx + 1, vx + 1,
                                 bottomY, topY,
@@ -112,7 +112,7 @@ public class ChunkMeshBuilder {
                     }
 
                     neighborTop = getBlockTopY(chunk, x - 1, y, z);
-                    if (isAir(chunk, x - 1, y, z)) {
+                    if (shouldRenderFace(chunk, x - 1, y, z, data)) {
                         vertexCount = addSideFace(positions, normals, uvs, indices, vertexCount,
                                 vx, vx,
                                 bottomY, topY,
@@ -173,6 +173,20 @@ public class ChunkMeshBuilder {
         BlockData data = getBlockDataById(blockId);
         if (data == null || data == BlockData.CROP) return y;
         return getBlockTopY(data, y);
+    }
+
+    private static boolean shouldRenderFace(Chunk chunk, int neighborX, int neighborY, int neighborZ,
+                                            BlockData currentBlock) {
+        if (isAir(chunk, neighborX, neighborY, neighborZ)) return true;
+        byte neighborId = chunk.getBlock(neighborX, neighborY, neighborZ);
+        BlockData neighborData = getBlockDataById(neighborId);
+
+        if (neighborData == null) return true;
+        if (neighborData.isTransparent()) {
+            return neighborData != currentBlock;
+        }
+
+        return false;
     }
 
     private static boolean isAir(Chunk chunk, int x, int y, int z) {

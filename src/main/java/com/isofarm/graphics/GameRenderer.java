@@ -90,6 +90,8 @@ public class GameRenderer {
 
         updateBlur(camera);
 
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         chunkMeshes.forEach((chunk, mesh) -> {
             if (mesh != null && mesh.getIndicesCount() > 0) {
                 float minX = chunk.getChunkX() * Chunk.SIZE_X;

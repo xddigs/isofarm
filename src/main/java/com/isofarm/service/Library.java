@@ -32,7 +32,7 @@ public class Library implements Service<GameMaster> {
         itemR.register(DEFAULT_ID + ".glass", () -> new Block(BlockData.GLASS));
         itemR.register(DEFAULT_ID + ".oak_log", () -> new Block(BlockData.OAK_LOG));
         itemR.register(DEFAULT_ID + ".oak_wood", () -> new Block(BlockData.OAK_WOOD));
-        itemR.register(DEFAULT_ID + ".oak_leaves", () -> new Block(BlockData.LEAVES));
+        itemR.register(DEFAULT_ID + ".oak_leaves", () -> new Block(BlockData.OAK_LEAVES));
     }
 
     public static void initCommands(float delta, GameMaster gameMaster) {
