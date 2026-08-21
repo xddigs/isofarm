@@ -6,7 +6,6 @@ import org.joml.SimplexNoise;
 import java.util.Random;
 
 public class WorldGenerator {
-    private static final Random random = new Random();
     private static final float NOISE_SCALE = 0.03f;
     private static final int BASE_HEIGHT = 20;
     private static final int HEIGHT_VARIATION = 4;
@@ -18,7 +17,10 @@ public class WorldGenerator {
 
     public void generateChunk(int chunkX, int chunkZ) {
         Chunk chunk = world.getOrCreateChunk(chunkX, chunkZ);
+        long chunkSeed = ((long) chunkX * 341873128712L) + ((long) chunkZ * 132897987541L);
+        Random chunkRandom = new Random(chunkSeed);
 
+        int[][] heightMap = new int[Chunk.SIZE_X][Chunk.SIZE_Z];
         for (int x = 0; x < Chunk.SIZE_X; x++) {
             for (int z = 0; z < Chunk.SIZE_Z; z++) {
                 int worldX = chunkX * Chunk.SIZE_X + x;
@@ -27,6 +29,7 @@ public class WorldGenerator {
                 float noise = SimplexNoise.noise(worldX * NOISE_SCALE, worldZ * NOISE_SCALE);
                 int height = (int) (BASE_HEIGHT + (noise * HEIGHT_VARIATION));
                 height = Math.clamp(height, 1, Chunk.SIZE_Y - 1);
+                heightMap[x][z] = height;
 
                 for (int y = 0; y <= height; y++) {
                     byte blockId;
@@ -39,74 +42,64 @@ public class WorldGenerator {
                     }
                     chunk.setBlock(x, y, z, blockId);
                 }
+            }
+        }
 
-                if (random.nextDouble() < 0.002 && !hasTreeNearby(worldX, worldZ, height)) {
-                    generateTree(worldX, height, worldZ);
+        for (int x = 2; x < Chunk.SIZE_X - 2; x++) {
+            for (int z = 2; z < Chunk.SIZE_Z - 2; z++) {
+                int height = heightMap[x][z];
+                int worldX = chunkX * Chunk.SIZE_X + x;
+                int worldZ = chunkZ * Chunk.SIZE_Z + z;
+
+                if (chunkRandom.nextDouble() < 0.01 && canPlaceTree(heightMap, x, z)) {
+                    generateCompactTree(worldX, height, worldZ, chunkRandom);
                 }
             }
         }
     }
 
-    private void generateTree(int x, int groundY, int z) {
-        boolean hasGrown = false;
-        boolean isLarge = random.nextBoolean();
-        int treeHeight = random.nextInt(3) + 3;
-        if (isLarge) treeHeight += random.nextInt(2);
-        for (int y = 1; y <= treeHeight; y++) {
-            world.setBlockTypeAt(x, groundY + y, z, BlockData.OAK_LOG.getId());
-            if (y == treeHeight) {
-                hasGrown = true;
+    private boolean canPlaceTree(int[][] heightMap, int centerX, int centerZ) {
+        for (int dx = -3; dx <= 3; dx++) {
+            for (int dz = -3; dz <= 3; dz++) {
+                int nx = centerX + dx;
+                int nz = centerZ + dz;
+                if (nx >= 0 && nx < Chunk.SIZE_X && nz >= 0 && nz < Chunk.SIZE_Z) {
+                    if (Math.abs(heightMap[nx][nz] - heightMap[centerX][centerZ]) > 1) {
+                        return false;
+                    }
+                }
             }
         }
-
-        if (hasGrown) {
-            generateLeaves(x, groundY + treeHeight, z,
-                    treeHeight, isLarge);
-        }
+        return true;
     }
 
-    private void generateLeaves(int x, int topY, int z,
-                                int treeHeight, boolean isLarge) {
-        int radius = isLarge ? 2 : 1;
+    private void generateCompactTree(int worldX, int groundY, int worldZ, Random random) {
+        int trunkHeight = 4 + random.nextInt(2);
+        int topY = groundY + trunkHeight;
 
-        for (int y = -treeHeight; y <= 0; y++) {
-            int distanceFromTop = -y;
-            int currentRadius = Math.min(radius, distanceFromTop / 2 + 1);
+        for (int y = 1; y <= trunkHeight; y++) {
+            world.setBlockTypeAt(worldX, groundY + y, worldZ, BlockData.OAK_LOG.getId());
+        }
 
-            for (int dx = -currentRadius; dx <= currentRadius; dx++) {
-                for (int dz = -currentRadius; dz <= currentRadius; dz++) {
-                    int distance = Math.abs(dx) + Math.abs(dz);
-                    if (distance > currentRadius + 1) continue;
+        int leafRadius = 2;
+        for (int ly = topY - 2; ly <= topY + 1; ly++) {
+            int subRadius = (ly == topY + 1) ? 1 : leafRadius;
 
-                    if (Math.abs(dx) == currentRadius &&
-                            Math.abs(dz) == currentRadius &&
-                            random.nextDouble() < 0.4) {
-                        continue;
+            for (int dx = -subRadius; dx <= subRadius; dx++) {
+                for (int dz = -subRadius; dz <= subRadius; dz++) {
+
+                    if (Math.abs(dx) == subRadius && Math.abs(dz) == subRadius) {
+                        if (random.nextDouble() < 0.5) continue;
                     }
 
-                    if (random.nextDouble() < 0.008) continue;
-                    if (dx == 0 && dz == 0 && y < 0) continue;
-                    world.setBlockTypeAt(x + dx, topY + y, z + dz, BlockData.LEAVES.getId());
+                    int targetX = worldX + dx;
+                    int targetZ = worldZ + dz;
+                    byte currentBlock = world.getBlockTypeAt(targetX, ly, targetZ);
+                    if (currentBlock == 0) { // Asumiendo 0 = AIRE / Vacío
+                        world.setBlockTypeAt(targetX, ly, targetZ, BlockData.OAK_LEAVES.getId());
+                    }
                 }
             }
         }
-    }
-
-    private boolean hasTreeNearby(int worldX, int worldZ, int height) {
-        for (int i = 0; i < 9; i++) {
-            if (i == 4) continue;
-            int offsetX = (i % 3) - 1;
-            int offsetZ = (i / 3) - 1;
-            int checkX = worldX + offsetX;
-            int checkZ = worldZ + offsetZ;
-
-            for (int y = Math.max(0, height - 1); y <= height + 6; y++) {
-                byte block = world.getBlockTypeAt(checkX, y, checkZ);
-                if (block == BlockData.OAK_LOG.getId()) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 }
