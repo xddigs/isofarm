@@ -27,6 +27,7 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class GameInteraction {
     private static final float PICKUP_DISTANCE = 1.5f;
+    private static final float TIMEOUT = 0.4f;
 
     private static final Logger log = LoggerFactory.getLogger(GameInteraction.class);
     private final CropService cropService;
@@ -41,6 +42,7 @@ public class GameInteraction {
     private int breakingZ = Integer.MIN_VALUE;
 
     private float breakProgress = 0.0f;
+    private float breakTimeout = TIMEOUT;
     private long lastBreakTime = 0L;
 
     public GameInteraction(GameMaster gameMaster,
@@ -105,9 +107,13 @@ public class GameInteraction {
         if (hoveredCell == null) return null;
         if (!isWithinRange(gameMaster, hoveredCell)) return null;
 
-        if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT)
-                && !gameMaster.isInventoryOpen()) {
-            breakAction(gameMaster, hoveredCell);
+        breakTimeout -= gameMaster.getGenDelta();
+        breakTimeout = Math.max(breakTimeout, 0.0f);
+
+        if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT) && !gameMaster.isInventoryOpen()) {
+            if (breakTimeout <= 0.0f) {
+                breakAction(gameMaster, hoveredCell);
+            }
         } else {
             resetBreaking();
         }
@@ -355,6 +361,7 @@ public class GameInteraction {
         gameMaster.addEntity(item);
         gameUIservice.logAction(cell);
         log.info("Block removed: {} at {},{},{}", blockData.getName(), x, y, z);
+        this.breakTimeout = TIMEOUT;
     }
 
     private void resetBreaking() {

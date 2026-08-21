@@ -287,6 +287,10 @@ public class GameMaster {
         }
     }
 
+    public float getGenDelta() {
+        return genDelta;
+    }
+
     public void update(float delta) {
         if (weatherService.isRaining()) {
             rainEngine.update(delta);
