@@ -97,10 +97,11 @@ public class RainEngine {
             for (int cz = centerChunkZ - dist; cz <= centerChunkZ + dist; cz++) {
                 int worldX = cx * Chunk.SIZE_X + (Chunk.SIZE_X / 2);
                 int worldZ = cz * Chunk.SIZE_Z + (Chunk.SIZE_Z / 2);
-                float highestY = world.getHighestY(worldX, worldZ).y();
+                float baseWorldY = world.getHighestY(worldX, worldZ).y();
+                shader.setUniform("uChunkPos", new Vector3f(cx * Chunk.SIZE_X,
+                        baseWorldY + 15.0f, cz * Chunk.SIZE_Z));
 
-                shader.setUniform("uChunkPos", new Vector3f(cx * Chunk.SIZE_X, highestY, cz * Chunk.SIZE_Z));
-                shader.setUniform("uGroundY", highestY);
+                shader.setUniform("uGroundY", baseWorldY);
                 glDrawArrays(GL_LINES, 0, DROPS_PER_CHUNK * VERTICES_PER_DROP);
             }
         }
