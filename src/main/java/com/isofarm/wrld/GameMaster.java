@@ -255,6 +255,8 @@ public class GameMaster {
         }
 
         gameRenderer.initCamera(getActiveCamera());
+        toastService.info("Camera changed to " + (Settings.isOrthographic() ?
+                "orthographic" : "perspective"));
     }
 
     public boolean isOrthographicCamera() {
