@@ -9,6 +9,7 @@ public abstract class Character extends Entity implements Levelable {
     private final Inventory inventory;
     private final Purse purse;
     private Reputation reputation;
+    private Gamemode gamemode;
 
     private int level;
     private int experience;
@@ -218,5 +219,13 @@ public abstract class Character extends Entity implements Levelable {
 
     public void setReputation(Reputation reputation) {
         this.reputation = reputation;
+    }
+
+    public Gamemode getGamemode() {
+        return gamemode;
+    }
+
+    public void setGamemode(Gamemode gamemode) {
+        this.gamemode = gamemode;
     }
 }

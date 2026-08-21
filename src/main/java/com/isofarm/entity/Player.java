@@ -1,9 +1,12 @@
 package com.isofarm.entity;
 
+import com.isofarm.Game;
 import com.isofarm.data.*;
-import com.isofarm.graphics.*;
+import com.isofarm.graphics.CameraView;
+import com.isofarm.graphics.ResourceManager;
+import com.isofarm.graphics.Shader;
+import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.service.SoundService;
-import com.isofarm.service.TimeService;
 import com.isofarm.service.ToastService;
 import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
@@ -42,6 +45,7 @@ public class Player extends Character {
         setDimensions(new Vector3f(1.0f, 1.0f, 1.0f));
         setUpInventory();
         setReputation(Reputation.NEUTRAL);
+        setGamemode(Gamemode.SURVIVAL);
     }
 
     @Override
