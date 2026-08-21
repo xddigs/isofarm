@@ -147,9 +147,13 @@ public class GameRenderer {
         gameMaster.getParticles().render(defaultShader, rm.getSpriteMesh());
 
         if (gameMaster.getWeatherService().isRaining()) {
+            Vector3f camPos = camera.getPosition();
+            Vector3f renderCamPos = new Vector3f(camPos.x, camPos.y == 0.0f
+                    ? 20.0f : camPos.y, camPos.z);
+
             gameMaster.getRainEngine().render(rm.getRainShader(),
                     camera.getViewMatrix(), camera.getProjectionMatrix(),
-                    camera.getPosition(), gameMaster.getWorld());
+                    renderCamPos, gameMaster.getWorld());
         }
 
         if (blocksTexture != null) blocksTexture.unbind();
