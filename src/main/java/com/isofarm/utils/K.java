@@ -22,6 +22,8 @@ public final class K {
     }
 
     public static final class World {
+
+
         public static final float GRAVITY = -25.0f;
         public static final float JUMP_FORCE = 9.0f;
 
@@ -40,7 +42,7 @@ public final class K {
         public static final float RAIN_MIN_Y = 0.0f;
         public static final float RAIN_SLANT_X = 0.08f;
         public static final float RAIN_SLANT_Z = 0.08f;
-        public static final float RAIN_SPAWN_RADIUS = 15.0f;
+        public static final float RAIN_SPAWN_RADIUS = getRainRadius();
         public static final float RAIN_SPAWN_HEIGHT_OFFSET = 10.0f;
         public static final float RAIN_SPAWN_HEIGHT_VARIATION = 10.0f;
         public static final float RAIN_MIN_VELOCITY = 18.0f;
@@ -50,6 +52,10 @@ public final class K {
         public static final float RAIN_LINE_WIDTH = 1.5f;
         public static final float DEFAULT_TEXTURE_SCALE = 16.0f;
         public static final float SHORTER_BLOCK_HEIGHT = 0.9375f;
+
+        public static float getRainRadius() {
+            return Settings.renderDistance * 1000f;
+        }
     }
 
     public static final class Window {

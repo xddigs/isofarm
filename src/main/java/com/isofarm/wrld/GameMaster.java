@@ -289,7 +289,8 @@ public class GameMaster {
 
     public void update(float delta) {
         if (weatherService.isRaining()) {
-            rainEngine.update(delta, getActiveCamera().getPosition());
+            rainEngine.update(delta, getActiveCamera().getPosition(),
+                    world, chunkManager);
         }
 
         gameUIservice.update(delta);
