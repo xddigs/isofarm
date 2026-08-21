@@ -4,6 +4,7 @@ import com.isofarm.data.Block;
 import com.isofarm.entity.Player;
 import com.isofarm.data.SoundGroup;
 import com.isofarm.service.SoundService;
+import com.isofarm.utils.HoveredCell;
 import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
@@ -41,7 +42,7 @@ public class StepController {
             if (block != null && block.getType() != null) {
                 SoundGroup soundGroup = block.getType().getSoundGroup();
                 soundService.playStepSound(soundGroup, gameMaster.getGameInteraction().getDistanceToBlock(gameMaster,
-                        gameMaster.getGameInteraction().getHoveredCell(gameMaster)), Settings.maxInteractionDistance);
+                        HoveredCell.get(gameMaster)), Settings.maxInteractionDistance);
             }
         }
     }

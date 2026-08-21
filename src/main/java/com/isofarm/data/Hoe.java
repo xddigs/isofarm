@@ -1,6 +1,7 @@
 package com.isofarm.data;
 
 import com.isofarm.input.GameInteraction;
+import com.isofarm.utils.HoveredCell;
 import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
@@ -31,7 +32,7 @@ public class Hoe extends Tool {
 
         gameMaster.getItemRenderer().playPlaceAnimation();
         gameMaster.getSoundService().playPlaceSound(block.getType().getSoundGroup(),
-                interaction.getDistanceToBlock(gameMaster, interaction.getHoveredCell(gameMaster)),
+                interaction.getDistanceToBlock(gameMaster, HoveredCell.get(gameMaster)),
                 Settings.getMaxInteractionDistance());
     }
 

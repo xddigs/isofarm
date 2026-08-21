@@ -10,6 +10,7 @@ import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.service.CropService;
 import com.isofarm.service.GameUIService;
 import com.isofarm.service.TimeService;
+import com.isofarm.utils.HoveredCell;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import com.isofarm.wrld.Chunk;
@@ -45,12 +46,6 @@ public class GameInteraction {
         this.itemRenderer = gameMaster.getItemRenderer();
     }
 
-    public Hit getHoveredCell(GameMaster gameMaster) {
-        return gameMaster.getOrthoCamera().highlight(gameMaster.getWorld(),
-                Mouse.getX(), Mouse.getY(),
-                gameMaster.getWindowWidth(), gameMaster.getWindowHeight());
-    }
-
     public Hit update(GameMaster gameMaster, Item selectedItem) {
         if (Keyboard.isKeyPressed(GLFW_KEY_TAB)) {
             gameMaster.setPromptingForInput(true);
@@ -81,7 +76,7 @@ public class GameInteraction {
 
         Hit hoveredCell;
         if (gameMaster.isOrthographicCamera()) {
-            hoveredCell = getHoveredCell(gameMaster);
+            hoveredCell = HoveredCell.get(gameMaster);
         } else {
             hoveredCell = gameMaster.getCamera().highlight(gameMaster.getWorld());
         }

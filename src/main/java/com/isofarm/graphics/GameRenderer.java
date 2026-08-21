@@ -4,6 +4,7 @@ import com.isofarm.data.Crop;
 import com.isofarm.data.Hit;
 import com.isofarm.entity.Player;
 import com.isofarm.service.TimeService;
+import com.isofarm.utils.HoveredCell;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import com.isofarm.wrld.Chunk;
@@ -106,7 +107,7 @@ public class GameRenderer {
         });
 
         Player player = gameMaster.getPlayer();
-        Hit hoveredCell = gameMaster.getGameInteraction().getHoveredCell(gameMaster);
+        Hit hoveredCell = HoveredCell.get(gameMaster);
 
         if (hoveredCell != null && player != null) {
             player.lookAt(hoveredCell.x() + 0.5f, hoveredCell.z() + 0.5f,

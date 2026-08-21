@@ -7,6 +7,7 @@ import com.isofarm.gui.GUI;
 import com.isofarm.gui.UIManager;
 import com.isofarm.input.*;
 import com.isofarm.service.*;
+import com.isofarm.utils.HoveredCell;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import org.slf4j.Logger;
@@ -54,7 +55,6 @@ public class GameMaster {
     private CameraController cameraController;
     private OrthographicCameraController orthoCameraController;
     private StepController stepController;
-    private Hit hoveredCell = null;
 
     private float windowWidth;
     private float windowHeight;
@@ -157,7 +157,6 @@ public class GameMaster {
     public GameRenderer getGameRenderer() { return gameRenderer; }
     public ItemRenderer getItemRenderer() { return itemRenderer; }
     public ParticleEngine getParticles() { return particles; }
-    public Hit getHoveredCell() { return hoveredCell; }
     public Framebuffer getMaskFbo() { return maskFbo; }
     public Framebuffer getSceneFbo() { return sceneFbo; }
     public RainEngine getRainEngine() { return rainEngine; }
@@ -282,7 +281,7 @@ public class GameMaster {
 
     private void updateEntities(float delta) {
         for (Entity entity : entities) {
-            entity.update(gameInteraction.getHoveredCell(this), delta);
+            entity.update(HoveredCell.get(this), delta);
         }
     }
 
@@ -315,7 +314,7 @@ public class GameMaster {
         genDelta = delta;
         timeService.update(delta, weatherService);
         float timeOfDay = timeService.getHour() + (timeService.getMinute() / 60.0f);
-        celestialLighting.update(hoveredCell, timeOfDay);
+        celestialLighting.update(HoveredCell.get(this), timeOfDay);
         particles.update(delta);
         shop.update(timeService);
         cropService.update(delta, weatherService.getWeather());
@@ -332,7 +331,7 @@ public class GameMaster {
         stepController.update(this, player, soundService, delta);
 
         Item selectedInventoryItem = gameUIservice.getInventoryUI().getSelectedItem();
-        hoveredCell = gameInteraction.update(this, selectedInventoryItem);
+        gameInteraction.update(this, selectedInventoryItem);
 
         if (player != null) {
             chunkManager.update(player.getPosition().x,
