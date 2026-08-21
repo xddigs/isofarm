@@ -16,6 +16,7 @@ public enum BlockData {
     OAK_LOG((byte) 7, "Log", false, 100, 6, 0, 6, 2, 6, 1, SoundGroup.HARD, 1.2f),
     OAK_WOOD((byte) 8, "Oak Wood", 100, 7, 0, SoundGroup.HARD, 4.0f),
     OAK_LEAVES((byte) 9, "Leaves", 100, 8, 0, SoundGroup.SOIL, 1.1f),
+    SNOW((byte) 10, "Snow", 120, 9, 0, SoundGroup.SNOW, 0.8f),
 
     WATER((byte) -1, "Water", 100, 0, 0, SoundGroup.SILENT, 0f),
     CROP((byte) -1, "Crop", -1, 0, 0, SoundGroup.SOIL, 1f);
