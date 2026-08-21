@@ -9,7 +9,7 @@ public class WorldGenerator {
     private static final Random random = new Random();
     private static final float NOISE_SCALE = 0.03f;
     private static final int BASE_HEIGHT = 20;
-    private static final int HEIGHT_VARIATION = 5;
+    private static final int HEIGHT_VARIATION = 4;
     private final World world;
 
     public WorldGenerator(World world) {
