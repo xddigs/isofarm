@@ -18,7 +18,7 @@ import static org.lwjgl.opengl.GL30.*;
 
 @SuppressWarnings("all")
 public class RainEngine {
-    private static final int DROPS_PER_CHUNK = 150;
+    private static final int DROPS_PER_CHUNK = 400;
     private static final int VERTICES_PER_DROP = 2;
 
     private final int vao;
@@ -53,8 +53,8 @@ public class RainEngine {
         for (int i = 0; i < DROPS_PER_CHUNK; i++) {
             float rx = rnd.nextFloat() * Chunk.SIZE_X;
             float rz = rnd.nextFloat() * Chunk.SIZE_Z;
-            float ry = 15.0f + rnd.nextFloat() * 15.0f;
-            float length = 0.35f + rnd.nextFloat() * 0.25f;
+            float ry = rnd.nextFloat() * 25.0f;
+            float length = 0.48f + rnd.nextFloat() * 1.5f;
 
             data[idx++] = rx;
             data[idx++] = ry;
@@ -80,34 +80,35 @@ public class RainEngine {
         shader.setUniform("uTime", timeAccumulator);
 
         glBindVertexArray(vao);
-        glLineWidth(1.2f);
+        glLineWidth(2.0f);
 
         glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LEQUAL);
-
         glDepthMask(false);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         int centerChunkX = (int) Math.floor(cameraPos.x / Chunk.SIZE_X);
         int centerChunkZ = (int) Math.floor(cameraPos.z / Chunk.SIZE_Z);
-        int dist = Settings.renderDistance;
+        int dist = Math.min(Settings.renderDistance, 2);
 
         for (int cx = centerChunkX - dist; cx <= centerChunkX + dist; cx++) {
             for (int cz = centerChunkZ - dist; cz <= centerChunkZ + dist; cz++) {
                 int worldX = cx * Chunk.SIZE_X + (Chunk.SIZE_X / 2);
                 int worldZ = cz * Chunk.SIZE_Z + (Chunk.SIZE_Z / 2);
-                float baseWorldY = world.getHighestY(worldX, worldZ).y();
-                shader.setUniform("uChunkPos", new Vector3f(cx * Chunk.SIZE_X,
-                        baseWorldY + 15.0f, cz * Chunk.SIZE_Z));
 
-                shader.setUniform("uGroundY", baseWorldY);
+                float groundY = world.getHighestY(worldX, worldZ).y();
+                float spawnY = Math.max(cameraPos.y + 5.0f, groundY + 10.0f);
+
+                shader.setUniform("uChunkPos", new Vector3f(cx * Chunk.SIZE_X, spawnY, cz * Chunk.SIZE_Z));
+                shader.setUniform("uGroundY", groundY);
+
                 glDrawArrays(GL_LINES, 0, DROPS_PER_CHUNK * VERTICES_PER_DROP);
             }
         }
 
         glDepthMask(true);
         glDisable(GL_BLEND);
+        glLineWidth(1.0f);
         glBindVertexArray(0);
         shader.unbind();
     }
