@@ -5,6 +5,10 @@ public enum SoundGroup {
         new String[]{"fx/steps/steps_grass_01.ogg", "fx/steps/steps_grass_02.ogg", "fx/steps/steps_grass_03.ogg", "fx/steps/steps_grass_04.ogg"},
         new String[]{"fx/blocks/dig.ogg", "fx/blocks/dirt.ogg"},
         new String[]{"fx/blocks/dirt.ogg"}, new String[]{}, new String[]{}),
+    SNOW(
+        new String[]{"fx/steps/steps_snow_01.ogg", "fx/steps/steps_snow_02.ogg", "fx/steps/steps_snow_03.ogg", "fx/steps/steps_snow_04.ogg"},
+        new String[]{"fx/blocks/snow_break.ogg"},
+        new String[]{"fx/blocks/snow_place.ogg"}, new String[]{}, new String[]{}),
     HARD(new String[]{}, new String[]{"fx/blocks/wood.ogg"}, new String[]{}, new String[]{}, new String[]{}),
     GLASS(new String[]{}, new String[]{"fx/blocks/fragile_break.ogg", "fx/blocks/fragile_break2.ogg"}, new String[]{}, new String[]{}, new String[]{}),
     ITEMS(new String[]{}, new String[]{"fx/items/broke.ogg"}, new String[]{}, new String[]{"fx/items/drop.ogg", "fx/items/pickup.ogg"}, new String[]{}),

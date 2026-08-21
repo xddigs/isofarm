@@ -22,8 +22,6 @@ public final class K {
     }
 
     public static final class World {
-
-
         public static final float GRAVITY = -25.0f;
         public static final float JUMP_FORCE = 9.0f;
 
@@ -37,17 +35,6 @@ public final class K {
         public static final int WATER_LEVEL_MAX = 100;
 
         public static final int MAX_PARTICLES = 24;
-
-        public static final int RAIN_MAX_DROPS = 5000;
-        public static final float RAIN_SLANT_X = 0.08f;
-        public static final float RAIN_SLANT_Z = 0.08f;
-        public static final float RAIN_SPAWN_HEIGHT_OFFSET = 10.0f;
-        public static final float RAIN_SPAWN_HEIGHT_VARIATION = 10.0f;
-        public static final float RAIN_MIN_VELOCITY = 18.0f;
-        public static final float RAIN_VELOCITY_VARIATION = 7.0f;
-        public static final float RAIN_MIN_LENGTH = 0.35f;
-        public static final float RAIN_LENGTH_VARIATION = 0.35f;
-        public static final float RAIN_LINE_WIDTH = 1.5f;
         public static final float DEFAULT_TEXTURE_SCALE = 16.0f;
         public static final float SHORTER_BLOCK_HEIGHT = 0.9375f;
     }
@@ -80,7 +67,7 @@ public final class K {
         public static final float COORD_DISPLAY_DURATION = 3.0f;
 
         public static final int ICON_SEED_CROPS_FRAMES = 4;
-        public static final int ICON_BLOCK_FRAMES = 9;
+        public static final int ICON_BLOCK_FRAMES = 10;
         public static final int ICON_TOOL_FRAMES = 4;
 
         public static final int BLOCK_ATLAS_COLUMNS = ICON_BLOCK_FRAMES;

@@ -32,14 +32,7 @@ public class WorldGenerator {
                 heightMap[x][z] = height;
 
                 for (int y = 0; y <= height; y++) {
-                    byte blockId;
-                    if (y == height) {
-                        blockId = BlockData.GRASS.getId();
-                    } else if (y > height - 3) {
-                        blockId = BlockData.DIRT.getId();
-                    } else {
-                        blockId = BlockData.STONE.getId();
-                    }
+                    byte blockId = getBlockId(y, height);
                     chunk.setBlock(x, y, z, blockId);
                 }
             }
@@ -56,6 +49,22 @@ public class WorldGenerator {
                 }
             }
         }
+    }
+
+    private static byte getBlockId(int y, int height) {
+        byte blockId;
+        if (y == height) {
+            blockId = BlockData.GRASS.getId();
+        } else if (y > height - 3) {
+            blockId = BlockData.DIRT.getId();
+        } else if (y > height - 7) {
+            blockId = BlockData.STONE.getId();
+        } else if (y > height - 12) {
+            blockId = BlockData.VOIDSTONE.getId();
+        } else {
+            blockId = BlockData.AIR.getId();
+        }
+        return blockId;
     }
 
     private boolean canPlaceTree(int[][] heightMap, int centerX, int centerZ) {
