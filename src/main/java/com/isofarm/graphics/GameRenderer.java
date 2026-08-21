@@ -43,6 +43,8 @@ public class GameRenderer {
         Framebuffer maskFbo = gameMaster.getMaskFbo();
 
         sceneFbo.bind();
+        glViewport(0, 0, (int) windowWidth, (int) windowHeight);
+
         Vector3f skyColor = TimeService.getSkyColor();
         glClearColor(skyColor.x, skyColor.y, skyColor.z, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -107,17 +109,12 @@ public class GameRenderer {
         Player player = gameMaster.getPlayer();
         Hit hoveredCell = gameMaster.getGameInteraction().getHoveredCell(gameMaster);
 
-        if (hoveredCell != null) {
-            player.lookAt(hoveredCell.x() + 0.5f,
-                    hoveredCell.z() + 0.5f);
-        }
-        if (player != null) {
-            renderPlayer(gameMaster, rm, player);
+        if (hoveredCell != null && player != null) {
+            player.lookAt(hoveredCell.x() + 0.5f, hoveredCell.z() + 0.5f);
         }
 
         gameMaster.getWorld().forEach(block -> {
             if (!(block instanceof Crop crop)) return;
-
             SpriteSheet sheet = rm.getCropSpritesheets().get(crop.getCropType());
             if (sheet == null) return;
 
@@ -142,6 +139,7 @@ public class GameRenderer {
 
         gameMaster.getEntities().forEach(entity -> entity.render(gameMaster));
         gameMaster.getParticles().render(defaultShader, rm.getSpriteMesh());
+
         if (blocksTexture != null) blocksTexture.unbind();
 
         if (hoveredCell != null) {
@@ -255,54 +253,6 @@ public class GameRenderer {
         }
     }
 
-    private void renderPlayer(GameMaster gameMaster, ResourceManager rm, Player player) {
-        CameraView camera = gameMaster.getActiveCamera();
-        SpriteSheet sheet = rm.getPlayerSpriteSheet();
-        Direction direction = player.getDirection();
-
-        if (sheet == null) return;
-        Shader shader = rm.getDefaultShader();
-        shader.bind();
-
-        glActiveTexture(GL_TEXTURE0 + K.Render.PRIMARY_TEXTURE_UNIT);
-        sheet.bind();
-
-        int totalFrames = sheet.getTotalFrames();
-        int frameIndex = direction.frame();
-
-        float frameWidthUV = 1.0f / totalFrames;
-        float offsetXUV = frameIndex * frameWidthUV;
-
-        shader.setUniform("uUseTexture", true);
-        shader.setUniform("uUseFaceAtlas", false);
-        shader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
-        shader.setUniform("uTotalFrames", totalFrames);
-        shader.setUniform("uFrameIndex", frameIndex);
-
-        shader.setUniform("uAtlasScale", new Vector2f(frameWidthUV, 1.0f));
-        shader.setUniform("uAtlasOffset", new Vector2f(offsetXUV, 0.0f));
-
-        Vector3f position = player.getPosition();
-        Matrix4f view = camera.getViewMatrix();
-        Vector3f right = new Vector3f(view.m00(), view.m10(), view.m20());
-        right.y = 0;
-        right.normalize();
-
-        float halfHeight = player.getDimensions().y * 0.5f;
-        float width = player.getDimensions().x;
-        float height = player.getDimensions().y;
-
-        modelMatrix.identity()
-                .translate(position.x, position.y + halfHeight, position.z)
-                .m00(right.x * width).m01(right.y * width).m02(right.z * width)
-                .m10(0.0f).m11(height).m12(0.0f)
-                .m20(-right.z * width).m21(0.0f).m22(right.x * width);
-
-        shader.setUniform("uModel", modelMatrix);
-        rm.getSpriteMesh().render();
-        sheet.unbind();
-    }
-
     private void renderShadowPass(GameMaster gameMaster, ResourceManager rm,
                                   Map<Chunk, Mesh> chunkMeshes) {
         ShadowMap shadowMap = gameMaster.getShadowMap();
@@ -371,5 +321,9 @@ public class GameRenderer {
     public void initCamera(CameraView camera) {
         previousCameraYaw = camera.getYaw();
         previousCameraPitch = camera.getPitch();
+    }
+
+    public Matrix4f getModelMatrix() {
+        return modelMatrix;
     }
 }

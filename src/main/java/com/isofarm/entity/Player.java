@@ -1,14 +1,20 @@
 package com.isofarm.entity;
 
 import com.isofarm.data.*;
+import com.isofarm.graphics.*;
 import com.isofarm.service.SoundService;
+import com.isofarm.service.TimeService;
 import com.isofarm.service.ToastService;
 import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
+import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.lwjgl.opengl.GL13.*;
 
 @DataClass
 public class Player extends Character {
@@ -31,7 +37,7 @@ public class Player extends Character {
         float highestY = world.getHighestY(spawnX, spawnZ);
         setPosition(new Vector3f(spawnX, highestY, spawnZ));
         setVelocity(new Vector3f(0.0f, 0.0f, 0.0f));
-        setDimensions(new Vector3f(0.6f, 1.0f, 0.6f));
+        setDimensions(new Vector3f(1.0f, 1.0f, 1.0f));
         setUpInventory();
         setReputation(Reputation.NEUTRAL);
     }
@@ -52,7 +58,68 @@ public class Player extends Character {
     }
 
     @Override
-    public void render(GameMaster gameMaster) {}
+    public void render(GameMaster gameMaster) {
+        ResourceManager rm = gameMaster.getResourceManager();
+        CameraView camera = gameMaster.getActiveCamera();
+        SpriteSheet sheet = rm.getPlayerSpriteSheet();
+        Matrix4f modelMatrix = gameMaster.getGameRenderer().getModelMatrix();
+
+        if (sheet == null || rm.getPlayerMesh() == null) return;
+        Shader shader = rm.getDefaultShader();
+        shader.bind();
+
+        shader.setUniform("uProjection", camera.getProjectionMatrix());
+        shader.setUniform("uView", camera.getViewMatrix());
+
+        glActiveTexture(GL_TEXTURE0);
+        sheet.bind();
+        shader.setUniform("uTexture", 0);
+        shader.setUniform("uUseTexture", true);
+        shader.setUniform("uUseFaceAtlas", false);
+
+        int totalFrames = Math.max(1, sheet.getTotalFrames());
+        int frameIndex = direction != null ? direction.frame() : 0;
+        shader.setUniform("uTotalFrames", totalFrames);
+        shader.setUniform("uFrameIndex", frameIndex);
+
+        shader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
+        shader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
+
+        CelestialLighting lighting = gameMaster.getCelestialLighting();
+        if (lighting != null) {
+            shader.setUniform("uSunColor", lighting.getColor());
+            shader.setUniform("uLightIntensity", lighting.getIntensity());
+            shader.setUniform("uLightDirection", lighting.getDirection());
+            shader.setUniform("uAmbientIntensity", Math.max(0.4f, lighting.getAmbientIntensity()));
+        }
+
+        shader.setUniform("uSkyColor", TimeService.getSkyColor());
+        shader.setUniform("uParticleAlpha", 1.0f);
+        shader.setUniform("uIsMaskPass", false);
+        shader.setUniform("uEnableShadows", false);
+
+        float scaleX = (dimensions == null || dimensions.x <= 0) ? 1.0f : dimensions.x;
+        float scaleY = (dimensions == null || dimensions.y <= 0) ? 1.0f : dimensions.y;
+        float scaleZ = (dimensions == null || dimensions.z <= 0) ? 1.0f : dimensions.z;
+        Vector3f scale = new Vector3f(scaleX, scaleY, scaleZ);
+
+        float yawRad = (float) Math.toRadians(camera.getYaw());
+        modelMatrix.identity()
+                .translate(position)
+                .rotateY(yawRad)
+                .scale(scale);
+
+        shader.setUniform("uModel", modelMatrix);
+
+        glDisable(GL_CULL_FACE);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_DEPTH_TEST);
+        glDepthMask(true);
+
+        rm.getPlayerMesh().render();
+        sheet.unbind();
+    }
 
     public void move(World world, Vector3f direction, float delta) {
         moveAndCollide(world, direction, delta);

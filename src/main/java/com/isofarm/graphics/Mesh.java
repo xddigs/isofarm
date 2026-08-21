@@ -15,7 +15,7 @@ import static org.lwjgl.opengl.GL30.*;
 
 public class Mesh {
     private static final Logger log = LoggerFactory.getLogger(Mesh.class);
-    private int vaoId;
+    private final int vaoId;
     private final int posVboId;
     private final int normalVboId;
     private final int uvVboId;
@@ -275,10 +275,10 @@ public class Mesh {
 
     public static Mesh quadVertical() {
         float[] positions = new float[]{
-                -0.25f, 0.0f, 0.0f,
-                0.25f, 0.0f, 0.0f,
-                0.25f, 1.0f, 0.0f,
-                -0.25f, 1.0f, 0.0f
+                -0.5f, 0.0f, 0.0f,
+                0.5f, 0.0f, 0.0f,
+                0.5f, 1.0f, 0.0f,
+                -0.5f, 1.0f, 0.0f
         };
 
         float[] normals = new float[]{
@@ -289,10 +289,10 @@ public class Mesh {
         };
 
         float[] texCoords = new float[]{
-                0.0f, 1.0f,
-                1.0f, 1.0f,
+                0.0f, 0.0f,
                 1.0f, 0.0f,
-                0.0f, 0.0f
+                1.0f, 1.0f,
+                0.0f, 1.0f
         };
 
         int[] indices = new int[]{
