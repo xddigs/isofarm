@@ -118,10 +118,7 @@ public abstract class Entity {
         this.onGround = onGround;
     }
 
-    public void moveAndCollide(World world,
-                               Vector3f targetVelocity,
-                               float delta) {
-
+    public void moveAndCollide(World world, Vector3f targetVelocity, float delta) {
         float smooth = 1.0f - (float) Math.exp(-12.0f * delta);
 
         velocity.x += (targetVelocity.x - velocity.x) * smooth;

@@ -291,12 +291,28 @@ public class Player extends Character {
         return direction;
     }
 
-    public void setPath(List<GridPos> path) {
-        this.path = path != null ? path : List.of();
-        this.pathIndex = 0;
-    }
-
     public boolean isFollowingPath() {
         return pathIndex < path.size();
+    }
+
+    public List<GridPos> getPath() {
+        return path;
+    }
+
+    public void setPath(List<GridPos> path) {
+        this.path = path;
+    }
+
+    public int getPathIndex() {
+        return pathIndex;
+    }
+
+    public void setPathIndex(int pathIndex) {
+        this.pathIndex = Math.max(0, pathIndex);
+    }
+
+    public void clearPath() {
+        this.path = List.of();
+        this.pathIndex = 0;
     }
 }

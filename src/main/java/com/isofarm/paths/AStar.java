@@ -119,6 +119,5 @@ public class AStar {
         }
     }
 
-    private record Neighbor(GridPos position, float cost) {
-    }
+    private record Neighbor(GridPos position, float cost) {}
 }
