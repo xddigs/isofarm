@@ -77,7 +77,8 @@ public class GameInteraction {
             addItem(gameMaster);
         }
 
-        if (!gameMaster.isPromptingForInput()) {
+        if (!gameMaster.isPromptingForInput() &&
+                !gameMaster.isInventoryOpen()) {
             if (Keyboard.isKeyPressed(GLFW_KEY_V)) {
                 gameMaster.changeCamera();
             }
