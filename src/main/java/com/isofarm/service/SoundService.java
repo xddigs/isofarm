@@ -31,15 +31,16 @@ public class SoundService {
     private int breakSource;
     private int placeSource;
     private int useSource;
+    private int backgroundSource;
 
     public SoundService() {
         this.init();
-
         for (SoundGroup group : SoundGroup.values()) {
             loadSoundArray(group.getStepSounds());
             loadSoundArray(group.getBreakSounds());
             loadSoundArray(group.getPlaceSounds());
             loadSoundArray(group.getUseSounds());
+            loadSoundArray(group.getBackgroundSounds());
         }
     }
 
@@ -68,37 +69,46 @@ public class SoundService {
         breakSource = alGenSources();
         placeSource = alGenSources();
         useSource = alGenSources();
+        backgroundSource = alGenSources();
 
         alSourcef(breakSource, AL_GAIN, 1.0f);
         alSourcef(stepSource, AL_GAIN, 1.0f);
         alSourcef(placeSource, AL_GAIN, 1.0f);
+        alSourcef(useSource, AL_GAIN, 1.0f);
+        alSourcef(backgroundSource, AL_GAIN, 1.0f);
     }
 
     public void playStepSound(SoundGroup group, float distance, float maxDistance) {
-        float volume = calculateBreakVolume(distance, maxDistance);
+        float volume = calc(distance, maxDistance);
         playSound(stepSource, group != null ? group.getStepSounds() : null,
                 0.95f, 0.1f, volume);
     }
 
     public void playBreakSound(SoundGroup group, float distance, float maxDistance) {
-        float volume = calculateBreakVolume(distance, maxDistance);
+        float volume = calc(distance, maxDistance);
         playSound(breakSource, group != null ? group.getBreakSounds() : null,
                 0.8f, 0.2f, volume);
     }
 
     public void playPlaceSound(SoundGroup group, float distance, float maxDistance) {
-        float volume = calculateBreakVolume(distance, maxDistance);
+        float volume = calc(distance, maxDistance);
         playSound(breakSource, group != null ? group.getPlaceSounds() : null,
                 0.75f, 0.2f, volume);
     }
 
     public void playUseSound(SoundGroup group, float distance, float maxDistance) {
-        float volume = calculateBreakVolume(distance, maxDistance);
+        float volume = calc(distance, maxDistance);
         playSound(useSource, group != null ? group.getUseSounds() : null,
                 1.0f, 0.2f, volume);
     }
 
-    private float calculateBreakVolume(float distance, float maxDistance) {
+    public void playBackgroundSound(SoundGroup group, float distance, float maxDistance) {
+        float volume = calc(distance, maxDistance);
+        playSound(useSource, group != null ? group.getUseSounds() : null,
+                0.8f, 0.2f, volume);
+    }
+
+    private float calc(float distance, float maxDistance) {
         if (maxDistance <= 0.0f) {
             return 1.0f;
         }
@@ -169,6 +179,8 @@ public class SoundService {
         alDeleteSources(stepSource);
         alDeleteSources(breakSource);
         alDeleteSources(placeSource);
+        alDeleteSources(useSource);
+        alDeleteSources(backgroundSource);
         soundBuffers.values().forEach(AL10::alDeleteBuffers);
         alcMakeContextCurrent(MemoryUtil.NULL);
         alcDestroyContext(context);
