@@ -6,9 +6,12 @@ import org.joml.SimplexNoise;
 import java.util.Random;
 
 public class WorldGenerator {
-    private static final float NOISE_SCALE = 0.03f;
-    private static final int BASE_HEIGHT = 20;
-    private static final int HEIGHT_VARIATION = 4;
+    private static final float CONTINENTAL_SCALE = 0.005f;
+    private static final float DETAIL_SCALE = 0.025f;
+
+    private static final int BASE_HEIGHT = 18;
+    private static final int MOUNTAIN_HEIGHT = 56;
+
     private final World world;
 
     public WorldGenerator(World world) {
@@ -25,14 +28,15 @@ public class WorldGenerator {
             for (int z = 0; z < Chunk.SIZE_Z; z++) {
                 int worldX = chunkX * Chunk.SIZE_X + x;
                 int worldZ = chunkZ * Chunk.SIZE_Z + z;
-
-                float noise = SimplexNoise.noise(worldX * NOISE_SCALE, worldZ * NOISE_SCALE);
-                int height = (int) (BASE_HEIGHT + (noise * HEIGHT_VARIATION));
+                float continental = (SimplexNoise.noise(worldX * CONTINENTAL_SCALE, worldZ * CONTINENTAL_SCALE) + 1.0f) * 0.5f;
+                float mountainFactor = (float) Math.pow(continental, 2.5f);
+                float detailNoise = SimplexNoise.noise(worldX * DETAIL_SCALE, worldZ * DETAIL_SCALE);
+                int height = (int) (BASE_HEIGHT + (detailNoise * 3.0f) + (mountainFactor * MOUNTAIN_HEIGHT));
                 height = Math.clamp(height, 1, Chunk.SIZE_Y - 1);
                 heightMap[x][z] = height;
 
                 for (int y = 0; y <= height; y++) {
-                    byte blockId = getBlockId(y, height);
+                    byte blockId = getBlockId(y, height, mountainFactor);
                     chunk.setBlock(x, y, z, blockId);
                 }
             }
@@ -44,32 +48,34 @@ public class WorldGenerator {
                 int worldX = chunkX * Chunk.SIZE_X + x;
                 int worldZ = chunkZ * Chunk.SIZE_Z + z;
 
-                if (chunkRandom.nextDouble() < 0.01 && canPlaceTree(heightMap, x, z)) {
+                if (height < BASE_HEIGHT + 12 && chunkRandom.nextDouble() < 0.01 && canPlaceTree(heightMap, x, z)) {
                     generateCompactTree(worldX, height, worldZ, chunkRandom);
                 }
             }
         }
     }
 
-    private static byte getBlockId(int y, int height) {
-        byte blockId;
+    private static byte getBlockId(int y, int height, float mountainFactor) {
+        boolean isHighMountain = mountainFactor > 0.45f;
         if (y == height) {
-            blockId = BlockData.GRASS.getId();
+            if (isHighMountain && y > BASE_HEIGHT + 14) {
+                return BlockData.SNOW.getId();
+            }
+            return BlockData.GRASS.getId();
         } else if (y > height - 3) {
-            blockId = BlockData.DIRT.getId();
-        } else if (y > height - 7) {
-            blockId = BlockData.STONE.getId();
-        } else if (y > height - 12) {
-            blockId = BlockData.VOIDSTONE.getId();
+            return isHighMountain ? BlockData.STONE.getId() : BlockData.DIRT.getId();
+        } else if (y > height - 10) {
+            return BlockData.STONE.getId();
+        } else if (y > height - 18) {
+            return BlockData.VOIDSTONE.getId();
         } else {
-            blockId = BlockData.AIR.getId();
+            return BlockData.AIR.getId();
         }
-        return blockId;
     }
 
     private boolean canPlaceTree(int[][] heightMap, int centerX, int centerZ) {
-        for (int dx = -3; dx <= 3; dx++) {
-            for (int dz = -3; dz <= 3; dz++) {
+        for (int dx = -2; dx <= 2; dx++) {
+            for (int dz = -2; dz <= 2; dz++) {
                 int nx = centerX + dx;
                 int nz = centerZ + dz;
                 if (nx >= 0 && nx < Chunk.SIZE_X && nz >= 0 && nz < Chunk.SIZE_Z) {
@@ -96,15 +102,14 @@ public class WorldGenerator {
 
             for (int dx = -subRadius; dx <= subRadius; dx++) {
                 for (int dz = -subRadius; dz <= subRadius; dz++) {
-
-                    if (Math.abs(dx) == subRadius && Math.abs(dz) == subRadius) {
-                        if (random.nextDouble() < 0.5) continue;
+                    if (Math.abs(dx) == subRadius && Math.abs(dz) == subRadius && random.nextDouble() < 0.5) {
+                        continue;
                     }
 
                     int targetX = worldX + dx;
                     int targetZ = worldZ + dz;
                     byte currentBlock = world.getBlockTypeAt(targetX, ly, targetZ);
-                    if (currentBlock == 0) { // Asumiendo 0 = AIRE / Vacío
+                    if (currentBlock == 0) {
                         world.setBlockTypeAt(targetX, ly, targetZ, BlockData.OAK_LEAVES.getId());
                     }
                 }
