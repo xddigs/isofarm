@@ -323,7 +323,9 @@ public class GameMaster {
         if (Settings.isOrthographic()) {
             orthoCameraController.update(this, delta);
         } else {
-            cameraController.update(this, delta);
+            if (!isPromptingForInput()) {
+                cameraController.update(this, delta);
+            }
             camera.update(delta);
         }
 
