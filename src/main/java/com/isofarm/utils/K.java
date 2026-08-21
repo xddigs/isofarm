@@ -33,7 +33,6 @@ public final class K {
         public static final int STARTING_COINS = 100;
         public static final int MAX_STACK = 128;
         public static final int WATER_LEVEL_MAX = 100;
-        public static final long TILLED_DIRT_DURATION = 10_000L;
 
         public static final int MAX_PARTICLES = 24;
 
@@ -161,6 +160,7 @@ public final class K {
         public static final String TOOL_ICONS = "assets/icons/tool_icons.png";
         public static final String BLOCK_ICONS = "assets/icons/block_icons.png";
         public static final String INVENTORY_ICONS = "assets/icons/inventory_icons.png";
+        public static final String PLAYER_SPRITESHEET = "assets/sprites/gb.png";
         public static final String BLOCKS = "assets/textures/blocks.png";
         public static final String WATER = "assets/textures/water.png";
     }
@@ -172,7 +172,6 @@ public final class K {
     }
 
     public static final class Colors {
-        public static final Vector3f SUNLIGHT_DEFAULT = new Vector3f(1.0f, 1.0f, 1.0f);
         public static final Vector3f OUTLINE_DEFAULT = new Vector3f(0.0f, 0.0f, 0.0f);
         public static final Vector3f RAIN = new Vector3f(0.35f, 0.55f, 1.0f);
 
