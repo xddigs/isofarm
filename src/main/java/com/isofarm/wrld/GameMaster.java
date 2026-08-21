@@ -171,6 +171,7 @@ public class GameMaster {
     public GameUIService getGameUIService() { return gameUIservice; }
     public WeatherService getWeatherService() { return weatherService; }
     public TimeService getTimeService() { return timeService; }
+    public CommandService getCommandService() { return commandService; }
     public float getWindowWidth() { return windowWidth; }
     public float getWindowHeight() { return windowHeight; }
     public Camera getCamera() { return camera; }
@@ -290,23 +291,7 @@ public class GameMaster {
             rainEngine.update(delta, getActiveCamera().getPosition());
         }
 
-        if (Keyboard.isKeyPressed(org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER)) {
-            if (!isPromptingForInput()) {
-                setPromptingForInput(true);
-                gameUIservice.openChat();
-            } else {
-                String command = gameUIservice.getChatText();
-                if (command != null && !command.isEmpty()) {
-                    gameUIservice.addChatMessage("> " + command);
-                    commandService.execute(command);
-                }
-                setPromptingForInput(false);
-                gameUIservice.closeChat();
-            }
-        }
-
         gameUIservice.update(delta);
-
         if (player == null) {
             return;
         }

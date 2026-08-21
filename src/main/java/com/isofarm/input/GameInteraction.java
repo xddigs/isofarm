@@ -54,8 +54,19 @@ public class GameInteraction {
     }
 
     public Hit update(GameMaster gameMaster, Item selectedItem) {
-        if (Keyboard.isKeyPressed(GLFW_KEY_TAB)) {
-            gameMaster.setPromptingForInput(true);
+        if (Keyboard.isKeyPressed(org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER)) {
+            if (!gameMaster.isPromptingForInput()) {
+                gameMaster.setPromptingForInput(true);
+                gameUIservice.openChat();
+            } else {
+                String command = gameUIservice.getChatText();
+                if (command != null && !command.isEmpty()) {
+                    gameUIservice.addChatMessage(">> " + command);
+                    gameMaster.getCommandService().execute(command);
+                }
+                gameMaster.setPromptingForInput(false);
+                gameUIservice.closeChat();
+            }
         }
 
         if (Keyboard.isKeyPressed(GLFW_KEY_F1)) {
