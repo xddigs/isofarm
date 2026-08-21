@@ -29,6 +29,14 @@ public class SpriteSheet {
         return (float) texture.getHeight();
     }
 
+    public int getFrameWidth() {
+        return texture.getWidth() / totalFrames;
+    }
+
+    public int getFrameHeight() {
+        return texture.getHeight();
+    }
+
     public int getTotalFrames() {
         return totalFrames;
     }
