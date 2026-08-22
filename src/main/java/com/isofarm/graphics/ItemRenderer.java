@@ -84,20 +84,6 @@ public class ItemRenderer {
         return new Vector3f();
     }
 
-    private float getAnimationRotation() {
-        if (currentAnimation == ActionAnimation.BREAK) {
-            float progress = animationProgress();
-            return (float) Math.sin(progress * Math.PI) * 18.0f;
-        }
-
-        if (currentAnimation == ActionAnimation.PLACE) {
-            float progress = animationProgress();
-            return (float) Math.sin(progress * Math.PI) * 5.0f;
-        }
-
-        return 0.0f;
-    }
-
     public void renderWorldItem(GameMaster gameMaster, WorldItem worldItem, CelestialLighting lighting) {
         if (worldItem == null) return;
         Item item = worldItem.getItem();
@@ -107,31 +93,34 @@ public class ItemRenderer {
         Shader shader = gameMaster.getResourceManager().getShader("item");
         if (shader == null) return;
         Vector3f position = worldItem.getPosition();
-        renderWorldItemMesh(gameMaster, item, spriteSheet, shader, lighting, position);
+        renderWorldItemMesh(gameMaster, worldItem, item, spriteSheet, shader, lighting);
     }
 
-    private void renderWorldItemMesh(GameMaster gameMaster, Item item,
-                                     SpriteSheet spriteSheet, Shader shader,
-                                     CelestialLighting lighting, Vector3f position) {
+    private void renderWorldItemMesh(GameMaster gameMaster, WorldItem worldItem,
+                                     Item item, SpriteSheet spriteSheet, Shader shader,
+                                     CelestialLighting lighting) {
 
         if (item == null || spriteSheet == null || quadMesh == null) {
             return;
         }
 
+        Vector3f position = worldItem.getPosition();
         float scale = 0.45f;
-        baseModelMatrix.identity().translate(position.x, position.y, position.z).rotateY((float)
-                Math.toRadians(45.0f)).scale(scale, -scale, scale);
+        baseModelMatrix.identity()
+                .translate(position.x, position.y, position.z)
+                .rotateY((float) Math.toRadians(worldItem.getRotation()))
+                .scale(scale, -scale, scale);
 
         int frameIndex = item instanceof Block ? item.getId() - 1 : item.getId();
         shader.bind();
         glBindTexture(GL_TEXTURE_2D, spriteSheet.getTextureId());
-        shader.setUniform("uProjection", gameMaster.getCamera().getProjectionMatrix());
-        shader.setUniform("uView", gameMaster.getCamera().getViewMatrix());
+        shader.setUniform("uProjection", gameMaster.getActiveCamera().getProjectionMatrix());
+        shader.setUniform("uView", gameMaster.getActiveCamera().getViewMatrix());
         shader.setUniform("uFrameIndex", frameIndex);
         shader.setUniform("uTotalFrames", spriteSheet.getTotalFrames());
 
         Vector3f viewLightDir = new Vector3f(lighting.getDirection());
-        gameMaster.getCamera().getViewMatrix().transformDirection(viewLightDir);
+        gameMaster.getActiveCamera().getViewMatrix().transformDirection(viewLightDir);
         shader.setUniform("uLightDirection", viewLightDir);
         shader.setUniform("uSunColor", lighting.getColor());
         shader.setUniform("uSkyColor", lighting.getColor());
@@ -166,7 +155,6 @@ public class ItemRenderer {
         }
 
         Vector3f animationOffset = getAnimationOffset();
-        float animationRotation = getAnimationRotation();
 
         baseModelMatrix.identity()
                 .translate(
@@ -175,20 +163,19 @@ public class ItemRenderer {
                         OFFSET_Z + animationOffset.z
                 )
                 .rotateX((float) Math.toRadians(rotateX))
-                .rotateY((float) Math.toRadians(
-                        rotateY + animationRotation))
+                .rotateY((float) Math.toRadians(rotateY))
                 .rotateZ((float) Math.toRadians(rotateZ))
                 .scale(ITEM_SCALE, -ITEM_SCALE, ITEM_SCALE);
 
         int frameIndex = item instanceof Block ? item.getId() - 1 : item.getId();
         shader.bind();
         glBindTexture(GL_TEXTURE_2D, spriteSheet.getTextureId());
-        shader.setUniform("uProjection", gameMaster.getCamera().getProjectionMatrix());
+        shader.setUniform("uProjection", gameMaster.getActiveCamera().getProjectionMatrix());
         shader.setUniform("uView", new Matrix4f().identity());
         shader.setUniform("uFrameIndex", frameIndex);
         shader.setUniform("uTotalFrames", spriteSheet.getTotalFrames());
         Vector3f viewLightDir = new Vector3f(lighting.getDirection());
-        gameMaster.getCamera().getViewMatrix().transformDirection(viewLightDir);
+        gameMaster.getActiveCamera().getViewMatrix().transformDirection(viewLightDir);
         shader.setUniform("uLightDirection", viewLightDir);
         shader.setUniform("uSunColor", lighting.getColor());
         shader.setUniform("uSkyColor", lighting.getColor());
@@ -204,6 +191,8 @@ public class ItemRenderer {
             quadMesh.render();
         }
 
+        glDepthMask(true);
+        glEnable(GL_DEPTH_TEST);
         shader.unbind();
         glBindTexture(GL_TEXTURE_2D, 0);
     }

@@ -59,15 +59,24 @@ public class Player extends Character {
     public void update(Hit hit, float delta) {
         updateCrouching(delta);
 
+        heal(Math.clamp(getHitpoints(),
+                delta * 0.5f + getLevel(), getMaxHitpoints()));
+
         if (!isOnGround()) {
-            setIsOffGroundTimer(getIsOffGroundTimer() + 0.1f);
-            if (isOnGround() && getIsOffGroundTimer() >= 3.0f) {
-                fallDamage(delta * getIsOffGroundTimer());
-                soundService.playUseSound(SoundGroup.ENTITY, 1.0f, 1.0f);
-            } else {
-                setIsOffGroundTimer(0.0f);
-            }
+            setIsOffGroundTimer(getIsOffGroundTimer() + delta);
         }
+
+        if (isOnGround() && !wasOnGround()) {
+            float fallVelocity = Math.abs(getVelocity().y);
+            if (fallVelocity > 8.0f) {
+                float damage = (fallVelocity - 8.0f) * 5.0f;
+                fallDamage(damage);
+            }
+
+            setIsOffGroundTimer(0.0f);
+        }
+
+        setWasOnGround(isOnGround());
 
         for (InventorySlot slot : getInventory().getSlots()) {
             if (slot.getItem() instanceof Tool tool) {

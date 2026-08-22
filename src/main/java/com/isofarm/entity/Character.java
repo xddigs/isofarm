@@ -15,11 +15,11 @@ public abstract class Character extends Entity implements Levelable {
     private int experience;
     private int experienceForNextLevel;
 
-    private int hitpoints;
-    private int maxHitpoints;
+    private float hitpoints;
+    private float maxHitpoints;
 
-    private int stamina;
-    private int maxStamina;
+    private float stamina;
+    private float maxStamina;
 
     private int strength;
     private int intelligence;
@@ -97,13 +97,15 @@ public abstract class Character extends Entity implements Levelable {
 
             int levelUpScaling = (int) (level * 0.8f);
             scale(levelUpScaling);
+            maxHitpoints *= levelUpScaling / 2f;
+            maxStamina *= levelUpScaling / 2f;
             experienceForNextLevel = calcNextLevel();
         }
     }
 
     @Override
     public int calcNextLevel() {
-        return (int) (level * 1.2f);
+        return (int) (100 * Math.pow(1.2, level - 1));
     }
 
     @Override
@@ -136,8 +138,14 @@ public abstract class Character extends Entity implements Levelable {
         this.hitpoints = (int) Math.min(this.hitpoints, this.hitpoints + amount);
     }
 
+    public void restoreStamina(float amount) {
+        if (amount <= 0) return;
+        this.stamina = Math.min(getMaxStamina(), this.stamina + amount);
+    }
+
     public void consumeStamina(float amount) {
-        this.stamina = (int) Math.max(0.0f, this.stamina - amount);
+        if (amount <= 0) return;
+        this.stamina = Math.max(0.0f, this.stamina - amount);
     }
 
     public boolean isAlive() {
@@ -160,7 +168,7 @@ public abstract class Character extends Entity implements Levelable {
         return purse.getBalance();
     }
 
-    public int getHitpoints() {
+    public float getHitpoints() {
         return hitpoints;
     }
 
@@ -168,15 +176,15 @@ public abstract class Character extends Entity implements Levelable {
         this.hitpoints = hitpoints;
     }
 
-    public int getMaxHitpoints() {
-        return maxHitpoints;
+    public float getMaxHitpoints() {
+        return maxHitpoints * level;
     }
 
     public void setMaxHitpoints(int maxHitpoints) {
         this.maxHitpoints = maxHitpoints;
     }
 
-    public int getStamina() {
+    public float getStamina() {
         return stamina;
     }
 
@@ -184,8 +192,8 @@ public abstract class Character extends Entity implements Levelable {
         this.stamina = stamina;
     }
 
-    public int getMaxStamina() {
-        return maxStamina;
+    public float getMaxStamina() {
+        return maxStamina * level;
     }
 
     public void setMaxStamina(int maxStamina) {

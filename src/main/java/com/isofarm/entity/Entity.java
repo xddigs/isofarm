@@ -19,6 +19,7 @@ public abstract class Entity {
     private float standingHeight;
     private float crouchingHeight;
     private boolean onGround;
+    private boolean wasOnGround;
     private boolean isCrounching;
 
     private float currentEyeHeight = 1.6f;
@@ -36,6 +37,7 @@ public abstract class Entity {
         this.crouchingHeight = 1.4f;
 
         this.onGround = false;
+        this.wasOnGround = onGround;
     }
 
     public byte getId() {
@@ -119,8 +121,16 @@ public abstract class Entity {
         return onGround;
     }
 
+    public boolean wasOnGround() {
+        return wasOnGround;
+    }
+
     public void setOnGround(boolean onGround) {
         this.onGround = onGround;
+    }
+
+    public void setWasOnGround(boolean wasOnGround) {
+        this.wasOnGround = wasOnGround;
     }
 
     public void moveAndCollide(World world, Vector3f targetVelocity, float delta) {

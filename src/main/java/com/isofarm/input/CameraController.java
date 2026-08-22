@@ -107,10 +107,16 @@ public class CameraController implements Service<Camera> {
         Player player = gameMaster.getPlayer();
 
         float speed = K.Camera.MOVEMENT_SPEED;
-        if (!gameMaster.isInventoryOpen() && !gameMaster.isChatOpen()) {
-            if (Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-                speed *= K.Camera.SPRINT_MULTIPLIER;
-            }
+        boolean isSprinting = Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)
+                        && !gameMaster.isInventoryOpen()
+                        && !gameMaster.isChatOpen()
+                        && player.getStamina() > 0;
+
+        if (isSprinting) {
+            speed *= K.Camera.SPRINT_MULTIPLIER;
+            player.consumeStamina(delta * speed);
+        } else {
+            player.restoreStamina(delta * 15.0f);
         }
 
         float yaw = (float) Math.toRadians(camera.getYaw());

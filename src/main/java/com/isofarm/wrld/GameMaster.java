@@ -259,7 +259,7 @@ public class GameMaster {
 
         gameRenderer.initCamera(getActiveCamera());
         toastService.info("Camera changed to " + (Settings.isOrthographic() ?
-                "orthographic" : "perspective"));
+                "orthographic" : "first person"));
     }
 
     public boolean isOrthographicCamera() {
@@ -322,7 +322,6 @@ public class GameMaster {
         timeService.update(delta, weatherService);
         float timeOfDay = timeService.getHour() + (timeService.getMinute() / 60.0f);
         celestialLighting.update(HoveredCell.get(this), timeOfDay);
-        particles.update(delta);
         shop.update(timeService);
         cropService.update(delta, weatherService.getWeather());
         updateEntities(delta);
@@ -336,6 +335,7 @@ public class GameMaster {
             camera.update(delta);
         }
 
+        particles.update(delta);
         itemRenderer.update(delta);
         stepController.update(this, player, soundService, delta);
 
@@ -358,8 +358,12 @@ public class GameMaster {
             SpriteSheet spriteSheet = resourceManager.getItemSpriteSheet(selectedItem);
             Shader itemShader = resourceManager.getShader("item");
 
+            glDisable(GL_DEPTH_TEST);
+            glDepthMask(false);
             itemRenderer.render(this, selectedItem, spriteSheet,
                     itemShader, celestialLighting, genDelta);
+            glDepthMask(true);
+            glEnable(GL_DEPTH_TEST);
         }
 
         gameUIservice.render(isHUDShown(), this);
@@ -388,6 +392,15 @@ public class GameMaster {
         float center = (K.World.MAP_WORLD_SIZE - 1) / 2.0f;
         float worldCenter = center * K.World.TILE_SIZE;
         this.camera.setPosition(worldCenter, 0.0f, worldCenter);
+    }
+
+    public WorldItem getWorldItem(Item item) {
+        return entities.stream()
+                .filter(WorldItem.class::isInstance)
+                .map(WorldItem.class::cast)
+                .filter(worldItem -> worldItem.getItem().equals(item))
+                .findFirst()
+                .orElse(null);
     }
 
     public void toggleInventory() {

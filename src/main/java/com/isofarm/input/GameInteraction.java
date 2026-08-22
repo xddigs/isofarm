@@ -355,6 +355,7 @@ public class GameInteraction {
             boolean usable = Arrays.stream(tool.getType().getUsableOn())
                     .anyMatch(b -> b.getId() == blockId);
             if (!usable) {
+                tool.setPlayer(gameMaster.getPlayer());
                 tool.misuse();
             } else {
                 tool.use();
@@ -423,6 +424,7 @@ public class GameInteraction {
             Block block = world.getBlockAt(cell.x(), cell.y(), cell.z());
             if (Arrays.stream(hoe.getType().getUsableOn()).noneMatch(b -> b.getId() ==
                     block.getType().getId())) {
+                hoe.setPlayer(gameMaster.getPlayer());
                 hoe.misuse();
             } else {
                 hoe.use(gameMaster, block);

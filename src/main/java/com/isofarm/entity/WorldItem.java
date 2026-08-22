@@ -115,9 +115,7 @@ public class WorldItem extends Entity {
     @Override
     public void render(GameMaster gameMaster) {
         SpriteSheet spriteSheet = gameMaster.getResourceManager().getItemSpriteSheet(item);
-
         Shader shader = gameMaster.getResourceManager().getShader("item");
-
         if (spriteSheet == null || shader == null) {
             return;
         }
