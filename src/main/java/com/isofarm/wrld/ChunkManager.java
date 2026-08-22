@@ -42,7 +42,6 @@ public class ChunkManager {
     public void updateLoadedChunks(int centerChunkX, int centerChunkZ) {
         int r = Settings.getRenderDistance();
         int unloadDist = r + Settings.getUnloadMargin();
-
         chunkMeshes.entrySet().removeIf(entry -> {
             Chunk chunk = entry.getKey();
 
@@ -51,13 +50,14 @@ public class ChunkManager {
 
             if (dx > unloadDist || dz > unloadDist) {
                 Mesh mesh = entry.getValue();
+
                 if (mesh != null) {
                     mesh.dispose();
                 }
+                world.getChunks().remove(world.get2DKey(chunk.getChunkX(),
+                        chunk.getChunkZ()));
 
-                world.getChunks().remove(world.get2DKey(chunk.getChunkX(), chunk.getChunkZ()));
                 cleanupSoilTimersForChunk(chunk);
-
                 return true;
             }
 
@@ -66,16 +66,34 @@ public class ChunkManager {
 
         for (int cx = centerChunkX - r; cx <= centerChunkX + r; cx++) {
             for (int cz = centerChunkZ - r; cz <= centerChunkZ + r; cz++) {
-                if ((cx - centerChunkX) * (cx - centerChunkX) + (cz - centerChunkZ) * (cz - centerChunkZ) > r * r) {
+
+                if ((cx - centerChunkX) * (cx - centerChunkX)
+                        + (cz - centerChunkZ) * (cz - centerChunkZ)
+                        > r * r) {
                     continue;
                 }
 
                 Chunk chunk = world.getOrCreateChunk(cx, cz);
-
                 if (!chunkMeshes.containsKey(chunk)) {
                     generator.generateChunk(cx, cz);
                     updateGrass(cx, cz);
+                }
+            }
+        }
 
+        for (int cx = centerChunkX - r; cx <= centerChunkX + r; cx++) {
+            for (int cz = centerChunkZ - r; cz <= centerChunkZ + r; cz++) {
+
+                if ((cx - centerChunkX) * (cx - centerChunkX)
+                        + (cz - centerChunkZ) * (cz - centerChunkZ)
+                        > r * r) {
+                    continue;
+                }
+
+                Chunk chunk = world.getChunks().get(world.get2DKey(cx, cz));
+                if (chunk == null) continue;
+
+                if (!chunkMeshes.containsKey(chunk)) {
                     Mesh mesh = ChunkMeshBuilder.buildMesh(world, chunk);
                     chunkMeshes.put(chunk, mesh);
                 }

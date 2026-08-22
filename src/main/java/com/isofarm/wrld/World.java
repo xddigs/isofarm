@@ -28,6 +28,12 @@ public class World {
         return chunks.computeIfAbsent(key, k -> new Chunk(chunkX, chunkZ));
     }
 
+    public boolean isChunkLoadedAt(int x, int z) {
+        int chunkX = Math.floorDiv(x, Chunk.SIZE_X);
+        int chunkZ = Math.floorDiv(z, Chunk.SIZE_Z);
+        return chunks.containsKey(get2DKey(chunkX, chunkZ));
+    }
+
     public Map<Long, Chunk> getChunks() {
         return chunks;
     }

@@ -46,85 +46,86 @@ public class ChunkMeshBuilder {
                     int worldX = chunkX * Chunk.SIZE_X + x;
                     int worldZ = chunkZ * Chunk.SIZE_Z + z;
 
-                    float vx = x;
-                    float vy = y;
-                    float vz = z;
-                    float bottomY = vy;
-                    float topY = (data == BlockData.TILLED_DIRT) ? vy + TILLED_HEIGHT : vy + 1.0f;
+                    float bottomY = (float) y;
+                    float topY = (data == BlockData.TILLED_DIRT) ? (float) y + TILLED_HEIGHT : (float) y + 1.0f;
 
-                    float aboveBottomY = getBlockBottomY(chunk, x, y + 1, z);
-                    if (shouldRenderFace(world, worldX, y + 1, worldZ, data) || aboveBottomY > topY) {
+                    boolean renderFace = shouldRenderFace(world, worldX, y + 1, worldZ, data);
+                    float aboveBottomY = getBlockBottomY(world, worldX, y + 1, worldZ);
+                    if (renderFace || aboveBottomY > topY) {
                         float uMin = data.getTopAtlasOffset().x;
                         float vMin = data.getTopAtlasOffset().y;
                         float uMax = uMin + data.getAtlasScale().x;
                         float vMax = vMin + data.getAtlasScale().y;
 
-                        posIdx = addQuadPos(posBuffer, posIdx, vx, topY, vz + 1, vx + 1, topY, vz + 1, vx + 1, topY, vz, vx, topY, vz);
+                        posIdx = addQuadPos(posBuffer, posIdx, (float) x, topY, (float) z + 1, (float) x + 1, topY, (float) z + 1, (float) x + 1, topY, (float) z, (float) x, topY, (float) z);
                         uvIdx = addQuadUV(uvBuffer, uvIdx, uMin, vMax, uMax, vMax, uMax, vMin, uMin, vMin);
                         normIdx = addQuadNorm(normBuffer, normIdx, 0, 1, 0);
                         elemIdx = addQuadIndices(indexBuffer, elemIdx, vertexCount);
                         vertexCount += 4;
                     }
 
-                    float belowTopY = getBlockTopY(chunk, x, y - 1, z);
-                    if (shouldRenderFace(world, worldX, y - 1, worldZ, data) || belowTopY < bottomY) {
-                        float uMin = data.getBottomAtlasOffset().x;
-                        float vMin = data.getBottomAtlasOffset().y;
-                        float uMax = uMin + data.getAtlasScale().x;
-                        float vMax = vMin + data.getAtlasScale().y;
+                    if (y > 0) {
+                        renderFace = shouldRenderFace(world, worldX, y - 1, worldZ, data);
+                        float belowTopY = getBlockTopY(world, worldX, y - 1, worldZ);
+                        if (renderFace || (belowTopY < bottomY && belowTopY > 0)) {
+                            float uMin = data.getBottomAtlasOffset().x;
+                            float vMin = data.getBottomAtlasOffset().y;
+                            float uMax = uMin + data.getAtlasScale().x;
+                            float vMax = vMin + data.getAtlasScale().y;
 
-                        posIdx = addQuadPos(posBuffer, posIdx, vx, bottomY, vz, vx + 1, bottomY, vz, vx + 1, bottomY, vz + 1, vx, bottomY, vz + 1);
-                        uvIdx = addQuadUV(uvBuffer, uvIdx, uMin, vMin, uMax, vMin, uMax, vMax, uMin, vMax);
-                        normIdx = addQuadNorm(normBuffer, normIdx, 0, -1, 0);
-                        elemIdx = addQuadIndices(indexBuffer, elemIdx, vertexCount);
-                        vertexCount += 4;
+                            posIdx = addQuadPos(posBuffer, posIdx, (float) x, bottomY, (float) z, (float) x + 1, bottomY, (float) z, (float) x + 1, bottomY, (float) z + 1, (float) x, bottomY, (float) z + 1);
+                            uvIdx = addQuadUV(uvBuffer, uvIdx, uMin, vMin, uMax, vMin, uMax, vMax, uMin, vMax);
+                            normIdx = addQuadNorm(normBuffer, normIdx, 0, -1, 0);
+                            elemIdx = addQuadIndices(indexBuffer, elemIdx, vertexCount);
+                            vertexCount += 4;
+                        }
                     }
 
-                    float neighborTop = getBlockTopY(chunk, x, y, z + 1);
-                    if (shouldRenderFace(world, worldX, y, worldZ + 1, data) || neighborTop < topY) {
+                    renderFace = shouldRenderFace(world, worldX, y, worldZ + 1, data);
+                    float neighborTop = getBlockTopY(world, worldX, y, worldZ + 1);
+                    if (renderFace) {
                         float expBottom = Math.max(bottomY, neighborTop);
-                        float uvB = (neighborTop < topY && !shouldRenderFace(world, worldX, y, worldZ + 1, data)) ?
-                                (expBottom - bottomY) / (topY - bottomY) : 0.0f;
+                        float uvB = (neighborTop > bottomY) ? (neighborTop - bottomY) / (topY - bottomY) : 0.0f;
 
                         vertexCount = addSideQuadDirect(posBuffer, normBuffer, uvBuffer, indexBuffer,
                                 posIdx, normIdx, uvIdx, elemIdx, vertexCount,
-                                vx, vx + 1, expBottom, topY, vz + 1, vz + 1, 0, 0, 1, data, uvB, 1.0f);
+                                (float) x, (float) x + 1, expBottom, topY, (float) z + 1, (float) z + 1, 0, 0, 1, data, uvB, 1.0f);
                         posIdx += 12; normIdx += 12; uvIdx += 8; elemIdx += 6;
                     }
 
-                    neighborTop = getBlockTopY(chunk, x, y, z - 1);
-                    if (shouldRenderFace(world, worldX, y, worldZ - 1, data) || neighborTop < topY) {
+                    renderFace = shouldRenderFace(world, worldX, y, worldZ - 1, data);
+                    neighborTop = getBlockTopY(world, worldX, y, worldZ - 1);
+                    if (renderFace) {
                         float expBottom = Math.max(bottomY, neighborTop);
-                        float uvB = (neighborTop < topY && !shouldRenderFace(world, worldX, y, worldZ - 1, data)) ?
-                                (expBottom - bottomY) / (topY - bottomY) : 0.0f;
+                        float uvB = (neighborTop > bottomY) ? (neighborTop - bottomY) / (topY - bottomY) : 0.0f;
 
                         vertexCount = addSideQuadDirect(posBuffer, normBuffer, uvBuffer, indexBuffer,
                                 posIdx, normIdx, uvIdx, elemIdx, vertexCount,
-                                vx + 1, vx, expBottom, topY, vz, vz, 0, 0, -1, data, uvB, 1.0f);
+                                (float) x + 1, (float) x, expBottom, topY, (float) z, (float) z, 0, 0, -1, data, uvB, 1.0f);
                         posIdx += 12; normIdx += 12; uvIdx += 8; elemIdx += 6;
                     }
 
-                    neighborTop = getBlockTopY(chunk, x + 1, y, z);
-                    if (shouldRenderFace(world, worldX + 1, y, worldZ, data) || neighborTop < topY) {
+                    renderFace = shouldRenderFace(world, worldX + 1, y, worldZ, data);
+                    neighborTop = getBlockTopY(world, worldX + 1, y, worldZ);
+                    if (renderFace) {
                         float expBottom = Math.max(bottomY, neighborTop);
-                        float uvB = (neighborTop < topY && !shouldRenderFace(world, worldX + 1, y, worldZ, data)) ?
-                                (expBottom - bottomY) / (topY - bottomY) : 0.0f;
+                        float uvB = (neighborTop > bottomY) ? (neighborTop - bottomY) / (topY - bottomY) : 0.0f;
 
                         vertexCount = addSideQuadDirect(posBuffer, normBuffer, uvBuffer, indexBuffer,
                                 posIdx, normIdx, uvIdx, elemIdx, vertexCount,
-                                vx + 1, vx + 1, expBottom, topY, vz + 1, vz, 1, 0, 0, data, uvB, 1.0f);
+                                (float) x + 1, (float) x + 1, expBottom, topY, (float) z + 1, (float) z, 1, 0, 0, data, uvB, 1.0f);
                         posIdx += 12; normIdx += 12; uvIdx += 8; elemIdx += 6;
                     }
 
-                    neighborTop = getBlockTopY(chunk, x - 1, y, z);
-                    if (shouldRenderFace(world, worldX - 1, y, worldZ, data) || neighborTop < topY) {
+                    renderFace = shouldRenderFace(world, worldX - 1, y, worldZ, data);
+                    neighborTop = getBlockTopY(world, worldX - 1, y, worldZ);
+                    if (renderFace) {
                         float expBottom = Math.max(bottomY, neighborTop);
-                        float uvB = (neighborTop < topY && !shouldRenderFace(world, worldX - 1, y, worldZ, data)) ?
-                                (expBottom - bottomY) / (topY - bottomY) : 0.0f;
+                        float uvB = (neighborTop > bottomY) ? (neighborTop - bottomY) / (topY - bottomY) : 0.0f;
 
                         vertexCount = addSideQuadDirect(posBuffer, normBuffer, uvBuffer, indexBuffer,
                                 posIdx, normIdx, uvIdx, elemIdx, vertexCount,
-                                vx, vx, expBottom, topY, vz, vz + 1, -1, 0, 0, data, uvB, 1.0f);
+                                (float) x, (float) x, expBottom, topY, (float) z, (float) z + 1, -1, 0, 0, data, uvB, 1.0f);
                         posIdx += 12; normIdx += 12; uvIdx += 8; elemIdx += 6;
                     }
                 }
@@ -148,29 +149,53 @@ public class ChunkMeshBuilder {
         return (data == BlockData.TILLED_DIRT) ? y + TILLED_HEIGHT : y + 1.0f;
     }
 
-    private static float getBlockBottomY(Chunk chunk, int x, int y, int z) {
-        if (x < 0 || x >= Chunk.SIZE_X || y < 0 || y >= Chunk.SIZE_Y || z < 0 || z >= Chunk.SIZE_Z) return y;
-        byte blockId = chunk.getBlock(x, y, z);
-        return blockId == 0 ? y : y;
+    private static float getBlockBottomY(World world, int worldX, int worldY, int worldZ) {
+        if (worldY < 0 || worldY >= Chunk.SIZE_Y) {
+            return 0.0f;
+        }
+
+        if (!world.isChunkLoadedAt(worldX, worldZ)) {
+            return 0.0f;
+        }
+        byte blockId = world.getBlockTypeAt(worldX, worldY, worldZ);
+        if (blockId == 0) return 0.0f;
+        BlockData data = BLOCK_LUT[blockId & 0xFF];
+        if (data == null || data == BlockData.CROP) {
+            return 0.0f;
+        }
+        return worldY;
     }
 
-    private static float getBlockTopY(Chunk chunk, int x, int y, int z) {
-        if (x < 0 || x >= Chunk.SIZE_X || y < 0 || y >= Chunk.SIZE_Y || z < 0 || z >= Chunk.SIZE_Z) return y;
-        byte blockId = chunk.getBlock(x, y, z);
-        if (blockId == 0) return y;
+    private static float getBlockTopY(World world, int worldX, int worldY, int worldZ) {
+        if (worldY < 0 || worldY >= Chunk.SIZE_Y) {
+            return 0.0f;
+        }
+
+        if (!world.isChunkLoadedAt(worldX, worldZ)) {
+            return 0.0f;
+        }
+
+        byte blockId = world.getBlockTypeAt(worldX, worldY, worldZ);
+        if (blockId == 0) return 0.0f;
         BlockData data = BLOCK_LUT[blockId & 0xFF];
-        if (data == null || data == BlockData.CROP) return y;
-        return getBlockTopY(data, y);
+        if (data == null || data == BlockData.CROP) {
+            return 0.0f;
+        }
+        return getBlockTopY(data, worldY);
     }
 
     private static boolean shouldRenderFace(World world, int worldX, int worldY,
                                             int worldZ, BlockData currentBlock) {
+        if (worldY < 0) return false;
+        if (worldY >= Chunk.SIZE_Y) return true;
+        if (!world.isChunkLoadedAt(worldX, worldZ)) return false;
 
-        if (worldY < 0 || worldY >= Chunk.SIZE_Y) return true;
         byte neighborId = world.getBlockTypeAt(worldX, worldY, worldZ);
-        if (neighborId == 0) return true; // Aire
+        if (neighborId == 0) return true;
+
         BlockData neighborData = BLOCK_LUT[neighborId & 0xFF];
         if (neighborData == null) return true;
+
         return neighborData.isTransparent() && neighborData != currentBlock;
     }
 
@@ -184,7 +209,8 @@ public class ChunkMeshBuilder {
         return idx + 12;
     }
 
-    private static int addQuadUV(float[] buf, int idx, float u1, float v1, float u2, float v2, float u3, float v3, float u4, float v4) {
+    private static int addQuadUV(float[] buf, int idx, float u1, float v1, float u2,
+                                 float v2, float u3, float v3, float u4, float v4) {
         buf[idx] = u1; buf[idx+1] = v1;
         buf[idx+2] = u2; buf[idx+3] = v2;
         buf[idx+4] = u3; buf[idx+5] = v3;

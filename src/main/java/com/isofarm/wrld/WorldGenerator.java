@@ -13,6 +13,7 @@ public class WorldGenerator {
     private static final int MOUNTAIN_HEIGHT = 150;
 
     private final World world;
+    private static Random chunkRandom = new Random();
 
     public WorldGenerator(World world) {
         this.world = world;
@@ -21,7 +22,6 @@ public class WorldGenerator {
     public void generateChunk(int chunkX, int chunkZ) {
         Chunk chunk = world.getOrCreateChunk(chunkX, chunkZ);
         long chunkSeed = ((long) chunkX * 341873128712L) + ((long) chunkZ * 132897987541L);
-        Random chunkRandom = new Random(chunkSeed);
 
         int[][] heightMap = new int[Chunk.SIZE_X][Chunk.SIZE_Z];
         for (int x = 0; x < Chunk.SIZE_X; x++) {
@@ -65,7 +65,7 @@ public class WorldGenerator {
             return BlockData.GRASS.getId();
         } else if (y > height - 3) {
             return isHighMountain ? BlockData.STONE.getId() : BlockData.DIRT.getId();
-        } else if (y <= Math.floor(Math.random())) {
+        } else if (chunkRandom.nextDouble() < 0.01) {
             return BlockData.VOIDSTONE.getId();
         } else {
             return BlockData.STONE.getId();
