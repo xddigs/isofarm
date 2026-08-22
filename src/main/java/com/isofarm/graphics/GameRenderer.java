@@ -146,7 +146,11 @@ public class GameRenderer {
             }
             entity.render(gameMaster);
         });
-        gameMaster.getParticles().render(defaultShader, rm.getSpriteMesh());
+
+        glDisable(GL_DEPTH_TEST);
+        gameMaster.getParticles().render(defaultShader, rm.getSpriteMesh(),
+                gameMaster.getActiveCamera());
+        glEnable(GL_DEPTH_TEST);
 
         if (gameMaster.getWeatherService().isRaining()) {
             Vector3f rainTargetPos;

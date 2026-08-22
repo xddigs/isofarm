@@ -31,17 +31,19 @@ public class ParticleEngine implements Service<Particle> {
         particles.removeIf(Particle::isDead);
     }
 
-    public void render(Shader shader, Mesh quadMesh) {
+    public void render(Shader shader, Mesh quadMesh,
+                       CameraView camera) {
+        shader.bind();
+        shader.setUniform("uProjection", camera.getProjectionMatrix());
+        shader.setUniform("uView", camera.getViewMatrix());
         shader.setUniform("uParticleAlpha", 1.0f);
-        if (particles.isEmpty()) {
-            return;
-        }
+
+        if (particles.isEmpty()) return;
 
         shader.setUniform("uUseTexture", true);
         shader.setUniform("uUseFaceAtlas", false);
 
         SpriteSheet currentTexture = null;
-
         for (Particle p : particles) {
             if (p.getTexture() == null) {
                 continue;
@@ -76,6 +78,7 @@ public class ParticleEngine implements Service<Particle> {
         shader.setUniform("uUseFaceAtlas", true);
         shader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
         shader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
+        shader.unbind();
     }
 
     public void spawn(float blockX, float blockY, float blockZ,
