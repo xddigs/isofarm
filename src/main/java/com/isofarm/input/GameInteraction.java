@@ -121,12 +121,12 @@ public class GameInteraction {
         breakTimeout -= gameMaster.getGenDelta();
         breakTimeout = Math.max(breakTimeout, 0.0f);
 
-        boolean wasCtrlHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)
+        boolean isCtrlHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)
                 || Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
+        boolean wasLeftClickPressed = Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT);
+        boolean canBreakBlocks = wasLeftClickPressed && !isCtrlHeld && !gameMaster.isInventoryOpen();
 
-        if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT)
-                && !wasCtrlHeld
-                && !gameMaster.isInventoryOpen()) {
+        if (canBreakBlocks) {
             if (breakTimeout <= 0.0f) {
                 breakAction(gameMaster, hoveredCell);
             }
