@@ -16,7 +16,6 @@ import com.isofarm.utils.Settings;
 import com.isofarm.wrld.Chunk;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
-import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.slf4j.Logger;
@@ -122,10 +121,16 @@ public class GameInteraction {
         breakTimeout -= gameMaster.getGenDelta();
         breakTimeout = Math.max(breakTimeout, 0.0f);
 
-        if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT) && !gameMaster.isInventoryOpen()) {
+        boolean wasCtrlHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)
+                || Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
+
+        if (Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT)
+                && !wasCtrlHeld
+                && !gameMaster.isInventoryOpen()) {
             if (breakTimeout <= 0.0f) {
                 breakAction(gameMaster, hoveredCell);
             }
+
         } else {
             resetBreaking();
         }
@@ -461,8 +466,7 @@ public class GameInteraction {
             byte blockId = world.getBlockTypeAt(x, y, z);
 
             if (blockId != BlockData.TILLED_DIRT.getId()) {
-                log.debug("Cannot plant at {},{},{}: selected block is not TILLED_DIRT", x, y, z);
-                gameMaster.getToastService().error("You can only plant seeds on tilled dirt");
+                log.trace("Cannot plant at {},{},{}: selected block is not TILLED_DIRT", x, y, z);
                 return;
             }
 

@@ -39,8 +39,8 @@ public record OrthographicCameraController(OrthographicCamera camera)
     }
 
     private void rotateCamera(float delta) {
-        boolean rotateLeft = Keyboard.isKeyDown(GLFW_KEY_A) || Keyboard.isKeyDown(GLFW_KEY_LEFT);
-        boolean rotateRight = Keyboard.isKeyDown(GLFW_KEY_D) || Keyboard.isKeyDown(GLFW_KEY_RIGHT);
+        boolean rotateLeft = Keyboard.isKeyDown(GLFW_KEY_LEFT);
+        boolean rotateRight = Keyboard.isKeyDown(GLFW_KEY_RIGHT);
 
         if (rotateLeft == rotateRight) {
             return;
@@ -58,7 +58,12 @@ public record OrthographicCameraController(OrthographicCamera camera)
     }
 
     private void click(GameMaster gameMaster, Player player, World world) {
-        if (!Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
+        boolean isCtrlHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)
+                        || Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
+
+        boolean wasLeftClickPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
+
+        if (!isCtrlHeld || !wasLeftClickPressed) {
             return;
         }
 
@@ -78,9 +83,11 @@ public record OrthographicCameraController(OrthographicCamera camera)
 
         if (goal == null) return;
         if (start.equals(goal)) return;
+
         var path = PathFinder.findPath(world, player, start, goal);
 
         if (path.isEmpty()) return;
+
         player.setPath(path);
     }
 
