@@ -14,11 +14,12 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("unused")
 @DataClass
 public class WorldItem extends Entity {
+    private static final Logger log = LoggerFactory.getLogger(WorldItem.class);
     private static final float GRAVITY = -20.0f;
     private static final float GROUND_OFFSET = 0.02f;
     private static final float ITEM_HEIGHT = 0.45f;
 
-    private static final float PICKUP_DELAY = 0.56f;
+    private static final float PICKUP_DELAY = 0.2f;
 
     private static final float AIR_DRAG = 2.5f;
     private static final float GROUND_FRICTION = 8.0f;
@@ -29,7 +30,6 @@ public class WorldItem extends Entity {
     private static final float ROTATION_SPEED = 90.0f;
     private static final float GROUND_BOB_SPEED = 3.0f;
     private static final float GROUND_BOB_HEIGHT = 0.08f;
-    private static final Logger log = LoggerFactory.getLogger(WorldItem.class);
 
     private final Item item;
     private int amount;
@@ -38,6 +38,7 @@ public class WorldItem extends Entity {
     private float bobTime;
     private float pickupTimer;
     private float groundY;
+    private boolean isAttracting = false;
 
     public WorldItem(Item item, int amount, Vector3f position) {
         super(item.getName());
@@ -153,5 +154,13 @@ public class WorldItem extends Entity {
 
     public void setBobTime(float bobTime) {
         this.bobTime = bobTime;
+    }
+
+    public boolean isAttracting() {
+        return isAttracting;
+    }
+
+    public void setAttracting(boolean attracting) {
+        this.isAttracting = attracting;
     }
 }

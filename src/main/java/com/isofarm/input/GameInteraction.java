@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.Iterator;
 
+import static org.joml.Math.lerp;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class GameInteraction {
@@ -208,30 +209,47 @@ public class GameInteraction {
     private void pickUp(GameMaster gameMaster) {
         Player player = gameMaster.getPlayer();
         if (player == null) return;
+
         Iterator<Entity> iterator = gameMaster.getEntities().iterator();
         while (iterator.hasNext()) {
             Entity entity = iterator.next();
             if (!(entity instanceof WorldItem worldItem)) continue;
 
             if (!worldItem.canBePickedUp()) continue;
-            float distance = worldItem.getPosition()
-                    .distance(player.getPosition());
 
-            if (distance > PICKUP_DISTANCE) continue;
-            Item item = worldItem.getItem();
-            int amount = worldItem.getAmount();
+            Vector3f playerPos = player.getPosition();
+            Vector3f itemPos = worldItem.getPosition();
+            float distance = itemPos.distance(playerPos);
 
-            if (item == null || amount <= 0) {
-                iterator.remove();
-                continue;
+            if (distance <= PICKUP_DISTANCE) {
+                worldItem.setAttracting(true);
             }
 
-            player.add(item, amount);
-            iterator.remove();
-            gameMaster.getSoundService().playUseSound(SoundGroup.ITEMS,
-                    distance, player.getPosition().x);
+            if (worldItem.isAttracting()) {
+                float delta = gameMaster.getGenDelta();
+                float lerpFactor = Math.min(1.0f, 10.0f * delta);
 
-            log.info("Picked up x{} {}", amount, item.getName());
+                Vector3f targetPos = new Vector3f(playerPos.x, playerPos.y +
+                        player.getDimensions().y, playerPos.z);
+
+                itemPos.x = lerp(itemPos.x, targetPos.x, lerpFactor);
+                itemPos.y = lerp(itemPos.y, targetPos.y, lerpFactor);
+                itemPos.z = lerp(itemPos.z, targetPos.z, lerpFactor);
+
+                if (distance < 0.4f) {
+                    Item item = worldItem.getItem();
+                    int amount = worldItem.getAmount();
+
+                    if (item != null && amount > 0) {
+                        player.add(item, amount);
+                        gameMaster.getSoundService().playUseSound(
+                                SoundGroup.ITEMS, distance, playerPos.x
+                        );
+                        log.info("Picked up x{} {}", amount, item.getName());
+                    }
+                    iterator.remove();
+                }
+            }
         }
     }
 
