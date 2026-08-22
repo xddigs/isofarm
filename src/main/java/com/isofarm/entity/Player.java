@@ -6,7 +6,6 @@ import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.Shader;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.pathfinding.GridPos;
-import com.isofarm.service.ItemRegistry;
 import com.isofarm.service.SoundService;
 import com.isofarm.service.ToastService;
 import com.isofarm.utils.K;
@@ -52,7 +51,7 @@ public class Player extends Character {
         setVelocity(new Vector3f(0.0f, 0.0f, 0.0f));
         setDimensions(new Vector3f(1.0f, 1.0f, 1.0f));
         setReputation(Reputation.NEUTRAL);
-        setGamemode(Gamemode.GODMODE);
+        setGamemode(Gamemode.SURVIVAL);
         setUpInventory();
     }
 

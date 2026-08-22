@@ -149,15 +149,14 @@ public class Library implements Service<GameMaster> {
                 log.warn("Usage: /gm mode");
             }
 
-            if (args[0].equalsIgnoreCase("SURVIVAL")) {
-                gameMaster.getPlayer().setGamemode(Gamemode.SURVIVAL);
-            } else if (args[0].equalsIgnoreCase("GODMODE")) {
-                gameMaster.getPlayer().setGamemode(Gamemode.GODMODE);
-            } else {
+            Gamemode targetMode = Gamemode.fromString(args[0]);
+            if (targetMode == null) {
                 log.warn("Invalid gamemode: {}", args[0]);
+                return;
             }
 
             log.info("Command gm executed");
+            gameMaster.getPlayer().setGamemode(targetMode);
             gameMaster.getToastService().success("You changed gamemode to " +
                     args[0].toLowerCase());
         }));

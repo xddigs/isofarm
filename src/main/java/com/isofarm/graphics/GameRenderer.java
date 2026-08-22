@@ -268,6 +268,15 @@ public class GameRenderer {
             motionBlurShader.unbind();
             glEnable(GL_DEPTH_TEST);
         }
+
+        if (player.isNoClip()) {
+            glDisable(GL_CULL_FACE);
+            // glDisable(GL_DEPTH_TEST);
+        } else {
+            glEnable(GL_CULL_FACE);
+            glCullFace(GL_BACK);
+            glEnable(GL_DEPTH_TEST);
+        }
     }
 
     private void renderShadowPass(GameMaster gameMaster, ResourceManager rm,

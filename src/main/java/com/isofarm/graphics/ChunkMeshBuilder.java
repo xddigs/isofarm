@@ -154,7 +154,8 @@ public class ChunkMeshBuilder {
     }
 
     private static boolean shouldRenderFace(Chunk chunk, int neighborX, int neighborY, int neighborZ, BlockData currentBlock) {
-        if (neighborY < 0 || neighborY >= Chunk.SIZE_Y || neighborX < 0 || neighborX >= Chunk.SIZE_X || neighborZ < 0 || neighborZ >= Chunk.SIZE_Z) return true;
+        if (neighborY < 0 || neighborY >= Chunk.SIZE_Y || neighborX < 0 ||
+                neighborX >= Chunk.SIZE_X || neighborZ < 0 || neighborZ >= Chunk.SIZE_Z) return true;
         byte neighborId = chunk.getBlock(neighborX, neighborY, neighborZ);
         if (neighborId == 0) return true;
 
@@ -163,7 +164,9 @@ public class ChunkMeshBuilder {
         return neighborData.isTransparent() && neighborData != currentBlock;
     }
 
-    private static int addQuadPos(float[] buf, int idx, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4) {
+    private static int addQuadPos(float[] buf, int idx, float x1, float y1, float z1,
+                                  float x2, float y2, float z2, float x3, float y3, float z3,
+                                  float x4, float y4, float z4) {
         buf[idx] = x1; buf[idx+1] = y1; buf[idx+2] = z1;
         buf[idx+3] = x2; buf[idx+4] = y2; buf[idx+5] = z2;
         buf[idx+6] = x3; buf[idx+7] = y3; buf[idx+8] = z3;

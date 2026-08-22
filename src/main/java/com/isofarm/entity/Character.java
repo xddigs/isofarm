@@ -228,4 +228,8 @@ public abstract class Character extends Entity implements Levelable {
     public void setGamemode(Gamemode gamemode) {
         this.gamemode = gamemode;
     }
+
+    public boolean isNoClip() {
+        return gamemode.isNoClip();
+    }
 }

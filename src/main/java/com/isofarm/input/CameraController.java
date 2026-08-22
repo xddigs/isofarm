@@ -44,16 +44,20 @@ public class CameraController implements Service<Camera> {
 
         Player player = gameMaster.getPlayer();
         if (player != null) {
-            boolean isGodmode = gameMaster.getPlayer().getGamemode().isGodmode();
+            boolean isGodmode = player.getGamemode().isGodmode();
+            boolean isNoClip = player.isNoClip();
 
-            if (!isGodmode) {
+            if (isNoClip) {
+                isFlying = true;
+            } else if (!isGodmode) {
                 if (isFlying) {
                     isFlying = false;
                     currentFlyVelocity.set(0, 0, 0);
                 }
             }
 
-            if (isGodmode && !gameMaster.isInventoryOpen() && !gameMaster.isPromptingForInput()) {
+            if (isGodmode && !isNoClip && !gameMaster.isInventoryOpen()
+                    && !gameMaster.isPromptingForInput()) {
                 if (Keyboard.isKeyPressed(GLFW_KEY_SPACE)) {
                     float currentTime = (float) glfwGetTime();
                     if (currentTime - spaceLastPressedTime <= DOUBLE_TAP_TIME) {
@@ -121,7 +125,8 @@ public class CameraController implements Service<Camera> {
         float moveY = 0.0f;
         float moveZ = 0.0f;
 
-        if (!gameMaster.isInventoryOpen() && !gameMaster.isPromptingForInput()) {
+        if (!gameMaster.isInventoryOpen() &&
+                !gameMaster.isPromptingForInput()) {
             if (Keyboard.isKeyDown(GLFW_KEY_W)) {
                 moveX += forwardX;
                 moveZ += forwardZ;
