@@ -50,6 +50,11 @@ public abstract class Entity {
         return position;
     }
 
+    public String getPositionString() {
+        return String.format("X:%.2f // Y:%.2f // Z:%.2f",
+                position.x, position.y, position.z);
+    }
+
     public void setPosition(Vector3f position) {
         this.position.set(position);
     }

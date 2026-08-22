@@ -18,6 +18,9 @@ public abstract class Character extends Entity implements Levelable {
     private int hitpoints;
     private int maxHitpoints;
 
+    private int stamina;
+    private int maxStamina;
+
     private int strength;
     private int intelligence;
     private int dexterity;
@@ -25,6 +28,8 @@ public abstract class Character extends Entity implements Levelable {
     private int wisdom;
     private int charisma;
     private int luck;
+
+    private float isOffGroundTimer;
 
     public Character(String name, ToastService toastService) {
         super(name);
@@ -35,6 +40,9 @@ public abstract class Character extends Entity implements Levelable {
 
         this.hitpoints = 100;
         this.maxHitpoints = 100;
+
+        this.stamina = 100;
+        this.maxStamina = 100;
 
         this.level = 1;
         this.experience = 0;
@@ -113,12 +121,23 @@ public abstract class Character extends Entity implements Levelable {
         charisma += (int) (amount * Math.random());
     }
 
-    public void heal(int amount) {
-        hitpoints = Math.min(hitpoints + amount, maxHitpoints);
+    public void fallDamage(float amount) {
+        if (!isAlive() || amount <= 0) return;
+        if (!isOnGround() && isOffGroundTimer < 3.0f) return;
+        damage(amount);
     }
 
-    public void damage(int amount) {
-        hitpoints -= amount;
+    public void damage(float amount) {
+        if (!isAlive() || amount <= 0) return;
+        this.hitpoints = (int) Math.max(0.0f, this.hitpoints - amount);
+    }
+
+    public void heal(float amount) {
+        this.hitpoints = (int) Math.min(this.hitpoints, this.hitpoints + amount);
+    }
+
+    public void consumeStamina(float amount) {
+        this.stamina = (int) Math.max(0.0f, this.stamina - amount);
     }
 
     public boolean isAlive() {
@@ -155,6 +174,22 @@ public abstract class Character extends Entity implements Levelable {
 
     public void setMaxHitpoints(int maxHitpoints) {
         this.maxHitpoints = maxHitpoints;
+    }
+
+    public int getStamina() {
+        return stamina;
+    }
+
+    public void setStamina(int stamina) {
+        this.stamina = stamina;
+    }
+
+    public int getMaxStamina() {
+        return maxStamina;
+    }
+
+    public void setMaxStamina(int maxStamina) {
+        this.maxStamina = maxStamina;
     }
 
     public int getStrength() {
@@ -231,5 +266,13 @@ public abstract class Character extends Entity implements Levelable {
 
     public boolean isNoClip() {
         return gamemode.isNoClip();
+    }
+
+    public float getIsOffGroundTimer() {
+        return isOffGroundTimer;
+    }
+
+    public void setIsOffGroundTimer(float isOffGroundTimer) {
+        this.isOffGroundTimer = isOffGroundTimer;
     }
 }

@@ -58,6 +58,17 @@ public class Player extends Character {
     @Override
     public void update(Hit hit, float delta) {
         updateCrouching(delta);
+
+        if (!isOnGround()) {
+            setIsOffGroundTimer(getIsOffGroundTimer() + 0.1f);
+            if (isOnGround() && getIsOffGroundTimer() >= 3.0f) {
+                fallDamage(delta * getIsOffGroundTimer());
+                soundService.playUseSound(SoundGroup.ENTITY, 1.0f, 1.0f);
+            } else {
+                setIsOffGroundTimer(0.0f);
+            }
+        }
+
         for (InventorySlot slot : getInventory().getSlots()) {
             if (slot.getItem() instanceof Tool tool) {
                 if (tool.getDurability() <= 0) {

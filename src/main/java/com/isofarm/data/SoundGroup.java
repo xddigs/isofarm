@@ -12,7 +12,7 @@ public enum SoundGroup {
     HARD(new String[]{}, new String[]{"fx/blocks/wood.ogg"}, new String[]{}, new String[]{}, new String[]{}),
     GLASS(new String[]{}, new String[]{"fx/blocks/fragile_break.ogg", "fx/blocks/fragile_break2.ogg"}, new String[]{}, new String[]{}, new String[]{}),
     ITEMS(new String[]{}, new String[]{"fx/items/broke.ogg"}, new String[]{}, new String[]{"fx/items/drop.ogg", "fx/items/pickup.ogg"}, new String[]{}),
-    ENTITY(new String[]{}, new String[]{}, new String[]{}, new String[]{}, new String[]{"fx/entity/hurt.ogg"}),
+    ENTITY(new String[]{}, new String[]{}, new String[]{}, new String[]{"fx/entity/hurt.ogg"}, new String[]{}),
     RAIN(new String[]{}, new String[]{}, new String[]{}, new String[]{}, new String[]{"fx/ambient/rain.ogg"}),
     NATURE(new String[]{}, new String[]{}, new String[]{}, new String[]{}, new String[]{"fx/ambient/nature.ogg"}),
     SILENT(new String[]{}, new String[]{}, new String[]{}, new String[]{}, new String[]{});
