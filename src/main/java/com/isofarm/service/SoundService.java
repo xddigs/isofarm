@@ -21,7 +21,7 @@ import static org.lwjgl.openal.AL10.*;
 import static org.lwjgl.openal.ALC10.*;
 import static org.lwjgl.stb.STBVorbis.stb_vorbis_decode_memory;
 
-public class SoundService {
+public class SoundService implements Service<SoundGroup> {
     private static final Logger log = LoggerFactory.getLogger(SoundService.class);
     private long device;
     private long context;
@@ -32,6 +32,7 @@ public class SoundService {
     private int placeSource;
     private int useSource;
     private int backgroundSource;
+    private int loopingSource;
 
     private String currentBackgroundSound;
 
@@ -43,6 +44,7 @@ public class SoundService {
             loadSoundArray(group.getPlaceSounds());
             loadSoundArray(group.getUseSounds());
             loadSoundArray(group.getBackgroundSounds());
+            loadSoundArray(group.getLoopingSounds());
         }
     }
 
@@ -72,12 +74,14 @@ public class SoundService {
         placeSource = alGenSources();
         useSource = alGenSources();
         backgroundSource = alGenSources();
+        loopingSource = alGenSources();
 
         alSourcef(breakSource, AL_GAIN, 1.0f);
         alSourcef(stepSource, AL_GAIN, 1.0f);
         alSourcef(placeSource, AL_GAIN, 1.0f);
         alSourcef(useSource, AL_GAIN, 1.0f);
         alSourcef(backgroundSource, AL_GAIN, 1.0f);
+        alSourcef(loopingSource, AL_GAIN, 1.0f);
     }
 
     public void playStepSound(SoundGroup group, float distance, float maxDistance) {
@@ -102,6 +106,13 @@ public class SoundService {
         float volume = calc(distance, maxDistance);
         playSound(useSource, group != null ? group.getUseSounds() : null,
                 1.0f, 0.2f, volume);
+    }
+
+    public void playLoopingSound(SoundGroup group) {
+        if (group == null) return;
+        String[] sounds = group.getLoopingSounds();
+        if (sounds == null || sounds.length == 0) return;
+        playSound(loopingSource, sounds, 1.0f, 0.0f, 1.0f);
     }
 
     public void setBackgroundSound(SoundGroup group) {
