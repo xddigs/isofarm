@@ -28,6 +28,11 @@ public class GUI {
     private static final UIFont big = new UIFont(K.Paths.FONT, 32.0f);
     private static final UIFont large = new UIFont(K.Paths.FONT, 48.0f);
 
+    private static final UIFont smallBold = new UIFont(K.Paths.FONT_BOLD, 16.0f);
+    private static final UIFont normalBold = new UIFont(K.Paths.FONT_BOLD, 24.0f);
+    private static final UIFont bigBold = new UIFont(K.Paths.FONT_BOLD, 32.0f);
+    private static final UIFont largeBold = new UIFont(K.Paths.FONT_BOLD, 48.0f);
+
     private static int screenWidth;
     private static int screenHeight;
 
@@ -424,6 +429,22 @@ public class GUI {
 
     public static UIFont getLargeFont() {
         return large;
+    }
+
+    public static UIFont getSmallBoldFont() {
+        return smallBold;
+    }
+
+    public static UIFont getNormalBoldFont() {
+        return normalBold;
+    }
+
+    public static UIFont getBigBoldFont() {
+        return bigBold;
+    }
+
+    public static UIFont getLargeBoldFont() {
+        return largeBold;
     }
 
     public static void dispose() {
