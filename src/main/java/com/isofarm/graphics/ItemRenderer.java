@@ -103,19 +103,33 @@ public class ItemRenderer {
         }
 
         Vector3f position = worldItem.getPosition();
-        float scale = 0.5f;
+        float scale = 0.4f;
+
         baseModelMatrix.identity()
                 .translate(position.x, position.y, position.z)
                 .rotateY((float) Math.toRadians(worldItem.getRotation()))
-                .scale(scale, -scale, scale);
+                .rotateZ((float) Math.toRadians(180.0f))
+                .scale(scale, scale, scale);
 
         int frameIndex = item instanceof Block ? item.getId() - 1 : item.getId();
+
         shader.bind();
+        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, spriteSheet.getTextureId());
+
         shader.setUniform("uProjection", gameMaster.getActiveCamera().getProjectionMatrix());
         shader.setUniform("uView", gameMaster.getActiveCamera().getViewMatrix());
         shader.setUniform("uFrameIndex", frameIndex);
         shader.setUniform("uTotalFrames", spriteSheet.getTotalFrames());
+
+        shader.setUniform("uUseTexture", true);
+        shader.setUniform("uUseFaceAtlas", false);
+        shader.setUniform("uParticleAlpha", 1.0f);
+        shader.setUniform("uAtlasScale", new org.joml.Vector2f(1.0f, 1.0f));
+        shader.setUniform("uAtlasOffset", new org.joml.Vector2f(0.0f, 0.0f));
+        shader.setUniform("uBaseColor", new Vector3f(1.0f, 1.0f, 1.0f));
+        shader.setUniform("uIsMaskPass", false);
+        shader.setUniform("uEnableShadows", false);
 
         Vector3f viewLightDir = new Vector3f(lighting.getDirection());
         gameMaster.getActiveCamera().getViewMatrix().transformDirection(viewLightDir);
@@ -124,12 +138,17 @@ public class ItemRenderer {
         shader.setUniform("uSkyColor", lighting.getColor());
         shader.setUniform("uLightIntensity", lighting.getIntensity());
         shader.setUniform("uAmbientIntensity", lighting.getAmbientIntensity());
-        shader.setUniform("uEnableShadows", false);
+
+        glDisable(GL_CULL_FACE);
+
         for (int i = THICKNESS_LAYERS - 1; i >= 0; i--) {
-            Matrix4f layerMatrix = new Matrix4f(baseModelMatrix).translate(0.0f, 0.0f, -i * LAYER_DEPTH);
+            float zOffset = (i - THICKNESS_LAYERS / 2.0f) * LAYER_DEPTH;
+            Matrix4f layerMatrix = new Matrix4f(baseModelMatrix).translate(0.0f, 0.0f, zOffset);
             shader.setUniform("uModel", layerMatrix);
             quadMesh.render();
         }
+
+        glEnable(GL_CULL_FACE);
 
         shader.unbind();
         glBindTexture(GL_TEXTURE_2D, 0);
