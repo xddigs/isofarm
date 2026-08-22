@@ -109,7 +109,7 @@ public class OrthographicCamera implements CameraView {
 
     public void setZoom(float zoom) {
         this.zoom = lerp(this.zoom, Math.clamp(zoom, MIN_ZOOM, MAX_ZOOM), .2f);
-        updateProjection(aspectRatio, 1.0f, Settings.renderDistance);
+        updateProjection(aspectRatio, 1.0f, Settings.getRenderDistance());
     }
 
     public Vector3f getUpVector() {

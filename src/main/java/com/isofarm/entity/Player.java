@@ -64,7 +64,7 @@ public class Player extends Character {
                     remove(tool);
                     toastService.error("Your " + tool.getName() + " broke!");
                     soundService.playBreakSound(SoundGroup.ITEMS,
-                            1.0f, Settings.maxInteractionDistance);
+                            1.0f, Settings.getMaxInteractionDistance());
                 }
             }
         }

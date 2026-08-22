@@ -122,8 +122,8 @@ public class CameraController implements Service<Camera> {
         float dx = Mouse.getDeltaX();
         float dy = Mouse.getDeltaY();
 
-        float newYaw = camera.getYaw() + dx * Settings.mouseSensitivity;
-        float newPitch = camera.getPitch() + dy * Settings.mouseSensitivity;
+        float newYaw = camera.getYaw() + dx * Settings.getMouseSensitivity();
+        float newPitch = camera.getPitch() + dy * Settings.getMouseSensitivity();
 
         camera.setYaw(newYaw);
         camera.setPitch(Math.clamp(newPitch, -89.0f, 89.0f));

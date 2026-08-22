@@ -18,8 +18,8 @@ public class Camera implements CameraView {
     private final Matrix4f projectionMatrix;
     private float pitch = K.Camera.DEFAULT_PITCH;
     private float yaw = K.Camera.DEFAULT_YAW;
-    private float currentFov = Settings.fov;
-    private float targetFov = Settings.fov;
+    private float currentFov = Settings.getFov();
+    private float targetFov = Settings.getFov();
     private float aspectRatio = 1.0f;
 
     public Camera(float width, float height, int renderDistanceChunks) {
@@ -123,7 +123,7 @@ public class Camera implements CameraView {
     }
 
     public void setZooming(boolean zooming) {
-        targetFov = zooming ? Settings.fov / 2.5f : Settings.fov;
+        targetFov = zooming ? Settings.getFov() / 2.5f : Settings.getFov();
     }
 
     public Hit highlight(World world) {

@@ -89,7 +89,7 @@ public class RainEngine {
 
         int centerChunkX = (int) Math.floor(cameraPos.x / Chunk.SIZE_X);
         int centerChunkZ = (int) Math.floor(cameraPos.z / Chunk.SIZE_Z);
-        int dist = Math.min(Settings.renderDistance, 2);
+        int dist = Math.min(Settings.getRenderDistance(), 2);
 
         for (int cx = centerChunkX - dist; cx <= centerChunkX + dist; cx++) {
             for (int cz = centerChunkZ - dist; cz <= centerChunkZ + dist; cz++) {

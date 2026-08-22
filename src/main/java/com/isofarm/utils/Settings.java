@@ -1,17 +1,18 @@
 package com.isofarm.utils;
 
+@SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
 public class Settings {
-
-    public static final float BASE_ICON_SIZE = 32.0f;
-    public static final float[] GUI_SCALES = {0.5f, 1.0f, 1.25f, 1.5f, 2.0f};
-    public static float fov = 80f;
-    public static float mouseSensitivity = 0.4f;
-    public static int renderDistance = 16;
-    public static int unloadMargin = 2;
-    public static int guiScaleIndex = 2;
-    public static boolean doEnableMotions = true;
-    public static boolean isOrthographic = true;
-    public static float maxInteractionDistance = 5.0f;
+    private static final float BASE_ICON_SIZE = 32.0f;
+    private static final float[] GUI_SCALES = {0.5f, 1.0f, 1.25f, 1.5f, 2.0f};
+    private static float fov = 80f;
+    private static float mouseSensitivity = 0.4f;
+    private static int renderDistance = 16;
+    private static int unloadMargin = 2;
+    private static int guiScaleIndex = 2;
+    private static boolean doEnableMotions = true;
+    private static boolean isOrthographic = true;
+    private static float maxInteractionDistance = 5.0f;
+    private static boolean doEnableMusic = true;
 
     private Settings() {}
 
@@ -83,12 +84,36 @@ public class Settings {
         return isOrthographic;
     }
 
+    public static void setOrthographic(boolean isOrthographic) {
+        Settings.isOrthographic = isOrthographic;
+    }
+
     public static float getMaxInteractionDistance() {
         return isOrthographic() ? 1500f : maxInteractionDistance;
     }
 
+    public static void setMaxInteractionDistance(float maxInteractionDistance) {
+        Settings.maxInteractionDistance = maxInteractionDistance;
+    }
+
+    public static float getFov() {
+        return fov;
+    }
+
+    public static void setFov(float fov) {
+        Settings.fov = fov;
+    }
+
+    public static float getMouseSensitivity() {
+        return mouseSensitivity;
+    }
+
     public static float doEnableMotions() {
         return doEnableMotions ? 0.8f : 0.0f;
+    }
+
+    public static void setDoEnableMotions(boolean doEnableMotions) {
+        Settings.doEnableMotions = doEnableMotions;
     }
 
     public static void toggleMotionBlur() {
@@ -97,5 +122,33 @@ public class Settings {
 
     public static void toggleOrthographic() {
         isOrthographic = !isOrthographic;
+    }
+
+    public static void toggleMusic() {
+        doEnableMusic = !doEnableMusic;
+    }
+
+    public static int getRenderDistance() {
+        return renderDistance;
+    }
+
+    public static void setRenderDistance(int renderDistance) {
+        Settings.renderDistance = renderDistance;
+    }
+
+    public static int getUnloadMargin() {
+        return unloadMargin;
+    }
+
+    public static void setUnloadMargin(int unloadMargin) {
+        Settings.unloadMargin = unloadMargin;
+    }
+
+    public static int getGuiScaleIndex() {
+        return guiScaleIndex;
+    }
+
+    public static boolean doEnableMusic() {
+        return doEnableMusic;
     }
 }

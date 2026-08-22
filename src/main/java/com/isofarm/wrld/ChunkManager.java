@@ -40,8 +40,8 @@ public class ChunkManager {
     }
 
     public void updateLoadedChunks(int centerChunkX, int centerChunkZ) {
-        int r = Settings.renderDistance;
-        int unloadDist = r + Settings.unloadMargin;
+        int r = Settings.getRenderDistance();
+        int unloadDist = r + Settings.getUnloadMargin();
 
         chunkMeshes.entrySet().removeIf(entry -> {
             Chunk chunk = entry.getKey();

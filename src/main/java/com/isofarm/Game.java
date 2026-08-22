@@ -79,6 +79,8 @@ public class Game {
             throw new RuntimeException("Failed to create GLFW window");
         }
 
+        glfwWindowHint(GLFW_SAMPLES, 16);
+
         try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer pWidth = stack.mallocInt(1);
             IntBuffer pHeight = stack.mallocInt(1);

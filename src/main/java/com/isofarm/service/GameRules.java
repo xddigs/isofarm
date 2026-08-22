@@ -10,11 +10,11 @@ public final class GameRules {
     private static final Map<String, Object> RULES = new LinkedHashMap<>();
 
     static {
-        RULES.put("doEnableMotions", Settings.doEnableMotions);
-        RULES.put("isOrthographic", Settings.isOrthographic);
-        RULES.put("renderDistance", Settings.renderDistance);
-        RULES.put("unloadMargin", Settings.unloadMargin);
-        RULES.put("maxInteractionDistance", Settings.maxInteractionDistance);
+        RULES.put("doEnableMotions", Settings.doEnableMotions());
+        RULES.put("isOrthographic", Settings.isOrthographic());
+        RULES.put("renderDistance", Settings.getRenderDistance());
+        RULES.put("unloadMargin", Settings.getUnloadMargin());
+        RULES.put("maxInteractionDistance", Settings.getMaxInteractionDistance());
     }
 
     private GameRules() {}
@@ -75,7 +75,6 @@ public final class GameRules {
         }
 
         Object current = RULES.get(rule);
-
         if (!current.getClass().equals(value.getClass())) {
             throw new IllegalArgumentException(
                     "Invalid value type for gamerule: " + rule
@@ -89,23 +88,23 @@ public final class GameRules {
     private static void apply(String rule, Object value) {
         switch (rule) {
             case "doEnableMotions" -> {
-                Settings.doEnableMotions = (Boolean) value;
+                Settings.setDoEnableMotions((Boolean) value);
             }
 
             case "isOrthographic" -> {
-                Settings.isOrthographic = (Boolean) value;
+                Settings.setOrthographic((Boolean) value);
             }
 
             case "renderDistance" -> {
-                Settings.renderDistance = (Integer) value;
+                Settings.setRenderDistance((Integer) value);
             }
 
             case "unloadMargin" -> {
-                Settings.unloadMargin = (Integer) value;
+                Settings.setUnloadMargin((Integer) value);
             }
 
             case "maxInteractionDistance" -> {
-                Settings.maxInteractionDistance = (Float) value;
+                Settings.setMaxInteractionDistance((Float) value);
             }
         }
     }

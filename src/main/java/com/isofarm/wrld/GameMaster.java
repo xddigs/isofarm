@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 
 @SuppressWarnings("all")
 public class GameMaster {
@@ -95,6 +96,7 @@ public class GameMaster {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_MULTISAMPLE);
 
         this.maskFbo = new Framebuffer((int) windowWidth, (int) windowHeight);
         this.sceneFbo = new Framebuffer((int) windowWidth, (int) windowHeight);
@@ -116,10 +118,10 @@ public class GameMaster {
         this.gameUIservice.setShop(shop);
 
         this.camera = new Camera(K.Camera.DEFAULT_WIDTH,
-                K.Camera.DEFAULT_HEIGHT, Settings.renderDistance);
+                K.Camera.DEFAULT_HEIGHT, Settings.getRenderDistance());
 
         this.orthoCamera = new OrthographicCamera(K.Camera.DEFAULT_WIDTH,
-                K.Camera.DEFAULT_HEIGHT, Settings.renderDistance);
+                K.Camera.DEFAULT_HEIGHT, Settings.getRenderDistance());
 
         this.camera.setPosition(0.0f, 0.0f, 0.0f);
 
@@ -294,9 +296,17 @@ public class GameMaster {
     public void update(float delta) {
         if (weatherService.isRaining()) {
             rainEngine.update(delta);
-            soundService.setBackgroundSound(SoundGroup.RAIN);
+            if (Settings.doEnableMusic()){
+                soundService.setBackgroundSound(SoundGroup.RAIN);
+            } else {
+                soundService.setBackgroundSound(null);
+            }
         } else {
-            soundService.setBackgroundSound(SoundGroup.NATURE);
+            if (Settings.doEnableMusic()){
+                soundService.setBackgroundSound(SoundGroup.NATURE);
+            } else {
+                soundService.setBackgroundSound(null);
+            }
         }
 
         gameUIservice.update(delta);
@@ -386,12 +396,12 @@ public class GameMaster {
 
         if (camera != null) {
             camera.updateProjection(newWidth, newHeight,
-                    Settings.renderDistance);
+                    Settings.getRenderDistance());
         }
 
         if (orthoCamera != null) {
             orthoCamera.updateProjection(newWidth, newHeight,
-                    Settings.renderDistance);
+                    Settings.getRenderDistance());
         }
 
         if (maskFbo != null) {

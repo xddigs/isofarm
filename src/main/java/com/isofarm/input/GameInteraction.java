@@ -97,6 +97,10 @@ public class GameInteraction {
             }
         }
 
+        if (Keyboard.isKeyPressed(GLFW_KEY_M)) {
+            Settings.toggleMusic();
+        }
+
         Hit hoveredCell;
         if (gameMaster.isOrthographicCamera()) {
             hoveredCell = HoveredCell.get(gameMaster);
@@ -336,7 +340,7 @@ public class GameInteraction {
 
         if (blockData.getSoundGroup() != null) {
             gameMaster.getSoundService().playBreakSound(blockData.getSoundGroup(),
-                    getDistanceToBlock(gameMaster, cell), Settings.maxInteractionDistance);
+                    getDistanceToBlock(gameMaster, cell), Settings.getMaxInteractionDistance());
         }
 
         world.setBlockTypeAt(x, y, z, BlockData.AIR.getId());
@@ -393,7 +397,7 @@ public class GameInteraction {
                 world.setBlockTypeAt(x, y, z, block.getType().getId());
                 itemRenderer.playPlaceAnimation();
                 gameMaster.getSoundService().playBreakSound(newBlock.getType().getSoundGroup(),
-                        getDistanceToBlock(gameMaster, cell), Settings.maxInteractionDistance);
+                        getDistanceToBlock(gameMaster, cell), Settings.getMaxInteractionDistance());
 
                 gameMaster.getPlayer().remove(selectedItem);
                 gameMaster.rebuildChunkMeshAt(x, z);
