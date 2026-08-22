@@ -1,5 +1,6 @@
 package com.isofarm.input;
 
+import com.isofarm.data.Gamemode;
 import com.isofarm.entity.Player;
 import com.isofarm.graphics.Camera;
 import com.isofarm.service.Service;
@@ -15,6 +16,10 @@ public class CameraController implements Service<Camera> {
     private boolean mouseCaptured = false;
     private final Vector3f targetVelocity;
     private float bobTime = 0.0f;
+
+    private boolean isFlying = false;
+    private float spaceLastPressedTime = 0.0f;
+    private static final float DOUBLE_TAP_TIME = 0.3f;
 
     public CameraController(Camera camera) {
         this.camera = camera;
@@ -35,23 +40,40 @@ public class CameraController implements Service<Camera> {
 
         Player player = gameMaster.getPlayer();
         if (player != null) {
-            movement(gameMaster, delta);
-            if (!gameMaster.isInventoryOpen() && !gameMaster.isPromptingForInput()
-                    && Keyboard.isKeyPressed(GLFW_KEY_SPACE)) {
-                player.jump();
+            boolean isGodmode = Gamemode.GODMODE.isGodmode();
+            if (!isGodmode) {
+                isFlying = false;
             }
 
-            if (Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
-                player.crunch();
-            } else {
-                player.uncrouch(gameMaster.getWorld());
+            if (isGodmode && !gameMaster.isInventoryOpen() && !gameMaster.isPromptingForInput()) {
+                if (Keyboard.isKeyPressed(GLFW_KEY_SPACE)) {
+                    float currentTime = (float) glfwGetTime();
+                    if (currentTime - spaceLastPressedTime <= DOUBLE_TAP_TIME) {
+                        isFlying = !isFlying;
+                    }
+                    spaceLastPressedTime = currentTime;
+                }
+            }
+
+            movement(gameMaster, delta);
+            if (!isFlying) {
+                if (!gameMaster.isInventoryOpen() && !gameMaster.isPromptingForInput()
+                        && Keyboard.isKeyPressed(GLFW_KEY_SPACE)) {
+                    player.jump();
+                }
+
+                if (Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
+                    player.crunch();
+                } else {
+                    player.uncrouch(gameMaster.getWorld());
+                }
             }
 
             camera.setZooming(!gameMaster.isInventoryOpen() &&
                     !gameMaster.isPromptingForInput() && Keyboard.isKeyDown(GLFW_KEY_C));
-            
+
             Vector3f eyePos = player.getEyePosition();
-            if (player.isOnGround() && targetVelocity.lengthSquared() > 0.1f) {
+            if (!isFlying && player.isOnGround() && targetVelocity.lengthSquared() > 0.1f) {
                 boolean isSprinting = Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT);
                 float speedFactor = isSprinting ? K.Camera.SPRINT_MULTIPLIER : 1.0f;
                 bobTime += delta * K.Camera.BOB_FREQUENCY * speedFactor;
@@ -60,6 +82,7 @@ public class CameraController implements Service<Camera> {
             } else {
                 bobTime = 0;
             }
+
             camera.getPosition().set(eyePos);
         }
     }
@@ -83,39 +106,71 @@ public class CameraController implements Service<Camera> {
         float rightZ = (float) Math.sin(yaw);
 
         float moveX = 0.0f;
+        float moveY = 0.0f;
         float moveZ = 0.0f;
 
         if (!gameMaster.isInventoryOpen() && !gameMaster.isPromptingForInput()) {
             if (Keyboard.isKeyDown(GLFW_KEY_W)) {
                 moveX += forwardX;
                 moveZ += forwardZ;
+                if (isFlying) {
+                    moveX += forwardX;
+                    moveZ += forwardZ;
+                }
             }
 
             if (Keyboard.isKeyDown(GLFW_KEY_S)) {
                 moveX -= forwardX;
                 moveZ -= forwardZ;
+                if (isFlying) {
+                    moveX -= forwardX;
+                    moveZ -= forwardZ;
+                }
             }
 
             if (Keyboard.isKeyDown(GLFW_KEY_D)) {
                 moveX += rightX;
                 moveZ += rightZ;
+                if (isFlying) {
+                    moveX += rightX;
+                    moveZ += rightZ;
+                }
             }
 
             if (Keyboard.isKeyDown(GLFW_KEY_A)) {
                 moveX -= rightX;
                 moveZ -= rightZ;
+                if (isFlying) {
+                    moveX -= rightX;
+                    moveZ -= rightZ;
+                }
+            }
+
+            if (isFlying) {
+                if (Keyboard.isKeyDown(GLFW_KEY_SPACE)) {
+                    moveY += 1.0f;
+                }
+                if (Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
+                    moveY -= 1.0f;
+                }
             }
         }
 
-        float length = (float) Math.sqrt(moveX * moveX + moveZ * moveZ);
-
-        if (length > 0.0f) {
-            moveX = (moveX / length) * speed;
-            moveZ = (moveZ / length) * speed;
+        float horizontalLength = (float) Math.sqrt(moveX * moveX + moveZ * moveZ);
+        if (horizontalLength > 0.0f) {
+            moveX = (moveX / horizontalLength) * speed;
+            moveZ = (moveZ / horizontalLength) * speed;
         }
 
-        targetVelocity.set(moveX, 0.0f, moveZ);
-        player.moveAndCollide(gameMaster.getWorld(), targetVelocity, delta);
+        if (isFlying) {
+            moveY *= speed;
+            targetVelocity.set(moveX, moveY, moveZ);
+            player.getPosition().add(targetVelocity.x * delta, targetVelocity.y * delta, targetVelocity.z * delta);
+            player.getVelocity().set(0, 0, 0);
+        } else {
+            targetVelocity.set(moveX, 0.0f, moveZ);
+            player.moveAndCollide(gameMaster.getWorld(), targetVelocity, delta);
+        }
     }
 
     private void mouseLook() {
@@ -143,5 +198,9 @@ public class CameraController implements Service<Camera> {
 
     public void release(GameMaster gameMaster) {
         releaseMouse(gameMaster);
+    }
+
+    public boolean isFlying() {
+        return isFlying;
     }
 }
