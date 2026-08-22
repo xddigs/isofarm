@@ -205,6 +205,9 @@ public class ChunkMeshBuilder {
 
         BlockData neighborData = BLOCK_LUT[neighborId & 0xFF];
         if (neighborData == null) return true;
+        if (currentBlock.isTransparent()) {
+            return true;
+        }
 
         return neighborData.isTransparent() && neighborData != currentBlock;
     }
