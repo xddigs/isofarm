@@ -431,14 +431,27 @@ public class GameUIService implements Service<GameMaster> {
         this.windowWidth = width;
         this.windowHeight = height;
         gameMaster.getToastService().setWindowWidth(width);
-
+        gameMaster.getToastService().info("Resized to " + width + "x" + height);
         resetHotbarPosition();
 
+        if (healthBar != null && staminaBar != null) {
+            float barWidth = healthBar.getWidth();
+            float barHeight = healthBar.getHeight();
+            float gapBetweenBars = 12.0f;
+            float offsetAboveHotbar = 10.0f;
+
+            float totalBarsWidth = (barWidth * 2.0f) + gapBetweenBars;
+            float startX = (width - totalBarsWidth) / 2.0f;
+            float barY = height - hotbarUI.getHeight() - K.UI.HOTBAR_OFFSET -
+                    barHeight - offsetAboveHotbar;
+
+            healthBar.setPosition(startX, barY);
+            staminaBar.setPosition(startX + barWidth + gapBetweenBars, barY);
+        }
+
         if (inventoryUI != null) {
-            inventoryUI.setPosition(
-                    (width - inventoryUI.getWidth()) / 2.0f,
-                    (height - inventoryUI.getHeight()) / 2.0f
-            );
+            inventoryUI.setPosition((width - inventoryUI.getWidth()) / 2.0f,
+                    (height - inventoryUI.getHeight()) / 2.0f);
         }
 
         if (chatField != null) {

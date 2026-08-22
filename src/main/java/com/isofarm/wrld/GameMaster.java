@@ -294,7 +294,7 @@ public class GameMaster {
     }
 
     public String getFps() {
-        return String.format("%.0f", 1.0f / genDelta + " FPS");
+        return String.format("%.0f", 1.0f / genDelta) + " FPS";
     }
 
     public void update(float delta) {
