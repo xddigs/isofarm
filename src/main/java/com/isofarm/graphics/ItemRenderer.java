@@ -9,6 +9,8 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
 
 public class ItemRenderer {
     private static final float OFFSET_X = 0.60f;
@@ -52,10 +54,6 @@ public class ItemRenderer {
         return Math.min(animationTime / ANIMATION_DURATION, 1.0f);
     }
 
-    private float easeOut(float t) {
-        return 1.0f - (1.0f - t) * (1.0f - t);
-    }
-
     public void update(float delta) {
         if (currentAnimation == ActionAnimation.NONE) {
             return;
@@ -84,7 +82,8 @@ public class ItemRenderer {
         return new Vector3f();
     }
 
-    public void renderWorldItem(GameMaster gameMaster, WorldItem worldItem, CelestialLighting lighting) {
+    public void renderWorldItem(GameMaster gameMaster, WorldItem worldItem,
+                                CelestialLighting lighting) {
         if (worldItem == null) return;
         Item item = worldItem.getItem();
         if (item == null) return;
@@ -92,7 +91,6 @@ public class ItemRenderer {
         if (spriteSheet == null) return;
         Shader shader = gameMaster.getResourceManager().getShader("item");
         if (shader == null) return;
-        Vector3f position = worldItem.getPosition();
         renderWorldItemMesh(gameMaster, worldItem, item, spriteSheet, shader, lighting);
     }
 
@@ -105,7 +103,7 @@ public class ItemRenderer {
         }
 
         Vector3f position = worldItem.getPosition();
-        float scale = 0.45f;
+        float scale = 0.5f;
         baseModelMatrix.identity()
                 .translate(position.x, position.y, position.z)
                 .rotateY((float) Math.toRadians(worldItem.getRotation()))
@@ -137,13 +135,21 @@ public class ItemRenderer {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    public void render(GameMaster gameMaster, Item item,
-                       SpriteSheet spriteSheet, Shader shader,
-                       CelestialLighting lighting, float delta) {
+    public void render(GameMaster gameMaster,
+                       Item item,
+                       SpriteSheet spriteSheet,
+                       Shader shader,
+                       CelestialLighting lighting,
+                       float delta) {
+
         if (item == null || spriteSheet == null || quadMesh == null) return;
         if (gameMaster.isOrthographicCamera()) return;
-        float rotateX, rotateY, rotateZ;
         boolean isTool = item instanceof Tool;
+
+        float rotateX;
+        float rotateY;
+        float rotateZ;
+
         if (isTool) {
             rotateX = 10.0f;
             rotateY = -90.0f;
@@ -156,12 +162,8 @@ public class ItemRenderer {
 
         Vector3f animationOffset = getAnimationOffset();
 
-        baseModelMatrix.identity()
-                .translate(
-                        OFFSET_X + animationOffset.x,
-                        OFFSET_Y + animationOffset.y,
-                        OFFSET_Z + animationOffset.z
-                )
+        baseModelMatrix.identity().translate(OFFSET_X + animationOffset.x,
+                OFFSET_Y + animationOffset.y, OFFSET_Z + animationOffset.z)
                 .rotateX((float) Math.toRadians(rotateX))
                 .rotateY((float) Math.toRadians(rotateY))
                 .rotateZ((float) Math.toRadians(rotateZ))
@@ -169,31 +171,42 @@ public class ItemRenderer {
 
         int frameIndex = item instanceof Block ? item.getId() - 1 : item.getId();
         shader.bind();
+
+        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, spriteSheet.getTextureId());
+
         shader.setUniform("uProjection", gameMaster.getActiveCamera().getProjectionMatrix());
         shader.setUniform("uView", new Matrix4f().identity());
         shader.setUniform("uFrameIndex", frameIndex);
         shader.setUniform("uTotalFrames", spriteSheet.getTotalFrames());
+
+        shader.setUniform("uUseTexture", true);
+        shader.setUniform("uUseFaceAtlas", false);
+        shader.setUniform("uParticleAlpha", 1.0f);
+        shader.setUniform("uAtlasScale", new org.joml.Vector2f(1.0f, 1.0f));
+        shader.setUniform("uAtlasOffset", new org.joml.Vector2f(0.0f, 0.0f));
+        shader.setUniform("uBaseColor", new Vector3f(1.0f, 1.0f, 1.0f));
+        shader.setUniform("uIsMaskPass", false);
+        shader.setUniform("uEnableShadows", false);
+
         Vector3f viewLightDir = new Vector3f(lighting.getDirection());
+
         gameMaster.getActiveCamera().getViewMatrix().transformDirection(viewLightDir);
+
         shader.setUniform("uLightDirection", viewLightDir);
         shader.setUniform("uSunColor", lighting.getColor());
         shader.setUniform("uSkyColor", lighting.getColor());
         shader.setUniform("uLightIntensity", lighting.getIntensity());
         shader.setUniform("uAmbientIntensity", lighting.getAmbientIntensity());
-        shader.setUniform("uEnableShadows", false);
 
         for (int i = THICKNESS_LAYERS - 1; i >= 0; i--) {
-            Matrix4f layerMatrix = new Matrix4f(baseModelMatrix)
-                    .translate(0.0f, 0.0f, -i * LAYER_DEPTH);
-
+            Matrix4f layerMatrix = new Matrix4f(baseModelMatrix).translate(0.0f, 0.0f, -i * LAYER_DEPTH);
             shader.setUniform("uModel", layerMatrix);
             quadMesh.render();
         }
 
-        glDepthMask(true);
-        glEnable(GL_DEPTH_TEST);
         shader.unbind();
+
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 

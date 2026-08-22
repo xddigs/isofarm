@@ -13,17 +13,18 @@ import org.joml.Vector3f;
 @DataClass
 public class WorldItem extends Entity {
     private static final float GRAVITY = -20.0f;
-    private static final float GROUND_OFFSET = 0.20f;
+    private static final float GROUND_OFFSET = 0.02f;
+    private static final float ITEM_HEIGHT = 0.45f;
 
     private static final float PICKUP_DELAY = 0.56f;
 
     private static final float AIR_DRAG = 2.5f;
-    private static final float GROUND_FRICTION = 7.0f;
+    private static final float GROUND_FRICTION = 8.0f;
 
     private static final float BOUNCE_FACTOR = 0.20f;
     private static final float MIN_BOUNCE_VELOCITY = 1.2f;
 
-    private static final float ROTATION_SPEED = 180.0f;
+    private static final float ROTATION_SPEED = 90.0f;
     private static final float GROUND_BOB_SPEED = 3.0f;
     private static final float GROUND_BOB_HEIGHT = 0.08f;
 
@@ -58,9 +59,10 @@ public class WorldItem extends Entity {
         rotation = (rotation + ROTATION_SPEED * delta) % 360.0f;
         int currentX = (int) Math.floor(position.x);
         int currentZ = (int) Math.floor(position.z);
-        int targetY = world.getHighestY(currentX, currentZ).y();
 
-        float targetGroundY = targetY + GROUND_OFFSET;
+        int targetY = world.getHighestY(currentX, currentZ).y();
+        float surfaceY = targetY + 1.0f;
+        float targetGroundY = surfaceY + GROUND_OFFSET + ITEM_HEIGHT * 0.5f;
 
         if (!isOnGround()) {
             velocity.y += GRAVITY * delta;

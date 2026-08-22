@@ -354,8 +354,8 @@ public class GameInteraction {
         if (selectedItem instanceof Tool tool) {
             boolean usable = Arrays.stream(tool.getType().getUsableOn())
                     .anyMatch(b -> b.getId() == blockId);
+            tool.setPlayer(gameMaster.getPlayer());
             if (!usable) {
-                tool.setPlayer(gameMaster.getPlayer());
                 tool.misuse();
             } else {
                 tool.use();
@@ -368,7 +368,6 @@ public class GameInteraction {
         Vector3f position = new Vector3f(x + 0.5f, y + 0.5f, z + 0.5f);
         Block removedBlock = new Block(blockData, x, y, z);
         WorldItem item = new WorldItem(removedBlock, 1, position);
-        item.setWorld(world);
         gameMaster.addEntity(item);
         gameUIservice.logAction(cell);
         log.info("Block removed: {} at {},{},{}", blockData.getName(), x, y, z);
