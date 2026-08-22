@@ -10,7 +10,7 @@ public class WorldGenerator {
     private static final float DETAIL_SCALE = 0.025f;
 
     private static final int BASE_HEIGHT = 18;
-    private static final int MOUNTAIN_HEIGHT = 56;
+    private static final int MOUNTAIN_HEIGHT = 150;
 
     private final World world;
 
