@@ -13,6 +13,7 @@ public class Settings {
     private static boolean isOrthographic = true;
     private static float maxInteractionDistance = 5.0f;
     private static boolean doEnableMusic = true;
+    private static boolean doEnableDebugInfo = true;
 
     private Settings() {}
 
@@ -130,6 +131,14 @@ public class Settings {
 
     public static boolean doEnableMusic() {
         return doEnableMusic;
+    }
+
+    public static void toggleDebugInfo() {
+        doEnableDebugInfo = !doEnableDebugInfo;
+    }
+
+    public static boolean doEnableDebugInfo() {
+        return doEnableDebugInfo;
     }
 
     public static int getRenderDistance() {

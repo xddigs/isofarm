@@ -151,7 +151,6 @@ public final class K {
         public static final String PLAYER_SPRITESHEET = "assets/sprites/gb.png";
         public static final String BLOCKS = "assets/textures/blocks.png";
         public static final String WATER = "assets/textures/water.png";
-        public static final String WIDGET_HITPOINTS = "gui/hitpoints.png";
     }
 
     public static final class Render {
