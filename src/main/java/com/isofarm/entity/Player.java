@@ -58,9 +58,7 @@ public class Player extends Character {
     @Override
     public void update(Hit hit, float delta) {
         updateCrouching(delta);
-
-        heal(Math.clamp(getHitpoints(),
-                delta * 0.5f + getLevel(), getMaxHitpoints()));
+        heal((0.5f + getLevel()) * delta);
 
         if (!isOnGround()) {
             setIsOffGroundTimer(getIsOffGroundTimer() + delta);
@@ -68,24 +66,22 @@ public class Player extends Character {
 
         if (isOnGround() && !wasOnGround()) {
             float fallVelocity = Math.abs(getVelocity().y);
-            if (fallVelocity > 8.0f) {
+            if (fallVelocity > 4.0f) {
                 float damage = (fallVelocity - 8.0f) * 5.0f;
                 fallDamage(damage);
+                soundService.playUseSound(SoundGroup.ENTITY, 1.0f,
+                        Settings.getMaxInteractionDistance());
             }
-
             setIsOffGroundTimer(0.0f);
         }
 
         setWasOnGround(isOnGround());
-
         for (InventorySlot slot : getInventory().getSlots()) {
-            if (slot.getItem() instanceof Tool tool) {
-                if (tool.getDurability() <= 0) {
-                    remove(tool);
-                    toastService.error("Your " + tool.getName() + " broke!");
-                    soundService.playBreakSound(SoundGroup.ITEMS,
-                            1.0f, Settings.getMaxInteractionDistance());
-                }
+            if (slot.getItem() instanceof Tool tool && tool.getDurability() <= 0) {
+                remove(tool);
+                toastService.error("Your " + tool.getName() + " broke!");
+                soundService.playBreakSound(SoundGroup.ITEMS, 1.0f,
+                        Settings.getMaxInteractionDistance());
             }
         }
     }
