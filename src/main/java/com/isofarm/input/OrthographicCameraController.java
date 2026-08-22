@@ -75,7 +75,7 @@ public record OrthographicCameraController(OrthographicCamera camera)
 
     private void followPath(Player player, World world, float delta) {
         if (!player.isFollowingPath()) {
-            player.move(world, new Vector3f(), delta);
+            player.move(world, delta);
             return;
         }
 
@@ -121,12 +121,12 @@ public record OrthographicCameraController(OrthographicCamera camera)
             direction.normalize().mul(PATH_SPEED);
         }
 
-        player.move(world, direction, delta);
+        player.move(world, delta);
         player.lookAt(targetX, targetZ, camera.getYaw());
     }
 
     private void stopPlayer(Player player, World world, float delta) {
-        player.move(world, new Vector3f(), delta);
+        player.move(world, delta);
     }
 
     private GridPos getGoalPosition(World world, Hit hit) {

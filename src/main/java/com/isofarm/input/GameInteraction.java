@@ -409,7 +409,7 @@ public class GameInteraction {
         }
 
         if (selectedItem instanceof WateringCan wateringCan) {
-            wateringCan.use(world);
+            wateringCan.use(gameMaster);
             gameMaster.getToastService().success("You water the crops!");
             return;
         }

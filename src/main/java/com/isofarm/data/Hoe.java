@@ -18,6 +18,7 @@ public class Hoe extends Tool {
     }
 
     public void use(GameMaster gameMaster, Block block) {
+        setPlayer(gameMaster.getPlayer());
         super.use();
         World world = gameMaster.getWorld();
         GameInteraction interaction = gameMaster.getGameInteraction();

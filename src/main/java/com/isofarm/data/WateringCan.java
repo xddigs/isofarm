@@ -1,6 +1,7 @@
 package com.isofarm.data;
 
 import com.isofarm.wrld.Chunk;
+import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
 
 @DataClass
@@ -40,15 +41,17 @@ public class WateringCan extends Tool {
         }
     }
 
-    public void use(World world) {
+    public void use(GameMaster gameMaster) {
+        setPlayer(gameMaster.getPlayer());
         super.use();
-        water(world);
+        water(gameMaster.getWorld());
     }
 
     @Override
     public Item copy() {
         WateringCan wateringCan = new WateringCan();
         wateringCan.water = water;
+        wateringCan.setPlayer(getPlayer());
         return wateringCan;
     }
 }

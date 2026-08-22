@@ -1,10 +1,13 @@
 package com.isofarm.data;
 
+import com.isofarm.entity.Player;
+
 @DataClass
 public abstract class Tool extends Item {
     private final ToolType type;
     private Tier tier;
     private int durability;
+    private Player player;
 
     public Tool(byte id, String name, int value,
                 ToolType type, Tier tier, int durability) {
@@ -42,19 +45,30 @@ public abstract class Tool extends Item {
         this.durability = durability;
     }
 
+    public Player getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
     public void use() {
+        if (player.getGamemode().isGodmode()) return;
         if (canBeUsed()) {
             durability--;
         }
     }
 
     public void misuse() {
+        if (player.getGamemode().isGodmode()) return;
         if (canBeUsed()) {
             durability *= -2;
         }
     }
 
     public void repair() {
+        if (player.getGamemode().isGodmode()) return;
         durability += Math.clamp(durability,
                 0, tier.getDurability());
     }

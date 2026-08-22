@@ -6,6 +6,7 @@ import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.Shader;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.pathfinding.GridPos;
+import com.isofarm.service.ItemRegistry;
 import com.isofarm.service.SoundService;
 import com.isofarm.service.ToastService;
 import com.isofarm.utils.K;
@@ -50,9 +51,9 @@ public class Player extends Character {
         setPosition(new Vector3f(spawnX, highestAltitude.y(), spawnZ));
         setVelocity(new Vector3f(0.0f, 0.0f, 0.0f));
         setDimensions(new Vector3f(1.0f, 1.0f, 1.0f));
-        setUpInventory();
         setReputation(Reputation.NEUTRAL);
-        setGamemode(Gamemode.SURVIVAL);
+        setGamemode(Gamemode.GODMODE);
+        setUpInventory();
     }
 
     @Override
@@ -197,10 +198,21 @@ public class Player extends Character {
     }
 
     private void setUpInventory() {
-        add(new Seed(), 4);
-        add(new Seed(CropType.CARROT), 4);
-        add(new Hoe(), 1);
-        add(new Pickaxe(), 1);
+        switch (getGamemode()) {
+            case SURVIVAL -> {
+                add(new Seed(), 4);
+                add(new Seed(CropType.CARROT), 4);
+                add(new Hoe(), 1);
+                add(new Pickaxe(), 1);
+            }
+            case GODMODE -> {
+                BlockData[] blocks = BlockData.values();
+                for (BlockData b : blocks) {
+                    add(new Block(b));
+                }
+                sort();
+            }
+        }
     }
 
     public void sell(Item item, int amount) {
@@ -229,12 +241,18 @@ public class Player extends Character {
         log.info("Added x1 of {} to inventory", item.getName());
     }
 
+    public void sort() {
+        getInventory().sort();
+    }
+
     public void remove(Item item, int amount) {
+        if (getGamemode().isGodmode()) return;
         getInventory().remove(item, amount);
         log.info("Removed x{} of {} to inventory", amount, item.getName());
     }
 
     public void remove(Item item) {
+        if (getGamemode().isGodmode()) return;
         getInventory().remove(item, 1);
         log.info("Removed x1 of {} from inventory", item.getName());
     }

@@ -1,6 +1,5 @@
 package com.isofarm.input;
 
-import com.isofarm.data.Gamemode;
 import com.isofarm.entity.Player;
 import com.isofarm.graphics.Camera;
 import com.isofarm.service.Service;
@@ -40,11 +39,10 @@ public class CameraController implements Service<Camera> {
 
         Player player = gameMaster.getPlayer();
         if (player != null) {
-            boolean isGodmode = Gamemode.GODMODE.isGodmode();
-            if (!isGodmode) {
-                isFlying = false;
-            }
+            boolean isGodmode = gameMaster.getPlayer()
+                    .getGamemode().isGodmode();
 
+            if (!isGodmode) isFlying = false;
             if (isGodmode && !gameMaster.isInventoryOpen() && !gameMaster.isPromptingForInput()) {
                 if (Keyboard.isKeyPressed(GLFW_KEY_SPACE)) {
                     float currentTime = (float) glfwGetTime();
