@@ -65,7 +65,7 @@ public class GameMaster {
 
     private Player player;
     private Shop shop;
-    private boolean isPromptingForInput = false;
+    private boolean isChatOpen = false;
     private boolean isInventoryOpen = false;
     private boolean isHUDShown = true;
 
@@ -202,12 +202,12 @@ public class GameMaster {
         chunkManager.setLastPlayerChunkZ(lastPlayerChunkZ);
     }
 
-    public boolean isPromptingForInput() {
-        return isPromptingForInput;
+    public boolean isChatOpen() {
+        return isChatOpen;
     }
 
-    public void setPromptingForInput(boolean isPromptingForInput) {
-        this.isPromptingForInput = isPromptingForInput;
+    public void setChatOpen(boolean isChatOpen) {
+        this.isChatOpen = isChatOpen;
     }
 
     public boolean isInventoryOpen() {
@@ -326,7 +326,7 @@ public class GameMaster {
         if (Settings.isOrthographic()) {
             orthoCameraController.update(this, delta);
         } else {
-            if (!isPromptingForInput()) {
+            if (!isChatOpen()) {
                 cameraController.update(this, delta);
             }
             camera.update(delta);

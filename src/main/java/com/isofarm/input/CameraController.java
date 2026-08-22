@@ -35,7 +35,7 @@ public class CameraController implements Service<Camera> {
     }
 
     public void update(GameMaster gameMaster, float delta) {
-        if (gameMaster.isInventoryOpen() || gameMaster.isPromptingForInput()) {
+        if (gameMaster.isInventoryOpen() || gameMaster.isChatOpen()) {
             releaseMouse(gameMaster);
         } else {
             captureMouse(gameMaster);
@@ -57,7 +57,7 @@ public class CameraController implements Service<Camera> {
             }
 
             if (isGodmode && !isNoClip && !gameMaster.isInventoryOpen()
-                    && !gameMaster.isPromptingForInput()) {
+                    && !gameMaster.isChatOpen()) {
                 if (Keyboard.isKeyPressed(GLFW_KEY_SPACE)) {
                     float currentTime = (float) glfwGetTime();
                     if (currentTime - spaceLastPressedTime <= DOUBLE_TAP_TIME) {
@@ -73,7 +73,7 @@ public class CameraController implements Service<Camera> {
             movement(gameMaster, delta);
 
             if (!isFlying) {
-                if (!gameMaster.isInventoryOpen() && !gameMaster.isPromptingForInput()
+                if (!gameMaster.isInventoryOpen() && !gameMaster.isChatOpen()
                         && Keyboard.isKeyPressed(GLFW_KEY_SPACE)) {
                     player.jump();
                 }
@@ -86,7 +86,7 @@ public class CameraController implements Service<Camera> {
             }
 
             camera.setZooming(!gameMaster.isInventoryOpen() &&
-                    !gameMaster.isPromptingForInput() && Keyboard.isKeyDown(GLFW_KEY_C));
+                    !gameMaster.isChatOpen() && Keyboard.isKeyDown(GLFW_KEY_C));
 
             Vector3f eyePos = player.getEyePosition();
             if (!isFlying && player.isOnGround() && targetVelocity.lengthSquared() > 0.1f) {
@@ -107,7 +107,7 @@ public class CameraController implements Service<Camera> {
         Player player = gameMaster.getPlayer();
 
         float speed = K.Camera.MOVEMENT_SPEED;
-        if (!gameMaster.isInventoryOpen() && !gameMaster.isPromptingForInput()) {
+        if (!gameMaster.isInventoryOpen() && !gameMaster.isChatOpen()) {
             if (Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
                 speed *= K.Camera.SPRINT_MULTIPLIER;
             }
@@ -126,7 +126,7 @@ public class CameraController implements Service<Camera> {
         float moveZ = 0.0f;
 
         if (!gameMaster.isInventoryOpen() &&
-                !gameMaster.isPromptingForInput()) {
+                !gameMaster.isChatOpen()) {
             if (Keyboard.isKeyDown(GLFW_KEY_W)) {
                 moveX += forwardX;
                 moveZ += forwardZ;

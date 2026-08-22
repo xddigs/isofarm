@@ -25,7 +25,7 @@ public record OrthographicCameraController(OrthographicCamera camera)
     private static boolean mouseCaptured = false;
 
     public void update(GameMaster gameMaster, float delta) {
-        if (gameMaster.isInventoryOpen() || gameMaster.isPromptingForInput()) {
+        if (gameMaster.isInventoryOpen() || gameMaster.isChatOpen()) {
             return;
         }
 

@@ -57,8 +57,8 @@ public class GameInteraction {
 
     public Hit update(GameMaster gameMaster, Item selectedItem) {
         if (Keyboard.isKeyPressed(org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER)) {
-            if (!gameMaster.isPromptingForInput()) {
-                gameMaster.setPromptingForInput(true);
+            if (!gameMaster.isChatOpen()) {
+                gameMaster.setChatOpen(true);
                 gameUIservice.openChat();
             } else {
                 String command = gameUIservice.getChatText();
@@ -66,7 +66,7 @@ public class GameInteraction {
                     gameUIservice.addChatMessage(">> " + command);
                     gameMaster.getCommandService().execute(command);
                 }
-                gameMaster.setPromptingForInput(false);
+                gameMaster.setChatOpen(false);
                 gameUIservice.closeChat();
             }
         }
@@ -75,7 +75,7 @@ public class GameInteraction {
             gameMaster.toggleHUD();
         }
 
-        if (Keyboard.isKeyPressed(GLFW_KEY_E) && !gameMaster.isPromptingForInput()) {
+        if (Keyboard.isKeyPressed(GLFW_KEY_E) && !gameMaster.isChatOpen()) {
             gameMaster.toggleInventory();
         }
 
@@ -90,14 +90,15 @@ public class GameInteraction {
             addItem(gameMaster);
         }
 
-        if (!gameMaster.isPromptingForInput() &&
+        if (!gameMaster.isChatOpen() &&
                 !gameMaster.isInventoryOpen()) {
             if (Keyboard.isKeyPressed(GLFW_KEY_V)) {
                 gameMaster.changeCamera();
             }
         }
 
-        if (Keyboard.isKeyPressed(GLFW_KEY_M)) {
+        if (Keyboard.isKeyPressed(GLFW_KEY_M) &&
+                !gameMaster.isChatOpen()) {
             Settings.toggleMusic();
         }
 
