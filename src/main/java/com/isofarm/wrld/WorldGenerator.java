@@ -57,6 +57,7 @@ public class WorldGenerator {
 
     private static byte getBlockId(int y, int height, float mountainFactor) {
         boolean isHighMountain = mountainFactor > 0.45f;
+
         if (y == height) {
             if (isHighMountain && y > BASE_HEIGHT + 14) {
                 return BlockData.SNOW.getId();
@@ -64,12 +65,10 @@ public class WorldGenerator {
             return BlockData.GRASS.getId();
         } else if (y > height - 3) {
             return isHighMountain ? BlockData.STONE.getId() : BlockData.DIRT.getId();
-        } else if (y > height - 10) {
-            return BlockData.STONE.getId();
-        } else if (y > height - 18) {
+        } else if (y <= Math.floor(Math.random())) {
             return BlockData.VOIDSTONE.getId();
         } else {
-            return BlockData.AIR.getId();
+            return BlockData.STONE.getId();
         }
     }
 

@@ -3,6 +3,7 @@ package com.isofarm.graphics;
 import com.isofarm.data.BlockData;
 import com.isofarm.utils.K;
 import com.isofarm.wrld.Chunk;
+import com.isofarm.wrld.World;
 
 public class ChunkMeshBuilder {
 
@@ -23,12 +24,15 @@ public class ChunkMeshBuilder {
     private static final float[] uvBuffer = new float[MAX_FLOATS];
     private static final int[] indexBuffer = new int[MAX_INDICES];
 
-    public static synchronized Mesh buildMesh(Chunk chunk) {
+    public static synchronized Mesh buildMesh(World world, Chunk chunk) {
         int posIdx = 0;
         int uvIdx = 0;
         int normIdx = 0;
         int elemIdx = 0;
         int vertexCount = 0;
+
+        int chunkX = chunk.getChunkX();
+        int chunkZ = chunk.getChunkZ();
 
         for (int x = 0; x < Chunk.SIZE_X; x++) {
             for (int y = 0; y < Chunk.SIZE_Y; y++) {
@@ -39,15 +43,17 @@ public class ChunkMeshBuilder {
                     BlockData data = BLOCK_LUT[blockId & 0xFF];
                     if (data == null || data == BlockData.CROP) continue;
 
+                    int worldX = chunkX * Chunk.SIZE_X + x;
+                    int worldZ = chunkZ * Chunk.SIZE_Z + z;
+
                     float vx = x;
                     float vy = y;
                     float vz = z;
-
                     float bottomY = vy;
                     float topY = (data == BlockData.TILLED_DIRT) ? vy + TILLED_HEIGHT : vy + 1.0f;
 
                     float aboveBottomY = getBlockBottomY(chunk, x, y + 1, z);
-                    if (shouldRenderFace(chunk, x, y + 1, z, data) || aboveBottomY > topY) {
+                    if (shouldRenderFace(world, worldX, y + 1, worldZ, data) || aboveBottomY > topY) {
                         float uMin = data.getTopAtlasOffset().x;
                         float vMin = data.getTopAtlasOffset().y;
                         float uMax = uMin + data.getAtlasScale().x;
@@ -61,7 +67,7 @@ public class ChunkMeshBuilder {
                     }
 
                     float belowTopY = getBlockTopY(chunk, x, y - 1, z);
-                    if (shouldRenderFace(chunk, x, y - 1, z, data) || belowTopY < bottomY) {
+                    if (shouldRenderFace(world, worldX, y - 1, worldZ, data) || belowTopY < bottomY) {
                         float uMin = data.getBottomAtlasOffset().x;
                         float vMin = data.getBottomAtlasOffset().y;
                         float uMax = uMin + data.getAtlasScale().x;
@@ -75,9 +81,10 @@ public class ChunkMeshBuilder {
                     }
 
                     float neighborTop = getBlockTopY(chunk, x, y, z + 1);
-                    if (shouldRenderFace(chunk, x, y, z + 1, data) || neighborTop < topY) {
+                    if (shouldRenderFace(world, worldX, y, worldZ + 1, data) || neighborTop < topY) {
                         float expBottom = Math.max(bottomY, neighborTop);
-                        float uvB = (neighborTop < topY && !shouldRenderFace(chunk, x, y, z + 1, data)) ? (expBottom - bottomY) / (topY - bottomY) : 0.0f;
+                        float uvB = (neighborTop < topY && !shouldRenderFace(world, worldX, y, worldZ + 1, data)) ?
+                                (expBottom - bottomY) / (topY - bottomY) : 0.0f;
 
                         vertexCount = addSideQuadDirect(posBuffer, normBuffer, uvBuffer, indexBuffer,
                                 posIdx, normIdx, uvIdx, elemIdx, vertexCount,
@@ -86,9 +93,10 @@ public class ChunkMeshBuilder {
                     }
 
                     neighborTop = getBlockTopY(chunk, x, y, z - 1);
-                    if (shouldRenderFace(chunk, x, y, z - 1, data) || neighborTop < topY) {
+                    if (shouldRenderFace(world, worldX, y, worldZ - 1, data) || neighborTop < topY) {
                         float expBottom = Math.max(bottomY, neighborTop);
-                        float uvB = (neighborTop < topY && !shouldRenderFace(chunk, x, y, z - 1, data)) ? (expBottom - bottomY) / (topY - bottomY) : 0.0f;
+                        float uvB = (neighborTop < topY && !shouldRenderFace(world, worldX, y, worldZ - 1, data)) ?
+                                (expBottom - bottomY) / (topY - bottomY) : 0.0f;
 
                         vertexCount = addSideQuadDirect(posBuffer, normBuffer, uvBuffer, indexBuffer,
                                 posIdx, normIdx, uvIdx, elemIdx, vertexCount,
@@ -97,9 +105,10 @@ public class ChunkMeshBuilder {
                     }
 
                     neighborTop = getBlockTopY(chunk, x + 1, y, z);
-                    if (shouldRenderFace(chunk, x + 1, y, z, data) || neighborTop < topY) {
+                    if (shouldRenderFace(world, worldX + 1, y, worldZ, data) || neighborTop < topY) {
                         float expBottom = Math.max(bottomY, neighborTop);
-                        float uvB = (neighborTop < topY && !shouldRenderFace(chunk, x + 1, y, z, data)) ? (expBottom - bottomY) / (topY - bottomY) : 0.0f;
+                        float uvB = (neighborTop < topY && !shouldRenderFace(world, worldX + 1, y, worldZ, data)) ?
+                                (expBottom - bottomY) / (topY - bottomY) : 0.0f;
 
                         vertexCount = addSideQuadDirect(posBuffer, normBuffer, uvBuffer, indexBuffer,
                                 posIdx, normIdx, uvIdx, elemIdx, vertexCount,
@@ -108,9 +117,10 @@ public class ChunkMeshBuilder {
                     }
 
                     neighborTop = getBlockTopY(chunk, x - 1, y, z);
-                    if (shouldRenderFace(chunk, x - 1, y, z, data) || neighborTop < topY) {
+                    if (shouldRenderFace(world, worldX - 1, y, worldZ, data) || neighborTop < topY) {
                         float expBottom = Math.max(bottomY, neighborTop);
-                        float uvB = (neighborTop < topY && !shouldRenderFace(chunk, x - 1, y, z, data)) ? (expBottom - bottomY) / (topY - bottomY) : 0.0f;
+                        float uvB = (neighborTop < topY && !shouldRenderFace(world, worldX - 1, y, worldZ, data)) ?
+                                (expBottom - bottomY) / (topY - bottomY) : 0.0f;
 
                         vertexCount = addSideQuadDirect(posBuffer, normBuffer, uvBuffer, indexBuffer,
                                 posIdx, normIdx, uvIdx, elemIdx, vertexCount,
@@ -153,12 +163,12 @@ public class ChunkMeshBuilder {
         return getBlockTopY(data, y);
     }
 
-    private static boolean shouldRenderFace(Chunk chunk, int neighborX, int neighborY, int neighborZ, BlockData currentBlock) {
-        if (neighborY < 0 || neighborY >= Chunk.SIZE_Y || neighborX < 0 ||
-                neighborX >= Chunk.SIZE_X || neighborZ < 0 || neighborZ >= Chunk.SIZE_Z) return true;
-        byte neighborId = chunk.getBlock(neighborX, neighborY, neighborZ);
-        if (neighborId == 0) return true;
+    private static boolean shouldRenderFace(World world, int worldX, int worldY,
+                                            int worldZ, BlockData currentBlock) {
 
+        if (worldY < 0 || worldY >= Chunk.SIZE_Y) return true;
+        byte neighborId = world.getBlockTypeAt(worldX, worldY, worldZ);
+        if (neighborId == 0) return true; // Aire
         BlockData neighborData = BLOCK_LUT[neighborId & 0xFF];
         if (neighborData == null) return true;
         return neighborData.isTransparent() && neighborData != currentBlock;

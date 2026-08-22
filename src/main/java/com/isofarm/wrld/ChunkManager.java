@@ -76,7 +76,7 @@ public class ChunkManager {
                     generator.generateChunk(cx, cz);
                     updateGrass(cx, cz);
 
-                    Mesh mesh = ChunkMeshBuilder.buildMesh(chunk);
+                    Mesh mesh = ChunkMeshBuilder.buildMesh(world, chunk);
                     chunkMeshes.put(chunk, mesh);
                 }
             }
@@ -99,7 +99,7 @@ public class ChunkManager {
                 oldMesh.dispose();
             }
 
-            chunkMeshes.put(chunk, ChunkMeshBuilder.buildMesh(chunk));
+            chunkMeshes.put(chunk, ChunkMeshBuilder.buildMesh(world, chunk));
         }
     }
 
