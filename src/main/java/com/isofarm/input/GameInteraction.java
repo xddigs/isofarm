@@ -75,6 +75,10 @@ public class GameInteraction {
             gameMaster.toggleHUD();
         }
 
+        if (Keyboard.isKeyPressed(GLFW_KEY_F3)) {
+            Settings.toggleDebugInfo();
+        }
+
         if (Keyboard.isKeyPressed(GLFW_KEY_E) && !gameMaster.isChatOpen()) {
             gameMaster.toggleInventory();
         }

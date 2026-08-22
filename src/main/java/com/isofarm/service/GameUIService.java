@@ -30,6 +30,10 @@ public class GameUIService implements Service<GameMaster> {
     private final HotbarUI hotbarUI;
     private final UITextField chatField;
     private final UILabel time;
+    private final UILabel coords;
+    private final UILabel fps;
+    private UIProgressBar healthBar;
+    private UIProgressBar staminaBar;
     private final List<String> chatHistory;
     private final SpriteSheet seedIcons;
     private final SpriteSheet cropIcons;
@@ -101,6 +105,40 @@ public class GameUIService implements Service<GameMaster> {
         this.time = new UILabel(20, 40, 100f, 25f, null);
         this.time.show();
         uiManager.getRoot().addChild(time);
+
+        this.coords = new UILabel(20, time.getAbsoluteY() + time.getAbsoluteHeight(),
+                100f, 25f, null);
+        this.coords.show();
+        uiManager.getRoot().addChild(coords);
+
+        this.fps = new UILabel(20, coords.getAbsoluteY() + coords.getAbsoluteHeight(),
+                100f, 25f, null);
+        this.fps.show();
+        uiManager.getRoot().addChild(fps);
+
+        int barWidth = 160;
+        int barHeight = 16;
+        int gapBetweenBars = 12;
+        int offsetAboveHotbar = 10;
+
+        float totalBarsWidth = (barWidth * 2) + gapBetweenBars;
+        float startX = (windowWidth - totalBarsWidth) / 2.0f;
+        float barY = windowHeight - hotbarUI.getHeight() - K.UI.HOTBAR_OFFSET - barHeight - offsetAboveHotbar;
+
+        this.healthBar = new UIProgressBar(startX, barY, barWidth, barHeight, 100, 100);
+        this.healthBar.setColors(
+                new Vector4f(0.8f, 0.1f, 0.1f, 1.0f),
+                new Vector4f(0.2f, 0.05f, 0.05f, 0.8f));
+        this.healthBar.setLayer(10);
+        uiManager.getRoot().addChild(this.healthBar);
+
+        float staminaX = startX + barWidth + gapBetweenBars;
+        this.staminaBar = new UIProgressBar(staminaX, barY, barWidth, barHeight, 100, 100);
+        this.staminaBar.setColors(
+                new Vector4f(0.1f, 0.8f, 0.2f, 1.0f),
+                new Vector4f(0.05f, 0.2f, 0.05f, 0.8f));
+        this.staminaBar.setLayer(10);
+        uiManager.getRoot().addChild(this.staminaBar);
     }
 
     public InventoryUI getInventoryUI() {
@@ -144,6 +182,24 @@ public class GameUIService implements Service<GameMaster> {
         }
 
         time.setText(gameMaster.getTimeService().getFormattedTime());
+        coords.setText(gameMaster.getPlayer().getPositionString());
+        fps.setText(gameMaster.getFps());
+
+        if (Settings.doEnableDebugInfo()) {
+            time.show();
+            coords.show();
+            fps.show();
+        } else {
+            time.hide();
+            coords.hide();
+            fps.hide();
+        }
+
+        if (player != null) {
+            healthBar.setValues(player.getHitpoints(), player.getMaxHitpoints());
+            staminaBar.setValues(player.getStamina(), player.getMaxStamina());
+        }
+
         uiManager.update(delta);
         gameMaster.getToastService().update(delta);
 

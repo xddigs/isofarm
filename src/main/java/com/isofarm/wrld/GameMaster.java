@@ -293,6 +293,10 @@ public class GameMaster {
         return genDelta;
     }
 
+    public String getFps() {
+        return String.format("%.0f", 1.0f / genDelta + " FPS");
+    }
+
     public void update(float delta) {
         if (weatherService.isRaining()) {
             rainEngine.update(delta);
