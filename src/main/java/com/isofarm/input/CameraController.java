@@ -14,15 +14,20 @@ public class CameraController implements Service<Camera> {
     private final Camera camera;
     private boolean mouseCaptured = false;
     private final Vector3f targetVelocity;
+    private final Vector3f currentFlyVelocity;
     private float bobTime = 0.0f;
 
     private boolean isFlying = false;
     private float spaceLastPressedTime = 0.0f;
     private static final float DOUBLE_TAP_TIME = 0.3f;
 
+    private static final float FLY_SPEED_MULTIPLIER = 1.2f;
+    private static final float FLY_DAMPING = 12.0f;
+
     public CameraController(Camera camera) {
         this.camera = camera;
         this.targetVelocity = new Vector3f();
+        this.currentFlyVelocity = new Vector3f();
     }
 
     public Camera getCamera() {
@@ -39,21 +44,30 @@ public class CameraController implements Service<Camera> {
 
         Player player = gameMaster.getPlayer();
         if (player != null) {
-            boolean isGodmode = gameMaster.getPlayer()
-                    .getGamemode().isGodmode();
+            boolean isGodmode = gameMaster.getPlayer().getGamemode().isGodmode();
 
-            if (!isGodmode) isFlying = false;
+            if (!isGodmode) {
+                if (isFlying) {
+                    isFlying = false;
+                    currentFlyVelocity.set(0, 0, 0);
+                }
+            }
+
             if (isGodmode && !gameMaster.isInventoryOpen() && !gameMaster.isPromptingForInput()) {
                 if (Keyboard.isKeyPressed(GLFW_KEY_SPACE)) {
                     float currentTime = (float) glfwGetTime();
                     if (currentTime - spaceLastPressedTime <= DOUBLE_TAP_TIME) {
                         isFlying = !isFlying;
+                        if (!isFlying) {
+                            currentFlyVelocity.set(0, 0, 0);
+                        }
                     }
                     spaceLastPressedTime = currentTime;
                 }
             }
 
             movement(gameMaster, delta);
+
             if (!isFlying) {
                 if (!gameMaster.isInventoryOpen() && !gameMaster.isPromptingForInput()
                         && Keyboard.isKeyPressed(GLFW_KEY_SPACE)) {
@@ -111,37 +125,21 @@ public class CameraController implements Service<Camera> {
             if (Keyboard.isKeyDown(GLFW_KEY_W)) {
                 moveX += forwardX;
                 moveZ += forwardZ;
-                if (isFlying) {
-                    moveX += forwardX;
-                    moveZ += forwardZ;
-                }
             }
 
             if (Keyboard.isKeyDown(GLFW_KEY_S)) {
                 moveX -= forwardX;
                 moveZ -= forwardZ;
-                if (isFlying) {
-                    moveX -= forwardX;
-                    moveZ -= forwardZ;
-                }
             }
 
             if (Keyboard.isKeyDown(GLFW_KEY_D)) {
                 moveX += rightX;
                 moveZ += rightZ;
-                if (isFlying) {
-                    moveX += rightX;
-                    moveZ += rightZ;
-                }
             }
 
             if (Keyboard.isKeyDown(GLFW_KEY_A)) {
                 moveX -= rightX;
                 moveZ -= rightZ;
-                if (isFlying) {
-                    moveX -= rightX;
-                    moveZ -= rightZ;
-                }
             }
 
             if (isFlying) {
@@ -161,9 +159,18 @@ public class CameraController implements Service<Camera> {
         }
 
         if (isFlying) {
-            moveY *= speed;
+            moveX *= FLY_SPEED_MULTIPLIER;
+            moveZ *= FLY_SPEED_MULTIPLIER;
+            moveY *= (speed * FLY_SPEED_MULTIPLIER);
+
             targetVelocity.set(moveX, moveY, moveZ);
-            player.getPosition().add(targetVelocity.x * delta, targetVelocity.y * delta, targetVelocity.z * delta);
+            currentFlyVelocity.lerp(targetVelocity, Math.clamp(delta * FLY_DAMPING, 0.0f, 1.0f));
+            player.getPosition().add(
+                    currentFlyVelocity.x * delta,
+                    currentFlyVelocity.y * delta,
+                    currentFlyVelocity.z * delta
+            );
+
             player.getVelocity().set(0, 0, 0);
         } else {
             targetVelocity.set(moveX, 0.0f, moveZ);

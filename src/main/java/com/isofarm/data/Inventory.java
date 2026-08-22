@@ -130,7 +130,6 @@ public class Inventory {
         group();
 
         List<Stack> stacks = new ArrayList<>();
-
         for (InventorySlot slot : slots) {
             if (!slot.isEmpty()) {
                 stacks.add(new Stack(slot.getItem(), slot.getAmount()));
@@ -143,7 +142,6 @@ public class Inventory {
                 .thenComparingInt(Stack::amount).reversed());
 
         int index = 0;
-
         for (Stack stack : stacks) {
             int remaining = stack.amount();
 
@@ -429,6 +427,5 @@ public class Inventory {
         return index >= 0 && index < slots.size();
     }
 
-    private record Stack(Item item, int amount) {
-    }
+    private record Stack(Item item, int amount) {}
 }

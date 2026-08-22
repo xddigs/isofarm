@@ -128,6 +128,10 @@ public class Settings {
         doEnableMusic = !doEnableMusic;
     }
 
+    public static boolean doEnableMusic() {
+        return doEnableMusic;
+    }
+
     public static int getRenderDistance() {
         return renderDistance;
     }
@@ -146,9 +150,5 @@ public class Settings {
 
     public static int getGuiScaleIndex() {
         return guiScaleIndex;
-    }
-
-    public static boolean doEnableMusic() {
-        return doEnableMusic;
     }
 }
