@@ -16,7 +16,9 @@ import com.isofarm.utils.Settings;
 import com.isofarm.wrld.Chunk;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -486,5 +488,17 @@ public class GameInteraction {
         }
 
         return null;
+    }
+
+    public boolean isBreakingBlock() {
+        return breakProgress > 0.0f && breakingX != Integer.MIN_VALUE;
+    }
+
+    public Vector3i getBreakingBlockPos() {
+        return new Vector3i(breakingX, breakingY, breakingZ);
+    }
+
+    public float getBreakProgress() {
+        return breakProgress;
     }
 }

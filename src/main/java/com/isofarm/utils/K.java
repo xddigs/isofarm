@@ -73,6 +73,7 @@ public final class K {
         public static final int BLOCK_ATLAS_COLUMNS = ICON_BLOCK_FRAMES;
         public static final int BLOCK_ATLAS_ROWS = 3;
         public static final int WATER_FRAMES = 8;
+        public static final int DESTROY_FRAMES = 9;
 
         public static final float TOAST_WIDTH = 250.0f;
         public static final float TOAST_HEIGHT = 64.0f;

@@ -23,6 +23,7 @@ public class ResourceManager {
     private final Mesh selectionMesh;
     private final Mesh spriteMesh;
     private final Mesh playerMesh;
+    private final Mesh destroyOverlayMesh;
 
     private final SpriteSheet blocksTexture;
     private final SpriteSheet waterTexture;
@@ -54,6 +55,7 @@ public class ResourceManager {
         this.selectionMesh = Mesh.selection();
         this.spriteMesh = Mesh.createCrop();
         this.playerMesh = Mesh.quadVertical();
+        this.destroyOverlayMesh = Mesh.createDestroyOverlayMesh();
 
         SpriteSheet blocks = null;
         try {
@@ -78,7 +80,7 @@ public class ResourceManager {
         this.playerSpriteSheet = new SpriteSheet(K.Paths.PLAYER_SPRITESHEET,
                 Direction.values().length);
 
-        this.destroyTexture = new SpriteSheet(K.Paths.DESTROY_STAGES, 9);
+        this.destroyTexture = new SpriteSheet(K.Paths.DESTROY_STAGES, K.UI.DESTROY_FRAMES);
 
         this.cropSpritesheets = new EnumMap<>(CropType.class);
         cropSpritesheets.put(CropType.WHEAT, wheat);
@@ -93,6 +95,7 @@ public class ResourceManager {
         spriteMesh.dispose();
         screenQuadMesh.dispose();
         playerMesh.dispose();
+        destroyOverlayMesh.dispose();
 
         if (blocksTexture != null) blocksTexture.dispose();
         if (waterTexture != null) waterTexture.dispose();
@@ -126,6 +129,7 @@ public class ResourceManager {
     public Shader getBlurShader() { return blurShader; }
     public Mesh getScreenQuadMesh() { return screenQuadMesh; }
     public Mesh getBlockMesh() { return blockMesh; }
+    public Mesh getDestroyOverlayMesh() { return destroyOverlayMesh; }
     public Mesh getSelectionMesh() { return selectionMesh; }
     public Mesh getSpriteMesh() { return spriteMesh; }
     public Mesh getPlayerMesh() { return playerMesh; }

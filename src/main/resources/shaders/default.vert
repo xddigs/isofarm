@@ -20,7 +20,6 @@ uniform vec4 uUVBounds;
 uniform int uFrameIndex;
 uniform int uTotalFrames;
 
-uniform vec2 uAtlasOffset = vec2(0.0, 0.0);
 uniform vec2 uTopAtlasOffset = vec2(0.0, 0.0);
 uniform vec2 uBottomAtlasOffset = vec2(0.0, 0.0);
 uniform vec2 uSideAtlasOffset = vec2(0.0, 0.0);
@@ -33,18 +32,6 @@ void main() {
     vFragPos = worldPosition.xyz;
     vNormal = normalize(mat3(transpose(inverse(uModel))) * aNormal);
     vLightSpacePosition = uLightSpaceMatrix * worldPosition;
-
-    if (uUseFaceAtlas) {
-        if (aNormal.y > 0.5) {
-            vAtlasOffset = uTopAtlasOffset;
-        } else if (aNormal.y < -0.5) {
-            vAtlasOffset = uBottomAtlasOffset;
-        } else {
-            vAtlasOffset = uSideAtlasOffset;
-        }
-    } else {
-        vAtlasOffset = uAtlasOffset;
-    }
 
     if (uTotalFrames > 1) {
         float frameWidth = 1.0 / float(uTotalFrames);

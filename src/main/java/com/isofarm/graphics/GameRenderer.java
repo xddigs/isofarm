@@ -2,8 +2,8 @@ package com.isofarm.graphics;
 
 import com.isofarm.data.Crop;
 import com.isofarm.data.Hit;
-import com.isofarm.entity.Entity;
 import com.isofarm.entity.Player;
+import com.isofarm.input.GameInteraction;
 import com.isofarm.service.TimeService;
 import com.isofarm.utils.HoveredCell;
 import com.isofarm.utils.K;
@@ -138,6 +138,9 @@ public class GameRenderer {
             rm.getSpriteMesh().render();
             sheet.unbind();
         });
+
+        renderDestroyOverlay(gameMaster.getGameInteraction(), defaultShader,
+                rm.getDestroyOverlayMesh(), rm.getDestroyTexture(), camera);
 
         gameMaster.getEntities().forEach(entity -> {
             if (entity instanceof Player && !gameMaster.isOrthographicCamera()) {
@@ -352,6 +355,54 @@ public class GameRenderer {
         Matrix4f texelFix = new Matrix4f().translate(dx, dy, 0.0f);
         lightProjection.mul(texelFix);
         lightSpaceMatrix.set(lightProjection).mul(lightView);
+    }
+
+    public void renderDestroyOverlay(GameInteraction interaction,
+                                     Shader shader,
+                                     Mesh blockMesh,
+                                     SpriteSheet destroyTexture,
+                                     CameraView camera) {
+
+        if (!interaction.isBreakingBlock() || destroyTexture == null) {
+            return;
+        }
+
+        Vector3i pos = interaction.getBreakingBlockPos();
+        float progress = Math.clamp(interaction.getBreakProgress(), 0.0f, 1.0f);
+        int totalFrames = destroyTexture.getTotalFrames();
+        if (totalFrames <= 0) return;
+
+        int frameIndex = Math.clamp((int) (progress * totalFrames), 0, totalFrames - 1);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glEnable(GL_DEPTH_TEST);
+        glDepthMask(false);
+        glDisable(GL_CULL_FACE);
+
+        shader.bind();
+        destroyTexture.bind();
+        shader.setUniform("uUseTexture", true);
+        shader.setUniform("uUseFaceAtlas", false);
+        shader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
+        shader.setUniform("uTotalFrames", totalFrames);
+        shader.setUniform("uFrameIndex", frameIndex);
+
+        shader.setUniform("uParticleAlpha", 1.0f);
+        shader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
+        shader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
+        shader.setUniform("uProjection", camera.getProjectionMatrix());
+        shader.setUniform("uView", camera.getViewMatrix());
+
+        modelMatrix.identity().translate(pos.x, pos.y, pos.z).scale(1.001f);
+        shader.setUniform("uModel", modelMatrix);
+        blockMesh.render();
+        destroyTexture.unbind();
+        shader.unbind();
+
+        glDepthMask(true);
+        glEnable(GL_CULL_FACE);
+        glDisable(GL_BLEND);
     }
 
     private void updateBlur(CameraView camera) {
