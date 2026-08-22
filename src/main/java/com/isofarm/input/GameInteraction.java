@@ -130,7 +130,6 @@ public class GameInteraction {
             if (breakTimeout <= 0.0f) {
                 breakAction(gameMaster, hoveredCell);
             }
-
         } else {
             resetBreaking();
         }
@@ -322,7 +321,6 @@ public class GameInteraction {
         }
 
         BlockData blockData = getBlockData(blockId);
-
         if (blockData == null) {
             resetBreaking();
             return;
@@ -344,13 +342,15 @@ public class GameInteraction {
         }
 
         float destroyTime = blockData.getDestroyTime();
+        if (selectedItem instanceof Tool tool) {
+            // TODO
+        }
         if (destroyTime <= 0.0f) {
             resetBreaking();
             return;
         }
 
         long now = System.nanoTime();
-
         float deltaTime = (now - lastBreakTime) / 1_000_000_000.0f;
         lastBreakTime = now;
         breakProgress += deltaTime / destroyTime;
