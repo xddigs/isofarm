@@ -134,9 +134,6 @@ public class Game {
             float delta = (float) (currentTime - lastTime);
             lastTime = currentTime;
             glfwPollEvents();
-            if (Keyboard.isKeyPressed(GLFW_KEY_ESCAPE)) {
-                glfwSetWindowShouldClose(window, true);
-            }
             Vector3f skyColor = TimeService.getSkyColor();
             glClearColor(skyColor.x, skyColor.y, skyColor.z, CLEAR_COLOR_ALPHA);
             master.update(delta);
