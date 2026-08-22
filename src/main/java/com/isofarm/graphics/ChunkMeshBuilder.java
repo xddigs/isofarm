@@ -4,20 +4,30 @@ import com.isofarm.data.BlockData;
 import com.isofarm.utils.K;
 import com.isofarm.wrld.Chunk;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ChunkMeshBuilder {
 
     private static final float PIXEL = 1.0f / K.World.DEFAULT_TEXTURE_SCALE;
     private static final float TILLED_HEIGHT = 1.0f - PIXEL;
+    private static final BlockData[] BLOCK_LUT = new BlockData[256];
+    static {
+        for (BlockData data : BlockData.values()) {
+            BLOCK_LUT[data.getId() & 0xFF] = data;
+        }
+    }
 
-    public static Mesh buildMesh(Chunk chunk) {
-        List<Float> positions = new ArrayList<>();
-        List<Float> normals = new ArrayList<>();
-        List<Float> uvs = new ArrayList<>();
-        List<Integer> indices = new ArrayList<>();
+    private static final int MAX_FLOATS = Chunk.SIZE_X * Chunk.SIZE_Y * Chunk.SIZE_Z * 24;
+    private static final int MAX_INDICES = Chunk.SIZE_X * Chunk.SIZE_Y * Chunk.SIZE_Z * 36;
 
+    private static final float[] posBuffer = new float[MAX_FLOATS];
+    private static final float[] normBuffer = new float[MAX_FLOATS];
+    private static final float[] uvBuffer = new float[MAX_FLOATS];
+    private static final int[] indexBuffer = new int[MAX_INDICES];
+
+    public static synchronized Mesh buildMesh(Chunk chunk) {
+        int posIdx = 0;
+        int uvIdx = 0;
+        int normIdx = 0;
+        int elemIdx = 0;
         int vertexCount = 0;
 
         for (int x = 0; x < Chunk.SIZE_X; x++) {
@@ -25,7 +35,8 @@ public class ChunkMeshBuilder {
                 for (int z = 0; z < Chunk.SIZE_Z; z++) {
                     byte blockId = chunk.getBlock(x, y, z);
                     if (blockId == 0) continue;
-                    BlockData data = getBlockDataById(blockId);
+
+                    BlockData data = BLOCK_LUT[blockId & 0xFF];
                     if (data == null || data == BlockData.CROP) continue;
 
                     float vx = x;
@@ -33,251 +44,169 @@ public class ChunkMeshBuilder {
                     float vz = z;
 
                     float bottomY = vy;
-                    float topY = getBlockTopY(data, vy);
+                    float topY = (data == BlockData.TILLED_DIRT) ? vy + TILLED_HEIGHT : vy + 1.0f;
 
                     float aboveBottomY = getBlockBottomY(chunk, x, y + 1, z);
                     if (shouldRenderFace(chunk, x, y + 1, z, data) || aboveBottomY > topY) {
-                        vertexCount = addFace(positions, normals, uvs, indices, vertexCount, new float[]{vx, topY, vz + 1, data.getTopAtlasOffset().x, data.getTopAtlasOffset().y + data.getAtlasScale().y, 0, 1, 0,
-                                vx + 1, topY, vz + 1, data.getTopAtlasOffset().x + data.getAtlasScale().x, data.getTopAtlasOffset().y + data.getAtlasScale().y, 0, 1, 0,
-                                vx + 1, topY, vz, data.getTopAtlasOffset().x + data.getAtlasScale().x, data.getTopAtlasOffset().y, 0, 1, 0,
-                                vx, topY, vz, data.getTopAtlasOffset().x, data.getTopAtlasOffset().y, 0, 1, 0});
+                        float uMin = data.getTopAtlasOffset().x;
+                        float vMin = data.getTopAtlasOffset().y;
+                        float uMax = uMin + data.getAtlasScale().x;
+                        float vMax = vMin + data.getAtlasScale().y;
+
+                        posIdx = addQuadPos(posBuffer, posIdx, vx, topY, vz + 1, vx + 1, topY, vz + 1, vx + 1, topY, vz, vx, topY, vz);
+                        uvIdx = addQuadUV(uvBuffer, uvIdx, uMin, vMax, uMax, vMax, uMax, vMin, uMin, vMin);
+                        normIdx = addQuadNorm(normBuffer, normIdx, 0, 1, 0);
+                        elemIdx = addQuadIndices(indexBuffer, elemIdx, vertexCount);
+                        vertexCount += 4;
                     }
 
                     float belowTopY = getBlockTopY(chunk, x, y - 1, z);
                     if (shouldRenderFace(chunk, x, y - 1, z, data) || belowTopY < bottomY) {
-                        vertexCount = addFace(positions, normals, uvs, indices, vertexCount, new float[]{vx, bottomY, vz, data.getBottomAtlasOffset().x, data.getBottomAtlasOffset().y, 0, -1, 0,
-                                vx + 1, bottomY, vz, data.getBottomAtlasOffset().x + data.getAtlasScale().x, data.getBottomAtlasOffset().y, 0, -1, 0,
-                                vx + 1, bottomY, vz + 1, data.getBottomAtlasOffset().x + data.getAtlasScale().x, data.getBottomAtlasOffset().y + data.getAtlasScale().y, 0, -1, 0,
-                                vx, bottomY, vz + 1, data.getBottomAtlasOffset().x, data.getBottomAtlasOffset().y + data.getAtlasScale().y, 0, -1, 0});
+                        float uMin = data.getBottomAtlasOffset().x;
+                        float vMin = data.getBottomAtlasOffset().y;
+                        float uMax = uMin + data.getAtlasScale().x;
+                        float vMax = vMin + data.getAtlasScale().y;
+
+                        posIdx = addQuadPos(posBuffer, posIdx, vx, bottomY, vz, vx + 1, bottomY, vz, vx + 1, bottomY, vz + 1, vx, bottomY, vz + 1);
+                        uvIdx = addQuadUV(uvBuffer, uvIdx, uMin, vMin, uMax, vMin, uMax, vMax, uMin, vMax);
+                        normIdx = addQuadNorm(normBuffer, normIdx, 0, -1, 0);
+                        elemIdx = addQuadIndices(indexBuffer, elemIdx, vertexCount);
+                        vertexCount += 4;
                     }
 
                     float neighborTop = getBlockTopY(chunk, x, y, z + 1);
-                    if (shouldRenderFace(chunk, x, y, z + 1, data)) {
-                        vertexCount = addSideFace(positions, normals, uvs, indices, vertexCount,
-                                vx, vx + 1,
-                                bottomY, topY,
-                                vz + 1, vz + 1,
-                                0, 0, 1,
-                                data, 0.0f, 1.0f);
+                    if (shouldRenderFace(chunk, x, y, z + 1, data) || neighborTop < topY) {
+                        float expBottom = Math.max(bottomY, neighborTop);
+                        float uvB = (neighborTop < topY && !shouldRenderFace(chunk, x, y, z + 1, data)) ? (expBottom - bottomY) / (topY - bottomY) : 0.0f;
 
-                    } else if (neighborTop < topY) {
-                        float exposedBottom = Math.max(bottomY, neighborTop);
-                        vertexCount = addSideFace(positions, normals, uvs, indices, vertexCount,
-                                vx, vx + 1,
-                                exposedBottom, topY,
-                                vz + 1, vz + 1,
-                                0, 0, 1,
-                                data,
-                                (exposedBottom - bottomY) / (topY - bottomY), 1.0f);
+                        vertexCount = addSideQuadDirect(posBuffer, normBuffer, uvBuffer, indexBuffer,
+                                posIdx, normIdx, uvIdx, elemIdx, vertexCount,
+                                vx, vx + 1, expBottom, topY, vz + 1, vz + 1, 0, 0, 1, data, uvB, 1.0f);
+                        posIdx += 12; normIdx += 12; uvIdx += 8; elemIdx += 6;
                     }
 
                     neighborTop = getBlockTopY(chunk, x, y, z - 1);
-                    if (shouldRenderFace(chunk, x, y, z - 1, data)) {
-                        vertexCount = addSideFace(positions, normals, uvs, indices, vertexCount,
-                                vx + 1, vx,
-                                bottomY, topY,
-                                vz, vz,
-                                0, 0, -1,
-                                data, 0.0f, 1.0f);
+                    if (shouldRenderFace(chunk, x, y, z - 1, data) || neighborTop < topY) {
+                        float expBottom = Math.max(bottomY, neighborTop);
+                        float uvB = (neighborTop < topY && !shouldRenderFace(chunk, x, y, z - 1, data)) ? (expBottom - bottomY) / (topY - bottomY) : 0.0f;
 
-                    } else if (neighborTop < topY) {
-                        float exposedBottom = Math.max(bottomY, neighborTop);
-                        vertexCount = addSideFace(positions, normals, uvs, indices, vertexCount,
-                                vx + 1, vx,
-                                exposedBottom, topY,
-                                vz, vz,
-                                0, 0, -1,
-                                data,
-                                (exposedBottom - bottomY) / (topY - bottomY), 1.0f);
+                        vertexCount = addSideQuadDirect(posBuffer, normBuffer, uvBuffer, indexBuffer,
+                                posIdx, normIdx, uvIdx, elemIdx, vertexCount,
+                                vx + 1, vx, expBottom, topY, vz, vz, 0, 0, -1, data, uvB, 1.0f);
+                        posIdx += 12; normIdx += 12; uvIdx += 8; elemIdx += 6;
                     }
 
                     neighborTop = getBlockTopY(chunk, x + 1, y, z);
-                    if (shouldRenderFace(chunk, x + 1, y, z, data)) {
-                        vertexCount = addSideFace(positions, normals, uvs, indices, vertexCount,
-                                vx + 1, vx + 1,
-                                bottomY, topY,
-                                vz + 1, vz,
-                                1, 0, 0,
-                                data, 0.0f, 1.0f);
+                    if (shouldRenderFace(chunk, x + 1, y, z, data) || neighborTop < topY) {
+                        float expBottom = Math.max(bottomY, neighborTop);
+                        float uvB = (neighborTop < topY && !shouldRenderFace(chunk, x + 1, y, z, data)) ? (expBottom - bottomY) / (topY - bottomY) : 0.0f;
 
-                    } else if (neighborTop < topY) {
-                        float exposedBottom = Math.max(bottomY, neighborTop);
-                        vertexCount = addSideFace(positions, normals, uvs, indices, vertexCount,
-                                vx + 1, vx + 1,
-                                exposedBottom, topY,
-                                vz + 1, vz,
-                                1, 0, 0,
-                                data,
-                                (exposedBottom - bottomY) / (topY - bottomY), 1.0f);
+                        vertexCount = addSideQuadDirect(posBuffer, normBuffer, uvBuffer, indexBuffer,
+                                posIdx, normIdx, uvIdx, elemIdx, vertexCount,
+                                vx + 1, vx + 1, expBottom, topY, vz + 1, vz, 1, 0, 0, data, uvB, 1.0f);
+                        posIdx += 12; normIdx += 12; uvIdx += 8; elemIdx += 6;
                     }
 
                     neighborTop = getBlockTopY(chunk, x - 1, y, z);
-                    if (shouldRenderFace(chunk, x - 1, y, z, data)) {
-                        vertexCount = addSideFace(positions, normals, uvs, indices, vertexCount,
-                                vx, vx,
-                                bottomY, topY,
-                                vz, vz + 1,
-                                -1, 0, 0,
-                                data, 0.0f, 1.0f);
+                    if (shouldRenderFace(chunk, x - 1, y, z, data) || neighborTop < topY) {
+                        float expBottom = Math.max(bottomY, neighborTop);
+                        float uvB = (neighborTop < topY && !shouldRenderFace(chunk, x - 1, y, z, data)) ? (expBottom - bottomY) / (topY - bottomY) : 0.0f;
 
-                    } else if (neighborTop < topY) {
-                        float exposedBottom = Math.max(bottomY, neighborTop);
-                        vertexCount = addSideFace(positions, normals, uvs, indices, vertexCount,
-                                vx, vx,
-                                exposedBottom, topY,
-                                vz, vz + 1,
-                                -1, 0, 0,
-                                data,
-                                (exposedBottom - bottomY) / (topY - bottomY), 1.0f);
+                        vertexCount = addSideQuadDirect(posBuffer, normBuffer, uvBuffer, indexBuffer,
+                                posIdx, normIdx, uvIdx, elemIdx, vertexCount,
+                                vx, vx, expBottom, topY, vz, vz + 1, -1, 0, 0, data, uvB, 1.0f);
+                        posIdx += 12; normIdx += 12; uvIdx += 8; elemIdx += 6;
                     }
                 }
             }
         }
 
-        float[] posArray = toFloatArray(positions);
-        float[] normArray = toFloatArray(normals);
-        float[] uvArray = toFloatArray(uvs);
-        int[] indexArray = toIntArray(indices);
+        float[] finalPos = new float[posIdx];
+        float[] finalNorm = new float[normIdx];
+        float[] finalUv = new float[uvIdx];
+        int[] finalIndices = new int[elemIdx];
 
-        return new Mesh(posArray, normArray, uvArray, indexArray);
+        System.arraycopy(posBuffer, 0, finalPos, 0, posIdx);
+        System.arraycopy(normBuffer, 0, finalNorm, 0, normIdx);
+        System.arraycopy(uvBuffer, 0, finalUv, 0, uvIdx);
+        System.arraycopy(indexBuffer, 0, finalIndices, 0, elemIdx);
+
+        return new Mesh(finalPos, finalNorm, finalUv, finalIndices);
     }
 
     private static float getBlockTopY(BlockData data, float y) {
-        if (data == BlockData.TILLED_DIRT) return y + TILLED_HEIGHT;
-        return y + 1.0f;
+        return (data == BlockData.TILLED_DIRT) ? y + TILLED_HEIGHT : y + 1.0f;
     }
 
     private static float getBlockBottomY(Chunk chunk, int x, int y, int z) {
-        if (x < 0 || x >= Chunk.SIZE_X ||
-                y < 0 || y >= Chunk.SIZE_Y ||
-                z < 0 || z >= Chunk.SIZE_Z) {
-            return y;
-        }
-
+        if (x < 0 || x >= Chunk.SIZE_X || y < 0 || y >= Chunk.SIZE_Y || z < 0 || z >= Chunk.SIZE_Z) return y;
         byte blockId = chunk.getBlock(x, y, z);
-        if (blockId == 0) return y;
-
-        BlockData data = getBlockDataById(blockId);
-        if (data == null || data == BlockData.CROP) return y;
-        return y;
+        return blockId == 0 ? y : y;
     }
 
     private static float getBlockTopY(Chunk chunk, int x, int y, int z) {
-        if (x < 0 || x >= Chunk.SIZE_X ||
-                y < 0 || y >= Chunk.SIZE_Y ||
-                z < 0 || z >= Chunk.SIZE_Z) return y;
-
+        if (x < 0 || x >= Chunk.SIZE_X || y < 0 || y >= Chunk.SIZE_Y || z < 0 || z >= Chunk.SIZE_Z) return y;
         byte blockId = chunk.getBlock(x, y, z);
         if (blockId == 0) return y;
-
-        BlockData data = getBlockDataById(blockId);
+        BlockData data = BLOCK_LUT[blockId & 0xFF];
         if (data == null || data == BlockData.CROP) return y;
         return getBlockTopY(data, y);
     }
 
-    private static boolean shouldRenderFace(Chunk chunk, int neighborX, int neighborY, int neighborZ,
-                                            BlockData currentBlock) {
-        if (isAir(chunk, neighborX, neighborY, neighborZ)) return true;
+    private static boolean shouldRenderFace(Chunk chunk, int neighborX, int neighborY, int neighborZ, BlockData currentBlock) {
+        if (neighborY < 0 || neighborY >= Chunk.SIZE_Y || neighborX < 0 || neighborX >= Chunk.SIZE_X || neighborZ < 0 || neighborZ >= Chunk.SIZE_Z) return true;
         byte neighborId = chunk.getBlock(neighborX, neighborY, neighborZ);
-        BlockData neighborData = getBlockDataById(neighborId);
+        if (neighborId == 0) return true;
 
+        BlockData neighborData = BLOCK_LUT[neighborId & 0xFF];
         if (neighborData == null) return true;
-        if (neighborData.isTransparent()) {
-            return neighborData != currentBlock;
-        }
-
-        return false;
+        return neighborData.isTransparent() && neighborData != currentBlock;
     }
 
-    private static boolean isAir(Chunk chunk, int x, int y, int z) {
-        if (y < 0 || y >= Chunk.SIZE_Y) return true;
-        if (x < 0 || x >= Chunk.SIZE_X || z < 0 || z >= Chunk.SIZE_Z) return true;
-        return chunk.getBlock(x, y, z) == 0;
+    private static int addQuadPos(float[] buf, int idx, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4) {
+        buf[idx] = x1; buf[idx+1] = y1; buf[idx+2] = z1;
+        buf[idx+3] = x2; buf[idx+4] = y2; buf[idx+5] = z2;
+        buf[idx+6] = x3; buf[idx+7] = y3; buf[idx+8] = z3;
+        buf[idx+9] = x4; buf[idx+10] = y4; buf[idx+11] = z4;
+        return idx + 12;
     }
 
-    private static BlockData getBlockDataById(byte id) {
-        for (BlockData data : BlockData.values()) {
-            if (data.getId() == id) {
-                return data;
-            }
-        }
-
-        return null;
+    private static int addQuadUV(float[] buf, int idx, float u1, float v1, float u2, float v2, float u3, float v3, float u4, float v4) {
+        buf[idx] = u1; buf[idx+1] = v1;
+        buf[idx+2] = u2; buf[idx+3] = v2;
+        buf[idx+4] = u3; buf[idx+5] = v3;
+        buf[idx+6] = u4; buf[idx+7] = v4;
+        return idx + 8;
     }
 
-    private static int addFace(List<Float> positions, List<Float> normals,
-                               List<Float> uvs, List<Integer> indices,
-                               int vertexCount, float[] faceData) {
+    private static int addQuadNorm(float[] buf, int idx, float nx, float ny, float nz) {
         for (int i = 0; i < 4; i++) {
-            int base = i * 8;
-
-            positions.add(faceData[base]);
-            positions.add(faceData[base + 1]);
-            positions.add(faceData[base + 2]);
-
-            uvs.add(faceData[base + 3]);
-            uvs.add(faceData[base + 4]);
-
-            normals.add(faceData[base + 5]);
-            normals.add(faceData[base + 6]);
-            normals.add(faceData[base + 7]);
+            buf[idx++] = nx; buf[idx++] = ny; buf[idx++] = nz;
         }
+        return idx;
+    }
 
-        indices.add(vertexCount);
-        indices.add(vertexCount + 1);
-        indices.add(vertexCount + 2);
+    private static int addQuadIndices(int[] buf, int idx, int vertexCount) {
+        buf[idx] = vertexCount; buf[idx+1] = vertexCount + 1; buf[idx+2] = vertexCount + 2;
+        buf[idx+3] = vertexCount + 2; buf[idx+4] = vertexCount + 3; buf[idx+5] = vertexCount;
+        return idx + 6;
+    }
 
-        indices.add(vertexCount + 2);
-        indices.add(vertexCount + 3);
-        indices.add(vertexCount);
+    private static int addSideQuadDirect(float[] pos, float[] norm, float[] uv, int[] idx,
+                                         int posI, int normI, int uvI, int elemI, int vertexCount,
+                                         float x1, float x2, float y1, float y2, float z1, float z2,
+                                         float nx, float ny, float nz, BlockData data, float uvB, float uvT) {
+        addQuadPos(pos, posI, x1, y1, z1, x2, y1, z2, x2, y2, z2, x1, y2, z1);
+
+        float u1 = data.getSideAtlasOffset().x;
+        float u2 = u1 + data.getAtlasScale().x;
+        float v1 = data.getSideAtlasOffset().y + data.getAtlasScale().y * uvB;
+        float v2 = data.getSideAtlasOffset().y + data.getAtlasScale().y * uvT;
+        addQuadUV(uv, uvI, u1, v1, u2, v1, u2, v2, u1, v2);
+
+        addQuadNorm(norm, normI, nx, ny, nz);
+        addQuadIndices(idx, elemI, vertexCount);
 
         return vertexCount + 4;
-    }
-
-    private static int addSideFace(List<Float> positions, List<Float> normals,
-                                   List<Float> uvs, List<Integer> indices, int vertexCount,
-                                   float x1, float x2,
-                                   float y1, float y2,
-                                   float z1, float z2,
-                                   float nx, float ny, float nz,
-                                   BlockData data,
-                                   float uvBottom, float uvTop) {
-        float atlasX = data.getSideAtlasOffset().x;
-        float atlasY = data.getSideAtlasOffset().y;
-
-        float atlasWidth = data.getAtlasScale().x;
-        float atlasHeight = data.getAtlasScale().y;
-
-        float u1 = atlasX;
-        float u2 = atlasX + atlasWidth;
-
-        float v1 = atlasY + atlasHeight * uvBottom;
-        float v2 = atlasY + atlasHeight * uvTop;
-
-        return addFace(positions, normals, uvs, indices, vertexCount,
-                new float[]{x1, y1, z1, u1, v1, nx, ny, nz,
-                        x2, y1, z2, u2, v1, nx, ny, nz,
-                        x2, y2, z2, u2, v2, nx, ny, nz,
-                        x1, y2, z1, u1, v2, nx, ny, nz});
-    }
-
-    private static float[] toFloatArray(List<Float> list) {
-        float[] arr = new float[list.size()];
-
-        for (int i = 0; i < list.size(); i++) {
-            arr[i] = list.get(i);
-        }
-
-        return arr;
-    }
-
-    private static int[] toIntArray(List<Integer> list) {
-        int[] arr = new int[list.size()];
-
-        for (int i = 0; i < list.size(); i++) {
-            arr[i] = list.get(i);
-        }
-
-        return arr;
     }
 }
