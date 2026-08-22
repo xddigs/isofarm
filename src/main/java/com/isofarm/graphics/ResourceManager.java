@@ -37,6 +37,7 @@ public class ResourceManager {
     private final SpriteSheet inventoryIcons;
 
     private final SpriteSheet playerSpriteSheet;
+    private final SpriteSheet destroyTexture;
 
     private final Map<CropType, SpriteSheet> cropSpritesheets;
 
@@ -76,6 +77,8 @@ public class ResourceManager {
 
         this.playerSpriteSheet = new SpriteSheet(K.Paths.PLAYER_SPRITESHEET,
                 Direction.values().length);
+
+        this.destroyTexture = new SpriteSheet(K.Paths.DESTROY_STAGES, 9);
 
         this.cropSpritesheets = new EnumMap<>(CropType.class);
         cropSpritesheets.put(CropType.WHEAT, wheat);
@@ -127,6 +130,7 @@ public class ResourceManager {
     public Mesh getSpriteMesh() { return spriteMesh; }
     public Mesh getPlayerMesh() { return playerMesh; }
     public SpriteSheet getBlocksTexture() { return blocksTexture; }
+    public SpriteSheet getDestroyTexture() { return destroyTexture; }
     public SpriteSheet getWaterTexture() { return waterTexture; }
     public SpriteSheet getSeedIcons() { return seedIcons; }
     public SpriteSheet getCropIcons() { return cropIcons; }
