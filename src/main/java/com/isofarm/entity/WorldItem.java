@@ -5,7 +5,6 @@ import com.isofarm.data.Hit;
 import com.isofarm.data.Item;
 import com.isofarm.graphics.Shader;
 import com.isofarm.graphics.SpriteSheet;
-import com.isofarm.pathfinding.GridPos;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
 import org.joml.Vector3f;
@@ -56,59 +55,42 @@ public class WorldItem extends Entity {
         if (world == null || delta <= 0.0f) return;
         if (pickupTimer > 0.0f) pickupTimer -= delta;
 
-        rotation += ROTATION_SPEED * delta;
+        rotation = (rotation + ROTATION_SPEED * delta) % 360.0f;
+        int currentX = (int) Math.floor(position.x);
+        int currentZ = (int) Math.floor(position.z);
+        int targetY = world.getHighestY(currentX, currentZ).y();
 
-        if (rotation >= 360.0f) {
-            rotation -= 360.0f;
-        }
+        float targetGroundY = targetY + GROUND_OFFSET;
 
         if (!isOnGround()) {
             velocity.y += GRAVITY * delta;
-            position.x += velocity.x * delta;
-            position.y += velocity.y * delta;
-            position.z += velocity.z * delta;
-
             float airDamping = Math.max(0.0f, 1.0f - AIR_DRAG * delta);
             velocity.x *= airDamping;
             velocity.z *= airDamping;
 
-            GridPos terrain = world.getHighestY(position.x, position.z);
-            if (position.y <= terrain.y() + GROUND_OFFSET) {
-                position.y = terrain.y() + GROUND_OFFSET;
-                groundY = position.y;
-                if (Math.abs(velocity.y) > MIN_BOUNCE_VELOCITY) {
-                    velocity.y *= -BOUNCE_FACTOR;
-                    setOnGround(false);
+            position.x += velocity.x * delta;
+            position.y += velocity.y * delta;
+            position.z += velocity.z * delta;
 
+            if (position.y <= targetGroundY) {
+                position.y = targetGroundY;
+                groundY = targetGroundY;
+
+                if (Math.abs(velocity.y) > MIN_BOUNCE_VELOCITY) {
+                    velocity.y = -velocity.y * BOUNCE_FACTOR;
                 } else {
-                    velocity.y = 0.0f;
-                    velocity.x = 0.0f;
-                    velocity.z = 0.0f;
+                    velocity.set(0, 0, 0);
                     setOnGround(true);
                     bobTime = 0.0f;
                 }
             }
+        } else {
+            position.y = targetGroundY + (float) Math.sin(bobTime) * GROUND_BOB_HEIGHT;
+            bobTime += delta * GROUND_BOB_SPEED;
 
-            return;
-        }
-
-        GridPos terrain = world.getHighestY(position.x, position.z);
-        groundY = terrain.y() + GROUND_OFFSET;
-        bobTime += delta * GROUND_BOB_SPEED;
-
-        float bobOffset = (float) Math.sin(bobTime) * GROUND_BOB_HEIGHT;
-
-        position.y = groundY + bobOffset;
-        float friction = Math.max(0.0f, 1.0f - GROUND_FRICTION * delta);
-        velocity.x *= friction;
-        velocity.z *= friction;
-
-        if (Math.abs(velocity.x) < 0.05f) {
-            velocity.x = 0.0f;
-        }
-
-        if (Math.abs(velocity.z) < 0.05f) {
-            velocity.z = 0.0f;
+            float friction = Math.max(0.0f, 1.0f - GROUND_FRICTION * delta);
+            velocity.x *= friction;
+            velocity.z *= friction;
         }
     }
 
