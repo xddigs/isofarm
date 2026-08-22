@@ -249,6 +249,10 @@ public class ChunkManager {
                 minX && pos.x() < maxX && pos.z() >= minZ && pos.z() < maxZ);
     }
 
+    public void shutdown() {
+        meshExecutor.shutdownNow();
+    }
+
     public void dispose() {
         meshExecutor.shutdownNow();
         completedMeshes.clear();
