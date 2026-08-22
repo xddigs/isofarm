@@ -8,6 +8,9 @@ import com.isofarm.utils.Settings;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ChunkManager {
     private static final float SOIL_GRASS_TIME = 10.0f;
@@ -15,6 +18,10 @@ public class ChunkManager {
     private final WorldGenerator generator;
     private final Map<Chunk, Mesh> chunkMeshes;
     private final Map<SoilPosition, Float> soilTimers;
+    private record MeshBuildResult(Chunk chunk, ChunkMeshBuilder.MeshData data) {}
+    private final ExecutorService meshExecutor;
+    private final ConcurrentLinkedQueue<MeshBuildResult> completedMeshes =
+            new ConcurrentLinkedQueue<>();
 
     private int lastPlayerChunkX = Integer.MAX_VALUE;
     private int lastPlayerChunkZ = Integer.MAX_VALUE;
@@ -24,9 +31,12 @@ public class ChunkManager {
         this.generator = new WorldGenerator(world);
         this.chunkMeshes = new HashMap<>();
         this.soilTimers = new HashMap<>();
+        int threads = Math.max(1, Runtime.getRuntime().availableProcessors() - 2);
+        this.meshExecutor = Executors.newFixedThreadPool(threads);
     }
 
     public void update(float playerX, float playerZ, float delta) {
+        processCompletedMeshes();
         updateSoil(delta);
 
         int playerChunkX = Math.floorDiv((int) playerX, Chunk.SIZE_X);
@@ -42,6 +52,7 @@ public class ChunkManager {
     public void updateLoadedChunks(int centerChunkX, int centerChunkZ) {
         int r = Settings.getRenderDistance();
         int unloadDist = r + Settings.getUnloadMargin();
+
         chunkMeshes.entrySet().removeIf(entry -> {
             Chunk chunk = entry.getKey();
 
@@ -54,6 +65,7 @@ public class ChunkManager {
                 if (mesh != null) {
                     mesh.dispose();
                 }
+
                 world.getChunks().remove(world.get2DKey(chunk.getChunkX(),
                         chunk.getChunkZ()));
 
@@ -74,6 +86,7 @@ public class ChunkManager {
                 }
 
                 Chunk chunk = world.getOrCreateChunk(cx, cz);
+
                 if (!chunkMeshes.containsKey(chunk)) {
                     generator.generateChunk(cx, cz);
                     updateGrass(cx, cz);
@@ -94,10 +107,37 @@ public class ChunkManager {
                 if (chunk == null) continue;
 
                 if (!chunkMeshes.containsKey(chunk)) {
-                    Mesh mesh = ChunkMeshBuilder.buildMesh(world, chunk);
-                    chunkMeshes.put(chunk, mesh);
+                    queueMeshBuild(chunk);
                 }
             }
+        }
+    }
+
+    private void queueMeshBuild(Chunk chunk) {
+        meshExecutor.submit(() -> {
+            ChunkMeshBuilder.MeshData data =
+                    ChunkMeshBuilder.buildMesh(world, chunk);
+
+            completedMeshes.add(new MeshBuildResult(chunk, data));
+        });
+    }
+
+    private void processCompletedMeshes() {
+        MeshBuildResult result;
+        while ((result = completedMeshes.poll()) != null) {
+            Chunk chunk = result.chunk();
+            if (!world.getChunks().containsKey(
+                    world.get2DKey(chunk.getChunkX(), chunk.getChunkZ()))) {
+                continue;
+            }
+
+            Mesh oldMesh = chunkMeshes.get(chunk);
+            if (oldMesh != null) {
+                oldMesh.dispose();
+            }
+
+            Mesh mesh = ChunkMeshBuilder.createMesh(result.data());
+            chunkMeshes.put(chunk, mesh);
         }
     }
 
@@ -112,12 +152,7 @@ public class ChunkManager {
         Chunk chunk = world.getChunks().get(world.get2DKey(chunkX, chunkZ));
 
         if (chunk != null) {
-            Mesh oldMesh = chunkMeshes.get(chunk);
-            if (oldMesh != null) {
-                oldMesh.dispose();
-            }
-
-            chunkMeshes.put(chunk, ChunkMeshBuilder.buildMesh(world, chunk));
+            queueMeshBuild(chunk);
         }
     }
 
@@ -215,6 +250,8 @@ public class ChunkManager {
     }
 
     public void dispose() {
+        meshExecutor.shutdownNow();
+        completedMeshes.clear();
         chunkMeshes.values().forEach(Mesh::dispose);
         chunkMeshes.clear();
         soilTimers.clear();
