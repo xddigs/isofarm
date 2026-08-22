@@ -6,23 +6,21 @@ import com.isofarm.wrld.Chunk;
 import com.isofarm.wrld.World;
 
 public class ChunkMeshBuilder {
-
     private static final float PIXEL = 1.0f / K.World.DEFAULT_TEXTURE_SCALE;
     private static final float TILLED_HEIGHT = 1.0f - PIXEL;
     private static final BlockData[] BLOCK_LUT = new BlockData[256];
+    private static final int MAX_FLOATS = Chunk.SIZE_X * Chunk.SIZE_Y * Chunk.SIZE_Z * 24;
+    private static final int MAX_INDICES = Chunk.SIZE_X * Chunk.SIZE_Y * Chunk.SIZE_Z * 36;
+    private static final float[] posBuffer = new float[MAX_FLOATS];
+    private static final float[] normBuffer = new float[MAX_FLOATS];
+    private static final float[] uvBuffer = new float[MAX_FLOATS];
+    private static final int[] indexBuffer = new int[MAX_INDICES];
+
     static {
         for (BlockData data : BlockData.values()) {
             BLOCK_LUT[data.getId() & 0xFF] = data;
         }
     }
-
-    private static final int MAX_FLOATS = Chunk.SIZE_X * Chunk.SIZE_Y * Chunk.SIZE_Z * 24;
-    private static final int MAX_INDICES = Chunk.SIZE_X * Chunk.SIZE_Y * Chunk.SIZE_Z * 36;
-
-    private static final float[] posBuffer = new float[MAX_FLOATS];
-    private static final float[] normBuffer = new float[MAX_FLOATS];
-    private static final float[] uvBuffer = new float[MAX_FLOATS];
-    private static final int[] indexBuffer = new int[MAX_INDICES];
 
     public static synchronized Mesh buildMesh(World world, Chunk chunk) {
         int posIdx = 0;
@@ -90,7 +88,10 @@ public class ChunkMeshBuilder {
                         vertexCount = addSideQuadDirect(posBuffer, normBuffer, uvBuffer, indexBuffer,
                                 posIdx, normIdx, uvIdx, elemIdx, vertexCount,
                                 (float) x, (float) x + 1, expBottom, topY, (float) z + 1, (float) z + 1, 0, 0, 1, data, uvB, 1.0f);
-                        posIdx += 12; normIdx += 12; uvIdx += 8; elemIdx += 6;
+                        posIdx += 12;
+                        normIdx += 12;
+                        uvIdx += 8;
+                        elemIdx += 6;
                     }
 
                     renderFace = shouldRenderFace(world, worldX, y, worldZ - 1, data);
@@ -102,7 +103,10 @@ public class ChunkMeshBuilder {
                         vertexCount = addSideQuadDirect(posBuffer, normBuffer, uvBuffer, indexBuffer,
                                 posIdx, normIdx, uvIdx, elemIdx, vertexCount,
                                 (float) x + 1, (float) x, expBottom, topY, (float) z, (float) z, 0, 0, -1, data, uvB, 1.0f);
-                        posIdx += 12; normIdx += 12; uvIdx += 8; elemIdx += 6;
+                        posIdx += 12;
+                        normIdx += 12;
+                        uvIdx += 8;
+                        elemIdx += 6;
                     }
 
                     renderFace = shouldRenderFace(world, worldX + 1, y, worldZ, data);
@@ -114,7 +118,10 @@ public class ChunkMeshBuilder {
                         vertexCount = addSideQuadDirect(posBuffer, normBuffer, uvBuffer, indexBuffer,
                                 posIdx, normIdx, uvIdx, elemIdx, vertexCount,
                                 (float) x + 1, (float) x + 1, expBottom, topY, (float) z + 1, (float) z, 1, 0, 0, data, uvB, 1.0f);
-                        posIdx += 12; normIdx += 12; uvIdx += 8; elemIdx += 6;
+                        posIdx += 12;
+                        normIdx += 12;
+                        uvIdx += 8;
+                        elemIdx += 6;
                     }
 
                     renderFace = shouldRenderFace(world, worldX - 1, y, worldZ, data);
@@ -126,7 +133,10 @@ public class ChunkMeshBuilder {
                         vertexCount = addSideQuadDirect(posBuffer, normBuffer, uvBuffer, indexBuffer,
                                 posIdx, normIdx, uvIdx, elemIdx, vertexCount,
                                 (float) x, (float) x, expBottom, topY, (float) z, (float) z + 1, -1, 0, 0, data, uvB, 1.0f);
-                        posIdx += 12; normIdx += 12; uvIdx += 8; elemIdx += 6;
+                        posIdx += 12;
+                        normIdx += 12;
+                        uvIdx += 8;
+                        elemIdx += 6;
                     }
                 }
             }
@@ -202,32 +212,50 @@ public class ChunkMeshBuilder {
     private static int addQuadPos(float[] buf, int idx, float x1, float y1, float z1,
                                   float x2, float y2, float z2, float x3, float y3, float z3,
                                   float x4, float y4, float z4) {
-        buf[idx] = x1; buf[idx+1] = y1; buf[idx+2] = z1;
-        buf[idx+3] = x2; buf[idx+4] = y2; buf[idx+5] = z2;
-        buf[idx+6] = x3; buf[idx+7] = y3; buf[idx+8] = z3;
-        buf[idx+9] = x4; buf[idx+10] = y4; buf[idx+11] = z4;
+        buf[idx] = x1;
+        buf[idx + 1] = y1;
+        buf[idx + 2] = z1;
+        buf[idx + 3] = x2;
+        buf[idx + 4] = y2;
+        buf[idx + 5] = z2;
+        buf[idx + 6] = x3;
+        buf[idx + 7] = y3;
+        buf[idx + 8] = z3;
+        buf[idx + 9] = x4;
+        buf[idx + 10] = y4;
+        buf[idx + 11] = z4;
         return idx + 12;
     }
 
     private static int addQuadUV(float[] buf, int idx, float u1, float v1, float u2,
                                  float v2, float u3, float v3, float u4, float v4) {
-        buf[idx] = u1; buf[idx+1] = v1;
-        buf[idx+2] = u2; buf[idx+3] = v2;
-        buf[idx+4] = u3; buf[idx+5] = v3;
-        buf[idx+6] = u4; buf[idx+7] = v4;
+        buf[idx] = u1;
+        buf[idx + 1] = v1;
+        buf[idx + 2] = u2;
+        buf[idx + 3] = v2;
+        buf[idx + 4] = u3;
+        buf[idx + 5] = v3;
+        buf[idx + 6] = u4;
+        buf[idx + 7] = v4;
         return idx + 8;
     }
 
     private static int addQuadNorm(float[] buf, int idx, float nx, float ny, float nz) {
         for (int i = 0; i < 4; i++) {
-            buf[idx++] = nx; buf[idx++] = ny; buf[idx++] = nz;
+            buf[idx++] = nx;
+            buf[idx++] = ny;
+            buf[idx++] = nz;
         }
         return idx;
     }
 
     private static int addQuadIndices(int[] buf, int idx, int vertexCount) {
-        buf[idx] = vertexCount; buf[idx+1] = vertexCount + 1; buf[idx+2] = vertexCount + 2;
-        buf[idx+3] = vertexCount + 2; buf[idx+4] = vertexCount + 3; buf[idx+5] = vertexCount;
+        buf[idx] = vertexCount;
+        buf[idx + 1] = vertexCount + 1;
+        buf[idx + 2] = vertexCount + 2;
+        buf[idx + 3] = vertexCount + 2;
+        buf[idx + 4] = vertexCount + 3;
+        buf[idx + 5] = vertexCount;
         return idx + 6;
     }
 
