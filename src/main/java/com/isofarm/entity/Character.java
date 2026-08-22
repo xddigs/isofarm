@@ -131,6 +131,7 @@ public abstract class Character extends Entity implements Levelable {
 
     public void damage(float amount) {
         if (!isAlive() || amount <= 0) return;
+        if (gamemode.isGodmode() || gamemode.isNoClip()) return;
         this.hitpoints = (int) Math.max(0.0f, this.hitpoints - amount);
     }
 
@@ -145,6 +146,7 @@ public abstract class Character extends Entity implements Levelable {
 
     public void consumeStamina(float amount) {
         if (amount <= 0) return;
+        if (gamemode.isGodmode() || gamemode.isNoClip()) return;
         this.stamina = Math.max(0.0f, this.stamina - amount);
     }
 
