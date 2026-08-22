@@ -343,8 +343,17 @@ public class GameInteraction {
 
         float destroyTime = blockData.getDestroyTime();
         if (selectedItem instanceof Tool tool) {
-            // TODO
+            BlockData[] usableOn = tool.getType().getUsableOn();
+            float[] efficiency = tool.getType().getEfficiency();
+
+            for (int i = 0; i < usableOn.length; i++) {
+                if (usableOn[i].getId() == blockId) {
+                    destroyTime *= efficiency[i];
+                    break;
+                }
+            }
         }
+
         if (destroyTime <= 0.0f) {
             resetBreaking();
             return;
