@@ -23,7 +23,7 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 @SuppressWarnings("unused")
 public class Game {
     private static final Logger log = LoggerFactory.getLogger(Game.class);
-    private static final String WINDOW_TITLE = "Tilled";
+    private static final String WINDOW_TITLE = "Isofarm";
 
     private static final int OPENGL_MAJOR_VERSION = 3;
     private static final int OPENGL_MINOR_VERSION = 3;
