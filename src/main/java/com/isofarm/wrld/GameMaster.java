@@ -272,10 +272,14 @@ public class GameMaster {
     }
 
     public void addEntity(Entity entity) {
-        if (entity == null) return;
+        if (entity == null) {
+            return;
+        }
+
         if (entity instanceof WorldItem worldItem) {
             worldItem.setWorld(world);
         }
+
         entities.add(entity);
     }
 
@@ -355,16 +359,14 @@ public class GameMaster {
     public void render() {
         gameRenderer.render(this, resourceManager, chunkManager.getChunkMeshes());
         Item selectedItem = gameUIservice.getHotbarUI().getSelectedItem();
+
         if (selectedItem != null && !isInventoryOpen() && isHUDShown()) {
             SpriteSheet spriteSheet = resourceManager.getItemSpriteSheet(selectedItem);
             Shader itemShader = resourceManager.getShader("item");
 
-            glDisable(GL_DEPTH_TEST);
-            glDepthMask(false);
+            glClear(GL_DEPTH_BUFFER_BIT);
             itemRenderer.render(this, selectedItem, spriteSheet,
                     itemShader, celestialLighting, genDelta);
-            glDepthMask(true);
-            glEnable(GL_DEPTH_TEST);
         }
 
         gameUIservice.render(isHUDShown(), this);

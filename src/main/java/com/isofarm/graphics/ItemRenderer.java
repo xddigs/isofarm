@@ -13,10 +13,10 @@ import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 
 public class ItemRenderer {
-    private static final float OFFSET_X = 0.60f;
-    private static final float OFFSET_Y = -0.35f;
-    private static final float OFFSET_Z = -0.55f;
-    private static final float ITEM_SCALE = 0.60f;
+    private static final float OFFSET_X = 1.0f;
+    private static final float OFFSET_Y = -0.60f;
+    private static final float OFFSET_Z = -1.0f;
+    private static final float ITEM_SCALE = 1.0f;
 
     private static final int THICKNESS_LAYERS = 24;
     private static final float LAYER_DEPTH = 0.0025f;
@@ -141,15 +141,10 @@ public class ItemRenderer {
                        Shader shader,
                        CelestialLighting lighting,
                        float delta) {
-
         if (item == null || spriteSheet == null || quadMesh == null) return;
         if (gameMaster.isOrthographicCamera()) return;
         boolean isTool = item instanceof Tool;
-
-        float rotateX;
-        float rotateY;
-        float rotateZ;
-
+        float rotateX, rotateY, rotateZ;
         if (isTool) {
             rotateX = 10.0f;
             rotateY = -90.0f;
@@ -171,10 +166,9 @@ public class ItemRenderer {
 
         int frameIndex = item instanceof Block ? item.getId() - 1 : item.getId();
         shader.bind();
-
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, spriteSheet.getTextureId());
-
+        shader.setUniform("uProjection", gameMaster.getActiveCamera().getProjectionMatrix());
         shader.setUniform("uProjection", gameMaster.getActiveCamera().getProjectionMatrix());
         shader.setUniform("uView", new Matrix4f().identity());
         shader.setUniform("uFrameIndex", frameIndex);
@@ -190,7 +184,6 @@ public class ItemRenderer {
         shader.setUniform("uEnableShadows", false);
 
         Vector3f viewLightDir = new Vector3f(lighting.getDirection());
-
         gameMaster.getActiveCamera().getViewMatrix().transformDirection(viewLightDir);
 
         shader.setUniform("uLightDirection", viewLightDir);
@@ -199,14 +192,15 @@ public class ItemRenderer {
         shader.setUniform("uLightIntensity", lighting.getIntensity());
         shader.setUniform("uAmbientIntensity", lighting.getAmbientIntensity());
 
+        glDisable(GL_CULL_FACE);
         for (int i = THICKNESS_LAYERS - 1; i >= 0; i--) {
             Matrix4f layerMatrix = new Matrix4f(baseModelMatrix).translate(0.0f, 0.0f, -i * LAYER_DEPTH);
             shader.setUniform("uModel", layerMatrix);
             quadMesh.render();
         }
 
+        glEnable(GL_CULL_FACE);
         shader.unbind();
-
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 

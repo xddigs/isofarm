@@ -8,6 +8,8 @@ import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
 import org.joml.Vector3f;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("unused")
 @DataClass
@@ -27,6 +29,7 @@ public class WorldItem extends Entity {
     private static final float ROTATION_SPEED = 90.0f;
     private static final float GROUND_BOB_SPEED = 3.0f;
     private static final float GROUND_BOB_HEIGHT = 0.08f;
+    private static final Logger log = LoggerFactory.getLogger(WorldItem.class);
 
     private final Item item;
     private int amount;

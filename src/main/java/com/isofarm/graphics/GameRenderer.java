@@ -2,6 +2,7 @@ package com.isofarm.graphics;
 
 import com.isofarm.data.Crop;
 import com.isofarm.data.Hit;
+import com.isofarm.entity.Entity;
 import com.isofarm.entity.Player;
 import com.isofarm.service.TimeService;
 import com.isofarm.utils.HoveredCell;
