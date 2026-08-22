@@ -15,7 +15,8 @@ public class OrthographicCamera implements CameraView {
     private static final float MIN_ZOOM = 1.0f;
     private static final float MAX_ZOOM = 80.0f;
 
-    private static final float YAW = 45.0f;
+    private static final float DEFAULT_YAW = 45.0f;
+    private float yaw = DEFAULT_YAW;
     private static final float PITCH = 35.2643897f;
 
     private static final float NEAR_PLANE = 0.1f;
@@ -52,7 +53,7 @@ public class OrthographicCamera implements CameraView {
         return new Matrix4f()
                 .identity()
                 .rotateX((float) Math.toRadians(PITCH))
-                .rotateY((float) Math.toRadians(YAW))
+                .rotateY((float) Math.toRadians(yaw))
                 .translate(-position.x, -position.y, -position.z);
     }
 
@@ -68,11 +69,11 @@ public class OrthographicCamera implements CameraView {
 
     @Override
     public float getYaw() {
-        return YAW;
+        return yaw;
     }
 
     public Vector3f getMovementForwardVector() {
-        float yawRad = (float) Math.toRadians(YAW);
+        float yawRad = (float) Math.toRadians(yaw);
         return new Vector3f((float) Math.sin(yawRad),
                 0.0f, (float) -Math.cos(yawRad)).normalize();
     }
@@ -82,12 +83,16 @@ public class OrthographicCamera implements CameraView {
         position.z = z;
     }
 
+    public void rotateYaw(float value) {
+        yaw += value;
+    }
+
     public void setPosition(float x, float y, float z) {
         position.set(x, y, z);
     }
 
     public Vector3f getForwardVector() {
-        float yawRad = (float) Math.toRadians(YAW);
+        float yawRad = (float) Math.toRadians(yaw);
         float pitchRad = (float) Math.toRadians(PITCH);
         Vector3f direction = new Vector3f();
         direction.x = (float) (Math.sin(yawRad) * Math.cos(pitchRad));

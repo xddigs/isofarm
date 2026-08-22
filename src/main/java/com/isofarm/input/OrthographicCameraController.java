@@ -10,8 +10,6 @@ import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
 import org.joml.Vector3f;
 
-import java.util.List;
-
 import static org.lwjgl.glfw.GLFW.*;
 
 public record OrthographicCameraController(OrthographicCamera camera)
@@ -20,9 +18,9 @@ public record OrthographicCameraController(OrthographicCamera camera)
     private static final float ZOOMED_ZOOM = NORMAL_ZOOM / 2.5f;
     private static final float VERTICAL_OFFSET = 0.0f;
     private static final float DISTANCE = 500.0f;
-    private static final float PATH_SPEED = 4.0f;
     private static final float PATH_REACH_DISTANCE = 0.08f;
     private static boolean mouseCaptured = false;
+    private static final float CAMERA_ROTATION_SPEED = 120.0f;
 
     public void update(GameMaster gameMaster, float delta) {
         if (gameMaster.isInventoryOpen() || gameMaster.isChatOpen()) {
@@ -32,10 +30,23 @@ public record OrthographicCameraController(OrthographicCamera camera)
         Player player = gameMaster.getPlayer();
         if (player == null) return;
 
+        rotateCamera(delta);
+
         click(gameMaster, player, gameMaster.getWorld());
         followPath(player, gameMaster.getWorld(), delta);
         followPlayer(player);
         updateZoom();
+    }
+
+    private void rotateCamera(float delta) {
+        boolean rotateLeft = Keyboard.isKeyDown(GLFW_KEY_A) || Keyboard.isKeyDown(GLFW_KEY_LEFT);
+        boolean rotateRight = Keyboard.isKeyDown(GLFW_KEY_D) || Keyboard.isKeyDown(GLFW_KEY_RIGHT);
+
+        if (rotateLeft == rotateRight) {
+            return;
+        }
+        float direction = rotateRight ? 1.0f : -1.0f;
+        camera.rotateYaw(direction * CAMERA_ROTATION_SPEED * delta);
     }
 
     private void updateZoom() {
@@ -74,59 +85,7 @@ public record OrthographicCameraController(OrthographicCamera camera)
     }
 
     private void followPath(Player player, World world, float delta) {
-        if (!player.isFollowingPath()) {
-            player.move(world, delta);
-            return;
-        }
-
-        List<GridPos> path = player.getPath();
-        int pathIndex = player.getPathIndex();
-
-        if (pathIndex >= path.size()) {
-            player.clearPath();
-            stopPlayer(player, world, delta);
-            return;
-        }
-
-        GridPos target = path.get(pathIndex);
-        Vector3f playerPosition = player.getPosition();
-
-        float targetX = target.x() + 0.5f;
-        float targetZ = target.z() + 0.5f;
-
-        float dx = targetX - playerPosition.x;
-        float dz = targetZ - playerPosition.z;
-
-        int currentY = (int) Math.floor(playerPosition.y);
-        if (target.y() > currentY && player.isOnGround()) {
-            player.jump();
-        }
-
-        float distanceSquared = dx * dx + dz * dz;
-
-        if (distanceSquared <= PATH_REACH_DISTANCE * PATH_REACH_DISTANCE) {
-            player.setPosition(targetX, playerPosition.y, targetZ);
-            int nextIndex = pathIndex + 1;
-            player.setPathIndex(nextIndex);
-
-            if (nextIndex >= path.size()) {
-                player.clearPath();
-                stopPlayer(player, world, delta);
-            }
-            return;
-        }
-
-        Vector3f direction = new Vector3f(dx, 0.0f, dz);
-        if (direction.lengthSquared() > 0.0f) {
-            direction.normalize().mul(PATH_SPEED);
-        }
-
-        player.move(world, delta);
-        player.lookAt(targetX, targetZ, camera.getYaw());
-    }
-
-    private void stopPlayer(Player player, World world, float delta) {
-        player.move(world, delta);
+        player.move(world, delta, camera.getYaw());
     }
 
     private GridPos getGoalPosition(World world, Hit hit) {

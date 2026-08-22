@@ -159,12 +159,14 @@ public class Player extends Character {
         moveAndCollide(world, direction, delta);
     }
 
-    public void move(World world, float delta) {
+    public void move(World world, float delta, float cameraYaw) {
         if (!isFollowingPath()) {
+            setVelocity(new Vector3f(0.0f, 0.0f, 0.0f));
             return;
         }
 
         GridPos target = path.get(pathIndex);
+
         float targetX = target.x() + 0.5f;
         float targetY = target.y();
         float targetZ = target.z() + 0.5f;
@@ -175,6 +177,7 @@ public class Player extends Character {
         float dz = targetZ - position.z;
 
         float distanceSquared = dx * dx + dz * dz;
+
         if (distanceSquared < 0.01f) {
             position.x = targetX;
             position.z = targetZ;
@@ -190,13 +193,16 @@ public class Player extends Character {
         }
 
         Vector3f direction = new Vector3f(dx, 0.0f, dz);
+
         if (direction.lengthSquared() > 0.0f) {
             direction.normalize();
         }
 
-        Vector3f velocity = new Vector3f(direction).mul(K.Camera.MOVEMENT_SPEED);
+        Vector3f velocity = new Vector3f(direction)
+                .mul(K.Camera.MOVEMENT_SPEED);
+
         setVelocity(velocity);
-        lookAt(targetX, targetZ, 45.0f);
+        lookAt(targetX, targetZ, cameraYaw);
         move(world, velocity, delta);
         position.y = targetY;
     }
@@ -338,7 +344,8 @@ public class Player extends Character {
     }
 
     public void setPath(List<GridPos> path) {
-        this.path = path;
+        this.path = path != null ? path : List.of();
+        this.pathIndex = 0;
     }
 
     public int getPathIndex() {
