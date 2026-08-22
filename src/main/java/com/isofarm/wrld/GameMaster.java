@@ -78,7 +78,8 @@ public class GameMaster {
         this.sun = new Sun("Sun");
         this.moon = new Moon("Moon");
         this.celestialLighting = new CelestialLighting(sun, moon);
-        this.shadowMap = new ShadowMap(4096, 4096);
+        this.shadowMap = new ShadowMap((int) Settings.getShadowMapSize(),
+                (int) Settings.getShadowMapSize());
 
         this.windowWidth = K.Window.DEFAULT_WIDTH;
         this.windowHeight = K.Window.DEFAULT_HEIGHT;

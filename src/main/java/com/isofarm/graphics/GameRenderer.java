@@ -9,11 +9,9 @@ import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import com.isofarm.wrld.Chunk;
 import com.isofarm.wrld.GameMaster;
-import org.joml.FrustumIntersection;
-import org.joml.Matrix4f;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
+import org.joml.*;
 
+import java.lang.Math;
 import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -329,10 +327,29 @@ public class GameRenderer {
         CameraView camera = gameMaster.getActiveCamera();
         Vector3f cameraPosition = new Vector3f(camera.getPosition());
         Vector3f lightDirection = new Vector3f(gameMaster.getCelestialLighting().getDirection()).normalize();
+
         lightTarget.set(cameraPosition);
         lightPosition.set(cameraPosition).sub(new Vector3f(lightDirection).mul(80.0f));
+
+        Vector3f up = new Vector3f(0.0f, 1.0f, 0.0f);
+        if (Math.abs(lightDirection.y) > 0.98f) {
+            up.set(0.0f, 0.0f, 1.0f);
+        }
+
         lightProjection.identity().ortho(-60.0f, 60.0f, -60.0f, 60.0f, 1.0f, 180.0f);
-        lightView.identity().lookAt(lightPosition, lightTarget, upVector);
+        lightView.identity().lookAt(lightPosition, lightTarget, up);
+
+        lightSpaceMatrix.set(lightProjection).mul(lightView);
+        Vector4f shadowCoord = new Vector4f(0.0f, 0.0f, 0.0f, 1.0f).mul(lightSpaceMatrix);
+        shadowCoord.mul(Settings.getShadowMapSize() / 2.0f);
+
+        float roundedX = Math.round(shadowCoord.x);
+        float roundedY = Math.round(shadowCoord.y);
+        float dx = (roundedX - shadowCoord.x) * (2.0f / Settings.getShadowMapSize());
+        float dy = (roundedY - shadowCoord.y) * (2.0f / Settings.getShadowMapSize());
+
+        Matrix4f texelFix = new Matrix4f().translate(dx, dy, 0.0f);
+        lightProjection.mul(texelFix);
         lightSpaceMatrix.set(lightProjection).mul(lightView);
     }
 

@@ -5,6 +5,7 @@ public class Settings {
     private static final float BASE_ICON_SIZE = 32.0f;
     private static final float[] GUI_SCALES = {0.5f, 1.0f, 1.25f, 1.5f, 2.0f};
     private static float fov = 80f;
+    private static final float SHADOW_MAP_SIZE = 4096.0f;
     private static float mouseSensitivity = 0.4f;
     private static int renderDistance = 12;
     private static int unloadMargin = 2;
@@ -16,6 +17,10 @@ public class Settings {
     private static boolean doEnableDebugInfo = true;
 
     private Settings() {}
+
+    public static float getShadowMapSize() {
+        return SHADOW_MAP_SIZE;
+    }
 
     public static float getScale() {
         return GUI_SCALES[guiScaleIndex];

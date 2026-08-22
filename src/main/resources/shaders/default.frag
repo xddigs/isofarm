@@ -47,7 +47,7 @@ float calculateShadow(vec4 lightSpacePosition, vec3 normal) {
     vec3 lightDir = normalize(-uLightDirection);
     float normalDotLight = max(dot(normal, lightDir), 0.0);
 
-    float bias = max(0.0005, 0.005 * (1.0 - normalDotLight));
+    float bias = max(0.0001, 0.001 * (1.0 - normalDotLight));
     float currentDepth = projectionCoordinates.z;
 
     vec2 texelSize = 1.0 / vec2(textureSize(uShadowMap, 0));
