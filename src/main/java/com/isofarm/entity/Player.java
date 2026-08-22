@@ -207,9 +207,10 @@ public class Player extends Character {
             }
             case GODMODE -> {
                 BlockData[] blocks = BlockData.values();
-                for (BlockData b : blocks) {
-                    add(new Block(b));
-                }
+                for (BlockData b : blocks) { add(new Block(b)); }
+
+                CropType[] crops = CropType.values();
+                for (CropType c : crops) { add(new Seed(c)); }
                 sort();
             }
         }
