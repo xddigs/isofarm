@@ -443,5 +443,23 @@ public class GameMaster {
 
     public void rebuildChunkMeshAt(int worldX, int worldZ) {
         chunkManager.rebuildChunkMeshAt(worldX, worldZ);
+        int localX = Math.floorMod(worldX, Chunk.SIZE_X);
+        int localZ = Math.floorMod(worldZ, Chunk.SIZE_Z);
+
+        if (localX == 0) {
+            chunkManager.rebuildChunkMeshAt(worldX - 1, worldZ);
+        }
+
+        if (localX == Chunk.SIZE_X - 1) {
+            chunkManager.rebuildChunkMeshAt(worldX + 1, worldZ);
+        }
+
+        if (localZ == 0) {
+            chunkManager.rebuildChunkMeshAt(worldX, worldZ - 1);
+        }
+
+        if (localZ == Chunk.SIZE_Z - 1) {
+            chunkManager.rebuildChunkMeshAt(worldX, worldZ + 1);
+        }
     }
 }
