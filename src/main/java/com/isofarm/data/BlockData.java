@@ -8,7 +8,7 @@ import org.joml.Vector2f;
 public enum BlockData {
     AIR((byte) 0, "Air", 0, 0, 0, SoundGroup.SILENT, 0f),
     DIRT((byte) 1, "Dirt", true, 100, 0, 0, SoundGroup.SOIL, 0.9f),
-    GRASS((byte) 2, "Grass", true, 120, 1, 0, 1, 3, 1, 1, SoundGroup.SOIL, 1.0f),
+    GRASS((byte) 2, "Grass", true, 120, 1, 0, SoundGroup.SOIL, 1.0f),
     STONE((byte) 3, "Stone", 150, 2, 0, SoundGroup.HARD, 6.0f),
     TILLED_DIRT((byte) 4, "Tilled Dirt", true, 110, 3, 0, 0, 0, 0, 0, SoundGroup.SOIL, 0.9f),
     VOIDSTONE((byte) 5, "Voidstone", 999, 4, 0, SoundGroup.HARD, 999999.0f),
