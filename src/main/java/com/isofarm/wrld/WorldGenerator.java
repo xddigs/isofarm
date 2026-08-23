@@ -13,7 +13,7 @@ public class WorldGenerator {
     private static final int MOUNTAIN_HEIGHT = 150;
 
     private final World world;
-    private static Random chunkRandom = new Random();
+    private static final Random chunkRandom = new Random();
 
     public WorldGenerator(World world) {
         this.world = world;
@@ -21,8 +21,6 @@ public class WorldGenerator {
 
     public void generateChunk(int chunkX, int chunkZ) {
         Chunk chunk = world.getOrCreateChunk(chunkX, chunkZ);
-        long chunkSeed = ((long) chunkX * 341873128712L) + ((long) chunkZ * 132897987541L);
-
         int[][] heightMap = new int[Chunk.SIZE_X][Chunk.SIZE_Z];
         for (int x = 0; x < Chunk.SIZE_X; x++) {
             for (int z = 0; z < Chunk.SIZE_Z; z++) {
@@ -49,7 +47,7 @@ public class WorldGenerator {
                 int worldZ = chunkZ * Chunk.SIZE_Z + z;
 
                 if (height < BASE_HEIGHT + 12 && chunkRandom.nextDouble() < 0.01 && canPlaceTree(heightMap, x, z)) {
-                    generateCompactTree(worldX, height, worldZ, chunkRandom);
+                    generateCompactTree(worldX, height, worldZ);
                 }
             }
         }
@@ -87,8 +85,8 @@ public class WorldGenerator {
         return true;
     }
 
-    private void generateCompactTree(int worldX, int groundY, int worldZ, Random random) {
-        int trunkHeight = 4 + random.nextInt(2);
+    private void generateCompactTree(int worldX, int groundY, int worldZ) {
+        int trunkHeight = 4 + chunkRandom.nextInt(2);
         int topY = groundY + trunkHeight;
 
         for (int y = 1; y <= trunkHeight; y++) {
@@ -101,7 +99,8 @@ public class WorldGenerator {
 
             for (int dx = -subRadius; dx <= subRadius; dx++) {
                 for (int dz = -subRadius; dz <= subRadius; dz++) {
-                    if (Math.abs(dx) == subRadius && Math.abs(dz) == subRadius && random.nextDouble() < 0.5) {
+                    if (Math.abs(dx) == subRadius && Math.abs(dz) == subRadius &&
+                            chunkRandom.nextDouble() < 0.5) {
                         continue;
                     }
 
