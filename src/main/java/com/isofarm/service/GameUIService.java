@@ -124,7 +124,9 @@ public class GameUIService implements Service<GameMaster> {
         float startX = (windowWidth - totalBarsWidth) / 2.0f;
         float barY = windowHeight - hotbarUI.getHeight() - K.UI.HOTBAR_OFFSET - barHeight - offsetAboveHotbar;
 
-        this.healthBar = new UIProgressBar(startX, barY, barWidth, barHeight, 100, 100);
+        this.healthBar = new UIProgressBar(startX, barY, barWidth, barHeight,
+                100, 100, true);
+
         this.healthBar.setColors(
                 new Vector4f(0.8f, 0.1f, 0.1f, 1.0f),
                 new Vector4f(0.2f, 0.05f, 0.05f, 0.8f));
@@ -132,7 +134,9 @@ public class GameUIService implements Service<GameMaster> {
         uiManager.getRoot().addChild(this.healthBar);
 
         float staminaX = startX + barWidth + gapBetweenBars;
-        this.staminaBar = new UIProgressBar(staminaX, barY, barWidth, barHeight, 100, 100);
+        this.staminaBar = new UIProgressBar(staminaX, barY, barWidth, barHeight,
+                100, 100, true);
+
         this.staminaBar.setColors(
                 new Vector4f(0.1f, 0.8f, 0.2f, 1.0f),
                 new Vector4f(0.05f, 0.2f, 0.05f, 0.8f));

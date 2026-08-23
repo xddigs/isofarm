@@ -276,4 +276,8 @@ public class ChunkManager {
     public void setLastPlayerChunkZ(int z) {
         this.lastPlayerChunkZ = z;
     }
+
+    public WorldGenerator getGenerator() {
+        return generator;
+    }
 }

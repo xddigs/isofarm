@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
@@ -72,8 +73,9 @@ public class GameMaster {
 
     private float genDelta;
 
-    public GameMaster(long windowHandle) {
+    public GameMaster(long windowHandle, UIManager uiManager) {
         this.windowHandle = windowHandle;
+        this.uiManager = uiManager;
 
         this.world = new World();
         this.sun = new Sun("Sun");
@@ -108,7 +110,6 @@ public class GameMaster {
         this.gameRenderer = new GameRenderer();
         this.itemRenderer = new ItemRenderer();
 
-        this.uiManager = new UIManager(windowWidth, windowHeight);
         this.gameUIservice = new GameUIService(windowHandle, this,
                 uiManager, resourceManager.getSeedIcons(), resourceManager.getCropIcons(),
                 resourceManager.getBlockIcons(), resourceManager.getToolIcons(),
@@ -141,10 +142,6 @@ public class GameMaster {
         player.setSoundService(soundService);
         addEntity(player);
 
-        chunkManager.updateLoadedChunks(0, 0);
-        GridPos spawn = world.getHighestY(0.0f, 0.0f);
-
-        player.setPosition(0.5f, spawn.y() + 1.0f, 0.5f);
         gameUIservice.setPlayer(player);
         shop.setPlayer(player);
 
@@ -152,6 +149,31 @@ public class GameMaster {
         toastService.info("Use E to open the inventory");
         Library.initItems(itemRegistry, player);
         Library.initCommands(genDelta, this);
+    }
+
+    public void initWorld(Consumer<Float> progressCallback) {
+        int r = Settings.getRenderDistance();
+        int totalChunks = (2 * r + 1) * (2 * r + 1);
+        int current = 0;
+        for (int cx = -r; cx <= r; cx++) {
+            for (int cz = -r; cz <= r; cz++) {
+                chunkManager.getGenerator().generateChunk(cx, cz);
+                current++;
+                if (progressCallback != null) {
+                    progressCallback.accept((float) current / totalChunks * 100f);
+                }
+            }
+        }
+        chunkManager.updateLoadedChunks(0, 0);
+    }
+
+    public void spawn() {
+        chunkManager.updateLoadedChunks(0, 0);
+        GridPos spawn = world.getHighestY(0.5f, 0.5f);
+        float spawnY = spawn.y() + 1.8f;
+        player.setPosition(0.5f, spawnY, 0.5f);
+        camera.setPosition(0.5f, spawnY, 0.5f);
+        orthoCamera.setPosition(0.5f, spawnY + 10.0f, 0.5f);
     }
 
     public Sun getSun() { return sun; }

@@ -1,11 +1,9 @@
 package com.isofarm;
 
+import com.isofarm.graphics.IntroScreen;
 import com.isofarm.input.Keyboard;
 import com.isofarm.input.Mouse;
-import com.isofarm.service.TimeService;
 import com.isofarm.utils.K;
-import com.isofarm.wrld.GameMaster;
-import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
@@ -27,22 +25,13 @@ public class Game {
 
     private static final int OPENGL_MAJOR_VERSION = 3;
     private static final int OPENGL_MINOR_VERSION = 3;
-    private static final int VSYNC_INTERVAL = 1;
-
-    private static final float FRAMES_PER_SECOND = 60.0f;
-
-    private static final float CLEAR_COLOR_RED = 0.15f;
-    private static final float CLEAR_COLOR_GREEN = 0.15f;
-    private static final float CLEAR_COLOR_BLUE = 0.20f;
-    private static final float CLEAR_COLOR_ALPHA = 1.0f;
+    private static final int VSYNC_INTERVAL = 0;
 
     private long window;
-    private GameMaster master;
 
     public void run() {
         log.info("Starting LWJGL 3 application...");
         init();
-        loop();
 
         log.debug("Closing window and releasing native resources...");
         glfwFreeCallbacks(window);
@@ -102,52 +91,20 @@ public class Game {
         glfwMakeContextCurrent(window);
         GL.createCapabilities();
 
-        glfwSetFramebufferSizeCallback(window, (windowHandle, width, height) -> {
-            if (width > 0 && height > 0) {
-                glViewport(0, 0, width, height);
-                if (master != null) {
-                    master.onResize(width, height);
-                }
-            }
-        });
-
         log.info("OpenGL context loaded successfully.");
         log.info("GPU Renderer: {}", glGetString(GL_RENDERER));
         log.info("OpenGL Version: {}", glGetString(GL_VERSION));
 
         glfwSwapInterval(VSYNC_INTERVAL);
-        master = new GameMaster(window);
-        Vector3f skyColor = TimeService.getSkyColor();
-        glClearColor(skyColor.x, skyColor.y, skyColor.z, CLEAR_COLOR_ALPHA);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        master.render();
+
         glfwSwapBuffers(window);
         glfwShowWindow(window);
+        IntroScreen screen = new IntroScreen(window);
+        screen.show();
         glfwSetCursorPos(window, K.Window.DEFAULT_WIDTH / 2, K.Window.DEFAULT_HEIGHT / 2);
         log.info("GLFW window successfully initialized.");
-    }
-
-    private void loop() {
-        double lastTime = glfwGetTime();
-        while (!glfwWindowShouldClose(window)) {
-            double currentTime = glfwGetTime();
-            float delta = (float) (currentTime - lastTime);
-            lastTime = currentTime;
-            glfwPollEvents();
-            if (Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT) &&
-                    Keyboard.isKeyPressed(GLFW_KEY_ESCAPE)) {
-                master.getChunkManager().shutdown();
-                glfwSetWindowShouldClose(window, true);
-            }
-            Vector3f skyColor = TimeService.getSkyColor();
-            glClearColor(skyColor.x, skyColor.y, skyColor.z, CLEAR_COLOR_ALPHA);
-            master.update(delta);
-
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-            master.render();
-            glfwSwapBuffers(window);
-        }
     }
 
     public static void main(String[] ignoredArgs) {

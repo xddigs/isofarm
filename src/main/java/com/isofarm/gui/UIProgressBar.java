@@ -9,17 +9,19 @@ public class UIProgressBar extends UIElement {
     
     private float borderWidth = 2.0f;
     private float cornerRadius = 4.0f;
-    private boolean showText = true;
+    private boolean showText;
 
     private Vector4f backgroundColor = new Vector4f(0.15f, 0.15f, 0.15f, 0.8f);
     private Vector4f fillColor = new Vector4f(0.8f, 0.2f, 0.2f, 1.0f);
     private Vector4f borderColor = new Vector4f(0.0f, 0.0f, 0.0f, 1.0f);
     private final Vector4f textColor = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-    public UIProgressBar(float x, float y, float width, float height, float value, float maxValue) {
+    public UIProgressBar(float x, float y, float width, float height,
+                         float value, float maxValue, boolean showText) {
         super(x, y, width, height);
         this.maxValue = Math.max(1.0f, maxValue);
         this.value = Math.clamp(value, 0.0f, this.maxValue);
+        this.showText = showText;
     }
 
     @Override
