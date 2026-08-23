@@ -50,13 +50,17 @@ public class ChunkManager {
         }
     }
 
-    public int getPendingMeshCount() {
-        return completedMeshes.size();
-    }
+    public void buildSingleChunkMesh(int chunkX, int chunkZ) {
+        Chunk chunk = world.getChunks().get(world.get2DKey(chunkX, chunkZ));
+        if (chunk == null) return;
 
-    public boolean hasFinishedLoading(int expectedChunks) {
-        return world.getChunks().size() >= expectedChunks
-                && completedMeshes.isEmpty();
+        if (!chunkMeshes.containsKey(chunk)) {
+            ChunkMeshBuilder.MeshData data = ChunkMeshBuilder.buildMesh(world, chunk);
+            Mesh mesh = ChunkMeshBuilder.createMesh(data);
+            if (mesh != null) {
+                chunkMeshes.put(chunk, mesh);
+            }
+        }
     }
 
     public void updateLoadedChunks(int centerChunkX, int centerChunkZ) {

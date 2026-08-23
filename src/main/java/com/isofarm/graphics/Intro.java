@@ -1,6 +1,7 @@
 package com.isofarm.graphics;
 
 import com.isofarm.gui.GUI;
+import com.isofarm.gui.UIFont;
 import com.isofarm.gui.UIManager;
 import com.isofarm.gui.UIProgressBar;
 import com.isofarm.input.Keyboard;
@@ -63,14 +64,12 @@ public class Intro {
             completedTasks[0]++;
             float overallProgress = ((float) completedTasks[0] / totalTasks) * 100.0f;
             progressBar.setValue(overallProgress);
-            renderLoadingFrame();
+            renderLoadingFrame("Loading engine resources...");
         });
 
         int minZ = -r;
         int currentChunkX = -r, currentChunkZ = minZ;
-
-        while (!glfwWindowShouldClose(window) && completedTasks[0] <
-                (resourceSteps + totalChunks)) {
+        while (!glfwWindowShouldClose(window) && completedTasks[0] < (resourceSteps + totalChunks)) {
             glfwPollEvents();
 
             gameMaster.getChunkManager().getGenerator()
@@ -85,50 +84,51 @@ public class Intro {
 
             float overallProgress = ((float) completedTasks[0] / totalTasks) * 100.0f;
             progressBar.setValue(overallProgress);
-            renderLoadingFrame();
+
+            String stepText = String.format("Generating terrain [%d,%d]...", currentChunkX, currentChunkZ);
+            renderLoadingFrame(stepText);
         }
 
-        gameMaster.getChunkManager().updateLoadedChunks(0, 0);
-        while (!glfwWindowShouldClose(window)) {
+        currentChunkX = -r;
+        currentChunkZ = minZ;
+
+        while (!glfwWindowShouldClose(window) && currentChunkX <= r) {
             glfwPollEvents();
-
-            gameMaster.getChunkManager().update(0, 0, 0.016f);
-            int remainingMeshes = gameMaster.getChunkManager().getPendingMeshCount();
-            int meshesDone = totalChunks - remainingMeshes;
-
-            int currentTasks = resourceSteps + totalChunks + meshesDone;
-            float overallProgress = ((float) currentTasks / totalTasks) * 100.0f;
-            progressBar.setValue(overallProgress);
-
-            renderLoadingFrame();
-            if (gameMaster.getChunkManager().hasFinishedLoading(totalChunks)) {
-                completedTasks[0] = resourceSteps + (totalChunks * 2);
-                progressBar.setValue(((float) completedTasks[0] / totalTasks) * 100.0f);
-                renderLoadingFrame();
-                break;
+            gameMaster.getChunkManager()
+                    .buildSingleChunkMesh(currentChunkX, currentChunkZ);
+            completedTasks[0]++;
+            currentChunkZ++;
+            if (currentChunkZ > r) {
+                currentChunkZ = minZ;
+                currentChunkX++;
             }
 
-            try {
-                Thread.sleep(5);
-            } catch (InterruptedException ignored) {}
+            float overallProgress = ((float) completedTasks[0] / totalTasks) * 100.0f;
+            progressBar.setValue(overallProgress);
+
+            String stepText = String.format("Building meshes [%d,%d]...", currentChunkX, currentChunkZ);
+            renderLoadingFrame(stepText);
         }
+
+        gameMaster.getChunkManager().setLastPlayerChunkX(0);
+        gameMaster.getChunkManager().setLastPlayerChunkZ(0);
 
         gameMaster.spawn();
         completedTasks[0]++;
         progressBar.setValue(((float) completedTasks[0] / totalTasks) * 100.0f);
-        renderLoadingFrame();
+        renderLoadingFrame("Spawning player...");
 
         gameMaster.initUI();
         completedTasks[0]++;
         progressBar.setValue(100.0f);
-        renderLoadingFrame();
+        renderLoadingFrame("Setting up the UI...");
 
         progressBar.hide();
         setupCallbacks();
         loop();
     }
 
-    private void renderLoadingFrame() {
+    private void renderLoadingFrame(String statusText) {
         glViewport(0, 0, (int) K.Window.DEFAULT_WIDTH, (int) K.Window.DEFAULT_HEIGHT);
         glDisable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
@@ -141,6 +141,14 @@ public class Intro {
 
         GUI.begin(K.Window.DEFAULT_WIDTH, K.Window.DEFAULT_HEIGHT);
         uiManager.render();
+
+        if (statusText != null) {
+            float textX = (K.Window.DEFAULT_WIDTH - 500f) / 2.0f;
+            float textY = ((K.Window.DEFAULT_HEIGHT - 25f) / 2.0f) - 30.0f;
+            UIFont font = GUI.getNormalFont();
+            GUI.drawString(statusText, textX, textY, font, K.UI.UI_TEXT_COLOR);
+        }
+
         GUI.end();
         glfwSwapBuffers(window);
         glFlush();
