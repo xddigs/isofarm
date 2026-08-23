@@ -86,7 +86,6 @@ public record OrthographicCameraController(OrthographicCamera camera)
         var path = PathFinder.findPath(world, player, start, goal);
 
         if (path.isEmpty()) return;
-
         player.setPath(path);
     }
 

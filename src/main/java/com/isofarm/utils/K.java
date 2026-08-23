@@ -13,7 +13,6 @@ public final class K {
         public static final float DEFAULT_YAW = -45.0f;
         public static final float DEFAULT_WIDTH = 16.0f;
         public static final float DEFAULT_HEIGHT = 8.0f;
-        public static final float MOVEMENT_SPEED = 6.0f;
         public static final float SPRINT_MULTIPLIER = 1.5f;
         public static final float BOB_FREQUENCY = 10.0f;
         public static final float BOB_AMOUNT = 0.08f;

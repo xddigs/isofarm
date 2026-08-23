@@ -106,7 +106,7 @@ public class CameraController implements Service<Camera> {
     private void movement(GameMaster gameMaster, float delta) {
         Player player = gameMaster.getPlayer();
 
-        float speed = K.Camera.MOVEMENT_SPEED;
+        float speed = player.getSpeed();
         boolean isSprinting = Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)
                         && !gameMaster.isInventoryOpen()
                         && !gameMaster.isChatOpen()

@@ -23,6 +23,7 @@ public abstract class Entity {
     private boolean isCrounching;
 
     private float currentEyeHeight = 1.6f;
+    private float speed;
 
     public Entity(String name) {
         this.id = (byte) (Math.floor((Math.random() * Math.random()) * 100));
@@ -38,6 +39,7 @@ public abstract class Entity {
 
         this.onGround = false;
         this.wasOnGround = onGround;
+        this.speed = 1.0f;
     }
 
     public byte getId() {
@@ -277,6 +279,14 @@ public abstract class Entity {
             }
         }
         return true;
+    }
+
+    public float getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(float speed) {
+        this.speed = speed;
     }
 
     public void updateCrouching(float delta) {

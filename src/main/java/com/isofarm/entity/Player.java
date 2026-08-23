@@ -8,7 +8,6 @@ import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.item.Item;
 import com.isofarm.item.Tool;
 import com.isofarm.pathfinding.GridPos;
-import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
@@ -47,6 +46,7 @@ public class Player extends Character {
         setPosition(new Vector3f(spawnX, highestAltitude.y(), spawnZ));
         setVelocity(new Vector3f(0.0f, 0.0f, 0.0f));
         setDimensions(new Vector3f(0.5f, 1.0f, 0.5f));
+        setSpeed(6.0f);
         setReputation(Reputation.NEUTRAL);
         setGamemode(Gamemode.SURVIVAL);
         setUpInventory();
@@ -191,7 +191,7 @@ public class Player extends Character {
         }
 
         Vector3f velocity = new Vector3f(direction)
-                .mul(K.Camera.MOVEMENT_SPEED);
+                .mul(this.getSpeed());
 
         setVelocity(velocity);
         lookAt(targetX, targetZ, cameraYaw);
