@@ -149,14 +149,7 @@ public class HotbarUI extends UIElement {
     }
 
     private void interact() {
-        boolean isCtrl = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL) || Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
-        boolean isRightClick = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_RIGHT);
         boolean isLeftClick = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
-
-        if (isCtrl && isRightClick && isSlotHovered(backpackSlotUI)) {
-            player.unequipBackpack();
-            return;
-        }
 
         if (isLeftClick && isSlotHovered(backpackSlotUI)) {
             selectSlot(K.UI.INVENTORY_COLUMNS);

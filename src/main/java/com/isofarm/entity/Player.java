@@ -147,12 +147,6 @@ public class Player extends Character {
         sheet.unbind();
     }
 
-    public void unequipBackpack() {
-        if (getInventory().hasBackpackEquipped()) {
-            // TODO
-        }
-    }
-
     public void move(World world, Vector3f direction, float delta) {
         moveAndCollide(world, direction, delta);
     }
@@ -311,6 +305,20 @@ public class Player extends Character {
         if (amount <= 0) return;
         log.info("Spent ${}", amount);
         getPurse().remove(amount);
+    }
+
+    public void craft(Recipe recipe) {
+        boolean canCraft = recipe.ingredients().stream().allMatch(ing ->
+                getInventory().getAmount(ing) >= ing.amount());
+
+        if (canCraft) {
+            for (RecipeIngredient ing : recipe.ingredients()) {
+                getInventory().remove(ing, ing.amount());
+            }
+            add(recipe.result(), recipe.resultAmount());
+            gameMaster.getToastService().success("You crafted " +
+                    recipe.resultAmount() + " " + recipe.result().getName());
+        }
     }
 
     public boolean hasSeeds() {

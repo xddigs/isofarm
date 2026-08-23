@@ -18,7 +18,8 @@ public class RecipeEntryUI extends UIElement {
     private boolean isSelected;
     private Runnable onClick;
 
-    public RecipeEntryUI(float x, float y, float width, float height, Recipe recipe) {
+    public RecipeEntryUI(float x, float y, float width, float height,
+                         Recipe recipe) {
         super(x, y, width, height);
         this.recipe = recipe;
         setFocusable(true);
@@ -55,6 +56,7 @@ public class RecipeEntryUI extends UIElement {
         Item resultItem = recipe.result();
         SpriteSheet resultSheet = ResourceManager.getItemSpriteSheet(resultItem);
 
+        float textYOffset = 6f;
         float paddingLeft = Settings.getScaledPadding() / 2.0f;
         float iconSize = Settings.getScaledIcon();
         float iconY = getAbsoluteY() + (getHeight() - iconSize) / 2.0f;
@@ -65,12 +67,10 @@ public class RecipeEntryUI extends UIElement {
                     getAbsoluteX() + paddingLeft, iconY, iconSize, iconSize, tint);
         }
 
-        float textX = getAbsoluteX() + paddingLeft + iconSize + Settings.scale(6.0f);
-        float fontHeight = GUI.getStringHeight(resultItem.getName(), GUI.getNormalFont());
-        float textY = getAbsoluteY() + (getHeight() - fontHeight) / 2.0f;
-
-        Vector4f textColor = canPlayerCraft() ? K.UI.UI_TEXT_COLOR : K.UI.UI_TEXT_DISABLED_COLOR;
-        GUI.drawString(resultItem.getName(), textX, textY, GUI.getNormalFont(), textColor);
+        GUI.drawString(resultItem.getName(),
+                getAbsoluteX() + iconSize + paddingLeft * 2,
+                getAbsoluteY() + iconSize / 2f + textYOffset,
+                GUI.getNormalFont(), tint);
     }
 
     private boolean canPlayerCraft() {

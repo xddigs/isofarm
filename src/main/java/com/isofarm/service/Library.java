@@ -13,6 +13,10 @@ public class Library implements Service<GameMaster> {
     private static final String DEFAULT_ID = "main";
 
     public static void initItems(ItemRegistry itemR, Player player) {
+        itemR.register(DEFAULT_ID + ".stick", () -> new Material(MaterialID.STICK));
+        itemR.register(DEFAULT_ID + ".wood", () -> new Material(MaterialID.WOOD));
+        itemR.register(DEFAULT_ID + ".stone", () -> new Material(MaterialID.STONE));
+
         itemR.register(DEFAULT_ID + ".backpack", Backpack::new);
         itemR.register(DEFAULT_ID + ".coin", Coin::new);
         itemR.register(DEFAULT_ID + ".wooden_hoe", () -> new Hoe());

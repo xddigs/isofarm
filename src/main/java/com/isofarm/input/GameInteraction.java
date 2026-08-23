@@ -87,6 +87,12 @@ public class GameInteraction {
             dropItem(gameMaster, selectedItem, dropAll);
         }
 
+        if (Keyboard.isKeyPressed(GLFW_KEY_E)) {
+            if (gameMaster.getPlayer().getInventory().hasBackpackEquipped()) {
+                gameMaster.toggleInventory();
+            }
+        }
+
         if (!gameMaster.isOrthographicCamera()) {
             pickUp(gameMaster);
         } else {
