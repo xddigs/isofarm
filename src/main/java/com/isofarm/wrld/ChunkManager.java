@@ -50,6 +50,15 @@ public class ChunkManager {
         }
     }
 
+    public int getPendingMeshCount() {
+        return completedMeshes.size();
+    }
+
+    public boolean hasFinishedLoading(int expectedChunks) {
+        return world.getChunks().size() >= expectedChunks
+                && completedMeshes.isEmpty();
+    }
+
     public void updateLoadedChunks(int centerChunkX, int centerChunkZ) {
         int r = Settings.getRenderDistance();
         int unloadDist = r + Settings.getUnloadMargin();
@@ -280,10 +289,5 @@ public class ChunkManager {
 
     public WorldGenerator getGenerator() {
         return generator;
-    }
-
-    public boolean hasFinishedLoading(int expectedChunks) {
-        return world.getChunks().size() >= expectedChunks
-                && completedMeshes.isEmpty();
     }
 }

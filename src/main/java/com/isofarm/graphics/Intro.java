@@ -22,8 +22,6 @@ public class Intro {
     private UIManager uiManager;
 
     private static final float CLEAR_COLOR_ALPHA = 1.0f;
-    private static final float RESOURCE_WEIGHT = 35.0f;
-    private static final float CHUNK_WEIGHT = 65.0f;
 
     public Intro(long window) {
         this.window = window;
@@ -52,10 +50,12 @@ public class Intro {
     public void show() {
         setupUI();
         gameMaster = new GameMaster(window, uiManager);
+
         int r = Settings.getRenderDistance();
         int totalChunks = (2 * r + 1) * (2 * r + 1);
         int resourceSteps = 10;
-        int totalTasks = resourceSteps + totalChunks;
+        int postProcessingSteps = 2;
+        int totalTasks = resourceSteps + (totalChunks * 2) + postProcessingSteps;
 
         final int[] completedTasks = {0};
 
@@ -66,10 +66,11 @@ public class Intro {
             renderLoadingFrame();
         });
 
-        int minX = -r, minZ = -r;
-        int currentChunkX = minX, currentChunkZ = minZ;
+        int minZ = -r;
+        int currentChunkX = -r, currentChunkZ = minZ;
 
-        while (!glfwWindowShouldClose(window) && completedTasks[0] < totalTasks) {
+        while (!glfwWindowShouldClose(window) && completedTasks[0] <
+                (resourceSteps + totalChunks)) {
             glfwPollEvents();
 
             gameMaster.getChunkManager().getGenerator()
@@ -88,9 +89,41 @@ public class Intro {
         }
 
         gameMaster.getChunkManager().updateLoadedChunks(0, 0);
+        while (!glfwWindowShouldClose(window)) {
+            glfwPollEvents();
+
+            gameMaster.getChunkManager().update(0, 0, 0.016f);
+            int remainingMeshes = gameMaster.getChunkManager().getPendingMeshCount();
+            int meshesDone = totalChunks - remainingMeshes;
+
+            int currentTasks = resourceSteps + totalChunks + meshesDone;
+            float overallProgress = ((float) currentTasks / totalTasks) * 100.0f;
+            progressBar.setValue(overallProgress);
+
+            renderLoadingFrame();
+            if (gameMaster.getChunkManager().hasFinishedLoading(totalChunks)) {
+                completedTasks[0] = resourceSteps + (totalChunks * 2);
+                progressBar.setValue(((float) completedTasks[0] / totalTasks) * 100.0f);
+                renderLoadingFrame();
+                break;
+            }
+
+            try {
+                Thread.sleep(5);
+            } catch (InterruptedException ignored) {}
+        }
+
         gameMaster.spawn();
-        progressBar.hide();
+        completedTasks[0]++;
+        progressBar.setValue(((float) completedTasks[0] / totalTasks) * 100.0f);
+        renderLoadingFrame();
+
         gameMaster.initUI();
+        completedTasks[0]++;
+        progressBar.setValue(100.0f);
+        renderLoadingFrame();
+
+        progressBar.hide();
         setupCallbacks();
         loop();
     }
