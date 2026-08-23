@@ -10,7 +10,7 @@ import org.joml.Vector3f;
 @DataClass
 public abstract class Entity {
     private final byte id;
-    private final String name;
+    private String name;
 
     protected Vector3f position;
     protected Vector3f velocity;
@@ -46,6 +46,10 @@ public abstract class Entity {
 
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Vector3f getPosition() {

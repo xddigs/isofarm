@@ -76,6 +76,7 @@ public class IntroScreen {
 
         gameMaster.spawn();
         progressBar.hide();
+        gameMaster.initUI();
         setupCallbacks();
         loop();
     }

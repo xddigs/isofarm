@@ -33,7 +33,6 @@ public class GameMaster {
     private final ShadowMap shadowMap;
     private final SoundService soundService;
     private final UIManager uiManager;
-    private final GameUIService gameUIservice;
     private final GameInteraction gameInteraction;
     private final CropService cropService;
     private final TimeService timeService;
@@ -50,6 +49,8 @@ public class GameMaster {
     private final ChunkManager chunkManager;
     private final GameRenderer gameRenderer;
     private final ItemRenderer itemRenderer;
+
+    private GameUIService gameUIservice;
 
     private Framebuffer maskFbo;
     private Framebuffer sceneFbo;
@@ -110,16 +111,8 @@ public class GameMaster {
         this.gameRenderer = new GameRenderer();
         this.itemRenderer = new ItemRenderer();
 
-        this.gameUIservice = new GameUIService(windowHandle, this,
-                uiManager, resourceManager.getSeedIcons(), resourceManager.getCropIcons(),
-                resourceManager.getBlockIcons(), resourceManager.getToolIcons(),
-                resourceManager.getMaterialIcons(),
-                resourceManager.getInventoryIcons());
-        this.commandService.setGameUIService(gameUIservice);
-
         this.shop = new Shop();
         this.entities = new LinkedList<>();
-        this.gameUIservice.setShop(shop);
 
         this.camera = new Camera(K.Camera.DEFAULT_WIDTH,
                 K.Camera.DEFAULT_HEIGHT, Settings.getRenderDistance());
@@ -137,12 +130,9 @@ public class GameMaster {
         this.gameInteraction = new GameInteraction(this,
                 resourceManager.getBlocksTexture());
         this.recenter();
-        this.player = new Player(gameUIservice.getEnteredPlayerName(),
-                world, toastService);
+        this.player = new Player(null, world, toastService);
         player.setSoundService(soundService);
         addEntity(player);
-
-        gameUIservice.setPlayer(player);
         shop.setPlayer(player);
 
         log.info("Player created: {}", player.getName());
@@ -165,6 +155,19 @@ public class GameMaster {
             }
         }
         chunkManager.updateLoadedChunks(0, 0);
+    }
+
+    public void initUI() {
+        gameUIservice = new GameUIService(windowHandle, this,
+                uiManager, resourceManager.getSeedIcons(), resourceManager.getCropIcons(),
+                resourceManager.getBlockIcons(), resourceManager.getToolIcons(),
+                resourceManager.getMaterialIcons(),
+                resourceManager.getInventoryIcons());
+
+        gameUIservice.setPlayer(this.player);
+        commandService.setGameUIService(gameUIservice);
+        gameUIservice.setShop(shop);
+        player.setName(gameUIservice.getPlayerName());
     }
 
     public void spawn() {

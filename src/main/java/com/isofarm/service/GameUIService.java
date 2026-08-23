@@ -447,7 +447,7 @@ public class GameUIService implements Service<GameMaster> {
         };
     }
 
-    public String getEnteredPlayerName() {
+    public String getPlayerName() {
         return "Gabi";
     }
 
