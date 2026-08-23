@@ -121,7 +121,7 @@ public class InventorySlotUI extends UIElement {
         float progress = durability / maxDurability;
 
         float padding = Settings.scale(2.0f);
-        float barHeight = Settings.getScaledBorder() * 2.0f;
+        float barHeight = Settings.getScaledBorder();
         float barWidth =  getAbsoluteWidth() - padding * 2.0f;
         float x = getAbsoluteX() + padding;
         float y = getAbsoluteY() + getAbsoluteHeight() - barHeight - padding;
@@ -143,7 +143,8 @@ public class InventorySlotUI extends UIElement {
             green = t * 0.5f;
         }
 
-        GUI.drawRect(x, y, barWidth * progress, barHeight, new Vector4f(red, green, blue, getWorldOpacity()));
+        GUI.drawRect(x, y, barWidth * progress, barHeight,
+                new Vector4f(red, green, blue, getWorldOpacity()));
     }
 
     private void renderAmount() {

@@ -291,73 +291,64 @@ public class GameInteraction {
                 .getHotbarUI()
                 .getSelectedItem();
 
-        if (selectedItem == null || selectedItem instanceof Backpack) {
+        byte blockId = world.getBlockTypeAt(x, y, z);
+        BlockData blockData = getBlockData(blockId);
+
+        Crop crop = world.getCropAt(x, y, z);
+        if (crop != null) {
+            CropType cropType = crop.getCropType();
+            int frameIndex = crop.getStage().getFrameIndex();
+            SpriteSheet sheet = gameMaster.getCropSpriteSheet(cropType);
+            if (crop.isReadyToHarvest()) {
+                cropService.harvest(
+                        gameMaster.getPlayer(),
+                        crop,
+                        gameMaster.getToastService(),
+                        sheet
+                );
+            } else {
+                cropService.rip(crop);
+            }
+
+            if (sheet != null) {
+                itemRenderer.playBreakAnimation();
+                particles.spawn(x, y +
+                        K.World.SHORTER_BLOCK_HEIGHT, z, sheet, frameIndex);
+            }
+
+            gameUIservice.logAction(cell);
+            return;
+        }
+
+        if (blockId == 0) {
             resetBreaking();
             return;
         }
 
+        if (blockData == null) {
+            resetBreaking();
+            return;
+        }
+
+        if (breakingX != x || breakingY != y || breakingZ != z) {
+            breakingX = x;
+            breakingY = y;
+            breakingZ = z;
+            breakProgress = 0.0f;
+            lastBreakTime = System.nanoTime();
+        }
+
+        Gamemode gamemode = gameMaster.getPlayer().getGamemode();
+        if (gamemode.isGodmode()) {
+            breakBlock(gameMaster, cell, blockData, blockId, selectedItem);
+            resetBreaking();
+            return;
+        }
+
+        float destroyTime = blockData.getDestroyTime();
         if (selectedItem instanceof Tool tool) {
-            byte blockId = world.getBlockTypeAt(x, y, z);
-            BlockData blockData = getBlockData(blockId);
             BlockData[] usableOn = tool.getType().getUsableOn();
             float[] efficiency = tool.getType().getEfficiency();
-
-            if (Arrays.stream(tool.getType().getUsableOn()).noneMatch(
-                    b -> b.equals(blockData))) {
-                return;
-            }
-
-            Crop crop = world.getCropAt(x, y, z);
-            if (crop != null) {
-                CropType cropType = crop.getCropType();
-                int frameIndex = crop.getStage().getFrameIndex();
-                SpriteSheet sheet = gameMaster.getCropSpriteSheet(cropType);
-                if (crop.isReadyToHarvest()) {
-                    cropService.harvest(
-                            gameMaster.getPlayer(),
-                            crop,
-                            gameMaster.getToastService(),
-                            sheet
-                    );
-                } else {
-                    cropService.rip(crop);
-                }
-
-                if (sheet != null) {
-                    itemRenderer.playBreakAnimation();
-                    particles.spawn(x, y + K.World.SHORTER_BLOCK_HEIGHT, z, sheet, frameIndex);
-                }
-
-                gameUIservice.logAction(cell);
-                return;
-            }
-
-            if (blockId == 0) {
-                resetBreaking();
-                return;
-            }
-
-            if (blockData == null) {
-                resetBreaking();
-                return;
-            }
-
-            if (breakingX != x || breakingY != y || breakingZ != z) {
-                breakingX = x;
-                breakingY = y;
-                breakingZ = z;
-                breakProgress = 0.0f;
-                lastBreakTime = System.nanoTime();
-            }
-
-            Gamemode gamemode = gameMaster.getPlayer().getGamemode();
-            if (gamemode.isGodmode()) {
-                breakBlock(gameMaster, cell, blockData, blockId, selectedItem);
-                resetBreaking();
-                return;
-            }
-
-            float destroyTime = blockData.getDestroyTime();
             for (int i = 0; i < usableOn.length; i++) {
                 if (usableOn[i].getId() == blockId) {
                     if (i < efficiency.length) {
@@ -366,21 +357,21 @@ public class GameInteraction {
                     break;
                 }
             }
+        }
 
-            if (destroyTime <= 0.0f) {
-                resetBreaking();
-                return;
-            }
+        if (destroyTime <= 0.0f) {
+            resetBreaking();
+            return;
+        }
 
-            long now = System.nanoTime();
-            float deltaTime = (now - lastBreakTime) / 1_000_000_000.0f;
-            lastBreakTime = now;
-            breakProgress += deltaTime / destroyTime;
+        long now = System.nanoTime();
+        float deltaTime = (now - lastBreakTime) / 1_000_000_000.0f;
+        lastBreakTime = now;
+        breakProgress += deltaTime / destroyTime;
 
-            if (breakProgress >= 1.0f) {
-                breakBlock(gameMaster, cell, blockData, blockId, selectedItem);
-                resetBreaking();
-            }
+        if (breakProgress >= 1.0f) {
+            breakBlock(gameMaster, cell, blockData, blockId, selectedItem);
+            resetBreaking();
         }
     }
 
