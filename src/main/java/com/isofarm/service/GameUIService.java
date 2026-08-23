@@ -153,9 +153,7 @@ public class GameUIService implements Service<GameMaster> {
                 inventoryUI.getAbsoluteY(),
                 Settings.scale(250f),
                 inventoryUI.getAbsoluteHeight(),
-                null
-        );
-
+                null);
         this.recipeBookUI.hide();
         uiManager.getRoot().addChild(recipeBookUI);
     }
@@ -166,6 +164,10 @@ public class GameUIService implements Service<GameMaster> {
 
     public HotbarUI getHotbarUI() {
         return hotbarUI;
+    }
+
+    public RecipeBookUI getRecipeBookUI() {
+        return recipeBookUI;
     }
 
     public void setPlayer(Player player) {

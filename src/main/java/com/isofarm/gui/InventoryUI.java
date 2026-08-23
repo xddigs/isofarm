@@ -39,8 +39,15 @@ public class InventoryUI extends UIElement {
     private UIProgressBar staminaBar;
     private GameMaster gameMaster;
 
+    private float defaultX;
+    private float targetX;
+    private float animationSpeed = 800.0f;
+    private boolean isRecipeMode = false;
+
     public InventoryUI(float x, float y) {
         super(x, y, getInventoryWidth(), getInventoryHeight());
+        defaultX = x;
+        targetX = x;
         int totalVisualSlots = (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
         this.slotUIs = new InventorySlotUI[totalVisualSlots];
         setFocusable(true);
@@ -73,7 +80,14 @@ public class InventoryUI extends UIElement {
 
         sortButton.setOnClick(this::sortInventory);
         groupButton.setOnClick(this::groupInventory);
-        recipesButton.setOnClick(this::openRecipes);
+        recipesButton.setOnClick(() -> {
+            if (isRecipeMode) {
+                closeRecipes();
+            } else {
+                openRecipes(gameMaster.getGameUIService()
+                        .getRecipeBookUI());
+            }
+        });
 
         sortButton.setTooltipText("Sort");
         groupButton.setTooltipText("Group");
@@ -109,21 +123,50 @@ public class InventoryUI extends UIElement {
         }
     }
 
-    public void openRecipes() {
-        if (gameMaster == null || gameMaster.getGameUIService() == null) return;
-        gameMaster.getGameUIService().toggleRecipeBook();
+    private void updatePosition(float delta) {
+        float currentX = getX();
+        if (Math.abs(targetX - currentX) < 0.5f) {
+            setPosition(targetX, getY());
+        } else {
+            float direction = Math.signum(targetX - currentX);
+            float movement = animationSpeed * delta;
+
+            float newX = currentX + direction * movement;
+
+            if ((direction > 0 && newX > targetX) ||
+                    (direction < 0 && newX < targetX)) {
+                newX = targetX;
+            }
+            setPosition(newX, getY());
+        }
+
+        RecipeBookUI recipeBookUI = gameMaster.getGameUIService().getRecipeBookUI();
+        if (recipeBookUI != null && isRecipeMode) {
+            float spacing = Settings.getScaledSpacing();
+            recipeBookUI.setPosition(getX() + getWidth() + spacing, getY());
+        }
+    }
+
+    public void openRecipes(RecipeBookUI recipeBookUI) {
+        if (recipeBookUI == null) return;
+        isRecipeMode = true;
+        float spacing = Settings.getScaledSpacing();
+        float shift = (recipeBookUI.getAbsoluteWidth() + spacing) / 3.0f;
+        targetX = defaultX - shift;
+    }
+
+    public void closeRecipes() {
+        isRecipeMode = false;
+        targetX = defaultX;
     }
 
     @Override
     public void update(float delta) {
         super.update(delta);
+        updatePosition(delta);
 
-        if (player == null) {
-            return;
-        }
-
+        if (player == null) return;
         boolean wasOpen = isVisible();
-
         boolean isOpen = gameMaster != null && gameMaster.isInventoryOpen();
 
         if (isOpen && !wasOpen) {
@@ -142,6 +185,12 @@ public class InventoryUI extends UIElement {
     private void onOpen() {
         if (hotbarUI == null || healthBar == null || staminaBar == null) {
             return;
+        }
+
+        if (gameMaster != null && !isRecipeMode) {
+            defaultX = (gameMaster.getWindowWidth() - getWidth()) / 2.0f;
+            targetX = defaultX;
+            setPosition(targetX, getY());
         }
 
         float hotbarX = getAbsoluteX() + (getWidth() - hotbarUI.getWidth()) / 2.0f;

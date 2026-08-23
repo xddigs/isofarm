@@ -5,6 +5,7 @@ import com.isofarm.data.Recipe;
 import com.isofarm.data.RecipeIngredient;
 import com.isofarm.data.Tier;
 import com.isofarm.item.Hoe;
+import com.isofarm.item.Pickaxe;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -19,6 +20,13 @@ public class RecipeRegistry implements Service<Recipe> {
                 List.of(new RecipeIngredient(MaterialID.STICK, 2),
                         new RecipeIngredient(MaterialID.WOOD, 1)),
                         new Hoe(Tier.WOOD), 1));
+
+        register(new Recipe(
+                "wooden_pickaxe",
+                "Wooden Pickaxe",
+                List.of(new RecipeIngredient(MaterialID.STICK, 2),
+                        new RecipeIngredient(MaterialID.WOOD, 3)),
+                new Pickaxe(Tier.WOOD), 1));
     }
 
     public static void register(Recipe recipe) {
