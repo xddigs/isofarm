@@ -219,8 +219,8 @@ public class Player extends Character {
             case SURVIVAL -> {
                 add(new Seed(), 4);
                 add(new Seed(CropType.CARROT), 4);
-                StartingKit startingKit = new StartingKit();
-                for (Item item : startingKit.getItems()) { add(item, 1); }
+                Kit kit = new StartingKit();
+                for (Item item : kit.getItems()) { add(item, 1); }
             }
             case GODMODE -> {}
         }
