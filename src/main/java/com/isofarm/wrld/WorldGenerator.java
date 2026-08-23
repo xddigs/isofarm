@@ -13,22 +13,43 @@ public class WorldGenerator {
     private static final int MOUNTAIN_HEIGHT = 150;
 
     private final World world;
-    private static final Random chunkRandom = new Random();
+
+    private final long seed;
+    private final float offsetX;
+    private final float offsetZ;
+    private final Random chunkRandom;
 
     public WorldGenerator(World world) {
+        this(world, new Random().nextLong());
+    }
+
+    public WorldGenerator(World world, long seed) {
         this.world = world;
+        this.seed = seed;
+
+        this.chunkRandom = new Random(seed);
+        this.offsetX = (seed & 0xFFFFL) * 311.7f;
+        this.offsetZ = ((seed >> 16) & 0xFFFFL) * 137.3f;
     }
 
     public void generateChunk(int chunkX, int chunkZ) {
         Chunk chunk = world.getOrCreateChunk(chunkX, chunkZ);
         int[][] heightMap = new int[Chunk.SIZE_X][Chunk.SIZE_Z];
+
         for (int x = 0; x < Chunk.SIZE_X; x++) {
             for (int z = 0; z < Chunk.SIZE_Z; z++) {
                 int worldX = chunkX * Chunk.SIZE_X + x;
                 int worldZ = chunkZ * Chunk.SIZE_Z + z;
-                float continental = (SimplexNoise.noise(worldX * CONTINENTAL_SCALE, worldZ * CONTINENTAL_SCALE) + 1.0f) * 0.5f;
+
+                float sampleX = worldX + offsetX;
+                float sampleZ = worldZ + offsetZ;
+
+                float continental = (SimplexNoise.noise(sampleX * CONTINENTAL_SCALE,
+                        sampleZ * CONTINENTAL_SCALE) + 1.0f) * 0.5f;
+
                 float mountainFactor = (float) Math.pow(continental, 2.5f);
-                float detailNoise = SimplexNoise.noise(worldX * DETAIL_SCALE, worldZ * DETAIL_SCALE);
+                float detailNoise = SimplexNoise.noise(sampleX * DETAIL_SCALE, sampleZ * DETAIL_SCALE);
+
                 int height = (int) (BASE_HEIGHT + (detailNoise * 3.0f) + (mountainFactor * MOUNTAIN_HEIGHT));
                 height = Math.clamp(height, 1, Chunk.SIZE_Y - 1);
                 heightMap[x][z] = height;
@@ -53,7 +74,7 @@ public class WorldGenerator {
         }
     }
 
-    private static byte getBlockId(int y, int height, float mountainFactor) {
+    private byte getBlockId(int y, int height, float mountainFactor) {
         boolean isHighMountain = mountainFactor > 0.45f;
 
         if (y == height) {
