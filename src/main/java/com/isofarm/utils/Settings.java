@@ -10,6 +10,7 @@ public class Settings {
     private static int renderDistance = 16;
     private static int unloadMargin = 4;
     private static int guiScaleIndex = 2;
+    private static boolean doKeepInventory = true;
     private static boolean doEnableMotions = true;
     private static boolean isOrthographic = true;
     private static float maxInteractionDistance = 5.0f;
@@ -122,12 +123,24 @@ public class Settings {
         return doEnableMotions ? 0.8f : 0.0f;
     }
 
+    public static boolean doKeepInventory() {
+        return doKeepInventory;
+    }
+
+    public static void setDoKeepInventory(boolean doKeepInventory) {
+        Settings.doKeepInventory = doKeepInventory;
+    }
+
     public static void setDoEnableMotions(boolean doEnableMotions) {
         Settings.doEnableMotions = doEnableMotions;
     }
 
     public static void toggleMotionBlur() {
         doEnableMotions = !doEnableMotions;
+    }
+
+    public static void toggleKeepInventory() {
+        doKeepInventory = !doKeepInventory;
     }
 
     public static void toggleOrthographic() {

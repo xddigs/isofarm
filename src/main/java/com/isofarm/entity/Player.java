@@ -162,7 +162,32 @@ public class Player extends Character {
     }
 
     public void respawn() {
+        if (!Settings.doKeepInventory()) clear();
+        setPosition(new Vector3f(0.5f, 1.0f, 0.5f));
+        setVelocity(new Vector3f(0.0f, 0.0f, 0.0f));
+        setDimensions(new Vector3f(0.5f, 1.0f, 0.5f));
+        setSpeed(6.0f);
+        setReputation(Reputation.NEUTRAL);
+        setGamemode(Gamemode.SURVIVAL);
+        setUpInventory();
+        setMaxFallVelocity(0.0f);
+        setIsOffGroundTimer(0.0f);
+        setWasOnGround(false);
+        this.maxHitpoints = 100;
+        this.hitpoints = maxHitpoints;
 
+        setExperience(0);
+        setLevel(0);
+        resetAttributes();
+    }
+
+    public void resetAttributes() {
+        setStrength(1);
+        setDexterity(1);
+        setConstitution(1);
+        setIntelligence(1);
+        setWisdom(1);
+        setCharisma(1);
     }
 
     public int getDamageSequence() {

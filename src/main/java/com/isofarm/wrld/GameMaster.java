@@ -411,6 +411,10 @@ public class GameMaster {
 
     private void updateEntities(float delta) {
         for (Entity entity : entities) {
+            if (entity instanceof Player player
+                    && !player.isAlive()) {
+                player.respawn();
+            }
             entities.removeIf(e -> !e.isAlive());
             entity.update(HoveredCell.get(this), delta);
         }

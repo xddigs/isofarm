@@ -10,6 +10,7 @@ public final class GameRules {
     private static final Map<String, Object> RULES = new LinkedHashMap<>();
 
     static {
+        RULES.put("doKeepInventory", Settings.doKeepInventory());
         RULES.put("doEnableMotions", Settings.doEnableMotions());
         RULES.put("isOrthographic", Settings.isOrthographic());
         RULES.put("renderDistance", Settings.getRenderDistance());
@@ -87,6 +88,9 @@ public final class GameRules {
 
     private static void apply(String rule, Object value) {
         switch (rule) {
+            case "doKeepInventory" -> {
+                Settings.setDoKeepInventory((Boolean) value);
+            }
             case "doEnableMotions" -> {
                 Settings.setDoEnableMotions((Boolean) value);
             }
