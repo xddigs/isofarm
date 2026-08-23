@@ -1,12 +1,13 @@
 package com.isofarm.gui;
 
-import com.isofarm.data.*;
+import com.isofarm.data.Inventory;
+import com.isofarm.data.InventorySlot;
+import com.isofarm.data.UIElement;
 import com.isofarm.entity.Player;
+import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.input.Mouse;
-import com.isofarm.item.Block;
 import com.isofarm.item.Item;
-import com.isofarm.item.Tool;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 
@@ -21,6 +22,7 @@ public class HotbarUI extends UIElement {
     private SpriteSheet cropIcons;
     private SpriteSheet blockIcons;
     private SpriteSheet toolIcons;
+    private SpriteSheet materialIcons;
     private SpriteSheet inventoryIcons;
 
     private int selectedSlot = 0;
@@ -41,30 +43,6 @@ public class HotbarUI extends UIElement {
     private static float getHotbarHeight() {
         return Settings.getScaledPadding() * 2.0f +
                 Settings.getScaledSlot();
-    }
-
-    private static int getItemIconColumn(Item item) {
-        if (item instanceof Produce produce && produce.getType() != null) {
-            return produce.getType().getId();
-        }
-
-        if (item instanceof Seed seed && seed.getType() != null) {
-            return seed.getType().getId();
-        }
-
-        if (item instanceof Crop crop && crop.getCropType() != null) {
-            return crop.getCropType().getId();
-        }
-
-        if (item instanceof Block block && block.getType() != null) {
-            return block.getType().getId() - 1;
-        }
-
-        if (item instanceof Tool tool) {
-            return tool.getId();
-        }
-
-        return 0;
     }
 
     private void createSlots() {
@@ -130,7 +108,7 @@ public class HotbarUI extends UIElement {
             return;
         }
 
-        SpriteSheet spriteSheet = getItemSpritesheet(item);
+        SpriteSheet spriteSheet = ResourceManager.getItemSpriteSheet(item);
 
         if (spriteSheet == null) {
             slotUI.setSpriteSheet(null);
@@ -140,7 +118,7 @@ public class HotbarUI extends UIElement {
         }
 
         slotUI.setSpriteSheet(spriteSheet);
-        slotUI.setSpriteFrame(getItemIconColumn(item));
+        slotUI.setSpriteFrame(ResourceManager.getItemIconColumn(item));
         slotUI.setTooltipText(item.getName());
     }
 
@@ -233,15 +211,6 @@ public class HotbarUI extends UIElement {
         return inventory.getSlot(inventoryIndex);
     }
 
-    private SpriteSheet getItemSpritesheet(Item item) {
-        if (item instanceof Produce) return cropIcons;
-        if (item instanceof Crop) return cropIcons;
-        if (item instanceof Seed) return seedIcons;
-        if (item instanceof Block) return blockIcons;
-        if (item instanceof Tool) return toolIcons;
-        return null;
-    }
-
     @Override
     public void render() {
         renderChildren();
@@ -298,6 +267,14 @@ public class HotbarUI extends UIElement {
 
     public void setToolIcons(SpriteSheet toolIcons) {
         this.toolIcons = toolIcons;
+    }
+
+    public SpriteSheet getMaterialIcons() {
+        return materialIcons;
+    }
+
+    public void setMaterialIcons(SpriteSheet materialIcons) {
+        this.materialIcons = materialIcons;
     }
 
     public SpriteSheet getInventoryIcons() {

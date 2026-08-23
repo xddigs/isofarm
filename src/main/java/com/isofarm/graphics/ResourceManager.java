@@ -3,6 +3,7 @@ package com.isofarm.graphics;
 import com.isofarm.data.*;
 import com.isofarm.item.Block;
 import com.isofarm.item.Item;
+import com.isofarm.item.Material;
 import com.isofarm.item.Tool;
 import com.isofarm.utils.K;
 import org.slf4j.Logger;
@@ -34,16 +35,16 @@ public class ResourceManager {
     private final SpriteSheet carrot;
     private final SpriteSheet potato;
     private final SpriteSheet beetroot;
-    private final SpriteSheet seedIcons;
-    private final SpriteSheet cropIcons;
-    private final SpriteSheet toolIcons;
-    private final SpriteSheet blockIcons;
+    private static SpriteSheet seedIcons;
+    private static SpriteSheet cropIcons;
+    private static SpriteSheet toolIcons;
+    private static SpriteSheet blockIcons;
+    private static SpriteSheet materialIcons;
     private final SpriteSheet inventoryIcons;
 
     private final SpriteSheet playerSpriteSheet;
     private final SpriteSheet destroyTexture;
-
-    private final Map<CropType, SpriteSheet> cropSpritesheets;
+    private static Map<CropType, SpriteSheet> cropSpritesheets;
 
     public ResourceManager() {
         this.defaultShader = new Shader(K.Paths.DEFAULT_VERT_SHADER, K.Paths.DEFAULT_FRAG_SHADER);
@@ -74,10 +75,11 @@ public class ResourceManager {
         this.potato = new SpriteSheet(K.Paths.POTATO_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
         this.beetroot = new SpriteSheet(K.Paths.BEETROOT_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
 
-        this.seedIcons = new SpriteSheet(K.Paths.SEED_ICONS, K.UI.ICON_SEED_CROPS_FRAMES);
-        this.cropIcons = new SpriteSheet(K.Paths.CROP_ICONS, K.UI.ICON_SEED_CROPS_FRAMES);
-        this.toolIcons = new SpriteSheet(K.Paths.TOOL_ICONS, K.UI.ICON_TOOL_FRAMES);
-        this.blockIcons = new SpriteSheet(K.Paths.BLOCK_ICONS, K.UI.ICON_BLOCK_FRAMES);
+        seedIcons = new SpriteSheet(K.Paths.SEED_ICONS, K.UI.ICON_SEED_CROPS_FRAMES);
+        cropIcons = new SpriteSheet(K.Paths.CROP_ICONS, K.UI.ICON_SEED_CROPS_FRAMES);
+        toolIcons = new SpriteSheet(K.Paths.TOOL_ICONS, K.UI.ICON_TOOL_FRAMES);
+        blockIcons = new SpriteSheet(K.Paths.BLOCK_ICONS, K.UI.ICON_BLOCK_FRAMES);
+        materialIcons = new SpriteSheet(K.Paths.MATERIAL_ICONS, 1);
         this.inventoryIcons = new SpriteSheet(K.Paths.INVENTORY_ICONS, 2);
 
         this.playerSpriteSheet = new SpriteSheet(K.Paths.PLAYER_SPRITESHEET,
@@ -85,7 +87,7 @@ public class ResourceManager {
 
         this.destroyTexture = new SpriteSheet(K.Paths.DESTROY_STAGES, K.UI.DESTROY_FRAMES);
 
-        this.cropSpritesheets = new EnumMap<>(CropType.class);
+        cropSpritesheets = new EnumMap<>(CropType.class);
         cropSpritesheets.put(CropType.WHEAT, wheat);
         cropSpritesheets.put(CropType.CARROT, carrot);
         cropSpritesheets.put(CropType.POTATO, potato);
@@ -112,6 +114,7 @@ public class ResourceManager {
         seedIcons.dispose();
         toolIcons.dispose();
         blockIcons.dispose();
+        materialIcons.dispose();
         inventoryIcons.dispose();
 
         playerSpriteSheet.dispose();
@@ -143,19 +146,49 @@ public class ResourceManager {
     public SpriteSheet getCropIcons() { return cropIcons; }
     public SpriteSheet getToolIcons() { return toolIcons; }
     public SpriteSheet getBlockIcons() { return blockIcons; }
+    public SpriteSheet getMaterialIcons() { return materialIcons; }
     public SpriteSheet getInventoryIcons() { return inventoryIcons; }
     public SpriteSheet getPlayerSpriteSheet() { return playerSpriteSheet; }
     public Map<CropType, SpriteSheet> getCropSpritesheets() { return cropSpritesheets; }
 
-    public SpriteSheet getItemSpriteSheet(Item item) {
+    public static SpriteSheet getItemSpriteSheet(Item item) {
         return switch (item) {
             case Crop crop -> cropSpritesheets.get(crop.getCropType());
             case Produce ignored -> cropIcons;
             case Seed ignored -> seedIcons;
             case Tool ignored -> toolIcons;
+            case Material ignored -> materialIcons;
             case Block ignored -> blockIcons;
             case null, default -> null;
         };
+    }
+
+    public static int getItemIconColumn(Item item) {
+        if (item instanceof Produce produce && produce.getType() != null) {
+            return produce.getType().getId();
+        }
+
+        if (item instanceof Seed seed && seed.getType() != null) {
+            return seed.getType().getId();
+        }
+
+        if (item instanceof Crop crop && crop.getCropType() != null) {
+            return crop.getCropType().getId();
+        }
+
+        if (item instanceof Block block && block.getType() != null) {
+            return block.getType().getId() - 1;
+        }
+
+        if (item instanceof Tool tool) {
+            return tool.getId();
+        }
+
+        if (item instanceof Material material) {
+            return material.getId();
+        }
+
+        return 0;
     }
 
     public Shader getShader(String name) {

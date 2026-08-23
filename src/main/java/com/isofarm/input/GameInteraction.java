@@ -402,7 +402,20 @@ public class GameInteraction {
 
         Vector3f position = new Vector3f(x + 0.5f, y + 0.5f, z + 0.5f);
         Block removedBlock = new Block(blockData, x, y, z);
+
+        Material material = null;
+        WorldItem materialItem;
+
+        if (removedBlock.getType().hasDrops()) {
+            material = new Material(removedBlock.getType().getRandomDrop());
+        }
+
         WorldItem item = new WorldItem(removedBlock, 1, position);
+        if (material != null) {
+            materialItem = new WorldItem(material, 1, position);
+            gameMaster.addEntity(materialItem);
+        }
+
         gameMaster.addEntity(item);
         gameUIservice.logAction(cell);
         log.info("Block removed: {} at {},{},{}", blockData.getName(), x, y, z);

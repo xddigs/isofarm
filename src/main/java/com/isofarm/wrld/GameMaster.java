@@ -112,6 +112,7 @@ public class GameMaster {
         this.gameUIservice = new GameUIService(windowHandle, this,
                 uiManager, resourceManager.getSeedIcons(), resourceManager.getCropIcons(),
                 resourceManager.getBlockIcons(), resourceManager.getToolIcons(),
+                resourceManager.getMaterialIcons(),
                 resourceManager.getInventoryIcons());
         this.commandService.setGameUIService(gameUIservice);
 

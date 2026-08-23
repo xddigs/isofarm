@@ -148,6 +148,7 @@ public final class K {
         public static final String CROP_ICONS = "assets/icons/crop_icons.png";
         public static final String TOOL_ICONS = "assets/icons/tool_icons.png";
         public static final String BLOCK_ICONS = "assets/icons/block_icons.png";
+        public static final String MATERIAL_ICONS = "assets/icons/material_icons.png";
         public static final String INVENTORY_ICONS = "assets/icons/inventory_icons.png";
         public static final String PLAYER_SPRITESHEET = "assets/sprites/gb.png";
         public static final String BLOCKS = "assets/textures/blocks.png";

@@ -40,6 +40,7 @@ public class GameUIService implements Service<GameMaster> {
     private final SpriteSheet cropIcons;
     private final SpriteSheet blockIcons;
     private final SpriteSheet toolIcons;
+    private final SpriteSheet materialIcons;
     private Player player;
     private Shop shop;
     private float windowWidth = K.Window.DEFAULT_WIDTH;
@@ -58,6 +59,7 @@ public class GameUIService implements Service<GameMaster> {
             SpriteSheet cropIcons,
             SpriteSheet blockIcons,
             SpriteSheet toolIcons,
+            SpriteSheet materialIcons,
             SpriteSheet inventoryIcons) {
         this.gameMaster = gameMaster;
         this.uiManager = uiManager;
@@ -66,6 +68,7 @@ public class GameUIService implements Service<GameMaster> {
         this.cropIcons = cropIcons;
         this.blockIcons = blockIcons;
         this.toolIcons = toolIcons;
+        this.materialIcons = materialIcons;
 
         this.chatHistory = new ArrayList<>();
         this.inventoryUI = new InventoryUI(windowWidth, windowHeight);
@@ -86,13 +89,8 @@ public class GameUIService implements Service<GameMaster> {
         inventoryUI.setCropIcons(cropIcons);
         inventoryUI.setBlockIcons(blockIcons);
         inventoryUI.setToolIcons(toolIcons);
+        inventoryUI.setMaterialIcons(materialIcons);
         inventoryUI.setInventoryIcons(inventoryIcons);
-
-        hotbarUI.setSeedIcons(seedIcons);
-        hotbarUI.setCropIcons(cropIcons);
-        hotbarUI.setBlockIcons(blockIcons);
-        hotbarUI.setToolIcons(toolIcons);
-        hotbarUI.setInventoryIcons(inventoryIcons);
         inventoryUI.setHotbarUI(gameMaster, hotbarUI);
 
         uiManager.getRoot().addChild(inventoryUI);
