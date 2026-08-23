@@ -18,6 +18,7 @@ public class ChunkManager {
     private final WorldGenerator generator;
     private final Map<Chunk, Mesh> chunkMeshes;
     private final Map<SoilPosition, Float> soilTimers;
+
     private record MeshBuildResult(Chunk chunk, ChunkMeshBuilder.MeshData data) {}
     private final ExecutorService meshExecutor;
     private final ConcurrentLinkedQueue<MeshBuildResult> completedMeshes =
@@ -279,5 +280,10 @@ public class ChunkManager {
 
     public WorldGenerator getGenerator() {
         return generator;
+    }
+
+    public boolean hasFinishedLoading(int expectedChunks) {
+        return world.getChunks().size() >= expectedChunks
+                && completedMeshes.isEmpty();
     }
 }
