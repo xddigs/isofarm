@@ -80,12 +80,12 @@ public class Player extends Character {
                 fallDamage(damage);
                 getSoundService().playBreakSound(SoundGroup.ENTITY, 1.0f, 1.0f);
             }
-
-            setMaxFallVelocity(0.0f);
-            setIsOffGroundTimer(0.0f);
         }
 
+        setMaxFallVelocity(0.0f);
+        setIsOffGroundTimer(0.0f);
         setWasOnGround(isOnGround());
+
         for (InventorySlot slot : getInventory().getSlots()) {
             if (slot.getItem() instanceof Tool tool && tool.getDurability() <= 0) {
                 remove(tool);

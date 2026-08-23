@@ -53,6 +53,9 @@ public class WorldItem extends Entity {
         this.bobTime = 0.0f;
         this.pickupTimer = PICKUP_DELAY;
         this.groundY = position.y;
+
+        this.maxHitpoints = 1;
+        this.hitpoints = maxHitpoints;
     }
 
     @Override

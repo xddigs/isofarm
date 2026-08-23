@@ -5,13 +5,9 @@ import com.isofarm.input.Keyboard;
 import com.isofarm.input.Mouse;
 import com.isofarm.utils.K;
 import org.lwjgl.glfw.GLFWErrorCallback;
-import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
-import org.lwjgl.system.MemoryStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -54,7 +50,7 @@ public class Game {
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-
+        glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, OPENGL_MAJOR_VERSION);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, OPENGL_MINOR_VERSION);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -69,22 +65,6 @@ public class Game {
         }
 
         glfwWindowHint(GLFW_SAMPLES, 16);
-
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            IntBuffer pWidth = stack.mallocInt(1);
-            IntBuffer pHeight = stack.mallocInt(1);
-
-            glfwGetWindowSize(window, pWidth, pHeight);
-            GLFWVidMode videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-
-            if (videoMode != null) {
-                glfwSetWindowPos(window,
-                        (videoMode.width() - pWidth.get(0)) / 2,
-                        (videoMode.height() - pHeight.get(0)) / 2
-                );
-            }
-        }
-
         Keyboard.init(window);
         Mouse.init(window);
 

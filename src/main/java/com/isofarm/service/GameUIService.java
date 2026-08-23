@@ -44,8 +44,8 @@ public class GameUIService implements Service<GameMaster> {
     private final SpriteSheet materialIcons;
     private Player player;
     private Shop shop;
-    private float windowWidth = K.Window.DEFAULT_WIDTH;
-    private float windowHeight = K.Window.DEFAULT_HEIGHT;
+    private float windowWidth;
+    private float windowHeight;
     private Vector2i lastActionCell = null;
     private float actionDisplayTimer = 0.0f;
     private float hotbarLabelTimer = 0.0f;
@@ -71,6 +71,9 @@ public class GameUIService implements Service<GameMaster> {
         this.toolIcons = toolIcons;
         this.materialIcons = materialIcons;
 
+        this.windowWidth = gameMaster.getWindowWidth();
+        this.windowHeight = gameMaster.getWindowHeight();
+
         this.chatHistory = new ArrayList<>();
         this.inventoryUI = new InventoryUI(windowWidth, windowHeight);
         this.inventoryUI.setLayer(100);
@@ -79,12 +82,12 @@ public class GameUIService implements Service<GameMaster> {
         this.hotbarUI.setLayer(50);
 
         this.inventoryUI.setPosition(
-                windowWidth / 2.0f - inventoryUI.getWidth() / 2,
-                windowHeight / 2.0f - inventoryUI.getHeight() / 2);
+                windowWidth / 2.0f - inventoryUI.getAbsoluteWidth() / 2,
+                windowHeight / 2.0f - inventoryUI.getAbsoluteHeight() / 2);
 
         this.hotbarUI.setPosition(
-                windowWidth / 2.0f - hotbarUI.getWidth() / 2,
-                windowHeight - hotbarUI.getHeight() - K.UI.HOTBAR_OFFSET);
+                windowWidth / 2.0f - hotbarUI.getAbsoluteWidth() / 2,
+                windowHeight - hotbarUI.getAbsoluteHeight() - K.UI.HOTBAR_OFFSET);
 
         inventoryUI.setSeedIcons(seedIcons);
         inventoryUI.setCropIcons(cropIcons);
@@ -501,8 +504,9 @@ public class GameUIService implements Service<GameMaster> {
         }
 
         if (inventoryUI != null) {
-            inventoryUI.setPosition((width - inventoryUI.getWidth()) / 2.0f,
-                    (height - inventoryUI.getHeight()) / 2.0f);
+            float inventoryX = (width - inventoryUI.getAbsoluteWidth()) / 2.0f;
+            float inventoryY = (height - inventoryUI.getAbsoluteHeight()) / 2.0f;
+            inventoryUI.setPosition(inventoryX, inventoryY);
         }
 
         if (chatField != null) {

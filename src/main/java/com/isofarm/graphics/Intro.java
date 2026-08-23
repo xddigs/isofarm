@@ -11,6 +11,9 @@ import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import org.lwjgl.system.MemoryStack;
+
+import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -23,34 +26,38 @@ public class Intro {
     private UIManager uiManager;
 
     private static final float CLEAR_COLOR_ALPHA = 1.0f;
+    private int framebufferWidth;
+    private int framebufferHeight;
 
     public Intro(long window) {
         this.window = window;
     }
 
     public void setupUI() {
+        updateFramebufferSize();
         float barWidth = 500f;
         float barHeight = 25f;
-        float x = (K.Window.DEFAULT_WIDTH - barWidth) / 2;
-        float y = (K.Window.DEFAULT_HEIGHT - barHeight) / 2;
+
+        float x = (framebufferWidth - barWidth) / 2.0f;
+        float y = (framebufferHeight - barHeight) / 2.0f;
 
         Vector4f foreground = new Vector4f(0.0f, 0.90f, 0.4f, 1.0f);
         Vector4f background = new Vector4f(0.2f, 0.2f, 0.2f, 1.0f);
-
-        progressBar = new UIProgressBar(x, y, barWidth, barHeight,
-                0.0f, 100.0f, false);
-
-        uiManager = new UIManager(K.Window.DEFAULT_WIDTH, K.Window.DEFAULT_HEIGHT);
+        progressBar = new UIProgressBar(x, y, barWidth, barHeight, 0.0f, 100.0f, false);
+        uiManager = new UIManager(framebufferWidth, framebufferHeight);
         progressBar.setColors(foreground, background);
         progressBar.show();
         uiManager.getRoot().show();
         uiManager.getRoot().addChild(progressBar);
-        uiManager.resize(K.Window.DEFAULT_WIDTH, K.Window.DEFAULT_HEIGHT);
+        uiManager.resize(framebufferWidth, framebufferHeight);
     }
 
     public void show() {
         setupUI();
         gameMaster = new GameMaster(window, uiManager);
+        updateFramebufferSize();
+        gameMaster.onResize(framebufferWidth, framebufferHeight);
+        setupCallbacks();
 
         int r = Settings.getRenderDistance();
         int totalChunks = (2 * r + 1) * (2 * r + 1);
@@ -124,27 +131,24 @@ public class Intro {
         renderLoadingFrame("Setting up the UI...");
 
         progressBar.hide();
-        setupCallbacks();
         loop();
     }
 
     private void renderLoadingFrame(String statusText) {
-        glViewport(0, 0, (int) K.Window.DEFAULT_WIDTH, (int) K.Window.DEFAULT_HEIGHT);
+        updateFramebufferSize();
+        glViewport(0, 0, framebufferWidth, framebufferHeight);
         glDisable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
         glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         uiManager.update(0.016f);
-
-        GUI.begin(K.Window.DEFAULT_WIDTH, K.Window.DEFAULT_HEIGHT);
+        GUI.begin(framebufferWidth, framebufferHeight);
         uiManager.render();
 
         if (statusText != null) {
-            float textX = (K.Window.DEFAULT_WIDTH - 500f) / 2.0f;
-            float textY = ((K.Window.DEFAULT_HEIGHT - 25f) / 2.0f) - 30.0f;
+            float textX = (framebufferWidth - 500f) / 2.0f;
+            float textY = ((framebufferHeight - 25f) / 2.0f) - 30.0f;
             UIFont font = GUI.getNormalFont();
             GUI.drawString(statusText, textX, textY, font, K.UI.UI_TEXT_COLOR);
         }
@@ -156,13 +160,38 @@ public class Intro {
 
     public void setupCallbacks() {
         glfwSetFramebufferSizeCallback(window, (windowHandle, width, height) -> {
-            if (width > 0 && height > 0) {
-                glViewport(0, 0, width, height);
-                if (gameMaster != null) {
-                    gameMaster.onResize(width, height);
-                }
+            if (width <= 0 || height <= 0) {
+                return;
             }
+
+            framebufferWidth = width;
+            framebufferHeight = height;
+
+            glViewport(0, 0, width, height);
+
+            if (uiManager != null) {
+                uiManager.resize(width, height);
+                GUI.resize(width, height);
+            }
+
+            if (gameMaster != null) {
+                gameMaster.onResize(width, height);
+            }
+
+            repositionProgressBar();
         });
+    }
+
+    private void repositionProgressBar() {
+        if (progressBar == null) return;
+
+        float barWidth = 500f;
+        float barHeight = 25f;
+
+        float x = (framebufferWidth - barWidth) / 2.0f;
+        float y = (framebufferHeight - barHeight) / 2.0f;
+
+        progressBar.setPosition(x, y);
     }
 
     private void loop() {
@@ -190,6 +219,16 @@ public class Intro {
             gameMaster.render();
 
             glfwSwapBuffers(window);
+        }
+    }
+
+    private void updateFramebufferSize() {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            IntBuffer width = stack.mallocInt(1);
+            IntBuffer height = stack.mallocInt(1);
+            glfwGetFramebufferSize(window, width, height);
+            framebufferWidth = width.get(0);
+            framebufferHeight = height.get(0);
         }
     }
 }

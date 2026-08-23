@@ -369,6 +369,9 @@ public class GameInteraction {
         lastBreakTime = now;
         breakProgress += deltaTime / destroyTime;
 
+        gameMaster.getItemRenderer().playBreakAnimation();
+        gameMaster.getSoundService().playLoopingSound(blockData.getSoundGroup());
+
         if (breakProgress >= 1.0f) {
             breakBlock(gameMaster, cell, blockData, blockId, selectedItem);
             resetBreaking();

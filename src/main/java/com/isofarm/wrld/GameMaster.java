@@ -122,10 +122,9 @@ public class GameMaster {
         this.shop = new Shop();
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
-        this.camera = new Camera(K.Camera.DEFAULT_WIDTH,
-                K.Camera.DEFAULT_HEIGHT, Settings.getRenderDistance());
-        this.orthoCamera = new OrthographicCamera(K.Camera.DEFAULT_WIDTH,
-                K.Camera.DEFAULT_HEIGHT, Settings.getRenderDistance());
+        this.camera = new Camera(windowWidth, windowHeight, Settings.getRenderDistance());
+        this.orthoCamera = new OrthographicCamera(windowWidth, windowHeight, Settings.getRenderDistance());
+
         this.camera.setPosition(0.0f, 0.0f, 0.0f);
         this.cameraController = new CameraController(camera);
         this.orthoCameraController = new OrthographicCameraController(orthoCamera);
@@ -564,13 +563,13 @@ public class GameMaster {
             sceneFbo = new Framebuffer(newWidth, newHeight);
         }
 
-        if (gameUIservice != null) {
-            gameUIservice.onResize(newWidth, newHeight);
-        }
-
         if (uiManager != null) {
             uiManager.resize(newWidth, newHeight);
             GUI.resize(newWidth, newHeight);
+        }
+
+        if (gameUIservice != null) {
+            gameUIservice.onResize(newWidth, newHeight);
         }
     }
 
