@@ -7,7 +7,7 @@ public class Settings {
     private static float fov = 80f;
     private static final float SHADOW_MAP_SIZE = 4096.0f;
     private static float mouseSensitivity = 0.4f;
-    private static int renderDistance = 12;
+    private static int renderDistance = 16;
     private static int unloadMargin = 4;
     private static int guiScaleIndex = 2;
     private static boolean doEnableMotions = true;

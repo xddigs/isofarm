@@ -1,6 +1,6 @@
 package com.isofarm;
 
-import com.isofarm.graphics.IntroScreen;
+import com.isofarm.graphics.Birth;
 import com.isofarm.input.Keyboard;
 import com.isofarm.input.Mouse;
 import com.isofarm.utils.K;
@@ -101,7 +101,7 @@ public class Game {
 
         glfwSwapBuffers(window);
         glfwShowWindow(window);
-        IntroScreen screen = new IntroScreen(window);
+        Birth screen = new Birth(window);
         screen.show();
         glfwSetCursorPos(window, K.Window.DEFAULT_WIDTH / 2, K.Window.DEFAULT_HEIGHT / 2);
         log.info("GLFW window successfully initialized.");

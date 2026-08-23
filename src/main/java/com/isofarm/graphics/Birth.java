@@ -6,6 +6,7 @@ import com.isofarm.gui.UIProgressBar;
 import com.isofarm.input.Keyboard;
 import com.isofarm.service.TimeService;
 import com.isofarm.utils.K;
+import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -13,7 +14,7 @@ import org.joml.Vector4f;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
-public class IntroScreen {
+public class Birth {
     private final long window;
     private GameMaster gameMaster;
 
@@ -22,7 +23,7 @@ public class IntroScreen {
 
     private static final float CLEAR_COLOR_ALPHA = 1.0f;
 
-    public IntroScreen(long window) {
+    public Birth(long window) {
         this.window = window;
     }
 
@@ -49,29 +50,59 @@ public class IntroScreen {
     public void show() {
         setupUI();
         gameMaster = new GameMaster(window, uiManager);
+        int r = Settings.getRenderDistance();
+        int minX = -r, maxX = r;
+        int minZ = -r, maxZ = r;
+        int currentChunkX = minX;
+        int currentChunkZ = minZ;
 
-        final float[] progress = {0.0f};
-        final boolean[] isLoaded = {false};
+        int totalChunks = (2 * r + 1) * (2 * r + 1);
+        int processedChunks = 0;
 
-        new Thread(() -> {
-            gameMaster.initWorld(p -> progress[0] = p);
-            isLoaded[0] = true;
-        }).start();
+        boolean isLoaded = false;
 
-        while (!isLoaded[0] && !glfwWindowShouldClose(window)) {
+        double lastTime = glfwGetTime();
+        while (!glfwWindowShouldClose(window) && !isLoaded) {
+            double currentTime = glfwGetTime();
+            float delta = (float)(currentTime - lastTime);
+            lastTime = currentTime;
             glfwPollEvents();
-            progressBar.setValue(progress[0]);
-            glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            glDisable(GL_DEPTH_TEST);
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            uiManager.update(0.016f);
-            GUI.begin(K.Window.DEFAULT_WIDTH, K.Window.DEFAULT_HEIGHT);
-            uiManager.render();
-            GUI.end();
+            if (processedChunks < totalChunks) {
+                float progress = ((float) processedChunks / totalChunks) * 100.0f;
+                progressBar.setValue(progress);
+                glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                uiManager.update(delta);
 
-            glfwSwapBuffers(window);
+                GUI.begin(K.Window.DEFAULT_WIDTH, K.Window.DEFAULT_HEIGHT);
+                uiManager.render();
+                GUI.end();
+
+                glfwSwapBuffers(window);
+                gameMaster.getChunkManager()
+                        .getGenerator()
+                        .generateChunk(currentChunkX, currentChunkZ);
+
+                processedChunks++;
+                currentChunkZ++;
+                if (currentChunkZ > maxZ) {
+                    currentChunkZ = minZ;
+                    currentChunkX++;
+                }
+
+            } else {
+                progressBar.setValue(100.0f);
+                glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                uiManager.update(0.016f);
+
+                GUI.begin(K.Window.DEFAULT_WIDTH, K.Window.DEFAULT_HEIGHT);
+                uiManager.render();
+                GUI.end();
+                glfwSwapBuffers(window);
+                gameMaster.getChunkManager().updateLoadedChunks(0, 0);
+                isLoaded = true;
+            }
         }
 
         gameMaster.spawn();
