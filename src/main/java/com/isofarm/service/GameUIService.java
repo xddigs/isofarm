@@ -550,4 +550,22 @@ public class GameUIService implements Service<GameMaster> {
         gameMaster.getToastService().success(
                 "You bought " + amount + " " + item.getName() + "!");
     }
+
+    public boolean canCraft(Player player, Recipe recipe) {
+        for (RecipeIngredient ing : recipe.ingredients()) {
+            int countInInventory = player.getInventory().getAmountOfMaterial(ing.materialID());
+            if (countInInventory < ing.amount()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void executeCraft(Player player, Recipe recipe) {
+        if (!canCraft(player, recipe)) return;
+        for (RecipeIngredient ing : recipe.ingredients()) {
+            player.getInventory().remove(ing, ing.amount());
+        }
+        player.add(recipe.result().copy(), recipe.resultAmount());
+    }
 }

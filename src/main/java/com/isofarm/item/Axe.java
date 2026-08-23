@@ -13,7 +13,7 @@ public class Axe extends Tool {
     public Axe() {
         this(Tier.WOOD);
     }
-    
+
     @Override
     public Item copy() {
         return new Axe(getTier());

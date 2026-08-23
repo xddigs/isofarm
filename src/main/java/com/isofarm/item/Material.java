@@ -1,21 +1,23 @@
 package com.isofarm.item;
 
+import com.isofarm.data.DataClass;
 import com.isofarm.data.MaterialID;
 
-public class Material extends Item {
-    private final MaterialID materialID;
-
-    public Material(MaterialID materialID) {
-        super(materialID.getId(), materialID.getName(), materialID.getValue());
-        this.materialID = materialID;
+@DataClass
+public record Material(MaterialID materialID) implements Item {
+    @Override
+    public byte getId() {
+        return materialID.getId();
     }
 
-    public Material() {
-        this(MaterialID.STICK);
+    @Override
+    public String getName() {
+        return materialID.getName();
     }
 
-    public MaterialID getMaterialID() {
-        return materialID;
+    @Override
+    public int getValue() {
+        return materialID.getValue();
     }
 
     @Override

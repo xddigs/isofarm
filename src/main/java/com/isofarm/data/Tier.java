@@ -1,7 +1,9 @@
 package com.isofarm.data;
 
 public enum Tier {
+    LEATHER((byte) -1, "Leather", 1),
     WOOD((byte) 0, "Wooden", 64),
+    ADVANCED((byte) 0, "Advanced", 0),
     COPPER((byte) 1, "Copper", 128),
     IRON((byte) 2, "Iron", 160),
     STEEL((byte) 3, "Steel", 192),

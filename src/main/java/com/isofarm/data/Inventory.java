@@ -1,17 +1,14 @@
 package com.isofarm.data;
 
-import com.isofarm.item.Block;
-import com.isofarm.item.Coin;
-import com.isofarm.item.Item;
-import com.isofarm.item.Tool;
+import com.isofarm.item.*;
 import com.isofarm.utils.K;
 
 import java.util.*;
 
 @DataClass
 public class Inventory {
-
     private final List<InventorySlot> slots;
+    private final InventorySlot backpackSlot = new InventorySlot(new Backpack(), 1);
 
     public Inventory() {
         this.slots = new ArrayList<>();
@@ -31,6 +28,14 @@ public class Inventory {
         }
 
         return Collections.unmodifiableMap(result);
+    }
+
+    public InventorySlot getBackpackSlot() {
+        return backpackSlot;
+    }
+
+    public boolean hasBackpackEquipped() {
+        return !backpackSlot.isEmpty() && backpackSlot.getItem() instanceof Backpack;
     }
 
     public int add(Item item, int amount) {
@@ -197,11 +202,6 @@ public class Inventory {
         }
     }
 
-    /**
-     * Takes an amount from a specific slot.
-     *
-     * @return actual amount taken
-     */
     public int take(int index, int amount) {
         if (!isValidIndex(index) || amount <= 0) {
             return 0;
@@ -220,11 +220,6 @@ public class Inventory {
         return taken;
     }
 
-    /**
-     * Adds an amount to a specific slot.
-     *
-     * @return actual amount added
-     */
     public int addToStack(int targetIndex, Item item, int amount) {
         if (!isValidIndex(targetIndex) || item == null || amount <= 0) {
             return 0;
@@ -360,9 +355,12 @@ public class Inventory {
                         && slot.getItem().getId() == id && slot.getAmount() > 0);
     }
 
-    public <T extends Item> int getTotalAmountOfType(Class<T> type) {
-        return slots.stream().filter(slot -> !slot.isEmpty()).filter(
-                slot -> type.isInstance(slot.getItem())).mapToInt(InventorySlot::getAmount).sum();
+    public int getAmountOfMaterial(MaterialID id) {
+        return slots.stream()
+                .filter(slot -> !slot.isEmpty())
+                .filter(slot -> slot.getItem() instanceof Material(MaterialID mid) && mid == id)
+                .mapToInt(InventorySlot::getAmount)
+                .sum();
     }
 
     public List<InventorySlot> getSlots() {

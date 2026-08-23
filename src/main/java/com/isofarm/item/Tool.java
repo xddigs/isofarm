@@ -6,7 +6,11 @@ import com.isofarm.data.ToolType;
 import com.isofarm.entity.Player;
 
 @DataClass
-public abstract class Tool extends Item {
+public abstract class Tool implements Item {
+    private final byte id;
+    private final String name;
+    private final int value;
+
     private final ToolType type;
     private Tier tier;
     private int durability;
@@ -15,11 +19,28 @@ public abstract class Tool extends Item {
 
     public Tool(byte id, String name, int value,
                 ToolType type, Tier tier, int durability) {
-        super(id, name, value);
+        this.id = id;
+        this.name = name;
+        this.value = value;
         this.type = type;
         this.tier = tier;
         this.durability = durability;
         this.baseDamage = type.getBaseDamage();
+    }
+
+    @Override
+    public byte getId() {
+        return id;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public int getValue() {
+        return value;
     }
 
     public float getBaseDamage() {

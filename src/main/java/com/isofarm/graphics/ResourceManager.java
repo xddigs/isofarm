@@ -79,8 +79,8 @@ public class ResourceManager {
         cropIcons = new SpriteSheet(K.Paths.CROP_ICONS, K.UI.ICON_SEED_CROPS_FRAMES);
         toolIcons = new SpriteSheet(K.Paths.TOOL_ICONS, K.UI.ICON_TOOL_FRAMES);
         blockIcons = new SpriteSheet(K.Paths.BLOCK_ICONS, K.UI.ICON_BLOCK_FRAMES);
-        materialIcons = new SpriteSheet(K.Paths.MATERIAL_ICONS, 1);
-        this.inventoryIcons = new SpriteSheet(K.Paths.INVENTORY_ICONS, 2);
+        materialIcons = new SpriteSheet(K.Paths.MATERIAL_ICONS, 3);
+        inventoryIcons = new SpriteSheet(K.Paths.INVENTORY_ICONS, 2);
 
         this.playerSpriteSheet = new SpriteSheet(K.Paths.PLAYER_SPRITESHEET,
                 Direction.values().length);

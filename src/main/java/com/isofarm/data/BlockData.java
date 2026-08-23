@@ -104,6 +104,10 @@ public enum BlockData {
         return null;
     }
 
+    public static BlockData[] all() {
+        return values();
+    }
+
     public byte getId() {
         return id;
     }

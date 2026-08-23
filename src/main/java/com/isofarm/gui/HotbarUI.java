@@ -6,17 +6,20 @@ import com.isofarm.data.UIElement;
 import com.isofarm.entity.Player;
 import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.SpriteSheet;
+import com.isofarm.input.Keyboard;
 import com.isofarm.input.Mouse;
+import com.isofarm.item.Backpack;
 import com.isofarm.item.Item;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
+import static org.lwjgl.glfw.GLFW.*;
 
 @SuppressWarnings("all")
 public class HotbarUI extends UIElement {
     private final InventorySlotUI[] slotUIs = new InventorySlotUI[K.UI.INVENTORY_COLUMNS];
     private Player player;
+    private InventorySlotUI backpackSlotUI;
 
     private SpriteSheet seedIcons;
     private SpriteSheet cropIcons;
@@ -36,8 +39,9 @@ public class HotbarUI extends UIElement {
 
     private static float getHotbarWidth() {
         return Settings.getScaledPadding() * 2.0f +
-                K.UI.INVENTORY_COLUMNS * Settings.getScaledSlot() +
-                (K.UI.INVENTORY_COLUMNS - 1) * Settings.getScaledSpacing();
+                (K.UI.INVENTORY_COLUMNS + 1) * Settings.getScaledSlot() +
+                (K.UI.INVENTORY_COLUMNS) * Settings.getScaledSpacing() +
+                Settings.getScaledSpacing() * 2.0f;
     }
 
     private static float getHotbarHeight() {
@@ -47,17 +51,24 @@ public class HotbarUI extends UIElement {
 
     private void createSlots() {
         for (int i = 0; i < K.UI.INVENTORY_COLUMNS; i++) {
-            float x = Settings.getScaledPadding() + i * (
-                    Settings.getScaledSlot() +
+            float x = Settings.getScaledPadding() + i * (Settings.getScaledSlot() +
                     Settings.getScaledSpacing());
 
             float y = Settings.getScaledPadding();
-
-            InventorySlotUI slotUI = new InventorySlotUI(x, y,
-                    Settings.getScaledSlot(), Settings.getScaledSlot());
+            InventorySlotUI slotUI = new InventorySlotUI(x, y, Settings.getScaledSlot(),
+                    Settings.getScaledSlot());
             slotUIs[i] = slotUI;
             addChild(slotUI);
         }
+
+        float backpackX = Settings.getScaledPadding() +
+                K.UI.INVENTORY_COLUMNS * (Settings.getScaledSlot() +
+                        Settings.getScaledSpacing()) +
+                        Settings.getScaledSpacing() * 2.0f;
+
+        backpackSlotUI = new InventorySlotUI(backpackX, Settings.getScaledPadding(),
+                Settings.getScaledSlot(), Settings.getScaledSlot());
+        addChild(backpackSlotUI);
     }
 
     @Override
@@ -81,21 +92,19 @@ public class HotbarUI extends UIElement {
     }
 
     private void syncInventory() {
+        if (player == null) return;
         Inventory inventory = player.getInventory();
         int hotbarStart = (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
-
         for (int i = 0; i < K.UI.INVENTORY_COLUMNS; i++) {
             InventorySlotUI slotUI = slotUIs[i];
             int inventoryIndex = hotbarStart + i;
-
-            if (inventoryIndex < inventory.getSlots().size()) {
-                slotUI.setSlot(inventory.getSlot(inventoryIndex));
-            } else {
-                slotUI.setSlot(null);
-            }
-
+            slotUI.setSlot(inventoryIndex < inventory.getSlots().size() ? inventory.getSlot(inventoryIndex) : null);
             updateItemSprite(slotUI);
         }
+
+        InventorySlot backpackSlot = player.getInventory().getBackpackSlot();
+        backpackSlotUI.setSlot(backpackSlot);
+        updateItemSprite(backpackSlotUI);
     }
 
     private void updateItemSprite(InventorySlotUI slotUI) {
@@ -138,17 +147,28 @@ public class HotbarUI extends UIElement {
     }
 
     private void interact() {
-        if (!Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
+        boolean isCtrl = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL) || Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
+        boolean isRightClick = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_RIGHT);
+        boolean isLeftClick = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
+
+        if (isCtrl && isRightClick && isSlotHovered(backpackSlotUI)) {
+            player.unequipBackpack();
             return;
         }
 
-        for (int i = 0; i < slotUIs.length; i++) {
-            if (!slotUIs[i].isHovered()) {
-                continue;
+        if (isLeftClick && isSlotHovered(backpackSlotUI)) {
+            if (backpackSlotUI.getItem() instanceof Backpack backpack) {
+                backpack.use(player.getGameMaster());
             }
+            return;
+        }
 
-            selectSlot(i);
-            break;
+        if (!isLeftClick) return;
+        for (int i = 0; i < slotUIs.length; i++) {
+            if (slotUIs[i].isHovered()) {
+                selectSlot(i);
+                break;
+            }
         }
     }
 

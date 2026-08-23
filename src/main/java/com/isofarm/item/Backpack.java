@@ -22,5 +22,8 @@ public class Backpack extends Tool {
 
     public void use(GameMaster gameMaster) {
         setPlayer(gameMaster.getPlayer());
+        if (!gameMaster.isChatOpen()) {
+            gameMaster.toggleInventory();
+        }
     }
 }

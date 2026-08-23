@@ -30,7 +30,6 @@ public class Shop {
         add(new Seed(CropType.BEETROOT), 16);
         add(new Block(BlockData.TILLED_DIRT), 2);
         add(new Block(BlockData.GRASS), 8);
-        add(new WateringCan(), 1);
         add(new Hoe(), 1);
     }
 

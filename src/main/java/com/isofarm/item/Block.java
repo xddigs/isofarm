@@ -5,14 +5,19 @@ import com.isofarm.data.DataClass;
 import com.isofarm.utils.K;
 
 @DataClass
-public class Block extends Item {
+public class Block implements Item {
     private final int waterLevelMax = K.World.WATER_LEVEL_MAX;
+    private final byte id;
+    private final String name;
+    private final int value;
     private BlockData type;
     private int x, y, z;
     private int waterLevel = 15;
 
     public Block(BlockData type, int x, int y, int z) {
-        super(type.getId(), type.getName(), type.getValue());
+        this.id = type.getId();
+        this.name = type.getName();
+        this.value = type.getValue();
         this.type = type;
         this.x = x;
         this.y = y;
@@ -24,12 +29,29 @@ public class Block extends Item {
     }
 
     public Block(BlockData type) {
-        super(type.getId(), type.getName(), type.getValue());
+        this.id = type.getId();
+        this.name = type.getName();
+        this.value = type.getValue();
         this.type = type;
     }
 
     public Block() {
         this(BlockData.CROP);
+    }
+
+    @Override
+    public byte getId() {
+        return id;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public int getValue() {
+        return value;
     }
 
     public BlockData getType() {

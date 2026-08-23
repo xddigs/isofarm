@@ -5,9 +5,10 @@ import com.isofarm.graphics.CameraView;
 import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.Shader;
 import com.isofarm.graphics.SpriteSheet;
-import com.isofarm.item.*;
+import com.isofarm.item.Backpack;
+import com.isofarm.item.Item;
+import com.isofarm.item.Tool;
 import com.isofarm.pathfinding.GridPos;
-import com.isofarm.service.ToastService;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
@@ -27,17 +28,17 @@ import static org.lwjgl.opengl.GL13.*;
 public class Player extends Character {
     private static final Logger log = LoggerFactory.getLogger(Player.class);
     private final String name;
-    private final ToastService toastService;
     private final Matrix4f modelMatrix;
+    private final GameMaster gameMaster;
 
     private Direction direction = Direction.SOUTH_WEST;
     private List<GridPos> path;
     private int pathIndex = 0;
 
-    public Player(String name, World world, ToastService toastService) {
-        super(name, toastService);
+    public Player(String name, World world, GameMaster gameMaster) {
+        super(name, gameMaster.getToastService());
         this.name = name;
-        this.toastService = toastService;
+        this.gameMaster = gameMaster;
         this.modelMatrix = new Matrix4f();
         this.path = new LinkedList<>();
 
@@ -76,7 +77,7 @@ public class Player extends Character {
         for (InventorySlot slot : getInventory().getSlots()) {
             if (slot.getItem() instanceof Tool tool && tool.getDurability() <= 0) {
                 remove(tool);
-                toastService.error("Your " + tool.getName() + " broke!");
+                gameMaster.getToastService().error("Your " + tool.getName() + " broke!");
                 getSoundService().playBreakSound(SoundGroup.ITEMS, 1.0f,
                         Settings.getMaxInteractionDistance());
             }
@@ -145,6 +146,12 @@ public class Player extends Character {
 
         rm.getPlayerMesh().render();
         sheet.unbind();
+    }
+
+    public void unequipBackpack() {
+        if (getInventory().hasBackpackEquipped()) {
+            // TODO
+        }
     }
 
     public void move(World world, Vector3f direction, float delta) {
@@ -218,7 +225,7 @@ public class Player extends Character {
         switch (getGamemode()) {
             case SURVIVAL -> {
                 add(new Seed(), 4);
-                add(new Seed(CropType.CARROT), 4);
+                add(new Backpack(), 1);
                 Kit kit = new StartingKit();
                 for (Item item : kit.getItems()) { add(item, 1); }
             }
@@ -238,7 +245,7 @@ public class Player extends Character {
         int toSell = Math.min(current, amount);
         getInventory().remove(item, toSell);
         int earnings = toSell * item.getValue();
-        toastService.sell("You successfully sold " + item.getName() + " for " + earnings + " coins");
+        gameMaster.getToastService().sell("You successfully sold " + item.getName() + " for " + earnings + " coins");
         earn(earnings);
     }
 
@@ -291,6 +298,10 @@ public class Player extends Character {
 
     public int getAmount(Item item) {
         return getInventory().getAmount(item);
+    }
+
+    public GameMaster getGameMaster() {
+        return gameMaster;
     }
 
     public void earn(int amount) {

@@ -137,7 +137,7 @@ public class GameMaster {
         this.recenter();
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
-        this.player = new Player(null, world, toastService);
+        this.player = new Player(null, world, this);
         player.setSoundService(soundService);
         addEntity(player);
         shop.setPlayer(player);

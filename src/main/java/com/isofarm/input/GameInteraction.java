@@ -82,13 +82,9 @@ public class GameInteraction {
             Settings.toggleDebugInfo();
         }
 
-        if (Keyboard.isKeyPressed(GLFW_KEY_E) && !gameMaster.isChatOpen()) {
-            gameMaster.toggleInventory();
-        }
-
         if (Keyboard.isKeyPressed(GLFW_KEY_Q)) {
             boolean dropAll = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL);
-            dropItem(gameMaster, selectedItem,dropAll);
+            dropItem(gameMaster, selectedItem, dropAll);
         }
 
         if (!gameMaster.isOrthographicCamera()) {
@@ -169,6 +165,10 @@ public class GameInteraction {
 
     public void dropItem(GameMaster gameMaster, Item selectedItem, boolean dropAll) {
         if (selectedItem == null) return;
+        if (selectedItem instanceof Backpack) {
+            gameMaster.getToastService().error("You can't drop your backpack");
+            return;
+        }
         Player player = gameMaster.getPlayer();
         if (player == null) return;
 
@@ -290,84 +290,89 @@ public class GameInteraction {
                 .getHotbarUI()
                 .getSelectedItem();
 
-        Crop crop = world.getCropAt(x, y, z);
-        if (crop != null) {
-            CropType cropType = crop.getCropType();
-            int frameIndex = crop.getStage().getFrameIndex();
-            SpriteSheet sheet = gameMaster.getCropSpriteSheet(cropType);
-            if (crop.isReadyToHarvest()) {
-                cropService.harvest(
-                        gameMaster.getPlayer(),
-                        crop,
-                        gameMaster.getToastService(),
-                        sheet
-                );
-            } else {
-                cropService.rip(crop);
-            }
-
-            if (sheet != null) {
-                itemRenderer.playBreakAnimation();
-                particles.spawn(x, y + K.World.SHORTER_BLOCK_HEIGHT, z, sheet, frameIndex);
-            }
-
-            gameUIservice.logAction(cell);
-            return;
-        }
-
-        byte blockId = world.getBlockTypeAt(x, y, z);
-        if (blockId == 0) {
-            resetBreaking();
-            return;
-        }
-
-        BlockData blockData = getBlockData(blockId);
-        if (blockData == null) {
-            resetBreaking();
-            return;
-        }
-
-        if (breakingX != x || breakingY != y || breakingZ != z) {
-            breakingX = x;
-            breakingY = y;
-            breakingZ = z;
-            breakProgress = 0.0f;
-            lastBreakTime = System.nanoTime();
-        }
-
-        Gamemode gamemode = gameMaster.getPlayer().getGamemode();
-        if (gamemode.isGodmode()) {
-            breakBlock(gameMaster, cell, blockData, blockId, selectedItem);
-            resetBreaking();
-            return;
-        }
-
-        float destroyTime = blockData.getDestroyTime();
         if (selectedItem instanceof Tool tool) {
+            byte blockId = world.getBlockTypeAt(x, y, z);
+            BlockData blockData = getBlockData(blockId);
             BlockData[] usableOn = tool.getType().getUsableOn();
             float[] efficiency = tool.getType().getEfficiency();
 
+            if (Arrays.stream(tool.getType().getUsableOn()).noneMatch(
+                    b -> b.equals(blockData))) {
+                return;
+            }
+
+            Crop crop = world.getCropAt(x, y, z);
+            if (crop != null) {
+                CropType cropType = crop.getCropType();
+                int frameIndex = crop.getStage().getFrameIndex();
+                SpriteSheet sheet = gameMaster.getCropSpriteSheet(cropType);
+                if (crop.isReadyToHarvest()) {
+                    cropService.harvest(
+                            gameMaster.getPlayer(),
+                            crop,
+                            gameMaster.getToastService(),
+                            sheet
+                    );
+                } else {
+                    cropService.rip(crop);
+                }
+
+                if (sheet != null) {
+                    itemRenderer.playBreakAnimation();
+                    particles.spawn(x, y + K.World.SHORTER_BLOCK_HEIGHT, z, sheet, frameIndex);
+                }
+
+                gameUIservice.logAction(cell);
+                return;
+            }
+
+            if (blockId == 0) {
+                resetBreaking();
+                return;
+            }
+
+            if (blockData == null) {
+                resetBreaking();
+                return;
+            }
+
+            if (breakingX != x || breakingY != y || breakingZ != z) {
+                breakingX = x;
+                breakingY = y;
+                breakingZ = z;
+                breakProgress = 0.0f;
+                lastBreakTime = System.nanoTime();
+            }
+
+            Gamemode gamemode = gameMaster.getPlayer().getGamemode();
+            if (gamemode.isGodmode()) {
+                breakBlock(gameMaster, cell, blockData, blockId, selectedItem);
+                resetBreaking();
+                return;
+            }
+
+            float destroyTime = blockData.getDestroyTime();
             for (int i = 0; i < usableOn.length; i++) {
                 if (usableOn[i].getId() == blockId) {
                     destroyTime *= efficiency[i];
                     break;
                 }
             }
-        }
 
-        if (destroyTime <= 0.0f) {
-            resetBreaking();
-            return;
-        }
+            if (destroyTime <= 0.0f) {
+                resetBreaking();
+                return;
+            }
 
-        long now = System.nanoTime();
-        float deltaTime = (now - lastBreakTime) / 1_000_000_000.0f;
-        lastBreakTime = now;
-        breakProgress += deltaTime / destroyTime;
+            long now = System.nanoTime();
+            float deltaTime = (now - lastBreakTime) / 1_000_000_000.0f;
+            lastBreakTime = now;
+            breakProgress += deltaTime / destroyTime;
 
-        if (breakProgress >= 1.0f) {
-            breakBlock(gameMaster, cell, blockData, blockId, selectedItem);
-            resetBreaking();
+            if (breakProgress >= 1.0f) {
+                breakBlock(gameMaster, cell, blockData, blockId, selectedItem);
+                resetBreaking();
+            }
         }
     }
 
@@ -407,7 +412,8 @@ public class GameInteraction {
         WorldItem materialItem;
 
         if (removedBlock.getType().hasDrops()) {
-            material = new Material(removedBlock.getType().getRandomDrop());
+            MaterialID mid = removedBlock.getType().getRandomDrop();
+            material = new Material(mid);
         }
 
         WorldItem item = new WorldItem(removedBlock, 1, position);
@@ -462,9 +468,8 @@ public class GameInteraction {
             return;
         }
 
-        if (selectedItem instanceof WateringCan wateringCan) {
-            wateringCan.use(gameMaster);
-            gameMaster.getToastService().success("You water the crops!");
+        if (selectedItem instanceof Backpack backpack) {
+            backpack.use(gameMaster);
             return;
         }
 
@@ -478,6 +483,7 @@ public class GameInteraction {
                 hoe.use(gameMaster, block);
             }
             gameMaster.rebuildChunkMeshAt(block.getX(), block.getZ());
+            return;
         }
 
         if (selectedItem instanceof Seed seed) {
