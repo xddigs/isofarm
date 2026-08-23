@@ -4,6 +4,9 @@ import com.isofarm.data.*;
 import com.isofarm.entity.Player;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.input.Mouse;
+import com.isofarm.item.Block;
+import com.isofarm.item.Item;
+import com.isofarm.item.Tool;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 

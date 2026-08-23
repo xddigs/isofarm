@@ -2,6 +2,8 @@ package com.isofarm.gui;
 
 import com.isofarm.data.*;
 import com.isofarm.graphics.SpriteSheet;
+import com.isofarm.item.Item;
+import com.isofarm.item.Tool;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import org.joml.Vector4f;

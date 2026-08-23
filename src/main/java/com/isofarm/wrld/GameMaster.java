@@ -6,6 +6,7 @@ import com.isofarm.graphics.*;
 import com.isofarm.gui.GUI;
 import com.isofarm.gui.UIManager;
 import com.isofarm.input.*;
+import com.isofarm.item.Item;
 import com.isofarm.pathfinding.GridPos;
 import com.isofarm.service.*;
 import com.isofarm.utils.HoveredCell;
@@ -136,7 +137,8 @@ public class GameMaster {
         recenter();
 
         this.player = new Player(gameUIservice.getEnteredPlayerName(),
-                world, toastService, soundService);
+                world, toastService);
+        player.setSoundService(soundService);
         addEntity(player);
 
         chunkManager.updateLoadedChunks(0, 0);

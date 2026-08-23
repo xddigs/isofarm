@@ -1,6 +1,6 @@
 package com.isofarm.input;
 
-import com.isofarm.data.Block;
+import com.isofarm.item.Block;
 import com.isofarm.entity.Player;
 import com.isofarm.data.SoundGroup;
 import com.isofarm.service.SoundService;

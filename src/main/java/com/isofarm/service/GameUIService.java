@@ -5,6 +5,7 @@ import com.isofarm.entity.Player;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.gui.*;
 import com.isofarm.input.Mouse;
+import com.isofarm.item.Item;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
@@ -18,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 import static org.lwjgl.opengl.GL11.*;
 
 @SuppressWarnings("all")

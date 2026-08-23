@@ -1,6 +1,9 @@
 package com.isofarm.graphics;
 
 import com.isofarm.data.*;
+import com.isofarm.item.Block;
+import com.isofarm.item.Item;
+import com.isofarm.item.Tool;
 import com.isofarm.utils.K;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

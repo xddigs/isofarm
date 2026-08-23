@@ -1,6 +1,6 @@
 package com.isofarm.service;
 
-import com.isofarm.data.Item;
+import com.isofarm.item.Item;
 
 import java.util.HashMap;
 import java.util.Map;

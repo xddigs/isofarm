@@ -68,7 +68,7 @@ public final class K {
 
         public static final int ICON_SEED_CROPS_FRAMES = 4;
         public static final int ICON_BLOCK_FRAMES = 10;
-        public static final int ICON_TOOL_FRAMES = 4;
+        public static final int ICON_TOOL_FRAMES = 7;
 
         public static final int BLOCK_ATLAS_COLUMNS = ICON_BLOCK_FRAMES;
         public static final int BLOCK_ATLAS_ROWS = 3;

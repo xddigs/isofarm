@@ -2,7 +2,7 @@ package com.isofarm.entity;
 
 import com.isofarm.data.DataClass;
 import com.isofarm.data.Hit;
-import com.isofarm.data.Item;
+import com.isofarm.item.Item;
 import com.isofarm.graphics.Shader;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.wrld.GameMaster;

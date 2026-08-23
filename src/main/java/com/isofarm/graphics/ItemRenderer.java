@@ -1,8 +1,8 @@
 package com.isofarm.graphics;
 
-import com.isofarm.data.Block;
-import com.isofarm.data.Item;
-import com.isofarm.data.Tool;
+import com.isofarm.item.Block;
+import com.isofarm.item.Item;
+import com.isofarm.item.Tool;
 import com.isofarm.entity.WorldItem;
 import com.isofarm.wrld.GameMaster;
 import org.joml.Matrix4f;

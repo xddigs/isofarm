@@ -1,4 +1,8 @@
-package com.isofarm.data;
+package com.isofarm.item;
+
+import com.isofarm.data.DataClass;
+import com.isofarm.data.Tier;
+import com.isofarm.data.ToolType;
 
 @DataClass
 public class Coin extends Tool {

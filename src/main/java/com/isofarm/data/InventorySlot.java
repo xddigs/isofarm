@@ -1,5 +1,7 @@
 package com.isofarm.data;
 
+import com.isofarm.item.Item;
+
 @DataClass
 public class InventorySlot {
     private Item item;

@@ -1,6 +1,6 @@
 package com.isofarm.wrld;
 
-import com.isofarm.data.Block;
+import com.isofarm.item.Block;
 import com.isofarm.data.BlockData;
 import com.isofarm.data.Crop;
 import com.isofarm.pathfinding.GridPos;

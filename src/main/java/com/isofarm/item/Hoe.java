@@ -1,5 +1,6 @@
-package com.isofarm.data;
+package com.isofarm.item;
 
+import com.isofarm.data.*;
 import com.isofarm.input.GameInteraction;
 import com.isofarm.utils.HoveredCell;
 import com.isofarm.utils.Settings;

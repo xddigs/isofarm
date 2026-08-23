@@ -1,6 +1,8 @@
 package com.isofarm.entity;
 
 import com.isofarm.data.*;
+import com.isofarm.item.Coin;
+import com.isofarm.service.SoundService;
 import com.isofarm.service.ToastService;
 
 @DataClass
@@ -10,6 +12,7 @@ public abstract class Character extends Entity implements Levelable {
     private final Purse purse;
     private Reputation reputation;
     private Gamemode gamemode;
+    private SoundService soundService;
 
     private int level;
     private int experience;
@@ -114,6 +117,14 @@ public abstract class Character extends Entity implements Levelable {
         toastService.success("Level up! You're now level " + level);
     }
 
+    public SoundService getSoundService() {
+        return soundService;
+    }
+
+    public void setSoundService(SoundService soundService) {
+        this.soundService = soundService;
+    }
+
     public void scale(int amount) {
         strength += (int) (amount * Math.random());
         intelligence += (int) (amount * Math.random());
@@ -133,6 +144,7 @@ public abstract class Character extends Entity implements Levelable {
         if (!isAlive() || amount <= 0) return;
         if (gamemode.isGodmode() || gamemode.isNoClip()) return;
         this.hitpoints = (int) Math.max(0.0f, this.hitpoints - amount);
+
     }
 
     public void heal(float amount) {

@@ -1,5 +1,7 @@
-package com.isofarm.data;
+package com.isofarm.item;
 
+import com.isofarm.data.BlockData;
+import com.isofarm.data.DataClass;
 import com.isofarm.utils.K;
 
 @DataClass

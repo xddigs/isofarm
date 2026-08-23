@@ -1,4 +1,6 @@
-package com.isofarm.data;
+package com.isofarm.item;
+
+import com.isofarm.data.DataClass;
 
 import java.util.Objects;
 

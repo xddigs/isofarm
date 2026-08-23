@@ -1,5 +1,7 @@
 package com.isofarm.data;
 
+import com.isofarm.item.Block;
+
 @DataClass
 public class Crop extends Block {
     private final CropType type;

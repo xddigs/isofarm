@@ -1,5 +1,8 @@
-package com.isofarm.data;
+package com.isofarm.item;
 
+import com.isofarm.data.DataClass;
+import com.isofarm.data.Tier;
+import com.isofarm.data.ToolType;
 import com.isofarm.wrld.Chunk;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
@@ -11,7 +14,7 @@ public class WateringCan extends Tool {
 
     public WateringCan() {
         super((byte) 1, "Watering Can", 100,
-                ToolType.ELSE, Tier.COPPER, 128);
+                ToolType.ELSE, Tier.IRON, 128);
         this.water = MAX_WATER;
     }
 

@@ -1,4 +1,7 @@
-package com.isofarm.data;
+package com.isofarm.item;
+
+import com.isofarm.data.Tier;
+import com.isofarm.data.ToolType;
 
 public class Pickaxe extends Tool {
 

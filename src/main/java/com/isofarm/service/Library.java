@@ -2,6 +2,7 @@ package com.isofarm.service;
 
 import com.isofarm.data.*;
 import com.isofarm.entity.Player;
+import com.isofarm.item.*;
 import com.isofarm.wrld.GameMaster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,9 @@ public class Library implements Service<GameMaster> {
         itemR.register(DEFAULT_ID + ".can", WateringCan::new);
         itemR.register(DEFAULT_ID + ".wooden_hoe", () -> new Hoe());
         itemR.register(DEFAULT_ID + ".wooden_pickaxe", () -> new Pickaxe());
+        itemR.register(DEFAULT_ID + ".wooden_shovel", () -> new Shovel());
+        itemR.register(DEFAULT_ID + ".wooden_axe", () -> new Axe());
+        itemR.register(DEFAULT_ID + ".wooden_sword", () -> new Sword());
         itemR.register(DEFAULT_ID + ".wheat_seed", Seed::new);
         itemR.register(DEFAULT_ID + ".carrot_seed", () -> new Seed(CropType.CARROT));
         itemR.register(DEFAULT_ID + ".potato_seed", () -> new Seed(CropType.POTATO));

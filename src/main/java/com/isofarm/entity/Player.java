@@ -5,8 +5,8 @@ import com.isofarm.graphics.CameraView;
 import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.Shader;
 import com.isofarm.graphics.SpriteSheet;
+import com.isofarm.item.*;
 import com.isofarm.pathfinding.GridPos;
-import com.isofarm.service.SoundService;
 import com.isofarm.service.ToastService;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
@@ -28,19 +28,16 @@ public class Player extends Character {
     private static final Logger log = LoggerFactory.getLogger(Player.class);
     private final String name;
     private final ToastService toastService;
-    private final SoundService soundService;
     private final Matrix4f modelMatrix;
 
     private Direction direction = Direction.SOUTH_WEST;
     private List<GridPos> path;
     private int pathIndex = 0;
 
-    public Player(String name, World world, ToastService toastService,
-                  SoundService soundService) {
+    public Player(String name, World world, ToastService toastService) {
         super(name, toastService);
         this.name = name;
         this.toastService = toastService;
-        this.soundService = soundService;
         this.modelMatrix = new Matrix4f();
         this.path = new LinkedList<>();
 
@@ -69,7 +66,7 @@ public class Player extends Character {
             if (fallVelocity > 4.0f) {
                 float damage = (fallVelocity - 8.0f) * 5.0f;
                 fallDamage(damage);
-                soundService.playUseSound(SoundGroup.ENTITY, 1.0f,
+                getSoundService().playUseSound(SoundGroup.ENTITY, 1.0f,
                         Settings.getMaxInteractionDistance());
             }
             setIsOffGroundTimer(0.0f);
@@ -80,7 +77,7 @@ public class Player extends Character {
             if (slot.getItem() instanceof Tool tool && tool.getDurability() <= 0) {
                 remove(tool);
                 toastService.error("Your " + tool.getName() + " broke!");
-                soundService.playBreakSound(SoundGroup.ITEMS, 1.0f,
+                getSoundService().playBreakSound(SoundGroup.ITEMS, 1.0f,
                         Settings.getMaxInteractionDistance());
             }
         }
@@ -125,9 +122,8 @@ public class Player extends Character {
         shader.setUniform("uProjection", camera.getProjectionMatrix());
         shader.setUniform("uView", camera.getViewMatrix());
 
-        float aspect = (sheet.getFrameWidth() > 0 && sheet.getFrameHeight() > 0)
-                ? (float) sheet.getFrameWidth() / (float) sheet.getFrameHeight()
-                : 1.0f;
+        float aspect = (sheet.getFrameWidth() > 0 && sheet.getFrameHeight() > 0) ?
+                (float) sheet.getFrameWidth() / (float) sheet.getFrameHeight() : 1.0f;
 
         float baseScaleY = (dimensions == null || dimensions.y <= 0) ? 1.0f : dimensions.y;
         float baseScaleX = baseScaleY * aspect;
@@ -225,13 +221,20 @@ public class Player extends Character {
                 add(new Seed(CropType.CARROT), 4);
                 add(new Hoe(), 1);
                 add(new Pickaxe(), 1);
+                add(new Shovel(), 1);
+                add(new Axe(), 1);
+                add(new Sword(), 1);
             }
             case GODMODE -> {
                 BlockData[] blocks = BlockData.values();
                 for (BlockData b : blocks) { add(new Block(b)); }
 
                 CropType[] crops = CropType.values();
-                for (CropType c : crops) { add(new Seed(c)); }
+                for (CropType c : crops) {
+                    add(new Seed(c));
+                    add(new Produce(c));
+                }
+
                 sort();
             }
         }
