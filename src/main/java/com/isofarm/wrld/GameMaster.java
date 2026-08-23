@@ -135,8 +135,7 @@ public class GameMaster {
 
         this.gameInteraction = new GameInteraction(this,
                 resourceManager.getBlocksTexture());
-        recenter();
-
+        this.recenter();
         this.player = new Player(gameUIservice.getEnteredPlayerName(),
                 world, toastService);
         player.setSoundService(soundService);
