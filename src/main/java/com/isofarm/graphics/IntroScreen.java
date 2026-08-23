@@ -32,7 +32,7 @@ public class IntroScreen {
         float x = (K.Window.DEFAULT_WIDTH - barWidth) / 2;
         float y = (K.Window.DEFAULT_HEIGHT - barHeight) / 2;
 
-        Vector4f foreground = new Vector4f(0.0f, 0.90f, 0.4f, 1.0f);
+        Vector4f foreground = new Vector4f(0.0f, 0.90f, 0.2f, 1.0f);
         Vector4f background = new Vector4f(0.2f, 0.2f, 0.2f, 1.0f);
 
         progressBar = new UIProgressBar(x, y, barWidth, barHeight,
