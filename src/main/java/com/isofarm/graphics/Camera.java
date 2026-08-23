@@ -21,6 +21,7 @@ public class Camera implements CameraView {
     private float currentFov = Settings.getFov();
     private float targetFov = Settings.getFov();
     private float aspectRatio = 1.0f;
+    private float roll = 0.0f;
 
     public Camera(float width, float height, int renderDistanceChunks) {
         this.position = new Vector3f(0.0f, 0.0f, 0.0f);
@@ -39,6 +40,7 @@ public class Camera implements CameraView {
                 .identity()
                 .rotateX((float) Math.toRadians(pitch))
                 .rotateY((float) Math.toRadians(yaw))
+                .rotateZ((float) Math.toRadians(roll))
                 .translate(-position.x, -position.y, -position.z);
     }
 
@@ -55,6 +57,14 @@ public class Camera implements CameraView {
     @Override
     public float getYaw() {
         return yaw;
+    }
+
+    public float getRoll() {
+        return roll;
+    }
+
+    public void setRoll(float roll) {
+        this.roll = roll;
     }
 
     public float getFov() {

@@ -33,6 +33,7 @@ public abstract class Character extends Entity implements Levelable {
     private int luck;
 
     private float isOffGroundTimer;
+    private float maxFallVelocity = 0.0f;
 
     public Character(String name, ToastService toastService) {
         super(name);
@@ -136,19 +137,25 @@ public abstract class Character extends Entity implements Levelable {
 
     public void fallDamage(float amount) {
         if (!isAlive() || amount <= 0) return;
-        if (!isOnGround() && isOffGroundTimer < 3.0f) return;
+        if (gamemode.isGodmode() || gamemode.isNoClip()) return;
         damage(amount);
     }
 
     public void damage(float amount) {
         if (!isAlive() || amount <= 0) return;
         if (gamemode.isGodmode() || gamemode.isNoClip()) return;
-        this.hitpoints = (int) Math.max(0.0f, this.hitpoints - amount);
-
+        float previousHitpoints = hitpoints;
+        hitpoints = Math.max(0.0f, hitpoints - amount);
+        if (hitpoints < previousHitpoints) {
+            onDamageTaken(amount);
+        }
     }
 
+    protected void onDamageTaken(float amount) {}
+
     public void heal(float amount) {
-        this.hitpoints = (int) Math.min(this.hitpoints, this.hitpoints + amount);
+        if (amount <= 0 || !isAlive()) return;
+        this.hitpoints = Math.min(getMaxHitpoints(), this.hitpoints + amount);
     }
 
     public void restoreStamina(float amount) {
@@ -296,5 +303,13 @@ public abstract class Character extends Entity implements Levelable {
 
     public void setIsOffGroundTimer(float isOffGroundTimer) {
         this.isOffGroundTimer = isOffGroundTimer;
+    }
+
+    public float getMaxFallVelocity() {
+        return maxFallVelocity;
+    }
+
+    public void setMaxFallVelocity(float maxFallVelocity) {
+        this.maxFallVelocity = maxFallVelocity;
     }
 }

@@ -8,21 +8,26 @@ import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
 import org.joml.Vector3f;
 
+import static org.joml.Math.lerp;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class CameraController implements Service<Camera> {
-    private final Camera camera;
-    private boolean mouseCaptured = false;
-    private final Vector3f targetVelocity;
-    private final Vector3f currentFlyVelocity;
-    private float bobTime = 0.0f;
-
-    private boolean isFlying = false;
-    private float spaceLastPressedTime = 0.0f;
     private static final float DOUBLE_TAP_TIME = 0.3f;
-
     private static final float FLY_SPEED_MULTIPLIER = 1.2f;
     private static final float FLY_DAMPING = 12.0f;
+    private static final float DAMAGE_TILT_MAX = 10.0f;
+    private static final float DAMAGE_TILT_STIFFNESS = 90.0f;
+    private static final float DAMAGE_TILT_DAMPING = 12.0f;
+    private final Camera camera;
+    private final Vector3f targetVelocity;
+    private final Vector3f currentFlyVelocity;
+    private boolean mouseCaptured = false;
+    private float bobTime = 0.0f;
+    private boolean isFlying = false;
+    private float spaceLastPressedTime = 0.0f;
+    private int lastDamageSequence = 0;
+    private float damageTilt = 0.0f;
+    private float damageTiltVelocity = 0.0f;
 
     public CameraController(Camera camera) {
         this.camera = camera;
@@ -44,6 +49,7 @@ public class CameraController implements Service<Camera> {
 
         Player player = gameMaster.getPlayer();
         if (player != null) {
+            updateDamageTilt(player, delta);
             boolean isGodmode = player.getGamemode().isGodmode();
             boolean isNoClip = player.isNoClip();
 
@@ -103,14 +109,30 @@ public class CameraController implements Service<Camera> {
         }
     }
 
+    private void updateDamageTilt(Player player, float delta) {
+        if (player.getDamageSequence() != lastDamageSequence) {
+            lastDamageSequence = player.getDamageSequence();
+            float damage = player.getLastDamageAmount();
+            float intensity = Math.clamp(damage / 20.0f, 0.0f, 1.0f);
+            float direction = Math.random() < 0.5f ? -1.0f : 1.0f;
+            damageTiltVelocity += direction * (20.0f + intensity * 40.0f);
+        }
+
+        float acceleration = -damageTilt * DAMAGE_TILT_STIFFNESS - damageTiltVelocity * DAMAGE_TILT_DAMPING;
+        damageTiltVelocity += acceleration * delta;
+        damageTilt += damageTiltVelocity * delta;
+        damageTilt = Math.clamp(damageTilt, -DAMAGE_TILT_MAX, DAMAGE_TILT_MAX);
+        camera.setRoll(damageTilt);
+    }
+
     private void movement(GameMaster gameMaster, float delta) {
         Player player = gameMaster.getPlayer();
 
         float speed = player.getSpeed();
         boolean isSprinting = Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)
-                        && !gameMaster.isInventoryOpen()
-                        && !gameMaster.isChatOpen()
-                        && player.getStamina() > 0;
+                && !gameMaster.isInventoryOpen()
+                && !gameMaster.isChatOpen()
+                && player.getStamina() > 0;
 
         if (isSprinting) {
             speed *= K.Camera.SPRINT_MULTIPLIER;

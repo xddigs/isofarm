@@ -32,6 +32,8 @@ public class Player extends Character {
     private Direction direction = Direction.SOUTH_WEST;
     private List<GridPos> path;
     private int pathIndex = 0;
+    private int damageSequence = 0;
+    private float lastDamageAmount = 0.0f;
 
     public Player(String name, World world, GameMaster gameMaster) {
         super(name, gameMaster.getToastService());
@@ -59,16 +61,20 @@ public class Player extends Character {
 
         if (!isOnGround()) {
             setIsOffGroundTimer(getIsOffGroundTimer() + delta);
+
+            float verticalVelocity = Math.abs(getVelocity().y);
+            if (verticalVelocity > getMaxFallVelocity()) {
+                setMaxFallVelocity(verticalVelocity);
+            }
         }
 
         if (isOnGround() && !wasOnGround()) {
-            float fallVelocity = Math.abs(getVelocity().y);
-            if (fallVelocity > 4.0f) {
-                float damage = (fallVelocity - 8.0f) * 5.0f;
+            if (getMaxFallVelocity() > 8.0f) {
+                float damage = (getMaxFallVelocity() - 8.0f) * 5.0f;
                 fallDamage(damage);
-                getSoundService().playUseSound(SoundGroup.ENTITY, 1.0f,
-                        Settings.getMaxInteractionDistance());
             }
+
+            setMaxFallVelocity(0.0f);
             setIsOffGroundTimer(0.0f);
         }
 
@@ -145,6 +151,20 @@ public class Player extends Character {
 
         rm.getPlayerMesh().render();
         sheet.unbind();
+    }
+
+    @Override
+    protected void onDamageTaken(float amount) {
+        lastDamageAmount = amount;
+        damageSequence++;
+    }
+
+    public int getDamageSequence() {
+        return damageSequence;
+    }
+
+    public float getLastDamageAmount() {
+        return lastDamageAmount;
     }
 
     public void move(World world, Vector3f direction, float delta) {
