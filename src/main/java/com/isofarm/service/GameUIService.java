@@ -376,7 +376,9 @@ public class GameUIService implements Service<GameMaster> {
 
         float width = Math.min(maxPossibleWidth, Math.max(baseWidth, contentWidth));
 
-        float availableTextWidth = width - paddingLeft - prefixWidth - gap - paddingRight;
+        float availableTextWidth = Math.max(Settings.scale(100.0f),
+                width - paddingLeft - prefixWidth - gap - paddingRight);
+
         String[] lines = GUI.wrapText(message, availableTextWidth, messageFont);
 
         float fontHeight = messageFont.getSize();
