@@ -1,6 +1,5 @@
 package com.isofarm.gui;
 
-import com.isofarm.data.UIElement;
 import com.isofarm.graphics.Mesh;
 import com.isofarm.graphics.Shader;
 import com.isofarm.graphics.SpriteSheet;

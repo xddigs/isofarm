@@ -1,6 +1,5 @@
 package com.isofarm.gui;
 
-import com.isofarm.data.UIElement;
 import com.isofarm.graphics.SpriteSheet;
 import org.joml.Vector4f;
 

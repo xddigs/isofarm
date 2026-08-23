@@ -28,6 +28,7 @@ public class GameUIService implements Service<GameMaster> {
     private final GameMaster gameMaster;
     private final UIManager uiManager;
     private final InventoryUI inventoryUI;
+    private final RecipeBookUI recipeBookUI;
     private final HotbarUI hotbarUI;
     private final UITextField chatField;
     private final UILabel time;
@@ -145,6 +146,18 @@ public class GameUIService implements Service<GameMaster> {
 
         inventoryUI.setHealthBar(healthBar);
         inventoryUI.setStaminaBar(staminaBar);
+
+        this.recipeBookUI = new RecipeBookUI(
+                inventoryUI.getAbsoluteX() + inventoryUI.getAbsoluteWidth()
+                        + Settings.getScaledPadding(),
+                inventoryUI.getAbsoluteY(),
+                Settings.scale(250f),
+                inventoryUI.getAbsoluteHeight(),
+                null
+        );
+
+        this.recipeBookUI.hide();
+        uiManager.getRoot().addChild(recipeBookUI);
     }
 
     public InventoryUI getInventoryUI() {
@@ -159,6 +172,7 @@ public class GameUIService implements Service<GameMaster> {
         this.player = player;
         inventoryUI.setPlayer(player);
         hotbarUI.setPlayer(player);
+        recipeBookUI.setPlayer(player);
     }
 
     public void setShop(Shop shop) {
@@ -211,7 +225,6 @@ public class GameUIService implements Service<GameMaster> {
 
         if (!gameMaster.isInventoryOpen()) {
             float scroll = Mouse.getScrollY();
-
             if (scroll != 0) {
                 selectItem(scroll > 0 ? -1 : 1);
                 gameMaster.getItemRenderer().playPlaceAnimation();
@@ -235,6 +248,15 @@ public class GameUIService implements Service<GameMaster> {
 
         GUI.end();
         glEnable(GL_DEPTH_TEST);
+    }
+
+    public void toggleRecipeBook() {
+        if (recipeBookUI.isVisible()) {
+            recipeBookUI.hide();
+        } else {
+            recipeBookUI.show();
+            recipeBookUI.refresh();
+        }
     }
 
     private void renderChatHistory() {

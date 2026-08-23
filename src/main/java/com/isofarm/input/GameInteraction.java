@@ -290,6 +290,11 @@ public class GameInteraction {
                 .getHotbarUI()
                 .getSelectedItem();
 
+        if (selectedItem == null || selectedItem instanceof Backpack) {
+            resetBreaking();
+            return;
+        }
+
         if (selectedItem instanceof Tool tool) {
             byte blockId = world.getBlockTypeAt(x, y, z);
             BlockData blockData = getBlockData(blockId);
@@ -354,7 +359,9 @@ public class GameInteraction {
             float destroyTime = blockData.getDestroyTime();
             for (int i = 0; i < usableOn.length; i++) {
                 if (usableOn[i].getId() == blockId) {
-                    destroyTime *= efficiency[i];
+                    if (i < efficiency.length) {
+                        destroyTime *= efficiency[i];
+                    }
                     break;
                 }
             }

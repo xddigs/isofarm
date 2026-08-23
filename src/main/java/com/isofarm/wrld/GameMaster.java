@@ -133,7 +133,6 @@ public class GameMaster {
         this.weatherService = new WeatherService(rainEngine, camera);
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
-        this.gameInteraction = new GameInteraction(this, resourceManager.getBlocksTexture());
         this.recenter();
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
@@ -147,6 +146,9 @@ public class GameMaster {
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
         Library.initCommands(genDelta, this);
+        notifyProgress(progressCallback, ++currentStep / totalSteps);
+
+        RecipeRegistry.init();
         notifyProgress(progressCallback, 1.0f);
     }
 
@@ -162,6 +164,9 @@ public class GameMaster {
                 resourceManager.getBlockIcons(), resourceManager.getToolIcons(),
                 resourceManager.getMaterialIcons(),
                 resourceManager.getInventoryIcons());
+
+        gameInteraction = new GameInteraction(this,
+                resourceManager.getBlocksTexture());
 
         gameUIservice.setPlayer(this.player);
         commandService.setGameUIService(gameUIservice);

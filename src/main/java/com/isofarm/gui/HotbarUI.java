@@ -2,7 +2,6 @@ package com.isofarm.gui;
 
 import com.isofarm.data.Inventory;
 import com.isofarm.data.InventorySlot;
-import com.isofarm.data.UIElement;
 import com.isofarm.entity.Player;
 import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.SpriteSheet;
@@ -30,6 +29,8 @@ public class HotbarUI extends UIElement {
 
     private int selectedSlot = 0;
     private boolean inventoryMode = false;
+
+    private static final int TOTAL_SELECTABLE_SLOTS = K.UI.INVENTORY_COLUMNS + 1;
 
     public HotbarUI(float x, float y) {
         super(x, y, getHotbarWidth(), getHotbarHeight());
@@ -64,7 +65,7 @@ public class HotbarUI extends UIElement {
         float backpackX = Settings.getScaledPadding() +
                 K.UI.INVENTORY_COLUMNS * (Settings.getScaledSlot() +
                         Settings.getScaledSpacing()) +
-                        Settings.getScaledSpacing() * 2.0f;
+                Settings.getScaledSpacing() * 2.0f;
 
         backpackSlotUI = new InventorySlotUI(backpackX, Settings.getScaledPadding(),
                 Settings.getScaledSlot(), Settings.getScaledSlot());
@@ -81,10 +82,7 @@ public class HotbarUI extends UIElement {
 
         syncInventory();
         updateSlots();
-
-        if (!inventoryMode) {
-            interact();
-        }
+        interact();
     }
 
     public void setInventoryMode(boolean inventoryMode) {
@@ -98,7 +96,8 @@ public class HotbarUI extends UIElement {
         for (int i = 0; i < K.UI.INVENTORY_COLUMNS; i++) {
             InventorySlotUI slotUI = slotUIs[i];
             int inventoryIndex = hotbarStart + i;
-            slotUI.setSlot(inventoryIndex < inventory.getSlots().size() ? inventory.getSlot(inventoryIndex) : null);
+            slotUI.setSlot(inventoryIndex < inventory.getSlots().size() ?
+                    inventory.getSlot(inventoryIndex) : null);
             updateItemSprite(slotUI);
         }
 
@@ -137,11 +136,14 @@ public class HotbarUI extends UIElement {
             slotUI.setSelected(false);
             slotUI.setHovered(isSlotHovered(slotUI));
         }
+        backpackSlotUI.setSelected(false);
+        backpackSlotUI.setHovered(isSlotHovered(backpackSlotUI));
 
         if (player != null) {
-            int selected = selectedSlot;
-            if (selected >= 0 && selected < slotUIs.length) {
-                slotUIs[selected].setSelected(true);
+            if (selectedSlot >= 0 && selectedSlot < K.UI.INVENTORY_COLUMNS) {
+                slotUIs[selectedSlot].setSelected(true);
+            } else if (selectedSlot == K.UI.INVENTORY_COLUMNS) {
+                backpackSlotUI.setSelected(true);
             }
         }
     }
@@ -157,9 +159,14 @@ public class HotbarUI extends UIElement {
         }
 
         if (isLeftClick && isSlotHovered(backpackSlotUI)) {
+            selectSlot(K.UI.INVENTORY_COLUMNS);
             if (backpackSlotUI.getItem() instanceof Backpack backpack) {
                 backpack.use(player.getGameMaster());
             }
+            return;
+        }
+
+        if (inventoryMode) {
             return;
         }
 
@@ -185,7 +192,7 @@ public class HotbarUI extends UIElement {
     }
 
     public void selectSlot(int slot) {
-        if (slot < 0 || slot >= K.UI.INVENTORY_COLUMNS) {
+        if (slot < 0 || slot >= TOTAL_SELECTABLE_SLOTS) {
             return;
         }
 
@@ -193,32 +200,25 @@ public class HotbarUI extends UIElement {
     }
 
     public void selectNext() {
-        selectSlot((selectedSlot + 1) % K.UI.INVENTORY_COLUMNS);
+        selectSlot((selectedSlot + 1) % TOTAL_SELECTABLE_SLOTS);
     }
 
     public void selectPrevious() {
-        selectSlot((selectedSlot - 1 + K.UI.INVENTORY_COLUMNS) % K.UI.INVENTORY_COLUMNS);
+        selectSlot((selectedSlot - 1 + TOTAL_SELECTABLE_SLOTS) % TOTAL_SELECTABLE_SLOTS);
     }
 
     public Item getSelectedItem() {
-        if (player == null) {
-            return null;
-        }
-
-        Inventory inventory = player.getInventory();
-        int hotbarStart = (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
-        int inventoryIndex = hotbarStart + selectedSlot;
-        if (inventoryIndex < 0 || inventoryIndex >= inventory.getSlots().size()) {
-            return null;
-        }
-
-        InventorySlot slot = inventory.getSlot(inventoryIndex);
-        return slot.isEmpty() ? null : slot.getItem();
+        InventorySlot slot = getSelectedInventorySlot();
+        return (slot == null || slot.isEmpty()) ? null : slot.getItem();
     }
 
     public InventorySlot getSelectedInventorySlot() {
         if (player == null) {
             return null;
+        }
+
+        if (selectedSlot == K.UI.INVENTORY_COLUMNS) {
+            return player.getInventory().getBackpackSlot();
         }
 
         Inventory inventory = player.getInventory();
@@ -238,8 +238,10 @@ public class HotbarUI extends UIElement {
     }
 
     private void renderSelector() {
-        InventorySlotUI slot = slotUIs[selectedSlot];
-        float thickness = Settings.getScaledThickness();
+        InventorySlotUI slot = (selectedSlot == K.UI.INVENTORY_COLUMNS) ?
+                backpackSlotUI : slotUIs[selectedSlot];
+
+        float thickness = Settings.getScaledThickness() * 2;
         float x = slot.getAbsoluteX() - thickness;
         float y = slot.getAbsoluteY() - thickness;
         float size = slot.getAbsoluteWidth() + thickness * 2.0f;
@@ -310,8 +312,12 @@ public class HotbarUI extends UIElement {
     }
 
     public InventorySlotUI getSlotUI(int index) {
-        if (index < 0 || index >= K.UI.INVENTORY_COLUMNS) {
-            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + K.UI.INVENTORY_COLUMNS);
+        if (index < 0 || index >= TOTAL_SELECTABLE_SLOTS) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + TOTAL_SELECTABLE_SLOTS);
+        }
+
+        if (index == K.UI.INVENTORY_COLUMNS) {
+            return backpackSlotUI;
         }
 
         return slotUIs[index];

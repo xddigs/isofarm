@@ -5,7 +5,6 @@ import com.isofarm.graphics.CameraView;
 import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.Shader;
 import com.isofarm.graphics.SpriteSheet;
-import com.isofarm.item.Backpack;
 import com.isofarm.item.Item;
 import com.isofarm.item.Tool;
 import com.isofarm.pathfinding.GridPos;
@@ -225,7 +224,6 @@ public class Player extends Character {
         switch (getGamemode()) {
             case SURVIVAL -> {
                 add(new Seed(), 4);
-                add(new Backpack(), 1);
                 Kit kit = new StartingKit();
                 for (Item item : kit.getItems()) { add(item, 1); }
             }

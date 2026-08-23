@@ -6,7 +6,7 @@ public class StartingKit extends Kit {
 
     public StartingKit() {
         setItems(new Item[]{
-                new Hoe(), new Pickaxe()
+                new Axe(), new Pickaxe()
         });
     }
 }

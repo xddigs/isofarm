@@ -80,7 +80,7 @@ public class ResourceManager {
         toolIcons = new SpriteSheet(K.Paths.TOOL_ICONS, K.UI.ICON_TOOL_FRAMES);
         blockIcons = new SpriteSheet(K.Paths.BLOCK_ICONS, K.UI.ICON_BLOCK_FRAMES);
         materialIcons = new SpriteSheet(K.Paths.MATERIAL_ICONS, 3);
-        inventoryIcons = new SpriteSheet(K.Paths.INVENTORY_ICONS, 2);
+        inventoryIcons = new SpriteSheet(K.Paths.INVENTORY_ICONS, 3);
 
         this.playerSpriteSheet = new SpriteSheet(K.Paths.PLAYER_SPRITESHEET,
                 Direction.values().length);

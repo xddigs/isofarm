@@ -1,6 +1,5 @@
 package com.isofarm.gui;
 
-import com.isofarm.data.UIElement;
 import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
 

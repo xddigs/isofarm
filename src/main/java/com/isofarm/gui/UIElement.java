@@ -1,5 +1,6 @@
-package com.isofarm.data;
+package com.isofarm.gui;
 
+import com.isofarm.data.DataClass;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.graphics.Texture;
 import org.joml.Vector2f;

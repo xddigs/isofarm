@@ -1,6 +1,5 @@
 package com.isofarm.gui;
 
-import com.isofarm.data.UIElement;
 import com.isofarm.input.Keyboard;
 import com.isofarm.input.Mouse;
 import org.lwjgl.glfw.GLFW;

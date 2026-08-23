@@ -13,7 +13,7 @@ public enum BlockData {
     TILLED_DIRT((byte) 4, "Tilled Dirt", true, false, new MaterialID[]{}, 110, 3, 0, 0, 0, 0, 0, SoundGroup.SOIL, 0.9f),
     VOIDSTONE((byte) 5, "Voidstone", 999, 4, 0, SoundGroup.HARD, 999999.0f, false, new MaterialID[]{}),
     GLASS((byte) 6, "Glass", 200, 5, 0, SoundGroup.GLASS, 1.2f, true, new MaterialID[]{}),
-    OAK_LOG((byte) 7, "Log", false, false, new MaterialID[]{}, 100, 6, 0, 6, 2, 6, 1, SoundGroup.HARD, 1.2f),
+    OAK_LOG((byte) 7, "Log", false, false, new MaterialID[]{MaterialID.WOOD}, 100, 6, 0, 6, 2, 6, 1, SoundGroup.HARD, 1.2f),
     OAK_WOOD((byte) 8, "Oak Wood", 100, 7, 0, SoundGroup.HARD, 4.0f, false, new MaterialID[]{}),
     OAK_LEAVES((byte) 9, "Oak Leaves", 100, 8, 0, SoundGroup.SOIL, 1.1f, true, new MaterialID[]{MaterialID.STICK}),
     SNOW((byte) 10, "Snow", 120, 9, 0, SoundGroup.SNOW, 0.8f, false, new MaterialID[]{}),

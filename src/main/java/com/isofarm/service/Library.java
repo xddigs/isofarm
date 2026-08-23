@@ -38,6 +38,10 @@ public class Library implements Service<GameMaster> {
         itemR.register(DEFAULT_ID + ".oak_wood", () -> new Block(BlockData.OAK_WOOD));
         itemR.register(DEFAULT_ID + ".oak_leaves", () -> new Block(BlockData.OAK_LEAVES));
         itemR.register(DEFAULT_ID + ".snow", () -> new Block(BlockData.SNOW));
+
+        itemR.register(MaterialID.WOOD, () -> new Block(BlockData.OAK_WOOD));
+        itemR.register(MaterialID.STICK, () -> new Material(MaterialID.STICK));
+        itemR.register(MaterialID.STONE, () -> new Block(BlockData.STONE));
     }
 
     public static void initCommands(float delta, GameMaster gameMaster) {
