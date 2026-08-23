@@ -7,7 +7,7 @@ import com.isofarm.wrld.GameMaster;
 public class Backpack extends Tool {
 
     public Backpack(ToolType type, Tier tier) {
-        super((byte) 2, tier.getName() + " Backpack", 100, type, tier,
+        super((byte) 1, tier.getName() + " Backpack", 100, type, tier,
                 tier.getDurability() + type.getBaseDurability());
     }
 
