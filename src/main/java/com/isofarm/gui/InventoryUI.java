@@ -20,6 +20,7 @@ public class InventoryUI extends UIElement {
     private final InventorySlotUI[] slotUIs;
     private UIButton sortButton;
     private UIButton groupButton;
+    private UIButton recipesButton;
 
     private Player player;
 
@@ -42,7 +43,6 @@ public class InventoryUI extends UIElement {
         super(x, y, getInventoryWidth(), getInventoryHeight());
         int totalVisualSlots = (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
         this.slotUIs = new InventorySlotUI[totalVisualSlots];
-
         setFocusable(true);
         createButtons();
         createSlots();
@@ -61,19 +61,27 @@ public class InventoryUI extends UIElement {
     }
 
     private void createButtons() {
-        float btnWidth = Settings.getScaledButton() * 1.5f;
-        float btnHeight = Settings.getScaledHeader() - Settings.getScaledPadding();
-        sortButton = new UIButton(Settings.getScaledPadding(), Settings.getScaledPadding(), btnWidth, btnHeight);
-        groupButton = new UIButton(Settings.getScaledPadding() + btnWidth + Settings.getScaledSpacing(), Settings.getScaledPadding(), btnWidth, btnHeight);
+        float btnWidth = Settings.getScaledSlot(), btnHeight = Settings.getScaledSlot();
+        sortButton = new UIButton(Settings.getScaledPadding(),
+                Settings.getScaledPadding() - Settings.getScaledSpacing(), btnWidth, btnHeight);
+
+        groupButton = new UIButton(Settings.getScaledPadding() + btnWidth + Settings.getScaledSpacing(),
+                Settings.getScaledPadding() - Settings.getScaledSpacing(), btnWidth, btnHeight);
+
+        recipesButton = new UIButton(Settings.getScaledPadding() + btnWidth * 2 + Settings.getScaledSpacing() * 2,
+                Settings.getScaledPadding() - Settings.getScaledSpacing(), btnWidth, btnHeight);
 
         sortButton.setOnClick(this::sortInventory);
         groupButton.setOnClick(this::groupInventory);
+        recipesButton.setOnClick(this::openRecipes);
 
-        sortButton.setTooltipText("Sort Inventory");
-        groupButton.setTooltipText("Group Items");
+        sortButton.setTooltipText("Sort");
+        groupButton.setTooltipText("Group");
+        recipesButton.setTooltipText("Recipe Book");
 
         addChild(sortButton);
         addChild(groupButton);
+        addChild(recipesButton);
     }
 
     private void createSlots() {
@@ -99,6 +107,11 @@ public class InventoryUI extends UIElement {
         if (player != null && player.getInventory() != null) {
             player.getInventory().group();
         }
+    }
+
+    public void openRecipes() {
+        if (gameMaster == null || gameMaster.getGameUIService() == null) return;
+        gameMaster.getGameUIService().toggleRecipeBook();
     }
 
     @Override
@@ -181,26 +194,25 @@ public class InventoryUI extends UIElement {
 
     private void syncInventory() {
         Inventory inventory = player.getInventory();
-
         for (int i = 0; i < slotUIs.length; i++) {
             InventorySlotUI slotUI = slotUIs[i];
-
             if (i < inventory.getSlots().size()) {
                 slotUI.setSlot(inventory.getSlot(i));
             } else {
                 slotUI.setSlot(null);
             }
-
             updateItemSprite(slotUI);
         }
 
         if (sortButton.getSpriteSheet() == null && inventoryIcons != null) {
-
             sortButton.setSpriteSheet(inventoryIcons);
             sortButton.setSpriteFrame(0);
 
             groupButton.setSpriteSheet(inventoryIcons);
             groupButton.setSpriteFrame(1);
+
+            recipesButton.setSpriteSheet(inventoryIcons);
+            recipesButton.setSpriteFrame(2);
         }
     }
 
@@ -282,7 +294,6 @@ public class InventoryUI extends UIElement {
         }
 
         if (isSameType(carriedItem, slot.getItem())) {
-
             mergeCarriedStack(slot);
         } else {
             swapStacks(slot);
