@@ -27,7 +27,7 @@ public class IntroScreen {
     }
 
     public void setupUI() {
-        float barWidth = 300f;
+        float barWidth = 500f;
         float barHeight = 25f;
         float x = (K.Window.DEFAULT_WIDTH - barWidth) / 2;
         float y = (K.Window.DEFAULT_HEIGHT - barHeight) / 2;
