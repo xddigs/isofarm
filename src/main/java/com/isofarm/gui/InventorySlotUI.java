@@ -72,10 +72,11 @@ public class InventorySlotUI extends UIElement {
         Vector4f border = K.UI.UI_SELECTED_BORDER_COLOR;
         Vector4f borderTint = new Vector4f(border.x, border.y, border.z, border.w * getWorldOpacity());
 
-        GUI.drawRect(x, y, width, 1.0f, borderTint);
-        GUI.drawRect(x, y + height - 1.0f, width, 1.0f, borderTint);
-        GUI.drawRect(x, y, 1.0f, height, borderTint);
-        GUI.drawRect(x + width - 1.0f, y, 1.0f, height, borderTint);
+        float borderSize = Settings.getScaledBorder();
+        GUI.drawRect(x, y, width, borderSize, borderTint);
+        GUI.drawRect(x, y + height - borderSize, width, borderSize, borderTint);
+        GUI.drawRect(x, y, borderSize, height, borderTint);
+        GUI.drawRect(x + width - borderSize, y, borderSize, height, borderTint);
 
         if (!isEmpty() && spriteSheet != null) {
             renderItem();
@@ -85,10 +86,7 @@ public class InventorySlotUI extends UIElement {
     }
 
     private void renderItem() {
-        float availableSpace = Math.min(getAbsoluteWidth(), getAbsoluteHeight()) - 4.0f;
-        int baseTextureSize = 16;
-        int scaleMultiplier = Math.max(1, (int) Math.floor(availableSpace / baseTextureSize));
-        float baseIconSize = scaleMultiplier * baseTextureSize;
+        float iconSize = Settings.getScaledIcon();
 
         float scaleX = 1.0f;
         float scaleY = 1.0f;
@@ -100,14 +98,12 @@ public class InventorySlotUI extends UIElement {
             scaleY = 1.0f - deformation;
         }
 
-        float renderWidth = baseIconSize * scaleX;
-        float renderHeight = baseIconSize * scaleY;
+        float renderWidth = iconSize * scaleX;
+        float renderHeight = iconSize * scaleY;
         float x = Math.round(getAbsoluteX() + (getAbsoluteWidth() - renderWidth) * 0.5f);
         float y = Math.round(getAbsoluteY() + (getAbsoluteHeight() - renderHeight) * 0.5f);
 
-        GUI.drawSprite(spriteSheet, spriteFrame, x, y, renderWidth, renderHeight,
-                new Vector4f(K.UI.UI_ITEM_TINT.x, K.UI.UI_ITEM_TINT.y,
-                        K.UI.UI_ITEM_TINT.z, K.UI.UI_ITEM_TINT.w * getWorldOpacity()));
+        GUI.drawSprite(spriteSheet, spriteFrame, x, y, renderWidth, renderHeight, new Vector4f(K.UI.UI_ITEM_TINT.x, K.UI.UI_ITEM_TINT.y, K.UI.UI_ITEM_TINT.z, K.UI.UI_ITEM_TINT.w * getWorldOpacity()));
 
         renderToolDurability();
         renderAmount();
@@ -124,12 +120,12 @@ public class InventorySlotUI extends UIElement {
         if (durability >= maxDurability) return;
         float progress = durability / maxDurability;
 
-        float barWidth = getAbsoluteWidth() - 6.0f;
-        float barHeight = 3.0f;
-        float x = getAbsoluteX() + 3.0f;
-        float y = getAbsoluteY() + getAbsoluteHeight() - barHeight - 2.0f;
-        GUI.drawRect(x, y, barWidth, barHeight, new Vector4f(0.15f,
-                0.15f, 0.15f, getWorldOpacity()));
+        float padding = Settings.scale(2.0f);
+        float barHeight = Settings.scale(2.0f);
+        float barWidth =  getAbsoluteWidth() - padding * 2.0f;
+        float x = getAbsoluteX() + padding;
+        float y = getAbsoluteY() + getAbsoluteHeight() - barHeight - padding;
+        GUI.drawRect(x, y, barWidth, barHeight, new Vector4f(0.15f, 0.15f, 0.15f, getWorldOpacity()));
 
         if (progress <= 0.0f) return;
         float red, green, blue = 0.0f;
@@ -147,8 +143,7 @@ public class InventorySlotUI extends UIElement {
             green = t * 0.5f;
         }
 
-        GUI.drawRect(x, y, barWidth * progress, barHeight,
-                new Vector4f(red, green, blue, getWorldOpacity()));
+        GUI.drawRect(x, y, barWidth * progress, barHeight, new Vector4f(red, green, blue, getWorldOpacity()));
     }
 
     private void renderAmount() {
@@ -160,15 +155,16 @@ public class InventorySlotUI extends UIElement {
         String amount = String.valueOf(slot.getAmount());
         float textWidth = getTextWidth(amount);
         float textHeight = countFont.getSize();
-        float x = getAbsoluteX() + getAbsoluteWidth() - textWidth - 4.0f;
-        float y = getAbsoluteY() + getAbsoluteHeight() - textHeight - 2.0f;
+        float paddingX = Settings.scale(2.0f);
+        float paddingY = Settings.scale(1.0f);
+        float x = getAbsoluteX() + getAbsoluteWidth() - textWidth - paddingX;
+        float y = getAbsoluteY() + getAbsoluteHeight() - textHeight - paddingY;
 
-        GUI.drawString(amount, x + 1.0f, y + textHeight, countFont,
+        GUI.drawString(amount, x + Settings.scale(0.5f), y + textHeight, countFont,
                 new Vector4f(0.0f, 0.0f, 0.0f, getWorldOpacity()));
 
-        GUI.drawString(amount, x, y + textHeight, countFont,
-                new Vector4f(K.UI.UI_TEXT_COLOR.x, K.UI.UI_TEXT_COLOR.y, K.UI.UI_TEXT_COLOR.z,
-                        K.UI.UI_TEXT_COLOR.w * getWorldOpacity()));
+        GUI.drawString(amount, x, y + textHeight, countFont, new Vector4f(K.UI.UI_TEXT_COLOR.x,
+                K.UI.UI_TEXT_COLOR.y, K.UI.UI_TEXT_COLOR.z, K.UI.UI_TEXT_COLOR.w * getWorldOpacity()));
     }
 
     private float getTextWidth(String value) {

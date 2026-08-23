@@ -250,8 +250,7 @@ public class HotbarUI extends UIElement {
 
     private void renderSelector() {
         InventorySlotUI slot = slotUIs[selectedSlot];
-
-        float thickness = Settings.getScaledThickness() + 1f;
+        float thickness = Settings.getScaledThickness();
         float x = slot.getAbsoluteX() - thickness;
         float y = slot.getAbsoluteY() - thickness;
         float size = slot.getAbsoluteWidth() + thickness * 2.0f;

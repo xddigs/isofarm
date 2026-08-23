@@ -140,6 +140,9 @@ public class GameUIService implements Service<GameMaster> {
                 new Vector4f(0.05f, 0.2f, 0.05f, 0.8f));
         this.staminaBar.setLayer(10);
         uiManager.getRoot().addChild(this.staminaBar);
+
+        inventoryUI.setHealthBar(healthBar);
+        inventoryUI.setStaminaBar(staminaBar);
     }
 
     public InventoryUI getInventoryUI() {
@@ -276,10 +279,21 @@ public class GameUIService implements Service<GameMaster> {
     }
 
     public void resetHotbarPosition() {
-        hotbarUI.setPosition(
-                windowWidth / 2.0f - hotbarUI.getWidth() / 2.0f,
-                windowHeight - hotbarUI.getHeight() - K.UI.HOTBAR_OFFSET
-        );
+        float hotbarX = windowWidth / 2.0f - hotbarUI.getWidth() / 2.0f;
+        float hotbarY = windowHeight - hotbarUI.getHeight() - K.UI.HOTBAR_OFFSET;
+        hotbarUI.setPosition(hotbarX, hotbarY);
+
+        float barWidth = healthBar.getWidth();
+        float barHeight = healthBar.getHeight();
+        float gapBetweenBars = 12.0f;
+        float offsetAboveHotbar = 10.0f;
+
+        float totalBarsWidth = (barWidth * 2.0f) + gapBetweenBars;
+        float startX = (windowWidth - totalBarsWidth) / 2.0f;
+        float barY = hotbarY - barHeight - offsetAboveHotbar;
+
+        healthBar.setPosition(startX, barY);
+        staminaBar.setPosition(startX + barWidth + gapBetweenBars, barY);
     }
 
     public void renderToasts() {

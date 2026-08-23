@@ -32,6 +32,8 @@ public class InventoryUI extends UIElement {
     private int carriedAmount;
 
     private HotbarUI hotbarUI;
+    private UIProgressBar healthBar;
+    private UIProgressBar staminaBar;
     private GameMaster gameMaster;
 
     public InventoryUI(float x, float y) {
@@ -147,14 +149,25 @@ public class InventoryUI extends UIElement {
     }
 
     private void onOpen() {
-        if (hotbarUI == null) {
+        if (hotbarUI == null || healthBar == null || staminaBar == null) {
             return;
         }
 
-        float hotbarX = getAbsoluteX() + getWidth() / 2f - hotbarUI.getWidth() / 2f;
+        float hotbarX = getAbsoluteX() + (getWidth() - hotbarUI.getWidth()) / 2.0f;
         float hotbarY = getAbsoluteY() + getHeight() + K.UI.HOTBAR_OFFSET;
         hotbarUI.setPosition(hotbarX, hotbarY);
         hotbarUI.setInventoryMode(true);
+
+        float barWidth = healthBar.getWidth();
+        float barHeight = healthBar.getHeight();
+        float gapBetweenBars = 12.0f;
+        float offsetAboveHotbar = 10.0f;
+
+        float totalBarsWidth = (barWidth * 2.0f) + gapBetweenBars;
+        float startX = hotbarX + (hotbarUI.getWidth() - totalBarsWidth) / 2.0f;
+        float barY = hotbarY - barHeight - offsetAboveHotbar;
+        healthBar.setPosition(startX, barY);
+        staminaBar.setPosition(startX + barWidth + gapBetweenBars, barY);
     }
 
     private void onClose() {
@@ -493,6 +506,22 @@ public class InventoryUI extends UIElement {
             GUI.drawString(amount, x + iconSize - 10, y + iconSize - 10,
                     GUI.getNormalFont(), K.UI.UI_TEXT_COLOR);
         }
+    }
+
+    public UIProgressBar getHealthBar() {
+        return healthBar;
+    }
+
+    public void setHealthBar(UIProgressBar healthBar) {
+        this.healthBar = healthBar;
+    }
+
+    public UIProgressBar getStaminaBar() {
+        return staminaBar;
+    }
+
+    public void setStaminaBar(UIProgressBar staminaBar) {
+        this.staminaBar = staminaBar;
     }
 
     public void setIcons(SpriteSheet seed, SpriteSheet crop, SpriteSheet block, SpriteSheet tool, SpriteSheet inv) {
