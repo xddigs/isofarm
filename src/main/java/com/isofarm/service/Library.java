@@ -236,5 +236,15 @@ public class Library implements Service<GameMaster> {
                 gameMaster.getToastService().error(e.getMessage());
             }
         }));
+
+        cr.register(new Command("/kill", new String[]{}, args -> {
+            if (player == null) {
+                log.warn("Cannot execute command: player does not exist.");
+                return;
+            }
+            player.setHitpoints(-player.getHitpoints());
+            log.info("Command kill executed");
+            gameMaster.getToastService().success("You killed yourself!");
+        }));
     }
 }

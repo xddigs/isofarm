@@ -10,7 +10,7 @@ public class Settings {
     private static int renderDistance = 16;
     private static int unloadMargin = 4;
     private static int guiScaleIndex = 2;
-    private static boolean doKeepInventory = true;
+    private static boolean doKeepInventory = false;
     private static boolean doEnableMotions = true;
     private static boolean isOrthographic = true;
     private static float maxInteractionDistance = 5.0f;

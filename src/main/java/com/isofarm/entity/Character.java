@@ -186,7 +186,7 @@ public abstract class Character extends Entity implements Levelable {
         return hitpoints;
     }
 
-    public void setHitpoints(int hitpoints) {
+    public void setHitpoints(float hitpoints) {
         this.hitpoints = hitpoints;
     }
 
@@ -202,7 +202,7 @@ public abstract class Character extends Entity implements Levelable {
         return stamina;
     }
 
-    public void setStamina(int stamina) {
+    public void setStamina(float stamina) {
         this.stamina = stamina;
     }
 
@@ -210,7 +210,7 @@ public abstract class Character extends Entity implements Levelable {
         return maxStamina * level;
     }
 
-    public void setMaxStamina(int maxStamina) {
+    public void setMaxStamina(float maxStamina) {
         this.maxStamina = maxStamina;
     }
 

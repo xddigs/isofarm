@@ -178,21 +178,27 @@ public class Player extends Character {
 
     public void respawn() {
         if (!Settings.doKeepInventory()) clear();
-        setPosition(new Vector3f(0.5f, 1.0f, 0.5f));
+        float spawnX = 0.5f;
+        float spawnZ = 0.5f;
+        GridPos highestAltitude = gameMaster.getWorld().getHighestY(spawnX, spawnZ);
+        setPosition(new Vector3f(spawnX, highestAltitude.y(), spawnZ));
         setVelocity(new Vector3f(0.0f, 0.0f, 0.0f));
         setDimensions(new Vector3f(0.5f, 1.0f, 0.5f));
         setSpeed(6.0f);
         setReputation(Reputation.NEUTRAL);
         setGamemode(Gamemode.SURVIVAL);
-        setUpInventory();
         setMaxFallVelocity(0.0f);
         setIsOffGroundTimer(0.0f);
         setWasOnGround(false);
-        this.maxHitpoints = 100;
-        this.hitpoints = maxHitpoints;
+
+        setMaxHitpoints(100);
+        setHitpoints(getMaxHitpoints());
+
+        setMaxStamina(100);
+        setStamina(getMaxStamina());
 
         setExperience(0);
-        setLevel(0);
+        setLevel(1);
         resetAttributes();
     }
 
