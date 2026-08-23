@@ -162,9 +162,7 @@ public class GameInteraction {
 
             player.add(item, amount);
             iterator.remove();
-            gameMaster.getSoundService().playUseSound(SoundGroup.ITEMS,
-                    1.0f, player.getPosition().x);
-
+            gameMaster.getSoundService().playEntitySound(SoundGroup.ITEMS);
             log.info("Added x{} {}", amount, item.getName());
         }
     }
@@ -209,8 +207,7 @@ public class GameInteraction {
             player.remove(item, amount);
             gameMaster.addEntity(worldItem);
             itemRenderer.playPlaceAnimation();
-            gameMaster.getSoundService().playUseSound(SoundGroup.ITEMS,
-                    playerPosition.x, playerPosition.x);
+            gameMaster.getSoundService().playEntitySound(SoundGroup.ITEMS);
 
             log.trace("Dropped x{} {} with velocity ({}, {}, {})", amount,
                     item.getName(), velocity.x, velocity.y, velocity.z);
@@ -255,9 +252,7 @@ public class GameInteraction {
 
                     if (item != null && amount > 0) {
                         player.add(item, amount);
-                        gameMaster.getSoundService().playUseSound(
-                                SoundGroup.ITEMS, distance, playerPos.x
-                        );
+                        gameMaster.getSoundService().playEntitySound(SoundGroup.ITEMS);
                         log.info("Picked up x{} {}", amount, item.getName());
                     }
                     iterator.remove();

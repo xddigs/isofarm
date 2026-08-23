@@ -158,6 +158,11 @@ public class Player extends Character {
     protected void onDamageTaken(float amount) {
         lastDamageAmount = amount;
         damageSequence++;
+        getSoundService().playEntitySound(SoundGroup.ENTITY);
+    }
+
+    public void respawn() {
+
     }
 
     public int getDamageSequence() {

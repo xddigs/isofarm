@@ -30,7 +30,7 @@ public class SoundService implements Service<SoundGroup> {
     private int stepSource;
     private int breakSource;
     private int placeSource;
-    private int useSource;
+    private int entitySource;
     private int backgroundSource;
     private int loopingSource;
 
@@ -42,7 +42,7 @@ public class SoundService implements Service<SoundGroup> {
             loadSoundArray(group.getStepSounds());
             loadSoundArray(group.getBreakSounds());
             loadSoundArray(group.getPlaceSounds());
-            loadSoundArray(group.getUseSounds());
+            loadSoundArray(group.getEntitySounds());
             loadSoundArray(group.getBackgroundSounds());
             loadSoundArray(group.getLoopingSounds());
         }
@@ -72,14 +72,14 @@ public class SoundService implements Service<SoundGroup> {
         stepSource = alGenSources();
         breakSource = alGenSources();
         placeSource = alGenSources();
-        useSource = alGenSources();
+        entitySource = alGenSources();
         backgroundSource = alGenSources();
         loopingSource = alGenSources();
 
         alSourcef(breakSource, AL_GAIN, 1.0f);
         alSourcef(stepSource, AL_GAIN, 1.0f);
         alSourcef(placeSource, AL_GAIN, 1.0f);
-        alSourcef(useSource, AL_GAIN, 1.0f);
+        alSourcef(entitySource, AL_GAIN, 1.0f);
         alSourcef(backgroundSource, AL_GAIN, 1.0f);
         alSourcef(loopingSource, AL_GAIN, 1.0f);
     }
@@ -102,10 +102,9 @@ public class SoundService implements Service<SoundGroup> {
                 0.75f, 0.2f, volume);
     }
 
-    public void playUseSound(SoundGroup group, float distance, float maxDistance) {
-        float volume = calc(distance, maxDistance);
-        playSound(useSource, group != null ? group.getUseSounds() : null,
-                1.0f, 0.2f, volume);
+    public void playEntitySound(SoundGroup group) {
+        playSound(entitySource, group != null ? group.getEntitySounds() : null,
+                1.0f, 0.2f, 1.2f);
     }
 
     public void playLoopingSound(SoundGroup group) {
@@ -233,7 +232,7 @@ public class SoundService implements Service<SoundGroup> {
         alDeleteSources(stepSource);
         alDeleteSources(breakSource);
         alDeleteSources(placeSource);
-        alDeleteSources(useSource);
+        alDeleteSources(entitySource);
         alDeleteSources(backgroundSource);
         soundBuffers.values().forEach(AL10::alDeleteBuffers);
         alcMakeContextCurrent(MemoryUtil.NULL);

@@ -23,16 +23,16 @@ public enum SoundGroup {
     private final String[] stepSounds;
     private final String[] breakSounds;
     private final String[] placeSounds;
-    private final String[] useSounds;
+    private final String[] entitySounds;
     private final String[] backgroundSounds;
     private final String[] loopingSounds;
 
     SoundGroup(String[] stepSounds, String[] breakSounds, String[] placeSounds,
-               String[] useSounds, String[] backgroundSounds, String[] loopingSounds) {
+               String[] entitySounds, String[] backgroundSounds, String[] loopingSounds) {
         this.stepSounds = stepSounds;
         this.breakSounds = breakSounds;
         this.placeSounds = placeSounds;
-        this.useSounds = useSounds;
+        this.entitySounds = entitySounds;
         this.backgroundSounds = backgroundSounds;
         this.loopingSounds = loopingSounds;
     }
@@ -40,7 +40,7 @@ public enum SoundGroup {
     public String[] getStepSounds() { return stepSounds; }
     public String[] getBreakSounds() { return breakSounds; }
     public String[] getPlaceSounds() { return placeSounds; }
-    public String[] getUseSounds() { return useSounds; }
+    public String[] getEntitySounds() { return entitySounds; }
     public String[] getBackgroundSounds() { return backgroundSounds; }
     public String[] getLoopingSounds() { return loopingSounds; }
 }
