@@ -56,6 +56,7 @@ public class Player extends Character {
 
     @Override
     public void update(Hit hit, float delta) {
+        if (!isAlive()) return;
         updateCrouching(delta);
         heal((0.5f + getLevel()) * delta);
 

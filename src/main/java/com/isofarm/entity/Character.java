@@ -18,9 +18,6 @@ public abstract class Character extends Entity implements Levelable {
     private int experience;
     private int experienceForNextLevel;
 
-    private float hitpoints;
-    private float maxHitpoints;
-
     private float stamina;
     private float maxStamina;
 
@@ -167,10 +164,6 @@ public abstract class Character extends Entity implements Levelable {
         if (amount <= 0) return;
         if (gamemode.isGodmode() || gamemode.isNoClip()) return;
         this.stamina = Math.max(0.0f, this.stamina - amount);
-    }
-
-    public boolean isAlive() {
-        return hitpoints > 0;
     }
 
     public void update() {

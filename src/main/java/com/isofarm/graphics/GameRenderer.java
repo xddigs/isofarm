@@ -146,6 +146,7 @@ public class GameRenderer {
             if (entity instanceof Player && !gameMaster.isOrthographicCamera()) {
                 return;
             }
+            gameMaster.getEntities().removeIf(e -> !e.isAlive());
             entity.render(gameMaster);
         });
 

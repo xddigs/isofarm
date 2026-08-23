@@ -16,6 +16,9 @@ public abstract class Entity {
     protected Vector3f velocity;
     protected Vector3f dimensions;
 
+    protected float hitpoints;
+    protected float maxHitpoints;
+
     private float standingHeight;
     private float crouchingHeight;
     private boolean onGround;
@@ -40,6 +43,10 @@ public abstract class Entity {
         this.onGround = false;
         this.wasOnGround = onGround;
         this.speed = 1.0f;
+    }
+
+    public boolean isAlive() {
+        return hitpoints > 0;
     }
 
     public byte getId() {
