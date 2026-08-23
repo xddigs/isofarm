@@ -91,7 +91,7 @@ public class InventoryUI extends UIElement {
 
         sortButton.setTooltipText("Sort");
         groupButton.setTooltipText("Group");
-        backpackButton.setTooltipText("Recipe Book");
+        backpackButton.setTooltipText("Backpack");
 
         addChild(sortButton);
         addChild(groupButton);
