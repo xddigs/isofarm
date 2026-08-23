@@ -33,7 +33,7 @@ public class Birth {
         float x = (K.Window.DEFAULT_WIDTH - barWidth) / 2;
         float y = (K.Window.DEFAULT_HEIGHT - barHeight) / 2;
 
-        Vector4f foreground = new Vector4f(0.0f, 0.90f, 0.2f, 1.0f);
+        Vector4f foreground = new Vector4f(0.0f, 0.90f, 0.4f, 1.0f);
         Vector4f background = new Vector4f(0.2f, 0.2f, 0.2f, 1.0f);
 
         progressBar = new UIProgressBar(x, y, barWidth, barHeight,
@@ -50,66 +50,64 @@ public class Birth {
     public void show() {
         setupUI();
         gameMaster = new GameMaster(window, uiManager);
+        progressBar.setValue(0.0f);
+        renderLoadingFrame();
+        gameMaster.loadResources();
+        progressBar.setValue(30.0f);
+        renderLoadingFrame();
+
         int r = Settings.getRenderDistance();
-        int minX = -r, maxX = r;
-        int minZ = -r, maxZ = r;
+        int minX = -r;
+        int minZ = -r;
         int currentChunkX = minX;
         int currentChunkZ = minZ;
 
         int totalChunks = (2 * r + 1) * (2 * r + 1);
         int processedChunks = 0;
 
-        boolean isLoaded = false;
-
-        double lastTime = glfwGetTime();
-        while (!glfwWindowShouldClose(window) && !isLoaded) {
-            double currentTime = glfwGetTime();
-            float delta = (float)(currentTime - lastTime);
-            lastTime = currentTime;
+        while (!glfwWindowShouldClose(window) && processedChunks < totalChunks) {
             glfwPollEvents();
-            if (processedChunks < totalChunks) {
-                float progress = ((float) processedChunks / totalChunks) * 100.0f;
-                progressBar.setValue(progress);
-                glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
-                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-                uiManager.update(delta);
 
-                GUI.begin(K.Window.DEFAULT_WIDTH, K.Window.DEFAULT_HEIGHT);
-                uiManager.render();
-                GUI.end();
+            gameMaster.getChunkManager().getGenerator()
+                    .generateChunk(currentChunkX, currentChunkZ);
 
-                glfwSwapBuffers(window);
-                gameMaster.getChunkManager()
-                        .getGenerator()
-                        .generateChunk(currentChunkX, currentChunkZ);
-
-                processedChunks++;
-                currentChunkZ++;
-                if (currentChunkZ > maxZ) {
-                    currentChunkZ = minZ;
-                    currentChunkX++;
-                }
-
-            } else {
-                progressBar.setValue(100.0f);
-                glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
-                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-                uiManager.update(0.016f);
-
-                GUI.begin(K.Window.DEFAULT_WIDTH, K.Window.DEFAULT_HEIGHT);
-                uiManager.render();
-                GUI.end();
-                glfwSwapBuffers(window);
-                gameMaster.getChunkManager().updateLoadedChunks(0, 0);
-                isLoaded = true;
+            processedChunks++;
+            currentChunkZ++;
+            if (currentChunkZ > r) {
+                currentChunkZ = minZ;
+                currentChunkX++;
             }
+
+            float chunkProgress = ((float) processedChunks / totalChunks);
+            float totalProgress = 30.0f + (chunkProgress * 70.0f);
+            progressBar.setValue(totalProgress);
+            renderLoadingFrame();
         }
 
+        gameMaster.getChunkManager().updateLoadedChunks(0, 0);
         gameMaster.spawn();
         progressBar.hide();
         gameMaster.initUI();
         setupCallbacks();
         loop();
+    }
+
+    private void renderLoadingFrame() {
+        glViewport(0, 0, (int) K.Window.DEFAULT_WIDTH, (int) K.Window.DEFAULT_HEIGHT);
+        glDisable(GL_DEPTH_TEST);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        uiManager.update(0.016f);
+
+        GUI.begin(K.Window.DEFAULT_WIDTH, K.Window.DEFAULT_HEIGHT);
+        uiManager.render();
+        GUI.end();
+        glfwSwapBuffers(window);
+        glFlush();
     }
 
     public void setupCallbacks() {
