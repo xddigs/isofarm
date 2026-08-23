@@ -20,7 +20,7 @@ public class InventoryUI extends UIElement {
     private final InventorySlotUI[] slotUIs;
     private UIButton sortButton;
     private UIButton groupButton;
-    private UIButton recipesButton;
+    private UIButton backpackButton;
 
     private Player player;
 
@@ -42,7 +42,7 @@ public class InventoryUI extends UIElement {
     private float defaultX;
     private float targetX;
     private float animationSpeed = 800.0f;
-    private boolean isRecipeMode = false;
+    private boolean isBackpackOpen = false;
 
     public InventoryUI(float x, float y) {
         super(x, y, getInventoryWidth(), getInventoryHeight());
@@ -75,27 +75,27 @@ public class InventoryUI extends UIElement {
         groupButton = new UIButton(Settings.getScaledPadding() + btnWidth + Settings.getScaledSpacing(),
                 Settings.getScaledPadding() - Settings.getScaledSpacing(), btnWidth, btnHeight);
 
-        recipesButton = new UIButton(Settings.getScaledPadding() + btnWidth * 2 + Settings.getScaledSpacing() * 2,
+        backpackButton = new UIButton(Settings.getScaledPadding() + btnWidth * 2 + Settings.getScaledSpacing() * 2,
                 Settings.getScaledPadding() - Settings.getScaledSpacing(), btnWidth, btnHeight);
 
         sortButton.setOnClick(this::sortInventory);
         groupButton.setOnClick(this::groupInventory);
-        recipesButton.setOnClick(() -> {
-            if (isRecipeMode) {
-                closeRecipes();
+        backpackButton.setOnClick(() -> {
+            if (isBackpackOpen) {
+                closeBackpack();
             } else {
-                openRecipes(gameMaster.getGameUIService()
-                        .getRecipeBookUI());
+                openBackpack(gameMaster.getGameUIService()
+                        .getBackpackInventoryUI());
             }
         });
 
         sortButton.setTooltipText("Sort");
         groupButton.setTooltipText("Group");
-        recipesButton.setTooltipText("Recipe Book");
+        backpackButton.setTooltipText("Recipe Book");
 
         addChild(sortButton);
         addChild(groupButton);
-        addChild(recipesButton);
+        addChild(backpackButton);
     }
 
     private void createSlots() {
@@ -140,28 +140,28 @@ public class InventoryUI extends UIElement {
             setPosition(newX, getY());
         }
 
-        RecipeBookUI recipeBookUI = gameMaster.getGameUIService().getRecipeBookUI();
-        if (recipeBookUI != null && isRecipeMode) {
+        BackpackInventoryUI backpackUI = gameMaster.getGameUIService().getBackpackInventoryUI();
+        if (backpackUI != null && isBackpackOpen) {
             float spacing = Settings.getScaledSpacing();
-            recipeBookUI.setPosition(getX() + getWidth() + spacing, getY());
+            backpackUI.setPosition(getX() + getWidth() + spacing, getY());
         }
     }
 
-    public void openRecipes(RecipeBookUI recipeBookUI) {
-        if (recipeBookUI == null) return;
-        recipeBookUI.show();
-        isRecipeMode = true;
+    public void openBackpack(BackpackInventoryUI backpackUI) {
+        if (backpackUI == null) return;
+        backpackUI.show();
+        isBackpackOpen = true;
         float spacing = Settings.getScaledSpacing();
-        float shift = (recipeBookUI.getAbsoluteWidth() + spacing) / 3.0f;
+        float shift = (backpackUI.getAbsoluteWidth() + spacing) / 3.0f;
         targetX = defaultX - shift;
     }
 
-    public void closeRecipes() {
-        isRecipeMode = false;
+    public void closeBackpack() {
+        isBackpackOpen = false;
         targetX = defaultX;
-        RecipeBookUI recipeBookUI = gameMaster.getGameUIService().getRecipeBookUI();
-        if (recipeBookUI != null) {
-            recipeBookUI.hide();
+        BackpackInventoryUI backpackUI = gameMaster.getGameUIService().getBackpackInventoryUI();
+        if (backpackUI != null) {
+            backpackUI.hide();
         }
     }
 
@@ -192,7 +192,7 @@ public class InventoryUI extends UIElement {
             return;
         }
 
-        if (gameMaster != null && !isRecipeMode) {
+        if (gameMaster != null && !isBackpackOpen) {
             defaultX = (gameMaster.getWindowWidth() - getWidth()) / 2.0f;
             targetX = defaultX;
             setPosition(targetX, getY());
@@ -265,8 +265,8 @@ public class InventoryUI extends UIElement {
             groupButton.setSpriteSheet(inventoryIcons);
             groupButton.setSpriteFrame(1);
 
-            recipesButton.setSpriteSheet(inventoryIcons);
-            recipesButton.setSpriteFrame(2);
+            backpackButton.setSpriteSheet(inventoryIcons);
+            backpackButton.setSpriteFrame(2);
         }
     }
 

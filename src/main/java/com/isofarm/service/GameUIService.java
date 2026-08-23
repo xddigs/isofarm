@@ -28,7 +28,7 @@ public class GameUIService implements Service<GameMaster> {
     private final GameMaster gameMaster;
     private final UIManager uiManager;
     private final InventoryUI inventoryUI;
-    private final RecipeBookUI recipeBookUI;
+    private final BackpackInventoryUI backpackUI;
     private final HotbarUI hotbarUI;
     private final UITextField chatField;
     private final UILabel time;
@@ -147,15 +147,14 @@ public class GameUIService implements Service<GameMaster> {
         inventoryUI.setHealthBar(healthBar);
         inventoryUI.setStaminaBar(staminaBar);
 
-        this.recipeBookUI = new RecipeBookUI(
+        this.backpackUI = new BackpackInventoryUI(
                 inventoryUI.getAbsoluteX() + inventoryUI.getAbsoluteWidth()
                         + Settings.getScaledPadding(),
                 inventoryUI.getAbsoluteY(),
                 null);
-        this.recipeBookUI.setRecipes(RecipeRegistry.init());
-        this.recipeBookUI.hide();
-        this.recipeBookUI.setLayer(1000);
-        uiManager.getRoot().addChild(recipeBookUI);
+        this.backpackUI.hide();
+        this.backpackUI.setLayer(1000);
+        uiManager.getRoot().addChild(backpackUI);
     }
 
     public InventoryUI getInventoryUI() {
@@ -166,15 +165,15 @@ public class GameUIService implements Service<GameMaster> {
         return hotbarUI;
     }
 
-    public RecipeBookUI getRecipeBookUI() {
-        return recipeBookUI;
+    public BackpackInventoryUI getBackpackInventoryUI() {
+        return backpackUI;
     }
 
     public void setPlayer(Player player) {
         this.player = player;
         inventoryUI.setPlayer(player);
         hotbarUI.setPlayer(player);
-        recipeBookUI.setPlayer(player);
+        backpackUI.setPlayer(player);
     }
 
     public void setShop(Shop shop) {
@@ -252,12 +251,11 @@ public class GameUIService implements Service<GameMaster> {
         glEnable(GL_DEPTH_TEST);
     }
 
-    public void toggleRecipeBook() {
-        if (recipeBookUI.isVisible()) {
-            recipeBookUI.hide();
+    public void toggleBackpack() {
+        if (backpackUI.isVisible()) {
+            backpackUI.hide();
         } else {
-            recipeBookUI.show();
-            recipeBookUI.rebuildEntries();
+            backpackUI.show();
         }
     }
 

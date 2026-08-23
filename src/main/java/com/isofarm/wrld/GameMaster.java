@@ -530,8 +530,8 @@ public class GameMaster {
     public void toggleInventory() {
         setInventoryOpen(!isInventoryOpen());
         if (isInventoryOpen()) {
-            gameUIservice.getRecipeBookUI().hide();
-            gameUIservice.getInventoryUI().closeRecipes();
+            gameUIservice.getBackpackInventoryUI().hide();
+            gameUIservice.getInventoryUI().closeBackpack();
         }
     }
 
