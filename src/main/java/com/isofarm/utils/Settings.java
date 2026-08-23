@@ -2,14 +2,14 @@ package com.isofarm.utils;
 
 @SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
 public class Settings {
-    private static final float BASE_ICON_SIZE = 32.0f;
-    private static final float[] GUI_SCALES = {0.5f, 1.0f, 1.25f, 1.5f, 2.0f};
+    private static final float BASE_ICON_SIZE = 16.0f;
+    private static final float[] GUI_SCALES = {0.5f, 1.0f, 1.25f, 1.5f, 2.0f, 2.5f, 3.0f};
     private static float fov = 80f;
     private static final float SHADOW_MAP_SIZE = 4096.0f;
     private static float mouseSensitivity = 0.4f;
     private static int renderDistance = 12;
     private static int unloadMargin = 2;
-    private static int guiScaleIndex = 2;
+    private static int guiScaleIndex = 6;
     private static boolean doEnableMotions = true;
     private static boolean isOrthographic = true;
     private static float maxInteractionDistance = 5.0f;
@@ -26,36 +26,40 @@ public class Settings {
         return GUI_SCALES[guiScaleIndex];
     }
 
+    public static float scale(float value) {
+        return value * getScale();
+    }
+
     public static float getScaledIcon() {
-        return BASE_ICON_SIZE * getScale();
+        return scale(BASE_ICON_SIZE);
     }
 
     public static float getScaledText() {
-        return getScaledIcon() * 0.75f;
+        return scale(12.0f);
     }
 
     public static float getScaledButton() {
-        return getScaledIcon() * 0.5f;
+        return scale(8.0f);
     }
 
     public static float getScaledLabel() {
-        return getScaledIcon() * 0.35f;
+        return scale(5.6f);
     }
 
     public static float getScaledTooltip() {
-        return getScaledIcon() * 0.25f;
+        return scale(4.0f);
     }
 
     public static float getScaledBorder() {
-        return getScaledIcon() * 0.1f;
+        return scale(1.6f);
     }
 
     public static float getScaledFrame() {
-        return getScaledIcon() * 0.05f;
+        return scale(0.8f);
     }
 
     public static float getScaledWindow() {
-        return getScaledIcon() * 0.025f;
+        return scale(0.4f);
     }
 
     public static float getScaledSlot() {
@@ -63,19 +67,19 @@ public class Settings {
     }
 
     public static float getScaledSpacing() {
-        return getScaledIcon() * 0.125f;
+        return scale(2.0f);
     }
 
     public static float getScaledPadding() {
-        return getScaledIcon() * 0.375f;
+        return scale(6.0f);
     }
 
     public static float getScaledCornerRadius() {
-        return getScaledIcon() * 0.25f;
+        return scale(4.0f);
     }
 
     public static float getScaledThickness() {
-        return getScaledIcon() * 0.050f;
+        return scale(0.8f);
     }
 
     public static float getScaledHeader() {
@@ -83,7 +87,7 @@ public class Settings {
     }
 
     public static float getScaledGUI() {
-        return getScaledIcon() * 1.25f;
+        return scale(20.0f);
     }
 
     public static boolean isOrthographic() {
