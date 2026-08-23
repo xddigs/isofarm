@@ -13,7 +13,7 @@ import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 
 public class ItemRenderer {
-    private static final float OFFSET_X = 1.0f;
+    private static final float OFFSET_X = 1.2f;
     private static final float OFFSET_Y = -0.60f;
     private static final float OFFSET_Z = -1.0f;
     private static final float ITEM_SCALE = 1.0f;

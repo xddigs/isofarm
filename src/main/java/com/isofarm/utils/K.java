@@ -85,7 +85,7 @@ public final class K {
         public static final float TOAST_DURATION = 3.0f;
 
         public static final float HOTBAR_LABEL_DURATION = 1.75f;
-        public static final float HOTBAR_LABEL_OFFSET_Y = 30.0f;
+        public static final float HOTBAR_LABEL_OFFSET_Y = 20.0f;
         public static final float HOTBAR_OFFSET = 20;
 
         public static final float CHAT_HISTORY_X = 10.0f;
