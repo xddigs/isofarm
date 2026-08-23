@@ -330,34 +330,17 @@ public class GUI {
 
         for (String word : words) {
             if (word.isEmpty()) continue;
-            if (getStringWidth(word, font) > maxWidth) {
+            String testLine = currentLine.isEmpty() ? word : currentLine + " " + word;
+            if (getStringWidth(testLine, font) <= maxWidth) {
+                if (!currentLine.isEmpty()) {
+                    currentLine.append(" ");
+                }
+                currentLine.append(word);
+            } else {
                 if (!currentLine.isEmpty()) {
                     lines.add(currentLine.toString());
                     currentLine.setLength(0);
                 }
-
-                StringBuilder charLine = new StringBuilder();
-                for (int i = 0; i < word.length(); i++) {
-                    char c = word.charAt(i);
-                    if (getStringWidth(charLine.toString() + c, font) > maxWidth) {
-                        lines.add(charLine.toString());
-                        charLine.setLength(0);
-                    }
-                    charLine.append(c);
-                }
-                if (!charLine.isEmpty()) {
-                    currentLine.append(charLine);
-                }
-                continue;
-            }
-
-            String testLine = currentLine.isEmpty() ? word : currentLine + " " + word;
-            if (getStringWidth(testLine, font) <= maxWidth) {
-                if (!currentLine.isEmpty()) currentLine.append(" ");
-                currentLine.append(word);
-            } else {
-                lines.add(currentLine.toString());
-                currentLine.setLength(0);
                 currentLine.append(word);
             }
         }

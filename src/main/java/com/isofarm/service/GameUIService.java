@@ -364,22 +364,27 @@ public class GameUIService implements Service<GameMaster> {
         float prefixWidth = GUI.getStringWidth(prefix, prefixFont);
         float messageWidth = GUI.getStringWidth(message, messageFont);
 
+        float x = toast.getX();
+        float y = toast.getY();
+
+        float screenWidth = GUI.getScreenWidth();
+        float marginFromEdge = Settings.scale(10.0f);
+        float maxPossibleWidth = Math.max(100.0f, screenWidth - x - marginFromEdge);
+
         float baseWidth = Settings.scale(K.UI.TOAST_WIDTH);
         float contentWidth = paddingLeft + prefixWidth + gap + messageWidth + paddingRight;
 
-        float maxAllowedWidth = Settings.scale(450.0f);
-        float width = Math.min(maxAllowedWidth, Math.max(baseWidth, contentWidth));
+        float width = Math.min(maxPossibleWidth, Math.max(baseWidth, contentWidth));
 
         float availableTextWidth = width - paddingLeft - prefixWidth - gap - paddingRight;
         String[] lines = GUI.wrapText(message, availableTextWidth, messageFont);
 
         float fontHeight = messageFont.getSize();
-        float lineHeight = fontHeight * 1.15f;
+        float lineHeight = fontHeight * 1.2f;
         float textBlockHeight = lines.length * lineHeight;
-        float height = Math.max(K.UI.TOAST_HEIGHT, textBlockHeight);
 
-        float x = toast.getX();
-        float y = toast.getY();
+        float minHeight = Settings.scale(36.0f);
+        float height = Math.max(minHeight, textBlockHeight + Settings.scale(12.0f));
 
         float[] bg = getToastBackground(toast.getType());
         float[] acc = getToastAccent(toast.getType());
@@ -389,17 +394,15 @@ public class GameUIService implements Service<GameMaster> {
         float cornerRadius = Settings.getScaledCornerRadius();
         GUI.drawRect(x, y, width, height, bgColor, cornerRadius);
         GUI.drawRect(x, y, accentWidth, height, accentColor, cornerRadius);
-        float messageX = x + paddingLeft + prefixWidth + gap;
 
-        float startY = y + (height - textBlockHeight) * 0.5f + (fontHeight * 0.75f);
+        float messageX = x + paddingLeft + prefixWidth + gap;
+        float startY = y + (height - textBlockHeight) * 0.5f + (fontHeight * 0.7f);
         float prefixFontHeight = prefixFont.getSize();
         float prefixY = y + (height - prefixFontHeight) * 0.5f + (prefixFontHeight * 0.7f);
-
         GUI.drawString(prefix, x + paddingLeft, prefixY, prefixFont, accentColor, 1.0f);
 
         for (int i = 0; i < lines.length; i++) {
-            GUI.drawString(lines[i], messageX, startY + (i * lineHeight), messageFont,
-                    K.UI.UI_TEXT_COLOR, 1.0f);
+            GUI.drawString(lines[i], messageX, startY + (i * lineHeight), messageFont, K.UI.UI_TEXT_COLOR, 1.0f);
         }
     }
 
