@@ -277,7 +277,6 @@ public class GameRenderer {
 
         if (player.isNoClip()) {
             glDisable(GL_CULL_FACE);
-            // glDisable(GL_DEPTH_TEST);
         } else {
             glEnable(GL_CULL_FACE);
             glCullFace(GL_BACK);
