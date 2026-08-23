@@ -5,6 +5,7 @@ import com.isofarm.graphics.CameraView;
 import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.Shader;
 import com.isofarm.graphics.SpriteSheet;
+import com.isofarm.item.Backpack;
 import com.isofarm.item.Item;
 import com.isofarm.item.Tool;
 import com.isofarm.pathfinding.GridPos;
@@ -56,7 +57,10 @@ public class Player extends Character {
 
     @Override
     public void update(Hit hit, float delta) {
-        if (!isAlive()) return;
+        if (!isAlive()) {
+            dropLoot();
+            return;
+        }
         updateCrouching(delta);
         heal((0.5f + getLevel()) * delta);
 
@@ -159,6 +163,17 @@ public class Player extends Character {
         lastDamageAmount = amount;
         damageSequence++;
         getSoundService().playEntitySound(SoundGroup.ENTITY);
+    }
+
+    @Override
+    protected void dropLoot() {
+        for (Item i : getInventory().getItems().keySet()) {
+            if (i == null) continue;
+            if (i instanceof Backpack) continue;
+            WorldItem item = new WorldItem(i, getInventory().getAmount(i),
+                    new Vector3f(position.x, position.y, position.z));
+            gameMaster.addEntity(item);
+        }
     }
 
     public void respawn() {
@@ -319,7 +334,11 @@ public class Player extends Character {
     }
 
     public void clear() {
-        getInventory().clear();
+        for (Item item : getInventory().getItems().keySet()) {
+            if (item == null) continue;
+            if (item instanceof Backpack) continue;
+            remove(item);
+        }
         log.info("Cleared inventory");
     }
 

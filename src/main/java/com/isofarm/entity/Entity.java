@@ -317,4 +317,6 @@ public abstract class Entity {
     public abstract void update(Hit hit, float delta);
 
     public abstract void render(GameMaster gameMaster);
+
+    protected void dropLoot() {}
 }
