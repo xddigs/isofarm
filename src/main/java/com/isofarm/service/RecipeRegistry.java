@@ -13,20 +13,20 @@ import java.util.List;
 public class RecipeRegistry implements Service<Recipe> {
     private static final List<Recipe> recipes = new LinkedList<>();
 
-    public static void init() {
+    public static List<Recipe> init() {
         register(new Recipe(
                 "wooden_hoe",
                 "Wooden Hoe",
                 List.of(new RecipeIngredient(MaterialID.STICK, 2),
                         new RecipeIngredient(MaterialID.WOOD, 1)),
                         new Hoe(Tier.WOOD), 1));
-
         register(new Recipe(
                 "wooden_pickaxe",
                 "Wooden Pickaxe",
                 List.of(new RecipeIngredient(MaterialID.STICK, 2),
                         new RecipeIngredient(MaterialID.WOOD, 3)),
                 new Pickaxe(Tier.WOOD), 1));
+        return getSortedRecipes();
     }
 
     public static void register(Recipe recipe) {

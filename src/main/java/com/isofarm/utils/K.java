@@ -111,6 +111,7 @@ public final class K {
         public static final Vector4f UI_HOTBAR_SELECTED_COLOR = new Vector4f(0.35f, 0.9f, 0.35f, 1.0f);
         public static final Vector4f RECIPE_SELECTED_COLOR = UI_HOVERED_COLOR;
         public static final Vector4f RECIPE_BACKGROUND_COLOR = UI_BACKGROUND_COLOR;
+        public static final Vector4f UI_TEXT_DISABLED_COLOR = new Vector4f(0.2f);
     }
 
     public static final class Paths {

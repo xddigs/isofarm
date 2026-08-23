@@ -18,7 +18,6 @@ public record OrthographicCameraController(OrthographicCamera camera)
     private static final float ZOOMED_ZOOM = NORMAL_ZOOM / 2.5f;
     private static final float VERTICAL_OFFSET = 0.0f;
     private static final float DISTANCE = 500.0f;
-    private static final float PATH_REACH_DISTANCE = 0.08f;
     private static boolean mouseCaptured = false;
     private static final float CAMERA_ROTATION_SPEED = 120.0f;
 

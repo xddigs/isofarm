@@ -147,9 +147,6 @@ public class GameMaster {
 
         Library.initCommands(genDelta, this);
         notifyProgress(progressCallback, ++currentStep / totalSteps);
-
-        RecipeRegistry.init();
-        notifyProgress(progressCallback, 1.0f);
     }
 
     private void notifyProgress(Consumer<Float> callback, float progress) {
@@ -532,6 +529,10 @@ public class GameMaster {
 
     public void toggleInventory() {
         setInventoryOpen(!isInventoryOpen());
+        if (isInventoryOpen()) {
+            gameUIservice.getRecipeBookUI().hide();
+            gameUIservice.getInventoryUI().closeRecipes();
+        }
     }
 
     public void onResize(int newWidth, int newHeight) {

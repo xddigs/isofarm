@@ -149,6 +149,7 @@ public class InventoryUI extends UIElement {
 
     public void openRecipes(RecipeBookUI recipeBookUI) {
         if (recipeBookUI == null) return;
+        recipeBookUI.show();
         isRecipeMode = true;
         float spacing = Settings.getScaledSpacing();
         float shift = (recipeBookUI.getAbsoluteWidth() + spacing) / 3.0f;
@@ -158,6 +159,10 @@ public class InventoryUI extends UIElement {
     public void closeRecipes() {
         isRecipeMode = false;
         targetX = defaultX;
+        RecipeBookUI recipeBookUI = gameMaster.getGameUIService().getRecipeBookUI();
+        if (recipeBookUI != null) {
+            recipeBookUI.hide();
+        }
     }
 
     @Override

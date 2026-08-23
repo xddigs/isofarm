@@ -285,6 +285,10 @@ public class GUI {
         return width;
     }
 
+    public static float getStringHeight(String text, UIFont normalFont) {
+        return normalFont.getSize() * text.length();
+    }
+
     public static float getCenteredTextY(String text, UIFont font,
                                          float boxY, float boxHeight) {
         if (text == null || text.isEmpty() || font == null) {

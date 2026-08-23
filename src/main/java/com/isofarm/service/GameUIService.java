@@ -151,10 +151,10 @@ public class GameUIService implements Service<GameMaster> {
                 inventoryUI.getAbsoluteX() + inventoryUI.getAbsoluteWidth()
                         + Settings.getScaledPadding(),
                 inventoryUI.getAbsoluteY(),
-                Settings.scale(250f),
-                inventoryUI.getAbsoluteHeight(),
                 null);
+        this.recipeBookUI.setRecipes(RecipeRegistry.init());
         this.recipeBookUI.hide();
+        this.recipeBookUI.setLayer(1000);
         uiManager.getRoot().addChild(recipeBookUI);
     }
 
@@ -257,7 +257,7 @@ public class GameUIService implements Service<GameMaster> {
             recipeBookUI.hide();
         } else {
             recipeBookUI.show();
-            recipeBookUI.refresh();
+            recipeBookUI.rebuildEntries();
         }
     }
 
