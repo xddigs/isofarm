@@ -75,7 +75,7 @@ public final class K {
         public static final int WATER_FRAMES = 8;
         public static final int DESTROY_FRAMES = 9;
 
-        public static final float TOAST_WIDTH = 250.0f;
+        public static final float TOAST_WIDTH = 320.0f;
         public static final float TOAST_HEIGHT = 64.0f;
         public static final float TOAST_MARGIN_RIGHT = 96.0f;
         public static final float TOAST_MARGIN_TOP = 24.0f;
@@ -83,6 +83,11 @@ public final class K {
         public static final float TOAST_SLIDE_SPEED = 8.0f;
         public static final float TOAST_EXIT_SPEED = 10.0f;
         public static final float TOAST_DURATION = 3.0f;
+
+        public static final float TOAST_ACCENT_WIDTH = 4.0f;
+        public static final float TOAST_MESSAGE_OFFSET_X = 10.0f;
+        public static final float TOAST_GAP_X = 8.0f;
+        public static final float TOAST_PADDING_RIGHT = 10.0f;
 
         public static final float HOTBAR_LABEL_DURATION = 1.75f;
         public static final float HOTBAR_LABEL_OFFSET_Y = 20.0f;
@@ -93,14 +98,6 @@ public final class K {
         public static final float CHAT_HISTORY_LINE_HEIGHT = 20.0f;
         public static final int CHAT_HISTORY_MAX_MESSAGES = 10;
         public static final Vector4f CHAT_HISTORY_TEXT_COLOR = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
-
-        public static final float TOAST_ACCENT_WIDTH = 6.0f;
-        public static final float TOAST_MESSAGE_OFFSET_X = 20.0f;
-        public static final float TOAST_LINE_HEIGHT = 18.0f;
-        public static final float TOAST_GAP_X = 8.0f;
-        public static final float TOAST_PADDING_RIGHT = 10.0f;
-        public static final float TOAST_PREFIX_BASELINE_ADJ = 0.35f;
-        public static final float TOAST_MESSAGE_GAP_Y = 0.2f;
 
         public static final Vector4f UI_BACKGROUND_COLOR = new Vector4f(0.25f, 0.25f, 0.25f, 1.0f);
         public static final Vector4f UI_BACKGROUND_COLOR_SLOT = new Vector4f(UI_BACKGROUND_COLOR.x,

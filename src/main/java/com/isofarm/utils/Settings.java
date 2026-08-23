@@ -3,13 +3,13 @@ package com.isofarm.utils;
 @SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
 public class Settings {
     private static final float BASE_ICON_SIZE = 16.0f;
-    private static final float[] GUI_SCALES = {0.5f, 1.0f, 1.25f, 1.5f, 2.0f, 2.5f, 3.0f};
+    private static final float[] GUI_SCALES = {1.0f, 2.0f, 3.0f};
     private static float fov = 80f;
     private static final float SHADOW_MAP_SIZE = 4096.0f;
     private static float mouseSensitivity = 0.4f;
     private static int renderDistance = 12;
     private static int unloadMargin = 2;
-    private static int guiScaleIndex = 6;
+    private static int guiScaleIndex = 2;
     private static boolean doEnableMotions = true;
     private static boolean isOrthographic = true;
     private static float maxInteractionDistance = 5.0f;

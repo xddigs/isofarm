@@ -1,6 +1,5 @@
 package com.isofarm.data;
 
-import com.isofarm.item.Block;
 import com.isofarm.utils.K;
 import org.joml.Vector2f;
 
@@ -16,7 +15,7 @@ public enum BlockData {
     GLASS((byte) 6, "Glass", 200, 5, 0, SoundGroup.GLASS, 1.2f, true, new MaterialID[]{}),
     OAK_LOG((byte) 7, "Log", false, false, new MaterialID[]{}, 100, 6, 0, 6, 2, 6, 1, SoundGroup.HARD, 1.2f),
     OAK_WOOD((byte) 8, "Oak Wood", 100, 7, 0, SoundGroup.HARD, 4.0f, false, new MaterialID[]{}),
-    OAK_LEAVES((byte) 9, "Leaves", 100, 8, 0, SoundGroup.SOIL, 1.1f, true, new MaterialID[]{MaterialID.STICK}),
+    OAK_LEAVES((byte) 9, "Oak Leaves", 100, 8, 0, SoundGroup.SOIL, 1.1f, true, new MaterialID[]{MaterialID.STICK}),
     SNOW((byte) 10, "Snow", 120, 9, 0, SoundGroup.SNOW, 0.8f, false, new MaterialID[]{}),
 
     WATER((byte) -1, "Water", 100, 0, 0, SoundGroup.SILENT, 0f, true, new MaterialID[]{}),

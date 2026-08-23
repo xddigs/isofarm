@@ -2,7 +2,7 @@ package com.isofarm.data;
 
 @DataClass
 public enum MaterialID {
-    STICK((byte) 0, "Stick", ToolType.values(), 1);
+    STICK((byte) 0, "Stick", new ToolType[]{ToolType.HOE, ToolType.PICKAXE, ToolType.SHOVEL, ToolType.AXE, ToolType.SWORD}, 1);
 
     private final byte id;
     private final String name;
