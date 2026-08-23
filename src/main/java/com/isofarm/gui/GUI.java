@@ -13,6 +13,9 @@ import org.lwjgl.stb.STBTTBakedChar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.lwjgl.opengl.GL11C.*;
 
 @Utils
@@ -127,11 +130,7 @@ public class GUI {
             return;
         }
 
-        float radius = Math.clamp(
-                arc,
-                0.0f,
-                Math.min(width, height) * 0.5f
-        );
+        float radius = Math.clamp(arc, 0.0f, Math.min(width, height) * 0.5f);
 
         float border = Math.max(0.0f, borderWidth);
         boolean rounded = radius > 0.0f || border > 0.0f;
@@ -196,6 +195,11 @@ public class GUI {
 
     public static void drawString(String text, float x, float y,
                                   UIFont font, Vector4f color) {
+        drawString(text, x, y, font, color, 1.0f);
+    }
+
+    public static void drawString(String text, float x, float y,
+                                  UIFont font, Vector4f color, float textScale) {
         if (text == null || text.isEmpty() || font == null) {
             return;
         }
@@ -213,17 +217,17 @@ public class GUI {
             int codePoint = text.codePointAt(i);
             STBTTBakedChar glyph = font.getGlyph(codePoint);
             if (glyph == null) {
-                cursorX += font.getSize() * 0.5f;
+                cursorX += (font.getSize() * 0.5f) * textScale;
                 i += Character.charCount(codePoint);
                 continue;
             }
 
-            float width = glyph.x1() - glyph.x0();
-            float height = glyph.y1() - glyph.y0();
+            float width = (glyph.x1() - glyph.x0()) * textScale;
+            float height = (glyph.y1() - glyph.y0()) * textScale;
 
             if (width > 0.0f && height > 0.0f) {
-                float glyphX = cursorX + glyph.xoff();
-                float glyphY = y + glyph.yoff();
+                float glyphX = cursorX + (glyph.xoff() * textScale);
+                float glyphY = y + (glyph.yoff() * textScale);
 
                 float u0 = (float) glyph.x0() / font.getAtlasWidth();
                 float v0 = (float) glyph.y0() / font.getAtlasHeight();
@@ -235,15 +239,12 @@ public class GUI {
                         .scale(width, height, 1.0f);
 
                 shader.setUniform("uModel", model);
-                shader.setUniform(
-                        "uGlyphUV",
-                        new Vector4f(u0, v0, u1, v1)
-                );
+                shader.setUniform("uGlyphUV", new Vector4f(u0, v0, u1, v1));
 
                 mesh.render();
             }
 
-            cursorX += glyph.xadvance();
+            cursorX += glyph.xadvance() * textScale;
             i += Character.charCount(codePoint);
         }
 
@@ -264,6 +265,10 @@ public class GUI {
     }
 
     public static float getStringWidth(String text, UIFont font) {
+        return getStringWidth(text, font, 1.0f);
+    }
+
+    public static float getStringWidth(String text, UIFont font, float textScale) {
         if (text == null || text.isEmpty() || font == null) {
             return 0.0f;
         }
@@ -273,10 +278,10 @@ public class GUI {
             char character = text.charAt(i);
             STBTTBakedChar glyph = font.getGlyph(character);
             if (glyph == null) {
-                width += font.getSize() * 0.5f;
+                width += (font.getSize() * 0.5f) * textScale;
                 continue;
             }
-            width += glyph.xadvance();
+            width += glyph.xadvance() * textScale;
         }
         return width;
     }
@@ -315,26 +320,45 @@ public class GUI {
     }
 
     public static String[] wrapText(String text, float maxWidth, UIFont font) {
-        if (text == null || text.isEmpty()) {
+        if (text == null || text.isEmpty() || maxWidth <= 0.0f) {
             return new String[0];
         }
 
-        java.util.List<String> lines = new java.util.ArrayList<>();
-        String[] words = text.split(" ");
+        List<String> lines = new ArrayList<>();
+        String[] words = text.split("\\s+");
         StringBuilder currentLine = new StringBuilder();
 
         for (String word : words) {
-            String testLine = currentLine.isEmpty() ? word : currentLine + " " + word;
-            if (getStringWidth(testLine, font) > maxWidth) {
+            if (word.isEmpty()) continue;
+            if (getStringWidth(word, font) > maxWidth) {
                 if (!currentLine.isEmpty()) {
                     lines.add(currentLine.toString());
-                    currentLine = new StringBuilder(word);
-                } else {
-                    lines.add(word);
-                    currentLine = new StringBuilder();
+                    currentLine.setLength(0);
                 }
+
+                StringBuilder charLine = new StringBuilder();
+                for (int i = 0; i < word.length(); i++) {
+                    char c = word.charAt(i);
+                    if (getStringWidth(charLine.toString() + c, font) > maxWidth) {
+                        lines.add(charLine.toString());
+                        charLine.setLength(0);
+                    }
+                    charLine.append(c);
+                }
+                if (!charLine.isEmpty()) {
+                    currentLine.append(charLine);
+                }
+                continue;
+            }
+
+            String testLine = currentLine.isEmpty() ? word : currentLine + " " + word;
+            if (getStringWidth(testLine, font) <= maxWidth) {
+                if (!currentLine.isEmpty()) currentLine.append(" ");
+                currentLine.append(word);
             } else {
-                currentLine.append(currentLine.isEmpty() ? "" : " ").append(word);
+                lines.add(currentLine.toString());
+                currentLine.setLength(0);
+                currentLine.append(word);
             }
         }
 
