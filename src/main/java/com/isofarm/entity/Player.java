@@ -26,6 +26,7 @@ import static org.lwjgl.opengl.GL13.*;
 @DataClass
 public class Player extends Character {
     private static final Logger log = LoggerFactory.getLogger(Player.class);
+    private static final float MAX_FALL_VELOCITY = 8.0f;
     private final String name;
     private final Matrix4f modelMatrix;
     private final GameMaster gameMaster;
@@ -73,10 +74,11 @@ public class Player extends Character {
             }
         }
 
-        if (isOnGround() && !wasOnGround()) {
-            if (getMaxFallVelocity() > 8.0f) {
-                float damage = (getMaxFallVelocity() - 8.0f) * 5.0f;
+        if (isOnGround() && !wasOnGround() && getIsOffGroundTimer() >= 4f) {
+            if (getMaxFallVelocity() > MAX_FALL_VELOCITY) {
+                float damage = (getMaxFallVelocity() - MAX_FALL_VELOCITY) * 4.0f;
                 fallDamage(damage);
+                getSoundService().playBreakSound(SoundGroup.ENTITY, 1.0f, 1.0f);
             }
 
             setMaxFallVelocity(0.0f);
@@ -181,7 +183,7 @@ public class Player extends Character {
         float spawnX = 0.5f;
         float spawnZ = 0.5f;
         GridPos highestAltitude = gameMaster.getWorld().getHighestY(spawnX, spawnZ);
-        setPosition(new Vector3f(spawnX, highestAltitude.y(), spawnZ));
+        setPosition(new Vector3f(spawnX, highestAltitude.y() + 1.0f, spawnZ));
         setVelocity(new Vector3f(0.0f, 0.0f, 0.0f));
         setDimensions(new Vector3f(0.5f, 1.0f, 0.5f));
         setSpeed(6.0f);
