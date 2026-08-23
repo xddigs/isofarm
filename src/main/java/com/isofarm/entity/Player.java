@@ -219,24 +219,10 @@ public class Player extends Character {
             case SURVIVAL -> {
                 add(new Seed(), 4);
                 add(new Seed(CropType.CARROT), 4);
-                add(new Hoe(), 1);
-                add(new Pickaxe(), 1);
-                add(new Shovel(), 1);
-                add(new Axe(), 1);
-                add(new Sword(), 1);
+                StartingKit startingKit = new StartingKit();
+                for (Item item : startingKit.getItems()) { add(item, 1); }
             }
-            case GODMODE -> {
-                BlockData[] blocks = BlockData.values();
-                for (BlockData b : blocks) { add(new Block(b)); }
-
-                CropType[] crops = CropType.values();
-                for (CropType c : crops) {
-                    add(new Seed(c));
-                    add(new Produce(c));
-                }
-
-                sort();
-            }
+            case GODMODE -> {}
         }
     }
 
