@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
@@ -93,49 +94,66 @@ public class GameMaster {
         this.entities = new LinkedList<>();
     }
 
-    public void loadResources() {
+    public void loadResources(Consumer<Float> progressCallback) {
+        float totalSteps = 10.0f;
+        int currentStep = 0;
+
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_MULTISAMPLE);
+        notifyProgress(progressCallback, ++currentStep / totalSteps);
 
         this.shadowMap = new ShadowMap((int) Settings.getShadowMapSize(),
                 (int) Settings.getShadowMapSize());
+        notifyProgress(progressCallback, ++currentStep / totalSteps);
 
         this.maskFbo = new Framebuffer((int) windowWidth, (int) windowHeight);
         this.sceneFbo = new Framebuffer((int) windowWidth, (int) windowHeight);
         this.blurFbo = new Framebuffer((int) windowWidth, (int) windowHeight);
+        notifyProgress(progressCallback, ++currentStep / totalSteps);
 
         this.resourceManager = new ResourceManager();
+        notifyProgress(progressCallback, ++currentStep / totalSteps);
+
         this.chunkManager = new ChunkManager(world);
         this.gameRenderer = new GameRenderer();
         this.itemRenderer = new ItemRenderer();
         this.shop = new Shop();
+        notifyProgress(progressCallback, ++currentStep / totalSteps);
 
         this.camera = new Camera(K.Camera.DEFAULT_WIDTH,
                 K.Camera.DEFAULT_HEIGHT, Settings.getRenderDistance());
         this.orthoCamera = new OrthographicCamera(K.Camera.DEFAULT_WIDTH,
                 K.Camera.DEFAULT_HEIGHT, Settings.getRenderDistance());
         this.camera.setPosition(0.0f, 0.0f, 0.0f);
-
         this.cameraController = new CameraController(camera);
         this.orthoCameraController = new OrthographicCameraController(orthoCamera);
         this.stepController = new StepController();
         this.weatherService = new WeatherService(rainEngine, camera);
+        notifyProgress(progressCallback, ++currentStep / totalSteps);
 
         this.gameInteraction = new GameInteraction(this, resourceManager.getBlocksTexture());
         this.recenter();
+        notifyProgress(progressCallback, ++currentStep / totalSteps);
 
         this.player = new Player(null, world, toastService);
         player.setSoundService(soundService);
         addEntity(player);
         shop.setPlayer(player);
-
-        log.info("Player created: {}", player.getName());
-        toastService.info("Use E to open the inventory");
+        notifyProgress(progressCallback, ++currentStep / totalSteps);
 
         Library.initItems(itemRegistry, player);
+        notifyProgress(progressCallback, ++currentStep / totalSteps);
+
         Library.initCommands(genDelta, this);
+        notifyProgress(progressCallback, 1.0f);
+    }
+
+    private void notifyProgress(Consumer<Float> callback, float progress) {
+        if (callback != null) {
+            callback.accept(progress);
+        }
     }
 
     public void initUI() {

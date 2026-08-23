@@ -14,7 +14,7 @@ import org.joml.Vector4f;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
-public class Birth {
+public class Intro {
     private final long window;
     private GameMaster gameMaster;
 
@@ -22,8 +22,10 @@ public class Birth {
     private UIManager uiManager;
 
     private static final float CLEAR_COLOR_ALPHA = 1.0f;
+    private static final float RESOURCE_WEIGHT = 35.0f;
+    private static final float CHUNK_WEIGHT = 65.0f;
 
-    public Birth(long window) {
+    public Intro(long window) {
         this.window = window;
     }
 
@@ -50,37 +52,38 @@ public class Birth {
     public void show() {
         setupUI();
         gameMaster = new GameMaster(window, uiManager);
-        progressBar.setValue(0.0f);
-        renderLoadingFrame();
-        gameMaster.loadResources();
-        progressBar.setValue(30.0f);
-        renderLoadingFrame();
-
         int r = Settings.getRenderDistance();
-        int minX = -r;
-        int minZ = -r;
-        int currentChunkX = minX;
-        int currentChunkZ = minZ;
-
         int totalChunks = (2 * r + 1) * (2 * r + 1);
-        int processedChunks = 0;
+        int resourceSteps = 10;
+        int totalTasks = resourceSteps + totalChunks;
 
-        while (!glfwWindowShouldClose(window) && processedChunks < totalChunks) {
+        final int[] completedTasks = {0};
+
+        gameMaster.loadResources(progress -> {
+            completedTasks[0]++;
+            float overallProgress = ((float) completedTasks[0] / totalTasks) * 100.0f;
+            progressBar.setValue(overallProgress);
+            renderLoadingFrame();
+        });
+
+        int minX = -r, minZ = -r;
+        int currentChunkX = minX, currentChunkZ = minZ;
+
+        while (!glfwWindowShouldClose(window) && completedTasks[0] < totalTasks) {
             glfwPollEvents();
 
             gameMaster.getChunkManager().getGenerator()
                     .generateChunk(currentChunkX, currentChunkZ);
 
-            processedChunks++;
+            completedTasks[0]++;
             currentChunkZ++;
             if (currentChunkZ > r) {
                 currentChunkZ = minZ;
                 currentChunkX++;
             }
 
-            float chunkProgress = ((float) processedChunks / totalChunks);
-            float totalProgress = 30.0f + (chunkProgress * 70.0f);
-            progressBar.setValue(totalProgress);
+            float overallProgress = ((float) completedTasks[0] / totalTasks) * 100.0f;
+            progressBar.setValue(overallProgress);
             renderLoadingFrame();
         }
 
