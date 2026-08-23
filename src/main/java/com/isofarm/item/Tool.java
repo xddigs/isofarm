@@ -1,5 +1,8 @@
-package com.isofarm.data;
+package com.isofarm.item;
 
+import com.isofarm.data.DataClass;
+import com.isofarm.data.Tier;
+import com.isofarm.data.ToolType;
 import com.isofarm.entity.Player;
 
 @DataClass
@@ -8,6 +11,7 @@ public abstract class Tool extends Item {
     private Tier tier;
     private int durability;
     private Player player;
+    private final float baseDamage;
 
     public Tool(byte id, String name, int value,
                 ToolType type, Tier tier, int durability) {
@@ -15,6 +19,11 @@ public abstract class Tool extends Item {
         this.type = type;
         this.tier = tier;
         this.durability = durability;
+        this.baseDamage = type.getBaseDamage();
+    }
+
+    public float getBaseDamage() {
+        return baseDamage;
     }
 
     public ToolType getType() {

@@ -1,11 +1,11 @@
 package com.isofarm.data;
 
 public enum Tier {
-    WOOD((byte) 0, "Wood", 64),
+    WOOD((byte) 0, "Wooden", 64),
     COPPER((byte) 1, "Copper", 128),
     IRON((byte) 2, "Iron", 160),
     STEEL((byte) 3, "Steel", 192),
-    GOLD((byte) 4, "Gold", 64),
+    GOLD((byte) 4, "Golden", 64),
     PLATINUM((byte) 5, "Platinum", 512),
     DIAMOND((byte) 6, "Diamond", 1024);
 
