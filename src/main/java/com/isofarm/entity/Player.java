@@ -289,7 +289,6 @@ public class Player extends Character {
     private void setUpInventory() {
         switch (getGamemode()) {
             case SURVIVAL -> {
-                add(new Seed(), 4);
                 Kit kit = new StartingKit();
                 for (Item item : kit.getItems()) { add(item, 1); }
             }
