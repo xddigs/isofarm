@@ -445,8 +445,21 @@ public class GameInteraction {
         WorldItem materialItem;
 
         if (removedBlock.getType().hasDrops()) {
-            MaterialID mid = (MaterialID) removedBlock.getType().getRandomDrop();
-            if (mid != null) material = new Material(mid);
+            Object dropObj = removedBlock.getType().getRandomDrop();
+
+            if (dropObj != null) {
+                Item droppedItem = null;
+                if (dropObj instanceof MaterialID mid) {
+                    droppedItem = new Material(mid);
+                } else if (dropObj instanceof Item item) {
+                    droppedItem = item;
+                }
+
+                if (droppedItem != null) {
+                    WorldItem dropEntity = new WorldItem(droppedItem, 1, position);
+                    gameMaster.addEntity(dropEntity);
+                }
+            }
         }
 
         WorldItem item = new WorldItem(removedBlock, 1, position);

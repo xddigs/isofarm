@@ -183,7 +183,8 @@ public enum BlockData {
     public Object getRandomDrop() {
         if (!hasDrops()) return null;
         if (Math.random() < 0.50f) {
-            return drops[(int) (Math.random() * (drops.length - 1))];
+            int index = (int) (Math.random() * drops.length);
+            return drops[index];
         }
         return null;
     }
