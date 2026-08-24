@@ -19,17 +19,17 @@ public class RecipeRegistry implements Service<Recipe> {
     public static List<Recipe> init() {
         create(Tier.WOOD)
         .result(new Material(MaterialID.STICK), 4)
-        .with(MaterialID.WOOD, 1);
+        .with(MaterialID.WOOD, 1).add();
 
         create(Tier.WOOD)
         .result(new Hoe(Tier.WOOD), 1)
         .with(MaterialID.WOOD, 1)
-        .with(MaterialID.STICK, 3);
+        .with(MaterialID.STICK, 3).add();
 
         create(Tier.WOOD)
         .result(new Pickaxe(Tier.WOOD), 1)
         .with(MaterialID.WOOD, 2)
-        .with(MaterialID.STICK, 3);
+        .with(MaterialID.STICK, 3).add();
 
         return recipes;
     }
@@ -56,8 +56,11 @@ public class RecipeRegistry implements Service<Recipe> {
 
         public RecipeBuilder with(MaterialID material, int count) {
             this.ingredients.add(new Ingredient(material, count));
-            recipes.add(new Recipe(tier, result, amount, ingredients));
             return this;
+        }
+
+        public Recipe add() {
+            return new Recipe(tier, result, amount, ingredients);
         }
     }
 }
