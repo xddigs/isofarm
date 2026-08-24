@@ -6,7 +6,6 @@ import com.isofarm.data.CompletionProvider;
 import com.isofarm.service.CommandRegistry;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class CommandCompletionProvider implements CompletionProvider {
@@ -83,6 +82,6 @@ public class CommandCompletionProvider implements CompletionProvider {
         }
 
         String input = arguments[argumentIndex];
-        return argument.complete(input);
+        return argument.complete(input, argumentIndex);
     }
 }
