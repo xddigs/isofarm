@@ -6,6 +6,7 @@ import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.gui.*;
 import com.isofarm.input.Mouse;
 import com.isofarm.item.Item;
+import com.isofarm.utils.Components;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
@@ -25,6 +26,8 @@ import static org.lwjgl.opengl.GL11.*;
 public class GameUIService implements Service<GameMaster> {
     private static final Logger log = LoggerFactory.getLogger(GameUIService.class);
     private static final float CHAT_HISTORY_DURATION = 3.0f;
+    private static final float HARDWARE_UPDATE_INTERVAL = 0.5f;
+    private static final float DEBUG_LABEL_WIDTH = 500.0f;
     private final GameMaster gameMaster;
     private final UIManager uiManager;
     private final InventoryUI inventoryUI;
@@ -34,14 +37,18 @@ public class GameUIService implements Service<GameMaster> {
     private final UILabel time;
     private final UILabel coords;
     private final UILabel fps;
-    private UIProgressBar healthBar;
-    private UIProgressBar staminaBar;
+    private final UILabel gpu;
+    private final UILabel cpu;
+    private final UILabel cpuTemp;
+    private final UILabel memory;
     private final List<String> chatHistory;
     private final SpriteSheet seedIcons;
     private final SpriteSheet cropIcons;
     private final SpriteSheet blockIcons;
     private final SpriteSheet toolIcons;
     private final SpriteSheet materialIcons;
+    private UIProgressBar healthBar;
+    private UIProgressBar staminaBar;
     private Player player;
     private Shop shop;
     private float windowWidth;
@@ -51,6 +58,7 @@ public class GameUIService implements Service<GameMaster> {
     private float hotbarLabelTimer = 0.0f;
     private String hotbarLabel = null;
     private float chatHistoryTimer = 0.0f;
+    private float hardwareUpdateTimer = 0.0f;
 
     public GameUIService(
             long windowHandle,
@@ -84,8 +92,6 @@ public class GameUIService implements Service<GameMaster> {
         this.inventoryUI.setPosition(
                 windowWidth / 2.0f - inventoryUI.getAbsoluteWidth() / 2,
                 windowHeight / 2.0f - inventoryUI.getAbsoluteHeight() / 2);
-        inventoryUI.setInventory(player.getInventory());
-        inventoryUI.createSlots();
 
         this.hotbarUI.setPosition(
                 windowWidth / 2.0f - hotbarUI.getAbsoluteWidth() / 2,
@@ -97,8 +103,6 @@ public class GameUIService implements Service<GameMaster> {
                 inventoryUI.getAbsoluteY());
 
         backpackUI.setLayer(100);
-        backpackUI.setInventory(player.getBackpack());
-        backpackUI.createBackpackSlots();
         backpackUI.hide();
 
         inventoryUI.setSeedIcons(seedIcons);
@@ -133,6 +137,26 @@ public class GameUIService implements Service<GameMaster> {
                 100f, 25f, null);
         this.fps.show();
         uiManager.getRoot().addChild(fps);
+
+        this.cpu = new UILabel(20, fps.getAbsoluteY() + fps.getAbsoluteHeight(),
+                DEBUG_LABEL_WIDTH, 25f, null);
+        this.cpu.show();
+        uiManager.getRoot().addChild(cpu);
+
+        this.cpuTemp = new UILabel(20, cpu.getAbsoluteY() + cpu.getAbsoluteHeight(),
+                DEBUG_LABEL_WIDTH, 25f, null);
+        this.cpuTemp.show();
+        uiManager.getRoot().addChild(cpuTemp);
+
+        this.gpu = new UILabel(20, cpu.getAbsoluteY() + cpu.getAbsoluteHeight(),
+                DEBUG_LABEL_WIDTH, 25f, null);
+        this.gpu.show();
+        uiManager.getRoot().addChild(gpu);
+
+        this.memory = new UILabel(20, cpuTemp.getAbsoluteY() + cpuTemp.getAbsoluteHeight(),
+                DEBUG_LABEL_WIDTH, 25f, null);
+        this.memory.show();
+        uiManager.getRoot().addChild(memory);
 
         int barWidth = 160;
         int barHeight = 16;
@@ -179,10 +203,19 @@ public class GameUIService implements Service<GameMaster> {
     }
 
     public void setPlayer(Player player) {
+        if (player == null) {
+            return;
+        }
+
         this.player = player;
         inventoryUI.setPlayer(player);
+        inventoryUI.setInventory(player.getInventory());
+        inventoryUI.createSlots();
         hotbarUI.setPlayer(player);
+        hotbarUI.setInventory(player.getInventory());
         backpackUI.setPlayer(player);
+        backpackUI.setInventory(player.getBackpack());
+        backpackUI.createBackpackSlots();
     }
 
     public void setShop(Shop shop) {
@@ -190,6 +223,12 @@ public class GameUIService implements Service<GameMaster> {
     }
 
     public void update(float delta) {
+        hardwareUpdateTimer -= delta;
+        if (hardwareUpdateTimer <= 0.0f) {
+            hardwareUpdateTimer = HARDWARE_UPDATE_INTERVAL;
+            updateHardwareInfo();
+        }
+
         if (actionDisplayTimer > 0.0f) {
             actionDisplayTimer -= delta;
         }
@@ -212,22 +251,28 @@ public class GameUIService implements Service<GameMaster> {
         }
 
         time.setText(gameMaster.getTimeService().getFormattedTime());
-        coords.setText(gameMaster.getPlayer().getPositionString());
-        fps.setText(gameMaster.getFps());
+        if (player != null) {
+            coords.setText(player.getPositionString());
+            healthBar.setValues(player.getHitpoints(), player.getMaxHitpoints());
+            staminaBar.setValues(player.getStamina(), player.getMaxStamina());
+        }
 
         if (Settings.doEnableDebugInfo()) {
             time.show();
             coords.show();
             fps.show();
+            cpu.show();
+            gpu.show();
+            cpuTemp.show();
+            memory.show();
         } else {
             time.hide();
             coords.hide();
             fps.hide();
-        }
-
-        if (player != null) {
-            healthBar.setValues(player.getHitpoints(), player.getMaxHitpoints());
-            staminaBar.setValues(player.getStamina(), player.getMaxStamina());
+            cpu.hide();
+            gpu.hide();
+            cpuTemp.hide();
+            memory.hide();
         }
 
         uiManager.update(delta);
@@ -235,11 +280,19 @@ public class GameUIService implements Service<GameMaster> {
 
         if (!gameMaster.isInventoryOpen()) {
             float scroll = Mouse.getScrollY();
+
             if (scroll != 0) {
                 selectItem(scroll > 0 ? -1 : 1);
                 gameMaster.getItemRenderer().playPlaceAnimation();
             }
         }
+    }
+
+    private void updateHardwareInfo() {
+        cpu.setText("CPU: " + Components.getCpu());
+        gpu.setText("GPU: " + Components.getGpu());
+        cpuTemp.setText("CPU Temp: " + Components.getCpuTemperature());
+        memory.setText("RAM: " + Components.getPhysicalMemory());
     }
 
     public void render(boolean isHUDShown, GameMaster gameMaster) {
@@ -249,7 +302,8 @@ public class GameUIService implements Service<GameMaster> {
             uiManager.render();
             renderHotbarLabel();
             renderToasts();
-        } else {}
+        } else {
+        }
 
         renderChatHistory();
         if (!gameMaster.isInventoryOpen() && !gameMaster.isOrthographicCamera()) {

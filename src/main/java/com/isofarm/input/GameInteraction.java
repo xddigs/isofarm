@@ -121,6 +121,7 @@ public class GameInteraction {
 
         boolean isLeftPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
         boolean isLeftHeld = Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT);
+        boolean isRightPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_RIGHT);
 
         if (isLeftPressed && canInteract) {
             itemRenderer.playAttackAnimation();
@@ -155,11 +156,10 @@ public class GameInteraction {
             resetBreaking();
         }
 
-        if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)
-                && !gameMaster.isInventoryOpen()) {
-            placeAction(gameMaster, hoveredCell, selectedItem);
+        if (isRightPressed && !gameMaster.isInventoryOpen()) {
+            placeAction(gameMaster, hoveredCell, selectedItem,
+                    isCtrlHeld, isRightPressed);
         }
-
         return hoveredCell;
     }
 
@@ -472,7 +472,8 @@ public class GameInteraction {
         lastBreakTime = 0L;
     }
 
-    private void placeAction(GameMaster gameMaster, Hit cell, Item selectedItem) {
+    private void placeAction(GameMaster gameMaster, Hit cell, Item selectedItem, boolean isCtrlDown,
+                             boolean isRightClick) {
         World world = gameMaster.getWorld();
         if (gameMaster.getPlayer().checkCollision(world)) return;
 
@@ -502,10 +503,14 @@ public class GameInteraction {
 
             return;
         }
-
         if (selectedItem instanceof Backpack backpack) {
-            backpack.use(gameMaster);
-            return;
+            if (isCtrlDown && isRightClick) {
+                backpack.unequip();
+                return;
+            } else if (isRightClick) {
+                backpack.use(gameMaster);
+                return;
+            }
         }
 
         if (selectedItem instanceof Hoe hoe) {

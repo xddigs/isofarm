@@ -110,7 +110,7 @@ public class HotbarUI extends UIElement {
             updateItemSprite(slotUI);
         }
 
-        InventorySlot backpackSlot = player.getInventory().getBackpackSlot();
+        InventorySlot backpackSlot = inventory.getBackpackSlot();
         backpackSlotUI.setSlot(backpackSlot);
         updateItemSprite(backpackSlotUI);
     }
@@ -221,10 +221,9 @@ public class HotbarUI extends UIElement {
         }
 
         if (selectedSlot == K.UI.INVENTORY_COLUMNS) {
-            return player.getInventory().getBackpackSlot();
+            return inventory.getBackpackSlot();
         }
 
-        Inventory inventory = player.getInventory();
         int hotbarStart = (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
         int inventoryIndex = hotbarStart + selectedSlot;
         if (inventoryIndex < 0 || inventoryIndex >= inventory.getSlots().size()) {

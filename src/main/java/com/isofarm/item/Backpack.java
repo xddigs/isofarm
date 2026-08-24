@@ -22,8 +22,19 @@ public class Backpack extends Tool {
 
     public void use(GameMaster gameMaster) {
         setPlayer(gameMaster.getPlayer());
+        if (!getPlayer().getBackpack().hasBackpackEquipped()) {
+            getPlayer().getBackpack().equipBackpack(this);
+            return;
+        }
+
         if (!gameMaster.isChatOpen()) {
             gameMaster.toggleInventory();
+        }
+    }
+
+    public void unequip() {
+        if (getPlayer().getBackpack().hasBackpackEquipped()) {
+            getPlayer().getBackpack().unequipBackpack();
         }
     }
 }

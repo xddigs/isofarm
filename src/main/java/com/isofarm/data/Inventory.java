@@ -40,10 +40,13 @@ public class Inventory {
     }
 
     public void equipBackpack(Backpack backpack) {
+        remove(backpack, 1);
         backpackSlot.setItem(backpack);
     }
 
     public void unequipBackpack() {
+        Item backpack = backpackSlot.getItem();
+        add(backpack, 1);
         backpackSlot.clear();
     }
 
