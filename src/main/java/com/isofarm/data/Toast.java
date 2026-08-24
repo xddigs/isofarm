@@ -47,7 +47,7 @@ public class Toast {
 
         if (!exiting && elapsed >= duration) {
             exiting = true;
-            targetX = windowWidth + 50.0f;
+            targetX = windowWidth + K.UI.TOAST_WIDTH;
         }
 
         float speed = exiting ? K.UI.TOAST_EXIT_SPEED

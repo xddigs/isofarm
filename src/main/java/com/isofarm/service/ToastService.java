@@ -108,7 +108,7 @@ public class ToastService implements Service<Toast> {
             return;
         }
 
-        float startX = windowWidth + 50.0f;
+        float startX = windowWidth + 500f;
         float targetX = windowWidth - K.UI.TOAST_WIDTH;
         float targetY = K.UI.TOAST_MARGIN_TOP;
 
