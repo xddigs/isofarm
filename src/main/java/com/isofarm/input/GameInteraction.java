@@ -127,6 +127,11 @@ public class GameInteraction {
             return null;
         }
 
+        if (selectedItem instanceof CraftingKit ck && isRightPressed
+                && !gameMaster.isInventoryOpen()) {
+            ck.use(gameMaster);
+        }
+
         Hit hoveredCell;
         if (gameMaster.isOrthographicCamera()) {
             hoveredCell = HoveredCell.get(gameMaster);
@@ -193,8 +198,8 @@ public class GameInteraction {
 
     public void dropItem(GameMaster gameMaster, Item selectedItem, boolean dropAll) {
         if (selectedItem == null) return;
-        if (selectedItem instanceof Backpack) {
-            gameMaster.getToastService().error("You can't drop your backpack");
+        if (selectedItem instanceof Backpack || selectedItem instanceof CraftingKit) {
+            gameMaster.getToastService().error("You can't drop your " + selectedItem.getName() + "!");
             return;
         }
         Player player = gameMaster.getPlayer();

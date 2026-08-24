@@ -314,14 +314,6 @@ public class GameUIService implements Service<GameMaster> {
         glEnable(GL_DEPTH_TEST);
     }
 
-    public void toggleBackpack() {
-        if (backpackUI.isVisible()) {
-            backpackUI.hide();
-        } else {
-            backpackUI.show();
-        }
-    }
-
     private void renderChatHistory() {
         if (chatHistoryTimer <= 0.0f || chatHistory.isEmpty()) {
             return;

@@ -23,6 +23,7 @@ public class CraftingKit extends Tool {
     }
 
     public boolean use(GameMaster gameMaster) {
+        gameMaster.getGameUIService().addChatMessage("Crafting kit used!");
         return true;
     }
 }

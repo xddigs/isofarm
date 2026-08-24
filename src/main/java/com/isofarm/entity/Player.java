@@ -6,6 +6,7 @@ import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.Shader;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.item.Backpack;
+import com.isofarm.item.CraftingKit;
 import com.isofarm.item.Item;
 import com.isofarm.item.Tool;
 import com.isofarm.pathfinding.GridPos;
@@ -169,8 +170,11 @@ public class Player extends Character {
     @Override
     protected void dropLoot() {
         for (Item i : getInventory().getItems().keySet()) {
-            if (i == null) continue;
-            if (i instanceof Backpack) continue;
+            switch (i) {
+                case Backpack ignored -> { continue; }
+                case CraftingKit ignored -> { continue; }
+                default -> {}
+            }
             WorldItem item = new WorldItem(i, getInventory().getAmount(i),
                     new Vector3f(position.x, position.y, position.z));
             gameMaster.addEntity(item);
