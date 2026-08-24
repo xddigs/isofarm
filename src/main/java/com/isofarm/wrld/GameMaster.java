@@ -534,10 +534,7 @@ public class GameMaster {
 
     public void toggleInventory() {
         setInventoryOpen(!isInventoryOpen());
-        if (isInventoryOpen()) {
-            gameUIservice.getBackpackInventoryUI().hide();
-            gameUIservice.getInventoryUI().closeBackpack();
-        }
+        gameUIservice.getInventoryUI().closeBackpack();
     }
 
     public void onResize(int newWidth, int newHeight) {
