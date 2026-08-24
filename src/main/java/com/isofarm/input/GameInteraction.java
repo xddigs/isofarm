@@ -88,9 +88,7 @@ public class GameInteraction {
         }
 
         if (Keyboard.isKeyPressed(GLFW_KEY_E)) {
-            if (gameMaster.getPlayer().getInventory().hasBackpackEquipped()) {
-                gameMaster.toggleInventory();
-            }
+            gameMaster.toggleInventory();
         }
 
         if (!gameMaster.isOrthographicCamera()) {
