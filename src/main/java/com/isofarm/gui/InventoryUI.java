@@ -591,13 +591,13 @@ public class InventoryUI extends UIElement {
                 final float iconSize = Settings.getScaledIcon();
 
                 Vector4f tint = canCraft ? new Vector4f(1.0f) : new Vector4f(0.4f, 0.4f, 0.4f, 0.5f);
-                GUI.drawSprite(iconSheet, iconCol, iconRow, slotX + 4f,
-                        slotY + 4f, iconSize, iconSize, tint);
+                GUI.drawSprite(iconSheet, iconCol, iconRow, slotX + 2f,
+                        slotY + 2f, iconSize, iconSize, tint);
             }
 
             if (recipe.resultAmount() > 1) {
                 String qty = String.valueOf(recipe.resultAmount());
-                GUI.drawNormalString(qty, slotX + SLOT_SIZE - 12, slotY + SLOT_SIZE - 16, new Vector4f(1.0f));
+                GUI.drawSmallString(qty, slotX + SLOT_SIZE - 12, slotY + SLOT_SIZE - 16, new Vector4f(1.0f));
             }
 
             if (hovered && Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {

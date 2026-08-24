@@ -261,6 +261,7 @@ public class Library implements Service<GameMaster> {
         for (String s : name) {
             builder.append(s);
         }
-        return builder.toString().trim().toLowerCase();
+        return builder.toString().trim()
+                .replaceAll(" ", "_").toLowerCase();
     }
 }
