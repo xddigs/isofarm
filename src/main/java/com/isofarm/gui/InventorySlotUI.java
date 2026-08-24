@@ -168,6 +168,7 @@ public class InventorySlotUI extends UIElement {
 
     private void renderAmount() {
         Item item = getItem();
+        if (slot == null) return;
         if (item == null || slot.getAmount() <= 1) {
             return;
         }
