@@ -178,7 +178,7 @@ public class GameInteraction {
 
             if (player.getInventory().isFull()) {
                 if (player.getBackpack().hasBackpackEquipped()) {
-                    player.getBackpack().add(item, amount);
+                    player.addToBackpack(item, amount);
                 }
             } else {
                 player.add(item, amount);
@@ -275,9 +275,7 @@ public class GameInteraction {
 
                     if (item != null && amount > 0) {
                         if (player.getInventory().isFull()) {
-                            if (player.getBackpack().hasBackpackEquipped()) {
-                                player.getBackpack().add(item, amount);
-                            }
+                            player.addToBackpack(item, amount);
                         } else {
                             player.add(item, amount);
                         }

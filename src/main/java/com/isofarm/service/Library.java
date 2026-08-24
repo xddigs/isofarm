@@ -103,9 +103,7 @@ public class Library implements Service<GameMaster> {
                 player.earn(amount);
             } else {
                 if (player.getInventory().isFull()) {
-                    if (player.getBackpack().hasBackpackEquipped()) {
-                        player.addToBackpack(item, amount);
-                    }
+                    player.addToBackpack(item, amount);
                 } else {
                     player.add(item, amount);
                 }

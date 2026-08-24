@@ -297,11 +297,12 @@ public class Inventory {
     }
 
     public boolean isFull() {
-        return slots.stream().filter(s -> s.getItem() != null).isParallel();
+        return slots.stream().noneMatch(InventorySlot::isEmpty);
     }
 
     public boolean isEmpty() {
-        return slots.stream().allMatch(InventorySlot::isEmpty);
+        return slots.stream().allMatch(
+                slot -> slot.isEmpty() || slot.getAmount() <= 0);
     }
 
     public int size() {

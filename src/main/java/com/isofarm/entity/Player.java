@@ -413,9 +413,7 @@ public class Player extends Character {
             }
 
             if (getInventory().isFull()) {
-                if (getInventory().hasBackpackEquipped()) {
-                    addToBackpack(recipe.result(), recipe.resultAmount());
-                }
+                addToBackpack(recipe.result(), recipe.resultAmount());
             } else {
                 add(recipe.result(), recipe.resultAmount());
             }
