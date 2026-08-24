@@ -33,12 +33,19 @@ public class HotbarUI extends UIElement {
     private static final int TOTAL_SELECTABLE_SLOTS = K.UI.INVENTORY_COLUMNS + 1;
 
     public HotbarUI(float x, float y) {
-        super(x, y, getHotbarWidth(), getHotbarHeight());
+        super(x, y, getInitialHotbarWidth(), getHotbarHeight());
         setFocusable(true);
         createSlots();
     }
 
-    private static float getHotbarWidth() {
+    private static float getInitialHotbarWidth() {
+        return Settings.getScaledPadding() * 2.0f +
+                (K.UI.INVENTORY_COLUMNS + 1) * Settings.getScaledSlot() +
+                (K.UI.INVENTORY_COLUMNS + 1) * Settings.getScaledSpacing() +
+                Settings.getScaledSpacing() * 2.0f;
+    }
+
+    public float getHotbarWidth() {
         return Settings.getScaledPadding() * 2.0f +
                 (K.UI.INVENTORY_COLUMNS + 1) * Settings.getScaledSlot() +
                 getMaxSelectableSlots() * Settings.getScaledSpacing() +
@@ -50,7 +57,7 @@ public class HotbarUI extends UIElement {
                 Settings.getScaledSlot();
     }
 
-    private static int getMaxSelectableSlots() {
+    public int getMaxSelectableSlots() {
         return (inventory != null && inventory.hasBackpackEquipped())
                 ? K.UI.INVENTORY_COLUMNS + 1
                 : K.UI.INVENTORY_COLUMNS;
@@ -70,6 +77,10 @@ public class HotbarUI extends UIElement {
     public void selectPrevious() {
         int max = getMaxSelectableSlots();
         selectSlot((selectedSlot - 1 + max) % max);
+    }
+
+    public void refreshSize() {
+        setWidth(getHotbarWidth());
     }
 
     private void createSlots() {

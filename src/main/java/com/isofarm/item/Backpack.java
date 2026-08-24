@@ -29,6 +29,7 @@ public class Backpack extends Tool {
 
         if (!player.getInventory().hasBackpackEquipped()) {
             player.getInventory().equipBackpack(this);
+            gameMaster.getGameUIService().resetHotbarPosition();
             return true;
         }
 
@@ -42,6 +43,7 @@ public class Backpack extends Tool {
     public void unequip() {
         if (getPlayer() != null && getPlayer().getInventory().hasBackpackEquipped()) {
             getPlayer().getInventory().unequipBackpack();
+            getPlayer().getGameMaster().getGameUIService().resetHotbarPosition();
         }
     }
 }
