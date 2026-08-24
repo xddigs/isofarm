@@ -159,33 +159,35 @@ public class GUI {
         shader.setUniform("uModel", model);
         shader.setUniform("uColor", tint);
         shader.setUniform("uUseTexture", true);
-        shader.setUniform("uFrameIndex", 0);
-        shader.setUniform("uFrameRow", 0);
-        shader.setUniform("uTotalFrames", 1);
-        shader.setUniform("uFramesPerRow", 1);
-
+        shader.setUniform("uUseFont", false);
+        shader.setUniform("uUVBounds", new Vector4f(0.0f, 0.0f, 1.0f, 1.0f));
         mesh.render();
         texture.unbind();
     }
 
-    public static void drawSprite(SpriteSheet spriteSheet, int frame, int row,
+    public static void drawSprite(SpriteSheet spriteSheet, int column, int row,
                                   float x, float y, float width, float height,
                                   Vector4f tint) {
         if (spriteSheet == null) return;
+        int cols = spriteSheet.getCols();
+        int rows = spriteSheet.getRows();
+
+        column = Math.clamp(column, 0, cols - 1);
+        row = Math.clamp(row, 0, rows - 1);
+
+        int frameIndex = row * cols + column;
+
+        Vector4f uv = spriteSheet.getUVBounds(frameIndex);
+        Vector4f uvBounds = new Vector4f(uv.x, uv.w, uv.z, uv.y);
+
         spriteSheet.bind();
-
-        model.identity()
-                .translate(x, y, 0.0f)
-                .scale(width, height, 1.0f);
-
+        model.identity().translate(x, y, 0.0f).scale(width, height, 1.0f);
         shader.setUniform("uModel", model);
         shader.setUniform("uColor", tint);
         shader.setUniform("uUseTexture", true);
+        shader.setUniform("uUseFont", false);
+        shader.setUniform("uUVBounds", uvBounds);
 
-        shader.setUniform("uFrameIndex", frame);
-        shader.setUniform("uFrameRow", row);
-        shader.setUniform("uFramesPerRow", spriteSheet.getCols());
-        shader.setUniform("uFrameRows", spriteSheet.getRows());
         mesh.render();
         spriteSheet.unbind();
     }

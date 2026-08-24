@@ -63,7 +63,7 @@ public class ResourceManager {
 
         SpriteSheet blocks = null;
         try {
-            blocks = new SpriteSheet(K.Paths.BLOCKS, K.UI.BLOCK_ATLAS_COLUMNS, 0);
+            blocks = new SpriteSheet(K.Paths.BLOCKS, K.UI.BLOCK_ATLAS_COLUMNS, 1);
         } catch (Exception e) {
             log.warn("Could not load blocks.png atlas, falling back to base colors: {}", e.getMessage());
         }

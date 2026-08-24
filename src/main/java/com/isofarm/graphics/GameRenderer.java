@@ -33,7 +33,8 @@ public class GameRenderer {
     private float blurX;
     private float blurY;
 
-    public void render(GameMaster gameMaster, ResourceManager rm, Map<Chunk, Mesh> chunkMeshes) {
+    public void render(GameMaster gameMaster, ResourceManager rm,
+                       Map<Chunk, Mesh> chunkMeshes) {
         renderShadowPass(gameMaster, rm, chunkMeshes);
         CameraView camera = gameMaster.getActiveCamera();
         float windowWidth = gameMaster.getWindowWidth();
@@ -51,10 +52,16 @@ public class GameRenderer {
         glActiveTexture(GL_TEXTURE0);
         Shader defaultShader = rm.getDefaultShader();
         defaultShader.bind();
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, gameMaster.getShadowMap().getDepthTexture());
+
+        int textureUnit = K.Render.PRIMARY_TEXTURE_UNIT;
+        int shadowUnit = 1;
+
+        defaultShader.setUniform("uTexture", textureUnit);
+        defaultShader.setUniform("uShadowMap", shadowUnit);
+
+        defaultShader.setUniform("uParticleAlpha", 1.0f);
+
         defaultShader.setUniform("uEnableShadows", true);
-        defaultShader.setUniform("uShadowMap", 1);
         defaultShader.setUniform("uIsMaskPass", false);
 
         defaultShader.setUniform("uProjection", camera.getProjectionMatrix());
@@ -67,21 +74,16 @@ public class GameRenderer {
         defaultShader.setUniform("uAmbientIntensity", lighting.getAmbientIntensity());
         defaultShader.setUniform("uSkyColor", TimeService.getSkyColor());
         defaultShader.setUniform("uLightSpaceMatrix", lightSpaceMatrix);
-
-        defaultShader.setUniform("uTotalFrames", 1);
-        defaultShader.setUniform("uFrameIndex", 0);
-        defaultShader.setUniform("uUseFaceAtlas", false);
+        defaultShader.setUniform("uUVBounds", new Vector4f(0.0f, 0.0f, 1.0f, 1.0f));
+        defaultShader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
+        defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
 
         SpriteSheet blocksTexture = rm.getBlocksTexture();
         if (blocksTexture != null) {
+            glActiveTexture(GL_TEXTURE0 + textureUnit);
             blocksTexture.bind();
             defaultShader.setUniform("uUseTexture", true);
             defaultShader.setUniform("uUseFaceAtlas", true);
-            defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
-            defaultShader.setUniform("uTotalFrames", 1);
-            defaultShader.setUniform("uFrameIndex", 0);
-            defaultShader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
-            defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
         }
 
         viewProjMatrix.set(camera.getProjectionMatrix()).mul(camera.getViewMatrix());
@@ -120,14 +122,16 @@ public class GameRenderer {
             SpriteSheet sheet = rm.getCropSpritesheets().get(crop.getCropType());
             if (sheet == null) return;
 
+            glActiveTexture(GL_TEXTURE0 + K.Render.PRIMARY_TEXTURE_UNIT);
             sheet.bind();
-            defaultShader.setUniform("uUseTexture", true);
             defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
+            defaultShader.setUniform("uUseTexture", true);
             defaultShader.setUniform("uUseFaceAtlas", false);
             defaultShader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
             defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
-            defaultShader.setUniform("uTotalFrames", sheet.getTotalFrames());
-            defaultShader.setUniform("uFrameIndex", crop.getStage().getFrameIndex());
+
+            int frame = crop.getStage().getFrameIndex();
+            defaultShader.setUniform("uUVBounds", sheet.getUVBounds(frame));
 
             float renderX = crop.getX() + 0.5f;
             float renderY = crop.getY() + K.World.SHORTER_BLOCK_HEIGHT;
@@ -368,11 +372,7 @@ public class GameRenderer {
         }
 
         Vector3i pos = interaction.getBreakingBlockPos();
-        float progress = Math.clamp(interaction.getBreakProgress(), 0.0f, 1.0f);
-        int totalFrames = destroyTexture.getTotalFrames();
-        if (totalFrames <= 0) return;
 
-        int frameIndex = Math.clamp((int) (progress * totalFrames), 0, totalFrames - 1);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -385,19 +385,27 @@ public class GameRenderer {
 
         shader.bind();
         destroyTexture.bind();
+
         shader.setUniform("uUseTexture", true);
         shader.setUniform("uUseFaceAtlas", false);
         shader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
-        shader.setUniform("uTotalFrames", totalFrames);
-        shader.setUniform("uFrameIndex", frameIndex);
 
         shader.setUniform("uParticleAlpha", 1.0f);
-        shader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
-        shader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
+
         shader.setUniform("uProjection", camera.getProjectionMatrix());
         shader.setUniform("uView", camera.getViewMatrix());
 
-        modelMatrix.identity().translate(pos.x, pos.y, pos.z).scale(1.001f);
+        int totalFrames = destroyTexture.getCols() * destroyTexture.getRows();
+        int frame = (int) (interaction.getBreakProgress() * totalFrames);
+        frame = Math.clamp(frame, 0, totalFrames - 1);
+
+        Vector4f uv = destroyTexture.getUVBounds(frame);
+        Vector4f uvBounds = new Vector4f(uv.x, uv.w, uv.z, uv.y);
+        shader.setUniform("uUVBounds", uvBounds);
+
+        modelMatrix.identity()
+                .translate(pos.x, pos.y, pos.z)
+                .scale(1.001f);
 
         shader.setUniform("uModel", modelMatrix);
         blockMesh.render();

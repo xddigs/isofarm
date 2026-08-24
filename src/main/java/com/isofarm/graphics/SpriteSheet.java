@@ -81,7 +81,6 @@ public class SpriteSheet {
 
         float vMax = 1.0f - row * frameHeight;
         float vMin = vMax - frameHeight;
-
         return new Vector4f(uMin, vMin, uMax, vMax);
     }
 
