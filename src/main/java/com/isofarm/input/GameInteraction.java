@@ -112,17 +112,26 @@ public class GameInteraction {
             Settings.toggleMusic();
         }
 
+        boolean isCtrlHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)
+                || Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
+
+        boolean canInteract = !isCtrlHeld
+                && !gameMaster.isInventoryOpen()
+                && !gameMaster.isChatOpen();
+
+        boolean isLeftPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
+        boolean isLeftHeld = Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT);
+
+        if (isLeftPressed && canInteract) {
+            itemRenderer.playAttackAnimation();
+        }
+
         Hit hoveredCell;
         if (gameMaster.isOrthographicCamera()) {
             hoveredCell = HoveredCell.get(gameMaster);
         } else {
             hoveredCell = gameMaster.getCamera().highlight(gameMaster.getWorld());
         }
-
-        boolean isCtrlHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)
-                || Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
-        boolean wasLeftClickPressed = Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT);
-        boolean canBreakBlocks = wasLeftClickPressed && !isCtrlHeld && !gameMaster.isInventoryOpen();
 
         if (hoveredCell == null) {
             resetBreaking();
@@ -137,17 +146,12 @@ public class GameInteraction {
         breakTimeout -= gameMaster.getGenDelta();
         breakTimeout = Math.max(breakTimeout, 0.0f);
 
-        if (wasLeftClickPressed
-                && !isCtrlHeld
-                && !gameMaster.isInventoryOpen()
-                && !gameMaster.isChatOpen()) {
-            itemRenderer.playAttackAnimation();
-        } else if (canBreakBlocks) {
+        if (isLeftHeld && canInteract) {
             if (breakTimeout <= 0.0f) {
                 breakAction(gameMaster, hoveredCell);
             }
+
         } else {
-            itemRenderer.stopAnimation();
             resetBreaking();
         }
 
