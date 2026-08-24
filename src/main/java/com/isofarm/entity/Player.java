@@ -408,9 +408,12 @@ public class Player extends Character {
     }
 
     public boolean craft(Recipe recipe) {
-        if (!hasIngredients(recipe)) return false;
-        if (!canAdd()) return false;
+        if (!hasIngredients(recipe)) {
+            gameMaster.getToastService().error("You don't have enough ingredients!");
+            return false;
+        }
 
+        if (!canAdd()) return false;
         for (Ingredient ingredient : recipe.ingredients()) {
             getInventory().remove(ingredient, ingredient.amount());
         }

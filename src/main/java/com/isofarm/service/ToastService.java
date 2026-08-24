@@ -22,6 +22,9 @@ public class ToastService implements Service<Toast> {
 
     public void setWindowWidth(float windowWidth) {
         this.windowWidth = windowWidth;
+        for (Toast toast : toasts) {
+            toast.setWindowWidth(windowWidth);
+        }
         rearrange();
     }
 

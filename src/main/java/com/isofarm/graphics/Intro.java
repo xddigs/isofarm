@@ -61,6 +61,7 @@ public class Intro {
 
     public void show() {
         setupUI();
+        toggleFullscreen();
         gameMaster = new GameMaster(window, uiManager);
         updateFramebufferSize();
         gameMaster.onResize(framebufferWidth, framebufferHeight);
@@ -138,7 +139,6 @@ public class Intro {
         renderLoadingFrame("Setting up the UI...");
 
         progressBar.hide();
-        toggleFullscreen();
         loop();
     }
 

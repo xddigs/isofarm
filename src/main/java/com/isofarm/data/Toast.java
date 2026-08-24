@@ -40,6 +40,7 @@ public class Toast {
 
     public void setWindowWidth(float windowWidth) {
         this.windowWidth = windowWidth;
+
     }
 
     public void update(float delta) {

@@ -455,9 +455,8 @@ public class GameUIService implements Service<GameMaster> {
         float x = toast.getX();
         float y = toast.getY();
 
-        float screenWidth = GUI.getScreenWidth();
         float marginFromEdge = Settings.scale(10.0f);
-        float maxPossibleWidth = Math.max(100.0f, screenWidth - x - marginFromEdge);
+        float maxPossibleWidth = Math.max(100.0f, this.windowWidth - x - marginFromEdge);
 
         float baseWidth = Settings.scale(K.UI.TOAST_WIDTH);
         float contentWidth = paddingLeft + prefixWidth + gap + messageWidth + paddingRight;
