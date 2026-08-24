@@ -15,6 +15,7 @@ import com.isofarm.wrld.World;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,52 +102,52 @@ public class Player extends Character {
         CameraView camera = gameMaster.getActiveCamera();
         SpriteSheet sheet = rm.getPlayerSpriteSheet();
 
-        if (sheet == null || rm.getPlayerMesh() == null) return;
+        if (sheet == null || rm.getPlayerMesh() == null) {
+            return;
+        }
 
         Shader shader = rm.getDefaultShader();
         shader.bind();
 
         glActiveTexture(GL_TEXTURE0);
         sheet.bind();
+
         shader.setUniform("uTexture", 0);
         shader.setUniform("uUseTexture", true);
         shader.setUniform("uUseFaceAtlas", false);
 
-        int totalFrames = Math.max(1, sheet.getTotalFrames());
         int frameIndex = direction != null ? direction.frame() : 0;
-        shader.setUniform("uTotalFrames", totalFrames);
-        shader.setUniform("uFrameIndex", frameIndex);
+        frameIndex = Math.clamp(frameIndex, 0, sheet.getTotalFrames() - 1);
+        Vector4f uvBounds = sheet.getUVBounds(frameIndex);
+
+        shader.setUniform("uUVBounds", uvBounds);
         shader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
         shader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
-        shader.setUniform("uUVBounds", new org.joml.Vector4f(0.0f, 0.0f, 1.0f, 1.0f));
+        shader.setUniform("uTopAtlasOffset", new Vector2f(0.0f, 0.0f));
+        shader.setUniform("uBottomAtlasOffset", new Vector2f(0.0f, 0.0f));
+        shader.setUniform("uSideAtlasOffset", new Vector2f(0.0f, 0.0f));
 
         shader.setUniform("uSunColor", new Vector3f(1.0f, 1.0f, 1.0f));
         shader.setUniform("uLightIntensity", 0.0f);
         shader.setUniform("uLightDirection", new Vector3f(0.0f, -1.0f, 0.0f));
         shader.setUniform("uAmbientIntensity", 1.0f);
-
-        shader.setUniform("uSkyColor", new Vector3f(1.0f));
+        shader.setUniform("uSkyColor", new Vector3f(1.0f, 1.0f, 1.0f));
         shader.setUniform("uParticleAlpha", 1.0f);
         shader.setUniform("uIsMaskPass", false);
         shader.setUniform("uEnableShadows", false);
-
         shader.setUniform("uLightSpaceMatrix", new Matrix4f());
         shader.setUniform("uProjection", camera.getProjectionMatrix());
         shader.setUniform("uView", camera.getViewMatrix());
 
-        float aspect = (sheet.getFrameWidth() > 0 && sheet.getFrameHeight() > 0) ?
+        float aspect = sheet.getFrameHeight() > 0 ?
                 (float) sheet.getFrameWidth() / (float) sheet.getFrameHeight() : 1.0f;
 
-        float baseScaleY = (dimensions == null || dimensions.y <= 0) ? 1.0f : dimensions.y;
+        float baseScaleY = (dimensions == null || dimensions.y <= 0.0f) ? 1.0f : dimensions.y;
         float baseScaleX = baseScaleY * aspect;
-        float baseScaleZ = (dimensions == null || dimensions.z <= 0) ? 1.0f : dimensions.z;
-
+        float baseScaleZ = (dimensions == null || dimensions.z <= 0.0f) ? 1.0f : dimensions.z;
         float yawRad = (float) Math.toRadians(-camera.getYaw());
-        modelMatrix.identity()
-                .translate(position)
-                .rotateY(yawRad)
-                .scale(baseScaleX, baseScaleY, baseScaleZ);
 
+        modelMatrix.identity().translate(position).rotateY(yawRad).scale(baseScaleX, baseScaleY, baseScaleZ);
         shader.setUniform("uModel", modelMatrix);
 
         glDisable(GL_CULL_FACE);
@@ -154,9 +155,10 @@ public class Player extends Character {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_DEPTH_TEST);
         glDepthMask(true);
-
         rm.getPlayerMesh().render();
         sheet.unbind();
+        shader.unbind();
+        glEnable(GL_CULL_FACE);
     }
 
     @Override

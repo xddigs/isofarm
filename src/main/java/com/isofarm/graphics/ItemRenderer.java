@@ -7,7 +7,9 @@ import com.isofarm.item.Item;
 import com.isofarm.item.Tool;
 import com.isofarm.wrld.GameMaster;
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
@@ -233,47 +235,49 @@ public class ItemRenderer {
 
     private void renderWorldItemMesh(GameMaster gameMaster, WorldItem worldItem, Item item,
                                      SpriteSheet spriteSheet, Shader shader, CelestialLighting lighting) {
-        if (item == null || spriteSheet == null || quadMesh == null) return;
+
+        if (item == null || spriteSheet == null || quadMesh == null) {
+            return;
+        }
 
         Vector3f position = worldItem.getPosition();
         float scale = 0.4f;
 
-        baseModelMatrix.identity()
-                .translate(position.x, position.y, position.z)
-                .rotateY((float) Math.toRadians(worldItem.getRotation()))
-                .rotateZ((float) Math.toRadians(180.0f))
-                .scale(scale, scale, scale);
+        baseModelMatrix.identity().translate(position.x, position.y, position.z).rotateY((float)
+                Math.toRadians(worldItem.getRotation())).rotateZ((float) Math.toRadians(180.0f)).scale(scale, scale, scale);
 
         int frameIndex = item instanceof Block ? item.getId() - 1 : item.getId();
+        frameIndex = Math.clamp(frameIndex, 0, spriteSheet.getTotalFrames() - 1);
+        Vector4f uvBounds = spriteSheet.getUVBounds(frameIndex);
 
         shader.bind();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, spriteSheet.getTextureId());
-
         shader.setUniform("uProjection", gameMaster.getActiveCamera().getProjectionMatrix());
         shader.setUniform("uView", gameMaster.getActiveCamera().getViewMatrix());
-        shader.setUniform("uFrameIndex", frameIndex);
-        shader.setUniform("uTotalFrames", spriteSheet.getTotalFrames());
+        shader.setUniform("uUVBounds", uvBounds);
         setupCommonShaderUniforms(shader, gameMaster, lighting);
         glDisable(GL_CULL_FACE);
+
         for (int i = THICKNESS_LAYERS - 1; i >= 0; i--) {
             float zOffset = (i - THICKNESS_LAYERS / 2.0f) * LAYER_DEPTH;
             Matrix4f layerMatrix = new Matrix4f(baseModelMatrix).translate(0.0f, 0.0f, zOffset);
             shader.setUniform("uModel", layerMatrix);
             quadMesh.render();
         }
-        glEnable(GL_CULL_FACE);
 
+        glEnable(GL_CULL_FACE);
         shader.unbind();
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     public void render(GameMaster gameMaster, Item item, SpriteSheet spriteSheet,
                        Shader shader, CelestialLighting lighting) {
+
         if (item == null || spriteSheet == null || quadMesh == null) return;
         if (gameMaster.isOrthographicCamera()) return;
-
         boolean isTool = item instanceof Tool;
+
         float rotateX = isTool ? 10.0f : 0.0f;
         float rotateY = isTool ? -90.0f : -15.0f;
         float rotateZ = isTool ? 48.0f : 0.0f;
@@ -284,24 +288,24 @@ public class ItemRenderer {
         float z = OFFSET_Z + animation.z;
         float swayLag = SWAY_LAG;
 
-        baseModelMatrix.identity()
-                .translate(x, y, z)
+        baseModelMatrix.identity().translate(x, y, z)
                 .rotateX((float) Math.toRadians(rotateX + animation.rotateX + swayY * swayLag))
                 .rotateY((float) Math.toRadians(rotateY + animation.rotateY + swayX * swayLag))
                 .rotateZ((float) Math.toRadians(rotateZ + animation.rotateZ))
-                .scale(ITEM_SCALE * animation.scaleX, -ITEM_SCALE * animation.scaleY, ITEM_SCALE * animation.scaleZ);
+                .scale(ITEM_SCALE * animation.scaleX,
+                        -ITEM_SCALE * animation.scaleY,
+                        ITEM_SCALE * animation.scaleZ);
 
         int frameIndex = item instanceof Block ? item.getId() - 1 : item.getId();
-
+        frameIndex = Math.clamp(frameIndex, 0, spriteSheet.getTotalFrames() - 1);
+        Vector4f uvBounds = spriteSheet.getUVBounds(frameIndex);
         shader.bind();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, spriteSheet.getTextureId());
-
         shader.setUniform("uProjection", gameMaster.getActiveCamera().getProjectionMatrix());
-        shader.setUniform("uView", new Matrix4f().identity());
-        shader.setUniform("uFrameIndex", frameIndex);
-        shader.setUniform("uTotalFrames", spriteSheet.getTotalFrames());
 
+        shader.setUniform("uView", new Matrix4f().identity());
+        shader.setUniform("uUVBounds", uvBounds);
         setupCommonShaderUniforms(shader, gameMaster, lighting);
 
         glDisable(GL_CULL_FACE);
@@ -310,8 +314,8 @@ public class ItemRenderer {
             shader.setUniform("uModel", layerMatrix);
             quadMesh.render();
         }
-        glEnable(GL_CULL_FACE);
 
+        glEnable(GL_CULL_FACE);
         shader.unbind();
         glBindTexture(GL_TEXTURE_2D, 0);
     }
@@ -321,15 +325,17 @@ public class ItemRenderer {
         shader.setUniform("uUseTexture", true);
         shader.setUniform("uUseFaceAtlas", false);
         shader.setUniform("uParticleAlpha", 1.0f);
-        shader.setUniform("uAtlasScale", new org.joml.Vector2f(1.0f, 1.0f));
-        shader.setUniform("uAtlasOffset", new org.joml.Vector2f(0.0f, 0.0f));
+        shader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
+        shader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
+        shader.setUniform("uTopAtlasOffset", new Vector2f(0.0f, 0.0f));
+        shader.setUniform("uBottomAtlasOffset", new Vector2f(0.0f, 0.0f));
+        shader.setUniform("uSideAtlasOffset", new Vector2f(0.0f, 0.0f));
         shader.setUniform("uBaseColor", new Vector3f(1.0f, 1.0f, 1.0f));
         shader.setUniform("uIsMaskPass", false);
         shader.setUniform("uEnableShadows", false);
 
         Vector3f viewLightDir = new Vector3f(lighting.getDirection());
         gameMaster.getActiveCamera().getViewMatrix().transformDirection(viewLightDir);
-
         shader.setUniform("uLightDirection", viewLightDir);
         shader.setUniform("uSunColor", lighting.getColor());
         shader.setUniform("uSkyColor", lighting.getColor());
