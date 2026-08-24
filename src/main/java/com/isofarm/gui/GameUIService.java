@@ -3,6 +3,7 @@ package com.isofarm.gui;
 import com.isofarm.data.*;
 import com.isofarm.entity.Player;
 import com.isofarm.graphics.SpriteSheet;
+import com.isofarm.input.CommandCompletionProvider;
 import com.isofarm.input.Mouse;
 import com.isofarm.item.Item;
 import com.isofarm.service.Service;
@@ -122,6 +123,7 @@ public class GameUIService implements Service<GameMaster> {
         this.chatField = new UITextField(10, windowHeight - 40, windowWidth - 20, 30);
         this.chatField.setLayer(1000);
         this.chatField.hide();
+        chatField.setCompletionProvider(new CommandCompletionProvider(gameMaster.getCommandRegistry()));
         uiManager.getRoot().addChild(chatField);
 
         this.time = new UILabel(20, 40, 100f, 25f, null);

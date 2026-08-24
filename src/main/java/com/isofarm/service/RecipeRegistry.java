@@ -1,9 +1,6 @@
 package com.isofarm.service;
 
-import com.isofarm.data.MaterialID;
-import com.isofarm.data.Recipe;
-import com.isofarm.data.RecipeIngredient;
-import com.isofarm.data.Tier;
+import com.isofarm.data.*;
 import com.isofarm.item.Hoe;
 import com.isofarm.item.Pickaxe;
 
@@ -14,30 +11,17 @@ public class RecipeRegistry implements Service<Recipe> {
     private static final List<Recipe> recipes = new LinkedList<>();
 
     public static List<Recipe> init() {
-        register(new Recipe(
-                "wooden_hoe",
-                "Wooden Hoe",
-                List.of(new RecipeIngredient(MaterialID.STICK, 2),
-                        new RecipeIngredient(MaterialID.WOOD, 1)),
-                        new Hoe(Tier.WOOD), 1));
-        register(new Recipe(
-                "wooden_pickaxe",
-                "Wooden Pickaxe",
-                List.of(new RecipeIngredient(MaterialID.STICK, 2),
-                        new RecipeIngredient(MaterialID.WOOD, 3)),
-                new Pickaxe(Tier.WOOD), 1));
-        return getSortedRecipes();
+        register(Recipe.of(Tier.WOOD, new Hoe(Tier.WOOD),1,
+                new RecipeIngredient(MaterialID.WOOD, 1),
+                new RecipeIngredient(MaterialID.STICK, 3)));
+        register(Recipe.of(Tier.WOOD, new Pickaxe(Tier.WOOD), 1,
+                new RecipeIngredient(MaterialID.WOOD, 2),
+                new RecipeIngredient(MaterialID.STICK, 3)));
+        return recipes;
     }
 
     public static void register(Recipe recipe) {
         recipes.add(recipe);
-    }
-
-    public static List<Recipe> getSortedRecipes() {
-        return recipes.stream()
-                .sorted((a, b) -> a.displayName()
-                .compareToIgnoreCase(b.displayName()))
-                .toList();
     }
 
     public List<Recipe> getRecipes() {

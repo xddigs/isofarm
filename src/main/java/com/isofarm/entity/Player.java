@@ -407,23 +407,36 @@ public class Player extends Character {
         getPurse().remove(amount);
     }
 
-    public void craft(Recipe recipe) {
-        boolean canCraft = recipe.ingredients().stream().allMatch(ing ->
-                getInventory().getAmount(ing) >= ing.amount());
+    public boolean craft(Recipe recipe) {
+        if (!hasIngredients(recipe)) return false;
+        if (!canAdd()) return false;
 
-        if (canCraft) {
-            for (RecipeIngredient ing : recipe.ingredients()) {
-                getInventory().remove(ing, ing.amount());
+        for (RecipeIngredient ingredient : recipe.ingredients()) {
+            getInventory().remove(ingredient, ingredient.amount());
+        }
+
+        add(recipe.result(), recipe.resultAmount());
+        gameMaster.getToastService().success("You crafted " +
+                recipe.resultAmount() + " " + recipe.result().getName());
+
+        return true;
+    }
+
+    public boolean hasIngredients(Recipe recipe) {
+        for (RecipeIngredient ingredient : recipe.ingredients()) {
+            if (getAmount(ingredient) < ingredient.amount()) {
+                return false;
             }
+        }
 
-            if (getInventory().isFull()) {
-                addToBackpack(recipe.result(), recipe.resultAmount());
-            } else {
-                add(recipe.result(), recipe.resultAmount());
-            }
+        return true;
+    }
 
-            gameMaster.getToastService().success("You crafted " +
-                    recipe.resultAmount() + " " + recipe.result().getName());
+    public boolean canAdd() {
+        if (getInventory().isFull()) {
+            return !getBackpack().hasBackpackEquipped();
+        } else {
+            return false;
         }
     }
 

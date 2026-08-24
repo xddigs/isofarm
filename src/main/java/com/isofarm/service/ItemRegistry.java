@@ -4,6 +4,7 @@ import com.isofarm.data.MaterialID;
 import com.isofarm.item.Item;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -60,5 +61,16 @@ public class ItemRegistry {
 
     public int materialSize() {
         return materials.size();
+    }
+
+    public List<String> getIds() {
+        return List.copyOf(items.keySet());
+    }
+
+    public List<String> getMaterialIds() {
+        return materials.keySet()
+                .stream()
+                .map(Enum::name)
+                .toList();
     }
 }

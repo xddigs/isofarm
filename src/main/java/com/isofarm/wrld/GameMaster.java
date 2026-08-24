@@ -1,9 +1,6 @@
 package com.isofarm.wrld;
 
-import com.isofarm.data.CropType;
-import com.isofarm.data.Season;
-import com.isofarm.data.Shop;
-import com.isofarm.data.SoundGroup;
+import com.isofarm.data.*;
 import com.isofarm.entity.*;
 import com.isofarm.graphics.*;
 import com.isofarm.gui.GUI;
@@ -45,6 +42,7 @@ public class GameMaster {
     private final CommandRegistry commandRegistry;
     private final ItemRegistry itemRegistry;
     private final List<Entity> entities;
+    private List<Recipe> recipes;
     private ShadowMap shadowMap;
     private GameInteraction gameInteraction;
     private WeatherService weatherService;
@@ -146,6 +144,9 @@ public class GameMaster {
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
         Library.initCommands(genDelta, this);
+        notifyProgress(progressCallback, ++currentStep / totalSteps);
+
+        recipes = RecipeRegistry.init();
         notifyProgress(progressCallback, ++currentStep / totalSteps);
     }
 
@@ -367,6 +368,10 @@ public class GameMaster {
 
     public List<Entity> getEntities() {
         return entities;
+    }
+
+    public List<Recipe> getRecipes() {
+        return recipes;
     }
 
     public void changeCamera() {

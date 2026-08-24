@@ -65,7 +65,6 @@ public class GameInteraction {
             } else {
                 String command = gameUIservice.getChatText();
                 if (command != null && !command.isEmpty()) {
-                    gameUIservice.addChatMessage(">> " + command);
                     gameMaster.getCommandService().execute(command);
                 }
                 gameMaster.setChatOpen(false);
@@ -86,7 +85,7 @@ public class GameInteraction {
             dropItem(gameMaster, selectedItem, dropAll);
         }
 
-        if (Keyboard.isKeyPressed(GLFW_KEY_E)) {
+        if (Keyboard.isKeyPressed(GLFW_KEY_E) && !gameMaster.isChatOpen()) {
             gameMaster.toggleInventory();
         }
 
@@ -129,7 +128,9 @@ public class GameInteraction {
 
         if (selectedItem instanceof CraftingKit ck && isRightPressed
                 && !gameMaster.isInventoryOpen()) {
-            ck.use(gameMaster);
+            if (ck.use(gameMaster)) {
+                return null;
+            }
         }
 
         Hit hoveredCell;
@@ -182,10 +183,8 @@ public class GameInteraction {
                 continue;
             }
 
-            if (player.getInventory().isFull()) {
-                if (player.getBackpack().hasBackpackEquipped()) {
-                    player.addToBackpack(item, amount);
-                }
+            if (player.canAdd()) {
+                player.addToBackpack(item, amount);
             } else {
                 player.add(item, amount);
             }
@@ -278,7 +277,7 @@ public class GameInteraction {
                     int amount = worldItem.getAmount();
 
                     if (item != null && amount > 0) {
-                        if (player.getInventory().isFull()) {
+                        if (player.canAdd()) {
                             player.addToBackpack(item, amount);
                         } else {
                             player.add(item, amount);

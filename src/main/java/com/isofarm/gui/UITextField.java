@@ -1,7 +1,10 @@
 package com.isofarm.gui;
 
+import com.isofarm.data.CompletionProvider;
 import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
+
+import java.util.List;
 
 @SuppressWarnings("all")
 public class UITextField extends UIElement {
@@ -20,6 +23,12 @@ public class UITextField extends UIElement {
     private float cursorTimer;
     private boolean cursorVisible = true;
     private float scrollOffset;
+
+    private CompletionProvider completionProvider;
+    private List<String> completions = List.of();
+    private int completionIndex = -1;
+    private String completionInput = "";
+    private int completionCursor = -1;
 
     public UITextField(float x, float y, float width, float height) {
         super(x, y, width, height);
@@ -49,9 +58,7 @@ public class UITextField extends UIElement {
     @Override
     public void render() {
         Vector4f background = isFocused() ? focusedColor : backgroundColor;
-        GUI.drawRect(getAbsoluteX(), getAbsoluteY(), getAbsoluteWidth(),
-                getAbsoluteHeight(), new Vector4f(background.x, background.y,
-                        background.z, background.w * getWorldOpacity()));
+        GUI.drawRect(getAbsoluteX(), getAbsoluteY(), getAbsoluteWidth(), getAbsoluteHeight(), new Vector4f(background.x, background.y, background.z, background.w * getWorldOpacity()));
 
         float textX = getAbsoluteX() + 8.0f - scrollOffset;
         float textY = GUI.getCenteredTextY(text.toString(), font, getAbsoluteY(), getAbsoluteHeight());
@@ -62,22 +69,17 @@ public class UITextField extends UIElement {
         if (selectionStart != selectionEnd) {
             float selectionX = textX + getTextWidth(text.substring(0, selectionStart));
             float selectionWidth = getTextWidth(text.substring(selectionStart, selectionEnd));
-            GUI.drawRect(selectionX, getAbsoluteY() + 5.0f, selectionWidth,
-                    getAbsoluteHeight() - 10.0f, new Vector4f(selectionColor.x,
-                            selectionColor.y, selectionColor.z, selectionColor.w * getWorldOpacity()));
+            GUI.drawRect(selectionX, getAbsoluteY() + 5.0f, selectionWidth, getAbsoluteHeight() - 10.0f, new Vector4f(selectionColor.x, selectionColor.y, selectionColor.z, selectionColor.w * getWorldOpacity()));
         }
 
         GUI.pushScissor(getAbsoluteX() + 8.0f, getAbsoluteY(), getAbsoluteWidth() - 16.0f, getAbsoluteHeight());
-        GUI.drawString(text.toString(), textX, textY, font, new Vector4f(textColor.x,
-                textColor.y, textColor.z, textColor.w * getWorldOpacity()));
+        GUI.drawString(text.toString(), textX, textY, font, new Vector4f(textColor.x, textColor.y, textColor.z, textColor.w * getWorldOpacity()));
 
         if (isFocused() && cursorVisible) {
             String beforeCursor = text.substring(0, cursorPosition);
             float cursorX = textX + getTextWidth(beforeCursor);
 
-            GUI.drawRect(cursorX, getAbsoluteY() + 6.0f, 1.0f,
-                    getAbsoluteHeight() - 12.0f, new Vector4f(cursorColor.x,
-                            cursorColor.y, cursorColor.z, cursorColor.w * getWorldOpacity()));
+            GUI.drawRect(cursorX, getAbsoluteY() + 6.0f, 1.0f, getAbsoluteHeight() - 12.0f, new Vector4f(cursorColor.x, cursorColor.y, cursorColor.z, cursorColor.w * getWorldOpacity()));
         }
 
         GUI.popScissor();
@@ -96,6 +98,16 @@ public class UITextField extends UIElement {
 
         boolean shift = (modifiers & GLFW.GLFW_MOD_SHIFT) != 0;
         boolean control = (modifiers & GLFW.GLFW_MOD_CONTROL) != 0;
+
+        if (key == GLFW.GLFW_KEY_TAB) {
+            if (!shift) {
+                completeForward();
+            } else {
+                completeBackward();
+            }
+
+            return true;
+        }
 
         switch (key) {
             case GLFW.GLFW_KEY_BACKSPACE -> {
@@ -246,12 +258,112 @@ public class UITextField extends UIElement {
         cursorPosition += chars.length;
         selectionAnchor = cursorPosition;
 
+        resetCompletion();
         resetCursorBlink();
 
         return true;
     }
 
+    public void setCompletionProvider(CompletionProvider completionProvider) {
+        this.completionProvider = completionProvider;
+        resetCompletion();
+    }
+
+    private void resetCompletion() {
+        completions = List.of();
+        completionIndex = -1;
+        completionInput = "";
+        completionCursor = -1;
+    }
+
+    private void completeForward() {
+        if (completionProvider == null) {
+            return;
+        }
+        prepareCompletions();
+        if (completions.isEmpty()) {
+            return;
+        }
+        completionIndex++;
+        if (completionIndex >= completions.size()) {
+            completionIndex = 0;
+        }
+        applyCompletion(completions.get(completionIndex));
+    }
+
+    private void completeBackward() {
+        if (completionProvider == null) {
+            return;
+        }
+        prepareCompletions();
+        if (completions.isEmpty()) {
+            return;
+        }
+        completionIndex--;
+
+        if (completionIndex < 0) {
+            completionIndex = completions.size() - 1;
+        }
+        applyCompletion(completions.get(completionIndex));
+    }
+
+    private void applyCompletion(String completion) {
+        if (completion == null || completion.isEmpty()) {
+            return;
+        }
+
+        int tokenStart = findCurrentTokenStart();
+        int tokenEnd = findCurrentTokenEnd();
+
+        text.replace(tokenStart, tokenEnd, completion);
+
+        cursorPosition = tokenStart + completion.length();
+        selectionAnchor = cursorPosition;
+
+        resetCursorBlink();
+    }
+
+    private void prepareCompletions() {
+        String currentText = text.toString();
+        if (completionInput.equals(currentText) &&
+                completionCursor == cursorPosition &&
+                !completions.isEmpty()) {
+            return;
+        }
+        completionInput = currentText;
+        completionCursor = cursorPosition;
+        completions = completionProvider.complete(currentText, cursorPosition);
+
+        completionIndex = -1;
+    }
+
+    private int findCurrentTokenStart() {
+        int position = cursorPosition;
+        while (position > 0) {
+            char c = text.charAt(position - 1);
+            if (Character.isWhitespace(c)) {
+                break;
+            }
+            position--;
+        }
+
+        return position;
+    }
+
+    private int findCurrentTokenEnd() {
+        int position = cursorPosition;
+        while (position < text.length()) {
+            char c = text.charAt(position);
+            if (Character.isWhitespace(c)) {
+                break;
+            }
+            position++;
+        }
+        return position;
+    }
+
     private void moveCursorLeft(boolean shift) {
+        resetCompletion();
         if (hasSelection() && !shift) {
             cursorPosition = getSelectionStart();
             selectionAnchor = cursorPosition;
@@ -268,6 +380,7 @@ public class UITextField extends UIElement {
     }
 
     private void moveCursorRight(boolean shift) {
+        resetCompletion();
         if (hasSelection() && !shift) {
             cursorPosition = getSelectionEnd();
             selectionAnchor = cursorPosition;
@@ -389,15 +502,9 @@ public class UITextField extends UIElement {
             return;
         }
 
-        String selected = text.substring(
-                getSelectionStart(),
-                getSelectionEnd()
-        );
+        String selected = text.substring(getSelectionStart(), getSelectionEnd());
 
-        GLFW.glfwSetClipboardString(
-                GLFW.glfwGetCurrentContext(),
-                selected
-        );
+        GLFW.glfwSetClipboardString(GLFW.glfwGetCurrentContext(), selected);
     }
 
     private void pasteClipboard() {

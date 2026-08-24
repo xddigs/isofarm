@@ -10,46 +10,54 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("all")
 public class Library implements Service<GameMaster> {
     private static final Logger log = LoggerFactory.getLogger(Library.class);
-    private static final String DEFAULT_ID = "main";
+    public static final String DEFAULT_ID = "iso";
+    public static final char SEPARATOR = ':';
 
     public static void initItems(ItemRegistry itemR, Player player) {
-        itemR.register(DEFAULT_ID + ".stick", () -> new Material(MaterialID.STICK));
-        itemR.register(DEFAULT_ID + ".wood", () -> new Material(MaterialID.WOOD));
-        itemR.register(DEFAULT_ID + ".stone", () -> new Material(MaterialID.STONE));
+        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Material(MaterialID.STICK).getName()), () -> new Material(MaterialID.STICK));
+        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Material(MaterialID.WOOD).getName()), () -> new Material(MaterialID.WOOD));
+        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Material(MaterialID.STONE).getName()), () -> new Material(MaterialID.STONE));
 
-        itemR.register(DEFAULT_ID + ".backpack", Backpack::new);
-        itemR.register(DEFAULT_ID + ".coin", Coin::new);
-        itemR.register(DEFAULT_ID + ".wooden_hoe", () -> new Hoe());
-        itemR.register(DEFAULT_ID + ".wooden_pickaxe", () -> new Pickaxe());
-        itemR.register(DEFAULT_ID + ".wooden_shovel", () -> new Shovel());
-        itemR.register(DEFAULT_ID + ".wooden_axe", () -> new Axe());
-        itemR.register(DEFAULT_ID + ".wooden_sword", () -> new Sword());
+        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Backpack().getName()), Backpack::new);
+        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Coin().getName()), Coin::new);
 
-        itemR.register(DEFAULT_ID + ".copper_backpack", () -> new Backpack(ToolType.BACKPACK, Tier.COPPER));
-        itemR.register(DEFAULT_ID + ".copper_hoe", () -> new Hoe(Tier.COPPER));
-        itemR.register(DEFAULT_ID + ".copper_pickaxe", () -> new Pickaxe(Tier.COPPER));
-        itemR.register(DEFAULT_ID + ".copper_shovel", () -> new Shovel(Tier.COPPER));
-        itemR.register(DEFAULT_ID + ".copper_axe", () -> new Axe(Tier.COPPER));
-        itemR.register(DEFAULT_ID + ".copper_sword", () -> new Sword(Tier.COPPER));
+        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Hoe().getName()), Hoe::new);
+        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Pickaxe().getName()), Pickaxe::new);
+        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Shovel().getName()), Shovel::new);
+        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Axe().getName()), Axe::new);
+        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Sword().getName()), Sword::new);
 
-        itemR.register(DEFAULT_ID + ".wheat_seed", Seed::new);
-        itemR.register(DEFAULT_ID + ".carrot_seed", () -> new Seed(CropType.CARROT));
-        itemR.register(DEFAULT_ID + ".potato_seed", () -> new Seed(CropType.POTATO));
-        itemR.register(DEFAULT_ID + ".beetroot_seed", () -> new Seed(CropType.BEETROOT));
-        itemR.register(DEFAULT_ID + ".wheat", () -> new Produce(CropType.WHEAT));
-        itemR.register(DEFAULT_ID + ".carrot", () -> new Produce(CropType.CARROT));
-        itemR.register(DEFAULT_ID + ".potato", () -> new Produce(CropType.POTATO));
-        itemR.register(DEFAULT_ID + ".beetroot", () -> new Produce(CropType.BEETROOT));
-        itemR.register(DEFAULT_ID + ".dirt", () -> new Block(BlockData.DIRT));
-        itemR.register(DEFAULT_ID + ".tilled_dirt", () -> new Block(BlockData.TILLED_DIRT));
-        itemR.register(DEFAULT_ID + ".grass", () -> new Block(BlockData.GRASS));
-        itemR.register(DEFAULT_ID + ".stone", () -> new Block(BlockData.STONE));
-        itemR.register(DEFAULT_ID + ".voidstone", () -> new Block(BlockData.VOIDSTONE));
-        itemR.register(DEFAULT_ID + ".glass", () -> new Block(BlockData.GLASS));
-        itemR.register(DEFAULT_ID + ".oak_log", () -> new Block(BlockData.OAK_LOG));
-        itemR.register(DEFAULT_ID + ".oak_wood", () -> new Block(BlockData.OAK_WOOD));
-        itemR.register(DEFAULT_ID + ".oak_leaves", () -> new Block(BlockData.OAK_LEAVES));
-        itemR.register(DEFAULT_ID + ".snow", () -> new Block(BlockData.SNOW));
+
+        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Backpack(ToolType.BACKPACK, Tier.COPPER).getName()), () -> new Backpack(ToolType.BACKPACK, Tier.COPPER));
+        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Hoe(Tier.COPPER).getName()), () -> new Hoe(Tier.COPPER));
+        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Pickaxe(Tier.COPPER).getName()), () -> new Pickaxe(Tier.COPPER));
+        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Shovel(Tier.COPPER).getName()), () -> new Shovel(Tier.COPPER));
+        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Axe(Tier.COPPER).getName()), () -> new Axe(Tier.COPPER));
+        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Sword(Tier.COPPER).getName()), () -> new Sword(Tier.COPPER));
+
+
+        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Seed().getName()), Seed::new);
+        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Seed(CropType.CARROT).getName()), () -> new Seed(CropType.CARROT));
+        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Seed(CropType.POTATO).getName()), () -> new Seed(CropType.POTATO));
+        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Seed(CropType.BEETROOT).getName()), () -> new Seed(CropType.BEETROOT));
+
+
+        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Produce(CropType.WHEAT).getName()), () -> new Produce(CropType.WHEAT));
+        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Produce(CropType.CARROT).getName()), () -> new Produce(CropType.CARROT));
+        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Produce(CropType.POTATO).getName()), () -> new Produce(CropType.POTATO));
+        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Produce(CropType.BEETROOT).getName()), () -> new Produce(CropType.BEETROOT));
+
+
+        for (BlockData block : BlockData.values()) {
+            if (block == BlockData.AIR ||
+                    block == BlockData.WATER ||
+                    block == BlockData.CROP) {
+                continue;
+            }
+
+            itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Block(block).getName()), () -> new Block(block));
+        }
+
 
         itemR.register(MaterialID.WOOD, () -> new Block(BlockData.OAK_WOOD));
         itemR.register(MaterialID.STICK, () -> new Material(MaterialID.STICK));
@@ -99,10 +107,11 @@ public class Library implements Service<GameMaster> {
                 return;
             }
 
-            if (itemId.equals(DEFAULT_ID + ".coin")) {
+            if (itemId.equals(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR),
+                    ToolType.COIN.getName()))) {
                 player.earn(amount);
             } else {
-                if (player.getInventory().isFull()) {
+                if (player.canAdd()) {
                     player.addToBackpack(item, amount);
                 } else {
                     player.add(item, amount);
@@ -258,5 +267,14 @@ public class Library implements Service<GameMaster> {
             log.info("Command kill executed");
             gameMaster.getToastService().success("You killed yourself!");
         }));
+    }
+
+    public static String getFormattedName(String... name) {
+        StringBuilder builder = new StringBuilder();
+        for (String s : name) {
+            builder.append(s);
+            builder.append(" ");
+        }
+        return builder.toString().trim().toLowerCase();
     }
 }

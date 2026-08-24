@@ -9,22 +9,15 @@ public class Keyboard {
     private static int modifiers;
 
     public static void init(long windowId) {
-        glfwSetKeyCallback(windowId, (unnamed, key, scancode, action, unnamed2) -> {
+        glfwSetKeyCallback(windowId, (window, key, scancode, action, mods) -> {
+            modifiers = mods;
             if (key >= 0 && key <= GLFW_KEY_LAST) {
-                keys[key] = (action != GLFW_RELEASE);
+                keys[key] = action != GLFW_RELEASE;
             }
         });
 
         glfwSetCharCallback(windowId, (window, codepoint) -> {
             typedCharacters.appendCodePoint(codepoint);
-        });
-
-        glfwSetKeyCallback(windowId, (unnamed, key, scancode, action, mods) -> {
-            modifiers = mods;
-
-            if (key >= 0 && key <= GLFW_KEY_LAST) {
-                keys[key] = (action != GLFW_RELEASE);
-            }
         });
     }
 
@@ -33,25 +26,25 @@ public class Keyboard {
     }
 
     public static boolean isKeyPressed(int keyCode) {
-        return keyCode >= 0 && keyCode <= GLFW_KEY_LAST
-                && keys[keyCode] && !lastKeys[keyCode];
+        return keyCode >= 0 && keyCode <= GLFW_KEY_LAST && keys[keyCode] && !lastKeys[keyCode];
     }
 
     public static boolean isKeyDown(int keyCode) {
         return keyCode >= 0 && keyCode <= GLFW_KEY_LAST && keys[keyCode];
     }
 
+    public static boolean isKeyReleased(int keyCode) {
+        return keyCode >= 0 && keyCode <= GLFW_KEY_LAST && !keys[keyCode] && lastKeys[keyCode];
+    }
+
     public static boolean anyKeyPressed() {
         for (boolean key : keys) {
-            if (key) return true;
+            if (key) {
+                return true;
+            }
         }
 
         return false;
-    }
-
-    public static boolean isKeyReleased(int keyCode) {
-        return keyCode >= 0 && keyCode <= GLFW_KEY_LAST
-                && !keys[keyCode] && lastKeys[keyCode];
     }
 
     public static String getTypedCharacters() {

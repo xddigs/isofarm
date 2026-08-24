@@ -3,14 +3,21 @@ package com.isofarm.service;
 import com.isofarm.data.Command;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CommandRegistry implements Service<Command> {
+
     private final Map<String, Command> commands = new HashMap<>();
 
-    public CommandRegistry() {}
+    public CommandRegistry() {
+    }
 
     public void register(Command command) {
+        if (command == null || command.name() == null) {
+            return;
+        }
+
         commands.put(command.name().toLowerCase(), command);
     }
 
@@ -42,5 +49,16 @@ public class CommandRegistry implements Service<Command> {
 
     public int size() {
         return commands.size();
+    }
+
+    public Map<String, Command> getCommands() {
+        return commands;
+    }
+
+    public List<String> getNames() {
+        return commands.keySet()
+                .stream()
+                .sorted()
+                .toList();
     }
 }
