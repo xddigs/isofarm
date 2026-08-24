@@ -410,11 +410,17 @@ public class Player extends Character {
     public boolean craft(Recipe recipe) {
         if (!hasIngredients(recipe)) return false;
         if (!hasSpace()) return false;
+
         for (Ingredient ingredient : recipe.ingredients()) {
             getInventory().remove(ingredient, ingredient.amount());
         }
 
-        add(recipe.result(), recipe.resultAmount());
+        if (!getInventory().isFull()) {
+            add(recipe.result(), recipe.resultAmount());
+        } else if (getBackpack().hasBackpackEquipped() && !getBackpack().isFull()) {
+            addToBackpack(recipe.result(), recipe.resultAmount());
+        }
+
         gameMaster.getToastService().success("You crafted " +
                 recipe.resultAmount() + " " + recipe.result().getName());
 

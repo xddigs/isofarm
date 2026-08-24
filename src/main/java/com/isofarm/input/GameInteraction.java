@@ -116,21 +116,20 @@ public class GameInteraction {
             itemRenderer.playAttackAnimation();
         }
 
-        if (selectedItem instanceof Backpack backpack && isRightPressed
-                && !gameMaster.isInventoryOpen()) {
+        if (selectedItem instanceof Backpack backpack &&
+                isRightPressed && !gameMaster.isInventoryOpen()) {
             if (isCtrlHeld) {
                 backpack.unequip(gameMaster);
             } else {
                 backpack.use(gameMaster);
             }
-            return null;
+            isRightPressed = false;
         }
 
-        if (selectedItem instanceof CraftingKit ck && isRightPressed
-                && !gameMaster.isInventoryOpen()) {
-            if (ck.use(gameMaster)) {
-                return null;
-            }
+        if (selectedItem instanceof CraftingKit ck &&
+                isRightPressed && !gameMaster.isInventoryOpen()) {
+            ck.use(gameMaster);
+            isRightPressed = false;
         }
 
         Hit hoveredCell;
