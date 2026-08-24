@@ -99,9 +99,9 @@ public class Library implements Service<GameMaster> {
             String coinId = getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), ToolType.COIN.getName());
             if (itemId.equalsIgnoreCase(coinId)) {
                 player.earn(amount);
-            } else if (player.canAddTo()) {
+            } else if (!player.hasSpace()) {
                 player.addToBackpack(item, amount);
-            } else {
+            } else if (player.hasSpace()){
                 player.add(item, amount);
             }
             log.info("Command add executed: {} x{}", itemId, amount);

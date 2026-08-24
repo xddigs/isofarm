@@ -78,12 +78,12 @@ public class CropService implements Service<Crop> {
         int cropValue = crop.getValue();
         int seeds = crop.getCropType().getSeeds();
 
-        if (player.canAddTo()) {
-            player.addToBackpack(new Produce(crop.getCropType()), yield);
-            player.addToBackpack(new Seed(crop.getCropType()), seeds);
-        } else {
+        if (player.hasSpace()) {
             player.add(new Produce(crop.getCropType()), yield);
             player.add(new Seed(crop.getCropType()), seeds);
+        } else {
+            player.addToBackpack(new Produce(crop.getCropType()), yield);
+            player.addToBackpack(new Seed(crop.getCropType()), seeds);
         }
 
         crop.setHarvested(true);

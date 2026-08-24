@@ -409,7 +409,7 @@ public class Player extends Character {
 
     public boolean craft(Recipe recipe) {
         if (!hasIngredients(recipe)) return false;
-        if (canAddTo()) return false;
+        if (!hasSpace()) return false;
         for (Ingredient ingredient : recipe.ingredients()) {
             getInventory().remove(ingredient, ingredient.amount());
         }
@@ -431,11 +431,10 @@ public class Player extends Character {
         return true;
     }
 
-    public boolean canAddTo() {
-        if (!getInventory().isFull()) {
-            return false;
-        }
-        return !getBackpack().hasBackpackEquipped() || getBackpack().isFull();
+    public boolean hasSpace() {
+        return !getInventory().isFull() ||
+                (getBackpack().hasBackpackEquipped()
+                        && !getBackpack().isFull());
     }
 
     public boolean hasSeeds() {
