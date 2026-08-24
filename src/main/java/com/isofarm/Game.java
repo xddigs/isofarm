@@ -5,9 +5,18 @@ import com.isofarm.input.Keyboard;
 import com.isofarm.input.Mouse;
 import com.isofarm.utils.K;
 import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.stb.STBImage;
+import org.lwjgl.system.MemoryStack;
+import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -55,6 +64,7 @@ public class Game {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, OPENGL_MINOR_VERSION);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+        glfwWindowHint(GLFW_ICONIFIED, GLFW_TRUE);
 
         window = glfwCreateWindow(
                 (int) K.Window.DEFAULT_WIDTH,
@@ -63,6 +73,8 @@ public class Game {
         if (window == NULL) {
             throw new RuntimeException("Failed to create GLFW window");
         }
+
+        setWindowIcon();
 
         glfwWindowHint(GLFW_SAMPLES, 16);
         Keyboard.init(window);
@@ -85,6 +97,52 @@ public class Game {
         screen.show();
         glfwSetCursorPos(window, K.Window.DEFAULT_WIDTH / 2, K.Window.DEFAULT_HEIGHT / 2);
         log.info("GLFW window successfully initialized.");
+    }
+
+    private void setWindowIcon() {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            GLFWImage.Buffer icons = GLFWImage.malloc(4, stack);
+            ByteBuffer[] pixels = new ByteBuffer[4];
+
+            int initialSize = 16;
+            for (int i = 0; i < pixels.length; i++) {
+                pixels[i] = loadIcon(icons, i, "/assets/icons/iconx" + initialSize + ".png", stack);
+                initialSize *= 2;
+            }
+            glfwSetWindowIcon(window, icons);
+        }
+    }
+
+    private ByteBuffer loadIcon(GLFWImage.Buffer icons, int index, String resourcePath, MemoryStack stack) {
+        try (InputStream input = Game.class.getResourceAsStream(resourcePath)) {
+            if (input == null) {
+                throw new NullPointerException("Window icon not found: " + resourcePath);
+            }
+
+            byte[] data = input.readAllBytes();
+            ByteBuffer imageBuffer = MemoryUtil.memAlloc(data.length);
+            imageBuffer.put(data).flip();
+
+            IntBuffer width = stack.mallocInt(1);
+            IntBuffer height = stack.mallocInt(1);
+            IntBuffer channels = stack.mallocInt(1);
+            ByteBuffer pixels = STBImage.stbi_load_from_memory(imageBuffer, width,
+                    height, channels, 4);
+
+            MemoryUtil.memFree(imageBuffer);
+
+            if (pixels == null) {
+                throw new NullPointerException(STBImage.stbi_failure_reason());
+            }
+
+            icons.position(index);
+            icons.width(width.get(0));
+            icons.height(height.get(0));
+            icons.pixels(pixels);
+            return pixels;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read window icon: " + resourcePath, e);
+        }
     }
 
     public static void main(String[] ignoredArgs) {
