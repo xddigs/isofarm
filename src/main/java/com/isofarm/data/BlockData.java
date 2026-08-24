@@ -180,10 +180,10 @@ public enum BlockData {
         return drops.length > 0;
     }
 
-    public MaterialID getRandomDrop() {
+    public Object getRandomDrop() {
         if (!hasDrops()) return null;
         if (Math.random() < 0.50f) {
-            return (MaterialID) drops[(int) (Math.random() * (drops.length - 1))];
+            return drops[(int) (Math.random() * (drops.length - 1))];
         }
         return null;
     }
