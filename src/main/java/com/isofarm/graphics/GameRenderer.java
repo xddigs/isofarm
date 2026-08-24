@@ -59,6 +59,9 @@ public class GameRenderer {
         defaultShader.setUniform("uTexture", textureUnit);
         defaultShader.setUniform("uShadowMap", shadowUnit);
 
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, gameMaster.getShadowMap().getDepthTexture());
+
         defaultShader.setUniform("uParticleAlpha", 1.0f);
 
         defaultShader.setUniform("uEnableShadows", true);
