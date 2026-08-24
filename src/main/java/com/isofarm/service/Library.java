@@ -7,57 +7,49 @@ import com.isofarm.wrld.GameMaster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.function.Supplier;
+
 @SuppressWarnings("all")
 public class Library implements Service<GameMaster> {
-    private static final Logger log = LoggerFactory.getLogger(Library.class);
     public static final String DEFAULT_ID = "iso";
     public static final char SEPARATOR = ':';
+    private static final Logger log = LoggerFactory.getLogger(Library.class);
 
     public static void initItems(ItemRegistry itemR, Player player) {
         itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Material(MaterialID.STICK).getName()), () -> new Material(MaterialID.STICK));
         itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Material(MaterialID.WOOD).getName()), () -> new Material(MaterialID.WOOD));
         itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Material(MaterialID.STONE).getName()), () -> new Material(MaterialID.STONE));
-
         itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Backpack().getName()), Backpack::new);
         itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Coin().getName()), Coin::new);
-
         itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Hoe().getName()), Hoe::new);
         itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Pickaxe().getName()), Pickaxe::new);
         itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Shovel().getName()), Shovel::new);
         itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Axe().getName()), Axe::new);
         itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Sword().getName()), Sword::new);
-
-
         itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Backpack(ToolType.BACKPACK, Tier.COPPER).getName()), () -> new Backpack(ToolType.BACKPACK, Tier.COPPER));
         itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Hoe(Tier.COPPER).getName()), () -> new Hoe(Tier.COPPER));
         itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Pickaxe(Tier.COPPER).getName()), () -> new Pickaxe(Tier.COPPER));
         itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Shovel(Tier.COPPER).getName()), () -> new Shovel(Tier.COPPER));
         itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Axe(Tier.COPPER).getName()), () -> new Axe(Tier.COPPER));
         itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Sword(Tier.COPPER).getName()), () -> new Sword(Tier.COPPER));
-
-
         itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Seed().getName()), Seed::new);
         itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Seed(CropType.CARROT).getName()), () -> new Seed(CropType.CARROT));
         itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Seed(CropType.POTATO).getName()), () -> new Seed(CropType.POTATO));
         itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Seed(CropType.BEETROOT).getName()), () -> new Seed(CropType.BEETROOT));
-
-
         itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Produce(CropType.WHEAT).getName()), () -> new Produce(CropType.WHEAT));
         itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Produce(CropType.CARROT).getName()), () -> new Produce(CropType.CARROT));
         itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Produce(CropType.POTATO).getName()), () -> new Produce(CropType.POTATO));
         itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Produce(CropType.BEETROOT).getName()), () -> new Produce(CropType.BEETROOT));
 
-
         for (BlockData block : BlockData.values()) {
-            if (block == BlockData.AIR ||
-                    block == BlockData.WATER ||
-                    block == BlockData.CROP) {
+            if (block == BlockData.AIR || block == BlockData.WATER || block == BlockData.CROP) {
                 continue;
             }
-
-            itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Block(block).getName()), () -> new Block(block));
+            itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR),
+                    new Block(block).getName()), () -> new Block(block));
         }
-
 
         itemR.register(MaterialID.WOOD, () -> new Block(BlockData.OAK_WOOD));
         itemR.register(MaterialID.STICK, () -> new Material(MaterialID.STICK));
@@ -70,23 +62,20 @@ public class Library implements Service<GameMaster> {
         ItemRegistry ir = gameMaster.getItemRegistry();
         WeatherService weatherService = gameMaster.getWeatherService();
 
-        cr.register(new Command("/add", new String[]{"item", "amount"}, args -> {
+        cr.register(new Command("/add", new CommandArgument[]{dynamic("item", ir::getIds), new CommandArgument("amount")}, args -> {
             if (player == null) {
                 log.warn("Cannot execute command: player does not exist.");
                 return;
             }
-
             if (args.length < 2) {
                 log.warn("Usage: /add <namespace:item> <amount>");
                 return;
             }
-
             String itemId = args[0];
-            if (itemId.isEmpty()) {
+            if (itemId == null || itemId.isBlank()) {
                 log.warn("Item ID cannot be empty.");
                 return;
             }
-
             int amount;
             try {
                 amount = Integer.parseInt(args[1]);
@@ -94,143 +83,121 @@ public class Library implements Service<GameMaster> {
                 log.warn("Invalid amount: {}", args[1]);
                 return;
             }
-
             if (amount <= 0) {
                 log.warn("Amount must be greater than zero.");
                 return;
             }
-
-
             Item item = ir.create(itemId);
             if (item == null) {
                 log.warn("Unknown item: {}", itemId);
                 return;
             }
-
-            if (itemId.equals(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR),
-                    ToolType.COIN.getName()))) {
+            String coinId = getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), ToolType.COIN.getName());
+            if (itemId.equalsIgnoreCase(coinId)) {
                 player.earn(amount);
+            } else if (player.canAdd()) {
+                player.addToBackpack(item, amount);
             } else {
-                if (player.canAdd()) {
-                    player.addToBackpack(item, amount);
-                } else {
-                    player.add(item, amount);
-                }
+                player.add(item, amount);
             }
             log.info("Command add executed: {} x{}", itemId, amount);
-            gameMaster.getToastService().success("You added " + amount + " " +
-                    item.getName() + " to your inventory!");
+            gameMaster.getToastService().success("You added " + amount + " " + item.getName() + " to your inventory!");
         }));
 
-        cr.register(new Command("/rain", new String[]{"start"}, args -> {
+        cr.register(new Command("/rain", new CommandArgument[]{literal("action", "start", "stop")}, args -> {
             if (player == null) {
                 log.warn("Cannot execute command: player does not exist.");
                 return;
             }
-
             if (args.length < 1) {
-                log.warn("Usage: /rain start/stop");
+                log.warn("Usage: /rain <action>");
                 return;
             }
-
-            if (args[0].equals("start")) {
-                if (args.length == 1) {
+            switch (args[0].toLowerCase()) {
+                case "start" -> {
                     weatherService.setWeather(WeatherType.RAIN);
                     log.info("Command rain executed");
                     gameMaster.getToastService().success("You started the rain.");
                 }
-            } else if (args.length == 1 && args[0].equals("stop")) {
-                weatherService.setWeather(WeatherType.CLEAR);
-                log.info("Command rain executed");
-                gameMaster.getToastService().success("You stopped the rain.");
-                return;
+                case "stop" -> {
+                    weatherService.setWeather(WeatherType.CLEAR);
+                    log.info("Command rain executed");
+                    gameMaster.getToastService().success("You stopped the rain.");
+                }
+                default -> log.warn("Unknown rain action: {}", args[0]);
             }
         }));
 
-        cr.register(new Command("/time", new String[]{"set", "amount"}, args -> {
+        cr.register(new Command("/time", new CommandArgument[]{literal("action", "set"), new CommandArgument("amount")}, args -> {
             if (player == null) {
                 log.warn("Cannot execute command: player does not exist.");
                 return;
             }
-
             if (args.length < 2) {
                 log.warn("Usage: /time set <amount>");
+                return;
             }
-
-            int amount = 0;
+            int amount;
             try {
                 amount = Integer.parseInt(args[1]);
             } catch (NumberFormatException e) {
                 log.warn("Invalid amount: {}", args[1]);
                 return;
             }
-
             if (amount < 0 || amount > 24000) {
                 log.warn("Amount must be between 0 and 24000.");
+                return;
             }
-
             gameMaster.getTimeService().setTimeScale(amount / 24000.0f);
         }));
 
-        cr.register(new Command("/gm", new String[]{"mode"}, args -> {
+        cr.register(new Command("/gm", new CommandArgument[]{dynamic("mode", () -> Arrays.stream(Gamemode.values()).map(Enum::name).toList())}, args -> {
             if (player == null) {
                 log.warn("Cannot execute command: player does not exist.");
                 return;
             }
-
             if (args.length < 1) {
-                log.warn("Usage: /gm mode");
+                log.warn("Usage: /gm <mode>");
+                return;
             }
-
             Gamemode targetMode = Gamemode.fromString(args[0]);
             if (targetMode == null) {
                 log.warn("Invalid gamemode: {}", args[0]);
                 return;
             }
-
-            log.info("Command gm executed");
-            gameMaster.getPlayer().setGamemode(targetMode);
-            gameMaster.getToastService().success("You changed gamemode to " +
-                    args[0].toLowerCase());
+            player.setGamemode(targetMode);
+            log.info("Command gamemode executed: {}", targetMode);
+            gameMaster.getToastService().success("You changed gamemode to " + targetMode.name().toLowerCase());
         }));
 
-        cr.register(new Command("/gamerule", new String[]{"rule", "value"}, args -> {
-
+        cr.register(new Command("/gamerule", new CommandArgument[]{dynamic("rule", () -> GameRules.getRules().keySet()), new CommandArgument("value")}, args -> {
             if (player == null) {
                 log.warn("Cannot execute command: player does not exist.");
                 return;
             }
-
             if (args.length == 0) {
                 gameMaster.getToastService().info("Available gamerules:");
-                GameRules.getRules().forEach((rule, value) ->
-                        gameMaster.getToastService().info(rule + " = " + value));
+                GameRules.getRules().forEach((rule, value) -> gameMaster.getToastService().info(rule + " = " + value));
                 return;
             }
-
             String rule = args[0];
-
             if (!GameRules.exists(rule)) {
                 log.warn("Unknown gamerule: {}", rule);
                 gameMaster.getToastService().error("Unknown gamerule: " + rule);
                 return;
             }
-
             if (args.length == 1) {
                 Object value = GameRules.get(rule);
                 log.info("Gamerule {} = {}", rule, value);
                 gameMaster.getToastService().info(rule + " = " + value);
                 return;
             }
-
             String valueString = args[1];
             Object currentValue = GameRules.get(rule);
             Object newValue;
-
             try {
                 if (currentValue instanceof Boolean) {
-                    if (!valueString.equalsIgnoreCase("true") &&
-                            !valueString.equalsIgnoreCase("false")) {
+                    if (!valueString.equalsIgnoreCase("true") && !valueString.equalsIgnoreCase("false")) {
                         throw new IllegalArgumentException("Expected true or false");
                     }
                     newValue = Boolean.parseBoolean(valueString);
@@ -241,13 +208,11 @@ public class Library implements Service<GameMaster> {
                 } else {
                     throw new IllegalArgumentException("Unsupported gamerule type");
                 }
-
             } catch (IllegalArgumentException e) {
                 log.warn("Invalid value for gamerule {}: {}", rule, valueString);
                 gameMaster.getToastService().error("Invalid value for " + rule);
                 return;
             }
-
             try {
                 GameRules.set(rule, newValue);
                 log.info("Gamerule changed: {} = {}", rule, newValue);
@@ -258,7 +223,7 @@ public class Library implements Service<GameMaster> {
             }
         }));
 
-        cr.register(new Command("/kill", new String[]{}, args -> {
+        cr.register(new Command("/kill", new CommandArgument[]{}, args -> {
             if (player == null) {
                 log.warn("Cannot execute command: player does not exist.");
                 return;
@@ -267,6 +232,24 @@ public class Library implements Service<GameMaster> {
             log.info("Command kill executed");
             gameMaster.getToastService().success("You killed yourself!");
         }));
+    }
+
+    private static CommandArgument literal(String name, String... values) {
+        return CommandArgument.of(name, (text, cursorPosition) -> {
+            String prefix = text == null ? "" : text.substring(0, Math.min(cursorPosition, text.length()));
+            return Arrays.stream(values).filter(value -> value.regionMatches(true, 0, prefix, 0, prefix.length())).sorted(String.CASE_INSENSITIVE_ORDER).toList();
+        });
+    }
+
+    private static CommandArgument dynamic(String name, Supplier<Collection<String>> supplier) {
+        return CommandArgument.of(name, (text, cursorPosition) -> {
+            String prefix = text == null ? "" : text.substring(0, Math.min(cursorPosition, text.length()));
+            Collection<String> values = supplier.get();
+            if (values == null) {
+                return java.util.List.of();
+            }
+            return values.stream().filter(value -> value != null).filter(value -> value.regionMatches(true, 0, prefix, 0, prefix.length())).sorted(String.CASE_INSENSITIVE_ORDER).toList();
+        });
     }
 
     public static String getFormattedName(String... name) {

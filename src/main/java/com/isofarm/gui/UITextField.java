@@ -105,7 +105,6 @@ public class UITextField extends UIElement {
             } else {
                 completeBackward();
             }
-
             return true;
         }
 
@@ -314,12 +313,11 @@ public class UITextField extends UIElement {
 
         int tokenStart = findCurrentTokenStart();
         int tokenEnd = findCurrentTokenEnd();
-
         text.replace(tokenStart, tokenEnd, completion);
-
         cursorPosition = tokenStart + completion.length();
         selectionAnchor = cursorPosition;
-
+        completionInput = text.toString();
+        completionCursor = cursorPosition;
         resetCursorBlink();
     }
 
@@ -333,7 +331,6 @@ public class UITextField extends UIElement {
         completionInput = currentText;
         completionCursor = cursorPosition;
         completions = completionProvider.complete(currentText, cursorPosition);
-
         completionIndex = -1;
     }
 

@@ -5,5 +5,5 @@ import java.util.function.Consumer;
 @DataClass
 public record Command(
         String name,
-        String[] args,
+        CommandArgument[] args,
         Consumer<String[]> action) {}

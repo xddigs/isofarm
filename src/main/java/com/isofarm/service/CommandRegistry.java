@@ -18,7 +18,7 @@ public class CommandRegistry implements Service<Command> {
             return;
         }
 
-        commands.put(command.name().toLowerCase(), command);
+        commands.put(normalize(command.name()), command);
     }
 
     public Command get(String name) {
@@ -26,16 +26,16 @@ public class CommandRegistry implements Service<Command> {
             return null;
         }
 
-        return commands.get(name.toLowerCase());
+        return commands.get(normalize(name));
     }
 
     public boolean contains(String name) {
-        return name != null && commands.containsKey(name.toLowerCase());
+        return name != null && commands.containsKey(normalize(name));
     }
 
     public void unregister(String name) {
         if (name != null) {
-            commands.remove(name.toLowerCase());
+            commands.remove(normalize(name));
         }
     }
 
@@ -60,5 +60,11 @@ public class CommandRegistry implements Service<Command> {
                 .stream()
                 .sorted()
                 .toList();
+    }
+
+    private String normalize(String name) {
+        return name.startsWith("/")
+                ? name.substring(1).toLowerCase()
+                : name.toLowerCase();
     }
 }

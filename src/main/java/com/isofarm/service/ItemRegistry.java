@@ -64,7 +64,10 @@ public class ItemRegistry {
     }
 
     public List<String> getIds() {
-        return List.copyOf(items.keySet());
+        return items.keySet()
+                .stream()
+                .sorted(String.CASE_INSENSITIVE_ORDER)
+                .toList();
     }
 
     public List<String> getMaterialIds() {
