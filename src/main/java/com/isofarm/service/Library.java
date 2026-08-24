@@ -13,47 +13,50 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("all")
 public class Library implements Service<GameMaster> {
+
     public static final String DEFAULT_ID = "iso";
     public static final char SEPARATOR = ':';
     private static final Logger log = LoggerFactory.getLogger(Library.class);
 
     public static void initItems(ItemRegistry itemR, Player player) {
-        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Material(MaterialID.STICK).getName()), () -> new Material(MaterialID.STICK));
-        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Material(MaterialID.WOOD).getName()), () -> new Material(MaterialID.WOOD));
-        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Material(MaterialID.STONE).getName()), () -> new Material(MaterialID.STONE));
-        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Backpack().getName()), Backpack::new);
-        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Coin().getName()), Coin::new);
-        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Hoe().getName()), Hoe::new);
-        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Pickaxe().getName()), Pickaxe::new);
-        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Shovel().getName()), Shovel::new);
-        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Axe().getName()), Axe::new);
-        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Sword().getName()), Sword::new);
-        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Backpack(ToolType.BACKPACK, Tier.COPPER).getName()), () -> new Backpack(ToolType.BACKPACK, Tier.COPPER));
-        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Hoe(Tier.COPPER).getName()), () -> new Hoe(Tier.COPPER));
-        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Pickaxe(Tier.COPPER).getName()), () -> new Pickaxe(Tier.COPPER));
-        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Shovel(Tier.COPPER).getName()), () -> new Shovel(Tier.COPPER));
-        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Axe(Tier.COPPER).getName()), () -> new Axe(Tier.COPPER));
-        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Sword(Tier.COPPER).getName()), () -> new Sword(Tier.COPPER));
-        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Seed().getName()), Seed::new);
-        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Seed(CropType.CARROT).getName()), () -> new Seed(CropType.CARROT));
-        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Seed(CropType.POTATO).getName()), () -> new Seed(CropType.POTATO));
-        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Seed(CropType.BEETROOT).getName()), () -> new Seed(CropType.BEETROOT));
-        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Produce(CropType.WHEAT).getName()), () -> new Produce(CropType.WHEAT));
-        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Produce(CropType.CARROT).getName()), () -> new Produce(CropType.CARROT));
-        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Produce(CropType.POTATO).getName()), () -> new Produce(CropType.POTATO));
-        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), new Produce(CropType.BEETROOT).getName()), () -> new Produce(CropType.BEETROOT));
+        registerDefault(itemR, () -> new Material(MaterialID.STICK));
+        registerDefault(itemR, () -> new Material(MaterialID.WOOD));
+        registerDefault(itemR, () -> new Material(MaterialID.STONE));
+        registerDefault(itemR, Backpack::new);
+        registerDefault(itemR, Coin::new);
+        registerDefault(itemR, Hoe::new);
+        registerDefault(itemR, Pickaxe::new);
+        registerDefault(itemR, Shovel::new);
+        registerDefault(itemR, Axe::new);
+        registerDefault(itemR, Sword::new);
+        registerDefault(itemR, () -> new Backpack(ToolType.BACKPACK, Tier.COPPER));
+        registerDefault(itemR, () -> new Hoe(Tier.COPPER));
+        registerDefault(itemR, () -> new Pickaxe(Tier.COPPER));
+        registerDefault(itemR, () -> new Shovel(Tier.COPPER));
+        registerDefault(itemR, () -> new Axe(Tier.COPPER));
+        registerDefault(itemR, () -> new Sword(Tier.COPPER));
+        registerDefault(itemR, Seed::new);
+
+        for (CropType type : new CropType[]{CropType.CARROT, CropType.POTATO, CropType.BEETROOT}) {
+            registerDefault(itemR, () -> new Seed(type));
+            registerDefault(itemR, () -> new Produce(type));
+        }
+        registerDefault(itemR, () -> new Produce(CropType.WHEAT));
 
         for (BlockData block : BlockData.values()) {
-            if (block == BlockData.AIR || block == BlockData.WATER || block == BlockData.CROP) {
-                continue;
+            if (block != BlockData.AIR && block != BlockData.WATER && block != BlockData.CROP) {
+                registerDefault(itemR, () -> new Block(block));
             }
-            itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR),
-                    new Block(block).getName()), () -> new Block(block));
         }
 
         itemR.register(MaterialID.WOOD, () -> new Block(BlockData.OAK_WOOD));
         itemR.register(MaterialID.STICK, () -> new Material(MaterialID.STICK));
         itemR.register(MaterialID.STONE, () -> new Block(BlockData.STONE));
+    }
+
+    private static void registerDefault(ItemRegistry itemR, Supplier<Item> supplier) {
+        Item item = supplier.get();
+        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), item.getName()), supplier);
     }
 
     public static void initCommands(float delta, GameMaster gameMaster) {
