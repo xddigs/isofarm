@@ -17,6 +17,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 public class HotbarUI extends UIElement {
     private final InventorySlotUI[] slotUIs = new InventorySlotUI[K.UI.INVENTORY_COLUMNS];
     private Player player;
+    private Inventory inventory;
     private InventorySlotUI backpackSlotUI;
 
     private SpriteSheet seedIcons;
@@ -86,13 +87,20 @@ public class HotbarUI extends UIElement {
         interact();
     }
 
+    public Inventory getInventory() {
+        return inventory;
+    }
+
+    public void setInventory(Inventory inventory) {
+        this.inventory = inventory;
+    }
+
     public void setInventoryMode(boolean inventoryMode) {
         this.inventoryMode = inventoryMode;
     }
 
     private void syncInventory() {
         if (player == null) return;
-        Inventory inventory = player.getInventory();
         int hotbarStart = (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
         for (int i = 0; i < K.UI.INVENTORY_COLUMNS; i++) {
             InventorySlotUI slotUI = slotUIs[i];

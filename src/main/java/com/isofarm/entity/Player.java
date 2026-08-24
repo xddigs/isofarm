@@ -323,8 +323,29 @@ public class Player extends Character {
         log.info("Added x1 of {} to inventory", item.getName());
     }
 
+    public void addToBackpack(Item item, int amount) {
+        if (getBackpack().hasBackpackEquipped()) getBackpack().add(item, amount);
+        log.info("Added x{} of {} to backpack", amount, item.getName());
+    }
+
+    public void addToBackpack(Item item) {
+        if (getBackpack().hasBackpackEquipped()) getBackpack().add(item, 1);
+        log.info("Added x1 of {} to backpack", item.getName());
+    }
+
+    public void removeFromBackpack(Item item, int amount) {
+        if (getBackpack().hasBackpackEquipped()) getBackpack().remove(item, amount);
+        log.info("Removed x{} of {} from backpack", amount, item.getName());
+    }
+
+    public void removeFromBackpack(Item item) {
+        if (getBackpack().hasBackpackEquipped()) getBackpack().remove(item, 1);
+        log.info("Removed x1 of {} from backpack", item.getName());
+    }
+
     public void sort() {
         getInventory().sort();
+        getBackpack().sort();
     }
 
     public void remove(Item item, int amount) {

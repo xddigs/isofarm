@@ -168,14 +168,14 @@ public class InventoryUI extends UIElement {
     }
 
     public void sortInventory() {
-        if (player != null && player.getInventory() != null) {
-            player.getInventory().sort();
+        if (player != null && inventory != null) {
+            inventory.sort();
         }
     }
 
     public void groupInventory() {
-        if (player != null && player.getInventory() != null) {
-            player.getInventory().group();
+        if (player != null && inventory != null) {
+            inventory.group();
         }
     }
 
@@ -297,7 +297,7 @@ public class InventoryUI extends UIElement {
             return;
         }
 
-        int remaining = player.getInventory().add(carriedItem, carriedAmount);
+        int remaining = inventory.add(carriedItem, carriedAmount);
 
         if (remaining <= 0) {
             clearCarriedItem();
@@ -312,13 +312,13 @@ public class InventoryUI extends UIElement {
     }
 
     protected void syncInventory() {
-        if (player.getInventory() == null) return;
+        if (inventory == null) return;
         for (int i = 0; i < slotUIs.length; i++) {
             InventorySlotUI slotUI = slotUIs[i];
             if (slotUI == null) continue;
 
-            if (i < (player.getInventory().getSlots().size())) {
-                slotUI.setSlot((player.getInventory().getSlot(i)));
+            if (i < (inventory.getSlots().size())) {
+                slotUI.setSlot((inventory.getSlot(i)));
             } else {
                 slotUI.setSlot(null);
             }
@@ -330,8 +330,8 @@ public class InventoryUI extends UIElement {
             InventorySlotUI slotUI = backpackSlotUIs[i];
             if (slotUI == null) continue;
 
-            if (i < (player.getInventory().getSlots().size())) {
-                slotUI.setSlot((player.getInventory().getSlot(i)));
+            if (i < (inventory.getSlots().size())) {
+                slotUI.setSlot((inventory.getSlot(i)));
             } else {
                 slotUI.setSlot(null);
             }
@@ -404,28 +404,15 @@ public class InventoryUI extends UIElement {
     }
 
     public void slotInteract() {
-        if (hotbarUI == null && !(this instanceof BackpackInventoryUI)) {
-            return;
-        }
-
-        InventorySlotUI[] backpackSlots = getBackpackSlotUIs();
-        if (this instanceof BackpackInventoryUI) {
-            interactWithSlots(backpackSlots);
-            return;
-        }
-
+        if (hotbarUI == null) return;
         InventorySlotUI[] hotbarSlots = hotbarUI.getSlotUIs();
-        InventorySlotUI[] allSlots = new InventorySlotUI[slotUIs.length + hotbarSlots.length];
+        InventorySlotUI[] backpackSlots = getBackpackSlotUIs();
+        InventorySlotUI[] allSlots = new InventorySlotUI[slotUIs.length + hotbarSlots.length + backpackSlots.length];
+        System.arraycopy(slotUIs, 0, allSlots, 0, slotUIs.length);
+        System.arraycopy(hotbarSlots, 0, allSlots, slotUIs.length, hotbarSlots.length);
+        System.arraycopy(backpackSlots, 0, allSlots, slotUIs.length + hotbarSlots.length, backpackSlots.length);
 
-        int offset = 0;
-        System.arraycopy(slotUIs, 0, allSlots, offset, slotUIs.length);
-        offset += slotUIs.length;
-        System.arraycopy(hotbarSlots, 0, allSlots, offset, hotbarSlots.length);
-        interactWithSlots(allSlots);
-    }
-
-    private void interactWithSlots(InventorySlotUI[] slots) {
-        for (InventorySlotUI slotUI : slots) {
+        for (InventorySlotUI slotUI : allSlots) {
             if (slotUI == null || !slotUI.isHovered()) continue;
             InventorySlot slot = slotUI.getSlotType();
             if (slot == null) continue;
@@ -478,7 +465,7 @@ public class InventoryUI extends UIElement {
     }
 
     private void mergeCarriedStack(InventorySlot slot) {
-        int maxStack = player.getInventory().getMaxStack(carriedItem);
+        int maxStack = inventory.getMaxStack(carriedItem);
         int space = maxStack - slot.getAmount();
 
         if (space <= 0) {
@@ -537,24 +524,21 @@ public class InventoryUI extends UIElement {
     }
 
     private void placeOne(InventorySlot slot) {
-        int maxStack = player.getInventory().getMaxStack(carriedItem);
-
+        int maxStack = inventory.getMaxStack(carriedItem);
         if (maxStack <= 0) {
             return;
         }
 
         slot.setItem(carriedItem);
         slot.setAmount(1);
-
         carriedAmount--;
-
         if (carriedAmount <= 0) {
             clearCarriedItem();
         }
     }
 
     private void addOneToSlot(InventorySlot slot) {
-        int maxStack = player.getInventory().getMaxStack(slot.getItem());
+        int maxStack = inventory.getMaxStack(slot.getItem());
 
         if (slot.getAmount() >= maxStack) {
             return;
@@ -662,7 +646,7 @@ public class InventoryUI extends UIElement {
         this.player = player;
 
         if (player != null) {
-            this.inventory = player.getInventory();
+            this.inventory = inventory;
         }
     }
 

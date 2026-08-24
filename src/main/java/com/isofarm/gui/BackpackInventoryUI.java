@@ -4,20 +4,32 @@ import com.isofarm.data.Inventory;
 import com.isofarm.entity.Player;
 
 public class BackpackInventoryUI extends InventoryUI {
+    private Inventory backpack;
 
-    private final Inventory backpackInventory;
-
-    public BackpackInventoryUI(float x, float y, Player player) {
+    public BackpackInventoryUI(float x, float y) {
         super(x, y);
         getButtons().forEach(this::removeChild);
         setBackpackUI(this);
 
         setWidth(getBackpackWidth());
         setHeight(getBackpackHeight());
-        setPlayer(player);
+    }
 
-        backpackInventory = new Inventory();
-        setInventory(backpackInventory);
+    @Override
+    public void setPlayer(Player player) {
+        super.setPlayer(player);
+
+        if (player != null) {
+            backpack = player.getBackpack();
+            setInventory(backpack);
+        } else {
+            backpack = null;
+            setInventory(null);
+        }
+    }
+
+    public Inventory getBackpack() {
+        return backpack;
     }
 
     @Override
@@ -28,11 +40,6 @@ public class BackpackInventoryUI extends InventoryUI {
     @Override
     public void render() {
         if (!isVisible()) return;
-
         renderChildren();
-    }
-
-    public Inventory getBackpackInventory() {
-        return backpackInventory;
     }
 }
