@@ -42,6 +42,7 @@ public class CameraController implements Service<Camera> {
     public void update(GameMaster gameMaster, float delta) {
         if (gameMaster.isInventoryOpen() || gameMaster.isChatOpen()) {
             releaseMouse(gameMaster);
+            return;
         } else {
             captureMouse(gameMaster);
             mouseLook();

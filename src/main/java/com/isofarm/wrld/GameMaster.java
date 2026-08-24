@@ -604,4 +604,10 @@ public class GameMaster {
             chunkManager.rebuildChunkMeshAt(worldX, worldZ + 1);
         }
     }
+
+    public List<Recipe> getRecipesFor(Craftable material) {
+        return recipes.stream()
+                .filter(r -> r.ingredients().stream().anyMatch(
+                        i -> i.craftable() == material)).toList();
+    }
 }

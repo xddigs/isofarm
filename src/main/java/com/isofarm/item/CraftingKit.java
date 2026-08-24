@@ -9,6 +9,7 @@ import com.isofarm.wrld.GameMaster;
 
 @DataClass
 public class CraftingKit extends Tool {
+    private Recipe selectedRecipe = null;
 
     public CraftingKit(ToolType type, Tier tier) {
         super((byte) 0, tier.getName() + type.getName(), 50, type, tier,
@@ -24,20 +25,31 @@ public class CraftingKit extends Tool {
         return new CraftingKit(ToolType.CRAFTING_KIT, Tier.LEATHER);
     }
 
+    public Recipe getSelectedRecipe() {
+        return selectedRecipe;
+    }
+
+    public void setSelectedRecipe(Recipe selectedRecipe) {
+        this.selectedRecipe = selectedRecipe;
+    }
+
     public boolean use(GameMaster gameMaster) {
         Player player = gameMaster.getPlayer();
-        for (Recipe recipe : gameMaster.getRecipes()) {
-            if (recipe.tier() != getTier()) {
-                continue;
+        if (selectedRecipe != null) {
+            if (selectedRecipe.tier() == getTier() && player.hasIngredients(selectedRecipe)) {
+                return player.craft(selectedRecipe);
             }
+            return false;
+        }
 
+        for (Recipe recipe : gameMaster.getRecipes()) {
+            if (recipe.tier() != getTier()) continue;
             if (player.hasIngredients(recipe)) {
                 return player.craft(recipe);
             }
         }
 
-        gameMaster.getToastService().error("You don't have enough " +
-                "ingredients to craft this");
+        gameMaster.getToastService().error("You don't have enough to craft this");
         return false;
     }
 }
