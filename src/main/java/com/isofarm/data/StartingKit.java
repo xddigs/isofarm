@@ -6,7 +6,8 @@ public class StartingKit extends Kit {
 
     public StartingKit() {
         setItems(new Item[]{
-                new Backpack(ToolType.BACKPACK, Tier.LEATHER),
+                new Backpack(),
+                new CraftingKit()
         });
     }
 }

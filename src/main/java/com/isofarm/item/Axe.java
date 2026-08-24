@@ -6,7 +6,7 @@ import com.isofarm.data.ToolType;
 public class Axe extends Tool {
 
     public Axe(Tier tier) {
-        super((byte) 5, tier.getName() + " Axe", 150, ToolType.AXE,
+        super((byte) 5, tier.getName() + ToolType.AXE.getName(), 150, ToolType.AXE,
                 tier,tier.getDurability() + ToolType.AXE.getBaseDurability());
     }
 

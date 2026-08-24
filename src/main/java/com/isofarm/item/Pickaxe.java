@@ -6,7 +6,7 @@ import com.isofarm.data.ToolType;
 public class Pickaxe extends Tool {
 
     public Pickaxe(Tier tier) {
-        super((byte) 3, tier.getName() + " Pickaxe", 100, ToolType.PICKAXE,
+        super((byte) 3, tier.getName() + ToolType.PICKAXE.getName(), 100, ToolType.PICKAXE,
                 tier,tier.getDurability() + ToolType.PICKAXE.getBaseDurability());
     }
 
