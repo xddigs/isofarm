@@ -11,6 +11,7 @@ import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.IntBuffer;
@@ -21,13 +22,19 @@ import static org.lwjgl.opengl.GL11.*;
 public class Intro {
     private final long window;
     private GameMaster gameMaster;
-
     private UIProgressBar progressBar;
     private UIManager uiManager;
 
     private static final float CLEAR_COLOR_ALPHA = 1.0f;
     private int framebufferWidth;
     private int framebufferHeight;
+
+    private boolean fullscreen = false;
+
+    private int windowedX;
+    private int windowedY;
+    private int windowedWidth;
+    private int windowedHeight;
 
     public Intro(long window) {
         this.window = window;
@@ -131,6 +138,7 @@ public class Intro {
         renderLoadingFrame("Setting up the UI...");
 
         progressBar.hide();
+        toggleFullscreen();
         loop();
     }
 
@@ -209,17 +217,73 @@ public class Intro {
                 glfwSetWindowShouldClose(window, true);
             }
 
+            if (Keyboard.isKeyPressed(GLFW_KEY_F11)) {
+                toggleFullscreen();
+            }
+
             Vector3f skyColor = TimeService.getSkyColor();
             glClearColor(skyColor.x, skyColor.y, skyColor.z, CLEAR_COLOR_ALPHA);
-
             gameMaster.update(delta);
-
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glEnable(GL_DEPTH_TEST);
             gameMaster.render();
-
             glfwSwapBuffers(window);
         }
+    }
+
+    private void toggleFullscreen() {
+        fullscreen = !fullscreen;
+        if (fullscreen) {
+            try (MemoryStack stack = MemoryStack.stackPush()) {
+                IntBuffer x = stack.mallocInt(1);
+                IntBuffer y = stack.mallocInt(1);
+                IntBuffer width = stack.mallocInt(1);
+                IntBuffer height = stack.mallocInt(1);
+
+                glfwGetWindowPos(window, x, y);
+                glfwGetWindowSize(window, width, height);
+
+                windowedX = x.get(0);
+                windowedY = y.get(0);
+                windowedWidth = width.get(0);
+                windowedHeight = height.get(0);
+            }
+
+            long monitor = glfwGetPrimaryMonitor();
+
+            if (monitor == 0) {
+                fullscreen = false;
+                return;
+            }
+
+            GLFWVidMode videoMode = glfwGetVideoMode(monitor);
+            if (videoMode == null) {
+                fullscreen = false;
+                return;
+            }
+
+            glfwSetWindowAttrib(window, GLFW_DECORATED, GLFW_FALSE);
+            glfwSetWindowPos(window, 0, 0);
+            glfwSetWindowSize(window, videoMode.width(), videoMode.height());
+
+        } else {
+            glfwSetWindowAttrib(window, GLFW_DECORATED, GLFW_TRUE);
+            glfwSetWindowPos(window, windowedX, windowedY);
+            glfwSetWindowSize(window, windowedWidth, windowedHeight);
+        }
+
+        updateFramebufferSize();
+        glViewport(0, 0, framebufferWidth, framebufferHeight);
+        if (uiManager != null) {
+            uiManager.resize(framebufferWidth, framebufferHeight);
+        }
+
+        GUI.resize(framebufferWidth, framebufferHeight);
+        if (gameMaster != null) {
+            gameMaster.onResize(framebufferWidth, framebufferHeight);
+        }
+
+        repositionProgressBar();
     }
 
     private void updateFramebufferSize() {
