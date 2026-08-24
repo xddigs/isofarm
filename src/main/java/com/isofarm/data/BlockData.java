@@ -182,6 +182,9 @@ public enum BlockData {
 
     public MaterialID getRandomDrop() {
         if (!hasDrops()) return null;
-        return drops[(int) (Math.random() * (drops.length - 1))];
+        if (Math.random() < 0.50f) {
+            return drops[(int) (Math.random() * (drops.length - 1))];
+        }
+        return null;
     }
 }

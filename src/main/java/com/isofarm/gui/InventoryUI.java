@@ -340,27 +340,39 @@ public class InventoryUI extends UIElement {
 
         if (sortButton.getSpriteSheet() == null && inventoryIcons != null) {
             sortButton.setSpriteSheet(inventoryIcons);
-            sortButton.setSpriteFrame(0);
+            sortButton.setSpriteColumn(0);
 
             groupButton.setSpriteSheet(inventoryIcons);
-            groupButton.setSpriteFrame(1);
+            groupButton.setSpriteColumn(1);
 
             backpackButton.setSpriteSheet(inventoryIcons);
-            backpackButton.setSpriteFrame(2);
+            backpackButton.setSpriteColumn(2);
         }
     }
 
     private void updateItemSprite(InventorySlotUI slotUI) {
         Item item = slotUI.getItem();
-
         if (item == null) {
             slotUI.setSpriteSheet(null);
+            slotUI.setSpriteColumn(0);
+            slotUI.setSpriteRow(0);
             slotUI.setTooltipText(null);
             return;
         }
 
-        slotUI.setSpriteSheet(ResourceManager.getItemSpriteSheet(item));
-        slotUI.setSpriteFrame(ResourceManager.getItemIconColumn(item));
+        SpriteSheet spriteSheet = ResourceManager.getItemSpriteSheet(item);
+
+        if (spriteSheet == null) {
+            slotUI.setSpriteSheet(null);
+            slotUI.setSpriteColumn(0);
+            slotUI.setSpriteRow(0);
+            slotUI.setTooltipText(null);
+            return;
+        }
+
+        slotUI.setSpriteSheet(spriteSheet);
+        slotUI.setSpriteColumn(ResourceManager.getItemIconColumn(item));
+        slotUI.setSpriteRow(ResourceManager.getItemIconRow(item));
         slotUI.setTooltipText(item.getName());
     }
 
@@ -595,7 +607,10 @@ public class InventoryUI extends UIElement {
         float iconSize = Settings.getScaledIcon();
         float x = Mouse.getX() - iconSize / 2f;
         float y = Mouse.getY() - iconSize / 2f;
-        GUI.drawSprite(sheet, ResourceManager.getItemIconColumn(carriedItem), x, y,
+        int column = ResourceManager.getItemIconColumn(carriedItem);
+        int row = ResourceManager.getItemIconRow(carriedItem);
+
+        GUI.drawSprite(sheet, column, row, x, y,
                 iconSize, iconSize, K.UI.UI_ITEM_TINT);
 
         if (carriedAmount > 1) {

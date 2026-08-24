@@ -150,12 +150,8 @@ public class GUI {
 
     public static void drawTexture(Texture texture, float x, float y,
                                    float width, float height, Vector4f tint) {
-        if (texture == null) {
-            return;
-        }
-
+        if (texture == null) return;
         texture.bind();
-
         model.identity()
                 .translate(x + width * 0.5f, y + height * 0.5f, 0.0f)
                 .scale(width, height, 1.0f);
@@ -164,20 +160,20 @@ public class GUI {
         shader.setUniform("uColor", tint);
         shader.setUniform("uUseTexture", true);
         shader.setUniform("uFrameIndex", 0);
+        shader.setUniform("uFrameRow", 0);
         shader.setUniform("uTotalFrames", 1);
+        shader.setUniform("uFramesPerRow", 1);
 
         mesh.render();
-
         texture.unbind();
     }
 
-    public static void drawSprite(SpriteSheet spriteSheet, int frame, float x, float y,
-                                  float width, float height, Vector4f tint) {
-        if (spriteSheet == null) {
-            return;
-        }
-
+    public static void drawSprite(SpriteSheet spriteSheet, int frame, int row,
+                                  float x, float y, float width, float height,
+                                  Vector4f tint) {
+        if (spriteSheet == null) return;
         spriteSheet.bind();
+
         model.identity()
                 .translate(x, y, 0.0f)
                 .scale(width, height, 1.0f);
@@ -185,9 +181,11 @@ public class GUI {
         shader.setUniform("uModel", model);
         shader.setUniform("uColor", tint);
         shader.setUniform("uUseTexture", true);
-        shader.setUniform("uFrameIndex", frame);
-        shader.setUniform("uTotalFrames", spriteSheet.getTotalFrames());
 
+        shader.setUniform("uFrameIndex", frame);
+        shader.setUniform("uFrameRow", row);
+        shader.setUniform("uFramesPerRow", spriteSheet.getCols());
+        shader.setUniform("uFrameRows", spriteSheet.getRows());
         mesh.render();
         spriteSheet.unbind();
     }
@@ -385,7 +383,8 @@ public class GUI {
         if (element.hasSpriteSheet()) {
             drawSprite(
                     element.getSpriteSheet(),
-                    element.getSpriteFrame(),
+                    element.getSpriteCol(),
+                    element.getSpriteRow(),
                     element.getAbsoluteX(),
                     element.getAbsoluteY(),
                     element.getAbsoluteWidth(),

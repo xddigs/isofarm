@@ -52,7 +52,7 @@ public class UIButton extends UIElement {
             float size = Math.min(getAbsoluteWidth(), getAbsoluteHeight()) * 0.65f;
             float x = getAbsoluteX() + (getAbsoluteWidth() - size) * 0.5f;
             float y = getAbsoluteY() + (getAbsoluteHeight() - size) * 0.5f;
-            GUI.drawSprite(spriteSheet, spriteFrame, x, y, size, size,
+            GUI.drawSprite(spriteSheet, spriteFrame, 0, x, y, size, size,
                     new Vector4f(1.0f, 1.0f, 1.0f, getWorldOpacity()));
         }
 
@@ -67,11 +67,11 @@ public class UIButton extends UIElement {
         this.spriteSheet = spriteSheet;
     }
 
-    public int getSpriteFrame() {
+    public int getSpriteCol() {
         return spriteFrame;
     }
 
-    public void setSpriteFrame(int spriteFrame) {
+    public void setSpriteColumn(int spriteFrame) {
         this.spriteFrame = Math.max(0, spriteFrame);
     }
 

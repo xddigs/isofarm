@@ -3,10 +3,14 @@ package com.isofarm.graphics;
 public class SpriteSheet {
     private final Texture texture;
     private final int totalFrames;
+    private final int cols;
+    private final int rows;
 
-    public SpriteSheet(String path, int totalFrames) {
+    public SpriteSheet(String path, int cols, int rows) {
         this.texture = new Texture(path);
-        this.totalFrames = totalFrames;
+        this.cols = cols;
+        this.rows = rows;
+        this.totalFrames = cols * rows;
     }
 
     public int getTextureId() {
@@ -19,6 +23,18 @@ public class SpriteSheet {
 
     public void unbind() {
         texture.unbind();
+    }
+
+    public int getCols() {
+        return cols;
+    }
+
+    public int getRows() {
+        return rows;
+    }
+
+    public int getFramesPerRow() {
+        return cols;
     }
 
     public float getWidth() {
@@ -34,7 +50,7 @@ public class SpriteSheet {
     }
 
     public int getFrameHeight() {
-        return texture.getHeight();
+        return texture.getHeight() / totalFrames;
     }
 
     public int getTotalFrames() {

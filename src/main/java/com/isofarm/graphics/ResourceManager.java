@@ -63,29 +63,29 @@ public class ResourceManager {
 
         SpriteSheet blocks = null;
         try {
-            blocks = new SpriteSheet(K.Paths.BLOCKS, K.UI.BLOCK_ATLAS_COLUMNS);
+            blocks = new SpriteSheet(K.Paths.BLOCKS, K.UI.BLOCK_ATLAS_COLUMNS, 0);
         } catch (Exception e) {
             log.warn("Could not load blocks.png atlas, falling back to base colors: {}", e.getMessage());
         }
         this.blocksTexture = blocks;
 
-        this.waterTexture = new SpriteSheet(K.Paths.WATER, K.UI.WATER_FRAMES);
-        this.wheat = new SpriteSheet(K.Paths.WHEAT_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
-        this.carrot = new SpriteSheet(K.Paths.CARROT_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
-        this.potato = new SpriteSheet(K.Paths.POTATO_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
-        this.beetroot = new SpriteSheet(K.Paths.BEETROOT_TEXTURE, K.Render.CROP_TOTAL_FRAMES);
+        this.waterTexture = new SpriteSheet(K.Paths.WATER, K.UI.WATER_FRAMES, 1);
+        this.wheat = new SpriteSheet(K.Paths.WHEAT_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
+        this.carrot = new SpriteSheet(K.Paths.CARROT_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
+        this.potato = new SpriteSheet(K.Paths.POTATO_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
+        this.beetroot = new SpriteSheet(K.Paths.BEETROOT_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
 
-        seedIcons = new SpriteSheet(K.Paths.SEED_ICONS, K.UI.ICON_SEED_CROPS_FRAMES);
-        cropIcons = new SpriteSheet(K.Paths.CROP_ICONS, K.UI.ICON_SEED_CROPS_FRAMES);
-        toolIcons = new SpriteSheet(K.Paths.TOOL_ICONS, K.UI.ICON_TOOL_FRAMES);
-        blockIcons = new SpriteSheet(K.Paths.BLOCK_ICONS, K.UI.ICON_BLOCK_FRAMES);
-        materialIcons = new SpriteSheet(K.Paths.MATERIAL_ICONS, 3);
-        inventoryIcons = new SpriteSheet(K.Paths.INVENTORY_ICONS, 3);
+        blockIcons = new SpriteSheet(K.Paths.BLOCK_ICONS, K.UI.ICON_BLOCK_FRAMES, 1);
+        toolIcons = new SpriteSheet(K.Paths.TOOL_ICONS, K.UI.ICON_TOOL_FRAMES, 2);
+        cropIcons = new SpriteSheet(K.Paths.CROP_ICONS, K.UI.ICON_SEED_CROPS_FRAMES, 1);
+        seedIcons = new SpriteSheet(K.Paths.SEED_ICONS, K.UI.ICON_SEED_CROPS_FRAMES, 1);
+        materialIcons = new SpriteSheet(K.Paths.MATERIAL_ICONS, 3, 1);
+        inventoryIcons = new SpriteSheet(K.Paths.INVENTORY_ICONS, 3, 1);
 
         this.playerSpriteSheet = new SpriteSheet(K.Paths.PLAYER_SPRITESHEET,
-                Direction.values().length);
+                Direction.values().length, 1);
 
-        this.destroyTexture = new SpriteSheet(K.Paths.DESTROY_STAGES, K.UI.DESTROY_FRAMES);
+        this.destroyTexture = new SpriteSheet(K.Paths.DESTROY_STAGES, K.UI.DESTROY_FRAMES, 1);
 
         cropSpritesheets = new EnumMap<>(CropType.class);
         cropSpritesheets.put(CropType.WHEAT, wheat);
@@ -188,6 +188,13 @@ public class ResourceManager {
             return material.getId();
         }
 
+        return 0;
+    }
+
+    public static int getItemIconRow(Item item) {
+        if (item instanceof Tool tool) {
+            return tool.getTier().getId();
+        }
         return 0;
     }
 

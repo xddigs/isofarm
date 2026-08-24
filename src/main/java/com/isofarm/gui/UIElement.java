@@ -42,7 +42,8 @@ public abstract class UIElement {
     private Texture sprite;
     private SpriteSheet spriteSheet;
     private String tooltipText;
-    private int spriteFrame;
+    private int spriteCol;
+    private int spriteRow;
     private int spriteFrameCount = 1;
     private boolean spriteAnimated;
     private boolean spriteLoop = true;
@@ -90,12 +91,12 @@ public abstract class UIElement {
 
         while (spriteAnimationTimer >= spriteFrameDuration) {
             spriteAnimationTimer -= spriteFrameDuration;
-            spriteFrame++;
-            if (spriteFrame >= spriteFrameCount) {
+            spriteCol++;
+            if (spriteCol >= spriteFrameCount) {
                 if (spriteLoop) {
-                    spriteFrame = 0;
+                    spriteCol = 0;
                 } else {
-                    spriteFrame = spriteFrameCount - 1;
+                    spriteCol = spriteFrameCount - 1;
                     spriteAnimated = false;
                 }
             }
@@ -492,7 +493,7 @@ public abstract class UIElement {
     public void setSprite(Texture sprite) {
         this.sprite = sprite;
         this.spriteSheet = null;
-        this.spriteFrame = 0;
+        this.spriteCol = 0;
         this.spriteFrameCount = 1;
         this.spriteAnimated = false;
     }
@@ -509,7 +510,7 @@ public abstract class UIElement {
     public void setSpriteSheet(SpriteSheet spriteSheet) {
         this.spriteSheet = spriteSheet;
         this.sprite = null;
-        this.spriteFrame = 0;
+        this.spriteCol = 0;
         this.spriteFrameCount = spriteSheet != null ? spriteSheet.getTotalFrames() : 1;
         this.spriteAnimationTimer = 0.0f;
     }
@@ -531,21 +532,39 @@ public abstract class UIElement {
         return spriteSheet != null;
     }
 
-    public int getSpriteFrame() {
-        return spriteFrame;
+    public int getSpriteCol() {
+        return spriteCol;
     }
 
-    public void setSpriteFrame(int spriteFrame) {
+    public void setSpriteColumn(int spriteFrame) {
         if (spriteSheet == null) {
-            this.spriteFrame = 0;
+            this.spriteCol = 0;
             return;
         }
 
-        this.spriteFrame = Math.clamp(spriteFrame, 0, spriteFrameCount - 1);
+        this.spriteCol = Math.clamp(spriteFrame, 0, spriteFrameCount - 1);
     }
 
-    public UIElement frame(int frame) {
-        setSpriteFrame(frame);
+    public int getSpriteRow() {
+        return spriteRow;
+    }
+
+    public void setSpriteRow(int spriteRow) {
+        if (spriteSheet == null) {
+            this.spriteRow = 0;
+            return;
+        }
+
+        this.spriteRow = Math.clamp(spriteRow, 0, spriteFrameCount - 1);
+    }
+
+    public UIElement col(int frame) {
+        setSpriteColumn(frame);
+        return this;
+    }
+
+    public UIElement row(int row) {
+        setSpriteRow(row);
         return this;
     }
 
@@ -556,8 +575,8 @@ public abstract class UIElement {
     public void setSpriteFrameCount(int spriteFrameCount) {
         this.spriteFrameCount = Math.max(1, spriteFrameCount);
 
-        if (spriteFrame >= this.spriteFrameCount) {
-            spriteFrame = this.spriteFrameCount - 1;
+        if (spriteCol >= this.spriteFrameCount) {
+            spriteCol = this.spriteFrameCount - 1;
         }
     }
 
@@ -605,7 +624,7 @@ public abstract class UIElement {
     }
 
     public void resetSpriteAnimation() {
-        spriteFrame = 0;
+        spriteCol = 0;
         spriteAnimationTimer = 0.0f;
     }
 

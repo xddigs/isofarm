@@ -435,7 +435,7 @@ public class GameInteraction {
 
         if (removedBlock.getType().hasDrops()) {
             MaterialID mid = removedBlock.getType().getRandomDrop();
-            material = new Material(mid);
+            if (mid != null) material = new Material(mid);
         }
 
         WorldItem item = new WorldItem(removedBlock, 1, position);

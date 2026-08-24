@@ -17,6 +17,7 @@ public class InventorySlotUI extends UIElement {
     private InventorySlot backpackSlot;
     private SpriteSheet spriteSheet;
     private int spriteFrame;
+    private int spriteRow;
     private UIFont countFont = GUI.getNormalFont();
     private boolean selected;
     private boolean hovered;
@@ -103,7 +104,6 @@ public class InventorySlotUI extends UIElement {
 
     private void renderItem() {
         float iconSize = Settings.getScaledIcon();
-
         float scaleX = 1.0f;
         float scaleY = 1.0f;
 
@@ -119,7 +119,7 @@ public class InventorySlotUI extends UIElement {
         float x = Math.round(getAbsoluteX() + (getAbsoluteWidth() - renderWidth) * 0.5f);
         float y = Math.round(getAbsoluteY() + (getAbsoluteHeight() - renderHeight) * 0.5f);
 
-        GUI.drawSprite(spriteSheet, spriteFrame, x, y, renderWidth, renderHeight,
+        GUI.drawSprite(spriteSheet, spriteFrame, spriteRow, x, y, renderWidth, renderHeight,
                 new Vector4f(K.UI.UI_ITEM_TINT.x, K.UI.UI_ITEM_TINT.y, K.UI.UI_ITEM_TINT.z,
                         K.UI.UI_ITEM_TINT.w * getWorldOpacity()));
 
@@ -230,12 +230,20 @@ public class InventorySlotUI extends UIElement {
         this.spriteSheet = spriteSheet;
     }
 
-    public int getSpriteFrame() {
+    public int getSpriteCol() {
         return spriteFrame;
     }
 
-    public void setSpriteFrame(int spriteFrame) {
+    public void setSpriteColumn(int spriteFrame) {
         this.spriteFrame = Math.max(0, spriteFrame);
+    }
+
+    public int getSpriteRow() {
+        return spriteRow;
+    }
+
+    public void setSpriteRow(int spriteRow) {
+        this.spriteRow = spriteRow;
     }
 
     public boolean isSelected() {

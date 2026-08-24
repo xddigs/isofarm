@@ -109,25 +109,26 @@ public class HotbarUI extends UIElement {
 
     private void updateItemSprite(InventorySlotUI slotUI) {
         Item item = slotUI.getItem();
-
         if (item == null) {
             slotUI.setSpriteSheet(null);
-            slotUI.setSpriteFrame(0);
+            slotUI.setSpriteColumn(0);
+            slotUI.setSpriteRow(0);
             slotUI.setTooltipText(null);
             return;
         }
 
         SpriteSheet spriteSheet = ResourceManager.getItemSpriteSheet(item);
-
         if (spriteSheet == null) {
             slotUI.setSpriteSheet(null);
-            slotUI.setSpriteFrame(0);
+            slotUI.setSpriteColumn(0);
+            slotUI.setSpriteRow(0);
             slotUI.setTooltipText(null);
             return;
         }
 
         slotUI.setSpriteSheet(spriteSheet);
-        slotUI.setSpriteFrame(ResourceManager.getItemIconColumn(item));
+        slotUI.setSpriteColumn(ResourceManager.getItemIconColumn(item));
+        slotUI.setSpriteRow(ResourceManager.getItemIconRow(item));
         slotUI.setTooltipText(item.getName());
     }
 

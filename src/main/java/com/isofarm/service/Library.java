@@ -24,6 +24,14 @@ public class Library implements Service<GameMaster> {
         itemR.register(DEFAULT_ID + ".wooden_shovel", () -> new Shovel());
         itemR.register(DEFAULT_ID + ".wooden_axe", () -> new Axe());
         itemR.register(DEFAULT_ID + ".wooden_sword", () -> new Sword());
+
+        itemR.register(DEFAULT_ID + ".copper_backpack", () -> new Backpack(ToolType.BACKPACK, Tier.COPPER));
+        itemR.register(DEFAULT_ID + ".copper_hoe", () -> new Hoe(Tier.COPPER));
+        itemR.register(DEFAULT_ID + ".copper_pickaxe", () -> new Pickaxe(Tier.COPPER));
+        itemR.register(DEFAULT_ID + ".copper_shovel", () -> new Shovel(Tier.COPPER));
+        itemR.register(DEFAULT_ID + ".copper_axe", () -> new Axe(Tier.COPPER));
+        itemR.register(DEFAULT_ID + ".copper_sword", () -> new Sword(Tier.COPPER));
+
         itemR.register(DEFAULT_ID + ".wheat_seed", Seed::new);
         itemR.register(DEFAULT_ID + ".carrot_seed", () -> new Seed(CropType.CARROT));
         itemR.register(DEFAULT_ID + ".potato_seed", () -> new Seed(CropType.POTATO));

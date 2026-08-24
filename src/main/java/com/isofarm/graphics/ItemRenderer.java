@@ -1,6 +1,7 @@
 package com.isofarm.graphics;
 
 import com.isofarm.entity.WorldItem;
+import com.isofarm.input.CameraController;
 import com.isofarm.item.Block;
 import com.isofarm.item.Item;
 import com.isofarm.item.Tool;
@@ -14,12 +15,12 @@ import static org.lwjgl.opengl.GL13.glActiveTexture;
 
 public class ItemRenderer {
 
-    private static final float OFFSET_X = 1.2f;
+    private static final float OFFSET_X = 1.1f;
     private static final float OFFSET_Y = -0.60f;
     private static final float OFFSET_Z = -1.0f;
+    private static final float SWAY_LAG = 50.0f;
 
-    private static final float ITEM_SCALE = 1.0f;
-
+    private static final float ITEM_SCALE = 1.2f;
     private static final int THICKNESS_LAYERS = 24;
     private static final float LAYER_DEPTH = 0.0025f;
 
@@ -37,6 +38,12 @@ public class ItemRenderer {
 
     private ActionAnimation currentAnimation = ActionAnimation.NONE;
     private float animationTime = 0.0f;
+
+    private float swayX;
+    private float swayY;
+
+    private float previousYaw;
+    private float previousPitch;
 
     public ItemRenderer() {
         this.baseModelMatrix = new Matrix4f();
@@ -70,7 +77,10 @@ public class ItemRenderer {
         animationTime = 0.0f;
     }
 
-    public void update(float delta) {
+    public void update(GameMaster gameMaster, float delta) {
+        CameraController cameraController = gameMaster.getCameraController();
+        updateCameraSway(cameraController);
+
         if (currentAnimation == ActionAnimation.NONE) {
             return;
         }
@@ -190,7 +200,27 @@ public class ItemRenderer {
         return transform;
     }
 
-    public void renderWorldItem(GameMaster gameMaster, WorldItem worldItem, CelestialLighting lighting) {
+    private void updateCameraSway(CameraController camera) {
+        float yaw = camera.getCamera().getYaw();
+        float pitch = camera.getCamera().getPitch();
+        float yawDelta = yaw - previousYaw;
+        float pitchDelta = pitch - previousPitch;
+
+        if (yawDelta > 180.0f) yawDelta -= 360.0f;
+        if (yawDelta < -180.0f) yawDelta += 360.0f;
+
+        swayX = Math.clamp(swayX - yawDelta * 0.0025f, -0.08f, 0.08f);
+        swayY = Math.clamp(swayY + pitchDelta * 0.0025f, -0.08f, 0.08f);
+
+        swayX *= 0.85f;
+        swayY *= 0.85f;
+
+        previousYaw = yaw;
+        previousPitch = pitch;
+    }
+
+    public void renderWorldItem(GameMaster gameMaster, WorldItem worldItem,
+                                CelestialLighting lighting) {
         if (worldItem == null) return;
         Item item = worldItem.getItem();
         if (item == null) return;
@@ -238,7 +268,8 @@ public class ItemRenderer {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    public void render(GameMaster gameMaster, Item item, SpriteSheet spriteSheet, Shader shader, CelestialLighting lighting) {
+    public void render(GameMaster gameMaster, Item item, SpriteSheet spriteSheet,
+                       Shader shader, CelestialLighting lighting) {
         if (item == null || spriteSheet == null || quadMesh == null) return;
         if (gameMaster.isOrthographicCamera()) return;
 
@@ -248,11 +279,15 @@ public class ItemRenderer {
         float rotateZ = isTool ? 48.0f : 0.0f;
 
         AnimationTransform animation = getAnimationTransform();
+        float x = OFFSET_X + animation.x + swayX;
+        float y = OFFSET_Y + animation.y + swayY;
+        float z = OFFSET_Z + animation.z;
+        float swayLag = SWAY_LAG;
 
         baseModelMatrix.identity()
-                .translate(OFFSET_X + animation.x, OFFSET_Y + animation.y, OFFSET_Z + animation.z)
-                .rotateX((float) Math.toRadians(rotateX + animation.rotateX))
-                .rotateY((float) Math.toRadians(rotateY + animation.rotateY))
+                .translate(x, y, z)
+                .rotateX((float) Math.toRadians(rotateX + animation.rotateX + swayY * swayLag))
+                .rotateY((float) Math.toRadians(rotateY + animation.rotateY + swayX * swayLag))
                 .rotateZ((float) Math.toRadians(rotateZ + animation.rotateZ))
                 .scale(ITEM_SCALE * animation.scaleX, -ITEM_SCALE * animation.scaleY, ITEM_SCALE * animation.scaleZ);
 

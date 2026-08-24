@@ -10,7 +10,9 @@ uniform mat4 uModel;
 uniform mat4 uProjection;
 
 uniform int uFrameIndex;
-uniform int uTotalFrames;
+uniform int uFrameRow;
+uniform int uFramesPerRow;
+uniform int uFrameRows;
 
 uniform bool uUseFont;
 uniform bool uUseTexture;
@@ -21,9 +23,22 @@ void main() {
 
     if (uUseFont) {
         vTexCoord = mix(uGlyphUV.xy, uGlyphUV.zw, aTexCoord);
+
     } else if (uUseTexture) {
-        float frameWidth = 1.0 / float(max(uTotalFrames, 1));
-        vTexCoord = vec2((float(uFrameIndex) + aTexCoord.x) * frameWidth, 1.0 - aTexCoord.y);
+        float columns = float(max(uFramesPerRow, 1));
+        float rows = float(max(uFrameRows, 1));
+
+        float frameWidth = 1.0 / columns;
+        float frameHeight = 1.0 / rows;
+
+        float column = float(uFrameIndex);
+        float row = float(uFrameRow);
+
+        vTexCoord = vec2(
+                (column + aTexCoord.x) * frameWidth,
+                1.0 - ((row + aTexCoord.y) * frameHeight)
+        );
+
     } else {
         vTexCoord = aTexCoord;
     }

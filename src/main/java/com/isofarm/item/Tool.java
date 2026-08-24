@@ -93,7 +93,7 @@ public abstract class Tool implements Item {
     public void misuse() {
         if (player.getGamemode().isGodmode()) return;
         if (canBeUsed()) {
-            durability *= -2;
+            durability -= 2;
         }
     }
 

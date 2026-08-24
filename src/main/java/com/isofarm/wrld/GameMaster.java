@@ -459,7 +459,7 @@ public class GameMaster {
         shop.update(timeService);
         cropService.update(delta, weatherService.getWeather());
         updateEntities(delta);
-        itemRenderer.update(delta);
+        itemRenderer.update(this, delta);
 
         if (Settings.isOrthographic()) {
             orthoCameraController.update(this, delta);
@@ -471,7 +471,6 @@ public class GameMaster {
         }
 
         particles.update(delta);
-        itemRenderer.update(delta);
         stepController.update(this, player, soundService, delta);
 
         Item selectedInventoryItem = gameUIservice.getInventoryUI().getSelectedItem();
