@@ -3,7 +3,7 @@ package com.isofarm.data;
 import com.isofarm.item.Item;
 
 @DataClass
-public record RecipeIngredient(MaterialID materialID, int amount) implements Item {
+public record Ingredient(MaterialID materialID, int amount) implements Item {
 
     @Override
     public byte getId() {
@@ -22,6 +22,6 @@ public record RecipeIngredient(MaterialID materialID, int amount) implements Ite
 
     @Override
     public Item copy() {
-        return new RecipeIngredient(materialID, amount);
+        return new Ingredient(materialID, amount);
     }
 }

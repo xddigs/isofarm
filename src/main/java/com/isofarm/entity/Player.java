@@ -411,7 +411,7 @@ public class Player extends Character {
         if (!hasIngredients(recipe)) return false;
         if (!canAdd()) return false;
 
-        for (RecipeIngredient ingredient : recipe.ingredients()) {
+        for (Ingredient ingredient : recipe.ingredients()) {
             getInventory().remove(ingredient, ingredient.amount());
         }
 
@@ -423,7 +423,7 @@ public class Player extends Character {
     }
 
     public boolean hasIngredients(Recipe recipe) {
-        for (RecipeIngredient ingredient : recipe.ingredients()) {
+        for (Ingredient ingredient : recipe.ingredients()) {
             if (getAmount(ingredient) < ingredient.amount()) {
                 return false;
             }
