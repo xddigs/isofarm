@@ -455,6 +455,7 @@ public class GameMaster {
         shop.update(timeService);
         cropService.update(delta, weatherService.getWeather());
         updateEntities(delta);
+        itemRenderer.update(delta);
 
         if (Settings.isOrthographic()) {
             orthoCameraController.update(this, delta);
@@ -491,7 +492,7 @@ public class GameMaster {
 
             glClear(GL_DEPTH_BUFFER_BIT);
             itemRenderer.render(this, selectedItem, spriteSheet,
-                    itemShader, celestialLighting, genDelta);
+                    itemShader, celestialLighting);
         }
 
         gameUIservice.render(isHUDShown(), this);

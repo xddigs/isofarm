@@ -1,10 +1,11 @@
 package com.isofarm.gui;
 
-import com.isofarm.data.Inventory;
 import com.isofarm.entity.Player;
 import com.isofarm.utils.Settings;
 
-public class BackpackInventoryUI extends UIElement {
+import java.util.Arrays;
+
+public class BackpackInventoryUI extends InventoryUI {
     private static final int BACKPACK_SLOTS = 16;
     private static final int BACKPACK_COLUMNS = 4;
     private static final int BACKPACK_ROWS = 4;
@@ -13,11 +14,17 @@ public class BackpackInventoryUI extends UIElement {
     private Player player;
 
     public BackpackInventoryUI(float x, float y, Player player) {
-        super(x, y, getBackpackWidth(), getBackpackHeight());
+        super(x, y);
         this.player = player;
         this.slotUIs = new InventorySlotUI[BACKPACK_SLOTS];
-        setFocusable(true);
-        createSlots();
+
+        getButtons().forEach(super::removeChild);
+
+        createBackpackSlots();
+        setBackpackUI(this);
+
+        setWidth(getBackpackWidth());
+        setHeight(getBackpackHeight());
     }
 
     private static float getBackpackWidth() {
@@ -32,7 +39,7 @@ public class BackpackInventoryUI extends UIElement {
                 (BACKPACK_ROWS - 1) * Settings.getScaledSpacing();
     }
 
-    private void createSlots() {
+    public void createBackpackSlots() {
         for (int i = 0; i < BACKPACK_SLOTS; i++) {
             int column = i % BACKPACK_COLUMNS;
             int row = i / BACKPACK_COLUMNS;
@@ -48,24 +55,6 @@ public class BackpackInventoryUI extends UIElement {
     @Override
     public void update(float delta) {
         super.update(delta);
-        if (player == null) return;
-        syncInventory();
-    }
-
-    private void syncInventory() {
-        if (player.getInventory() == null) return;
-        Inventory inventory = player.getInventory();
-        int offset = 0;
-        for (int i = 0; i < slotUIs.length; i++) {
-            InventorySlotUI slotUI = slotUIs[i];
-            int inventoryIndex = offset + i;
-
-            if (inventoryIndex < inventory.getSlots().size()) {
-                slotUI.setSlot(inventory.getSlot(inventoryIndex));
-            } else {
-                slotUI.setSlot(null);
-            }
-        }
     }
 
     @Override

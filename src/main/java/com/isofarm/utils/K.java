@@ -6,7 +6,8 @@ import org.joml.Vector4f;
 @Utils
 public final class K {
 
-    private K() {}
+    private K() {
+    }
 
     public static final class Camera {
         public static final float DEFAULT_PITCH = 35.264f;
@@ -60,6 +61,7 @@ public final class K {
         public static final int INVENTORY_COLUMNS = 9;
         public static final int INVENTORY_ROWS = 4;
         public static final int INVENTORY_SLOTS = INVENTORY_COLUMNS * INVENTORY_ROWS;
+        public static final float INVENTORY_BACKPACK_OFFSET = 50f;
 
         public static final float SQUISH_DURATION = 0.25f;
 
@@ -74,14 +76,13 @@ public final class K {
         public static final int WATER_FRAMES = 8;
         public static final int DESTROY_FRAMES = 9;
 
-        public static final float TOAST_WIDTH = 320.0f;
+        public static final float TOAST_WIDTH = 150f;
         public static final float TOAST_HEIGHT = 64.0f;
-        public static final float TOAST_MARGIN_RIGHT = 96.0f;
         public static final float TOAST_MARGIN_TOP = 24.0f;
         public static final float TOAST_SPACING = 8.0f;
         public static final float TOAST_SLIDE_SPEED = 8.0f;
         public static final float TOAST_EXIT_SPEED = 10.0f;
-        public static final float TOAST_DURATION = 3.0f;
+        public static final float TOAST_DURATION = 4.0f;
 
         public static final float TOAST_ACCENT_WIDTH = 4.0f;
         public static final float TOAST_MESSAGE_OFFSET_X = 10.0f;
@@ -127,7 +128,7 @@ public final class K {
         public static final String OUTLINE_FRAG_SHADER = "shaders/outline.frag";
 
         public static final String UI_VERTEX_SHADER = "shaders/ui.vert";
-        public static final String UI_FRAG_SHADER ="shaders/ui.frag";
+        public static final String UI_FRAG_SHADER = "shaders/ui.frag";
 
         public static final String RAIN_VERT_SHADER = "shaders/rain.vert";
         public static final String RAIN_FRAG_SHADER = "shaders/rain.frag";

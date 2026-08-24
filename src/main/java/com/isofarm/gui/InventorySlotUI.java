@@ -103,7 +103,9 @@ public class InventorySlotUI extends UIElement {
         float x = Math.round(getAbsoluteX() + (getAbsoluteWidth() - renderWidth) * 0.5f);
         float y = Math.round(getAbsoluteY() + (getAbsoluteHeight() - renderHeight) * 0.5f);
 
-        GUI.drawSprite(spriteSheet, spriteFrame, x, y, renderWidth, renderHeight, new Vector4f(K.UI.UI_ITEM_TINT.x, K.UI.UI_ITEM_TINT.y, K.UI.UI_ITEM_TINT.z, K.UI.UI_ITEM_TINT.w * getWorldOpacity()));
+        GUI.drawSprite(spriteSheet, spriteFrame, x, y, renderWidth, renderHeight,
+                new Vector4f(K.UI.UI_ITEM_TINT.x, K.UI.UI_ITEM_TINT.y, K.UI.UI_ITEM_TINT.z,
+                        K.UI.UI_ITEM_TINT.w * getWorldOpacity()));
 
         renderToolDurability();
         renderAmount();
@@ -121,11 +123,12 @@ public class InventorySlotUI extends UIElement {
         float progress = durability / maxDurability;
 
         float padding = Settings.scale(2.0f);
-        float barHeight = Settings.getScaledBorder();
+        float barHeight = Settings.getScaledBorder() - 5f;
         float barWidth =  getAbsoluteWidth() - padding * 2.0f;
         float x = getAbsoluteX() + padding;
         float y = getAbsoluteY() + getAbsoluteHeight() - barHeight - padding;
-        GUI.drawRect(x, y, barWidth, barHeight, new Vector4f(0.15f, 0.15f, 0.15f, getWorldOpacity()));
+        GUI.drawRect(x, y, barWidth, barHeight,
+                new Vector4f(0.0f, 0.0f, 0.0f, getWorldOpacity()));
 
         if (progress <= 0.0f) return;
         float red, green, blue = 0.0f;

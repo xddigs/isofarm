@@ -20,15 +20,8 @@ public class Toast {
 
     private float windowWidth;
 
-    public Toast(
-            float startX,
-            float startY,
-            float targetX,
-            float targetY,
-            ToastData type,
-            String message,
-            float duration
-    ) {
+    public Toast(float startX, float startY, float targetX, float targetY,
+                 ToastData type, String message, float duration) {
         this.x = startX;
         this.y = startY;
 
@@ -54,8 +47,7 @@ public class Toast {
 
         if (!exiting && elapsed >= duration) {
             exiting = true;
-
-            targetX = windowWidth + K.UI.TOAST_WIDTH + 50.0f;
+            targetX = windowWidth + 50.0f;
         }
 
         float speed = exiting ? K.UI.TOAST_EXIT_SPEED

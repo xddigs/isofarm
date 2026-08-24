@@ -1,9 +1,9 @@
 package com.isofarm.graphics;
 
+import com.isofarm.entity.WorldItem;
 import com.isofarm.item.Block;
 import com.isofarm.item.Item;
 import com.isofarm.item.Tool;
-import com.isofarm.entity.WorldItem;
 import com.isofarm.wrld.GameMaster;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -13,45 +13,61 @@ import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 
 public class ItemRenderer {
+
     private static final float OFFSET_X = 1.2f;
     private static final float OFFSET_Y = -0.60f;
     private static final float OFFSET_Z = -1.0f;
+
     private static final float ITEM_SCALE = 1.0f;
 
     private static final int THICKNESS_LAYERS = 24;
     private static final float LAYER_DEPTH = 0.0025f;
+
+    private static final float ANIMATION_DURATION = 0.38f;
 
     private final Matrix4f baseModelMatrix;
     private final Mesh quadMesh;
 
     private enum ActionAnimation {
         NONE,
+        ATTACK,
         BREAK,
-        PLACE
+        INTERACT
     }
 
     private ActionAnimation currentAnimation = ActionAnimation.NONE;
     private float animationTime = 0.0f;
-
-    private static final float ANIMATION_DURATION = 0.14f;
 
     public ItemRenderer() {
         this.baseModelMatrix = new Matrix4f();
         this.quadMesh = Mesh.createCenteredQuad();
     }
 
+    public void playAttackAnimation() {
+        startAnimation(ActionAnimation.ATTACK);
+    }
+
     public void playBreakAnimation() {
-        currentAnimation = ActionAnimation.BREAK;
-        animationTime = 0.0f;
+        if (currentAnimation == ActionAnimation.BREAK) return;
+        startAnimation(ActionAnimation.BREAK);
+    }
+
+    public void playInteractAnimation() {
+        startAnimation(ActionAnimation.INTERACT);
     }
 
     public void playPlaceAnimation() {
-        currentAnimation = ActionAnimation.PLACE;
+        playInteractAnimation();
+    }
+
+    public void stopAnimation() {
+        currentAnimation = ActionAnimation.NONE;
         animationTime = 0.0f;
     }
 
-    private float animationProgress() {
-        return Math.min(animationTime / ANIMATION_DURATION, 1.0f);
+    private void startAnimation(ActionAnimation animation) {
+        currentAnimation = animation;
+        animationTime = 0.0f;
     }
 
     public void update(float delta) {
@@ -60,30 +76,121 @@ public class ItemRenderer {
         }
 
         animationTime += delta;
-
         if (animationTime >= ANIMATION_DURATION) {
-            animationTime = ANIMATION_DURATION;
-            currentAnimation = ActionAnimation.NONE;
+            if (currentAnimation == ActionAnimation.BREAK) {
+                animationTime -= ANIMATION_DURATION;
+            } else {
+                animationTime = ANIMATION_DURATION;
+                currentAnimation = ActionAnimation.NONE;
+            }
         }
     }
 
-    private Vector3f getAnimationOffset() {
-        float progress = animationProgress();
-        if (currentAnimation == ActionAnimation.BREAK) {
-            float swing = (float) Math.sin(progress * Math.PI);
-            return new Vector3f(0.0f, -0.10f * swing, 0.12f * swing);
-        }
-
-        if (currentAnimation == ActionAnimation.PLACE) {
-            float swing = (float) Math.sin(progress * Math.PI);
-            return new Vector3f(0.0f, -0.12f * swing, 0.0f);
-        }
-
-        return new Vector3f();
+    public boolean isAnimationPlaying() {
+        return currentAnimation != ActionAnimation.NONE && animationTime < ANIMATION_DURATION;
     }
 
-    public void renderWorldItem(GameMaster gameMaster, WorldItem worldItem,
-                                CelestialLighting lighting) {
+    public boolean isAttackAnimationPlaying() {
+        return currentAnimation == ActionAnimation.ATTACK && animationTime < ANIMATION_DURATION;
+    }
+
+    public boolean isBreakAnimationPlaying() {
+        return currentAnimation == ActionAnimation.BREAK && animationTime < ANIMATION_DURATION;
+    }
+
+    public boolean isInteractAnimationPlaying() {
+        return currentAnimation == ActionAnimation.INTERACT && animationTime < ANIMATION_DURATION;
+    }
+
+    private float animationProgress() {
+        if (ANIMATION_DURATION <= 0.0f) return 1.0f;
+        return clamp01(animationTime / ANIMATION_DURATION);
+    }
+
+    private float clamp01(float value) {
+        return Math.clamp(value, 0.0f, 1.0f);
+    }
+
+    private float easeOutCubic(float t) {
+        t = clamp01(t);
+        return 1.0f - (float) Math.pow(1.0f - t, 3.0f);
+    }
+
+    private AnimationTransform getAnimationTransform() {
+        float t = animationProgress();
+        return switch (currentAnimation) {
+            case ATTACK -> getAttackTransform(t);
+            case BREAK -> getBreakTransform(t);
+            case INTERACT -> getInteractTransform(t);
+            case NONE -> new AnimationTransform();
+        };
+    }
+
+    private AnimationTransform getAttackTransform(float t) {
+        AnimationTransform transform = new AnimationTransform();
+        if (t < 0.22f) {
+            float p = easeOutCubic(t / 0.22f);
+            transform.x = -0.04f * p;
+            transform.y = 0.10f * p;
+            transform.z = -0.10f * p;
+            transform.rotateX = -22.0f * p;
+            transform.rotateY = 8.0f * p;
+            transform.rotateZ = 10.0f * p;
+        } else {
+            float p = easeOutCubic((t - 0.22f) / 0.78f);
+            transform.x = -0.04f + 0.08f * p;
+            transform.y = 0.10f - 0.25f * p;
+            transform.z = -0.10f + 0.28f * p;
+            transform.rotateX = -22.0f + 82.0f * p;
+            transform.rotateY = 8.0f - 12.0f * p;
+            transform.rotateZ = 10.0f - 25.0f * p;
+            transform.scaleX = 1.0f + 0.04f * p;
+            transform.scaleY = 1.0f - 0.05f * p;
+            transform.scaleZ = 1.0f + 0.04f * p;
+        }
+        return transform;
+    }
+
+    private AnimationTransform getBreakTransform(float t) {
+        AnimationTransform transform = new AnimationTransform();
+        if (t < 0.28f) {
+            float p = easeOutCubic(t / 0.28f);
+            transform.y = 0.12f * p;
+            transform.z = -0.08f * p;
+            transform.rotateX = -25.0f * p;
+            transform.rotateZ = 6.0f * p;
+        } else {
+            float p = easeOutCubic((t - 0.28f) / 0.72f);
+            transform.y = 0.12f - 0.28f * p;
+            transform.z = -0.08f + 0.24f * p;
+            transform.rotateX = -25.0f + 88.0f * p;
+            transform.rotateZ = 6.0f - 18.0f * p;
+            transform.scaleX = 1.0f + 0.05f * p;
+            transform.scaleY = 1.0f - 0.07f * p;
+            transform.scaleZ = 1.0f + 0.05f * p;
+        }
+        return transform;
+    }
+
+    private AnimationTransform getInteractTransform(float t) {
+        AnimationTransform transform = new AnimationTransform();
+        if (t < 0.35f) {
+            float p = easeOutCubic(t / 0.35f);
+            transform.y = 0.06f * p;
+            transform.z = -0.04f * p;
+            transform.rotateX = -8.0f * p;
+            transform.rotateZ = 4.0f * p;
+        } else {
+            float p = easeOutCubic((t - 0.35f) / 0.65f);
+            transform.y = 0.06f - 0.12f * p;
+            transform.z = -0.04f + 0.08f * p;
+            transform.rotateX = -8.0f + 18.0f * p;
+            transform.rotateZ = 4.0f - 8.0f * p;
+        }
+        return transform;
+    }
+
+    public void renderWorldItem(GameMaster gameMaster, WorldItem worldItem, CelestialLighting lighting) {
         if (worldItem == null) return;
         Item item = worldItem.getItem();
         if (item == null) return;
@@ -94,13 +201,9 @@ public class ItemRenderer {
         renderWorldItemMesh(gameMaster, worldItem, item, spriteSheet, shader, lighting);
     }
 
-    private void renderWorldItemMesh(GameMaster gameMaster, WorldItem worldItem,
-                                     Item item, SpriteSheet spriteSheet, Shader shader,
-                                     CelestialLighting lighting) {
-
-        if (item == null || spriteSheet == null || quadMesh == null) {
-            return;
-        }
+    private void renderWorldItemMesh(GameMaster gameMaster, WorldItem worldItem, Item item,
+                                     SpriteSheet spriteSheet, Shader shader, CelestialLighting lighting) {
+        if (item == null || spriteSheet == null || quadMesh == null) return;
 
         Vector3f position = worldItem.getPosition();
         float scale = 0.4f;
@@ -121,95 +224,50 @@ public class ItemRenderer {
         shader.setUniform("uView", gameMaster.getActiveCamera().getViewMatrix());
         shader.setUniform("uFrameIndex", frameIndex);
         shader.setUniform("uTotalFrames", spriteSheet.getTotalFrames());
-
-        shader.setUniform("uUseTexture", true);
-        shader.setUniform("uUseFaceAtlas", false);
-        shader.setUniform("uParticleAlpha", 1.0f);
-        shader.setUniform("uAtlasScale", new org.joml.Vector2f(1.0f, 1.0f));
-        shader.setUniform("uAtlasOffset", new org.joml.Vector2f(0.0f, 0.0f));
-        shader.setUniform("uBaseColor", new Vector3f(1.0f, 1.0f, 1.0f));
-        shader.setUniform("uIsMaskPass", false);
-        shader.setUniform("uEnableShadows", false);
-
-        Vector3f viewLightDir = new Vector3f(lighting.getDirection());
-        gameMaster.getActiveCamera().getViewMatrix().transformDirection(viewLightDir);
-        shader.setUniform("uLightDirection", viewLightDir);
-        shader.setUniform("uSunColor", lighting.getColor());
-        shader.setUniform("uSkyColor", lighting.getColor());
-        shader.setUniform("uLightIntensity", lighting.getIntensity());
-        shader.setUniform("uAmbientIntensity", lighting.getAmbientIntensity());
-
+        setupCommonShaderUniforms(shader, gameMaster, lighting);
         glDisable(GL_CULL_FACE);
-
         for (int i = THICKNESS_LAYERS - 1; i >= 0; i--) {
             float zOffset = (i - THICKNESS_LAYERS / 2.0f) * LAYER_DEPTH;
             Matrix4f layerMatrix = new Matrix4f(baseModelMatrix).translate(0.0f, 0.0f, zOffset);
             shader.setUniform("uModel", layerMatrix);
             quadMesh.render();
         }
-
         glEnable(GL_CULL_FACE);
 
         shader.unbind();
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    public void render(GameMaster gameMaster,
-                       Item item,
-                       SpriteSheet spriteSheet,
-                       Shader shader,
-                       CelestialLighting lighting,
-                       float delta) {
+    public void render(GameMaster gameMaster, Item item, SpriteSheet spriteSheet, Shader shader, CelestialLighting lighting) {
         if (item == null || spriteSheet == null || quadMesh == null) return;
         if (gameMaster.isOrthographicCamera()) return;
+
         boolean isTool = item instanceof Tool;
-        float rotateX, rotateY, rotateZ;
-        if (isTool) {
-            rotateX = 10.0f;
-            rotateY = -90.0f;
-            rotateZ = 48.0f;
-        } else {
-            rotateX = 0.0f;
-            rotateY = -15.0f;
-            rotateZ = 0.0f;
-        }
+        float rotateX = isTool ? 10.0f : 0.0f;
+        float rotateY = isTool ? -90.0f : -15.0f;
+        float rotateZ = isTool ? 48.0f : 0.0f;
 
-        Vector3f animationOffset = getAnimationOffset();
+        AnimationTransform animation = getAnimationTransform();
 
-        baseModelMatrix.identity().translate(OFFSET_X + animationOffset.x,
-                OFFSET_Y + animationOffset.y, OFFSET_Z + animationOffset.z)
-                .rotateX((float) Math.toRadians(rotateX))
-                .rotateY((float) Math.toRadians(rotateY))
-                .rotateZ((float) Math.toRadians(rotateZ))
-                .scale(ITEM_SCALE, -ITEM_SCALE, ITEM_SCALE);
+        baseModelMatrix.identity()
+                .translate(OFFSET_X + animation.x, OFFSET_Y + animation.y, OFFSET_Z + animation.z)
+                .rotateX((float) Math.toRadians(rotateX + animation.rotateX))
+                .rotateY((float) Math.toRadians(rotateY + animation.rotateY))
+                .rotateZ((float) Math.toRadians(rotateZ + animation.rotateZ))
+                .scale(ITEM_SCALE * animation.scaleX, -ITEM_SCALE * animation.scaleY, ITEM_SCALE * animation.scaleZ);
 
         int frameIndex = item instanceof Block ? item.getId() - 1 : item.getId();
+
         shader.bind();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, spriteSheet.getTextureId());
-        shader.setUniform("uProjection", gameMaster.getActiveCamera().getProjectionMatrix());
+
         shader.setUniform("uProjection", gameMaster.getActiveCamera().getProjectionMatrix());
         shader.setUniform("uView", new Matrix4f().identity());
         shader.setUniform("uFrameIndex", frameIndex);
         shader.setUniform("uTotalFrames", spriteSheet.getTotalFrames());
 
-        shader.setUniform("uUseTexture", true);
-        shader.setUniform("uUseFaceAtlas", false);
-        shader.setUniform("uParticleAlpha", 1.0f);
-        shader.setUniform("uAtlasScale", new org.joml.Vector2f(1.0f, 1.0f));
-        shader.setUniform("uAtlasOffset", new org.joml.Vector2f(0.0f, 0.0f));
-        shader.setUniform("uBaseColor", new Vector3f(1.0f, 1.0f, 1.0f));
-        shader.setUniform("uIsMaskPass", false);
-        shader.setUniform("uEnableShadows", false);
-
-        Vector3f viewLightDir = new Vector3f(lighting.getDirection());
-        gameMaster.getActiveCamera().getViewMatrix().transformDirection(viewLightDir);
-
-        shader.setUniform("uLightDirection", viewLightDir);
-        shader.setUniform("uSunColor", lighting.getColor());
-        shader.setUniform("uSkyColor", lighting.getColor());
-        shader.setUniform("uLightIntensity", lighting.getIntensity());
-        shader.setUniform("uAmbientIntensity", lighting.getAmbientIntensity());
+        setupCommonShaderUniforms(shader, gameMaster, lighting);
 
         glDisable(GL_CULL_FACE);
         for (int i = THICKNESS_LAYERS - 1; i >= 0; i--) {
@@ -217,15 +275,44 @@ public class ItemRenderer {
             shader.setUniform("uModel", layerMatrix);
             quadMesh.render();
         }
-
         glEnable(GL_CULL_FACE);
+
         shader.unbind();
         glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    private void setupCommonShaderUniforms(Shader shader, GameMaster gameMaster,
+                                           CelestialLighting lighting) {
+        shader.setUniform("uUseTexture", true);
+        shader.setUniform("uUseFaceAtlas", false);
+        shader.setUniform("uParticleAlpha", 1.0f);
+        shader.setUniform("uAtlasScale", new org.joml.Vector2f(1.0f, 1.0f));
+        shader.setUniform("uAtlasOffset", new org.joml.Vector2f(0.0f, 0.0f));
+        shader.setUniform("uBaseColor", new Vector3f(1.0f, 1.0f, 1.0f));
+        shader.setUniform("uIsMaskPass", false);
+        shader.setUniform("uEnableShadows", false);
+
+        Vector3f viewLightDir = new Vector3f(lighting.getDirection());
+        gameMaster.getActiveCamera().getViewMatrix().transformDirection(viewLightDir);
+
+        shader.setUniform("uLightDirection", viewLightDir);
+        shader.setUniform("uSunColor", lighting.getColor());
+        shader.setUniform("uSkyColor", lighting.getColor());
+        shader.setUniform("uLightIntensity", lighting.getIntensity());
+        shader.setUniform("uAmbientIntensity", lighting.getAmbientIntensity());
     }
 
     public void dispose() {
         if (quadMesh != null) {
             quadMesh.dispose();
         }
+    }
+
+    private static final class AnimationTransform {
+        float x, y, z;
+        float rotateX, rotateY, rotateZ;
+        float scaleX = 1.0f;
+        float scaleY = 1.0f;
+        float scaleZ = 1.0f;
     }
 }

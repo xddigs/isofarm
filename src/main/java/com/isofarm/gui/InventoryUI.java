@@ -12,12 +12,16 @@ import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_RIGHT;
 
 @SuppressWarnings("all")
 public class InventoryUI extends UIElement {
     private final InventorySlotUI[] slotUIs;
+    private final List<UIButton> buttons;
     private UIButton sortButton;
     private UIButton groupButton;
     private UIButton backpackButton;
@@ -35,6 +39,7 @@ public class InventoryUI extends UIElement {
     private int carriedAmount;
 
     private HotbarUI hotbarUI;
+    private BackpackInventoryUI backpackUI;
     private UIProgressBar healthBar;
     private UIProgressBar staminaBar;
     private GameMaster gameMaster;
@@ -50,9 +55,9 @@ public class InventoryUI extends UIElement {
         targetX = x;
         int totalVisualSlots = (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
         this.slotUIs = new InventorySlotUI[totalVisualSlots];
+        this.buttons = new ArrayList<>();
         setFocusable(true);
         createButtons();
-        createSlots();
     }
 
     private static float getInventoryWidth() {
@@ -65,6 +70,10 @@ public class InventoryUI extends UIElement {
         return Settings.getScaledPadding() * 2.0f + Settings.getScaledHeader() +
                 K.UI.INVENTORY_ROWS * Settings.getScaledSlot() +
                 (K.UI.INVENTORY_ROWS - 1) * Settings.getScaledSpacing();
+    }
+
+    public InventorySlotUI[] getSlotUIs() {
+        return slotUIs;
     }
 
     private void createButtons() {
@@ -93,12 +102,16 @@ public class InventoryUI extends UIElement {
         groupButton.setTooltipText("Group");
         backpackButton.setTooltipText("Backpack");
 
+        buttons.add(sortButton);
+        buttons.add(groupButton);
+        buttons.add(backpackButton);
+
         addChild(sortButton);
         addChild(groupButton);
         addChild(backpackButton);
     }
 
-    private void createSlots() {
+    public void createSlots() {
         for (int i = 0; i < slotUIs.length; i++) {
             int column = i % K.UI.INVENTORY_COLUMNS;
             int row = i / K.UI.INVENTORY_COLUMNS;
@@ -109,6 +122,10 @@ public class InventoryUI extends UIElement {
             slotUIs[i] = slotUI;
             addChild(slotUI);
         }
+    }
+
+    public List<UIButton> getButtons() {
+        return buttons;
     }
 
     public void sortInventory() {
@@ -140,7 +157,6 @@ public class InventoryUI extends UIElement {
             setPosition(newX, getY());
         }
 
-        BackpackInventoryUI backpackUI = gameMaster.getGameUIService().getBackpackInventoryUI();
         if (backpackUI != null && isBackpackOpen) {
             float spacing = Settings.getScaledSpacing();
             backpackUI.setPosition(getX() + getWidth() + spacing, getY());
@@ -304,7 +320,7 @@ public class InventoryUI extends UIElement {
         }
     }
 
-    private void slotInteract() {
+    public void slotInteract() {
         if (hotbarUI == null) {
             return;
         }
@@ -606,6 +622,14 @@ public class InventoryUI extends UIElement {
     public void setHotbarUI(GameMaster gameMaster, HotbarUI hotbarUI) {
         this.gameMaster = gameMaster;
         this.hotbarUI = hotbarUI;
+    }
+
+    public BackpackInventoryUI getBackpackUI() {
+        return backpackUI;
+    }
+
+    public void setBackpackUI(BackpackInventoryUI backpackUI) {
+        this.backpackUI = backpackUI;
     }
 
     public Item getSelectedItem() {

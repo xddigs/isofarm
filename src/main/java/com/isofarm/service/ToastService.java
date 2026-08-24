@@ -108,18 +108,19 @@ public class ToastService implements Service<Toast> {
             return;
         }
 
-        float startX = windowWidth + K.UI.TOAST_WIDTH + 50.0f;
-        float targetX = windowWidth - K.UI.TOAST_WIDTH - K.UI.TOAST_MARGIN_RIGHT;
+        float startX = windowWidth + 50.0f;
+        float targetX = windowWidth - K.UI.TOAST_WIDTH;
         float targetY = K.UI.TOAST_MARGIN_TOP;
 
-        Toast toast = new Toast(startX, targetY,targetX, targetY, type, message,
-                K.UI.TOAST_DURATION);
+        Toast toast = new Toast(startX, targetY, targetX, targetY,
+                type, message, K.UI.TOAST_DURATION);
+
         toast.setWindowWidth(windowWidth);
         add(toast);
     }
 
     private void rearrange() {
-        float targetX = windowWidth - K.UI.TOAST_WIDTH - K.UI.TOAST_MARGIN_RIGHT;
+        float targetX = windowWidth - K.UI.TOAST_WIDTH;
         float y = K.UI.TOAST_MARGIN_TOP;
 
         for (Toast toast : toasts) {

@@ -101,7 +101,8 @@ public class GameInteraction {
 
         if (!gameMaster.isChatOpen() &&
                 !gameMaster.isInventoryOpen()) {
-            if (Keyboard.isKeyPressed(GLFW_KEY_V)) {
+            if (Keyboard.isKeyPressed(GLFW_KEY_V) ||
+                    Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_MIDDLE)) {
                 gameMaster.changeCamera();
             }
         }
@@ -118,22 +119,35 @@ public class GameInteraction {
             hoveredCell = gameMaster.getCamera().highlight(gameMaster.getWorld());
         }
 
-        if (hoveredCell == null) return null;
-        if (!isWithinRange(gameMaster, hoveredCell)) return null;
-
-        breakTimeout -= gameMaster.getGenDelta();
-        breakTimeout = Math.max(breakTimeout, 0.0f);
-
         boolean isCtrlHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)
                 || Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
         boolean wasLeftClickPressed = Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT);
         boolean canBreakBlocks = wasLeftClickPressed && !isCtrlHeld && !gameMaster.isInventoryOpen();
 
-        if (canBreakBlocks) {
+        if (hoveredCell == null) {
+            resetBreaking();
+            return null;
+        }
+
+        if (!isWithinRange(gameMaster, hoveredCell)) {
+            resetBreaking();
+            return null;
+        }
+
+        breakTimeout -= gameMaster.getGenDelta();
+        breakTimeout = Math.max(breakTimeout, 0.0f);
+
+        if (wasLeftClickPressed
+                && !isCtrlHeld
+                && !gameMaster.isInventoryOpen()
+                && !gameMaster.isChatOpen()) {
+            itemRenderer.playAttackAnimation();
+        } else if (canBreakBlocks) {
             if (breakTimeout <= 0.0f) {
                 breakAction(gameMaster, hoveredCell);
             }
         } else {
+            itemRenderer.stopAnimation();
             resetBreaking();
         }
 
@@ -336,6 +350,7 @@ public class GameInteraction {
             breakingZ = z;
             breakProgress = 0.0f;
             lastBreakTime = System.nanoTime();
+            itemRenderer.playBreakAnimation();
         }
 
         Gamemode gamemode = gameMaster.getPlayer().getGamemode();
@@ -369,8 +384,9 @@ public class GameInteraction {
         lastBreakTime = now;
         breakProgress += deltaTime / destroyTime;
 
-        gameMaster.getItemRenderer().playBreakAnimation();
-        gameMaster.getSoundService().playLoopingSound(blockData.getSoundGroup());
+        if (!gameMaster.getItemRenderer().isBreakAnimationPlaying()) {
+            gameMaster.getItemRenderer().playBreakAnimation();
+        }
 
         if (breakProgress >= 1.0f) {
             breakBlock(gameMaster, cell, blockData, blockId, selectedItem);

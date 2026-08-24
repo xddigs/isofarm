@@ -84,6 +84,7 @@ public class GameUIService implements Service<GameMaster> {
         this.inventoryUI.setPosition(
                 windowWidth / 2.0f - inventoryUI.getAbsoluteWidth() / 2,
                 windowHeight / 2.0f - inventoryUI.getAbsoluteHeight() / 2);
+        this.inventoryUI.createSlots();
 
         this.hotbarUI.setPosition(
                 windowWidth / 2.0f - hotbarUI.getAbsoluteWidth() / 2,
@@ -151,12 +152,12 @@ public class GameUIService implements Service<GameMaster> {
         inventoryUI.setStaminaBar(staminaBar);
 
         this.backpackUI = new BackpackInventoryUI(
-                inventoryUI.getAbsoluteX() + inventoryUI.getAbsoluteWidth()
-                        + Settings.getScaledPadding(),
+                inventoryUI.getAbsoluteX() + inventoryUI.getAbsoluteWidth() -
+                        K.UI.INVENTORY_BACKPACK_OFFSET,
                 inventoryUI.getAbsoluteY(),
                 null);
         this.backpackUI.hide();
-        this.backpackUI.setLayer(1000);
+        this.backpackUI.setLayer(100);
         uiManager.getRoot().addChild(backpackUI);
     }
 

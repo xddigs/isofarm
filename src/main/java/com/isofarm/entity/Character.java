@@ -30,7 +30,6 @@ public abstract class Character extends Entity implements Levelable {
     private int luck;
 
     private float isOffGroundTimer;
-    private float maxFallVelocity = 0.0f;
 
     public Character(String name, ToastService toastService) {
         super(name);
@@ -296,13 +295,5 @@ public abstract class Character extends Entity implements Levelable {
 
     public void setIsOffGroundTimer(float isOffGroundTimer) {
         this.isOffGroundTimer = isOffGroundTimer;
-    }
-
-    public float getMaxFallVelocity() {
-        return maxFallVelocity;
-    }
-
-    public void setMaxFallVelocity(float maxFallVelocity) {
-        this.maxFallVelocity = maxFallVelocity;
     }
 }

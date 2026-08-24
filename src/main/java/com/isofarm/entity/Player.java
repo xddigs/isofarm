@@ -36,6 +36,8 @@ public class Player extends Character {
     private int pathIndex = 0;
     private int damageSequence = 0;
     private float lastDamageAmount = 0.0f;
+    private float fallStartY = 0.0f;
+    private boolean isFalling = false;
 
     public Player(String name, World world, GameMaster gameMaster) {
         super(name, gameMaster.getToastService());
@@ -66,25 +68,22 @@ public class Player extends Character {
         heal((0.5f + getLevel()) * delta);
 
         if (!isOnGround()) {
-            setIsOffGroundTimer(getIsOffGroundTimer() + delta);
+            if (getVelocity().y < 0.0f && !isFalling) {
+                isFalling = true;
+                fallStartY = getPosition().y;
+            }
 
-            float verticalVelocity = Math.abs(getVelocity().y);
-            if (verticalVelocity > getMaxFallVelocity()) {
-                setMaxFallVelocity(verticalVelocity);
+        } else {
+            if (isFalling) {
+                float fallDistance = fallStartY - getPosition().y;
+                if (fallDistance > 3.0f) {
+                    float damage = (fallDistance - 3.0f) * 2.0f;
+                    fallDamage(damage);
+                    getSoundService().playBreakSound(SoundGroup.ENTITY, 1.0f, 1.0f);
+                }
+                isFalling = false;
             }
         }
-
-        if (isOnGround() && !wasOnGround() && getIsOffGroundTimer() >= 4f) {
-            if (getMaxFallVelocity() > MAX_FALL_VELOCITY) {
-                float damage = (getMaxFallVelocity() - MAX_FALL_VELOCITY) * 4.0f;
-                fallDamage(damage);
-                getSoundService().playBreakSound(SoundGroup.ENTITY, 1.0f, 1.0f);
-            }
-        }
-
-        setMaxFallVelocity(0.0f);
-        setIsOffGroundTimer(0.0f);
-        setWasOnGround(isOnGround());
 
         for (InventorySlot slot : getInventory().getSlots()) {
             if (slot.getItem() instanceof Tool tool && tool.getDurability() <= 0) {
@@ -189,7 +188,6 @@ public class Player extends Character {
         setSpeed(6.0f);
         setReputation(Reputation.NEUTRAL);
         setGamemode(Gamemode.SURVIVAL);
-        setMaxFallVelocity(0.0f);
         setIsOffGroundTimer(0.0f);
         setWasOnGround(false);
 
