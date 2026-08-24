@@ -503,6 +503,7 @@ public class GameInteraction {
 
             return;
         }
+
         if (selectedItem instanceof Backpack backpack) {
             if (isCtrlDown && isRightClick) {
                 backpack.unequip();

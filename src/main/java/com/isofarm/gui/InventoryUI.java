@@ -125,6 +125,7 @@ public class InventoryUI extends UIElement {
         sortButton.setTooltipText("Sort");
         groupButton.setTooltipText("Group");
         backpackButton.setTooltipText("Backpack");
+        backpackButton.hide();
 
         buttons.add(sortButton);
         buttons.add(groupButton);
@@ -586,6 +587,12 @@ public class InventoryUI extends UIElement {
 
     @Override
     public void render() {
+        if (inventory.getBackpackSlot().getItem() != null) {
+            backpackButton.show();
+        } else {
+            backpackButton.hide();
+        }
+
         renderChildren();
         renderCarriedItem();
     }
