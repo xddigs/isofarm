@@ -5,14 +5,13 @@ import com.isofarm.data.InventorySlot;
 import com.isofarm.entity.Player;
 import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.SpriteSheet;
-import com.isofarm.input.Keyboard;
 import com.isofarm.input.Mouse;
 import com.isofarm.item.Backpack;
 import com.isofarm.item.Item;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 
-import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
 @SuppressWarnings("all")
 public class HotbarUI extends UIElement {
@@ -57,7 +56,8 @@ public class HotbarUI extends UIElement {
 
             float y = Settings.getScaledPadding();
             InventorySlotUI slotUI = new InventorySlotUI(x, y, Settings.getScaledSlot(),
-                    Settings.getScaledSlot());
+                    Settings.getScaledSlot(),
+                    InventorySlotUI.SlotType.HOTBAR);
             slotUIs[i] = slotUI;
             addChild(slotUI);
         }
@@ -68,7 +68,8 @@ public class HotbarUI extends UIElement {
                 Settings.getScaledSpacing() * 2.0f;
 
         backpackSlotUI = new InventorySlotUI(backpackX, Settings.getScaledPadding(),
-                Settings.getScaledSlot(), Settings.getScaledSlot());
+                Settings.getScaledSlot(), Settings.getScaledSlot(),
+                InventorySlotUI.SlotType.HOTBAR);
         addChild(backpackSlotUI);
     }
 

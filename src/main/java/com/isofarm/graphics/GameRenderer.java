@@ -380,6 +380,9 @@ public class GameRenderer {
         glDepthMask(false);
         glDisable(GL_CULL_FACE);
 
+        glEnable(GL_POLYGON_OFFSET_FILL);
+        glPolygonOffset(-1.0f, -1.0f);
+
         shader.bind();
         destroyTexture.bind();
         shader.setUniform("uUseTexture", true);
@@ -395,11 +398,13 @@ public class GameRenderer {
         shader.setUniform("uView", camera.getViewMatrix());
 
         modelMatrix.identity().translate(pos.x, pos.y, pos.z).scale(1.001f);
+
         shader.setUniform("uModel", modelMatrix);
         blockMesh.render();
         destroyTexture.unbind();
         shader.unbind();
 
+        glDisable(GL_POLYGON_OFFSET_FILL);
         glDepthMask(true);
         glEnable(GL_CULL_FACE);
         glDisable(GL_BLEND);

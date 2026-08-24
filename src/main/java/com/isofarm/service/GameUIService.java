@@ -84,11 +84,21 @@ public class GameUIService implements Service<GameMaster> {
         this.inventoryUI.setPosition(
                 windowWidth / 2.0f - inventoryUI.getAbsoluteWidth() / 2,
                 windowHeight / 2.0f - inventoryUI.getAbsoluteHeight() / 2);
-        this.inventoryUI.createSlots();
+        inventoryUI.createSlots();
 
         this.hotbarUI.setPosition(
                 windowWidth / 2.0f - hotbarUI.getAbsoluteWidth() / 2,
                 windowHeight - hotbarUI.getAbsoluteHeight() - K.UI.HOTBAR_OFFSET);
+
+        this.backpackUI = new BackpackInventoryUI(
+                inventoryUI.getAbsoluteX() + inventoryUI.getAbsoluteWidth() -
+                        K.UI.INVENTORY_BACKPACK_OFFSET,
+                inventoryUI.getAbsoluteY(),
+                player);
+
+        backpackUI.setLayer(100);
+        backpackUI.createBackpackSlots();
+        backpackUI.hide();
 
         inventoryUI.setSeedIcons(seedIcons);
         inventoryUI.setCropIcons(cropIcons);
@@ -97,9 +107,12 @@ public class GameUIService implements Service<GameMaster> {
         inventoryUI.setMaterialIcons(materialIcons);
         inventoryUI.setInventoryIcons(inventoryIcons);
         inventoryUI.setHotbarUI(gameMaster, hotbarUI);
+        inventoryUI.setGameMaster(gameMaster);
+        backpackUI.setGameMaster(gameMaster);
 
         uiManager.getRoot().addChild(inventoryUI);
         uiManager.getRoot().addChild(hotbarUI);
+        uiManager.getRoot().addChild(backpackUI);
 
         this.chatField = new UITextField(10, windowHeight - 40, windowWidth - 20, 30);
         this.chatField.setLayer(1000);
@@ -150,15 +163,6 @@ public class GameUIService implements Service<GameMaster> {
 
         inventoryUI.setHealthBar(healthBar);
         inventoryUI.setStaminaBar(staminaBar);
-
-        this.backpackUI = new BackpackInventoryUI(
-                inventoryUI.getAbsoluteX() + inventoryUI.getAbsoluteWidth() -
-                        K.UI.INVENTORY_BACKPACK_OFFSET,
-                inventoryUI.getAbsoluteY(),
-                null);
-        this.backpackUI.hide();
-        this.backpackUI.setLayer(100);
-        uiManager.getRoot().addChild(backpackUI);
     }
 
     public InventoryUI getInventoryUI() {

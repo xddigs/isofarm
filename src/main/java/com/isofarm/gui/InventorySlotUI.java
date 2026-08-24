@@ -12,25 +12,25 @@ import java.lang.Character;
 
 @SuppressWarnings("all")
 public class InventorySlotUI extends UIElement {
+    private final SlotType slotType;
     private InventorySlot slot;
+    private InventorySlot backpackSlot;
     private SpriteSheet spriteSheet;
     private int spriteFrame;
     private UIFont countFont = GUI.getNormalFont();
-
     private boolean selected;
     private boolean hovered;
-
     private boolean selectedOutline = false;
     private Vector4f selectionOutlineColor = K.UI.UI_HOTBAR_SELECTED_COLOR;
     private float selectionOutlineThickness = Settings.getScaledThickness() * 2f;
-
     private int lastAmount = 0;
     private Item lastItem = null;
     private float squishTimer = 0.0f;
-
-    public InventorySlotUI(float x, float y, float width, float height) {
+    public InventorySlotUI(float x, float y, float width, float height, SlotType slotType) {
         super(x, y, width, height);
+        this.slotType = slotType;
         setFocusable(true);
+        setSlot(getSlotType());
     }
 
     @Override
@@ -85,6 +85,22 @@ public class InventorySlotUI extends UIElement {
         renderChildren();
     }
 
+    public InventorySlot getSlotType() {
+        return switch (slotType) {
+            case BACKPACK -> backpackSlot;
+            case INVENTORY, HOTBAR -> slot;
+            default -> null;
+        };
+    }
+
+    public void setSlot(InventorySlot slot) {
+        if (slotType == SlotType.BACKPACK) {
+            this.backpackSlot = slot;
+        } else {
+            this.slot = slot;
+        }
+    }
+
     private void renderItem() {
         float iconSize = Settings.getScaledIcon();
 
@@ -124,7 +140,7 @@ public class InventorySlotUI extends UIElement {
 
         float padding = Settings.scale(2.0f);
         float barHeight = Settings.getScaledBorder() - 5f;
-        float barWidth =  getAbsoluteWidth() - padding * 2.0f;
+        float barWidth = getAbsoluteWidth() - padding * 2.0f;
         float x = getAbsoluteX() + padding;
         float y = getAbsoluteY() + getAbsoluteHeight() - barHeight - padding;
         GUI.drawRect(x, y, barWidth, barHeight,
@@ -191,16 +207,18 @@ public class InventorySlotUI extends UIElement {
         return slot;
     }
 
-    public void setSlot(InventorySlot slot) {
-        this.slot = slot;
+    public InventorySlot getBackpackSlot() {
+        return backpackSlot;
     }
 
     public Item getItem() {
-        return slot != null ? slot.getItem() : null;
+        InventorySlot currentSlot = getSlotType();
+        return currentSlot != null ? currentSlot.getItem() : null;
     }
 
     public boolean isEmpty() {
-        return slot == null || slot.isEmpty();
+        InventorySlot currentSlot = getSlotType();
+        return currentSlot == null || currentSlot.isEmpty();
     }
 
     public SpriteSheet getSpriteSheet() {
@@ -244,4 +262,6 @@ public class InventorySlotUI extends UIElement {
             this.countFont = countFont;
         }
     }
+
+    public enum SlotType {NONE, INVENTORY, BACKPACK, HOTBAR}
 }

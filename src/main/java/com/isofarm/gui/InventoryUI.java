@@ -20,7 +20,13 @@ import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_RIGHT;
 
 @SuppressWarnings("all")
 public class InventoryUI extends UIElement {
+    private static final int BACKPACK_SLOTS = 16;
+    private static final int BACKPACK_COLUMNS = 4;
+    private static final int BACKPACK_ROWS = 4;
+
     private final InventorySlotUI[] slotUIs;
+    private final InventorySlotUI[] backpackSlotUIs;
+
     private final List<UIButton> buttons;
     private UIButton sortButton;
     private UIButton groupButton;
@@ -55,6 +61,7 @@ public class InventoryUI extends UIElement {
         targetX = x;
         int totalVisualSlots = (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
         this.slotUIs = new InventorySlotUI[totalVisualSlots];
+        this.backpackSlotUIs = new InventorySlotUI[BACKPACK_SLOTS];
         this.buttons = new ArrayList<>();
         setFocusable(true);
         createButtons();
@@ -72,8 +79,24 @@ public class InventoryUI extends UIElement {
                 (K.UI.INVENTORY_ROWS - 1) * Settings.getScaledSpacing();
     }
 
+    public static float getBackpackWidth() {
+        return Settings.getScaledPadding() * 2.0f +
+                BACKPACK_COLUMNS * Settings.getScaledSlot() +
+                (BACKPACK_COLUMNS - 1) * Settings.getScaledSpacing();
+    }
+
+    public static float getBackpackHeight() {
+        return Settings.getScaledPadding() * 2.0f + Settings.getScaledHeader() +
+                BACKPACK_ROWS * Settings.getScaledSlot() +
+                (BACKPACK_ROWS - 1) * Settings.getScaledSpacing();
+    }
+
     public InventorySlotUI[] getSlotUIs() {
         return slotUIs;
+    }
+
+    public InventorySlotUI[] getBackpackSlotUIs() {
+        return backpackSlotUIs;
     }
 
     private void createButtons() {
@@ -117,10 +140,25 @@ public class InventoryUI extends UIElement {
             int row = i / K.UI.INVENTORY_COLUMNS;
             float x = Settings.getScaledPadding() + column * (Settings.getScaledSlot() + Settings.getScaledSpacing());
             float y = Settings.getScaledPadding() + Settings.getScaledHeader() + row * (Settings.getScaledSlot() + Settings.getScaledSpacing());
-            InventorySlotUI slotUI = new InventorySlotUI(x, y, Settings.getScaledSlot(), Settings.getScaledSlot());
+            InventorySlotUI slotUI = new InventorySlotUI(x, y, Settings.getScaledSlot(), Settings.getScaledSlot(),
+                    InventorySlotUI.SlotType.INVENTORY);
 
             slotUIs[i] = slotUI;
             addChild(slotUI);
+        }
+    }
+
+    public void createBackpackSlots() {
+        for (int i = 0; i < BACKPACK_SLOTS; i++) {
+            int column = i % BACKPACK_COLUMNS;
+            int row = i / BACKPACK_COLUMNS;
+            float x = Settings.getScaledPadding() + column * (Settings.getScaledSlot() + Settings.getScaledSpacing());
+            float y = Settings.getScaledPadding() + Settings.getScaledHeader() + row * (Settings.getScaledSlot() + Settings.getScaledSpacing());
+            InventorySlotUI slotUI = new InventorySlotUI(x, y, Settings.getScaledSlot(), Settings.getScaledSlot(),
+                    InventorySlotUI.SlotType.BACKPACK);
+
+            getBackpackSlotUIs()[i] = slotUI;
+            backpackUI.addChild(slotUI);
         }
     }
 
@@ -175,7 +213,16 @@ public class InventoryUI extends UIElement {
     public void closeBackpack() {
         isBackpackOpen = false;
         targetX = defaultX;
-        BackpackInventoryUI backpackUI = gameMaster.getGameUIService().getBackpackInventoryUI();
+        if (gameMaster == null || gameMaster.getGameUIService() == null) {
+            if (backpackUI != null) {
+                backpackUI.hide();
+            }
+            return;
+        }
+
+        BackpackInventoryUI backpackUI =
+                gameMaster.getGameUIService().getBackpackInventoryUI();
+
         if (backpackUI != null) {
             backpackUI.hide();
         }
@@ -204,6 +251,7 @@ public class InventoryUI extends UIElement {
     }
 
     private void onOpen() {
+        closeBackpack();
         if (hotbarUI == null || healthBar == null || staminaBar == null) {
             return;
         }
@@ -263,14 +311,30 @@ public class InventoryUI extends UIElement {
     }
 
     private void syncInventory() {
+        if (player == null || player.getInventory() == null) return;
         Inventory inventory = player.getInventory();
+
         for (int i = 0; i < slotUIs.length; i++) {
             InventorySlotUI slotUI = slotUIs[i];
+            if (slotUI == null) continue;
             if (i < inventory.getSlots().size()) {
                 slotUI.setSlot(inventory.getSlot(i));
             } else {
                 slotUI.setSlot(null);
             }
+
+            updateItemSprite(slotUI);
+        }
+
+        for (int i = 0; i < backpackSlotUIs.length; i++) {
+            InventorySlotUI slotUI = backpackSlotUIs[i];
+            if (slotUI == null) continue;
+            if (i < inventory.getSlots().size()) {
+                slotUI.setSlot(inventory.getSlot(i));
+            } else {
+                slotUI.setSlot(null);
+            }
+
             updateItemSprite(slotUI);
         }
 
@@ -310,6 +374,12 @@ public class InventoryUI extends UIElement {
             }
         }
 
+        for (InventorySlotUI slotUI : getBackpackSlotUIs()) {
+            if (slotUI != null) {
+                slotUI.setHovered(slotUI.contains(mouseX, mouseY));
+            }
+        }
+
         if (hotbarUI != null) {
             for (InventorySlotUI slotUI : hotbarUI.getSlotUIs()) {
 
@@ -321,13 +391,11 @@ public class InventoryUI extends UIElement {
     }
 
     public void slotInteract() {
-        if (hotbarUI == null) {
-            return;
-        }
-
+        if (hotbarUI == null) return;
         InventorySlotUI[] hotbarSlots = hotbarUI.getSlotUIs();
-        InventorySlotUI[] allSlots = new InventorySlotUI[slotUIs.length + hotbarSlots.length];
+        InventorySlotUI[] allSlots = new InventorySlotUI[slotUIs.length + hotbarSlots.length + backpackSlotUIs.length];
         System.arraycopy(slotUIs, 0, allSlots, 0, slotUIs.length);
+        System.arraycopy(backpackSlotUIs, 0, allSlots, slotUIs.length + hotbarSlots.length, backpackSlotUIs.length);
         System.arraycopy(hotbarSlots, 0, allSlots, slotUIs.length, hotbarSlots.length);
 
         for (InventorySlotUI slotUI : allSlots) {
@@ -335,10 +403,8 @@ public class InventoryUI extends UIElement {
                 continue;
             }
 
-            InventorySlot slot = slotUI.getSlot();
-            if (slot == null) {
-                continue;
-            }
+            InventorySlot slot = slotUI.getSlotType();
+            if (slot == null) continue;
 
             if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
                 leftClick(slot);
@@ -384,13 +450,11 @@ public class InventoryUI extends UIElement {
     private void placeEntireStack(InventorySlot slot) {
         slot.setItem(carriedItem);
         slot.setAmount(carriedAmount);
-
         clearCarriedItem();
     }
 
     private void mergeCarriedStack(InventorySlot slot) {
         int maxStack = player.getInventory().getMaxStack(carriedItem);
-
         int space = maxStack - slot.getAmount();
 
         if (space <= 0) {
@@ -398,7 +462,6 @@ public class InventoryUI extends UIElement {
         }
 
         int moved = Math.min(space, carriedAmount);
-
         slot.addAmount(moved);
         carriedAmount -= moved;
 
@@ -622,6 +685,10 @@ public class InventoryUI extends UIElement {
     public void setHotbarUI(GameMaster gameMaster, HotbarUI hotbarUI) {
         this.gameMaster = gameMaster;
         this.hotbarUI = hotbarUI;
+    }
+
+    public void setGameMaster(GameMaster gameMaster) {
+        this.gameMaster = gameMaster;
     }
 
     public BackpackInventoryUI getBackpackUI() {
