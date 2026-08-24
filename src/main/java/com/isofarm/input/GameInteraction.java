@@ -178,7 +178,14 @@ public class GameInteraction {
                 continue;
             }
 
-            player.add(item, amount);
+            if (player.getInventory().isFull()) {
+                if (player.getBackpack().hasBackpackEquipped()) {
+                    player.getBackpack().add(item, amount);
+                }
+            } else {
+                player.add(item, amount);
+            }
+
             iterator.remove();
             gameMaster.getSoundService().playEntitySound(SoundGroup.ITEMS);
             log.info("Added x{} {}", amount, item.getName());
@@ -269,7 +276,13 @@ public class GameInteraction {
                     int amount = worldItem.getAmount();
 
                     if (item != null && amount > 0) {
-                        player.add(item, amount);
+                        if (player.getInventory().isFull()) {
+                            if (player.getBackpack().hasBackpackEquipped()) {
+                                player.getBackpack().add(item, amount);
+                            }
+                        } else {
+                            player.add(item, amount);
+                        }
                         gameMaster.getSoundService().playEntitySound(SoundGroup.ITEMS);
                         log.info("Picked up x{} {}", amount, item.getName());
                     }

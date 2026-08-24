@@ -319,7 +319,7 @@ public class Player extends Character {
     }
 
     public void add(Item item) {
-        getInventory().add(item, 1);
+        add(item, 1);
         log.info("Added x1 of {} to inventory", item.getName());
     }
 
@@ -329,7 +329,7 @@ public class Player extends Character {
     }
 
     public void addToBackpack(Item item) {
-        if (getBackpack().hasBackpackEquipped()) getBackpack().add(item, 1);
+        addToBackpack(item, 1);
         log.info("Added x1 of {} to backpack", item.getName());
     }
 
@@ -339,7 +339,7 @@ public class Player extends Character {
     }
 
     public void removeFromBackpack(Item item) {
-        if (getBackpack().hasBackpackEquipped()) getBackpack().remove(item, 1);
+        removeFromBackpack(item, 1);
         log.info("Removed x1 of {} from backpack", item.getName());
     }
 
@@ -412,7 +412,15 @@ public class Player extends Character {
             for (RecipeIngredient ing : recipe.ingredients()) {
                 getInventory().remove(ing, ing.amount());
             }
-            add(recipe.result(), recipe.resultAmount());
+
+            if (getInventory().isFull()) {
+                if (getInventory().hasBackpackEquipped()) {
+                    addToBackpack(recipe.result(), recipe.resultAmount());
+                }
+            } else {
+                add(recipe.result(), recipe.resultAmount());
+            }
+
             gameMaster.getToastService().success("You crafted " +
                     recipe.resultAmount() + " " + recipe.result().getName());
         }

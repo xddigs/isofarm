@@ -8,7 +8,7 @@ import org.joml.Vector2f;
 public enum BlockData {
     AIR((byte) 0, "Air", 0, 0, 0, SoundGroup.SILENT, 0f, true, new MaterialID[]{}),
     DIRT((byte) 1, "Dirt", true, 100, 0, 0, SoundGroup.SOIL, 0.9f, false, new MaterialID[]{}),
-    GRASS((byte) 2, "Grass", true, 120, 1, 0, SoundGroup.SOIL, 1.0f, false, new MaterialID[]{}),
+    GRASS((byte) 2, "Grass", true, 120, 1, 0, SoundGroup.SOIL, 1.0f, false, new Seed[]{new Seed(CropType.WHEAT)}),
     STONE((byte) 3, "Stone", 150, 2, 0, SoundGroup.HARD, 6.0f, false, new MaterialID[]{}),
     TILLED_DIRT((byte) 4, "Tilled Dirt", true, false, new MaterialID[]{}, 110, 3, 0, 0, 0, 0, 0, SoundGroup.SOIL, 0.9f),
     VOIDSTONE((byte) 5, "Voidstone", 999, 4, 0, SoundGroup.HARD, 999999.0f, false, new MaterialID[]{}),
@@ -28,7 +28,7 @@ public enum BlockData {
     private final String name;
     private final boolean isTillable;
     private final boolean isTransparent;
-    private final MaterialID[] drops;
+    private final Object[] drops;
     private final int value;
 
     private final int topTileX;
@@ -48,30 +48,30 @@ public enum BlockData {
     private final float destroyTime;
 
     BlockData(byte id, String name, int value, int tileX, int tileY,
-              boolean isTillable, SoundGroup soundGroup, float destroyTime, boolean isTransparent, MaterialID[] drops) {
+              boolean isTillable, SoundGroup soundGroup, float destroyTime, boolean isTransparent, Object[] drops) {
         this(id, name, isTillable, isTransparent, drops, value, tileX, tileY, tileX, tileY,
                 tileX, tileY, soundGroup, destroyTime);
     }
 
     BlockData(byte id, String name, int value, int tileX, int tileY,
-              SoundGroup soundGroup, float destroyTime, boolean isTransparent, MaterialID[] drops) {
+              SoundGroup soundGroup, float destroyTime, boolean isTransparent, Object[] drops) {
         this(id, name, false, isTransparent, drops, value, tileX, tileY, tileX,
                 tileY, tileX, tileY, soundGroup, destroyTime);
     }
 
     BlockData(byte id, String name, boolean isTillable, int value, int
-            tileX, int tileY, SoundGroup soundGroup, float destroyTime, boolean isTransparent, MaterialID[] drops) {
+            tileX, int tileY, SoundGroup soundGroup, float destroyTime, boolean isTransparent, Object[] drops) {
         this(id, name, isTillable, isTransparent, drops, value, tileX, tileY, tileX,
                 tileY, tileX, tileY, soundGroup, destroyTime);
     }
 
     BlockData(byte id, String name, int value, boolean isTillable, int topTileX,
-              int topTileY, SoundGroup soundGroup, float destroyTime, boolean isTransparent, MaterialID[] drops) {
+              int topTileY, SoundGroup soundGroup, float destroyTime, boolean isTransparent, Object[] drops) {
         this(id, name, isTillable, isTransparent, drops, value, topTileX, topTileY,
                 0, 0, 0, 0, soundGroup, destroyTime);
     }
 
-    BlockData(byte id, String name, boolean isTillable, boolean isTransparent, MaterialID[] drops, int value, int topTileX,
+    BlockData(byte id, String name, boolean isTillable, boolean isTransparent, Object[] drops, int value, int topTileX,
               int topTileY, int bottomTileX, int bottomTileY, int sideTileX,
               int sideTileY, SoundGroup soundGroup, float destroyTime) {
         this.id = id;
@@ -172,7 +172,7 @@ public enum BlockData {
         return destroyTime;
     }
 
-    public MaterialID[] getDrops() {
+    public Object[] getDrops() {
         return drops;
     }
 
@@ -183,7 +183,7 @@ public enum BlockData {
     public MaterialID getRandomDrop() {
         if (!hasDrops()) return null;
         if (Math.random() < 0.50f) {
-            return drops[(int) (Math.random() * (drops.length - 1))];
+            return (MaterialID) drops[(int) (Math.random() * (drops.length - 1))];
         }
         return null;
     }

@@ -8,10 +8,11 @@ import java.util.*;
 @DataClass
 public class Inventory {
     private final List<InventorySlot> slots;
-    private final InventorySlot backpackSlot = new InventorySlot(new Backpack(), 1);
+    private final InventorySlot backpackSlot;
 
     public Inventory() {
         this.slots = new ArrayList<>();
+        this.backpackSlot = new InventorySlot();
 
         for (int i = 0; i < K.UI.INVENTORY_SLOTS; i++) {
             this.slots.add(new InventorySlot());
@@ -36,6 +37,14 @@ public class Inventory {
 
     public boolean hasBackpackEquipped() {
         return !backpackSlot.isEmpty() && backpackSlot.getItem() instanceof Backpack;
+    }
+
+    public void equipBackpack(Backpack backpack) {
+        backpackSlot.setItem(backpack);
+    }
+
+    public void unequipBackpack() {
+        backpackSlot.clear();
     }
 
     public int add(Item item, int amount) {
@@ -282,6 +291,10 @@ public class Inventory {
         for (InventorySlot slot : slots) {
             slot.clear();
         }
+    }
+
+    public boolean isFull() {
+        return slots.stream().filter(s -> s.getItem() != null).isParallel();
     }
 
     public boolean isEmpty() {

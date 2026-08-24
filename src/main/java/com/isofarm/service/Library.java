@@ -102,7 +102,13 @@ public class Library implements Service<GameMaster> {
             if (itemId.equals(DEFAULT_ID + ".coin")) {
                 player.earn(amount);
             } else {
-                player.add(item, amount);
+                if (player.getInventory().isFull()) {
+                    if (player.getBackpack().hasBackpackEquipped()) {
+                        player.addToBackpack(item, amount);
+                    }
+                } else {
+                    player.add(item, amount);
+                }
             }
             log.info("Command add executed: {} x{}", itemId, amount);
             gameMaster.getToastService().success("You added " + amount + " " +
