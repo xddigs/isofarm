@@ -5,10 +5,7 @@ import com.isofarm.graphics.CameraView;
 import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.Shader;
 import com.isofarm.graphics.SpriteSheet;
-import com.isofarm.item.Backpack;
-import com.isofarm.item.CraftingKit;
-import com.isofarm.item.Item;
-import com.isofarm.item.Tool;
+import com.isofarm.item.*;
 import com.isofarm.pathfinding.GridPos;
 import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
@@ -429,11 +426,10 @@ public class Player extends Character {
 
     public boolean hasIngredients(Recipe recipe) {
         for (Ingredient ingredient : recipe.ingredients()) {
-            if (getAmount(ingredient) < ingredient.amount()) {
+            if (getInventory().getAmount(ingredient) < ingredient.amount()) {
                 return false;
             }
         }
-
         return true;
     }
 

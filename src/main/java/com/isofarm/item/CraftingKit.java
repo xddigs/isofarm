@@ -31,10 +31,13 @@ public class CraftingKit extends Tool {
                 continue;
             }
 
-            if (player.craft(recipe)) {
-                return true;
+            if (player.hasIngredients(recipe)) {
+                return player.craft(recipe);
             }
         }
+
+        gameMaster.getToastService().error("You don't have enough " +
+                "ingredients to craft this");
         return false;
     }
 }
