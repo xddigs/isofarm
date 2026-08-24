@@ -1,13 +1,7 @@
 package com.isofarm.service;
 
-import com.isofarm.data.MaterialID;
-import com.isofarm.data.Recipe;
-import com.isofarm.data.Ingredient;
-import com.isofarm.data.Tier;
-import com.isofarm.item.Hoe;
-import com.isofarm.item.Item;
-import com.isofarm.item.Material;
-import com.isofarm.item.Pickaxe;
+import com.isofarm.data.*;
+import com.isofarm.item.*;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -17,16 +11,20 @@ public class RecipeRegistry implements Service<Recipe> {
     private static final List<Recipe> recipes = new LinkedList<>();
 
     public static List<Recipe> init() {
-        create(Tier.WOOD)
+        create(Tier.LEATHER)
+        .result(new Material(MaterialID.WOOD), 4)
+        .with(BlockData.OAK_LOG, 1).add();
+
+        create(Tier.LEATHER)
         .result(new Material(MaterialID.STICK), 4)
         .with(MaterialID.WOOD, 1).add();
 
-        create(Tier.WOOD)
+        create(Tier.LEATHER)
         .result(new Hoe(Tier.WOOD), 1)
         .with(MaterialID.WOOD, 1)
         .with(MaterialID.STICK, 3).add();
 
-        create(Tier.WOOD)
+        create(Tier.LEATHER)
         .result(new Pickaxe(Tier.WOOD), 1)
         .with(MaterialID.WOOD, 2)
         .with(MaterialID.STICK, 3).add();
@@ -54,13 +52,15 @@ public class RecipeRegistry implements Service<Recipe> {
             return this;
         }
 
-        public RecipeBuilder with(MaterialID material, int count) {
-            this.ingredients.add(new Ingredient(material, count));
+        public RecipeBuilder with(Craftable craftable, int count) {
+            this.ingredients.add(new Ingredient(craftable, count));
             return this;
         }
 
         public Recipe add() {
-            return new Recipe(tier, result, amount, ingredients);
+            Recipe recipe = new Recipe(tier, result, amount, ingredients);
+            recipes.add(recipe);
+            return recipe;
         }
     }
 }

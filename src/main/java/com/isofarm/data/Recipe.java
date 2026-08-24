@@ -9,4 +9,9 @@ public record Recipe(Tier tier, Item result, int resultAmount, List<Ingredient> 
     public static Recipe of(Tier tier, Item result, int resultAmount, Ingredient... ingredients) {
         return new Recipe(tier, result, resultAmount, List.of(ingredients));
     }
+
+    @Override
+    public String toString() {
+        return "Recipe=" + result + " x " + resultAmount;
+    }
 }

@@ -409,7 +409,8 @@ public class Player extends Character {
         if (!hasSpace()) return false;
 
         for (Ingredient ingredient : recipe.ingredients()) {
-            getInventory().remove(ingredient, ingredient.amount());
+            Craftable materialToRemove = new Material(ingredient.craftable());
+            getInventory().remove(materialToRemove, ingredient.amount());
         }
 
         if (!getInventory().isFull()) {
@@ -426,7 +427,8 @@ public class Player extends Character {
 
     public boolean hasIngredients(Recipe recipe) {
         for (Ingredient ingredient : recipe.ingredients()) {
-            if (getInventory().getAmount(ingredient) < ingredient.amount()) {
+            Craftable requiredMaterial = new Material(ingredient.craftable());
+            if (getInventory().getAmount(requiredMaterial) < ingredient.amount()) {
                 return false;
             }
         }

@@ -5,6 +5,7 @@ import com.isofarm.gui.UIFont;
 import com.isofarm.gui.UIManager;
 import com.isofarm.gui.UIProgressBar;
 import com.isofarm.input.Keyboard;
+import com.isofarm.service.RecipeRegistry;
 import com.isofarm.service.TimeService;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;

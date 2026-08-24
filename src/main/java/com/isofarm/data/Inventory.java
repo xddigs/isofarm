@@ -125,7 +125,6 @@ public class Inventory {
         }
 
         int remaining = amount;
-
         for (InventorySlot slot : slots) {
             if (remaining <= 0) {
                 break;
@@ -136,7 +135,6 @@ public class Inventory {
             }
 
             int current = slot.getAmount();
-
             if (current <= remaining) {
                 remaining -= current;
                 slot.clear();
@@ -149,7 +147,6 @@ public class Inventory {
 
     public void sort() {
         group();
-
         List<Stack> stacks = new ArrayList<>();
         for (InventorySlot slot : slots) {
             if (!slot.isEmpty()) {

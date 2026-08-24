@@ -3,25 +3,25 @@ package com.isofarm.data;
 import com.isofarm.item.Item;
 
 @DataClass
-public record Ingredient(MaterialID materialID, int amount) implements Item {
+public record Ingredient(Craftable craftable, int amount) implements Item {
 
     @Override
     public byte getId() {
-        return materialID.getId();
+        return craftable.getId();
     }
 
     @Override
     public String getName() {
-        return materialID.getName();
+        return craftable.getName();
     }
 
     @Override
     public int getValue() {
-        return materialID.getValue();
+        return craftable.getValue();
     }
 
     @Override
     public Item copy() {
-        return new Ingredient(materialID, amount);
+        return new Ingredient(craftable, amount);
     }
 }

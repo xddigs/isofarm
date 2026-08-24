@@ -1,11 +1,12 @@
 package com.isofarm.data;
 
+import com.isofarm.item.Item;
 import com.isofarm.utils.K;
 import org.joml.Vector2f;
 
 @SuppressWarnings("all")
 @DataClass
-public enum BlockData {
+public enum BlockData implements Craftable {
     AIR((byte) 0, "Air", 0, 0, 0, SoundGroup.SILENT, 0f, true, new MaterialID[]{}),
     DIRT((byte) 1, "Dirt", true, 100, 0, 0, SoundGroup.SOIL, 0.9f, false, new MaterialID[]{}),
     GRASS((byte) 2, "Grass", true, 120, 1, 0, SoundGroup.SOIL, 1.0f, false, new Seed[]{new Seed(CropType.WHEAT)}),
@@ -120,6 +121,11 @@ public enum BlockData {
         return value;
     }
 
+    @Override
+    public Item copy() {
+        return this;
+    }
+
     public boolean isTillable() {
         return isTillable;
     }
@@ -188,4 +194,6 @@ public enum BlockData {
         }
         return null;
     }
+
+
 }

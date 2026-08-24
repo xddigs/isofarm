@@ -162,8 +162,10 @@ public class GameMaster {
                 resourceManager.getBlockIcons(), resourceManager.getToolIcons(),
                 resourceManager.getMaterialIcons(),
                 resourceManager.getInventoryIcons());
+
         gameInteraction = new GameInteraction(this,
                 resourceManager.getBlocksTexture());
+
         gameUIservice.setPlayer(this.player);
         commandService.setGameUIService(gameUIservice);
         gameUIservice.setShop(shop);
@@ -372,6 +374,10 @@ public class GameMaster {
 
     public List<Recipe> getRecipes() {
         return recipes;
+    }
+
+    public void setRecipes(List<Recipe> recipes) {
+        this.recipes = recipes;
     }
 
     public void changeCamera() {

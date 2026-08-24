@@ -1,7 +1,9 @@
 package com.isofarm.data;
 
+import com.isofarm.item.Item;
+
 @DataClass
-public enum MaterialID {
+public enum MaterialID implements Craftable {
     STICK((byte) 0, "Stick", 1),
     WOOD((byte) 1, "Wood", 2),
     STONE((byte) 2, "Stone", 3);
@@ -19,4 +21,9 @@ public enum MaterialID {
     public byte getId() { return id; }
     public String getName() { return name; }
     public int getValue() { return value; }
+
+    @Override
+    public Item copy() {
+        return this;
+    }
 }
