@@ -576,13 +576,8 @@ public class InventoryUI extends UIElement {
             boolean canCraft = player.hasIngredients(recipe);
             boolean isSelected = activeCraftingKit != null && recipe.equals(activeCraftingKit.getSelectedRecipe());
 
-            Vector4f slotBg = canCraft
-                    ? (hovered ? new Vector4f(0.25f, 0.35f, 0.25f, 0.9f) : new Vector4f(0.18f, 0.18f, 0.2f, 0.8f))
-                    : (hovered ? new Vector4f(0.35f, 0.2f, 0.2f, 0.9f) : new Vector4f(0.12f, 0.12f, 0.14f, 0.6f));
-
-            Vector4f slotBorder = isSelected
-                    ? new Vector4f(0.9f, 0.9f, 0.9f, 1.0f)
-                    : (hovered ? new Vector4f(0.5f, 0.5f, 0.55f, 1.0f) : new Vector4f(0.25f, 0.25f, 0.28f, 1.0f));
+            Vector4f slotBg = isSelected ? K.UI.UI_SELECTED_COLOR : K.UI.UI_BACKGROUND_COLOR_SLOT;
+            Vector4f slotBorder = isSelected ? K.UI.UI_SELECTED_BORDER_COLOR : K.UI.UI_BORDER_COLOR;
 
             float borderWidth = isSelected ? 2.0f : 1.0f;
             GUI.drawRect(slotX, slotY, SLOT_SIZE, SLOT_SIZE, slotBg, 4.0f, slotBorder, borderWidth);
@@ -596,8 +591,8 @@ public class InventoryUI extends UIElement {
                 final float iconSize = Settings.getScaledIcon();
 
                 Vector4f tint = canCraft ? new Vector4f(1.0f) : new Vector4f(0.4f, 0.4f, 0.4f, 0.5f);
-                GUI.drawSprite(iconSheet, iconCol, iconRow, (slotX - iconSize)/2,
-                        (slotY - iconSize)/2, iconSize, iconSize, tint);
+                GUI.drawSprite(iconSheet, iconCol, iconRow, slotX + 4f,
+                        slotY + 4f, iconSize, iconSize, tint);
             }
 
             if (recipe.resultAmount() > 1) {
