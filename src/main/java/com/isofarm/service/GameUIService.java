@@ -148,12 +148,12 @@ public class GameUIService implements Service<GameMaster> {
         this.cpuTemp.show();
         uiManager.getRoot().addChild(cpuTemp);
 
-        this.gpu = new UILabel(20, cpu.getAbsoluteY() + cpu.getAbsoluteHeight(),
+        this.gpu = new UILabel(20, cpuTemp.getAbsoluteY() + cpuTemp.getAbsoluteHeight(),
                 DEBUG_LABEL_WIDTH, 25f, null);
         this.gpu.show();
         uiManager.getRoot().addChild(gpu);
 
-        this.memory = new UILabel(20, cpuTemp.getAbsoluteY() + cpuTemp.getAbsoluteHeight(),
+        this.memory = new UILabel(20, gpu.getAbsoluteY() + gpu.getAbsoluteHeight(),
                 DEBUG_LABEL_WIDTH, 25f, null);
         this.memory.show();
         uiManager.getRoot().addChild(memory);
