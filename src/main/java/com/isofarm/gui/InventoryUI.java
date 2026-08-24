@@ -587,7 +587,8 @@ public class InventoryUI extends UIElement {
 
     @Override
     public void render() {
-        if (inventory.getBackpackSlot().getItem() != null) {
+        if (inventory != null && inventory.getBackpackSlot() != null
+                && inventory.getBackpackSlot().getItem() != null) {
             backpackButton.show();
         } else {
             backpackButton.hide();
@@ -653,7 +654,9 @@ public class InventoryUI extends UIElement {
         this.player = player;
 
         if (player != null) {
-            this.inventory = inventory;
+            this.inventory = player.getInventory();
+        } else {
+            this.inventory = null;
         }
     }
 
