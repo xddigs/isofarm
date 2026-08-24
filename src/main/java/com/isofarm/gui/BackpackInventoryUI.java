@@ -3,8 +3,6 @@ package com.isofarm.gui;
 import com.isofarm.entity.Player;
 import com.isofarm.utils.Settings;
 
-import java.util.Arrays;
-
 public class BackpackInventoryUI extends InventoryUI {
     private static final int BACKPACK_SLOTS = 16;
     private static final int BACKPACK_COLUMNS = 4;
