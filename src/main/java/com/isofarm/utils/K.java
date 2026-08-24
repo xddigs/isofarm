@@ -12,8 +12,6 @@ public final class K {
     public static final class Camera {
         public static final float DEFAULT_PITCH = 35.264f;
         public static final float DEFAULT_YAW = -45.0f;
-        public static final float DEFAULT_WIDTH = 16.0f;
-        public static final float DEFAULT_HEIGHT = 8.0f;
         public static final float SPRINT_MULTIPLIER = 1.5f;
         public static final float BOB_FREQUENCY = 10.0f;
         public static final float BOB_AMOUNT = 0.08f;
@@ -109,9 +107,6 @@ public final class K {
         public static final Vector4f UI_ITEM_TINT = new Vector4f(1.0f);
         public static final Vector4f UI_TEXT_COLOR = new Vector4f(1.0f);
         public static final Vector4f UI_HOTBAR_SELECTED_COLOR = new Vector4f(0.35f, 0.9f, 0.35f, 1.0f);
-        public static final Vector4f RECIPE_SELECTED_COLOR = UI_HOVERED_COLOR;
-        public static final Vector4f RECIPE_BACKGROUND_COLOR = UI_BACKGROUND_COLOR;
-        public static final Vector4f UI_TEXT_DISABLED_COLOR = new Vector4f(0.2f);
     }
 
     public static final class Paths {
