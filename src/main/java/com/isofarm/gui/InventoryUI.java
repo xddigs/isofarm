@@ -405,9 +405,10 @@ public class InventoryUI extends UIElement {
     public void slotInteract() {
         if (hotbarUI == null) return;
         InventorySlotUI[] hotbarSlots = hotbarUI.getSlotUIs();
-        InventorySlotUI[] allSlots = new InventorySlotUI[slotUIs.length + hotbarSlots.length + backpackSlotUIs.length];
+        InventorySlotUI[] backpackSlots = getBackpackSlotUIs();
+        InventorySlotUI[] allSlots = new InventorySlotUI[slotUIs.length + hotbarSlots.length + backpackSlots.length];
         System.arraycopy(slotUIs, 0, allSlots, 0, slotUIs.length);
-        System.arraycopy(backpackSlotUIs, 0, allSlots, slotUIs.length + hotbarSlots.length, backpackSlotUIs.length);
+        System.arraycopy(backpackSlotUIs, 0, allSlots, backpackSlots.length + backpackSlots.length, backpackSlots.length);
         System.arraycopy(hotbarSlots, 0, allSlots, slotUIs.length, hotbarSlots.length);
 
         for (InventorySlotUI slotUI : allSlots) {
