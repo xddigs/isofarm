@@ -23,6 +23,7 @@ public class Library implements Service<GameMaster> {
         registerDefault(itemR, () -> new Material(MaterialID.WOOD));
         registerDefault(itemR, () -> new Material(MaterialID.STONE));
         registerDefault(itemR, Backpack::new);
+        registerDefault(itemR, CraftingKit::new);
         registerDefault(itemR, Coin::new);
         registerDefault(itemR, Hoe::new);
         registerDefault(itemR, Pickaxe::new);
@@ -56,7 +57,7 @@ public class Library implements Service<GameMaster> {
 
     private static void registerDefault(ItemRegistry itemR, Supplier<Item> supplier) {
         Item item = supplier.get();
-        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), item.getName()), supplier);
+        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), item.getName().trim()), supplier);
     }
 
     public static void initCommands(float delta, GameMaster gameMaster) {
@@ -98,7 +99,7 @@ public class Library implements Service<GameMaster> {
             String coinId = getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), ToolType.COIN.getName());
             if (itemId.equalsIgnoreCase(coinId)) {
                 player.earn(amount);
-            } else if (player.canAdd()) {
+            } else if (player.canAddTo()) {
                 player.addToBackpack(item, amount);
             } else {
                 player.add(item, amount);
@@ -259,7 +260,6 @@ public class Library implements Service<GameMaster> {
         StringBuilder builder = new StringBuilder();
         for (String s : name) {
             builder.append(s);
-            builder.append(" ");
         }
         return builder.toString().trim().toLowerCase();
     }

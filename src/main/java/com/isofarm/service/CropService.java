@@ -78,7 +78,7 @@ public class CropService implements Service<Crop> {
         int cropValue = crop.getValue();
         int seeds = crop.getCropType().getSeeds();
 
-        if (player.canAdd()) {
+        if (player.canAddTo()) {
             player.addToBackpack(new Produce(crop.getCropType()), yield);
             player.addToBackpack(new Seed(crop.getCropType()), seeds);
         } else {

@@ -183,7 +183,7 @@ public class GameInteraction {
                 continue;
             }
 
-            if (player.canAdd()) {
+            if (player.canAddTo()) {
                 player.addToBackpack(item, amount);
             } else {
                 player.add(item, amount);
@@ -277,7 +277,7 @@ public class GameInteraction {
                     int amount = worldItem.getAmount();
 
                     if (item != null && amount > 0) {
-                        if (player.canAdd()) {
+                        if (player.canAddTo()) {
                             player.addToBackpack(item, amount);
                         } else {
                             player.add(item, amount);

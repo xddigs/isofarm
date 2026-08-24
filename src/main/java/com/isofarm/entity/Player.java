@@ -408,12 +408,8 @@ public class Player extends Character {
     }
 
     public boolean craft(Recipe recipe) {
-        if (!hasIngredients(recipe)) {
-            gameMaster.getToastService().error("You don't have enough ingredients!");
-            return false;
-        }
-
-        if (!canAdd()) return false;
+        if (!hasIngredients(recipe)) return false;
+        if (canAddTo()) return false;
         for (Ingredient ingredient : recipe.ingredients()) {
             getInventory().remove(ingredient, ingredient.amount());
         }
@@ -435,12 +431,11 @@ public class Player extends Character {
         return true;
     }
 
-    public boolean canAdd() {
-        if (getInventory().isFull()) {
-            return !getBackpack().hasBackpackEquipped();
-        } else {
+    public boolean canAddTo() {
+        if (!getInventory().isFull()) {
             return false;
         }
+        return !getBackpack().hasBackpackEquipped() || getBackpack().isFull();
     }
 
     public boolean hasSeeds() {
