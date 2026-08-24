@@ -17,7 +17,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 public class HotbarUI extends UIElement {
     private final InventorySlotUI[] slotUIs = new InventorySlotUI[K.UI.INVENTORY_COLUMNS];
     private Player player;
-    private static Inventory inventory;
+    private Inventory inventory;
     private InventorySlotUI backpackSlotUI;
 
     private SpriteSheet seedIcons;
@@ -39,17 +39,29 @@ public class HotbarUI extends UIElement {
     }
 
     private static float getInitialHotbarWidth() {
-        return Settings.getScaledPadding() * 2.0f +
-                (K.UI.INVENTORY_COLUMNS + 1) * Settings.getScaledSlot() +
-                (K.UI.INVENTORY_COLUMNS + 1) * Settings.getScaledSpacing() +
-                Settings.getScaledSpacing() * 2.0f;
+        float padding = Settings.getScaledPadding();
+        float slot = Settings.getScaledSlot();
+        float spacing = Settings.getScaledSpacing();
+
+        return padding * 2.0f + K.UI.INVENTORY_COLUMNS * slot
+                + (K.UI.INVENTORY_COLUMNS - 1) * spacing;
     }
 
     public float getHotbarWidth() {
-        return Settings.getScaledPadding() * 2.0f +
-                (K.UI.INVENTORY_COLUMNS + 1) * Settings.getScaledSlot() +
-                getMaxSelectableSlots() * Settings.getScaledSpacing() +
-                Settings.getScaledSpacing() * 2.0f;
+        float padding = Settings.getScaledPadding();
+        float slot = Settings.getScaledSlot();
+        float spacing = Settings.getScaledSpacing();
+
+        float width = padding * 2.0f
+                + K.UI.INVENTORY_COLUMNS * slot
+                + (K.UI.INVENTORY_COLUMNS - 1) * spacing;
+
+        if (inventory != null && inventory.hasBackpackEquipped()) {
+            width += spacing * 2.0f;
+            width += slot;
+        }
+
+        return width;
     }
 
     private static float getHotbarHeight() {
