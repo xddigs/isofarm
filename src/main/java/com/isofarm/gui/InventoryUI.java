@@ -665,7 +665,7 @@ public class InventoryUI extends UIElement {
     }
 
     public void setInventory(Inventory inventory) {
-        this.player.setInventory(inventory);
+        this.inventory = inventory;
     }
 
     public void setSeedIcons(SpriteSheet seedIcons) {

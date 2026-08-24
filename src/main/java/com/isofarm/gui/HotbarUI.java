@@ -17,7 +17,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 public class HotbarUI extends UIElement {
     private final InventorySlotUI[] slotUIs = new InventorySlotUI[K.UI.INVENTORY_COLUMNS];
     private Player player;
-    private Inventory inventory;
+    private static Inventory inventory;
     private InventorySlotUI backpackSlotUI;
 
     private SpriteSheet seedIcons;
@@ -41,13 +41,35 @@ public class HotbarUI extends UIElement {
     private static float getHotbarWidth() {
         return Settings.getScaledPadding() * 2.0f +
                 (K.UI.INVENTORY_COLUMNS + 1) * Settings.getScaledSlot() +
-                (K.UI.INVENTORY_COLUMNS) * Settings.getScaledSpacing() +
+                getMaxSelectableSlots() * Settings.getScaledSpacing() +
                 Settings.getScaledSpacing() * 2.0f;
     }
 
     private static float getHotbarHeight() {
         return Settings.getScaledPadding() * 2.0f +
                 Settings.getScaledSlot();
+    }
+
+    private static int getMaxSelectableSlots() {
+        return (inventory != null && inventory.hasBackpackEquipped())
+                ? K.UI.INVENTORY_COLUMNS + 1
+                : K.UI.INVENTORY_COLUMNS;
+    }
+
+    public void selectSlot(int slot) {
+        if (slot < 0 || slot >= getMaxSelectableSlots()) {
+            return;
+        }
+        selectedSlot = slot;
+    }
+
+    public void selectNext() {
+        selectSlot((selectedSlot + 1) % getMaxSelectableSlots());
+    }
+
+    public void selectPrevious() {
+        int max = getMaxSelectableSlots();
+        selectSlot((selectedSlot - 1 + max) % max);
     }
 
     private void createSlots() {
@@ -71,6 +93,7 @@ public class HotbarUI extends UIElement {
         backpackSlotUI = new InventorySlotUI(backpackX, Settings.getScaledPadding(),
                 Settings.getScaledSlot(), Settings.getScaledSlot(),
                 InventorySlotUI.SlotType.HOTBAR);
+        backpackSlotUI.hide();
         addChild(backpackSlotUI);
     }
 
@@ -113,6 +136,15 @@ public class HotbarUI extends UIElement {
         InventorySlot backpackSlot = inventory.getBackpackSlot();
         backpackSlotUI.setSlot(backpackSlot);
         updateItemSprite(backpackSlotUI);
+
+        if (inventory.hasBackpackEquipped()) {
+            backpackSlotUI.show();
+        } else {
+            backpackSlotUI.hide();
+            if (selectedSlot == K.UI.INVENTORY_COLUMNS) {
+                selectedSlot = 0;
+            }
+        }
     }
 
     private void updateItemSprite(InventorySlotUI slotUI) {
@@ -161,7 +193,7 @@ public class HotbarUI extends UIElement {
     private void interact() {
         boolean isLeftClick = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
 
-        if (isLeftClick && isSlotHovered(backpackSlotUI)) {
+        if (isLeftClick && backpackSlotUI.isVisible() && isSlotHovered(backpackSlotUI)) {
             selectSlot(K.UI.INVENTORY_COLUMNS);
             if (backpackSlotUI.getItem() instanceof Backpack backpack) {
                 backpack.use(player.getGameMaster());
@@ -194,22 +226,6 @@ public class HotbarUI extends UIElement {
                 && mouseY >= y && mouseY <= y + height;
     }
 
-    public void selectSlot(int slot) {
-        if (slot < 0 || slot >= TOTAL_SELECTABLE_SLOTS) {
-            return;
-        }
-
-        selectedSlot = slot;
-    }
-
-    public void selectNext() {
-        selectSlot((selectedSlot + 1) % TOTAL_SELECTABLE_SLOTS);
-    }
-
-    public void selectPrevious() {
-        selectSlot((selectedSlot - 1 + TOTAL_SELECTABLE_SLOTS) % TOTAL_SELECTABLE_SLOTS);
-    }
-
     public Item getSelectedItem() {
         InventorySlot slot = getSelectedInventorySlot();
         return (slot == null || slot.isEmpty()) ? null : slot.getItem();
@@ -240,6 +256,11 @@ public class HotbarUI extends UIElement {
     }
 
     private void renderSelector() {
+        if (selectedSlot == K.UI.INVENTORY_COLUMNS &&
+                !backpackSlotUI.isVisible()) {
+            return;
+        }
+
         InventorySlotUI slot = (selectedSlot == K.UI.INVENTORY_COLUMNS) ?
                 backpackSlotUI : slotUIs[selectedSlot];
 

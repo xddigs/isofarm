@@ -9,7 +9,7 @@ import com.isofarm.graphics.ParticleEngine;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.item.*;
 import com.isofarm.service.CropService;
-import com.isofarm.service.GameUIService;
+import com.isofarm.gui.GameUIService;
 import com.isofarm.service.TimeService;
 import com.isofarm.utils.HoveredCell;
 import com.isofarm.utils.K;
@@ -48,8 +48,7 @@ public class GameInteraction {
     private float breakTimeout = TIMEOUT;
     private long lastBreakTime = 0L;
 
-    public GameInteraction(GameMaster gameMaster,
-                           SpriteSheet blocksTexture) {
+    public GameInteraction(GameMaster gameMaster, SpriteSheet blocksTexture) {
         this.cropService = gameMaster.getCropService();
         this.gameUIservice = gameMaster.getGameUIService();
         this.timeService = gameMaster.getTimeService();
@@ -59,7 +58,7 @@ public class GameInteraction {
     }
 
     public Hit update(GameMaster gameMaster, Item selectedItem) {
-        if (Keyboard.isKeyPressed(org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER)) {
+        if (Keyboard.isKeyPressed(GLFW_KEY_ENTER)) {
             if (!gameMaster.isChatOpen()) {
                 gameMaster.setChatOpen(true);
                 gameUIservice.openChat();
@@ -97,25 +96,18 @@ public class GameInteraction {
             addItem(gameMaster);
         }
 
-        if (!gameMaster.isChatOpen() &&
-                !gameMaster.isInventoryOpen()) {
-            if (Keyboard.isKeyPressed(GLFW_KEY_V) ||
-                    Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_MIDDLE)) {
+        if (!gameMaster.isChatOpen() && !gameMaster.isInventoryOpen()) {
+            if (Keyboard.isKeyPressed(GLFW_KEY_V) || Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_MIDDLE)) {
                 gameMaster.changeCamera();
             }
         }
 
-        if (Keyboard.isKeyPressed(GLFW_KEY_M) &&
-                !gameMaster.isChatOpen()) {
+        if (Keyboard.isKeyPressed(GLFW_KEY_M) && !gameMaster.isChatOpen()) {
             Settings.toggleMusic();
         }
 
-        boolean isCtrlHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)
-                || Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
-
-        boolean canInteract = !isCtrlHeld
-                && !gameMaster.isInventoryOpen()
-                && !gameMaster.isChatOpen();
+        boolean isCtrlHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL) || Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
+        boolean canInteract = !isCtrlHeld && !gameMaster.isInventoryOpen() && !gameMaster.isChatOpen();
 
         boolean isLeftPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
         boolean isLeftHeld = Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT);
@@ -123,6 +115,16 @@ public class GameInteraction {
 
         if (isLeftPressed && canInteract) {
             itemRenderer.playAttackAnimation();
+        }
+
+        if (selectedItem instanceof Backpack backpack && isRightPressed
+                && !gameMaster.isInventoryOpen()) {
+            if (isCtrlHeld) {
+                backpack.unequip();
+            } else {
+                backpack.use(gameMaster);
+            }
+            return null;
         }
 
         Hit hoveredCell;
@@ -155,8 +157,7 @@ public class GameInteraction {
         }
 
         if (isRightPressed && !gameMaster.isInventoryOpen()) {
-            placeAction(gameMaster, hoveredCell, selectedItem,
-                    isCtrlHeld, isRightPressed);
+            placeAction(gameMaster, hoveredCell, selectedItem);
         }
         return hoveredCell;
     }
@@ -217,8 +218,7 @@ public class GameInteraction {
             float throwStrength = 8.0f;
             float verticalStrength = 4.7f;
 
-            Vector3f velocity = new Vector3f(playerVelocity)
-                    .mul(inheritedVelocity);
+            Vector3f velocity = new Vector3f(playerVelocity).mul(inheritedVelocity);
 
             velocity.x += forward.x * throwStrength;
             velocity.z += forward.z * throwStrength;
@@ -234,7 +234,6 @@ public class GameInteraction {
 
             log.trace("Dropped x{} {} with velocity ({}, {}, {})", amount,
                     item.getName(), velocity.x, velocity.y, velocity.z);
-
             break;
         }
     }
@@ -262,8 +261,8 @@ public class GameInteraction {
                 float delta = gameMaster.getGenDelta();
                 float lerpFactor = Math.min(1.0f, 10.0f * delta);
 
-                Vector3f targetPos = new Vector3f(playerPos.x, playerPos.y +
-                        player.getDimensions().y, playerPos.z);
+                Vector3f targetPos = new Vector3f(playerPos.x,
+                        playerPos.y + player.getDimensions().y, playerPos.z);
 
                 itemPos.x = lerp(itemPos.x, targetPos.x, lerpFactor);
                 itemPos.y = lerp(itemPos.y, targetPos.y, lerpFactor);
@@ -314,9 +313,7 @@ public class GameInteraction {
         int y = cell.y();
         int z = cell.z();
 
-        Item selectedItem = gameMaster.getGameUIService()
-                .getHotbarUI()
-                .getSelectedItem();
+        Item selectedItem = gameMaster.getGameUIService().getHotbarUI().getSelectedItem();
 
         byte blockId = world.getBlockTypeAt(x, y, z);
         BlockData blockData = getBlockData(blockId);
@@ -327,20 +324,14 @@ public class GameInteraction {
             int frameIndex = crop.getStage().getFrameIndex();
             SpriteSheet sheet = gameMaster.getCropSpriteSheet(cropType);
             if (crop.isReadyToHarvest()) {
-                cropService.harvest(
-                        gameMaster.getPlayer(),
-                        crop,
-                        gameMaster.getToastService(),
-                        sheet
-                );
+                cropService.harvest(gameMaster.getPlayer(), crop, gameMaster.getToastService(), sheet);
             } else {
                 cropService.rip(crop);
             }
 
             if (sheet != null) {
                 itemRenderer.playBreakAnimation();
-                particles.spawn(x, y +
-                        K.World.SHORTER_BLOCK_HEIGHT, z, sheet, frameIndex);
+                particles.spawn(x, y + K.World.SHORTER_BLOCK_HEIGHT, z, sheet, frameIndex);
             }
 
             gameUIservice.logAction(cell);
@@ -423,10 +414,10 @@ public class GameInteraction {
         itemRenderer.playBreakAnimation();
 
         if (selectedItem instanceof Tool tool) {
-            boolean usable = Arrays.stream(tool.getType().getUsableOn())
+            boolean isUsableOn = Arrays.stream(tool.getType().getUsableOn())
                     .anyMatch(b -> b.getId() == blockId);
             tool.setPlayer(gameMaster.getPlayer());
-            if (!usable) {
+            if (!isUsableOn) {
                 tool.misuse();
             } else {
                 tool.use();
@@ -439,34 +430,23 @@ public class GameInteraction {
         Vector3f position = new Vector3f(x + 0.5f, y + 0.5f, z + 0.5f);
         Block removedBlock = new Block(blockData, x, y, z);
 
-        Material material = null;
-        WorldItem materialItem;
-
+        Item itemToDrop = null;
         if (removedBlock.getType().hasDrops()) {
             Object dropObj = removedBlock.getType().getRandomDrop();
-
-            if (dropObj != null) {
-                Item droppedItem = null;
-                if (dropObj instanceof MaterialID mid) {
-                    droppedItem = new Material(mid);
-                } else if (dropObj instanceof Item item) {
-                    droppedItem = item;
-                }
-
-                if (droppedItem != null) {
-                    WorldItem dropEntity = new WorldItem(droppedItem, 1, position);
-                    gameMaster.addEntity(dropEntity);
-                }
+            if (dropObj instanceof MaterialID mid) {
+                itemToDrop = new Material(mid);
+            } else if (dropObj instanceof Item item) {
+                itemToDrop = item;
             }
         }
 
-        WorldItem item = new WorldItem(removedBlock, 1, position);
-        if (material != null) {
-            materialItem = new WorldItem(material, 1, position);
-            gameMaster.addEntity(materialItem);
+        if (itemToDrop == null) {
+            itemToDrop = removedBlock;
         }
 
-        gameMaster.addEntity(item);
+        WorldItem dropEntity = new WorldItem(itemToDrop, 1, position);
+        gameMaster.addEntity(dropEntity);
+
         gameUIservice.logAction(cell);
         log.info("Block removed: {} at {},{},{}", blockData.getName(), x, y, z);
         this.breakTimeout = TIMEOUT;
@@ -481,8 +461,8 @@ public class GameInteraction {
         lastBreakTime = 0L;
     }
 
-    private void placeAction(GameMaster gameMaster, Hit cell, Item selectedItem, boolean isCtrlDown,
-                             boolean isRightClick) {
+    private void placeAction(GameMaster gameMaster, Hit cell,
+                             Item selectedItem) {
         World world = gameMaster.getWorld();
         if (gameMaster.getPlayer().checkCollision(world)) return;
 
@@ -501,8 +481,8 @@ public class GameInteraction {
                 Block newBlock = new Block(block.getType(), x, y, z);
                 world.setBlockTypeAt(x, y, z, block.getType().getId());
                 itemRenderer.playPlaceAnimation();
-                gameMaster.getSoundService().playBreakSound(newBlock.getType().getSoundGroup(),
-                        getDistanceToBlock(gameMaster, cell), Settings.getMaxInteractionDistance());
+                gameMaster.getSoundService().playBreakSound(newBlock.getType()
+                        .getSoundGroup(), getDistanceToBlock(gameMaster, cell), Settings.getMaxInteractionDistance());
 
                 gameMaster.getPlayer().remove(selectedItem);
                 gameMaster.rebuildChunkMeshAt(x, z);
@@ -513,20 +493,10 @@ public class GameInteraction {
             return;
         }
 
-        if (selectedItem instanceof Backpack backpack) {
-            if (isCtrlDown && isRightClick) {
-                backpack.unequip();
-                return;
-            } else if (isRightClick) {
-                backpack.use(gameMaster);
-                return;
-            }
-        }
-
         if (selectedItem instanceof Hoe hoe) {
             Block block = world.getBlockAt(cell.x(), cell.y(), cell.z());
-            if (Arrays.stream(hoe.getType().getUsableOn()).noneMatch(b -> b.getId() ==
-                    block.getType().getId())) {
+            if (Arrays.stream(hoe.getType().getUsableOn()).noneMatch(
+                    b -> b.getId() == block.getType().getId())) {
                 hoe.setPlayer(gameMaster.getPlayer());
                 hoe.misuse();
             } else {
@@ -553,8 +523,8 @@ public class GameInteraction {
             if (seed.getType() == null) return;
 
             Block tilledDirt = new Block(BlockData.TILLED_DIRT, x, y, z);
-            Crop planted = cropService.plant(x, y, z, gameMaster.getPlayer(), tilledDirt,
-                    seed.getType(), timeService.getCurrentSeason(), gameMaster.getToastService());
+            Crop planted = cropService.plant(x, y, z, gameMaster.getPlayer(), tilledDirt, seed.getType(),
+                    timeService.getCurrentSeason(), gameMaster.getToastService());
 
             if (planted != null) {
                 gameUIservice.logAction(cell);

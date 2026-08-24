@@ -1,6 +1,7 @@
 package com.isofarm.service;
 
 import com.isofarm.data.Command;
+import com.isofarm.gui.GameUIService;
 
 public class CommandService implements Service<Command> {
     private final CommandRegistry registry;

@@ -7,6 +7,7 @@ import com.isofarm.data.SoundGroup;
 import com.isofarm.entity.*;
 import com.isofarm.graphics.*;
 import com.isofarm.gui.GUI;
+import com.isofarm.gui.GameUIService;
 import com.isofarm.gui.UIManager;
 import com.isofarm.input.*;
 import com.isofarm.item.Item;

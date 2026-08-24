@@ -1,11 +1,11 @@
-package com.isofarm.service;
+package com.isofarm.gui;
 
 import com.isofarm.data.*;
 import com.isofarm.entity.Player;
 import com.isofarm.graphics.SpriteSheet;
-import com.isofarm.gui.*;
 import com.isofarm.input.Mouse;
 import com.isofarm.item.Item;
+import com.isofarm.service.Service;
 import com.isofarm.utils.Components;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
@@ -90,11 +90,11 @@ public class GameUIService implements Service<GameMaster> {
         this.hotbarUI.setLayer(50);
 
         this.inventoryUI.setPosition(
-                windowWidth / 2.0f - inventoryUI.getAbsoluteWidth() / 2,
-                windowHeight / 2.0f - inventoryUI.getAbsoluteHeight() / 2);
+                windowWidth / 2.0f - inventoryUI.getAbsoluteWidth() / 2.0f,
+                windowHeight / 2.0f - inventoryUI.getAbsoluteHeight() / 2.0f);
 
         this.hotbarUI.setPosition(
-                windowWidth / 2.0f - hotbarUI.getAbsoluteWidth() / 2,
+                windowWidth / 2.0f - hotbarUI.getAbsoluteWidth() / 2.0f,
                 windowHeight - hotbarUI.getAbsoluteHeight() - K.UI.HOTBAR_OFFSET);
 
         this.backpackUI = new BackpackInventoryUI(

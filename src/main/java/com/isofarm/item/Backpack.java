@@ -2,6 +2,7 @@ package com.isofarm.item;
 
 import com.isofarm.data.Tier;
 import com.isofarm.data.ToolType;
+import com.isofarm.entity.Player;
 import com.isofarm.wrld.GameMaster;
 
 public class Backpack extends Tool {
@@ -20,21 +21,27 @@ public class Backpack extends Tool {
         return new Backpack(ToolType.BACKPACK, Tier.LEATHER);
     }
 
-    public void use(GameMaster gameMaster) {
-        setPlayer(gameMaster.getPlayer());
-        if (!getPlayer().getBackpack().hasBackpackEquipped()) {
-            getPlayer().getBackpack().equipBackpack(this);
-            return;
+    public boolean use(GameMaster gameMaster) {
+        Player player = gameMaster.getPlayer();
+        if (player == null) return false;
+
+        setPlayer(player);
+
+        if (!player.getInventory().hasBackpackEquipped()) {
+            player.getInventory().equipBackpack(this);
+            return true;
         }
 
         if (!gameMaster.isChatOpen()) {
             gameMaster.toggleInventory();
         }
+
+        return false;
     }
 
     public void unequip() {
-        if (getPlayer().getBackpack().hasBackpackEquipped()) {
-            getPlayer().getBackpack().unequipBackpack();
+        if (getPlayer() != null && getPlayer().getInventory().hasBackpackEquipped()) {
+            getPlayer().getInventory().unequipBackpack();
         }
     }
 }
