@@ -150,8 +150,8 @@ public class GameInteraction {
             if (breakTimeout <= 0.0f) {
                 breakAction(gameMaster, hoveredCell);
             }
-
         } else {
+            itemRenderer.stopAnimation();
             resetBreaking();
         }
 
