@@ -8,8 +8,8 @@ import com.isofarm.service.ToastService;
 @DataClass
 public abstract class Character extends Entity implements Levelable {
     private final ToastService toastService;
-    private final Inventory inventory;
     private final Purse purse;
+    private Inventory inventory;
     private Reputation reputation;
     private Gamemode gamemode;
     private SoundService soundService;
@@ -147,7 +147,8 @@ public abstract class Character extends Entity implements Levelable {
         }
     }
 
-    protected void onDamageTaken(float amount) {}
+    protected void onDamageTaken(float amount) {
+    }
 
     public void heal(float amount) {
         if (amount <= 0 || !isAlive()) return;
@@ -171,6 +172,10 @@ public abstract class Character extends Entity implements Levelable {
 
     public Inventory getInventory() {
         return inventory;
+    }
+
+    public void setInventory(Inventory inventory) {
+        this.inventory = inventory;
     }
 
     public Purse getPurse() {

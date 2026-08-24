@@ -33,6 +33,7 @@ public class InventoryUI extends UIElement {
     private UIButton backpackButton;
 
     private Player player;
+    private Inventory inventory;
 
     private SpriteSheet seedIcons;
     private SpriteSheet cropIcons;
@@ -310,15 +311,14 @@ public class InventoryUI extends UIElement {
         carriedAmount = 0;
     }
 
-    private void syncInventory() {
-        if (player == null || player.getInventory() == null) return;
-        Inventory inventory = player.getInventory();
-
+    protected void syncInventory() {
+        if (player.getInventory() == null) return;
         for (int i = 0; i < slotUIs.length; i++) {
             InventorySlotUI slotUI = slotUIs[i];
             if (slotUI == null) continue;
-            if (i < inventory.getSlots().size()) {
-                slotUI.setSlot(inventory.getSlot(i));
+
+            if (i < (player.getInventory().getSlots().size())) {
+                slotUI.setSlot((player.getInventory().getSlot(i)));
             } else {
                 slotUI.setSlot(null);
             }
@@ -329,8 +329,9 @@ public class InventoryUI extends UIElement {
         for (int i = 0; i < backpackSlotUIs.length; i++) {
             InventorySlotUI slotUI = backpackSlotUIs[i];
             if (slotUI == null) continue;
-            if (i < inventory.getSlots().size()) {
-                slotUI.setSlot(inventory.getSlot(i));
+
+            if (i < (player.getInventory().getSlots().size())) {
+                slotUI.setSlot((player.getInventory().getSlot(i)));
             } else {
                 slotUI.setSlot(null);
             }
@@ -403,19 +404,29 @@ public class InventoryUI extends UIElement {
     }
 
     public void slotInteract() {
-        if (hotbarUI == null) return;
-        InventorySlotUI[] hotbarSlots = hotbarUI.getSlotUIs();
+        if (hotbarUI == null && !(this instanceof BackpackInventoryUI)) {
+            return;
+        }
+
         InventorySlotUI[] backpackSlots = getBackpackSlotUIs();
-        InventorySlotUI[] allSlots = new InventorySlotUI[slotUIs.length + hotbarSlots.length + backpackSlots.length];
-        System.arraycopy(slotUIs, 0, allSlots, 0, slotUIs.length);
-        System.arraycopy(backpackSlotUIs, 0, allSlots, backpackSlots.length + backpackSlots.length, backpackSlots.length);
-        System.arraycopy(hotbarSlots, 0, allSlots, slotUIs.length, hotbarSlots.length);
+        if (this instanceof BackpackInventoryUI) {
+            interactWithSlots(backpackSlots);
+            return;
+        }
 
-        for (InventorySlotUI slotUI : allSlots) {
-            if (slotUI == null || !slotUI.isHovered()) {
-                continue;
-            }
+        InventorySlotUI[] hotbarSlots = hotbarUI.getSlotUIs();
+        InventorySlotUI[] allSlots = new InventorySlotUI[slotUIs.length + hotbarSlots.length];
 
+        int offset = 0;
+        System.arraycopy(slotUIs, 0, allSlots, offset, slotUIs.length);
+        offset += slotUIs.length;
+        System.arraycopy(hotbarSlots, 0, allSlots, offset, hotbarSlots.length);
+        interactWithSlots(allSlots);
+    }
+
+    private void interactWithSlots(InventorySlotUI[] slots) {
+        for (InventorySlotUI slotUI : slots) {
+            if (slotUI == null || !slotUI.isHovered()) continue;
             InventorySlot slot = slotUI.getSlotType();
             if (slot == null) continue;
 
@@ -638,7 +649,8 @@ public class InventoryUI extends UIElement {
         this.staminaBar = staminaBar;
     }
 
-    public void setIcons(SpriteSheet seed, SpriteSheet crop, SpriteSheet block, SpriteSheet tool, SpriteSheet inv) {
+    public void setIcons(SpriteSheet seed, SpriteSheet crop,
+                         SpriteSheet block, SpriteSheet tool, SpriteSheet inv) {
         this.seedIcons = seed;
         this.cropIcons = crop;
         this.blockIcons = block;
@@ -648,6 +660,18 @@ public class InventoryUI extends UIElement {
 
     public void setPlayer(Player player) {
         this.player = player;
+
+        if (player != null) {
+            this.inventory = player.getInventory();
+        }
+    }
+
+    public Inventory getInventory() {
+        return inventory;
+    }
+
+    public void setInventory(Inventory inventory) {
+        this.player.setInventory(inventory);
     }
 
     public void setSeedIcons(SpriteSheet seedIcons) {
