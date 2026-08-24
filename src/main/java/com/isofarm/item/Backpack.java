@@ -1,5 +1,6 @@
 package com.isofarm.item;
 
+import com.isofarm.data.SoundGroup;
 import com.isofarm.data.Tier;
 import com.isofarm.data.ToolType;
 import com.isofarm.entity.Player;
@@ -28,6 +29,7 @@ public class Backpack extends Tool {
         setPlayer(player);
 
         if (!player.getInventory().hasBackpackEquipped()) {
+            gameMaster.getSoundService().playUseSound(SoundGroup.ITEMS);
             player.getInventory().equipBackpack(this);
             gameMaster.getGameUIService().resetHotbarPosition();
             return true;
@@ -40,8 +42,9 @@ public class Backpack extends Tool {
         return false;
     }
 
-    public void unequip() {
+    public void unequip(GameMaster gameMaster) {
         if (getPlayer() != null && getPlayer().getInventory().hasBackpackEquipped()) {
+            gameMaster.getSoundService().playUseSound(SoundGroup.ITEMS);
             getPlayer().getInventory().unequipBackpack();
             getPlayer().getGameMaster().getGameUIService().resetHotbarPosition();
         }

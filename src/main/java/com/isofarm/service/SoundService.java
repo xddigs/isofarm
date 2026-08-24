@@ -33,6 +33,7 @@ public class SoundService implements Service<SoundGroup> {
     private int entitySource;
     private int backgroundSource;
     private int loopingSource;
+    private int useSource;
 
     private String currentBackgroundSound;
 
@@ -45,6 +46,7 @@ public class SoundService implements Service<SoundGroup> {
             loadSoundArray(group.getEntitySounds());
             loadSoundArray(group.getBackgroundSounds());
             loadSoundArray(group.getLoopingSounds());
+            loadSoundArray(group.getUseSounds());
         }
     }
 
@@ -75,6 +77,7 @@ public class SoundService implements Service<SoundGroup> {
         entitySource = alGenSources();
         backgroundSource = alGenSources();
         loopingSource = alGenSources();
+        useSource = alGenSources();
 
         alSourcef(breakSource, AL_GAIN, 1.0f);
         alSourcef(stepSource, AL_GAIN, 1.0f);
@@ -82,6 +85,7 @@ public class SoundService implements Service<SoundGroup> {
         alSourcef(entitySource, AL_GAIN, 1.0f);
         alSourcef(backgroundSource, AL_GAIN, 1.0f);
         alSourcef(loopingSource, AL_GAIN, 1.0f);
+        alSourcef(useSource, AL_GAIN, 1.0f);
     }
 
     public void playStepSound(SoundGroup group, float distance, float maxDistance) {
@@ -112,6 +116,13 @@ public class SoundService implements Service<SoundGroup> {
         String[] sounds = group.getLoopingSounds();
         if (sounds == null || sounds.length == 0) return;
         playSound(loopingSource, sounds, 1.0f, 0.0f, 1.0f);
+    }
+
+    public void playUseSound(SoundGroup group) {
+        if (group == null) return;
+        String[] sounds = group.getUseSounds();
+        if (sounds == null || sounds.length == 0) return;
+        playSound(useSource, sounds, 1.0f, 0.0f, 1.0f);
     }
 
     public void setBackgroundSound(SoundGroup group) {

@@ -120,7 +120,7 @@ public class GameInteraction {
         if (selectedItem instanceof Backpack backpack && isRightPressed
                 && !gameMaster.isInventoryOpen()) {
             if (isCtrlHeld) {
-                backpack.unequip();
+                backpack.unequip(gameMaster);
             } else {
                 backpack.use(gameMaster);
             }
