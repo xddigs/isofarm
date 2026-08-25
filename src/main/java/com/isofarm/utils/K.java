@@ -71,11 +71,8 @@ public final class K {
         public static final int ICON_MATERIAL_COLS = 5;
         public static final int ICON_INV_COLS = 4;
 
-        public static final int BLOCK_ATLAS_COLUMNS = 12;
-        public static final int BLOCK_ATLAS_ROWS = 3;
         public static final int WATER_FRAMES = 8;
         public static final int DESTROY_FRAMES = 9;
-        public static final int FLOWERS_FRAMES = 48;
 
         public static final float TOAST_WIDTH = 400f;
         public static final float TOAST_HEIGHT = 64.0f;
@@ -149,9 +146,7 @@ public final class K {
         public static final String MATERIAL_ICONS = "assets/icons/material_icons.png";
         public static final String INVENTORY_ICONS = "assets/icons/inventory_icons.png";
         public static final String PLAYER_SPRITESHEET = "assets/sprites/gb.png";
-        public static final String BLOCKS = "assets/textures/blocks.png";
         public static final String WATER = "assets/textures/blocks/water.png";
-        public static final String FLOWERS = "assets/textures/flowers.png";
         public static final String DESTROY_STAGES = "assets/textures/blocks/destroy.png";
     }
 

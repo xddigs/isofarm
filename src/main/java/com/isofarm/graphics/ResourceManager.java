@@ -62,7 +62,6 @@ public class ResourceManager {
 
         List<String> allPaths = BlockData.getAllTexturePaths();
         this.blocksAtlas = new TextureAtlas(allPaths, 16, 16);
-
         for (BlockData block : BlockData.values()) {
             block.initRegions(this.blocksAtlas);
         }
@@ -139,6 +138,8 @@ public class ResourceManager {
     public Mesh getSelectionMesh() { return selectionMesh; }
     public Mesh getSpriteMesh() { return spriteMesh; }
     public Mesh getPlayerMesh() { return playerMesh; }
+    public TextureAtlas getBlocksAtlas() { return blocksAtlas; }
+    public SpriteSheet getWaterTexture() { return waterTexture; }
     public SpriteSheet getDestroyTexture() { return destroyTexture; }
     public SpriteSheet getSeedIcons() { return seedIcons; }
     public SpriteSheet getCropIcons() { return cropIcons; }

@@ -12,7 +12,6 @@ import java.util.List;
 @DataClass
 public enum BlockData implements Craftable {
     AIR((byte) 0, (byte) 0, "Air", false, 0, null, null, null, SoundGroup.SILENT, 0f, true, new MaterialID[]{}, Tier.NONE),
-    PLANT((byte) 999, (byte) -1, "Plant", false, 0, "assets/textures/blocks/short_grass.png", SoundGroup.SILENT, 0f, true, new MaterialID[]{}, Tier.NONE),
     DIRT((byte) 1, (byte) 0, "Dirt", true, 100, "assets/textures/blocks/dirt.png", SoundGroup.SOIL, 0.9f, false, new MaterialID[]{}, Tier.NONE),
     GRASS((byte) 2, (byte) 0, "Grass", true, 120, "assets/textures/blocks/grass.png", SoundGroup.SOIL, 1.0f, false, new Seed[]{new Seed(CropType.WHEAT)}, Tier.NONE),
     STONE((byte) 3, (byte) 0, "Stone", false, 150, "assets/textures/blocks/stone.png", SoundGroup.HARD, 6.0f, false, new MaterialID[]{}, Tier.NONE),
