@@ -270,16 +270,11 @@ public class Player extends Character {
         float distanceSquared = dx * dx + dz * dz;
 
         if (distanceSquared < 0.01f) {
-            position.x = targetX;
-            position.z = targetZ;
-            position.y = targetY;
-
             pathIndex++;
 
             if (!isFollowingPath()) {
                 setVelocity(new Vector3f(0.0f, 0.0f, 0.0f));
             }
-
             return;
         }
 
@@ -288,12 +283,10 @@ public class Player extends Character {
             direction.normalize();
         }
 
-        Vector3f velocity = new Vector3f(direction)
-                .mul(this.getSpeed());
-
+        Vector3f velocity = new Vector3f(direction).mul(this.getSpeed());
+        velocity.y = getVelocity().y;
         setVelocity(velocity);
-        move(world, velocity, delta);
-        position.y = targetY;
+        moveAndCollide(world, velocity, delta);
     }
 
     public String getName() {

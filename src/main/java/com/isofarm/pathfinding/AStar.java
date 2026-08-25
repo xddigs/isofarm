@@ -6,6 +6,7 @@ import java.util.*;
 
 public class AStar {
     private static final float STRAIGHT_COST = 1.0f;
+    private static final float DIAGONAL_COST = 1.414f;
     private static final float UP_COST = 1.2f;
     private static final float DOWN_COST = 1.0f;
 
@@ -48,37 +49,53 @@ public class AStar {
     }
 
     private static List<Neighbor> getNeighbors(World world, GridPos current) {
-        List<Neighbor> neighbors = new ArrayList<>(4);
-        addHorizontalNeighbor(world, neighbors, current, 1, 0);
-        addHorizontalNeighbor(world, neighbors, current, -1, 0);
-        addHorizontalNeighbor(world, neighbors, current, 0, 1);
-        addHorizontalNeighbor(world, neighbors, current, 0, -1);
+        List<Neighbor> neighbors = new ArrayList<>(8);
+
+        addHorizontalNeighbor(world, neighbors, current, 1, 0, STRAIGHT_COST);
+        addHorizontalNeighbor(world, neighbors, current, -1, 0, STRAIGHT_COST);
+        addHorizontalNeighbor(world, neighbors, current, 0, 1, STRAIGHT_COST);
+        addHorizontalNeighbor(world, neighbors, current, 0, -1, STRAIGHT_COST);
+
+        addDiagonalNeighbor(world, neighbors, current, 1, 1);
+        addDiagonalNeighbor(world, neighbors, current, 1, -1);
+        addDiagonalNeighbor(world, neighbors, current, -1, 1);
+        addDiagonalNeighbor(world, neighbors, current, -1, -1);
+
         return neighbors;
     }
 
     private static void addHorizontalNeighbor(World world, List<Neighbor> neighbors,
-                                              GridPos current, int dx, int dz) {
+                                              GridPos current, int dx, int dz, float baseCost) {
         int x = current.x() + dx;
         int z = current.z() + dz;
         GridPos sameLevel = new GridPos(x, current.y(), z);
 
         if (canStandAt(world, sameLevel)) {
-            neighbors.add(new Neighbor(sameLevel, STRAIGHT_COST));
-
+            neighbors.add(new Neighbor(sameLevel, baseCost));
             return;
         }
 
         GridPos up = new GridPos(x, current.y() + 1, z);
         if (canStandAt(world, up)) {
-            neighbors.add(new Neighbor(up, UP_COST));
-
+            neighbors.add(new Neighbor(up, baseCost * UP_COST));
             return;
         }
 
         GridPos down = new GridPos(x, current.y() - 1, z);
         if (canStandAt(world, down)) {
-            neighbors.add(new Neighbor(down, DOWN_COST));
+            neighbors.add(new Neighbor(down, baseCost * DOWN_COST));
         }
+    }
+
+    private static void addDiagonalNeighbor(World world, List<Neighbor> neighbors, GridPos current, int dx, int dz) {
+        GridPos side1 = new GridPos(current.x() + dx, current.y(), current.z());
+        GridPos side2 = new GridPos(current.x(), current.y(), current.z() + dz);
+
+        if (!canStandAt(world, side1) || !canStandAt(world, side2)) {
+            return;
+        }
+
+        addHorizontalNeighbor(world, neighbors, current, dx, dz, DIAGONAL_COST);
     }
 
     private static boolean canStandAt(World world, GridPos position) {
@@ -97,12 +114,17 @@ public class AStar {
     }
 
     private static float heuristic(GridPos a, GridPos b) {
-        return Math.abs(a.x() - b.x()) + Math.abs(a.y() - b.y()) + Math.abs(a.z() - b.z());
+        float dx = Math.abs(a.x() - b.x());
+        float dy = Math.abs(a.y() - b.y());
+        float dz = Math.abs(a.z() - b.z());
+
+        float minXZ = Math.min(dx, dz);
+        float maxXZ = Math.max(dx, dz);
+        return (DIAGONAL_COST * minXZ) + (STRAIGHT_COST * (maxXZ - minXZ)) + dy;
     }
 
     private static List<GridPos> reconstructPath(Node node) {
         LinkedList<GridPos> path = new LinkedList<>();
-
         Node current = node;
 
         while (current != null) {
@@ -111,12 +133,6 @@ public class AStar {
         }
 
         return path;
-    }
-
-    private record Node(GridPos position, Node parent, float gCost, float hCost) {
-        float fCost() {
-            return gCost + hCost;
-        }
     }
 
     private record Neighbor(GridPos position, float cost) {}
