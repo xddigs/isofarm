@@ -151,10 +151,7 @@ public class GameRenderer {
             defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
             defaultShader.setUniform("uUseTexture", true);
             defaultShader.setUniform("uUseFaceAtlas", false);
-            defaultShader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
-            defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
             glDisable(GL_CULL_FACE);
-
             gameMaster.getWorld().forEach(block -> {
                 if (block.getId() != BlockData.FLOWER.getId()) return;
                 int frameIndex = 0;
@@ -162,6 +159,7 @@ public class GameRenderer {
                 float renderX = block.getX() + 0.5f;
                 float renderY = block.getY() + 0.001f;
                 float renderZ = block.getZ() + 0.5f;
+
                 modelMatrix.identity().translate(renderX, renderY, renderZ);
                 defaultShader.setUniform("uModel", modelMatrix);
                 flowerMesh.render();

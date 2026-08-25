@@ -37,40 +37,13 @@ public class ChunkMeshBuilder {
             for (int y = 0; y < Chunk.SIZE_Y; y++) {
                 for (int z = 0; z < Chunk.SIZE_Z; z++) {
                     byte blockId = chunk.getBlock(x, y, z);
-                    if (blockId == 0) {
+                    if (blockId == BlockData.AIR.getId() ||
+                            blockId == BlockData.FLOWER.getId()) {
                         continue;
                     }
 
                     BlockData data = BLOCK_LUT[blockId & 0xFF];
-                    if (data == null || data == BlockData.CROP) continue;
-
-                    if (data == BlockData.FLOWER) {
-                        float uMin = data.getTopAtlasOffset().x;
-                        float vMin = data.getTopAtlasOffset().y;
-                        float uMax = uMin + data.getAtlasScale().x;
-                        float vMax = vMin + data.getAtlasScale().y;
-
-                        posIdx = addQuadPos(posBuffer, posIdx,
-                                (float)x, (float)y, (float)z,
-                                (float)x + 1, (float)y, (float)z + 1,
-                                (float)x + 1, (float)y + 1, (float)z + 1,
-                                (float)x, (float)y + 1, (float)z);
-                        uvIdx = addQuadUV(uvBuffer, uvIdx, uMin, vMax, uMax, vMax, uMax, vMin, uMin, vMin);
-                        normIdx = addQuadNorm(normBuffer, normIdx, 0, 1, 0);
-                        elemIdx = addQuadIndices(indexBuffer, elemIdx, vertexCount);
-                        vertexCount += 4;
-
-                        posIdx = addQuadPos(posBuffer, posIdx,
-                                (float)x + 1, (float)y, (float)z,
-                                (float)x, (float)y, (float)z + 1,
-                                (float)x, (float)y + 1, (float)z + 1,
-                                (float)x + 1, (float)y + 1, (float)z);
-                        uvIdx = addQuadUV(uvBuffer, uvIdx, uMin, vMax, uMax, vMax, uMax, vMin, uMin, vMin);
-                        normIdx = addQuadNorm(normBuffer, normIdx, 0, 1, 0);
-                        elemIdx = addQuadIndices(indexBuffer, elemIdx, vertexCount);
-                        vertexCount += 4;
-                        continue;
-                    }
+                    if (data == null) continue;
 
                     int worldX = chunkX * Chunk.SIZE_X + x;
                     int worldZ = chunkZ * Chunk.SIZE_Z + z;
@@ -188,7 +161,7 @@ public class ChunkMeshBuilder {
         byte blockId = world.getBlockTypeAt(worldX, worldY, worldZ);
         if (blockId == 0) return 0.0f;
         BlockData data = BLOCK_LUT[blockId & 0xFF];
-        if (data == null || data == BlockData.CROP || data == BlockData.FLOWER) return 0.0f;
+        if (data == null || data == BlockData.FLOWER) return 0.0f;
         return worldY;
     }
 
@@ -197,7 +170,7 @@ public class ChunkMeshBuilder {
         byte blockId = world.getBlockTypeAt(worldX, worldY, worldZ);
         if (blockId == 0) return 0.0f;
         BlockData data = BLOCK_LUT[blockId & 0xFF];
-        if (data == null || data == BlockData.CROP) return 0.0f;
+        if (data == null || data == BlockData.FLOWER) return 0.0f;
         return getBlockTopY(data, worldY);
     }
 
@@ -209,6 +182,7 @@ public class ChunkMeshBuilder {
         if (neighborId == 0) return true;
         BlockData neighborData = BLOCK_LUT[neighborId & 0xFF];
         if (neighborData == null) return true;
+        if (neighborData == BlockData.FLOWER) return true;
         return neighborData.isTransparent() && neighborData != currentBlock;
     }
 
@@ -218,6 +192,7 @@ public class ChunkMeshBuilder {
         if (neighborId == 0) return true;
         BlockData neighborData = BLOCK_LUT[neighborId & 0xFF];
         if (neighborData == null) return true;
+        if (neighborData == BlockData.FLOWER) return true;
         if (neighborData == BlockData.TILLED_DIRT && currentBlock != BlockData.TILLED_DIRT) return true;
         return neighborData.isTransparent() && neighborData != currentBlock;
     }

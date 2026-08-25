@@ -68,15 +68,6 @@ public class WorldGenerator {
                     }
                     chunk.setBlock(x, y, z, blockId);
                 }
-
-                if (height < FLOWER_MAX_HEIGHT && mountainFactor < 0.2f) {
-                    if (chunkRandom.nextDouble() < FLOWER_CHANCE) {
-                        int flowerY = height + 1;
-                        if (flowerY < Chunk.SIZE_Y) {
-                            chunk.setBlock(x, flowerY, z, BlockData.FLOWER.getId());
-                        }
-                    }
-                }
             }
         }
 
@@ -86,7 +77,12 @@ public class WorldGenerator {
                 int worldX = chunkX * Chunk.SIZE_X + x;
                 int worldZ = chunkZ * Chunk.SIZE_Z + z;
 
-                if (height < BASE_HEIGHT + 12 && chunkRandom.nextDouble() < 0.01 && canPlaceTree(heightMap, x, z)) {
+                if (height <= FLOWER_MAX_HEIGHT && chunkRandom.nextDouble() < FLOWER_CHANCE) {
+                    chunk.setBlock(x, height + 1, z, BlockData.FLOWER.getId());
+                }
+
+                if (height < BASE_HEIGHT + 12 && chunkRandom.nextDouble() < 0.01 &&
+                        canPlaceTree(heightMap, x, z)) {
                     generateCompactTree(worldX, height, worldZ);
                 }
             }
