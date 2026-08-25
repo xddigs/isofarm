@@ -11,7 +11,6 @@ import java.util.Map;
 
 public class ResourceManager {
     private static final Logger log = LoggerFactory.getLogger(ResourceManager.class);
-
     private final Shader defaultShader;
     private final Shader outlineShader;
     private final Shader rainShader;
@@ -28,6 +27,7 @@ public class ResourceManager {
 
     private final SpriteSheet blocksTexture;
     private final SpriteSheet waterTexture;
+    private final SpriteSheet flowers;
     private final SpriteSheet wheat;
     private final SpriteSheet carrot;
     private final SpriteSheet potato;
@@ -65,6 +65,7 @@ public class ResourceManager {
             log.warn("Could not load blocks.png atlas, falling back to base colors: {}", e.getMessage());
         }
         this.blocksTexture = blocks;
+        this.flowers = new SpriteSheet(K.Paths.FLOWERS, K.UI.FLOWERS_FRAMES, 1);
 
         this.waterTexture = new SpriteSheet(K.Paths.WATER, K.UI.WATER_FRAMES, 1);
         this.wheat = new SpriteSheet(K.Paths.WHEAT_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
@@ -100,6 +101,7 @@ public class ResourceManager {
         destroyOverlayMesh.dispose();
 
         if (blocksTexture != null) blocksTexture.dispose();
+        if (flowers != null) flowers.dispose();
         if (waterTexture != null) waterTexture.dispose();
 
         wheat.dispose();
@@ -137,6 +139,7 @@ public class ResourceManager {
     public Mesh getSpriteMesh() { return spriteMesh; }
     public Mesh getPlayerMesh() { return playerMesh; }
     public SpriteSheet getBlocksTexture() { return blocksTexture; }
+    public SpriteSheet getFlowers() { return flowers; }
     public SpriteSheet getDestroyTexture() { return destroyTexture; }
     public SpriteSheet getWaterTexture() { return waterTexture; }
     public SpriteSheet getSeedIcons() { return seedIcons; }

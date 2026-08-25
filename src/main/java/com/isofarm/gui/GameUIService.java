@@ -397,14 +397,10 @@ public class GameUIService implements Service<GameMaster> {
     public void renderCrosshair(float windowWidth, float windowHeight) {
         float centerX = Math.round(windowWidth * 0.5f);
         float centerY = Math.round(windowHeight * 0.5f);
-        float length = Settings.scale(6f);
-        float thickness = 2.0f;
         Vector4f color = new Vector4f(1.0f);
-        GUI.drawLine(centerX - length * 0.5f, centerY,
-                centerX + length * 0.5f, centerY, thickness, color);
+        float thickness = 3.0f;
 
-        GUI.drawLine(centerX, centerY - length * 0.5f,
-                centerX, centerY + length * 0.5f, thickness, color);
+        GUI.drawRect(centerX, centerY, thickness, thickness, color);
     }
 
     public void selectItem(int direction) {
