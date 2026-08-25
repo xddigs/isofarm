@@ -1,31 +1,43 @@
 package com.isofarm.data;
 
+import com.isofarm.graphics.TextureAtlas;
 import com.isofarm.item.Craftable;
 import com.isofarm.item.Item;
 import com.isofarm.item.MiningComponent;
-import com.isofarm.utils.K;
-import org.joml.Vector2f;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @SuppressWarnings("all")
 @DataClass
 public enum BlockData implements Craftable {
-    AIR((byte) 0, (byte) 0, "Air", 0, 0, 0, SoundGroup.SILENT, 0f, true, new MaterialID[]{}, Tier.NONE),
-    PLANT((byte) 999, (byte) -1, "Plant", 0, 0, 0, SoundGroup.SILENT, 0f, true, new MaterialID[]{}, Tier.NONE),
-    DIRT((byte) 1, (byte) 0, "Dirt", true, 100, 0, 0, SoundGroup.SOIL, 0.9f, false, new MaterialID[]{}, Tier.NONE),
-    GRASS((byte) 2, (byte) 0, "Grass", true, 120, 1, 0, SoundGroup.SOIL, 1.0f, false, new Seed[]{new Seed(CropType.WHEAT)}, Tier.NONE),
-    STONE((byte) 3, (byte) 0, "Stone", 150, 2, 0, SoundGroup.HARD, 6.0f, false, new MaterialID[]{}, Tier.NONE),
-    TILLED_DIRT((byte) 4, (byte) 0, "Tilled Dirt", true, false, new MaterialID[]{}, Tier.NONE, 110, 3, 0, 0, 0, 0, 0, SoundGroup.SOIL, 0.9f),
-    VOIDSTONE((byte) 5, (byte) 0, "Voidstone", 999, 4, 0, SoundGroup.HARD, 999999.0f, false, new MaterialID[]{}, Tier.NONE),
-    GLASS((byte) 6, (byte) 0, "Glass", 200, 5, 0, SoundGroup.GLASS, 1.2f, true, new MaterialID[]{}, Tier.NONE),
-    OAK_LOG((byte) 7, (byte) 0, "Oak Log", false, false, new MaterialID[]{}, Tier.WOOD, 100, 6, 2, 6, 2, 6, 1,SoundGroup.HARD, 2.2f),
-    OAK_WOOD((byte) 8, (byte) 0, "Oak Wood", 100, 7, 0, SoundGroup.HARD, 4.0f, false, new MaterialID[]{}, Tier.WOOD),
-    OAK_LEAVES((byte) 9, (byte) 0, "Oak Leaves", 100, 8, 0, SoundGroup.SOIL, 1.1f, false, new MaterialID[]{MaterialID.STICK}, Tier.NONE),
-    SNOW((byte) 10, (byte) 0, "Snow", 120, 9, 0, SoundGroup.SNOW, 0.8f, false, new MaterialID[]{}, Tier.NONE),
-    COPPER_ORE((byte) 11, (byte) 1, "Copper Ore Block", 150, 10, 0, SoundGroup.HARD, 6.0f, false, new MiningComponent[]{new MiningComponent(Tier.COPPER, MaterialID.ORE)}, Tier.COPPER),
-    IRON_ORE((byte) 12, (byte) 1, "Iron Ore Block", 150, 11, 0, SoundGroup.HARD, 8.0f, false, new MiningComponent[]{new MiningComponent(Tier.IRON, MaterialID.ORE)}, Tier.IRON);
+    AIR((byte) 0, (byte) 0, "Air", false, 0, null, null, null, SoundGroup.SILENT, 0f, true, new MaterialID[]{}, Tier.NONE),
+    PLANT((byte) 999, (byte) -1, "Plant", false, 0, "assets/textures/blocks/short_grass.png", SoundGroup.SILENT, 0f, true, new MaterialID[]{}, Tier.NONE),
+    DIRT((byte) 1, (byte) 0, "Dirt", true, 100, "assets/textures/blocks/dirt.png", SoundGroup.SOIL, 0.9f, false, new MaterialID[]{}, Tier.NONE),
+    GRASS((byte) 2, (byte) 0, "Grass", true, 120, "assets/textures/blocks/grass.png", SoundGroup.SOIL, 1.0f, false, new Seed[]{new Seed(CropType.WHEAT)}, Tier.NONE),
+    STONE((byte) 3, (byte) 0, "Stone", false, 150, "assets/textures/blocks/stone.png", SoundGroup.HARD, 6.0f, false, new MaterialID[]{}, Tier.NONE),
+    TILLED_DIRT((byte) 4, (byte) 0, "Tilled Dirt", true, 110, "assets/textures/blocks/dirt_tilled.png", "assets/textures/blocks/dirt.png", "assets/textures/blocks/dirt.png", SoundGroup.SOIL, 0.9f, false, new MaterialID[]{}, Tier.NONE),
+    VOIDSTONE((byte) 5, (byte) 0, "Voidstone", false, 999, "assets/textures/blocks/voidstone.png", SoundGroup.HARD, 999999.0f, false, new MaterialID[]{}, Tier.NONE),
+    GLASS((byte) 6, (byte) 0, "Glass", false, 200, "assets/textures/blocks/glass.png", SoundGroup.GLASS, 1.2f, true, new MaterialID[]{}, Tier.NONE),
+    OAK_LOG((byte) 7, (byte) 0, "Oak Log", false, 100, "assets/textures/blocks/oak_log_top.png", "assets/textures/blocks/oak_log_bottom.png", "assets/textures/blocks/oak_log_side.png", SoundGroup.HARD, 2.2f, false, new MaterialID[]{}, Tier.WOOD),
+    OAK_WOOD((byte) 8, (byte) 0, "Oak Wood", false, 100, "assets/textures/blocks/oak_plank.png", SoundGroup.HARD, 4.0f, false, new MaterialID[]{}, Tier.WOOD),
+    OAK_LEAVES((byte) 9, (byte) 0, "Oak Leaves", false, 100, "assets/textures/blocks/oak_leaves.png", SoundGroup.SOIL, 1.1f, false, new MaterialID[]{MaterialID.STICK}, Tier.NONE),
+    SNOW((byte) 10, (byte) 0, "Snow", false, 120, "assets/textures/blocks/snow.png", SoundGroup.SNOW, 0.8f, false, new MaterialID[]{}, Tier.NONE),
+    COPPER_ORE((byte) 11, (byte) 1, "Copper Ore Block", false, 150, "assets/textures/blocks/copper_ore.png", SoundGroup.HARD, 6.0f, false, new MiningComponent[]{new MiningComponent(Tier.COPPER, MaterialID.ORE)}, Tier.COPPER),
+    IRON_ORE((byte) 12, (byte) 1, "Iron Ore Block", false, 150, "assets/textures/blocks/iron_ore.png", SoundGroup.HARD, 8.0f, false, new MiningComponent[]{new MiningComponent(Tier.IRON, MaterialID.ORE)}, Tier.IRON),
+    BLUE_FLOWER((byte) 19, (byte) 0, "Blue Flower", false, 10, "assets/textures/blocks/blue_flower.png", SoundGroup.SOIL, 0.0f, true, new MaterialID[]{}, Tier.NONE),
+    BRIGHT_FLOWER((byte) 20, (byte) 0, "Bright Flower", false, 10, "assets/textures/blocks/bright_flower.png", SoundGroup.SOIL, 0.0f, true, new MaterialID[]{}, Tier.NONE),
+    GHOSTFLOWER((byte) 21, (byte) 0, "Ghostflower", false, 15, "assets/textures/blocks/ghostflower.png", SoundGroup.SOIL, 0.0f, true, new MaterialID[]{}, Tier.NONE),
+    LILLY((byte) 22, (byte) 0, "Lilly", false, 10, "assets/textures/blocks/lilly.png", SoundGroup.SOIL, 0.0f, true, new MaterialID[]{}, Tier.NONE),
+    RED_MUSHROOM((byte) 23, (byte) 0, "Red Mushroom", false, 15, "assets/textures/blocks/red_mushroom.png", SoundGroup.SOIL, 0.0f, true, new MaterialID[]{}, Tier.NONE),
+    ROSE((byte) 24, (byte) 0, "Rose", false, 10, "assets/textures/blocks/rose.png", SoundGroup.SOIL, 0.0f, true, new MaterialID[]{}, Tier.NONE),
+    ROSE_SHORT((byte) 25, (byte) 0, "Short Rose", false, 10, "assets/textures/blocks/rose_short.png", SoundGroup.SOIL, 0.0f, true, new MaterialID[]{}, Tier.NONE),
+    ROSEBUSH((byte) 26, (byte) 0, "Rosebush", false, 20, "assets/textures/blocks/rosebush.png", SoundGroup.SOIL, 0.0f, true, new MaterialID[]{}, Tier.NONE),
+    ROSES((byte) 27, (byte) 0, "Roses Cluster", false, 15, "assets/textures/blocks/roses.png", SoundGroup.SOIL, 0.0f, true, new MaterialID[]{}, Tier.NONE),
+    SHORT_GRASS((byte) 28, (byte) 0, "Short Grass", false, 5, "assets/textures/blocks/short_grass.png", SoundGroup.SOIL, 0.0f, true, new MaterialID[]{}, Tier.NONE),
+    TALL_GRASS((byte) 29, (byte) 0, "Tall Grass", false, 5, "assets/textures/blocks/tall_grass.png", SoundGroup.SOIL, 0.0f, true, new MaterialID[]{}, Tier.NONE),
+    TULIP((byte) 30, (byte) 0, "Tulip", false, 10, "assets/textures/blocks/tulip.png", SoundGroup.SOIL, 0.0f, true, new MaterialID[]{}, Tier.NONE);
 
-    public static final int ATLAS_COLS = K.UI.BLOCK_ATLAS_COLUMNS;
-    public static final int ATLAS_ROWS = K.UI.BLOCK_ATLAS_ROWS;
     public static final BlockData[] ORES = {COPPER_ORE, IRON_ORE};
 
     private final byte id;
@@ -37,83 +49,79 @@ public enum BlockData implements Craftable {
     private final Tier tier;
     private final int value;
 
-    private final int topTileX;
-    private final int topTileY;
-    private final int bottomTileX;
-    private final int bottomTileY;
-    private final int sideTileX;
-    private final int sideTileY;
-
-    private final Vector2f atlasScale;
-    private final Vector2f topAtlasOffset;
-    private final Vector2f bottomAtlasOffset;
-    private final Vector2f sideAtlasOffset;
-
+    private final String topPath;
+    private final String bottomPath;
+    private final String sidePath;
     private final SoundGroup soundGroup;
-
     private final float destroyTime;
 
-    BlockData(byte id, byte row, String name, int value, int tileX, int tileY,
-              boolean isTillable, SoundGroup soundGroup, float destroyTime, boolean isTransparent, Object[] drops, Tier tier) {
-        this(id, row, name, isTillable, isTransparent, drops, tier, value, tileX, tileY, tileX, tileY,
-                tileX, tileY, soundGroup, destroyTime);
-    }
+    private TextureAtlas.TextureRegion topRegion;
+    private TextureAtlas.TextureRegion bottomRegion;
+    private TextureAtlas.TextureRegion sideRegion;
 
-    BlockData(byte id, byte row, String name, int value, int tileX, int tileY,
+    BlockData(byte id, byte row, String name, boolean isTillable, int value, String topPath, String bottomPath, String sidePath,
               SoundGroup soundGroup, float destroyTime, boolean isTransparent, Object[] drops, Tier tier) {
-        this(id, row, name, false, isTransparent, drops, tier, value, tileX, tileY, tileX,
-                tileY, tileX, tileY, soundGroup, destroyTime);
-    }
-
-    BlockData(byte id, byte row, String name, boolean isTillable, int value, int
-            tileX, int tileY, SoundGroup soundGroup, float destroyTime, boolean isTransparent, Object[] drops, Tier tier) {
-        this(id, row, name, isTillable, isTransparent, drops, tier, value, tileX, tileY, tileX,
-                tileY, tileX, tileY, soundGroup, destroyTime);
-    }
-
-    BlockData(byte id, byte row, String name, int value, boolean isTillable, int topTileX,
-              int topTileY, SoundGroup soundGroup, float destroyTime, boolean isTransparent, Object[] drops, Tier tier) {
-        this(id, row, name, isTillable, isTransparent, drops, tier, value, topTileX, topTileY,
-                0, 0, 0, 0, soundGroup, destroyTime);
-    }
-
-    BlockData(byte id, byte row, String name, boolean isTillable, boolean isTransparent, Object[] drops, Tier tier, int value, int topTileX,
-              int topTileY, int bottomTileX, int bottomTileY, int sideTileX,
-              int sideTileY, SoundGroup soundGroup, float destroyTime) {
         this.id = id;
         this.row = row;
         this.name = name;
         this.isTillable = isTillable;
+        this.value = value;
+        this.topPath = topPath;
+        this.bottomPath = bottomPath;
+        this.sidePath = sidePath;
+        this.soundGroup = soundGroup;
+        this.destroyTime = destroyTime;
         this.isTransparent = isTransparent;
         this.drops = drops;
         this.tier = tier;
-        this.value = value;
-        this.topTileX = topTileX;
-        this.topTileY = topTileY;
-        this.bottomTileX = bottomTileX;
-        this.bottomTileY = bottomTileY;
-        this.sideTileX = sideTileX;
-        this.sideTileY = sideTileY;
-        this.soundGroup = soundGroup;
-        this.destroyTime = destroyTime;
+    }
 
-        this.atlasScale = new Vector2f(1.0f / ATLAS_COLS, 1.0f / ATLAS_ROWS);
-        this.topAtlasOffset = calculateAtlasOffset(topTileX, topTileY);
-        this.bottomAtlasOffset = calculateAtlasOffset(bottomTileX, bottomTileY);
-        this.sideAtlasOffset = calculateAtlasOffset(sideTileX, sideTileY);
+    BlockData(byte id, byte row, String name, boolean isTillable, int value, String texturePath,
+              SoundGroup soundGroup, float destroyTime, boolean isTransparent, Object[] drops, Tier tier) {
+        this(id, row, name, isTillable, value, texturePath, texturePath, texturePath, soundGroup, destroyTime, isTransparent, drops, tier);
+    }
+
+    public static List<String> getAllTexturePaths() {
+        List<String> paths = new ArrayList<>();
+        for (BlockData block : values()) {
+            if (block.topPath != null && !paths.contains(block.topPath)) paths.add(block.topPath);
+            if (block.bottomPath != null && !paths.contains(block.bottomPath)) paths.add(block.bottomPath);
+            if (block.sidePath != null && !paths.contains(block.sidePath)) paths.add(block.sidePath);
+        }
+        return paths;
     }
 
     public static BlockData fromId(byte id) {
         for (BlockData block : values()) {
-            if (block.getId() == id) {
-                return block;
-            }
+            if (block.getId() == id) return block;
         }
         return null;
     }
 
     public static BlockData[] all() {
         return values();
+    }
+
+    public static BlockData[] getOres() {
+        return ORES;
+    }
+
+    public static BlockData getOre(Tier tier) {
+        for (BlockData block : ORES) {
+            if (block.getTier() == tier) return block;
+        }
+        return null;
+    }
+
+    public static BlockData getRandomOre() {
+        return ORES[(int) (Math.random() * ORES.length)];
+    }
+
+    public void initRegions(TextureAtlas atlas) {
+        if (atlas == null) return;
+        if (topPath != null) this.topRegion = atlas.getRegion(topPath);
+        if (bottomPath != null) this.bottomRegion = atlas.getRegion(bottomPath);
+        if (sidePath != null) this.sideRegion = atlas.getRegion(sidePath);
     }
 
     public byte getId() {
@@ -149,40 +157,28 @@ public enum BlockData implements Craftable {
         return isTransparent;
     }
 
-    public int getTileX() {
-        return sideTileX;
+    public String getTopPath() {
+        return topPath;
     }
 
-    public int getTileY() {
-        return sideTileY;
+    public String getBottomPath() {
+        return bottomPath;
     }
 
-    public Vector2f getAtlasScale() {
-        return atlasScale;
+    public String getSidePath() {
+        return sidePath;
     }
 
-    private Vector2f calculateAtlasOffset(int tx, int ty) {
-        float scaleX = 1.0f / ATLAS_COLS;
-        float scaleY = 1.0f / ATLAS_ROWS;
-        float offsetX = tx * scaleX;
-        float offsetY = (ATLAS_ROWS > 1) ? (ATLAS_ROWS - 1 - ty) * scaleY : ty * scaleY;
-        return new Vector2f(offsetX, offsetY);
+    public TextureAtlas.TextureRegion getTopRegion() {
+        return topRegion;
     }
 
-    public Vector2f getTopAtlasOffset() {
-        return topAtlasOffset;
+    public TextureAtlas.TextureRegion getBottomRegion() {
+        return bottomRegion;
     }
 
-    public Vector2f getBottomAtlasOffset() {
-        return bottomAtlasOffset;
-    }
-
-    public Vector2f getSideAtlasOffset() {
-        return sideAtlasOffset;
-    }
-
-    public Vector2f getAtlasOffset() {
-        return sideAtlasOffset;
+    public TextureAtlas.TextureRegion getSideRegion() {
+        return sideRegion;
     }
 
     public SoundGroup getSoundGroup() {
@@ -198,7 +194,7 @@ public enum BlockData implements Craftable {
     }
 
     public boolean hasDrops() {
-        return drops.length > 0;
+        return drops != null && drops.length > 0;
     }
 
     public Object getRandomDrop() {
@@ -208,22 +204,5 @@ public enum BlockData implements Craftable {
             return drops[index];
         }
         return null;
-    }
-
-    public static BlockData[] getOres() {
-        return ORES;
-    }
-
-    public static BlockData getOre(Tier tier) {
-        for (BlockData block : ORES) {
-            if (block.getTier() == tier) {
-                return block;
-            }
-        }
-        return null;
-    }
-
-    public static BlockData getRandomOre() {
-        return ORES[(int) (Math.random() * ORES.length)];
     }
 }

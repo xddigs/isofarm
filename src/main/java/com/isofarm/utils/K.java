@@ -150,9 +150,9 @@ public final class K {
         public static final String INVENTORY_ICONS = "assets/icons/inventory_icons.png";
         public static final String PLAYER_SPRITESHEET = "assets/sprites/gb.png";
         public static final String BLOCKS = "assets/textures/blocks.png";
-        public static final String WATER = "assets/textures/water.png";
+        public static final String WATER = "assets/textures/blocks/water.png";
         public static final String FLOWERS = "assets/textures/flowers.png";
-        public static final String DESTROY_STAGES = "assets/textures/destroy.png";
+        public static final String DESTROY_STAGES = "assets/textures/blocks/destroy.png";
     }
 
     public static final class Render {

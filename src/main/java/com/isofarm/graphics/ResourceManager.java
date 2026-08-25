@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 
 public class ResourceManager {
@@ -26,7 +27,7 @@ public class ResourceManager {
     private final Mesh playerMesh;
     private final Mesh destroyOverlayMesh;
 
-    private final SpriteSheet blocksTexture;
+    private final TextureAtlas blocksAtlas;
     private final SpriteSheet waterTexture;
     private final SpriteSheet wheat;
     private final SpriteSheet carrot;
@@ -59,13 +60,12 @@ public class ResourceManager {
         this.playerMesh = Mesh.quadVertical();
         this.destroyOverlayMesh = Mesh.createDestroyOverlayMesh();
 
-        SpriteSheet blocks = null;
-        try {
-            blocks = new SpriteSheet(K.Paths.BLOCKS, K.UI.BLOCK_ATLAS_COLUMNS, 4);
-        } catch (Exception e) {
-            log.warn("Could not load blocks.png atlas, falling back to base colors: {}", e.getMessage());
+        List<String> allPaths = BlockData.getAllTexturePaths();
+        this.blocksAtlas = new TextureAtlas(allPaths, 16, 16);
+
+        for (BlockData block : BlockData.values()) {
+            block.initRegions(this.blocksAtlas);
         }
-        this.blocksTexture = blocks;
 
         this.waterTexture = new SpriteSheet(K.Paths.WATER, K.UI.WATER_FRAMES, 1);
         this.wheat = new SpriteSheet(K.Paths.WHEAT_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
@@ -101,7 +101,7 @@ public class ResourceManager {
         playerMesh.dispose();
         destroyOverlayMesh.dispose();
 
-        if (blocksTexture != null) blocksTexture.dispose();
+        blocksAtlas.dispose();
         if (waterTexture != null) waterTexture.dispose();
 
         wheat.dispose();
@@ -139,7 +139,6 @@ public class ResourceManager {
     public Mesh getSelectionMesh() { return selectionMesh; }
     public Mesh getSpriteMesh() { return spriteMesh; }
     public Mesh getPlayerMesh() { return playerMesh; }
-    public SpriteSheet getBlocksTexture() { return blocksTexture; }
     public SpriteSheet getDestroyTexture() { return destroyTexture; }
     public SpriteSheet getSeedIcons() { return seedIcons; }
     public SpriteSheet getCropIcons() { return cropIcons; }
