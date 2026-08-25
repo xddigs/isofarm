@@ -6,7 +6,6 @@ import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.input.Mouse;
 import com.isofarm.item.Block;
-import com.isofarm.item.Craftable;
 import com.isofarm.item.Item;
 import com.isofarm.item.Tool;
 import com.isofarm.utils.K;
@@ -469,6 +468,17 @@ public class InventoryUI extends UIElement {
             }
 
             case CRAFTING -> {
+                if (carriedItem == null) {
+                    pickEntireStack(slot);
+                    return;
+                }
+
+                if (slot.isEmpty()) {
+                    placeEntireStack(slot);
+                    return;
+                }
+
+                tryCraft(slot);
             }
         }
     }
@@ -520,6 +530,7 @@ public class InventoryUI extends UIElement {
 
     private void rightClick(InventorySlot slot) {
         switch (currentTab) {
+
             case INVENTORY -> {
                 if (carriedItem == null) {
                     takeHalf(slot);
@@ -539,6 +550,10 @@ public class InventoryUI extends UIElement {
             }
 
             case CRAFTING -> {
+                if (tryCraftOne(slot)) {
+                    return;
+                }
+
                 if (carriedItem == null) {
                     pickEntireStack(slot);
                     return;
@@ -551,6 +566,65 @@ public class InventoryUI extends UIElement {
 
                 tryCraft(slot);
             }
+        }
+    }
+
+    private boolean tryCraftOne(InventorySlot slot) {
+        if (slot == null || slot.isEmpty()) {
+            return false;
+        }
+
+        Item item = slot.getItem();
+        Recipe recipe = findSingleIngredientRecipe(item);
+        if (recipe == null) {
+            return false;
+        }
+
+        Ingredient ingredient = recipe.ingredients().getFirst();
+        if (slot.getAmount() < ingredient.amount()) {
+            ToastFactory.info("Not enough materials");
+            return true;
+        }
+
+        craftSingleIngredient(recipe, slot);
+        return true;
+    }
+
+    private Recipe findSingleIngredientRecipe(Item item) {
+        if (gameMaster == null || item == null) {
+            return null;
+        }
+
+        for (Recipe recipe : gameMaster.getRecipes()) {
+            if (recipe.ingredients().size() != 1) {
+                continue;
+            }
+
+            Ingredient ingredient = recipe.ingredients().getFirst();
+            if (matchesIngredient(ingredient, item)) {
+                return recipe;
+            }
+        }
+
+        return null;
+    }
+
+    private void craftSingleIngredient(Recipe recipe, InventorySlot slot) {
+        Ingredient ingredient = recipe.ingredients().getFirst();
+        int cost = ingredient.amount();
+        if (slot.getAmount() < cost) {
+            return;
+        }
+
+        slot.setAmount(slot.getAmount() - cost);
+        if (slot.getAmount() <= 0) {
+            slot.clear();
+        }
+
+        Item result = recipe.result().copy();
+        int remaining = inventory.add(result, recipe.resultAmount());
+        if (!player.hasSpace()) {
+            player.addToBackpack(result, remaining);
         }
     }
 
@@ -606,10 +680,7 @@ public class InventoryUI extends UIElement {
         if (ingredient == null || item == null) {
             return false;
         }
-
-        Craftable required = ingredient.craftable();
-        return required.getClass() == item.getClass()
-                && required.getId() == item.getId();
+        return ingredient.craftable().getId() == item.getId();
     }
 
     private boolean canCraft(Recipe recipe, Item first,
