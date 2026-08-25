@@ -83,7 +83,7 @@ public class ResourceManager {
         inventoryIcons = new SpriteSheet(K.Paths.INVENTORY_ICONS, 3, 1);
 
         this.playerSpriteSheet = new SpriteSheet(K.Paths.PLAYER_SPRITESHEET,
-                Direction.values().length, 1);
+                Direction.values().length, 6);
 
         this.destroyTexture = new SpriteSheet(K.Paths.DESTROY_STAGES, K.UI.DESTROY_FRAMES, 1);
 

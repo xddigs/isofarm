@@ -7,6 +7,7 @@ import com.isofarm.graphics.Shader;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.item.*;
 import com.isofarm.pathfinding.GridPos;
+import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
@@ -22,16 +23,17 @@ import java.util.List;
 
 import static org.lwjgl.opengl.GL13.*;
 
+@SuppressWarnings("all")
 @DataClass
 public class Player extends Character {
     private static final Logger log = LoggerFactory.getLogger(Player.class);
-    private static final float MAX_FALL_VELOCITY = 8.0f;
     private final String name;
     private final Matrix4f modelMatrix;
     private final GameMaster gameMaster;
 
-    private Direction direction = Direction.SOUTH_WEST;
+    private Direction direction = Direction.SOUTH;
     private List<GridPos> path;
+
     private int pathIndex = 0;
     private int damageSequence = 0;
     private float lastDamageAmount = 0.0f;
@@ -63,6 +65,8 @@ public class Player extends Character {
             dropLoot();
             return;
         }
+
+        setAnimTimer(getAnimTimer() + delta);
         updateCrouching(delta);
         heal((0.5f + getLevel()) * delta);
 
@@ -105,9 +109,30 @@ public class Player extends Character {
         }
 
         Shader shader = rm.getDefaultShader();
-        int textureUnit = com.isofarm.utils.K.Render.PRIMARY_TEXTURE_UNIT;
-        int frameIndex = direction != null ? direction.frame() : 0;
-        Vector4f uvBounds = sheet.getUVBounds(frameIndex);
+        int textureUnit = K.Render.PRIMARY_TEXTURE_UNIT;
+        boolean isMoving = getVelocity().lengthSquared() > 0.001f;
+        boolean flipHorizontal = false;
+        int baseRow = 0;
+        if (direction != null) {
+            switch (direction) {
+                case NORTH_WEST, NORTH_EAST -> baseRow = 4;
+                case WEST -> {
+                    baseRow = 2;
+                    flipHorizontal = true;
+                }
+                case EAST -> baseRow = 2;
+                default -> baseRow = 0;
+            }
+        }
+
+        int rowIndex = isMoving ? baseRow + 1 : baseRow;
+        int totalFramesInRow = isMoving ? 8 : 4;
+        int currentFrame = (int) (getAnimTimer() / getFrameDuration()) % totalFramesInRow;
+
+        int sheetColumns = 8;
+        int spriteIndex = (rowIndex * sheetColumns) + currentFrame;
+
+        Vector4f uvBounds = sheet.getUVBounds(spriteIndex);
 
         shader.bind();
 
@@ -139,8 +164,9 @@ public class Player extends Character {
 
         float aspect = sheet.getFrameHeight() > 0 ? (float) sheet.getFrameWidth() / (float) sheet.getFrameHeight() : 1.0f;
         float baseScaleY = dimensions == null || dimensions.y <= 0 ? 1.0f : dimensions.y;
-        float baseScaleX = baseScaleY * aspect;
+        float baseScaleX = (baseScaleY * aspect) * (flipHorizontal ? -1.0f : 1.0f);
         float baseScaleZ = dimensions == null || dimensions.z <= 0 ? 1.0f : dimensions.z;
+
         float yawRad = (float) Math.toRadians(-camera.getYaw());
         modelMatrix.identity().translate(position).rotateY(yawRad).scale(baseScaleX, baseScaleY, baseScaleZ);
         shader.setUniform("uModel", modelMatrix);
@@ -258,7 +284,6 @@ public class Player extends Character {
         }
 
         Vector3f direction = new Vector3f(dx, 0.0f, dz);
-
         if (direction.lengthSquared() > 0.0f) {
             direction.normalize();
         }
@@ -267,20 +292,8 @@ public class Player extends Character {
                 .mul(this.getSpeed());
 
         setVelocity(velocity);
-        lookAt(targetX, targetZ, cameraYaw);
         move(world, velocity, delta);
         position.y = targetY;
-    }
-
-    public void lookAt(float targetX, float targetZ, float cameraYaw) {
-        float dx = targetX - position.x;
-        float dz = targetZ - position.z;
-
-        if (dx * dx + dz * dz < 0.09f) {
-            return;
-        }
-        this.direction = Direction.fromVector(
-                dx, dz, cameraYaw);
     }
 
     public String getName() {

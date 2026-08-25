@@ -417,6 +417,7 @@ public class GameInteraction {
         itemRenderer.playBreakAnimation();
 
         if (selectedItem instanceof Tool tool) {
+            if (tool instanceof Backpack || tool instanceof CraftingKit) return;
             boolean isUsableOn = Arrays.stream(tool.getType().getUsableOn())
                     .anyMatch(b -> b.getId() == blockId);
             tool.setPlayer(gameMaster.getPlayer());

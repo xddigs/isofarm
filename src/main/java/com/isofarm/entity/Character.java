@@ -7,6 +7,7 @@ import com.isofarm.service.ToastService;
 
 @DataClass
 public abstract class Character extends Entity implements Levelable {
+    private static final float FRAME_DURATION = 0.15f;
     private final ToastService toastService;
     private final Purse purse;
     private Inventory inventory;
@@ -14,14 +15,11 @@ public abstract class Character extends Entity implements Levelable {
     private Reputation reputation;
     private Gamemode gamemode;
     private SoundService soundService;
-
     private int level;
     private int experience;
     private int experienceForNextLevel;
-
     private float stamina;
     private float maxStamina;
-
     private int strength;
     private int intelligence;
     private int dexterity;
@@ -29,8 +27,8 @@ public abstract class Character extends Entity implements Levelable {
     private int wisdom;
     private int charisma;
     private int luck;
-
     private float isOffGroundTimer;
+    private float animTimer = 0.0f;
 
     public Character(String name, ToastService toastService) {
         super(name);
@@ -114,6 +112,18 @@ public abstract class Character extends Entity implements Levelable {
     public void levelUp() {
         level++;
         toastService.success("Level up! You're now level " + level);
+    }
+
+    public float getFrameDuration() {
+        return FRAME_DURATION;
+    }
+
+    public float getAnimTimer() {
+        return animTimer;
+    }
+
+    public void setAnimTimer(float animTimer) {
+        this.animTimer = animTimer;
     }
 
     public SoundService getSoundService() {

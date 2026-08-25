@@ -115,11 +115,6 @@ public class GameRenderer {
         Player player = gameMaster.getPlayer();
         Hit hoveredCell = HoveredCell.get(gameMaster);
 
-        if (hoveredCell != null && player != null) {
-            player.lookAt(hoveredCell.x() + 0.5f, hoveredCell.z() + 0.5f,
-                    gameMaster.getActiveCamera().getYaw());
-        }
-
         gameMaster.getWorld().forEach(block -> {
             if (!(block instanceof Crop crop)) return;
             SpriteSheet sheet = rm.getCropSpritesheets().get(crop.getCropType());
