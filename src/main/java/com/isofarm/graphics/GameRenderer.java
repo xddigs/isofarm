@@ -143,26 +143,29 @@ public class GameRenderer {
         });
 
         SpriteSheet flowerSheet = rm.getFlowers();
-        Mesh flowerMesh = rm.getFlowerMesh();
 
-        if (flowerSheet != null && flowerMesh != null) {
+        if (flowerSheet != null) {
             glActiveTexture(GL_TEXTURE0 + K.Render.PRIMARY_TEXTURE_UNIT);
             flowerSheet.bind();
             defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
             defaultShader.setUniform("uUseTexture", true);
             defaultShader.setUniform("uUseFaceAtlas", false);
+
             glDisable(GL_CULL_FACE);
+
             gameMaster.getWorld().forEach(block -> {
                 if (block.getId() != BlockData.FLOWER.getId()) return;
+
                 int frameIndex = 0;
                 defaultShader.setUniform("uUVBounds", flowerSheet.getUVBounds(frameIndex));
+
                 float renderX = block.getX() + 0.5f;
                 float renderY = block.getY() + 0.001f;
                 float renderZ = block.getZ() + 0.5f;
 
                 modelMatrix.identity().translate(renderX, renderY, renderZ);
                 defaultShader.setUniform("uModel", modelMatrix);
-                flowerMesh.render();
+                rm.getFlowerMesh().render();
             });
 
             flowerSheet.unbind();

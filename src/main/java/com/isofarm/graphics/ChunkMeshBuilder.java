@@ -37,13 +37,13 @@ public class ChunkMeshBuilder {
             for (int y = 0; y < Chunk.SIZE_Y; y++) {
                 for (int z = 0; z < Chunk.SIZE_Z; z++) {
                     byte blockId = chunk.getBlock(x, y, z);
-                    if (blockId == BlockData.AIR.getId() ||
-                            blockId == BlockData.FLOWER.getId()) {
+                    if (blockId == BlockData.AIR.getId()) {
                         continue;
                     }
 
                     BlockData data = BLOCK_LUT[blockId & 0xFF];
                     if (data == null) continue;
+                    if (data == BlockData.FLOWER) continue;
 
                     int worldX = chunkX * Chunk.SIZE_X + x;
                     int worldZ = chunkZ * Chunk.SIZE_Z + z;
