@@ -186,7 +186,8 @@ public class ResourceManager {
         }
 
         if (item instanceof Material material) {
-            return material.getId() % K.UI.ICON_MATERIAL_COLS;
+            int index = material.getId() - 1;
+            return index % K.UI.ICON_MATERIAL_COLS;
         }
 
         return 0;

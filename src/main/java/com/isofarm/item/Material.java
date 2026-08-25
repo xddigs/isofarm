@@ -1,9 +1,10 @@
 package com.isofarm.item;
 
 import com.isofarm.data.DataClass;
+import com.isofarm.data.MaterialID;
 
 @DataClass
-public record Material(Craftable materialID) implements Craftable {
+public record Material(MaterialID materialID) implements Craftable {
     @Override
     public byte getId() {
         return materialID.getId();
