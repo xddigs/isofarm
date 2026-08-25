@@ -20,6 +20,7 @@ public class ResourceManager {
 
     private final Mesh screenQuadMesh;
     private final Mesh blockMesh;
+    private final Mesh flowerMesh;
     private final Mesh selectionMesh;
     private final Mesh spriteMesh;
     private final Mesh playerMesh;
@@ -54,6 +55,7 @@ public class ResourceManager {
         this.screenQuadMesh = Mesh.screenQuad();
         this.blockMesh = Mesh.createMesh(K.World.DEFAULT_BLOCK_DEPTH);
         this.selectionMesh = Mesh.selection();
+        this.flowerMesh = Mesh.createCrossMesh();
         this.spriteMesh = Mesh.createCrop();
         this.playerMesh = Mesh.quadVertical();
         this.destroyOverlayMesh = Mesh.createDestroyOverlayMesh();
@@ -94,6 +96,7 @@ public class ResourceManager {
 
     public void dispose() {
         blockMesh.dispose();
+        flowerMesh.dispose();
         selectionMesh.dispose();
         spriteMesh.dispose();
         screenQuadMesh.dispose();
@@ -134,6 +137,7 @@ public class ResourceManager {
     public Shader getBlurShader() { return blurShader; }
     public Mesh getScreenQuadMesh() { return screenQuadMesh; }
     public Mesh getBlockMesh() { return blockMesh; }
+    public Mesh getFlowerMesh() { return flowerMesh; }
     public Mesh getDestroyOverlayMesh() { return destroyOverlayMesh; }
     public Mesh getSelectionMesh() { return selectionMesh; }
     public Mesh getSpriteMesh() { return spriteMesh; }
