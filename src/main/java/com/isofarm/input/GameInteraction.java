@@ -7,14 +7,15 @@ import com.isofarm.entity.WorldItem;
 import com.isofarm.graphics.ItemRenderer;
 import com.isofarm.graphics.ParticleEngine;
 import com.isofarm.graphics.SpriteSheet;
+import com.isofarm.graphics.TextureAtlas;
+import com.isofarm.gui.GameUIService;
 import com.isofarm.item.*;
 import com.isofarm.service.CropService;
-import com.isofarm.gui.GameUIService;
 import com.isofarm.service.TimeService;
-import com.isofarm.utils.ToastFactory;
 import com.isofarm.utils.HoveredCell;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
+import com.isofarm.utils.ToastFactory;
 import com.isofarm.wrld.Chunk;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
@@ -38,7 +39,7 @@ public class GameInteraction {
     private final GameUIService gameUIservice;
     private final TimeService timeService;
     private final ParticleEngine particles;
-    private final SpriteSheet blocksTexture;
+    private final TextureAtlas blocksTexture;
     private final ItemRenderer itemRenderer;
 
     private int breakingX = Integer.MIN_VALUE;
@@ -49,12 +50,12 @@ public class GameInteraction {
     private float breakTimeout = TIMEOUT;
     private long lastBreakTime = 0L;
 
-    public GameInteraction(GameMaster gameMaster, SpriteSheet blocksTexture) {
+    public GameInteraction(GameMaster gameMaster, TextureAtlas blockTexture) {
         this.cropService = gameMaster.getCropService();
         this.gameUIservice = gameMaster.getGameUIService();
         this.timeService = gameMaster.getTimeService();
         this.particles = gameMaster.getParticles();
-        this.blocksTexture = blocksTexture;
+        this.blocksTexture = blockTexture;
         this.itemRenderer = gameMaster.getItemRenderer();
     }
 
@@ -424,7 +425,7 @@ public class GameInteraction {
         }
 
         gameMaster.rebuildChunkMeshAt(x, z);
-        particles.spawn(x, y, z, blockData, blocksTexture);
+        particles.spawn(x, y, z, blockData);
 
         Vector3f position = new Vector3f(x + 0.5f, y + 0.5f, z + 0.5f);
         Block removedBlock = new Block(blockData, x, y, z);
@@ -555,5 +556,9 @@ public class GameInteraction {
 
     public float getBreakProgress() {
         return breakProgress;
+    }
+
+    public TextureAtlas getBlocksTexture() {
+        return blocksTexture;
     }
 }

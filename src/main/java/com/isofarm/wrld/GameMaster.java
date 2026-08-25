@@ -164,7 +164,7 @@ public class GameMaster {
                 resourceManager.getInventoryIcons());
 
         gameInteraction = new GameInteraction(this,
-                resourceManager.getBlocksTexture());
+                resourceManager.getBlocksAtlas());
 
         gameUIservice.setPlayer(this.player);
         commandService.setGameUIService(gameUIservice);

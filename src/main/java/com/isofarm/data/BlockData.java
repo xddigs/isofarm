@@ -38,6 +38,11 @@ public enum BlockData implements Craftable {
     TULIP((byte) 30, (byte) 0, "Tulip", false, 10, "assets/textures/blocks/tulip.png", SoundGroup.SOIL, 0.0f, true, new MaterialID[]{}, Tier.NONE);
 
     public static final BlockData[] ORES = {COPPER_ORE, IRON_ORE};
+    public static final BlockData[] PLANTS = {
+            BLUE_FLOWER, BRIGHT_FLOWER, GHOSTFLOWER, LILLY,
+            RED_MUSHROOM, ROSE, ROSE_SHORT, ROSEBUSH, ROSES,
+            SHORT_GRASS, TALL_GRASS, TULIP
+    };
 
     private final byte id;
     private final byte row;

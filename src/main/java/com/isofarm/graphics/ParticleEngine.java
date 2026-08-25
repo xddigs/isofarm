@@ -6,6 +6,7 @@ import com.isofarm.service.Service;
 import com.isofarm.utils.K;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
+import org.joml.Vector4f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,31 +32,26 @@ public class ParticleEngine implements Service<Particle> {
         particles.removeIf(Particle::isDead);
     }
 
-    public void render(Shader shader, Mesh quadMesh,
-                       CameraView camera) {
+    public void render(Shader shader, Mesh quadMesh, CameraView camera) {
+        if (particles.isEmpty()) return;
+
         shader.bind();
         shader.setUniform("uProjection", camera.getProjectionMatrix());
         shader.setUniform("uView", camera.getViewMatrix());
         shader.setUniform("uParticleAlpha", 1.0f);
-
-        if (particles.isEmpty()) return;
-
         shader.setUniform("uUseTexture", true);
         shader.setUniform("uUseFaceAtlas", false);
 
         SpriteSheet currentTexture = null;
         for (Particle p : particles) {
-            if (p.getTexture() == null) {
-                continue;
-            }
-
-            if (p.getTexture() != currentTexture) {
-                if (currentTexture != null) {
-                    currentTexture.unbind();
+            if (p.getTexture() != null) {
+                if (p.getTexture() != currentTexture) {
+                    if (currentTexture != null) {
+                        currentTexture.unbind();
+                    }
+                    currentTexture = p.getTexture();
+                    currentTexture.bind();
                 }
-
-                currentTexture = p.getTexture();
-                currentTexture.bind();
             }
 
             modelMatrix.identity()
@@ -65,6 +61,12 @@ public class ParticleEngine implements Service<Particle> {
             shader.setUniform("uModel", modelMatrix);
             shader.setUniform("uAtlasOffset", p.getUvOffset());
             shader.setUniform("uAtlasScale", p.getUvScale());
+            shader.setUniform("uUVBounds", new Vector4f(
+                    p.getUvOffset().x,
+                    p.getUvOffset().y,
+                    p.getUvOffset().x + p.getUvScale().x,
+                    p.getUvOffset().y + p.getUvScale().y
+            ));
 
             quadMesh.render();
         }
@@ -76,15 +78,22 @@ public class ParticleEngine implements Service<Particle> {
         shader.setUniform("uParticleAlpha", 1.0f);
         shader.setUniform("uUseTexture", true);
         shader.setUniform("uUseFaceAtlas", true);
+        shader.setUniform("uUVBounds", new Vector4f(0.0f, 0.0f, 1.0f, 1.0f));
         shader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
         shader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
         shader.unbind();
     }
 
-    public void spawn(float blockX, float blockY, float blockZ,
-                      BlockData blockData, SpriteSheet blocksTexture) {
-        Vector2f baseOffset = blockData.getSideAtlasOffset();
-        Vector2f baseScale = blockData.getAtlasScale();    
+    public void spawn(float blockX, float blockY, float blockZ, BlockData blockData) {
+        if (blockData == null || blockData == BlockData.AIR) return;
+
+        TextureAtlas.TextureRegion region = blockData.getSideRegion();
+        if (region == null) {
+            region = blockData.getTopRegion();
+        }
+
+        Vector2f baseOffset = region != null ? region.offset() : new Vector2f(0.0f, 0.0f);
+        Vector2f baseScale = region != null ? region.scale() : new Vector2f(1.0f, 1.0f);
 
         int totalParticles = K.World.MAX_PARTICLES;
 
@@ -110,11 +119,13 @@ public class ParticleEngine implements Service<Particle> {
             float maxLife = 0.3f + random.nextFloat() * 0.3f;
 
             add(new Particle(px, py, pz, vx, vy, vz, size, maxLife,
-                    particleOffset, particleScale, blocksTexture));
+                    particleOffset, particleScale, null));
         }
     }
 
     public void spawn(float x, float y, float z, SpriteSheet cropSheet, int frameIndex) {
+        if (cropSheet == null) return;
+
         int totalParticles = K.World.MAX_PARTICLES;
         float frameWidthUV = 1.0f / cropSheet.getTotalFrames();
         float baseUvX = frameIndex * frameWidthUV;
@@ -138,6 +149,7 @@ public class ParticleEngine implements Service<Particle> {
             Vector2f particleScale = new Vector2f(particleUvWidth, particleUvHeight);
             float size = 0.08f + random.nextFloat() * 0.06f;
             float maxLife = 0.3f + random.nextFloat() * 0.3f;
+
             add(new Particle(px, py, pz, vx, vy, vz, size, maxLife,
                     particleOffset, particleScale, cropSheet));
         }
