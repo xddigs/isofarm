@@ -51,16 +51,19 @@ public class ChunkMeshBuilder {
                     float aboveBottomY = getBlockBottomY(world, worldX, y + 1, worldZ);
 
                     if (renderFace || aboveBottomY > topY) {
-                        float uMin = data.getTopAtlasOffset().x;
-                        float vMin = data.getTopAtlasOffset().y;
-                        float uMax = uMin + data.getAtlasScale().x;
-                        float vMax = vMin + data.getAtlasScale().y;
+                        TextureAtlas.TextureRegion region = data.getTopRegion();
+                        if (region != null) {
+                            float uMin = region.uvMin().x;
+                            float vMin = region.uvMin().y;
+                            float uMax = region.uvMax().x;
+                            float vMax = region.uvMax().y;
 
-                        posIdx = addQuadPos(posBuffer, posIdx, (float) x, topY, (float) z + 1, (float) x + 1, topY, (float) z + 1, (float) x + 1, topY, (float) z, (float) x, topY, (float) z);
-                        uvIdx = addQuadUV(uvBuffer, uvIdx, uMin, vMax, uMax, vMax, uMax, vMin, uMin, vMin);
-                        normIdx = addQuadNorm(normBuffer, normIdx, 0, 1, 0);
-                        elemIdx = addQuadIndices(indexBuffer, elemIdx, vertexCount);
-                        vertexCount += 4;
+                            posIdx = addQuadPos(posBuffer, posIdx, (float) x, topY, (float) z + 1, (float) x + 1, topY, (float) z + 1, (float) x + 1, topY, (float) z, (float) x, topY, (float) z);
+                            uvIdx = addQuadUV(uvBuffer, uvIdx, uMin, vMax, uMax, vMax, uMax, vMin, uMin, vMin);
+                            normIdx = addQuadNorm(normBuffer, normIdx, 0, 1, 0);
+                            elemIdx = addQuadIndices(indexBuffer, elemIdx, vertexCount);
+                            vertexCount += 4;
+                        }
                     }
 
                     if (y > 0) {
@@ -68,16 +71,19 @@ public class ChunkMeshBuilder {
                         float belowTopY = getBlockTopY(world, worldX, y - 1, worldZ);
 
                         if (renderFace || (belowTopY < bottomY && belowTopY > 0)) {
-                            float uMin = data.getBottomAtlasOffset().x;
-                            float vMin = data.getBottomAtlasOffset().y;
-                            float uMax = uMin + data.getAtlasScale().x;
-                            float vMax = vMin + data.getAtlasScale().y;
+                            TextureAtlas.TextureRegion region = data.getBottomRegion();
+                            if (region != null) {
+                                float uMin = region.uvMin().x;
+                                float vMin = region.uvMin().y;
+                                float uMax = region.uvMax().x;
+                                float vMax = region.uvMax().y;
 
-                            posIdx = addQuadPos(posBuffer, posIdx, (float) x, bottomY, (float) z, (float) x + 1, bottomY, (float) z, (float) x + 1, bottomY, (float) z + 1, (float) x, bottomY, (float) z + 1);
-                            uvIdx = addQuadUV(uvBuffer, uvIdx, uMin, vMin, uMax, vMin, uMax, vMax, uMin, vMax);
-                            normIdx = addQuadNorm(normBuffer, normIdx, 0, -1, 0);
-                            elemIdx = addQuadIndices(indexBuffer, elemIdx, vertexCount);
-                            vertexCount += 4;
+                                posIdx = addQuadPos(posBuffer, posIdx, (float) x, bottomY, (float) z, (float) x + 1, bottomY, (float) z, (float) x + 1, bottomY, (float) z + 1, (float) x, bottomY, (float) z + 1);
+                                uvIdx = addQuadUV(uvBuffer, uvIdx, uMin, vMin, uMax, vMin, uMax, vMax, uMin, vMax);
+                                normIdx = addQuadNorm(normBuffer, normIdx, 0, -1, 0);
+                                elemIdx = addQuadIndices(indexBuffer, elemIdx, vertexCount);
+                                vertexCount += 4;
+                            }
                         }
                     }
 
@@ -251,11 +257,17 @@ public class ChunkMeshBuilder {
                                          int posI, int normI, int uvI, int elemI, int vertexCount,
                                          float x1, float x2, float y1, float y2, float z1, float z2,
                                          float nx, float ny, float nz, BlockData data, float uvB, float uvT) {
+        TextureAtlas.TextureRegion region = data.getSideRegion();
+        if (region == null) return vertexCount;
+
         addQuadPos(pos, posI, x1, y1, z1, x2, y1, z2, x2, y2, z2, x1, y2, z1);
-        float u1 = data.getSideAtlasOffset().x;
-        float u2 = u1 + data.getAtlasScale().x;
-        float v1 = data.getSideAtlasOffset().y + data.getAtlasScale().y * uvB;
-        float v2 = data.getSideAtlasOffset().y + data.getAtlasScale().y * uvT;
+
+        float u1 = region.uvMin().x;
+        float u2 = region.uvMax().x;
+        float heightUV = region.uvMax().y - region.uvMin().y;
+        float v1 = region.uvMin().y + heightUV * uvB;
+        float v2 = region.uvMin().y + heightUV * uvT;
+
         addQuadUV(uv, uvI, u1, v1, u2, v1, u2, v2, u1, v2);
         addQuadNorm(norm, normI, nx, ny, nz);
         addQuadIndices(idx, elemI, vertexCount);
