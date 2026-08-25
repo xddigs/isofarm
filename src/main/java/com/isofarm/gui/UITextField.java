@@ -29,6 +29,7 @@ public class UITextField extends UIElement {
     private int completionIndex = -1;
     private String completionInput = "";
     private int completionCursor = -1;
+    private int completionTokenStart = -1;
 
     public UITextField(float x, float y, float width, float height) {
         super(x, y, width, height);
@@ -79,7 +80,8 @@ public class UITextField extends UIElement {
             String beforeCursor = text.substring(0, cursorPosition);
             float cursorX = textX + getTextWidth(beforeCursor);
 
-            GUI.drawRect(cursorX, getAbsoluteY() + 6.0f, 1.0f, getAbsoluteHeight() - 12.0f, new Vector4f(cursorColor.x, cursorColor.y, cursorColor.z, cursorColor.w * getWorldOpacity()));
+            GUI.drawRect(cursorX, getAbsoluteY() + 6.0f, 1.0f, getAbsoluteHeight() - 12.0f,
+                    new Vector4f(cursorColor.x, cursorColor.y, cursorColor.z, cursorColor.w * getWorldOpacity()));
         }
 
         GUI.popScissor();
@@ -119,6 +121,7 @@ public class UITextField extends UIElement {
                     selectionAnchor = cursorPosition;
                 }
 
+                resetCompletion();
                 resetCursorBlink();
                 return true;
             }
@@ -131,6 +134,7 @@ public class UITextField extends UIElement {
                     text.delete(cursorPosition, next);
                 }
 
+                resetCompletion();
                 resetCursorBlink();
                 return true;
             }
@@ -273,6 +277,7 @@ public class UITextField extends UIElement {
         completionIndex = -1;
         completionInput = "";
         completionCursor = -1;
+        completionTokenStart = -1;
     }
 
     private void completeForward() {
@@ -322,15 +327,16 @@ public class UITextField extends UIElement {
     }
 
     private void prepareCompletions() {
-        String currentText = text.toString();
-        if (completionInput.equals(currentText) &&
-                completionCursor == cursorPosition &&
-                !completions.isEmpty()) {
+        if (!completions.isEmpty()
+                && completionCursor == cursorPosition
+                && completionTokenStart >= 0) {
             return;
         }
-        completionInput = currentText;
+
+        completionInput = text.toString();
         completionCursor = cursorPosition;
-        completions = completionProvider.complete(currentText, cursorPosition);
+        completionTokenStart = findCurrentTokenStart();
+        completions = completionProvider.complete(completionInput, completionCursor);
         completionIndex = -1;
     }
 
