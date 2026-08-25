@@ -34,7 +34,7 @@ public abstract class Character extends Entity implements Levelable {
         this.toastService = toastService;
         this.inventory = new Inventory();
         this.backpack = new Inventory();
-        this.purse = new Purse(inventory, new Coin());
+        this.purse = new Purse();
         this.reputation = Reputation.NEUTRAL;
 
         this.hitpoints = 100;
