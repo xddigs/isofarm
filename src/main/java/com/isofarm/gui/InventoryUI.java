@@ -20,7 +20,6 @@ import java.util.List;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_RIGHT;
 
-@SuppressWarnings("all")
 public class InventoryUI extends UIElement {
     private static final int BACKPACK_SLOTS = 16;
     private static final int BACKPACK_COLUMNS = 4;
@@ -59,11 +58,6 @@ public class InventoryUI extends UIElement {
     private float targetX;
     private float animationSpeed = 800.0f;
     private boolean isBackpackOpen = false;
-
-    private boolean showingCraftingMenu = false;
-    private float craftingMenuX, craftingMenuY;
-    private List<Recipe> availableRecipes = new ArrayList<>();
-    private CraftingKit activeCraftingKit;
 
     public InventoryUI(float x, float y) {
         super(x, y, getInventoryWidth(), getInventoryHeight());
@@ -136,7 +130,12 @@ public class InventoryUI extends UIElement {
         });
 
         craftingButton.setOnClick(() -> {
-            currentTab = Tab.CRAFTING;
+            if (currentTab.equals(Tab.INVENTORY)) {
+                currentTab = Tab.CRAFTING;
+            } else {
+                currentTab = Tab.INVENTORY;
+            }
+            ToastFactory.info("Crafting menu clicked. Current tab: " + currentTab + "");
         });
 
         sortButton.setTooltipText("Sort");
@@ -455,20 +454,26 @@ public class InventoryUI extends UIElement {
     }
 
     private void leftClick(InventorySlot slot) {
-        if (carriedItem == null) {
-            pickEntireStack(slot);
-            return;
-        }
+        switch (currentTab) {
+            case INVENTORY -> {
+                if (carriedItem == null) {
+                    pickEntireStack(slot);
+                    return;
+                }
 
-        if (slot.isEmpty()) {
-            placeEntireStack(slot);
-            return;
-        }
+                if (slot.isEmpty()) {
+                    placeEntireStack(slot);
+                    return;
+                }
 
-        if (isSameType(carriedItem, slot.getItem())) {
-            mergeCarriedStack(slot);
-        } else {
-            swapStacks(slot);
+                if (isSameType(carriedItem, slot.getItem())) {
+                    mergeCarriedStack(slot);
+                } else {
+                    swapStacks(slot);
+                }
+            }
+
+            case CRAFTING -> {}
         }
     }
 
@@ -518,37 +523,27 @@ public class InventoryUI extends UIElement {
     }
 
     private void rightClick(InventorySlot slot) {
-        if (slot != null && slot.getItem() instanceof CraftingKit kit) {
-            this.availableRecipes = gameMaster.getRecipes().stream()
-                    .filter(r -> r.tier() == kit.getTier())
-                    .toList();
+        switch (currentTab) {
+            case INVENTORY -> {
+                if (carriedItem == null) {
+                    takeHalf(slot);
+                    return;
+                }
 
-            if (!availableRecipes.isEmpty()) {
-                this.activeCraftingKit = kit;
-                this.craftingMenuX = Mouse.getX();
-                this.craftingMenuY = Mouse.getY();
-                this.showingCraftingMenu = true;
-            } else {
-                ToastFactory.info("There's no recipe for this kit yet");
+                if (slot.isEmpty()) {
+                    placeOne(slot);
+                    return;
+                }
+
+                if (!isSameType(carriedItem, slot.getItem())) {
+                    return;
+                }
+
+                addOneToSlot(slot);
             }
-            return;
-        }
 
-        if (carriedItem == null) {
-            takeHalf(slot);
-            return;
+            case CRAFTING -> {}
         }
-
-        if (slot.isEmpty()) {
-            placeOne(slot);
-            return;
-        }
-
-        if (!isSameType(carriedItem, slot.getItem())) {
-            return;
-        }
-
-        addOneToSlot(slot);
     }
 
     private void takeHalf(InventorySlot slot) {
@@ -602,27 +597,14 @@ public class InventoryUI extends UIElement {
             return false;
         }
 
-        if (a instanceof Produce p1 && b instanceof Produce p2) {
-            return p1.getType() == p2.getType();
-        }
-
-        if (a instanceof Seed s1 && b instanceof Seed s2) {
-            return s1.getType() == s2.getType();
-        }
-
-        if (a instanceof Crop c1 && b instanceof Crop c2) {
-            return c1.getCropType() == c2.getCropType();
-        }
-
-        if (a instanceof Block b1 && b instanceof Block b2) {
-            return b1.getType() == b2.getType();
-        }
-
-        if (a instanceof Tool t1 && b instanceof Tool t2) {
-            return t1.getId() == t2.getId();
-        }
-
-        return a.getName().equals(b.getName());
+        return switch (a) {
+            case Produce p1 when b instanceof Produce p2 -> p1.getType() == p2.getType();
+            case Seed s1 when b instanceof Seed s2 -> s1.getType() == s2.getType();
+            case Crop c1 when b instanceof Crop c2 -> c1.getCropType() == c2.getCropType();
+            case Block b1 when b instanceof Block b2 -> b1.getType() == b2.getType();
+            case Tool t1 when b instanceof Tool t2 -> t1.getId() == t2.getId();
+            default -> a.getName().equals(b.getName());
+        };
     }
 
     @Override
