@@ -96,6 +96,11 @@ public enum BlockData implements Craftable {
         return paths;
     }
 
+    public boolean isSolid() {
+        return !this.equals(AIR) ||
+                !Arrays.stream(PLANTS).anyMatch(block -> block == this) ;
+    }
+
     public static BlockData fromId(byte id) {
         for (BlockData block : values()) {
             if (block.getId() == id) return block;
