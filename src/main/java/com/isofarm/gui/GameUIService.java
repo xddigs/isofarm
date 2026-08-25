@@ -257,6 +257,7 @@ public class GameUIService implements Service<GameMaster> {
         }
 
         time.setText(gameMaster.getTimeService().getFormattedTime());
+        fps.setText(gameMaster.getFps());
         if (player != null) {
             coords.setText(player.getPositionString());
             healthBar.setValues(player.getHitpoints(), player.getMaxHitpoints());

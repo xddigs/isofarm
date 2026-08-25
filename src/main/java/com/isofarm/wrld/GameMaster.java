@@ -170,6 +170,7 @@ public class GameMaster {
         commandService.setGameUIService(gameUIservice);
         gameUIservice.setShop(shop);
         player.setName(gameUIservice.getPlayerName());
+        ToastFactory.info("Press E to open inventory");
     }
 
     public void spawn() {
@@ -577,6 +578,7 @@ public class GameMaster {
         if (gameUIservice != null) {
             gameUIservice.onResize(newWidth, newHeight);
         }
+        ToastFactory.onResize(newWidth);
     }
 
     public void rebuildChunkMeshAt(int worldX, int worldZ) {

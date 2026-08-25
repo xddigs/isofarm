@@ -108,7 +108,7 @@ public class ToastFactory implements Service<Toast> {
             return;
         }
 
-        float startX = windowWidth + 500f;
+        float startX = windowWidth + 250f;
         float targetX = windowWidth - K.UI.TOAST_WIDTH;
         float targetY = K.UI.TOAST_MARGIN_TOP;
 
@@ -132,5 +132,9 @@ public class ToastFactory implements Service<Toast> {
             toast.setTargetY(y);
             y += K.UI.TOAST_HEIGHT + K.UI.TOAST_SPACING;
         }
+    }
+
+    public static void onResize(float width) {
+        windowWidth = width;
     }
 }
