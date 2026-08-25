@@ -2,6 +2,7 @@ package com.isofarm.service;
 
 import com.isofarm.data.Command;
 import com.isofarm.gui.GameUIService;
+import com.isofarm.utils.ToastFactory;
 
 public class CommandService implements Service<Command> {
     private final CommandRegistry registry;
@@ -27,7 +28,7 @@ public class CommandService implements Service<Command> {
         Command command = registry.get(commandName);
         if (command == null) {
             if (gameUIService != null) {
-                gameUIService.addChatMessage("Command not found: " + commandName);
+                ToastFactory.error("Command not found: " + commandName);
             }
             return;
         }
@@ -38,7 +39,7 @@ public class CommandService implements Service<Command> {
         
         String result = "You ran: " + commandName + " " + String.join(" ", args);
         if (gameUIService != null) {
-            gameUIService.addChatMessage(result);
+            ToastFactory.info(result);
         }
     }
 }
