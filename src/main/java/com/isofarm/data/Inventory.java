@@ -404,7 +404,6 @@ public class Inventory {
 
         return switch (item) {
             case Block ignored -> K.World.MAX_STACK;
-            case Coin ignored -> K.World.MAX_STACK * 4;
             case Tool ignored -> 1;
             case Seed ignored -> K.World.MAX_STACK * 2;
             default -> K.World.MAX_STACK / 2;
