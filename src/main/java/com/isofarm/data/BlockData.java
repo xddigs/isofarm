@@ -20,7 +20,7 @@ public enum BlockData implements Craftable {
     OAK_WOOD((byte) 8, (byte) 0, "Oak Wood", 100, 7, 0, SoundGroup.HARD, 4.0f, false, new MaterialID[]{}, Tier.WOOD),
     OAK_LEAVES((byte) 9, (byte) 0, "Oak Leaves", 100, 8, 0, SoundGroup.SOIL, 1.1f, false, new MaterialID[]{MaterialID.STICK}, Tier.NONE),
     SNOW((byte) 10, (byte) 0, "Snow", 120, 9, 0, SoundGroup.SNOW, 0.8f, false, new MaterialID[]{}, Tier.NONE),
-    COPPER_ORE((byte) 11, (byte) 1, "Copper Ore", 150, 10, 0, SoundGroup.HARD, 6.0f, false, new MiningComponent[]{new MiningComponent(Tier.COPPER, MaterialID.ORE)}, Tier.COPPER),
+    COPPER_ORE((byte) 11, (byte) 1, "Copper Ore Block", 150, 10, 0, SoundGroup.HARD, 6.0f, false, new MiningComponent[]{new MiningComponent(Tier.COPPER, MaterialID.ORE)}, Tier.COPPER),
     WATER((byte) -1, (byte) -1, "Water", 100, 0, 0, SoundGroup.SILENT, 0f, true, new MaterialID[]{}, Tier.NONE),
     CROP((byte) -1, (byte) -1, "Crop", -1, 0, 0, SoundGroup.SOIL, 1f, false, new MaterialID[]{}, Tier.NONE);
 

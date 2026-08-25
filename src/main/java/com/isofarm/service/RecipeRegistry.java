@@ -16,7 +16,7 @@ public class RecipeRegistry implements Service<Recipe> {
                 .with(BlockData.OAK_LOG, 1).add();
 
         create(Tier.LEATHER)
-                .result(new Material(MaterialID.STICK, Tier.NONE), 4)
+                .result(new Material(Tier.NONE, MaterialID.STICK), 4)
                 .with(BlockData.OAK_WOOD, 1).add();
 
         create(Tier.LEATHER)

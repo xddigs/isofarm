@@ -5,7 +5,15 @@ import com.isofarm.data.MaterialID;
 import com.isofarm.data.Tier;
 
 @DataClass
-public record Material(MaterialID materialID, Tier tier) implements Craftable {
+public class Material implements Craftable {
+    private final Tier tier;
+    private final MaterialID materialID;
+
+    public Material(Tier tier, MaterialID materialID) {
+        this.tier = tier;
+        this.materialID = materialID;
+    }
+
     @Override
     public byte getId() {
         return materialID.getId();
@@ -25,6 +33,14 @@ public record Material(MaterialID materialID, Tier tier) implements Craftable {
 
     @Override
     public Item copy() {
-        return new Material(materialID, tier);
+        return new Material(tier, materialID);
+    }
+
+    public Tier getTier() {
+        return tier;
+    }
+
+    public MaterialID getMaterialID() {
+        return materialID;
     }
 }

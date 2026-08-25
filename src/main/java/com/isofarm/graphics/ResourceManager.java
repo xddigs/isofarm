@@ -1,10 +1,7 @@
 package com.isofarm.graphics;
 
 import com.isofarm.data.*;
-import com.isofarm.item.Block;
-import com.isofarm.item.Item;
-import com.isofarm.item.Material;
-import com.isofarm.item.Tool;
+import com.isofarm.item.*;
 import com.isofarm.utils.K;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -186,37 +183,26 @@ public class ResourceManager {
         }
 
         if (item instanceof Material material) {
-            return getMaterialIconColumn(material);
+            return getMaterialIconColumn(material.getTier(),
+                    material.getMaterialID());
         }
 
         return 0;
     }
 
-    private static int getMaterialIconColumn(Material material) {
-        MaterialID materialID = material.materialID();
-        Tier tier = material.tier();
-
-        return switch (materialID) {
-            case STICK -> 0;
-            case ORE -> switch (tier) {
-                case IRON -> 2;
-                case STEEL -> 4;
-                case GOLD -> 6;
-                case PLATINUM -> 8;
-                case DIAMOND -> 10;
-                default -> 0;
-            };
-
-            case INGOT -> switch (tier) {
-                case COPPER -> 1;
-                case IRON -> 3;
-                case STEEL -> 5;
-                case GOLD -> 7;
-                case PLATINUM -> 9;
-                case DIAMOND -> 11;
-                default -> 0;
-            };
+    private static int getMaterialIconColumn(Tier tier, MaterialID materialID) {
+        if (materialID == MaterialID.STICK) return 0;
+        int baseCol = switch (tier) {
+            case COPPER -> 1;
+            case IRON -> 3;
+            case STEEL -> 5;
+            case GOLD -> 7;
+            case PLATINUM -> 9;
+            case DIAMOND -> 11;
+            default -> 1;
         };
+
+        return materialID == MaterialID.INGOT ? baseCol + 1 : baseCol;
     }
 
     public static int getItemIconRow(Item item) {
@@ -238,10 +224,11 @@ public class ResourceManager {
         }
 
         if (item instanceof Material material) {
-            return getMaterialIconColumn(material);
+            return getMaterialIconColumn(material.getTier(),
+                    material.getMaterialID());
         }
 
-        return item != null ? item.getId() : 0;
+        return getItemIconColumn(item);
     }
 
     public Shader getShader(String name) {

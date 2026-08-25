@@ -27,7 +27,7 @@ public class Library implements Service<GameMaster> {
         registerDefault(itemR, Axe::new);
         registerDefault(itemR, Sword::new);
 
-        registerDefault(itemR, () -> new Material(MaterialID.STICK, Tier.NONE));
+        registerDefault(itemR, () -> new Material(Tier.NONE, MaterialID.STICK));
         registerDefault(itemR, () -> new MiningComponent(Tier.COPPER, MaterialID.ORE));
         registerDefault(itemR, () -> new MiningComponent(Tier.COPPER, MaterialID.INGOT));
 

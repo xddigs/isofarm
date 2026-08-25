@@ -5,7 +5,7 @@ import com.isofarm.data.MaterialID;
 import com.isofarm.data.Tier;
 
 @DataClass
-public class MiningComponent implements Craftable {
+public class MiningComponent extends Material implements Craftable {
     private final Tier tier;
     private final MaterialID materialID;
     private final byte id;
@@ -13,6 +13,7 @@ public class MiningComponent implements Craftable {
     private final int value;
 
     public MiningComponent(Tier tier, MaterialID materialID) {
+        super(tier, materialID);
         this.tier = tier;
         this.materialID = materialID;
         this.id = materialID.getId();
