@@ -20,7 +20,6 @@ public class ResourceManager {
 
     private final Mesh screenQuadMesh;
     private final Mesh blockMesh;
-    private final Mesh flowerMesh;
     private final Mesh selectionMesh;
     private final Mesh spriteMesh;
     private final Mesh playerMesh;
@@ -28,7 +27,6 @@ public class ResourceManager {
 
     private final SpriteSheet blocksTexture;
     private final SpriteSheet waterTexture;
-    private final SpriteSheet flowers;
     private final SpriteSheet wheat;
     private final SpriteSheet carrot;
     private final SpriteSheet potato;
@@ -55,7 +53,6 @@ public class ResourceManager {
         this.screenQuadMesh = Mesh.screenQuad();
         this.blockMesh = Mesh.createMesh(K.World.DEFAULT_BLOCK_DEPTH);
         this.selectionMesh = Mesh.selection();
-        this.flowerMesh = Mesh.createCrossMesh();
         this.spriteMesh = Mesh.createCrop();
         this.playerMesh = Mesh.quadVertical();
         this.destroyOverlayMesh = Mesh.createDestroyOverlayMesh();
@@ -67,7 +64,6 @@ public class ResourceManager {
             log.warn("Could not load blocks.png atlas, falling back to base colors: {}", e.getMessage());
         }
         this.blocksTexture = blocks;
-        this.flowers = new SpriteSheet(K.Paths.FLOWERS, K.UI.FLOWERS_FRAMES, 1);
 
         this.waterTexture = new SpriteSheet(K.Paths.WATER, K.UI.WATER_FRAMES, 1);
         this.wheat = new SpriteSheet(K.Paths.WHEAT_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
@@ -96,7 +92,6 @@ public class ResourceManager {
 
     public void dispose() {
         blockMesh.dispose();
-        flowerMesh.dispose();
         selectionMesh.dispose();
         spriteMesh.dispose();
         screenQuadMesh.dispose();
@@ -104,7 +99,6 @@ public class ResourceManager {
         destroyOverlayMesh.dispose();
 
         if (blocksTexture != null) blocksTexture.dispose();
-        if (flowers != null) flowers.dispose();
         if (waterTexture != null) waterTexture.dispose();
 
         wheat.dispose();
@@ -137,15 +131,12 @@ public class ResourceManager {
     public Shader getBlurShader() { return blurShader; }
     public Mesh getScreenQuadMesh() { return screenQuadMesh; }
     public Mesh getBlockMesh() { return blockMesh; }
-    public Mesh getFlowerMesh() { return flowerMesh; }
     public Mesh getDestroyOverlayMesh() { return destroyOverlayMesh; }
     public Mesh getSelectionMesh() { return selectionMesh; }
     public Mesh getSpriteMesh() { return spriteMesh; }
     public Mesh getPlayerMesh() { return playerMesh; }
     public SpriteSheet getBlocksTexture() { return blocksTexture; }
-    public SpriteSheet getFlowers() { return flowers; }
     public SpriteSheet getDestroyTexture() { return destroyTexture; }
-    public SpriteSheet getWaterTexture() { return waterTexture; }
     public SpriteSheet getSeedIcons() { return seedIcons; }
     public SpriteSheet getCropIcons() { return cropIcons; }
     public SpriteSheet getToolIcons() { return toolIcons; }
