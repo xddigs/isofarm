@@ -22,7 +22,6 @@ public class TextureAtlas {
     private static final Logger log = LoggerFactory.getLogger(TextureAtlas.class);
     private final int textureId;
     private final Map<String, TextureRegion> regions = new HashMap<>();
-    public record TextureRegion(Vector2f uvMin, Vector2f uvMax, Vector2f scale, Vector2f offset) {}
 
     public TextureAtlas(List<String> imagePaths, int tileWidth, int tileHeight) {
         int count = imagePaths.size();
@@ -33,7 +32,7 @@ public class TextureAtlas {
         int atlasHeight = rows * tileHeight;
 
         ByteBuffer atlasBuffer = BufferUtils.createByteBuffer(atlasWidth * atlasHeight * 4);
-        STBImage.stbi_set_flip_vertically_on_load(true);
+        STBImage.stbi_set_flip_vertically_on_load(false);
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer w = stack.mallocInt(1);
@@ -45,9 +44,12 @@ public class TextureAtlas {
                 ByteBuffer image = loadTextureFromResources(originalPath, w, h, comp);
 
                 if (image == null) {
-                    throw new RuntimeException("Failed to load texture from resources: " +
-                            originalPath + " - " + STBImage.stbi_failure_reason());
+                    System.err.println("Failed to load texture: " + originalPath);
+                    continue;
                 }
+
+                int imgW = w.get(0);
+                int imgH = h.get(0);
 
                 int col = i % cols;
                 int row = i / cols;
@@ -55,15 +57,21 @@ public class TextureAtlas {
                 int offsetY = row * tileHeight;
 
                 for (int y = 0; y < tileHeight; y++) {
-                    int srcPos = y * tileWidth * 4;
-                    int destPos = ((offsetY + y) * atlasWidth + offsetX) * 4;
-                    for (int x = 0; x < tileWidth * 4; x++) {
-                        atlasBuffer.put(destPos + x, image.get(srcPos + x));
+                    for (int x = 0; x < tileWidth; x++) {
+                        int srcX = (int) ((float) x / tileWidth * imgW);
+                        int srcY = (int) ((float) y / tileHeight * imgH);
+
+                        int srcPos = (srcY * imgW + srcX) * 4;
+                        int destPos = ((offsetY + y) * atlasWidth + (offsetX + x)) * 4;
+
+                        atlasBuffer.put(destPos, image.get(srcPos));
+                        atlasBuffer.put(destPos + 1, image.get(srcPos + 1));
+                        atlasBuffer.put(destPos + 2, image.get(srcPos + 2));
+                        atlasBuffer.put(destPos + 3, image.get(srcPos + 3));
                     }
                 }
 
                 STBImage.stbi_image_free(image);
-
                 float uMin = (float) offsetX / atlasWidth;
                 float vMin = (float) offsetY / atlasHeight;
                 float uMax = (float) (offsetX + tileWidth) / atlasWidth;
@@ -81,7 +89,6 @@ public class TextureAtlas {
         textureId = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, textureId);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, atlasWidth, atlasHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, atlasBuffer);
-
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -92,11 +99,8 @@ public class TextureAtlas {
 
     private ByteBuffer loadTextureFromResources(String path, IntBuffer w, IntBuffer h, IntBuffer comp) {
         String resourcePath = path.startsWith("/") ? path : "/" + path;
-
         try (InputStream in = TextureAtlas.class.getResourceAsStream(resourcePath)) {
-            if (in == null) {
-                return null;
-            }
+            if (in == null) return null;
 
             byte[] bytes = in.readAllBytes();
             ByteBuffer buffer = MemoryUtil.memAlloc(bytes.length);
@@ -126,5 +130,8 @@ public class TextureAtlas {
 
     public void dispose() {
         glDeleteTextures(textureId);
+    }
+
+    public record TextureRegion(Vector2f uvMin, Vector2f uvMax, Vector2f scale, Vector2f offset) {
     }
 }
