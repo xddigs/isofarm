@@ -372,7 +372,8 @@ public class Inventory {
     public int getAmountOfMaterial(MaterialID id) {
         return slots.stream()
                 .filter(slot -> !slot.isEmpty())
-                .filter(slot -> slot.getItem() instanceof Material(MaterialID mid) && mid == id)
+                .filter(slot -> slot.getItem()
+                        instanceof Material(MaterialID mid, Tier tier) && mid == id)
                 .mapToInt(InventorySlot::getAmount)
                 .sum();
     }

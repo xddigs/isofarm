@@ -2,9 +2,10 @@ package com.isofarm.item;
 
 import com.isofarm.data.DataClass;
 import com.isofarm.data.MaterialID;
+import com.isofarm.data.Tier;
 
 @DataClass
-public record Material(MaterialID materialID) implements Craftable {
+public record Material(MaterialID materialID, Tier tier) implements Craftable {
     @Override
     public byte getId() {
         return materialID.getId();
@@ -12,7 +13,9 @@ public record Material(MaterialID materialID) implements Craftable {
 
     @Override
     public String getName() {
-        return materialID.getName();
+        String name = materialID.getName();
+        name += tier.equals(Tier.NONE) ? "" : tier.getName();
+        return name;
     }
 
     @Override
@@ -22,6 +25,6 @@ public record Material(MaterialID materialID) implements Craftable {
 
     @Override
     public Item copy() {
-        return new Material(materialID);
+        return new Material(materialID, tier);
     }
 }

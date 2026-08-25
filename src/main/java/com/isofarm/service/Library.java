@@ -27,9 +27,7 @@ public class Library implements Service<GameMaster> {
         registerDefault(itemR, Axe::new);
         registerDefault(itemR, Sword::new);
 
-        registerDefault(itemR, () -> new Material(MaterialID.STICK));
-        registerDefault(itemR, () -> new Material(MaterialID.WOOD));
-        registerDefault(itemR, () -> new Material(MaterialID.STONE));
+        registerDefault(itemR, () -> new Material(MaterialID.STICK, Tier.NONE));
         registerDefault(itemR, () -> new MiningComponent(Tier.COPPER, MaterialID.ORE));
         registerDefault(itemR, () -> new MiningComponent(Tier.COPPER, MaterialID.INGOT));
 
@@ -53,10 +51,6 @@ public class Library implements Service<GameMaster> {
                 registerDefault(itemR, () -> new Block(block));
             }
         }
-
-        itemR.register(MaterialID.WOOD, () -> new Block(BlockData.OAK_WOOD));
-        itemR.register(MaterialID.STICK, () -> new Material(MaterialID.STICK));
-        itemR.register(MaterialID.STONE, () -> new Block(BlockData.STONE));
     }
 
     private static void registerDefault(ItemRegistry itemR, Supplier<Item> supplier) {

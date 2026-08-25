@@ -435,10 +435,11 @@ public class GameInteraction {
         Block removedBlock = new Block(blockData, x, y, z);
 
         Item itemToDrop = null;
+
         if (removedBlock.getType().hasDrops()) {
             Object dropObj = removedBlock.getType().getRandomDrop();
             if (dropObj instanceof MaterialID mid) {
-                itemToDrop = new Material(mid);
+                itemToDrop = new Material(mid, blockData.getTier());
             } else if (dropObj instanceof MiningComponent mc) {
                 itemToDrop = mc;
             } else if (dropObj instanceof Item item) {

@@ -5,7 +5,7 @@ import com.isofarm.data.DataClass;
 import com.isofarm.utils.K;
 
 @DataClass
-public class Block implements Item {
+public class Block implements Craftable {
     private final int waterLevelMax = K.World.WATER_LEVEL_MAX;
     private final byte id;
     private final String name;

@@ -186,11 +186,37 @@ public class ResourceManager {
         }
 
         if (item instanceof Material material) {
-            int index = material.getId() - 1;
-            return index % K.UI.ICON_MATERIAL_COLS;
+            return getMaterialIconColumn(material);
         }
 
         return 0;
+    }
+
+    private static int getMaterialIconColumn(Material material) {
+        MaterialID materialID = material.materialID();
+        Tier tier = material.tier();
+
+        return switch (materialID) {
+            case STICK -> 0;
+            case ORE -> switch (tier) {
+                case IRON -> 2;
+                case STEEL -> 4;
+                case GOLD -> 6;
+                case PLATINUM -> 8;
+                case DIAMOND -> 10;
+                default -> 0;
+            };
+
+            case INGOT -> switch (tier) {
+                case COPPER -> 1;
+                case IRON -> 3;
+                case STEEL -> 5;
+                case GOLD -> 7;
+                case PLATINUM -> 9;
+                case DIAMOND -> 11;
+                default -> 0;
+            };
+        };
     }
 
     public static int getItemIconRow(Item item) {
@@ -212,7 +238,7 @@ public class ResourceManager {
         }
 
         if (item instanceof Material material) {
-            return material.getId() - 1;
+            return getMaterialIconColumn(material);
         }
 
         return item != null ? item.getId() : 0;

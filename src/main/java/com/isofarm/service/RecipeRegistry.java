@@ -12,26 +12,26 @@ public class RecipeRegistry implements Service<Recipe> {
 
     public static List<Recipe> init() {
         create(Tier.LEATHER)
-                .result(new Material(MaterialID.WOOD), 4)
+                .result(new Block(BlockData.OAK_WOOD), 4)
                 .with(BlockData.OAK_LOG, 1).add();
 
         create(Tier.LEATHER)
-                .result(new Material(MaterialID.STICK), 4)
-                .with(MaterialID.WOOD, 1).add();
-
-        create(Tier.LEATHER)
-                .result(new MiningComponent(Tier.COPPER, MaterialID.INGOT), 1)
-                .with(new MiningComponent(Tier.COPPER, MaterialID.ORE), 1).add();
+                .result(new Material(MaterialID.STICK, Tier.NONE), 4)
+                .with(BlockData.OAK_WOOD, 1).add();
 
         create(Tier.LEATHER)
                 .result(new Hoe(Tier.WOOD), 1)
-                .with(MaterialID.WOOD, 1)
+                .with(BlockData.OAK_WOOD, 2)
                 .with(MaterialID.STICK, 3).add();
 
         create(Tier.LEATHER)
                 .result(new Pickaxe(Tier.WOOD), 1)
-                .with(MaterialID.WOOD, 2)
-                .with(MaterialID.STICK, 3).add();
+                .with(BlockData.OAK_WOOD, 3)
+                .with(MaterialID.STICK, 2).add();
+
+        create(Tier.COPPER)
+                .result(new MiningComponent(Tier.COPPER, MaterialID.INGOT), 1)
+                .with(new MiningComponent(Tier.COPPER, MaterialID.ORE), 1).add();
 
         return recipes;
     }
