@@ -412,38 +412,6 @@ public class Player extends Character {
         getPurse().remove(amount);
     }
 
-    public boolean craft(Recipe recipe) {
-        if (!hasIngredients(recipe)) return false;
-        if (!hasSpace()) return false;
-
-        for (Ingredient ingredient : recipe.ingredients()) {
-            Craftable required = ingredient.craftable();
-            getInventory().remove(required, ingredient.amount());
-        }
-
-        if (!getInventory().isFull()) {
-            add(recipe.result(), recipe.resultAmount());
-        } else if (getBackpack().hasBackpackEquipped() && !getBackpack().isFull()) {
-            addToBackpack(recipe.result(), recipe.resultAmount());
-        }
-
-        ToastFactory.success("You crafted " +
-                recipe.resultAmount() + " " + recipe.result().getName());
-
-        return true;
-    }
-
-    public boolean hasIngredients(Recipe recipe) {
-        for (Ingredient ingredient : recipe.ingredients()) {
-            Craftable required = ingredient.craftable();
-            if (getInventory().getAmount(required) < ingredient.amount()) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     public boolean hasSpace() {
         return !getInventory().isFull() ||
                 (getBackpack().hasBackpackEquipped()

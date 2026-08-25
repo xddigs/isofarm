@@ -33,25 +33,4 @@ public class CraftingKit extends Tool {
     public void setSelectedRecipe(Recipe selectedRecipe) {
         this.selectedRecipe = selectedRecipe;
     }
-
-    public boolean use(GameMaster gameMaster) {
-        Player player = gameMaster.getPlayer();
-        if (selectedRecipe != null) {
-            if (selectedRecipe.tier() == getTier()
-                    && player.hasIngredients(selectedRecipe)) {
-                return player.craft(selectedRecipe);
-            }
-            return false;
-        }
-
-        for (Recipe recipe : gameMaster.getRecipes()) {
-            if (recipe.tier() != getTier()) continue;
-            if (player.hasIngredients(recipe)) {
-                return player.craft(recipe);
-            }
-        }
-
-        ToastFactory.error("You don't have enough to craft this");
-        return false;
-    }
 }

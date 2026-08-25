@@ -127,12 +127,6 @@ public class GameInteraction {
             isRightPressed = false;
         }
 
-        if (selectedItem instanceof CraftingKit ck &&
-                isRightPressed && !gameMaster.isInventoryOpen()) {
-            ck.use(gameMaster);
-            isRightPressed = false;
-        }
-
         Hit hoveredCell;
         if (gameMaster.isOrthographicCamera()) {
             hoveredCell = HoveredCell.get(gameMaster);

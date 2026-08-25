@@ -6,7 +6,7 @@ import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.input.Mouse;
 import com.isofarm.item.Block;
-import com.isofarm.item.CraftingKit;
+import com.isofarm.item.Craftable;
 import com.isofarm.item.Item;
 import com.isofarm.item.Tool;
 import com.isofarm.utils.K;
@@ -24,6 +24,7 @@ public class InventoryUI extends UIElement {
     private static final int BACKPACK_SLOTS = 16;
     private static final int BACKPACK_COLUMNS = 4;
     private static final int BACKPACK_ROWS = 4;
+    private static final float animationSpeed = 800.0f;
 
     private final InventorySlotUI[] slotUIs;
     private final InventorySlotUI[] backpackSlotUIs;
@@ -33,30 +34,24 @@ public class InventoryUI extends UIElement {
     private UIButton groupButton;
     private UIButton backpackButton;
     private UIButton craftingButton;
-
     private Player player;
     private Inventory inventory;
     private Tab currentTab;
-
     private SpriteSheet seedIcons;
     private SpriteSheet cropIcons;
     private SpriteSheet blockIcons;
     private SpriteSheet toolIcons;
     private SpriteSheet materialIcons;
     private SpriteSheet inventoryIcons;
-
     private Item carriedItem;
     private int carriedAmount;
-
     private HotbarUI hotbarUI;
     private BackpackInventoryUI backpackUI;
     private UIProgressBar healthBar;
     private UIProgressBar staminaBar;
     private GameMaster gameMaster;
-
     private float defaultX;
     private float targetX;
-    private float animationSpeed = 800.0f;
     private boolean isBackpackOpen = false;
 
     public InventoryUI(float x, float y) {
@@ -135,7 +130,7 @@ public class InventoryUI extends UIElement {
             } else {
                 currentTab = Tab.INVENTORY;
             }
-            ToastFactory.info("Crafting menu clicked. Current tab: " + currentTab + "");
+            ToastFactory.info("Crafting menu clicked. Current tab: " + currentTab);
         });
 
         sortButton.setTooltipText("Sort");
@@ -473,7 +468,8 @@ public class InventoryUI extends UIElement {
                 }
             }
 
-            case CRAFTING -> {}
+            case CRAFTING -> {
+            }
         }
     }
 
@@ -542,7 +538,138 @@ public class InventoryUI extends UIElement {
                 addOneToSlot(slot);
             }
 
-            case CRAFTING -> {}
+            case CRAFTING -> {
+                if (carriedItem == null) {
+                    pickEntireStack(slot);
+                    return;
+                }
+
+                if (slot.isEmpty()) {
+                    placeEntireStack(slot);
+                    return;
+                }
+
+                tryCraft(slot);
+            }
+        }
+    }
+
+    private void tryCraft(InventorySlot targetSlot) {
+        if (carriedItem == null || targetSlot == null || targetSlot.isEmpty()) {
+            return;
+        }
+
+        Item targetItem = targetSlot.getItem();
+        Recipe recipe = findRecipe(carriedItem, targetItem);
+        if (recipe == null) {
+            ToastFactory.info("These materials cannot be combined");
+            return;
+        }
+
+        if (!canCraft(recipe, carriedItem, carriedAmount, targetItem, targetSlot.getAmount())) {
+            ToastFactory.info("Not enough materials");
+            return;
+        }
+
+        craft(recipe, targetSlot);
+    }
+
+    private Recipe findRecipe(Item first, Item second) {
+        if (gameMaster == null) {
+            return null;
+        }
+
+        for (Recipe recipe : gameMaster.getRecipes()) {
+            if (recipeMatches(recipe, first, second)) {
+                return recipe;
+            }
+        }
+
+        return null;
+    }
+
+    private boolean recipeMatches(Recipe recipe, Item first, Item second) {
+        List<Ingredient> ingredients = recipe.ingredients();
+
+        if (ingredients.size() != 2) {
+            return false;
+        }
+
+        Ingredient a = ingredients.get(0);
+        Ingredient b = ingredients.get(1);
+
+        return matchesIngredient(a, first) && matchesIngredient(b, second) ||
+                matchesIngredient(a, second) && matchesIngredient(b, first);
+    }
+
+    private boolean matchesIngredient(Ingredient ingredient, Item item) {
+        if (ingredient == null || item == null) {
+            return false;
+        }
+
+        Craftable required = ingredient.craftable();
+        return required.getClass() == item.getClass()
+                && required.getId() == item.getId();
+    }
+
+    private boolean canCraft(Recipe recipe, Item first,
+                             int firstAmount, Item second, int secondAmount) {
+
+        List<Ingredient> ingredients = recipe.ingredients();
+        if (ingredients.size() != 2) {
+            return false;
+        }
+
+        Ingredient a = ingredients.get(0);
+        Ingredient b = ingredients.get(1);
+        if (matchesIngredient(a, first) && matchesIngredient(b, second)) {
+            return firstAmount >= a.amount()
+                    && secondAmount >= b.amount();
+        }
+
+        if (matchesIngredient(a, second) && matchesIngredient(b, first)) {
+            return firstAmount >= b.amount()
+                    && secondAmount >= a.amount();
+        }
+        return false;
+    }
+
+    private void craft(Recipe recipe, InventorySlot targetSlot) {
+        List<Ingredient> ingredients = recipe.ingredients();
+        Ingredient firstIngredient = ingredients.get(0);
+        Ingredient secondIngredient = ingredients.get(1);
+
+        Item firstItem = carriedItem;
+        int firstAmount = carriedAmount;
+
+        Item secondItem = targetSlot.getItem();
+        int secondAmount = targetSlot.getAmount();
+
+        int firstCost;
+        int secondCost;
+
+        if (matchesIngredient(firstIngredient, firstItem)
+                && matchesIngredient(secondIngredient, secondItem)) {
+
+            firstCost = firstIngredient.amount();
+            secondCost = secondIngredient.amount();
+
+        } else {
+
+            firstCost = secondIngredient.amount();
+            secondCost = firstIngredient.amount();
+        }
+
+        firstAmount -= firstCost;
+        secondAmount -= secondCost;
+
+        targetSlot.setItem(recipe.result().copy());
+        targetSlot.setAmount(recipe.resultAmount());
+
+        if (firstAmount > 0) {
+            carriedAmount = firstAmount;
+        } else {
+            clearCarriedItem();
         }
     }
 
@@ -764,7 +891,6 @@ public class InventoryUI extends UIElement {
     }
 
     public enum Tab {
-        INVENTORY,
-        CRAFTING
+        INVENTORY, CRAFTING
     }
 }
