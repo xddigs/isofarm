@@ -11,6 +11,7 @@ import com.isofarm.item.*;
 import com.isofarm.service.CropService;
 import com.isofarm.gui.GameUIService;
 import com.isofarm.service.TimeService;
+import com.isofarm.service.ToastService;
 import com.isofarm.utils.HoveredCell;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
@@ -197,7 +198,7 @@ public class GameInteraction {
     public void dropItem(GameMaster gameMaster, Item selectedItem, boolean dropAll) {
         if (selectedItem == null) return;
         if (selectedItem instanceof Backpack || selectedItem instanceof CraftingKit) {
-            gameMaster.getToastService().error("You can't drop your " + selectedItem.getName() + "!");
+            ToastService.error("You can't drop your " + selectedItem.getName() + "!");
             return;
         }
         Player player = gameMaster.getPlayer();
@@ -327,7 +328,7 @@ public class GameInteraction {
             int frameIndex = crop.getStage().getFrameIndex();
             SpriteSheet sheet = gameMaster.getCropSpriteSheet(cropType);
             if (crop.isReadyToHarvest()) {
-                cropService.harvest(gameMaster.getPlayer(), crop, gameMaster.getToastService());
+                cropService.harvest(gameMaster.getPlayer(), crop);
             } else {
                 cropService.rip(crop);
             }
@@ -531,7 +532,7 @@ public class GameInteraction {
 
             Block tilledDirt = new Block(BlockData.TILLED_DIRT, x, y, z);
             Crop planted = cropService.plant(x, y, z, gameMaster.getPlayer(), tilledDirt, seed.getType(),
-                    timeService.getCurrentSeason(), gameMaster.getToastService());
+                    timeService.getCurrentSeason());
 
             if (planted != null) {
                 gameUIservice.logAction(cell);

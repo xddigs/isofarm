@@ -12,11 +12,11 @@ public class ToastService implements Service<Toast> {
     private static final List<Toast> toasts = new ArrayList<>();
     private static float windowWidth = K.Window.DEFAULT_WIDTH;
 
-    public List<Toast> getToasts() {
+    public static List<Toast> getToasts() {
         return toasts;
     }
 
-    public void setWindowWidth(float windowWidth) {
+    public static void setWindowWidth(float windowWidth) {
         ToastService.windowWidth = windowWidth;
         for (Toast toast : toasts) {
             toast.setWindowWidth(windowWidth);

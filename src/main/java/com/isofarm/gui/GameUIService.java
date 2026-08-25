@@ -384,11 +384,11 @@ public class GameUIService implements Service<GameMaster> {
     }
 
     public void renderToasts() {
-        if (gameMaster.getToastService().isEmpty()) {
+        if (ToastService.isEmpty()) {
             return;
         }
 
-        for (Toast toast : gameMaster.getToastService().getToasts()) {
+        for (Toast toast : ToastService.getToasts()) {
             renderToast(toast);
         }
     }
@@ -543,8 +543,8 @@ public class GameUIService implements Service<GameMaster> {
     public void onResize(int width, int height) {
         this.windowWidth = width;
         this.windowHeight = height;
-        gameMaster.getToastService().setWindowWidth(width);
-        gameMaster.getToastService().info("Resized to " + width + "x" + height);
+        ToastService.setWindowWidth(width);
+        ToastService.info("Resized to " + width + "x" + height);
         resetHotbarPosition();
 
         if (healthBar != null && staminaBar != null) {
@@ -619,7 +619,7 @@ public class GameUIService implements Service<GameMaster> {
         if (player.purse() < totalPrice) {
             log.warn("Player doesn't have enough money to buy {} x{}",
                     item.getName(), amount);
-            gameMaster.getToastService().warning(
+            ToastService.warning(
                     "You don't have enough money to buy " + amount + " "
                             + item.getName() + "!");
             return;
@@ -632,7 +632,7 @@ public class GameUIService implements Service<GameMaster> {
         player.getInventory().add(item, amount);
 
         log.info("Player bought {} x{} from shop", item.getName(), amount);
-        gameMaster.getToastService().success(
+        ToastService.success(
                 "You bought " + amount + " " + item.getName() + "!");
     }
 }
