@@ -243,7 +243,7 @@ public class InventorySlotUI extends UIElement {
     }
 
     public void setSpriteRow(int spriteRow) {
-        this.spriteRow = spriteRow;
+        this.spriteRow = Math.max(0, spriteRow);
     }
 
     public boolean isSelected() {

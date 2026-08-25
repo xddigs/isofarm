@@ -248,7 +248,7 @@ public class ItemRenderer {
                 .rotateY((float) Math.toRadians(worldItem.getRotation()))
                 .rotateZ((float) Math.toRadians(180.0f)).scale(scale, scale, scale);
 
-        int frameIndex = item instanceof Block ? item.getId() - 1 : item.getId();
+        int frameIndex = ResourceManager.getItemIconFrame(item);
         frameIndex = Math.clamp(frameIndex, 0, spriteSheet.getTotalFrames() - 1);
         Vector4f uvBounds = spriteSheet.getUVBounds(frameIndex);
         int textureUnit = com.isofarm.utils.K.Render.PRIMARY_TEXTURE_UNIT;

@@ -164,6 +164,11 @@ public class ResourceManager {
     }
 
     public static int getItemIconColumn(Item item) {
+        if (item instanceof Block block && block.getType() != null) {
+            int index = block.getType().getId() - 1;
+            return index % K.UI.ICON_BLOCK_COLS;
+        }
+
         if (item instanceof Produce produce && produce.getType() != null) {
             return produce.getType().getId();
         }
@@ -176,26 +181,40 @@ public class ResourceManager {
             return crop.getCropType().getId();
         }
 
-        if (item instanceof Block block && block.getType() != null) {
-            return block.getType().getId() - 1;
-        }
-
         if (item instanceof Tool tool) {
             return tool.getId();
         }
 
         if (item instanceof Material material) {
-            return material.getId();
+            return material.getId() % K.UI.ICON_MATERIAL_COLS;
         }
 
         return 0;
     }
 
     public static int getItemIconRow(Item item) {
+        if (item instanceof Block block && block.getType() != null) {
+            int index = block.getType().getId() - 1;
+            return index / K.UI.ICON_BLOCK_COLS;
+        }
+
         if (item instanceof Tool tool) {
             return tool.getTier().getId();
         }
+
         return 0;
+    }
+
+    public static int getItemIconFrame(Item item) {
+        if (item instanceof Block block && block.getType() != null) {
+            return block.getType().getId() - 1;
+        }
+
+        if (item instanceof Material material) {
+            return material.getId() - 1;
+        }
+
+        return item != null ? item.getId() : 0;
     }
 
     public Shader getShader(String name) {
