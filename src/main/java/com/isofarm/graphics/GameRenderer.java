@@ -1,6 +1,5 @@
 package com.isofarm.graphics;
 
-import com.isofarm.data.BlockData;
 import com.isofarm.data.Crop;
 import com.isofarm.data.Hit;
 import com.isofarm.entity.Player;
@@ -141,33 +140,6 @@ public class GameRenderer {
             rm.getSpriteMesh().render();
             sheet.unbind();
         });
-
-        SpriteSheet flowerSheet = rm.getFlowers();
-        Mesh flowerMesh = rm.getFlowerMesh();
-
-        if (flowerSheet != null && flowerMesh != null) {
-            glActiveTexture(GL_TEXTURE0 + K.Render.PRIMARY_TEXTURE_UNIT);
-            flowerSheet.bind();
-            defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
-            defaultShader.setUniform("uUseTexture", true);
-            defaultShader.setUniform("uUseFaceAtlas", false);
-            glDisable(GL_CULL_FACE);
-            gameMaster.getWorld().forEach(block -> {
-                if (block.getId() != BlockData.FLOWER.getId()) return;
-                int frameIndex = 0;
-                defaultShader.setUniform("uUVBounds", flowerSheet.getUVBounds(frameIndex));
-                float renderX = block.getX() + 0.5f;
-                float renderY = block.getY() + 0.001f;
-                float renderZ = block.getZ() + 0.5f;
-
-                modelMatrix.identity().translate(renderX, renderY, renderZ);
-                defaultShader.setUniform("uModel", modelMatrix);
-                flowerMesh.render();
-            });
-
-            flowerSheet.unbind();
-            glEnable(GL_CULL_FACE);
-        }
 
         renderDestroyOverlay(gameMaster.getGameInteraction(), defaultShader,
                 rm.getDestroyOverlayMesh(), rm.getDestroyTexture(), camera);

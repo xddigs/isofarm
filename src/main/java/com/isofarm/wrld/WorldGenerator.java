@@ -16,6 +16,9 @@ public class WorldGenerator {
     private static final int ORE_MAX_HEIGHT = 45;
     private static final float ORE_CHANCE = 0.015f;
 
+    private static final int FLOWER_MAX_HEIGHT = BASE_HEIGHT + 10;
+    private static final float FLOWER_CHANCE = 0.04f;
+
     private final World world;
 
     private final long seed;
@@ -74,7 +77,12 @@ public class WorldGenerator {
                 int worldX = chunkX * Chunk.SIZE_X + x;
                 int worldZ = chunkZ * Chunk.SIZE_Z + z;
 
-                if (height < BASE_HEIGHT + 12 && chunkRandom.nextDouble() < 0.01 && canPlaceTree(heightMap, x, z)) {
+                if (height <= FLOWER_MAX_HEIGHT && chunkRandom.nextDouble() < FLOWER_CHANCE) {
+                    chunk.setBlock(x, height + 1, z, BlockData.FLOWER.getId());
+                }
+
+                if (height < BASE_HEIGHT + 12 && chunkRandom.nextDouble() < 0.01 &&
+                        canPlaceTree(heightMap, x, z)) {
                     generateCompactTree(worldX, height, worldZ);
                 }
             }

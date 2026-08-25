@@ -58,7 +58,7 @@ public class Library implements Service<GameMaster> {
         registerDefault(itemR, () -> new Produce(CropType.WHEAT));
 
         for (BlockData block : BlockData.values()) {
-            if (block != BlockData.AIR && block != BlockData.WATER && block != BlockData.CROP) {
+            if (block.getId() > 0) {
                 registerDefault(itemR, () -> new Block(block));
             }
         }

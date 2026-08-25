@@ -36,7 +36,7 @@ public class Block implements Craftable {
     }
 
     public Block() {
-        this(BlockData.CROP);
+        this(BlockData.DIRT);
     }
 
     @Override
