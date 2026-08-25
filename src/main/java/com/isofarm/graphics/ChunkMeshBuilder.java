@@ -40,7 +40,7 @@ public class ChunkMeshBuilder {
                     if (blockId == 0) continue;
 
                     BlockData data = BLOCK_LUT[blockId & 0xFF];
-                    if (data == null || data == BlockData.CROP) continue;
+                    if (data == null) continue;
 
                     int worldX = chunkX * Chunk.SIZE_X + x;
                     int worldZ = chunkZ * Chunk.SIZE_Z + z;
@@ -158,7 +158,7 @@ public class ChunkMeshBuilder {
         byte blockId = world.getBlockTypeAt(worldX, worldY, worldZ);
         if (blockId == 0) return 0.0f;
         BlockData data = BLOCK_LUT[blockId & 0xFF];
-        if (data == null || data == BlockData.CROP) return 0.0f;
+        if (data == null) return 0.0f;
         return worldY;
     }
 
@@ -167,7 +167,7 @@ public class ChunkMeshBuilder {
         byte blockId = world.getBlockTypeAt(worldX, worldY, worldZ);
         if (blockId == 0) return 0.0f;
         BlockData data = BLOCK_LUT[blockId & 0xFF];
-        if (data == null || data == BlockData.CROP) return 0.0f;
+        if (data == null) return 0.0f;
         return getBlockTopY(data, worldY);
     }
 
