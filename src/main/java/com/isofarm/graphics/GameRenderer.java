@@ -1,5 +1,6 @@
 package com.isofarm.graphics;
 
+import com.isofarm.data.BlockData;
 import com.isofarm.data.Crop;
 import com.isofarm.data.Hit;
 import com.isofarm.entity.Player;
@@ -139,6 +140,33 @@ public class GameRenderer {
             defaultShader.setUniform("uModel", modelMatrix);
             rm.getSpriteMesh().render();
             sheet.unbind();
+        });
+
+        gameMaster.getWorld().forEach(block -> {
+            if (block.getId() != BlockData.PLANT.getId()) return;
+
+            SpriteSheet blocksAtlas = rm.getBlocksTexture();
+            if (blocksAtlas == null) return;
+
+            glActiveTexture(GL_TEXTURE0 + K.Render.PRIMARY_TEXTURE_UNIT);
+            blocksAtlas.bind();
+
+            defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
+            defaultShader.setUniform("uUseTexture", true);
+            defaultShader.setUniform("uUseFaceAtlas", false);
+
+            int hash = Math.abs(block.getX() * 31 + block.getZ() * 17);
+            int plantColumn = hash % blocksAtlas.getCols();
+            int frameIndex = (3 * blocksAtlas.getCols()) + plantColumn;
+            defaultShader.setUniform("uUVBounds", blocksAtlas.getUVBounds(frameIndex));
+
+            float renderX = block.getX() + 0.5f;
+            float renderY = block.getY() + 0.001f;
+            float renderZ = block.getZ() + 0.5f;
+
+            modelMatrix.identity().translate(renderX, renderY, renderZ);
+            defaultShader.setUniform("uModel", modelMatrix);
+            rm.getFlowerMesh().render();
         });
 
         renderDestroyOverlay(gameMaster.getGameInteraction(), defaultShader,
@@ -310,19 +338,26 @@ public class GameRenderer {
         });
 
         gameMaster.getWorld().forEach(block -> {
-            if (!(block instanceof Crop crop)) {
-                return;
+            float renderX = 0f, renderY = 0f, renderZ = 0f;
+            boolean isRenderableSprite = false;
+
+            if (block instanceof Crop crop) {
+                renderX = crop.getX() + 0.5f;
+                renderY = crop.getY() + K.World.SHORTER_BLOCK_HEIGHT;
+                renderZ = crop.getZ() + 0.5f;
+                isRenderableSprite = true;
+            } else if (block.getId() == BlockData.PLANT.getId()) {
+                renderX = block.getX() + 0.5f;
+                renderY = block.getY();
+                renderZ = block.getZ() + 0.5f;
+                isRenderableSprite = true;
             }
 
-            float renderX = crop.getX() + 0.5f;
-            float renderY = crop.getY() + K.World.SHORTER_BLOCK_HEIGHT;
-            float renderZ = crop.getZ() + 0.5f;
-
-            modelMatrix.identity()
-                    .translate(renderX, renderY, renderZ);
-
-            shadowShader.setUniform("uModel", modelMatrix);
-            rm.getSpriteMesh().render();
+            if (isRenderableSprite) {
+                modelMatrix.identity().translate(renderX, renderY, renderZ);
+                shadowShader.setUniform("uModel", modelMatrix);
+                rm.getSpriteMesh().render();
+            }
         });
 
         shadowShader.unbind();

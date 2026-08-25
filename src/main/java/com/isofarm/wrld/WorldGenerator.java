@@ -77,6 +77,10 @@ public class WorldGenerator {
                 int worldX = chunkX * Chunk.SIZE_X + x;
                 int worldZ = chunkZ * Chunk.SIZE_Z + z;
 
+                if (height <= FLOWER_MAX_HEIGHT && chunkRandom.nextDouble() < FLOWER_CHANCE) {
+                    chunk.setBlock(x, height + 1, z, BlockData.PLANT.getId());
+                }
+
                 if (height < BASE_HEIGHT + 12 && chunkRandom.nextDouble() < 0.01 &&
                         canPlaceTree(heightMap, x, z)) {
                     generateCompactTree(worldX, height, worldZ);

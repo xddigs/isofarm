@@ -10,6 +10,7 @@ import org.joml.Vector2f;
 @DataClass
 public enum BlockData implements Craftable {
     AIR((byte) 0, (byte) 0, "Air", 0, 0, 0, SoundGroup.SILENT, 0f, true, new MaterialID[]{}, Tier.NONE),
+    PLANT((byte) 999, (byte) -1, "Plant", 0, 0, 0, SoundGroup.SILENT, 0f, true, new MaterialID[]{}, Tier.NONE),
     DIRT((byte) 1, (byte) 0, "Dirt", true, 100, 0, 0, SoundGroup.SOIL, 0.9f, false, new MaterialID[]{}, Tier.NONE),
     GRASS((byte) 2, (byte) 0, "Grass", true, 120, 1, 0, SoundGroup.SOIL, 1.0f, false, new Seed[]{new Seed(CropType.WHEAT)}, Tier.NONE),
     STONE((byte) 3, (byte) 0, "Stone", 150, 2, 0, SoundGroup.HARD, 6.0f, false, new MaterialID[]{}, Tier.NONE),
