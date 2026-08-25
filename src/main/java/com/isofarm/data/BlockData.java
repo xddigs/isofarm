@@ -16,7 +16,7 @@ public enum BlockData implements Craftable {
     TILLED_DIRT((byte) 4, (byte) 0, "Tilled Dirt", true, false, new MaterialID[]{}, Tier.NONE, 110, 3, 0, 0, 0, 0, 0, SoundGroup.SOIL, 0.9f),
     VOIDSTONE((byte) 5, (byte) 0, "Voidstone", 999, 4, 0, SoundGroup.HARD, 999999.0f, false, new MaterialID[]{}, Tier.NONE),
     GLASS((byte) 6, (byte) 0, "Glass", 200, 5, 0, SoundGroup.GLASS, 1.2f, true, new MaterialID[]{}, Tier.NONE),
-    OAK_LOG((byte) 7, (byte) 0, "Oak Log", false, false, new MaterialID[]{}, Tier.WOOD, 100, 6, 2, 6, 1, 6, 1, SoundGroup.HARD, 1.2f),
+    OAK_LOG((byte) 7, (byte) 0, "Oak Log", false, false, new MaterialID[]{}, Tier.WOOD, 100, 6, 2, 6, 2, 6, 1,SoundGroup.HARD, 2.2f),
     OAK_WOOD((byte) 8, (byte) 0, "Oak Wood", 100, 7, 0, SoundGroup.HARD, 4.0f, false, new MaterialID[]{}, Tier.WOOD),
     OAK_LEAVES((byte) 9, (byte) 0, "Oak Leaves", 100, 8, 0, SoundGroup.SOIL, 1.1f, false, new MaterialID[]{MaterialID.STICK}, Tier.NONE),
     SNOW((byte) 10, (byte) 0, "Snow", 120, 9, 0, SoundGroup.SNOW, 0.8f, false, new MaterialID[]{}, Tier.NONE),

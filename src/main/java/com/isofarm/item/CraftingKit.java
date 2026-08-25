@@ -36,7 +36,8 @@ public class CraftingKit extends Tool {
     public boolean use(GameMaster gameMaster) {
         Player player = gameMaster.getPlayer();
         if (selectedRecipe != null) {
-            if (selectedRecipe.tier() == getTier() && player.hasIngredients(selectedRecipe)) {
+            if (selectedRecipe.tier() == getTier()
+                    && player.hasIngredients(selectedRecipe)) {
                 return player.craft(selectedRecipe);
             }
             return false;
