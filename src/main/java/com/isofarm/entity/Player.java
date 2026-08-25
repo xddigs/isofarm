@@ -7,7 +7,7 @@ import com.isofarm.graphics.Shader;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.item.*;
 import com.isofarm.pathfinding.GridPos;
-import com.isofarm.service.ToastService;
+import com.isofarm.utils.ToastFactory;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
@@ -92,7 +92,7 @@ public class Player extends Character {
         for (InventorySlot slot : getInventory().getSlots()) {
             if (slot.getItem() instanceof Tool tool && tool.getDurability() <= 0) {
                 remove(tool);
-                ToastService.error("Your " + tool.getName() + " broke!");
+                ToastFactory.error("Your " + tool.getName() + " broke!");
                 getSoundService().playBreakSound(SoundGroup.ITEMS, 1.0f,
                         Settings.getMaxInteractionDistance());
             }
@@ -317,7 +317,7 @@ public class Player extends Character {
         int toSell = Math.min(current, amount);
         getInventory().remove(item, toSell);
         int earnings = toSell * item.getValue();
-        ToastService.sell("You successfully sold " + item.getName() + " for " + earnings + " coins");
+        ToastFactory.sell("You successfully sold " + item.getName() + " for " + earnings + " coins");
         earn(earnings);
     }
 
@@ -427,7 +427,7 @@ public class Player extends Character {
             addToBackpack(recipe.result(), recipe.resultAmount());
         }
 
-        ToastService.success("You crafted " +
+        ToastFactory.success("You crafted " +
                 recipe.resultAmount() + " " + recipe.result().getName());
 
         return true;

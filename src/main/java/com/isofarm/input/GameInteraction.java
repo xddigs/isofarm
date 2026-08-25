@@ -11,7 +11,7 @@ import com.isofarm.item.*;
 import com.isofarm.service.CropService;
 import com.isofarm.gui.GameUIService;
 import com.isofarm.service.TimeService;
-import com.isofarm.service.ToastService;
+import com.isofarm.utils.ToastFactory;
 import com.isofarm.utils.HoveredCell;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
@@ -198,7 +198,7 @@ public class GameInteraction {
     public void dropItem(GameMaster gameMaster, Item selectedItem, boolean dropAll) {
         if (selectedItem == null) return;
         if (selectedItem instanceof Backpack || selectedItem instanceof CraftingKit) {
-            ToastService.error("You can't drop your " + selectedItem.getName() + "!");
+            ToastFactory.error("You can't drop your " + selectedItem.getName() + "!");
             return;
         }
         Player player = gameMaster.getPlayer();

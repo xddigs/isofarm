@@ -1,14 +1,15 @@
-package com.isofarm.service;
+package com.isofarm.utils;
 
 import com.isofarm.data.Toast;
 import com.isofarm.data.ToastData;
-import com.isofarm.utils.K;
+import com.isofarm.service.Service;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class ToastService implements Service<Toast> {
+@Utils
+public class ToastFactory implements Service<Toast> {
     private static final List<Toast> toasts = new ArrayList<>();
     private static float windowWidth = K.Window.DEFAULT_WIDTH;
 
@@ -17,7 +18,7 @@ public class ToastService implements Service<Toast> {
     }
 
     public static void setWindowWidth(float windowWidth) {
-        ToastService.windowWidth = windowWidth;
+        ToastFactory.windowWidth = windowWidth;
         for (Toast toast : toasts) {
             toast.setWindowWidth(windowWidth);
         }

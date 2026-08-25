@@ -5,7 +5,7 @@ import com.isofarm.data.Recipe;
 import com.isofarm.data.Tier;
 import com.isofarm.data.ToolType;
 import com.isofarm.entity.Player;
-import com.isofarm.service.ToastService;
+import com.isofarm.utils.ToastFactory;
 import com.isofarm.wrld.GameMaster;
 
 @DataClass
@@ -51,7 +51,7 @@ public class CraftingKit extends Tool {
             }
         }
 
-        ToastService.error("You don't have enough to craft this");
+        ToastFactory.error("You don't have enough to craft this");
         return false;
     }
 }

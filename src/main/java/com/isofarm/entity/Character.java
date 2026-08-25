@@ -2,7 +2,7 @@ package com.isofarm.entity;
 
 import com.isofarm.data.*;
 import com.isofarm.service.SoundService;
-import com.isofarm.service.ToastService;
+import com.isofarm.utils.ToastFactory;
 
 @DataClass
 public abstract class Character extends Entity implements Levelable {
@@ -108,7 +108,7 @@ public abstract class Character extends Entity implements Levelable {
     @Override
     public void levelUp() {
         level++;
-        ToastService.success("Level up! You're now level " + level);
+        ToastFactory.success("Level up! You're now level " + level);
     }
 
     public float getFrameDuration() {

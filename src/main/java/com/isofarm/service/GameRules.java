@@ -1,7 +1,7 @@
 package com.isofarm.service;
 
-import com.isofarm.gui.GameUIService;
 import com.isofarm.utils.Settings;
+import com.isofarm.utils.ToastFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,7 +128,7 @@ public final class GameRules {
                 }
             }
         } catch (ClassCastException e) {
-            ToastService.error(String.format("Invalid value for %s: %s", rule, value));
+            ToastFactory.error(String.format("Invalid value for %s: %s", rule, value));
         }
     }
 }

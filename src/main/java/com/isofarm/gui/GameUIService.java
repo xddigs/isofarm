@@ -7,7 +7,7 @@ import com.isofarm.input.CommandCompletionProvider;
 import com.isofarm.input.Mouse;
 import com.isofarm.item.Item;
 import com.isofarm.service.Service;
-import com.isofarm.service.ToastService;
+import com.isofarm.utils.ToastFactory;
 import com.isofarm.utils.Components;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
@@ -282,7 +282,7 @@ public class GameUIService implements Service<GameMaster> {
         }
 
         uiManager.update(delta);
-        ToastService.update(delta);
+        ToastFactory.update(delta);
 
         if (!gameMaster.isInventoryOpen()) {
             float scroll = Mouse.getScrollY();
@@ -384,11 +384,11 @@ public class GameUIService implements Service<GameMaster> {
     }
 
     public void renderToasts() {
-        if (ToastService.isEmpty()) {
+        if (ToastFactory.isEmpty()) {
             return;
         }
 
-        for (Toast toast : ToastService.getToasts()) {
+        for (Toast toast : ToastFactory.getToasts()) {
             renderToast(toast);
         }
     }
@@ -543,8 +543,8 @@ public class GameUIService implements Service<GameMaster> {
     public void onResize(int width, int height) {
         this.windowWidth = width;
         this.windowHeight = height;
-        ToastService.setWindowWidth(width);
-        ToastService.info("Resized to " + width + "x" + height);
+        ToastFactory.setWindowWidth(width);
+        ToastFactory.info("Resized to " + width + "x" + height);
         resetHotbarPosition();
 
         if (healthBar != null && staminaBar != null) {
@@ -619,7 +619,7 @@ public class GameUIService implements Service<GameMaster> {
         if (player.purse() < totalPrice) {
             log.warn("Player doesn't have enough money to buy {} x{}",
                     item.getName(), amount);
-            ToastService.warning(
+            ToastFactory.warning(
                     "You don't have enough money to buy " + amount + " "
                             + item.getName() + "!");
             return;
@@ -632,7 +632,7 @@ public class GameUIService implements Service<GameMaster> {
         player.getInventory().add(item, amount);
 
         log.info("Player bought {} x{} from shop", item.getName(), amount);
-        ToastService.success(
+        ToastFactory.success(
                 "You bought " + amount + " " + item.getName() + "!");
     }
 }

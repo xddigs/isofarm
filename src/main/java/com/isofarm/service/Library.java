@@ -3,6 +3,7 @@ package com.isofarm.service;
 import com.isofarm.data.*;
 import com.isofarm.entity.Player;
 import com.isofarm.item.*;
+import com.isofarm.utils.ToastFactory;
 import com.isofarm.wrld.GameMaster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,7 +100,7 @@ public class Library implements Service<GameMaster> {
                 player.add(item, amount);
             }
             log.info("Command add executed: {} x{}", itemId, amount);
-            ToastService.success("You added " + amount + " " + item.getName() + " to your inventory!");
+            ToastFactory.success("You added " + amount + " " + item.getName() + " to your inventory!");
         }));
 
         cr.register(new Command("/rain", new CommandArgument[]{literal("action", "start", "stop")}, args -> {
@@ -115,12 +116,12 @@ public class Library implements Service<GameMaster> {
                 case "start" -> {
                     weatherService.setWeather(WeatherType.RAIN);
                     log.info("Command rain executed");
-                    ToastService.success("You started the rain.");
+                    ToastFactory.success("You started the rain.");
                 }
                 case "stop" -> {
                     weatherService.setWeather(WeatherType.CLEAR);
                     log.info("Command rain executed");
-                    ToastService.success("You stopped the rain.");
+                    ToastFactory.success("You stopped the rain.");
                 }
                 default -> log.warn("Unknown rain action: {}", args[0]);
             }
@@ -165,7 +166,7 @@ public class Library implements Service<GameMaster> {
             }
             player.setGamemode(targetMode);
             log.info("Command gamemode executed: {}", targetMode);
-            ToastService.success("You changed gamemode to " + targetMode.name().toLowerCase());
+            ToastFactory.success("You changed gamemode to " + targetMode.name().toLowerCase());
         }));
 
         cr.register(new Command("/gamerule", new CommandArgument[]{dynamic("rule", () -> GameRules.getRules().keySet()), new CommandArgument("value")}, args -> {
@@ -174,20 +175,20 @@ public class Library implements Service<GameMaster> {
                 return;
             }
             if (args.length == 0) {
-                ToastService.info("Available gamerules:");
-                GameRules.getRules().forEach((rule, value) -> ToastService.info(rule + " = " + value));
+                ToastFactory.info("Available gamerules:");
+                GameRules.getRules().forEach((rule, value) -> ToastFactory.info(rule + " = " + value));
                 return;
             }
             String rule = args[0];
             if (!GameRules.exists(rule)) {
                 log.warn("Unknown gamerule: {}", rule);
-                ToastService.error("Unknown gamerule: " + rule);
+                ToastFactory.error("Unknown gamerule: " + rule);
                 return;
             }
             if (args.length == 1) {
                 Object value = GameRules.get(rule);
                 log.info("Gamerule {} = {}", rule, value);
-                ToastService.info(rule + " = " + value);
+                ToastFactory.info(rule + " = " + value);
                 return;
             }
             String valueString = args[1];
@@ -208,16 +209,16 @@ public class Library implements Service<GameMaster> {
                 }
             } catch (IllegalArgumentException e) {
                 log.warn("Invalid value for gamerule {}: {}", rule, valueString);
-                ToastService.error("Invalid value for " + rule);
+                ToastFactory.error("Invalid value for " + rule);
                 return;
             }
             try {
                 GameRules.set(rule, newValue);
                 log.info("Gamerule changed: {} = {}", rule, newValue);
-                ToastService.success("Gamerule " + rule + " was set to " + newValue);
+                ToastFactory.success("Gamerule " + rule + " was set to " + newValue);
             } catch (IllegalArgumentException e) {
                 log.warn("Could not set gamerule {}: {}", rule, e.getMessage());
-                ToastService.error(e.getMessage());
+                ToastFactory.error(e.getMessage());
             }
         }));
 
@@ -228,7 +229,7 @@ public class Library implements Service<GameMaster> {
             }
             player.setHitpoints(-player.getHitpoints());
             log.info("Command kill executed");
-            ToastService.success("You killed yourself!");
+            ToastFactory.success("You killed yourself!");
         }));
     }
 

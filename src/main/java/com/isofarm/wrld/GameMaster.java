@@ -14,6 +14,7 @@ import com.isofarm.service.*;
 import com.isofarm.utils.HoveredCell;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
+import com.isofarm.utils.ToastFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -388,7 +389,7 @@ public class GameMaster {
         }
 
         gameRenderer.initCamera(getActiveCamera());
-        ToastService.info("Camera changed to " + (Settings.isOrthographic() ?
+        ToastFactory.info("Camera changed to " + (Settings.isOrthographic() ?
                 "orthographic" : "first person"));
     }
 
