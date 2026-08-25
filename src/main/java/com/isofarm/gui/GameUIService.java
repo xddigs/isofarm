@@ -590,11 +590,6 @@ public class GameUIService implements Service<GameMaster> {
         return chatField.getText();
     }
 
-    public void renderInv() {
-        if (player == null) return;
-
-    }
-
     private void sellItem(Inventory inv, Item item) {
         Item targetItem = null;
         int cumulativeAmount = 0;

@@ -9,11 +9,10 @@ import com.isofarm.item.Block;
 import com.isofarm.item.CraftingKit;
 import com.isofarm.item.Item;
 import com.isofarm.item.Tool;
-import com.isofarm.utils.ToastFactory;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
+import com.isofarm.utils.ToastFactory;
 import com.isofarm.wrld.GameMaster;
-import org.joml.Vector4f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,9 +33,11 @@ public class InventoryUI extends UIElement {
     private UIButton sortButton;
     private UIButton groupButton;
     private UIButton backpackButton;
+    private UIButton craftingButton;
 
     private Player player;
     private Inventory inventory;
+    private Tab currentTab;
 
     private SpriteSheet seedIcons;
     private SpriteSheet cropIcons;
@@ -72,6 +73,7 @@ public class InventoryUI extends UIElement {
         this.slotUIs = new InventorySlotUI[totalVisualSlots];
         this.backpackSlotUIs = new InventorySlotUI[BACKPACK_SLOTS];
         this.buttons = new ArrayList<>();
+        this.currentTab = Tab.INVENTORY;
         setFocusable(true);
         createButtons();
     }
@@ -119,6 +121,9 @@ public class InventoryUI extends UIElement {
         backpackButton = new UIButton(Settings.getScaledPadding() + btnWidth * 2 + Settings.getScaledSpacing() * 2,
                 Settings.getScaledPadding() - Settings.getScaledSpacing(), btnWidth, btnHeight);
 
+        craftingButton = new UIButton(Settings.getScaledPadding() + btnWidth * 3 + Settings.getScaledSpacing() * 3,
+                Settings.getScaledPadding() - Settings.getScaledSpacing(), btnWidth, btnHeight);
+
         sortButton.setOnClick(this::sortInventory);
         groupButton.setOnClick(this::groupInventory);
         backpackButton.setOnClick(() -> {
@@ -130,18 +135,26 @@ public class InventoryUI extends UIElement {
             }
         });
 
+        craftingButton.setOnClick(() -> {
+            currentTab = Tab.CRAFTING;
+        });
+
         sortButton.setTooltipText("Sort");
         groupButton.setTooltipText("Group");
         backpackButton.setTooltipText("Backpack");
         backpackButton.hide();
 
+        craftingButton.setTooltipText("Crafting Kit");
+
         buttons.add(sortButton);
         buttons.add(groupButton);
         buttons.add(backpackButton);
+        buttons.add(craftingButton);
 
         addChild(sortButton);
         addChild(groupButton);
         addChild(backpackButton);
+        addChild(craftingButton);
     }
 
     public void createSlots() {
@@ -357,6 +370,9 @@ public class InventoryUI extends UIElement {
 
             backpackButton.setSpriteSheet(inventoryIcons);
             backpackButton.setSpriteColumn(2);
+
+            craftingButton.setSpriteSheet(inventoryIcons);
+            craftingButton.setSpriteColumn(3);
         }
     }
 
@@ -535,80 +551,6 @@ public class InventoryUI extends UIElement {
         addOneToSlot(slot);
     }
 
-    public void renderRecipes() {
-        if (!showingCraftingMenu || availableRecipes.isEmpty()) return;
-        final int COLS = availableRecipes.size();
-        final float SLOT_SIZE = Settings.getScaledSlot();
-        final float SPACING = Settings.getScaledSpacing();
-
-        int total = availableRecipes.size();
-        int cols = Math.min(total, COLS);
-        int rows = (int) Math.ceil((double) total / cols);
-
-        float width = cols * SLOT_SIZE + (cols + 1) * SPACING;
-        float height = rows * SLOT_SIZE + (rows + 1) * SPACING;
-
-        float x = Math.clamp(craftingMenuX, 0, GUI.getScreenWidth() - width);
-        float y = Math.clamp(craftingMenuY, 0, GUI.getScreenHeight() - height);
-
-        float mouseX = Mouse.getX();
-        float mouseY = Mouse.getY();
-
-        boolean isMouseInsideMenu = mouseX >= x && mouseX <= x + width &&
-                mouseY >= y && mouseY <= y + height;
-        if (!isMouseInsideMenu) {
-            showingCraftingMenu = false;
-            return;
-        }
-
-        Player player = gameMaster.getPlayer();
-
-        for (int i = 0; i < total; i++) {
-            Recipe recipe = availableRecipes.get(i);
-            int col = i % cols;
-            int row = i / cols;
-
-            float slotX = x + SPACING + col * (SLOT_SIZE + SPACING);
-            float slotY = y + SPACING + row * (SLOT_SIZE + SPACING);
-
-            boolean hovered = mouseX >= slotX && mouseX <= slotX + SLOT_SIZE &&
-                    mouseY >= slotY && mouseY <= slotY + SLOT_SIZE;
-
-            boolean canCraft = player.hasIngredients(recipe);
-            boolean isSelected = activeCraftingKit != null && recipe.equals(activeCraftingKit.getSelectedRecipe());
-
-            Vector4f slotBg = isSelected ? K.UI.UI_SELECTED_COLOR : K.UI.UI_BACKGROUND_COLOR_SLOT;
-            Vector4f slotBorder = isSelected ? K.UI.UI_SELECTED_BORDER_COLOR : K.UI.UI_BORDER_COLOR;
-
-            float borderWidth = isSelected ? 2.0f : 1.0f;
-            GUI.drawRect(slotX, slotY, SLOT_SIZE, SLOT_SIZE, slotBg, 4.0f, slotBorder, borderWidth);
-
-            Item resultItem = recipe.result();
-            SpriteSheet iconSheet = ResourceManager.getItemSpriteSheet(resultItem);
-
-            if (iconSheet != null) {
-                int iconCol = ResourceManager.getItemIconColumn(resultItem);
-                int iconRow = ResourceManager.getItemIconRow(resultItem);
-                final float iconSize = Settings.getScaledIcon();
-
-                Vector4f tint = canCraft ? new Vector4f(1.0f) : new Vector4f(0.4f, 0.4f, 0.4f, 0.5f);
-                GUI.drawSprite(iconSheet, iconCol, iconRow, slotX + 2f,
-                        slotY + 2f, iconSize, iconSize, tint);
-            }
-
-            if (recipe.resultAmount() > 1) {
-                String qty = String.valueOf(recipe.resultAmount());
-                GUI.drawSmallString(qty, slotX + SLOT_SIZE - 12, slotY + SLOT_SIZE - 16, new Vector4f(1.0f));
-            }
-
-            if (hovered && Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
-                activeCraftingKit.setSelectedRecipe(recipe);
-                showingCraftingMenu = false;
-                break;
-            }
-        }
-    }
-
     private void takeHalf(InventorySlot slot) {
         if (slot.isEmpty()) {
             return;
@@ -693,7 +635,6 @@ public class InventoryUI extends UIElement {
         }
 
         renderChildren();
-        renderRecipes();
         renderCarriedItem();
     }
 
@@ -838,5 +779,10 @@ public class InventoryUI extends UIElement {
         }
 
         return null;
+    }
+
+    public enum Tab {
+        INVENTORY,
+        CRAFTING
     }
 }
