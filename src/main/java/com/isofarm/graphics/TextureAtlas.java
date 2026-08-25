@@ -4,7 +4,11 @@ import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
+import org.lwjgl.system.MemoryUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.HashMap;
@@ -15,6 +19,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 
 public class TextureAtlas {
+    private static final Logger log = LoggerFactory.getLogger(TextureAtlas.class);
     private final int textureId;
     private final Map<String, TextureRegion> regions = new HashMap<>();
     public record TextureRegion(Vector2f uvMin, Vector2f uvMax, Vector2f scale, Vector2f offset) {}
@@ -36,10 +41,12 @@ public class TextureAtlas {
             IntBuffer comp = stack.mallocInt(1);
 
             for (int i = 0; i < count; i++) {
-                String path = imagePaths.get(i);
-                ByteBuffer image = STBImage.stbi_load(path, w, h, comp, 4);
+                String originalPath = imagePaths.get(i);
+                ByteBuffer image = loadTextureFromResources(originalPath, w, h, comp);
+
                 if (image == null) {
-                    throw new RuntimeException("Failed to load texture: " + path + " - " + STBImage.stbi_failure_reason());
+                    throw new RuntimeException("Failed to load texture from resources: " +
+                            originalPath + " - " + STBImage.stbi_failure_reason());
                 }
 
                 int col = i % cols;
@@ -56,16 +63,17 @@ public class TextureAtlas {
                 }
 
                 STBImage.stbi_image_free(image);
+
                 float uMin = (float) offsetX / atlasWidth;
                 float vMin = (float) offsetY / atlasHeight;
                 float uMax = (float) (offsetX + tileWidth) / atlasWidth;
                 float vMax = (float) (offsetY + tileHeight) / atlasHeight;
 
-                regions.put(path, new TextureRegion(
-                    new Vector2f(uMin, vMin),
-                    new Vector2f(uMax, vMax),
-                    new Vector2f((float) tileWidth / atlasWidth, (float) tileHeight / atlasHeight),
-                    new Vector2f(uMin, vMin)
+                regions.put(originalPath, new TextureRegion(
+                        new Vector2f(uMin, vMin),
+                        new Vector2f(uMax, vMax),
+                        new Vector2f((float) tileWidth / atlasWidth, (float) tileHeight / atlasHeight),
+                        new Vector2f(uMin, vMin)
                 ));
             }
         }
@@ -80,6 +88,28 @@ public class TextureAtlas {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
         glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    private ByteBuffer loadTextureFromResources(String path, IntBuffer w, IntBuffer h, IntBuffer comp) {
+        String resourcePath = path.startsWith("/") ? path : "/" + path;
+
+        try (InputStream in = TextureAtlas.class.getResourceAsStream(resourcePath)) {
+            if (in == null) {
+                return null;
+            }
+
+            byte[] bytes = in.readAllBytes();
+            ByteBuffer buffer = MemoryUtil.memAlloc(bytes.length);
+            buffer.put(bytes);
+            buffer.flip();
+
+            ByteBuffer image = STBImage.stbi_load_from_memory(buffer, w, h, comp, 4);
+            MemoryUtil.memFree(buffer);
+            return image;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return null;
+        }
     }
 
     public void bind() {
