@@ -31,6 +31,8 @@ public class Library implements Service<GameMaster> {
         registerDefault(itemR, () -> new Material(Tier.NONE, MaterialID.STICK));
         registerDefault(itemR, () -> new MiningComponent(Tier.COPPER, MaterialID.ORE));
         registerDefault(itemR, () -> new MiningComponent(Tier.COPPER, MaterialID.INGOT));
+        registerDefault(itemR, () -> new MiningComponent(Tier.IRON, MaterialID.ORE));
+        registerDefault(itemR, () -> new MiningComponent(Tier.IRON, MaterialID.INGOT));
 
         registerDefault(itemR, () -> new CraftingKit(ToolType.CRAFTING_KIT, Tier.COPPER));
         registerDefault(itemR, () -> new Backpack(ToolType.BACKPACK, Tier.COPPER));
@@ -39,6 +41,14 @@ public class Library implements Service<GameMaster> {
         registerDefault(itemR, () -> new Shovel(Tier.COPPER));
         registerDefault(itemR, () -> new Axe(Tier.COPPER));
         registerDefault(itemR, () -> new Sword(Tier.COPPER));
+
+        registerDefault(itemR, () -> new CraftingKit(ToolType.CRAFTING_KIT, Tier.IRON));
+        registerDefault(itemR, () -> new Backpack(ToolType.BACKPACK, Tier.IRON));
+        registerDefault(itemR, () -> new Hoe(Tier.IRON));
+        registerDefault(itemR, () -> new Pickaxe(Tier.IRON));
+        registerDefault(itemR, () -> new Shovel(Tier.IRON));
+        registerDefault(itemR, () -> new Axe(Tier.IRON));
+        registerDefault(itemR, () -> new Sword(Tier.IRON));
         registerDefault(itemR, Seed::new);
 
         for (CropType type : new CropType[]{CropType.CARROT, CropType.POTATO, CropType.BEETROOT}) {
