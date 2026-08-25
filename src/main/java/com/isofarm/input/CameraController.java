@@ -8,6 +8,7 @@ import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
 import org.joml.Vector3f;
 
+import static org.joml.Math.lerp;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class CameraController implements Service<Camera> {
@@ -128,25 +129,6 @@ public class CameraController implements Service<Camera> {
     private void movement(GameMaster gameMaster, float delta) {
         Player player = gameMaster.getPlayer();
 
-        boolean isSprinting = Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)
-                && !gameMaster.isInventoryOpen()
-                && !gameMaster.isChatOpen()
-                && player.getStamina() > 0
-                && !player.isCrounching();
-
-        boolean isCrounching = !isSprinting && player.isCrounching();
-        float speed = isCrounching ? player.getSpeed()/2f : player.getSpeed();
-        float fov = camera.getFov();
-
-        if (isSprinting) {
-            speed *= K.Camera.SPRINT_MULTIPLIER;
-            camera.setFov(Math.max(fov, 100f));
-            player.consumeStamina(delta * speed);
-        } else {
-            camera.setFov(fov);
-            player.restoreStamina(delta * 15.0f);
-        }
-
         float yaw = (float) Math.toRadians(camera.getYaw());
 
         float forwardX = (float) Math.sin(yaw);
@@ -159,8 +141,7 @@ public class CameraController implements Service<Camera> {
         float moveY = 0.0f;
         float moveZ = 0.0f;
 
-        if (!gameMaster.isInventoryOpen() &&
-                !gameMaster.isChatOpen()) {
+        if (!gameMaster.isInventoryOpen() && !gameMaster.isChatOpen()) {
             if (Keyboard.isKeyDown(GLFW_KEY_W)) {
                 moveX += forwardX;
                 moveZ += forwardZ;
@@ -185,10 +166,34 @@ public class CameraController implements Service<Camera> {
                 if (Keyboard.isKeyDown(GLFW_KEY_SPACE)) {
                     moveY += 1.0f;
                 }
+
                 if (Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
                     moveY -= 1.0f;
                 }
             }
+        }
+
+        boolean hasMovementInput = moveX != 0.0f || moveZ != 0.0f;
+        boolean isSprinting = Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)
+                && !gameMaster.isInventoryOpen() && !gameMaster.isChatOpen()
+                && hasMovementInput && player.getStamina() > 0
+                && !player.isCrounching();
+
+        boolean isCrounching = !isSprinting && player.isCrounching();
+        float speed = isCrounching ? player.getSpeed() / 2f : player.getSpeed();
+        float fov = Settings.getFov();
+
+        if (isSprinting) {
+            speed *= K.Camera.SPRINT_MULTIPLIER;
+            float targetFov = fov * 1.15f;
+            float smoothing = 8.0f;
+            camera.setFov(lerp(camera.getFov(), targetFov, Math.clamp(delta * smoothing, 0.0f, 1.0f)));
+            player.consumeStamina(delta * speed);
+        } else {
+            float targetFov = fov;
+            float smoothing = 8.0f;
+            camera.setFov(lerp(camera.getFov(), targetFov, Math.clamp(delta * smoothing, 0.0f, 1.0f)));
+            player.restoreStamina(delta * 15.0f);
         }
 
         float horizontalLength = (float) Math.sqrt(moveX * moveX + moveZ * moveZ);
@@ -200,16 +205,11 @@ public class CameraController implements Service<Camera> {
         if (isFlying) {
             moveX *= FLY_SPEED_MULTIPLIER;
             moveZ *= FLY_SPEED_MULTIPLIER;
-            moveY *= (speed * FLY_SPEED_MULTIPLIER);
-
+            moveY *= speed * FLY_SPEED_MULTIPLIER;
             targetVelocity.set(moveX, moveY, moveZ);
             currentFlyVelocity.lerp(targetVelocity, Math.clamp(delta * FLY_DAMPING, 0.0f, 1.0f));
-            player.getPosition().add(
-                    currentFlyVelocity.x * delta,
-                    currentFlyVelocity.y * delta,
-                    currentFlyVelocity.z * delta
-            );
-
+            player.getPosition().add(currentFlyVelocity.x * delta, currentFlyVelocity.y * delta,
+                    currentFlyVelocity.z * delta);
             player.getVelocity().set(0, 0, 0);
         } else {
             targetVelocity.set(moveX, 0.0f, moveZ);
