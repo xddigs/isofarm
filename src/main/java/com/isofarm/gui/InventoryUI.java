@@ -9,6 +9,7 @@ import com.isofarm.item.Block;
 import com.isofarm.item.CraftingKit;
 import com.isofarm.item.Item;
 import com.isofarm.item.Tool;
+import com.isofarm.service.ToastService;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
@@ -512,7 +513,7 @@ public class InventoryUI extends UIElement {
                 this.craftingMenuY = Mouse.getY();
                 this.showingCraftingMenu = true;
             } else {
-                gameMaster.getToastService().info("There's no recipe for this kit yet");
+                ToastService.info("There's no recipe for this kit yet");
             }
             return;
         }
