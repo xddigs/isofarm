@@ -5,12 +5,16 @@ import org.joml.SimplexNoise;
 
 import java.util.Random;
 
+@SuppressWarnings("all")
 public class WorldGenerator {
     private static final float CONTINENTAL_SCALE = 0.005f;
     private static final float DETAIL_SCALE = 0.025f;
 
     private static final int BASE_HEIGHT = 18;
     private static final int MOUNTAIN_HEIGHT = 150;
+
+    private static final int COPPER_MAX_HEIGHT = 45;
+    private static final float COPPER_CHANCE = 0.015f;
 
     private final World world;
 
@@ -56,6 +60,9 @@ public class WorldGenerator {
 
                 for (int y = 0; y <= height; y++) {
                     byte blockId = getBlockId(y, height, mountainFactor);
+                    if (generateCopper(worldX, worldZ, y, height)) {
+                        blockId = BlockData.COPPER_ORE.getId();
+                    }
                     chunk.setBlock(x, y, z, blockId);
                 }
             }
@@ -134,5 +141,23 @@ public class WorldGenerator {
                 }
             }
         }
+    }
+
+    private boolean generateCopper(int worldX, int worldZ, int y,
+                                   int surfaceHeight) {
+        if (y >= surfaceHeight || y > COPPER_MAX_HEIGHT || y >= surfaceHeight - 3) {
+            return false;
+        }
+
+        long hash = seed;
+        hash ^= worldX * 341873128712L;
+        hash ^= worldZ * 132897987541L;
+        hash ^= y * 42317861L;
+        hash ^= (hash >>> 33);
+        hash *= 0xff51afd7ed558ccdl;
+        hash ^= (hash >>> 33);
+
+        long positiveHash = hash & Long.MAX_VALUE;
+        return (positiveHash / (double) Long.MAX_VALUE) < COPPER_CHANCE;
     }
 }
