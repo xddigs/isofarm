@@ -7,6 +7,7 @@ import com.isofarm.graphics.Shader;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.item.*;
 import com.isofarm.pathfinding.GridPos;
+import com.isofarm.service.ToastService;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
@@ -41,7 +42,7 @@ public class Player extends Character {
     private boolean isFalling = false;
 
     public Player(String name, World world, GameMaster gameMaster) {
-        super(name, gameMaster.getToastService());
+        super(name);
         this.name = name;
         this.gameMaster = gameMaster;
         this.modelMatrix = new Matrix4f();
@@ -91,7 +92,7 @@ public class Player extends Character {
         for (InventorySlot slot : getInventory().getSlots()) {
             if (slot.getItem() instanceof Tool tool && tool.getDurability() <= 0) {
                 remove(tool);
-                gameMaster.getToastService().error("Your " + tool.getName() + " broke!");
+                ToastService.error("Your " + tool.getName() + " broke!");
                 getSoundService().playBreakSound(SoundGroup.ITEMS, 1.0f,
                         Settings.getMaxInteractionDistance());
             }
@@ -283,7 +284,8 @@ public class Player extends Character {
             direction.normalize();
         }
 
-        Vector3f velocity = new Vector3f(direction).mul(this.getSpeed());
+        float speed = isCrounching() ? getSpeed()/3f : getSpeed();
+        Vector3f velocity = new Vector3f(direction).mul(speed);
         velocity.y = getVelocity().y;
         setVelocity(velocity);
         moveAndCollide(world, velocity, delta);
@@ -315,7 +317,7 @@ public class Player extends Character {
         int toSell = Math.min(current, amount);
         getInventory().remove(item, toSell);
         int earnings = toSell * item.getValue();
-        gameMaster.getToastService().sell("You successfully sold " + item.getName() + " for " + earnings + " coins");
+        ToastService.sell("You successfully sold " + item.getName() + " for " + earnings + " coins");
         earn(earnings);
     }
 
@@ -425,7 +427,7 @@ public class Player extends Character {
             addToBackpack(recipe.result(), recipe.resultAmount());
         }
 
-        gameMaster.getToastService().success("You crafted " +
+        ToastService.success("You crafted " +
                 recipe.resultAmount() + " " + recipe.result().getName());
 
         return true;

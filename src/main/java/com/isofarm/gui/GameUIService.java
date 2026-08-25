@@ -7,6 +7,7 @@ import com.isofarm.input.CommandCompletionProvider;
 import com.isofarm.input.Mouse;
 import com.isofarm.item.Item;
 import com.isofarm.service.Service;
+import com.isofarm.service.ToastService;
 import com.isofarm.utils.Components;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
@@ -281,7 +282,7 @@ public class GameUIService implements Service<GameMaster> {
         }
 
         uiManager.update(delta);
-        gameMaster.getToastService().update(delta);
+        ToastService.update(delta);
 
         if (!gameMaster.isInventoryOpen()) {
             float scroll = Mouse.getScrollY();

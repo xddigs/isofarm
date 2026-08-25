@@ -327,7 +327,7 @@ public class GameInteraction {
             int frameIndex = crop.getStage().getFrameIndex();
             SpriteSheet sheet = gameMaster.getCropSpriteSheet(cropType);
             if (crop.isReadyToHarvest()) {
-                cropService.harvest(gameMaster.getPlayer(), crop, gameMaster.getToastService(), sheet);
+                cropService.harvest(gameMaster.getPlayer(), crop, gameMaster.getToastService());
             } else {
                 cropService.rip(crop);
             }

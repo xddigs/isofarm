@@ -39,7 +39,6 @@ public class GameMaster {
     private final CommandService commandService;
     private final ParticleEngine particles;
     private final RainEngine rainEngine;
-    private final ToastService toastService;
     private final CommandRegistry commandRegistry;
     private final ItemRegistry itemRegistry;
     private final List<Entity> entities;
@@ -87,7 +86,6 @@ public class GameMaster {
         this.cropService = new CropService(world, particles);
         this.timeService = new TimeService();
         this.commandRegistry = new CommandRegistry();
-        this.toastService = new ToastService();
         this.commandService = new CommandService(commandRegistry);
         this.itemRegistry = new ItemRegistry();
         this.rainEngine = new RainEngine();
@@ -250,10 +248,6 @@ public class GameMaster {
         return cropService;
     }
 
-    public ToastService getToastService() {
-        return toastService;
-    }
-
     public CommandRegistry getCommandRegistry() {
         return commandRegistry;
     }
@@ -394,7 +388,7 @@ public class GameMaster {
         }
 
         gameRenderer.initCamera(getActiveCamera());
-        toastService.info("Camera changed to " + (Settings.isOrthographic() ?
+        ToastService.info("Camera changed to " + (Settings.isOrthographic() ?
                 "orthographic" : "first person"));
     }
 

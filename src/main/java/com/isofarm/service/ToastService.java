@@ -9,26 +9,22 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ToastService implements Service<Toast> {
-    private final List<Toast> toasts;
-    private float windowWidth = K.Window.DEFAULT_WIDTH;
-
-    public ToastService() {
-        this.toasts = new ArrayList<>();
-    }
+    private static final List<Toast> toasts = new ArrayList<>();
+    private static float windowWidth = K.Window.DEFAULT_WIDTH;
 
     public List<Toast> getToasts() {
         return toasts;
     }
 
     public void setWindowWidth(float windowWidth) {
-        this.windowWidth = windowWidth;
+        ToastService.windowWidth = windowWidth;
         for (Toast toast : toasts) {
             toast.setWindowWidth(windowWidth);
         }
         rearrange();
     }
 
-    public void add(Toast toast) {
+    public static void add(Toast toast) {
         if (toast == null) {
             return;
         }
@@ -43,23 +39,23 @@ public class ToastService implements Service<Toast> {
         }
     }
 
-    public Toast get(int index) {
+    public static Toast get(int index) {
         return toasts.get(index);
     }
 
-    public void clear() {
+    public static void clear() {
         toasts.clear();
     }
 
-    public int size() {
+    public static int size() {
         return toasts.size();
     }
 
-    public boolean isEmpty() {
+    public static boolean isEmpty() {
         return toasts.isEmpty();
     }
 
-    public void update(float delta) {
+    public static void update(float delta) {
         if (toasts.isEmpty()) {
             return;
         }
@@ -78,35 +74,35 @@ public class ToastService implements Service<Toast> {
         rearrange();
     }
 
-    public void info(String message) {
+    public static void info(String message) {
         create(ToastData.INFO, message);
     }
 
-    public void success(String message) {
+    public static void success(String message) {
         create(ToastData.SUCCESS, message);
     }
 
-    public void warning(String message) {
+    public static void warning(String message) {
         create(ToastData.WARNING, message);
     }
 
-    public void error(String message) {
+    public static void error(String message) {
         create(ToastData.ERROR, message);
     }
 
-    public void reward(String message) {
+    public static void reward(String message) {
         create(ToastData.REWARD, message);
     }
 
-    public void purchase(String message) {
+    public static void purchase(String message) {
         create(ToastData.PURCHASE, message);
     }
 
-    public void sell(String message) {
+    public static void sell(String message) {
         create(ToastData.SELL, message);
     }
 
-    private void create(ToastData type, String message) {
+    private static void create(ToastData type, String message) {
         if (message == null || message.isBlank()) {
             return;
         }
@@ -122,7 +118,7 @@ public class ToastService implements Service<Toast> {
         add(toast);
     }
 
-    private void rearrange() {
+    private static void rearrange() {
         float targetX = windowWidth - K.UI.TOAST_WIDTH;
         float y = K.UI.TOAST_MARGIN_TOP;
 

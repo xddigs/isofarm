@@ -7,7 +7,6 @@ import com.isofarm.service.ToastService;
 @DataClass
 public abstract class Character extends Entity implements Levelable {
     private static final float FRAME_DURATION = 0.15f;
-    private final ToastService toastService;
     private final Purse purse;
     private Inventory inventory;
     private Inventory backpack;
@@ -29,9 +28,8 @@ public abstract class Character extends Entity implements Levelable {
     private float isOffGroundTimer;
     private float animTimer = 0.0f;
 
-    public Character(String name, ToastService toastService) {
+    public Character(String name) {
         super(name);
-        this.toastService = toastService;
         this.inventory = new Inventory();
         this.backpack = new Inventory();
         this.purse = new Purse();
@@ -110,7 +108,7 @@ public abstract class Character extends Entity implements Levelable {
     @Override
     public void levelUp() {
         level++;
-        toastService.success("Level up! You're now level " + level);
+        ToastService.success("Level up! You're now level " + level);
     }
 
     public float getFrameDuration() {

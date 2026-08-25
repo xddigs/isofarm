@@ -8,7 +8,6 @@ import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
 import org.joml.Vector3f;
 
-import static org.joml.Math.lerp;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class CameraController implements Service<Camera> {
@@ -129,16 +128,22 @@ public class CameraController implements Service<Camera> {
     private void movement(GameMaster gameMaster, float delta) {
         Player player = gameMaster.getPlayer();
 
-        float speed = player.getSpeed();
         boolean isSprinting = Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)
                 && !gameMaster.isInventoryOpen()
                 && !gameMaster.isChatOpen()
-                && player.getStamina() > 0;
+                && player.getStamina() > 0
+                && !player.isCrounching();
+
+        boolean isCrounching = !isSprinting && player.isCrounching();
+        float speed = isCrounching ? player.getSpeed()/2f : player.getSpeed();
+        float fov = camera.getFov();
 
         if (isSprinting) {
             speed *= K.Camera.SPRINT_MULTIPLIER;
+            camera.setFov(Math.max(fov, 100f));
             player.consumeStamina(delta * speed);
         } else {
+            camera.setFov(fov);
             player.restoreStamina(delta * 15.0f);
         }
 

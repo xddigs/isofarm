@@ -1,6 +1,9 @@
 package com.isofarm.service;
 
+import com.isofarm.gui.GameUIService;
 import com.isofarm.utils.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -8,6 +11,7 @@ import java.util.Map;
 @SuppressWarnings("all")
 public final class GameRules {
     private static final Map<String, Object> RULES = new LinkedHashMap<>();
+    private static final Logger log = LoggerFactory.getLogger(GameRules.class);
 
     static {
         RULES.put("doKeepInventory", Settings.doKeepInventory());
@@ -89,38 +93,42 @@ public final class GameRules {
     }
 
     private static void apply(String rule, Object value) {
-        switch (rule) {
-            case "doKeepInventory" -> {
-                Settings.setDoKeepInventory((Boolean) value);
-            }
+        try {
+            switch (rule) {
+                case "doKeepInventory" -> {
+                    Settings.setDoKeepInventory((Boolean) value);
+                }
 
-            case "fov" -> {
-                Settings.setFov((Float) value);
-            }
+                case "fov" -> {
+                    Settings.setFov((Float) value);
+                }
 
-            case "doEnableMotions" -> {
-                Settings.setDoEnableMotions((Boolean) value);
-            }
+                case "doEnableMotions" -> {
+                    Settings.setDoEnableMotions((Boolean) value);
+                }
 
-            case "isOrthographic" -> {
-                Settings.setOrthographic((Boolean) value);
-            }
+                case "isOrthographic" -> {
+                    Settings.setOrthographic((Boolean) value);
+                }
 
-            case "renderDistance" -> {
-                Settings.setRenderDistance((Integer) value);
-            }
+                case "renderDistance" -> {
+                    Settings.setRenderDistance((Integer) value);
+                }
 
-            case "unloadMargin" -> {
-                Settings.setUnloadMargin((Integer) value);
-            }
+                case "unloadMargin" -> {
+                    Settings.setUnloadMargin((Integer) value);
+                }
 
-            case "doEnableShadows" -> {
-                Settings.setDoEnableShadows((Boolean) value);
-            }
+                case "doEnableShadows" -> {
+                    Settings.setDoEnableShadows((Boolean) value);
+                }
 
-            case "maxInteractionDistance" -> {
-                Settings.setMaxInteractionDistance((Float) value);
+                case "maxInteractionDistance" -> {
+                    Settings.setMaxInteractionDistance((Float) value);
+                }
             }
+        } catch (ClassCastException e) {
+            ToastService.error(String.format("Invalid value for %s: %s", rule, value));
         }
     }
 }
