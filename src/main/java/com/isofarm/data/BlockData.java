@@ -6,6 +6,7 @@ import com.isofarm.item.Item;
 import com.isofarm.item.MiningComponent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @SuppressWarnings("all")
@@ -151,6 +152,10 @@ public enum BlockData implements Craftable {
     @Override
     public Item copy() {
         return this;
+    }
+
+    public boolean isPlant() {
+        return Arrays.stream(PLANTS).anyMatch(block -> block == this);
     }
 
     public boolean isTillable() {

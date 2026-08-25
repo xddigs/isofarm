@@ -143,7 +143,7 @@ public class GameRenderer {
 
         gameMaster.getWorld().forEach(block -> {
             BlockData data = BlockData.fromId(block.getId());
-            if (data == null || !data.isTransparent() || data == BlockData.AIR) return;
+            if (data == null || !data.isPlant() || data == BlockData.AIR) return;
 
             if (blockAtlas != null) {
                 glActiveTexture(GL_TEXTURE0 + K.Render.PRIMARY_TEXTURE_UNIT);
@@ -153,7 +153,7 @@ public class GameRenderer {
                 defaultShader.setUniform("uUseTexture", true);
                 defaultShader.setUniform("uUseFaceAtlas", false);
 
-                TextureAtlas.TextureRegion region = data.getTopRegion();
+                TextureAtlas.TextureRegion region = data.getSideRegion();
                 if (region != null) {
                     defaultShader.setUniform("uUVBounds", new Vector4f(
                             region.uvMin().x, region.uvMin().y,
@@ -161,19 +161,18 @@ public class GameRenderer {
                     ));
                     defaultShader.setUniform("uAtlasScale", region.scale());
                     defaultShader.setUniform("uAtlasOffset", region.offset());
-                } else {
-                    defaultShader.setUniform("uUVBounds", new Vector4f(0f, 0f, 1f, 1f));
-                    defaultShader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
-                    defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
                 }
 
                 float renderX = block.getX() + 0.5f;
-                float renderY = block.getY() + 0.001f;
+                float renderY = block.getY();
                 float renderZ = block.getZ() + 0.5f;
 
                 modelMatrix.identity().translate(renderX, renderY, renderZ);
                 defaultShader.setUniform("uModel", modelMatrix);
+
+                glDisable(GL_CULL_FACE);
                 rm.getFlowerMesh().render();
+                glEnable(GL_CULL_FACE);
             }
         });
 
