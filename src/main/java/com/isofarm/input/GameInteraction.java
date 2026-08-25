@@ -448,7 +448,7 @@ public class GameInteraction {
             itemToDrop = removedBlock;
         }
 
-        WorldItem dropEntity = new WorldItem(itemToDrop, 1, position);
+        WorldItem dropEntity = new WorldItem(itemToDrop, (int)(Math.random()) + 1, position);
         gameMaster.addEntity(dropEntity);
 
         gameUIservice.logAction(cell);

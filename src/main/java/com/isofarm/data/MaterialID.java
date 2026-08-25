@@ -7,7 +7,9 @@ import com.isofarm.item.Item;
 public enum MaterialID implements Craftable {
     STICK((byte) 0, "Stick", 1),
     WOOD((byte) 1, "Wood", 2),
-    STONE((byte) 2, "Stone", 3);
+    STONE((byte) 2, "Stone", 3),
+    ORE((byte) 3, " Ore", 15),
+    INGOT((byte) 4, " Ingot", 50);
 
     private final byte id;
     private final String name;

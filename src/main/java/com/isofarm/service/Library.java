@@ -19,17 +19,21 @@ public class Library implements Service<GameMaster> {
     private static final Logger log = LoggerFactory.getLogger(Library.class);
 
     public static void initItems(ItemRegistry itemR, Player player) {
-        registerDefault(itemR, () -> new Material(MaterialID.STICK));
-        registerDefault(itemR, () -> new Material(MaterialID.WOOD));
-        registerDefault(itemR, () -> new Material(MaterialID.STONE));
         registerDefault(itemR, Backpack::new);
         registerDefault(itemR, CraftingKit::new);
-        registerDefault(itemR, Coin::new);
         registerDefault(itemR, Hoe::new);
         registerDefault(itemR, Pickaxe::new);
         registerDefault(itemR, Shovel::new);
         registerDefault(itemR, Axe::new);
         registerDefault(itemR, Sword::new);
+
+        registerDefault(itemR, () -> new Material(MaterialID.STICK));
+        registerDefault(itemR, () -> new Material(MaterialID.WOOD));
+        registerDefault(itemR, () -> new Material(MaterialID.STONE));
+        registerDefault(itemR, () -> new MiningComponent(Tier.COPPER, MaterialID.ORE));
+        registerDefault(itemR, () -> new MiningComponent(Tier.COPPER, MaterialID.INGOT));
+
+        registerDefault(itemR, () -> new CraftingKit(ToolType.CRAFTING_KIT, Tier.COPPER));
         registerDefault(itemR, () -> new Backpack(ToolType.BACKPACK, Tier.COPPER));
         registerDefault(itemR, () -> new Hoe(Tier.COPPER));
         registerDefault(itemR, () -> new Pickaxe(Tier.COPPER));
@@ -91,13 +95,9 @@ public class Library implements Service<GameMaster> {
                 log.warn("Amount must be greater than zero.");
                 return;
             }
+
             Item item = ir.create(itemId);
-            if (item == null) {
-                log.warn("Unknown item: {}", itemId);
-                return;
-            }
-            String coinId = getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), ToolType.COIN.getName());
-            if (itemId.equalsIgnoreCase(coinId)) {
+            if (itemId.equals(null)) {
                 player.earn(amount);
             } else if (!player.hasSpace()) {
                 player.addToBackpack(item, amount);

@@ -1,7 +1,6 @@
 package com.isofarm.entity;
 
 import com.isofarm.data.*;
-import com.isofarm.item.Coin;
 import com.isofarm.service.SoundService;
 import com.isofarm.service.ToastService;
 

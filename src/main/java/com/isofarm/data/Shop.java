@@ -18,7 +18,7 @@ public class Shop {
     public Shop() {
         this.owner = getRandomName();
         this.stock = new Inventory();
-        this.purse = new Purse(stock, new Coin());
+        this.purse = new Purse();
         setUpStock();
         this.purse.add(K.World.STARTING_COINS);
     }
