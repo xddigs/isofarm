@@ -24,7 +24,6 @@ public class Mesh {
 
     public Mesh(float[] positions, float[] normals, float[] textCoords, int[] indices) {
         this.vertexCount = indices.length;
-
         FloatBuffer posBuffer = null;
         FloatBuffer normalBuffer = null;
         FloatBuffer texBuffer = null;
@@ -113,6 +112,46 @@ public class Mesh {
         }
 
         return new Mesh(positions, normals, textCoords, indices);
+    }
+
+    public static Mesh createCrossMesh() {
+        float[] positions = new float[]{
+                0.0f, 0.0f, 0.0f,
+                1.0f, 0.0f, 1.0f,
+                1.0f, 1.0f, 1.0f,
+                0.0f, 1.0f, 0.0f,
+
+                1.0f, 0.0f, 0.0f,
+                0.0f, 0.0f, 1.0f,
+                0.0f, 1.0f, 1.0f,
+                1.0f, 1.0f, 0.0f
+        };
+
+        float[] normals = new float[]{
+                0.0f, 1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f, 0.0f,
+                0.0f, 1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f, 0.0f
+        };
+
+        float[] texCoords = new float[]{
+                0.0f, 0.0f,
+                1.0f, 0.0f,
+                1.0f, 1.0f,
+                0.0f, 1.0f,
+
+                0.0f, 0.0f,
+                1.0f, 0.0f,
+                1.0f, 1.0f,
+                0.0f, 1.0f
+        };
+
+        int[] indices = new int[]{
+                0, 1, 2,  2, 3, 0,
+                2, 1, 0,  0, 3, 2,
+                4, 5, 6,  6, 7, 4,
+                6, 5, 4,  4, 7, 6
+        };
+
+        return new Mesh(positions, normals, texCoords, indices);
     }
 
     public static Mesh createDestroyOverlayMesh() {

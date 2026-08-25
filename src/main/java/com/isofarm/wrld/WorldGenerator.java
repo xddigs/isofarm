@@ -16,6 +16,9 @@ public class WorldGenerator {
     private static final int ORE_MAX_HEIGHT = 45;
     private static final float ORE_CHANCE = 0.015f;
 
+    private static final int FLOWER_MAX_HEIGHT = BASE_HEIGHT + 10;
+    private static final float FLOWER_CHANCE = 0.04f;
+
     private final World world;
 
     private final long seed;
@@ -64,6 +67,15 @@ public class WorldGenerator {
                         blockId = BlockData.getRandomOre().getId();
                     }
                     chunk.setBlock(x, y, z, blockId);
+                }
+
+                if (height < FLOWER_MAX_HEIGHT && mountainFactor < 0.2f) {
+                    if (chunkRandom.nextDouble() < FLOWER_CHANCE) {
+                        int flowerY = height + 1;
+                        if (flowerY < Chunk.SIZE_Y) {
+                            chunk.setBlock(x, flowerY, z, BlockData.FLOWER.getId());
+                        }
+                    }
                 }
             }
         }

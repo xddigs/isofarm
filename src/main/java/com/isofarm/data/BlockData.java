@@ -23,7 +23,8 @@ public enum BlockData implements Craftable {
     COPPER_ORE((byte) 11, (byte) 1, "Copper Ore Block", 150, 10, 0, SoundGroup.HARD, 6.0f, false, new MiningComponent[]{new MiningComponent(Tier.COPPER, MaterialID.ORE)}, Tier.COPPER),
     IRON_ORE((byte) 12, (byte) 1, "Iron Ore Block", 150, 11, 0, SoundGroup.HARD, 8.0f, false, new MiningComponent[]{new MiningComponent(Tier.IRON, MaterialID.ORE)}, Tier.IRON),
     WATER((byte) -1, (byte) -1, "Water", 100, 0, 0, SoundGroup.SILENT, 0f, true, new MaterialID[]{}, Tier.NONE),
-    CROP((byte) -1, (byte) -1, "Crop", -1, 0, 0, SoundGroup.SOIL, 1f, false, new MaterialID[]{}, Tier.NONE);
+    CROP((byte) -1, (byte) -1, "Crop", -1, 0, 0, SoundGroup.SOIL, 0.1f, false, new MaterialID[]{}, Tier.NONE),
+    FLOWER((byte) -1, (byte) -1, "Flower", -1, 0, 0, SoundGroup.SOIL, 0.1f, false, new MaterialID[]{}, Tier.NONE),;
 
     public static final int ATLAS_COLS = K.UI.BLOCK_ATLAS_COLUMNS;
     public static final int ATLAS_ROWS = K.UI.BLOCK_ATLAS_ROWS;
