@@ -54,20 +54,7 @@ void main() {
     vec4 texColor = vec4(uBaseColor, 1.0);
 
     if (uUseTexture) {
-        vec2 finalUV = vTexCoord;
-
-        if (uUseFaceAtlas) {
-            float rowStep = 1.0 / 4.0;
-
-            if (vNormal.y > 0.5) {
-            } else if (vNormal.y < -0.5) {
-                finalUV.y -= rowStep * 2.0;
-            } else {
-                finalUV.y -= rowStep * 1.0;
-            }
-        }
-
-        texColor = texture(uTexture, finalUV);
+        texColor = texture(uTexture, vTexCoord);
         if (texColor.a < 0.1) {
             discard;
         }

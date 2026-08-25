@@ -85,7 +85,8 @@ public class GameRenderer {
             glActiveTexture(GL_TEXTURE0 + textureUnit);
             blockAtlas.bind();
             defaultShader.setUniform("uUseTexture", true);
-            defaultShader.setUniform("uUseFaceAtlas", true);
+            defaultShader.setUniform("uUseFaceAtlas", false);
+            defaultShader.setUniform("uUVBounds", new Vector4f(0.0f, 0.0f, 1.0f, 1.0f));
         }
 
         viewProjMatrix.set(camera.getProjectionMatrix()).mul(camera.getViewMatrix());
