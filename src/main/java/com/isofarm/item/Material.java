@@ -1,8 +1,6 @@
 package com.isofarm.item;
 
-import com.isofarm.data.Craftable;
 import com.isofarm.data.DataClass;
-import com.isofarm.data.MaterialID;
 
 @DataClass
 public record Material(Craftable materialID) implements Craftable {

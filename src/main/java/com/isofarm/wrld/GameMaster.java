@@ -7,6 +7,7 @@ import com.isofarm.gui.GUI;
 import com.isofarm.gui.GameUIService;
 import com.isofarm.gui.UIManager;
 import com.isofarm.input.*;
+import com.isofarm.item.Craftable;
 import com.isofarm.item.Item;
 import com.isofarm.pathfinding.GridPos;
 import com.isofarm.service.*;

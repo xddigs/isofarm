@@ -1,5 +1,6 @@
 package com.isofarm.data;
 
+import com.isofarm.item.Craftable;
 import com.isofarm.item.Item;
 import com.isofarm.utils.K;
 import org.joml.Vector2f;
