@@ -64,7 +64,7 @@ public class GameRenderer {
 
         defaultShader.setUniform("uParticleAlpha", 1.0f);
 
-        defaultShader.setUniform("uEnableShadows", true);
+        defaultShader.setUniform("uEnableShadows", Settings.doEnableShadows());
         defaultShader.setUniform("uIsMaskPass", false);
 
         defaultShader.setUniform("uProjection", camera.getProjectionMatrix());

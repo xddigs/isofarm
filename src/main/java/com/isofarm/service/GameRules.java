@@ -14,7 +14,9 @@ public final class GameRules {
         RULES.put("doEnableMotions", Settings.doEnableMotions());
         RULES.put("isOrthographic", Settings.isOrthographic());
         RULES.put("renderDistance", Settings.getRenderDistance());
+        RULES.put("fov", Settings.getFov());
         RULES.put("unloadMargin", Settings.getUnloadMargin());
+        RULES.put("doEnableShadows", Settings.doEnableShadows());
         RULES.put("maxInteractionDistance", Settings.getMaxInteractionDistance());
     }
 
@@ -91,6 +93,11 @@ public final class GameRules {
             case "doKeepInventory" -> {
                 Settings.setDoKeepInventory((Boolean) value);
             }
+
+            case "fov" -> {
+                Settings.setFov((Float) value);
+            }
+
             case "doEnableMotions" -> {
                 Settings.setDoEnableMotions((Boolean) value);
             }
@@ -105,6 +112,10 @@ public final class GameRules {
 
             case "unloadMargin" -> {
                 Settings.setUnloadMargin((Integer) value);
+            }
+
+            case "doEnableShadows" -> {
+                Settings.setDoEnableShadows((Boolean) value);
             }
 
             case "maxInteractionDistance" -> {

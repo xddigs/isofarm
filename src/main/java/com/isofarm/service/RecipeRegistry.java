@@ -29,6 +29,11 @@ public class RecipeRegistry implements Service<Recipe> {
                 .with(BlockData.OAK_WOOD, 3)
                 .with(MaterialID.STICK, 2).add();
 
+        create(Tier.LEATHER)
+                .result(new CraftingKit(ToolType.CRAFTING_KIT, Tier.COPPER), 1)
+                .with(new Material(Tier.COPPER, MaterialID.ORE), 3)
+                .with(BlockData.OAK_WOOD, 2).add();
+
         create(Tier.COPPER)
                 .result(new MiningComponent(Tier.COPPER, MaterialID.INGOT), 1)
                 .with(new MiningComponent(Tier.COPPER, MaterialID.ORE), 1).add();

@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 @SuppressWarnings("all")
 public class Library implements Service<GameMaster> {
 
-    public static final String DEFAULT_ID = "iso";
+    public static final String DEFAULT_ID = "isofarm";
     public static final char SEPARATOR = ':';
     private static final Logger log = LoggerFactory.getLogger(Library.class);
 

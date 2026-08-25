@@ -4,8 +4,8 @@ package com.isofarm.utils;
 public class Settings {
     private static final float BASE_ICON_SIZE = 16.0f;
     private static final float[] GUI_SCALES = {1.0f, 2.0f, 3.0f};
-    private static float fov = 80f;
     private static final float SHADOW_MAP_SIZE = 4096.0f;
+    private static float fov = 80f;
     private static float mouseSensitivity = 0.4f;
     private static int renderDistance = 16;
     private static int unloadMargin = 4;
@@ -16,8 +16,10 @@ public class Settings {
     private static float maxInteractionDistance = 5.0f;
     private static boolean doEnableMusic = true;
     private static boolean doEnableDebugInfo = true;
+    private static boolean doEnableShadows = true;
 
-    private Settings() {}
+    private Settings() {
+    }
 
     public static float getShadowMapSize() {
         return SHADOW_MAP_SIZE;
@@ -115,6 +117,14 @@ public class Settings {
         Settings.fov = fov;
     }
 
+    public static boolean doEnableShadows() {
+        return doEnableShadows;
+    }
+
+    public static void setDoEnableShadows(boolean doEnableShadows) {
+        Settings.doEnableShadows = doEnableShadows;
+    }
+
     public static float getMouseSensitivity() {
         return mouseSensitivity;
     }
@@ -141,6 +151,10 @@ public class Settings {
 
     public static void toggleKeepInventory() {
         doKeepInventory = !doKeepInventory;
+    }
+
+    public static void toggleShadows() {
+        doEnableShadows = !doEnableShadows;
     }
 
     public static void toggleOrthographic() {
