@@ -160,6 +160,7 @@ public class ChunkManager {
         int chunkX = Math.floorDiv(worldX, Chunk.SIZE_X);
         int chunkZ = Math.floorDiv(worldZ, Chunk.SIZE_Z);
 
+        updateGrass(chunkX, chunkZ);
         rebuildSingleChunk(chunkX, chunkZ);
 
         int localX = Math.floorMod(worldX, Chunk.SIZE_X);
@@ -190,16 +191,11 @@ public class ChunkManager {
                 for (int y = Chunk.SIZE_Y - 2; y >= 0; y--) {
                     byte block = world.getBlockTypeAt(worldX, y, worldZ);
 
-                    if (block == BlockData.AIR.getId()) {
-                        continue;
-                    }
-
-                    if (block == BlockData.DIRT.getId() || block == BlockData.TILLED_DIRT.getId()) {
+                    if (isSoil(block)) {
                         if (isExposedToAir(worldX, y, worldZ)) {
                             startSoilTimer(worldX, y, worldZ);
                         }
                     }
-                    break;
                 }
             }
         }

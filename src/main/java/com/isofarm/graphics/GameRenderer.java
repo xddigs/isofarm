@@ -181,10 +181,14 @@ public class GameRenderer {
             blockAtlas.bind();
             defaultShader.setUniform("uUseTexture", true);
             defaultShader.setUniform("uUseFaceAtlas", false);
+            defaultShader.setUniform("uUVBounds", new Vector4f(0.0f, 0.0f, 1.0f, 1.0f));
+            defaultShader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
+            defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
         }
 
         chunkMeshes.forEach((chunk, chunkMesh) -> {
-            if (chunkMesh != null && chunkMesh.waterMesh() != null && chunkMesh.waterMesh().getIndicesCount() > 0) {
+            if (chunkMesh != null && chunkMesh.waterMesh() != null
+                    && chunkMesh.waterMesh().getIndicesCount() > 0) {
                 float minX = chunk.getChunkX() * Chunk.SIZE_X;
                 float minY = 0;
                 float minZ = chunk.getChunkZ() * Chunk.SIZE_Z;
@@ -261,13 +265,15 @@ public class GameRenderer {
             outlineShader.bind();
             outlineShader.setUniform("uScreenSize", new Vector2f(windowWidth, windowHeight));
             outlineShader.setUniform("uOutlineColor", K.Colors.OUTLINE_DEFAULT);
-            outlineShader.setUniform("uMaskTexture", K.Render.PRIMARY_TEXTURE_UNIT);
-
+            outlineShader.setUniform("uMaskTexture", 0);
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, maskFbo.getTextureId());
 
             rm.getScreenQuadMesh().render();
+
+            glBindTexture(GL_TEXTURE_2D, 0);
             outlineShader.unbind();
+
             glEnable(GL_DEPTH_TEST);
             defaultShader.bind();
             defaultShader.setUniform("uIsMaskPass", false);

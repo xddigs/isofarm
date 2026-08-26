@@ -28,11 +28,8 @@ public class ChunkMeshBuilder {
         }
     }
 
-    public record RawMeshData(float[] positions, float[] normals, float[] uv, int[] indices) {
-    }
-
-    public record ChunkMeshData(RawMeshData solidData, RawMeshData waterData) {
-    }
+    public record RawMeshData(float[] positions, float[] normals, float[] uv, int[] indices) {}
+    public record ChunkMeshData(RawMeshData solidData, RawMeshData waterData) {}
 
     public record ChunkRenderMesh(Mesh solidMesh, Mesh waterMesh) {
         public void dispose() {
@@ -209,7 +206,7 @@ public class ChunkMeshBuilder {
         if (neighborData == null) return true;
         if (currentBlock.isFluid() && neighborData.isFluid()) return false;
         if (currentBlock.isFluid()) return neighborData.isTransparent() && !neighborData.isSolid();
-        if (neighborData.isFluid()) return false;
+        if (neighborData.isFluid()) return true;
         return neighborData.isTransparent() && neighborData != currentBlock;
     }
 
