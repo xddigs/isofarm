@@ -1,5 +1,6 @@
 package com.isofarm.item;
 
+import com.isofarm.data.Enchantment;
 import com.isofarm.data.Tier;
 import com.isofarm.data.ToolType;
 
@@ -17,5 +18,10 @@ public class Pickaxe extends Tool {
     @Override
     public Item copy() {
         return new Pickaxe(getTier());
+    }
+
+    @Override
+    public boolean enchanting(Enchantment enchantment) {
+        return false;
     }
 }

@@ -1,5 +1,6 @@
 package com.isofarm.item;
 
+import com.isofarm.data.Enchantment;
 import com.isofarm.data.Tier;
 import com.isofarm.data.ToolType;
 
@@ -17,5 +18,10 @@ public class Shovel extends Tool {
     @Override
     public Item copy() {
         return new Shovel(getTier());
+    }
+
+    @Override
+    public boolean enchanting(Enchantment enchantment) {
+        return false;
     }
 }

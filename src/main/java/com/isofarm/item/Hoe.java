@@ -43,4 +43,9 @@ public class Hoe extends Tool {
     public Item copy() {
         return new Hoe(getTier());
     }
+
+    @Override
+    public boolean enchanting(Enchantment enchantment) {
+        return false;
+    }
 }

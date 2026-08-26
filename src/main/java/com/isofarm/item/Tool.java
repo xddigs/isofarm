@@ -1,12 +1,13 @@
 package com.isofarm.item;
 
 import com.isofarm.data.DataClass;
+import com.isofarm.data.Enchantment;
 import com.isofarm.data.Tier;
 import com.isofarm.data.ToolType;
 import com.isofarm.entity.Player;
 
 @DataClass
-public abstract class Tool implements Item {
+public abstract class Tool implements Item, Enchantable {
     private final byte id;
     private final String name;
     private final int value;
@@ -15,6 +16,7 @@ public abstract class Tool implements Item {
     private Tier tier;
     private int durability;
     private Player player;
+    private final Enchantment[] enchantments;
     private final float baseDamage;
 
     public Tool(byte id, String name, int value,
@@ -26,6 +28,7 @@ public abstract class Tool implements Item {
         this.tier = tier;
         this.durability = durability;
         this.baseDamage = type.getBaseDamage();
+        this.enchantments = new Enchantment[3];
     }
 
     @Override

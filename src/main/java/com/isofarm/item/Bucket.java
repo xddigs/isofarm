@@ -1,6 +1,7 @@
 package com.isofarm.item;
 
 import com.isofarm.data.BlockData;
+import com.isofarm.data.Enchantment;
 import com.isofarm.data.Tier;
 import com.isofarm.data.ToolType;
 import com.isofarm.entity.Player;
@@ -45,5 +46,10 @@ public class Bucket extends Tool {
     public void use(GameMaster gameMaster) {
         Player player = gameMaster.getPlayer();
 
+    }
+
+    @Override
+    public boolean enchanting(Enchantment enchantment) {
+        return false;
     }
 }

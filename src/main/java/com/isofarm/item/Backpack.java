@@ -1,5 +1,6 @@
 package com.isofarm.item;
 
+import com.isofarm.data.Enchantment;
 import com.isofarm.data.SoundGroup;
 import com.isofarm.data.Tier;
 import com.isofarm.data.ToolType;
@@ -48,5 +49,10 @@ public class Backpack extends Tool {
             getPlayer().getInventory().unequipBackpack();
             getPlayer().getGameMaster().getGameUIService().resetHotbarPosition();
         }
+    }
+
+    @Override
+    public boolean enchanting(Enchantment enchantment) {
+        return false;
     }
 }
