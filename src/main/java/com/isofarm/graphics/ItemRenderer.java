@@ -17,7 +17,6 @@ import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 
 public class ItemRenderer {
-
     private static final float OFFSET_X = 1.1f;
     private static final float OFFSET_Y = -0.60f;
     private static final float OFFSET_Z = -1.0f;
@@ -251,7 +250,7 @@ public class ItemRenderer {
         int frameIndex = ResourceManager.getItemIconFrame(item);
         frameIndex = Math.clamp(frameIndex, 0, spriteSheet.getTotalFrames() - 1);
         Vector4f uvBounds = spriteSheet.getUVBounds(frameIndex);
-        int textureUnit = com.isofarm.utils.K.Render.PRIMARY_TEXTURE_UNIT;
+        int textureUnit = K.Render.PRIMARY_TEXTURE_UNIT;
 
         shader.bind();
         glActiveTexture(GL_TEXTURE0 + textureUnit);
@@ -312,7 +311,7 @@ public class ItemRenderer {
                 .rotateZ((float) Math.toRadians(rotateZ + animation.rotateZ))
                 .scale(ITEM_SCALE * animation.scaleX, -ITEM_SCALE * animation.scaleY, ITEM_SCALE * animation.scaleZ);
 
-        int frameIndex = item instanceof Block ? item.getId() - 1 : item.getId();
+        int frameIndex = ResourceManager.getItemIconFrame(item);
         frameIndex = Math.clamp(frameIndex, 0, spriteSheet.getTotalFrames() - 1);
         Vector4f uvBounds = spriteSheet.getUVBounds(frameIndex);
         int textureUnit = K.Render.PRIMARY_TEXTURE_UNIT;

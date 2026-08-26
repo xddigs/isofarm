@@ -223,8 +223,13 @@ public class ResourceManager {
         }
 
         if (item instanceof Material material) {
-            return getMaterialIconColumn(material.getTier(),
-                    material.getMaterialID());
+            return getMaterialIconColumn(material.getTier(), material.getMaterialID());
+        }
+
+        if (item instanceof Tool tool) {
+            int col = getItemIconColumn(tool);
+            int row = getItemIconRow(tool);
+            return row * K.UI.ICON_TOOL_COLS + col;
         }
 
         return getItemIconColumn(item);
