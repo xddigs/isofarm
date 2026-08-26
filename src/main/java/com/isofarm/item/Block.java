@@ -98,4 +98,8 @@ public class Block implements Craftable {
     public Item copy() {
         return new Block(type, x, y, z);
     }
+
+    public boolean hasSpecificDrop() {
+        return type.getDrop() != null;
+    }
 }

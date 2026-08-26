@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11C.*;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
 
 @Utils
 public class GUI {
@@ -41,6 +43,12 @@ public class GUI {
     private GUI() {}
 
     public static void begin(float screenWidth, float screenHeight) {
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_CULL_FACE);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDepthMask(false);
+        glActiveTexture(GL_TEXTURE0);
         shader.bind();
         GUI.screenWidth = (int) screenWidth;
         GUI.screenHeight = (int) screenHeight;
@@ -52,6 +60,10 @@ public class GUI {
 
     public static void end() {
         shader.unbind();
+        glDepthMask(true);
+        glDisable(GL_BLEND);
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
     }
 
     public static void drawLine(float x1, float y1, float x2, float y2,

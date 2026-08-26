@@ -436,8 +436,8 @@ public class GameInteraction {
 
         Vector3f position = new Vector3f(x + 0.5f, y + 0.5f, z + 0.5f);
         Block removedBlock = new Block(blockData, x, y, z);
-
         Item itemToDrop = null;
+        BlockData removedBlockData = removedBlock.getType();
 
         if (removedBlock.getType().hasDrops()) {
             Object dropObj = removedBlock.getType().getRandomDrop();
@@ -451,7 +451,11 @@ public class GameInteraction {
         }
 
         if (itemToDrop == null) {
-            itemToDrop = removedBlock;
+            if (removedBlock.hasSpecificDrop()) {
+                itemToDrop = (Item) removedBlockData.getDrop();
+            } else {
+                itemToDrop = removedBlock;
+            }
         }
 
         WorldItem dropEntity = new WorldItem(itemToDrop, (int)(Math.random()) + 1, position);

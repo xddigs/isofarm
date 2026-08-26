@@ -179,19 +179,16 @@ public class GameRenderer {
 
         renderDestroyOverlay(gameMaster.getGameInteraction(), defaultShader,
                 rm.getDestroyOverlayMesh(), rm.getDestroyTexture(), camera);
-        glDepthMask(true);
 
+        gameMaster.getEntities().removeIf(e -> !e.isAlive());
         gameMaster.getEntities().forEach(entity -> {
             if (entity instanceof Player && !gameMaster.isOrthographicCamera()) {
                 return;
             }
-            gameMaster.getEntities().removeIf(e -> !e.isAlive());
             entity.render(gameMaster);
         });
 
-        glEnable(GL_CULL_FACE);
         defaultShader.setUniform("uParticleAlpha", 1.0f);
-        defaultShader.setUniform("uWaterAlpha", 1.0f);
 
         glDisable(GL_DEPTH_TEST);
         gameMaster.getParticles().render(defaultShader, rm.getSpriteMesh(),
@@ -455,7 +452,9 @@ public class GameRenderer {
         shader.unbind();
 
         glDisable(GL_POLYGON_OFFSET_FILL);
+        glPolygonOffset(0.0f, 0.0f);
         glDepthMask(true);
+        glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
         glDisable(GL_BLEND);
         glActiveTexture(GL_TEXTURE0);
