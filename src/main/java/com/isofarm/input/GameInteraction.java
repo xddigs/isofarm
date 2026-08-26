@@ -451,11 +451,7 @@ public class GameInteraction {
         }
 
         if (itemToDrop == null) {
-            if (removedBlock.hasSpecificDrop()) {
-                itemToDrop = (Item) removedBlockData.getDrop();
-            } else {
-                itemToDrop = removedBlock;
-            }
+            itemToDrop = removedBlock;
         }
 
         WorldItem dropEntity = new WorldItem(itemToDrop, (int)(Math.random()) + 1, position);
