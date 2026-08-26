@@ -186,7 +186,9 @@ public class World {
     }
 
     public boolean isBlockSolid(int x, int y, int z) {
-        return getBlockTypeAt(x, y, z) != 0;
+        byte blockId = getBlockTypeAt(x, y, z);
+        BlockData block = BlockData.fromId(blockId);
+        return block != null && block.isSolid();
     }
 
     public GridPos getHighestY(float spawnX, float spawnZ) {
