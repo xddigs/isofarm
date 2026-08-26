@@ -5,7 +5,9 @@ import com.isofarm.data.Crop;
 import com.isofarm.data.Hit;
 import com.isofarm.entity.Player;
 import com.isofarm.input.GameInteraction;
+import com.isofarm.item.Water;
 import com.isofarm.service.TimeService;
+import com.isofarm.service.WeatherService;
 import com.isofarm.utils.HoveredCell;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
@@ -16,10 +18,13 @@ import org.joml.*;
 import java.lang.Math;
 import java.util.Map;
 
+import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;
 
 public class GameRenderer {
+    private static final float WATER_ANIMATION_SPEED = 8.0f;
+
     private final Matrix4f modelMatrix = new Matrix4f();
     private final Matrix4f viewProjMatrix = new Matrix4f();
     private final FrustumIntersection frustum = new FrustumIntersection();
@@ -183,12 +188,42 @@ public class GameRenderer {
             entity.render(gameMaster);
         });
 
+        float totalTime = (float) glfwGetTime();
+        int currentFrame = (int) (totalTime * WATER_ANIMATION_SPEED) % rm.getWaterTexture().getTotalFrames();
+
+        Vector4f uvBounds = rm.getWaterTexture().getUVBounds(currentFrame);
+        glActiveTexture(GL_TEXTURE0 + K.Render.PRIMARY_TEXTURE_UNIT);
+        rm.getWaterTexture().bind();
+
+        defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
+        defaultShader.setUniform("uUseTexture", true);
+        defaultShader.setUniform("uUseFaceAtlas", false);
+        defaultShader.setUniform("uUVBounds", uvBounds);
+        defaultShader.setUniform("uParticleAlpha", 0.65f);
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDepthMask(false);
+
+        gameMaster.getWorld().forEach(block -> {
+            if (!(block instanceof Water water)) return;
+            float renderX = water.getX();
+            float renderY = water.getY();
+            float renderZ = water.getZ();
+            modelMatrix.identity().translate(renderX, renderY, renderZ);
+            defaultShader.setUniform("uModel", modelMatrix);
+            rm.getBlockMesh().render();
+        });
+
+        glDepthMask(true);
+        defaultShader.setUniform("uParticleAlpha", 1.0f);
+
         glDisable(GL_DEPTH_TEST);
         gameMaster.getParticles().render(defaultShader, rm.getSpriteMesh(),
                 gameMaster.getActiveCamera());
         glEnable(GL_DEPTH_TEST);
 
-        if (gameMaster.getWeatherService().isRaining()) {
+        if (WeatherService.isRaining()) {
             Vector3f rainTargetPos;
             if (gameMaster.isOrthographicCamera() && player != null) {
                 rainTargetPos = new Vector3f(player.getPosition().x(),

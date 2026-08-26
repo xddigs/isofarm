@@ -12,6 +12,7 @@ public class WorldGenerator {
 
     private static final int BASE_HEIGHT = 18;
     private static final int MOUNTAIN_HEIGHT = 150;
+    private static final int WATER_LEVEL = 16;
 
     private static final int ORE_MAX_HEIGHT = 45;
     private static final float ORE_CHANCE = 0.015f;
@@ -21,11 +22,9 @@ public class WorldGenerator {
     private static final float LARGE_TREE_CHANCE = 0.1f;
 
     private final World world;
-
     private final long seed;
     private final float offsetX;
     private final float offsetZ;
-    private final Random chunkRandom;
 
     public WorldGenerator(World world) {
         this(world, new Random().nextLong());
@@ -34,8 +33,6 @@ public class WorldGenerator {
     public WorldGenerator(World world, long seed) {
         this.world = world;
         this.seed = seed;
-
-        this.chunkRandom = new Random(seed);
         this.offsetX = (seed & 0xFFFFL) * 311.7f;
         this.offsetZ = ((seed >> 16) & 0xFFFFL) * 137.3f;
     }
@@ -43,6 +40,9 @@ public class WorldGenerator {
     public void generateChunk(int chunkX, int chunkZ) {
         Chunk chunk = world.getOrCreateChunk(chunkX, chunkZ);
         int[][] heightMap = new int[Chunk.SIZE_X][Chunk.SIZE_Z];
+
+        long chunkSeed = seed ^ ((long) chunkX * 341873128712L + (long) chunkZ * 132897987541L);
+        Random chunkRandom = new Random(chunkSeed);
 
         for (int x = 0; x < Chunk.SIZE_X; x++) {
             for (int z = 0; z < Chunk.SIZE_Z; z++) {
@@ -52,9 +52,7 @@ public class WorldGenerator {
                 float sampleX = worldX + offsetX;
                 float sampleZ = worldZ + offsetZ;
 
-                float continental = (SimplexNoise.noise(sampleX * CONTINENTAL_SCALE,
-                        sampleZ * CONTINENTAL_SCALE) + 1.0f) * 0.5f;
-
+                float continental = (SimplexNoise.noise(sampleX * CONTINENTAL_SCALE, sampleZ * CONTINENTAL_SCALE) + 1.0f) * 0.5f;
                 float mountainFactor = (float) Math.pow(continental, 2.5f);
                 float detailNoise = SimplexNoise.noise(sampleX * DETAIL_SCALE, sampleZ * DETAIL_SCALE);
 
@@ -62,12 +60,22 @@ public class WorldGenerator {
                 height = Math.clamp(height, 1, Chunk.SIZE_Y - 1);
                 heightMap[x][z] = height;
 
-                for (int y = 0; y <= height; y++) {
-                    byte blockId = getBlockId(y, height, mountainFactor);
-                    if (generateOre(worldX, worldZ, y, height)) {
-                        blockId = BlockData.getRandomOre().getId();
+                int maxY = Math.max(height, WATER_LEVEL);
+                for (int y = 0; y <= maxY; y++) {
+                    byte blockId = BlockData.AIR.getId();
+
+                    if (y <= height) {
+                        blockId = getBlockId(y, height, mountainFactor, y < WATER_LEVEL, chunkRandom);
+                        if (generateOre(worldX, worldZ, y, height)) {
+                            blockId = BlockData.getRandomOre().getId();
+                        }
+                    } else if (y <= WATER_LEVEL) {
+                        blockId = BlockData.WATER.getId();
                     }
-                    chunk.setBlock(x, y, z, blockId);
+
+                    if (blockId != BlockData.AIR.getId()) {
+                        chunk.setBlock(x, y, z, blockId);
+                    }
                 }
             }
         }
@@ -78,31 +86,35 @@ public class WorldGenerator {
                 int worldX = chunkX * Chunk.SIZE_X + x;
                 int worldZ = chunkZ * Chunk.SIZE_Z + z;
 
-                if (height <= FLOWER_MAX_HEIGHT && chunkRandom.nextDouble() < FLOWER_CHANCE) {
-                    BlockData plant = BlockData.PLANTS[chunkRandom.nextInt(BlockData.PLANTS.length)];
-                    chunk.setBlock(x, height + 1, z, plant.getId());
-                }
+                if (height > WATER_LEVEL) {
+                    if (height <= FLOWER_MAX_HEIGHT && chunkRandom.nextDouble() < FLOWER_CHANCE) {
+                        BlockData plant = BlockData.PLANTS[chunkRandom.nextInt(BlockData.PLANTS.length)];
+                        chunk.setBlock(x, height + 1, z, plant.getId());
+                    }
 
-                if (height < BASE_HEIGHT + 12 && chunkRandom.nextDouble() < 0.01 &&
-                        canPlaceTree(heightMap, x, z)) {
-                    generateCompactTree(worldX, height, worldZ,
-                            chunkRandom.nextFloat() < LARGE_TREE_CHANCE);
+                    if (height < BASE_HEIGHT + 12 && chunkRandom.nextDouble() < 0.01 && canPlaceTree(heightMap, x, z)) {
+                        generateCompactTree(worldX, height, worldZ, chunkRandom.nextFloat() < LARGE_TREE_CHANCE, chunkRandom);
+                    }
                 }
             }
         }
     }
 
-    private byte getBlockId(int y, int height, float mountainFactor) {
+    private byte getBlockId(int y, int height, float mountainFactor, boolean isUnderwater, Random random) {
         boolean isHighMountain = mountainFactor > 0.45f;
 
         if (y == height) {
+            if (isUnderwater) {
+                return BlockData.DIRT.getId();
+            }
             if (isHighMountain && y > BASE_HEIGHT + 14) {
                 return BlockData.SNOW.getId();
             }
             return BlockData.GRASS.getId();
         } else if (y > height - 3) {
+            if (isUnderwater) return BlockData.DIRT.getId();
             return isHighMountain ? BlockData.STONE.getId() : BlockData.DIRT.getId();
-        } else if (chunkRandom.nextDouble() < 0.01) {
+        } else if (random.nextDouble() < 0.01) {
             return BlockData.VOIDSTONE.getId();
         } else {
             return BlockData.STONE.getId();
@@ -124,9 +136,8 @@ public class WorldGenerator {
         return true;
     }
 
-    private void generateCompactTree(int worldX, int groundY, int worldZ,
-                                     boolean isLargeTree) {
-        int trunkHeight = 4 + chunkRandom.nextInt(2);
+    private void generateCompactTree(int worldX, int groundY, int worldZ, boolean isLargeTree, Random random) {
+        int trunkHeight = 4 + random.nextInt(2);
         int topY = groundY + trunkHeight;
 
         for (int y = 1; y <= trunkHeight; y++) {
@@ -139,8 +150,7 @@ public class WorldGenerator {
 
             for (int dx = -subRadius; dx <= subRadius; dx++) {
                 for (int dz = -subRadius; dz <= subRadius; dz++) {
-                    if (Math.abs(dx) == subRadius && Math.abs(dz) == subRadius &&
-                            chunkRandom.nextDouble() < 0.5) {
+                    if (Math.abs(dx) == subRadius && Math.abs(dz) == subRadius && random.nextDouble() < 0.5) {
                         continue;
                     }
 
@@ -155,8 +165,7 @@ public class WorldGenerator {
         }
     }
 
-    private boolean generateOre(int worldX, int worldZ, int y,
-                                   int surfaceHeight) {
+    private boolean generateOre(int worldX, int worldZ, int y, int surfaceHeight) {
         if (y >= surfaceHeight || y > ORE_MAX_HEIGHT || y >= surfaceHeight - 3) {
             return false;
         }
