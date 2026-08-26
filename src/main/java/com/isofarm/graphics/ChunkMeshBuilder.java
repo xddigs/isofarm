@@ -67,10 +67,23 @@ public class ChunkMeshBuilder {
                     float topY = (data == BlockData.TILLED_DIRT || data == BlockData.WATER) ? y + TILLED_HEIGHT : y + 1.0f;
                     float waterValue = data == BlockData.WATER ? 1.0f : 0.0f;
 
-                    boolean renderFace = shouldRenderFace(world, worldX, y + 1, worldZ, data);
+                    boolean renderFace;
                     float aboveBottomY = getBlockBottomY(world, worldX, y + 1, worldZ);
 
-                    if (renderFace || aboveBottomY > topY) {
+                    boolean renderTopFace;
+                    if (data == BlockData.WATER) {
+                        byte aboveId = world.getBlockTypeAt(worldX, y + 1, worldZ);
+                        BlockData aboveData = aboveId == 0 ? null : BLOCK_LUT[aboveId & 0xFF];
+                        if (aboveData == BlockData.WATER) {
+                            renderTopFace = false;
+                        } else {
+                            renderTopFace = shouldRenderFace(world, worldX, y + 1, worldZ, data);
+                        }
+                    } else {
+                        renderTopFace = shouldRenderFace(world, worldX, y + 1, worldZ, data) || aboveBottomY > topY;
+                    }
+
+                    if (renderTopFace) {
                         TextureAtlas.TextureRegion region = data.getTopRegion();
                         if (region != null) {
                             float uMin = region.uvMin().x;
@@ -87,7 +100,7 @@ public class ChunkMeshBuilder {
                         }
                     }
 
-                    if (y > 0) {
+                    if (y > 0 && !data.equals(BlockData.WATER)) {
                         renderFace = shouldRenderFace(world, worldX, y - 1, worldZ, data);
                         float belowTopY = getBlockTopY(world, worldX, y - 1, worldZ);
 
@@ -109,67 +122,69 @@ public class ChunkMeshBuilder {
                         }
                     }
 
-                    renderFace = shouldRenderFace(world, worldX, y, worldZ + 1, data);
-                    if (renderFace || isPartialSideExposure(world, worldX, y, worldZ + 1, data)) {
-                        float expBottom = getSideBottomY(world, worldX, y, worldZ + 1, bottomY, data);
-                        float uvB = calculateSideUvBottom(expBottom, bottomY, topY);
-                        int newVertexCount = addSideQuadDirect(posBuffer, normBuffer, uvBuffer, waterBuffer, indexBuffer, posIdx, normIdx, uvIdx, waterIdx, elemIdx, vertexCount, x, x + 1, expBottom, topY, z + 1, z + 1, 0, 0, 1, data, uvB, 1.0f);
+                    if (!data.equals(BlockData.WATER)) {
+                        renderFace = shouldRenderFace(world, worldX, y, worldZ + 1, data);
+                        if (renderFace || isPartialSideExposure(world, worldX, y, worldZ + 1, data)) {
+                            float expBottom = getSideBottomY(world, worldX, y, worldZ + 1, bottomY, data);
+                            float uvB = calculateSideUvBottom(expBottom, bottomY, topY);
+                            int newVertexCount = addSideQuadDirect(posBuffer, normBuffer, uvBuffer, waterBuffer, indexBuffer, posIdx, normIdx, uvIdx, waterIdx, elemIdx, vertexCount, x, x + 1, expBottom, topY, z + 1, z + 1, 0, 0, 1, data, uvB, 1.0f);
 
-                        if (newVertexCount != vertexCount) {
-                            vertexCount = newVertexCount;
-                            posIdx += 12;
-                            normIdx += 12;
-                            uvIdx += 8;
-                            waterIdx += 4;
-                            elemIdx += 6;
+                            if (newVertexCount != vertexCount) {
+                                vertexCount = newVertexCount;
+                                posIdx += 12;
+                                normIdx += 12;
+                                uvIdx += 8;
+                                waterIdx += 4;
+                                elemIdx += 6;
+                            }
                         }
-                    }
 
-                    renderFace = shouldRenderFace(world, worldX, y, worldZ - 1, data);
-                    if (renderFace || isPartialSideExposure(world, worldX, y, worldZ - 1, data)) {
-                        float expBottom = getSideBottomY(world, worldX, y, worldZ - 1, bottomY, data);
-                        float uvB = calculateSideUvBottom(expBottom, bottomY, topY);
-                        int newVertexCount = addSideQuadDirect(posBuffer, normBuffer, uvBuffer, waterBuffer, indexBuffer, posIdx, normIdx, uvIdx, waterIdx, elemIdx, vertexCount, x + 1, x, expBottom, topY, z, z, 0, 0, -1, data, uvB, 1.0f);
+                        renderFace = shouldRenderFace(world, worldX, y, worldZ - 1, data);
+                        if (renderFace || isPartialSideExposure(world, worldX, y, worldZ - 1, data)) {
+                            float expBottom = getSideBottomY(world, worldX, y, worldZ - 1, bottomY, data);
+                            float uvB = calculateSideUvBottom(expBottom, bottomY, topY);
+                            int newVertexCount = addSideQuadDirect(posBuffer, normBuffer, uvBuffer, waterBuffer, indexBuffer, posIdx, normIdx, uvIdx, waterIdx, elemIdx, vertexCount, x + 1, x, expBottom, topY, z, z, 0, 0, -1, data, uvB, 1.0f);
 
-                        if (newVertexCount != vertexCount) {
-                            vertexCount = newVertexCount;
-                            posIdx += 12;
-                            normIdx += 12;
-                            uvIdx += 8;
-                            waterIdx += 4;
-                            elemIdx += 6;
+                            if (newVertexCount != vertexCount) {
+                                vertexCount = newVertexCount;
+                                posIdx += 12;
+                                normIdx += 12;
+                                uvIdx += 8;
+                                waterIdx += 4;
+                                elemIdx += 6;
+                            }
                         }
-                    }
 
-                    renderFace = shouldRenderFace(world, worldX + 1, y, worldZ, data);
-                    if (renderFace || isPartialSideExposure(world, worldX + 1, y, worldZ, data)) {
-                        float expBottom = getSideBottomY(world, worldX + 1, y, worldZ, bottomY, data);
-                        float uvB = calculateSideUvBottom(expBottom, bottomY, topY);
-                        int newVertexCount = addSideQuadDirect(posBuffer, normBuffer, uvBuffer, waterBuffer, indexBuffer, posIdx, normIdx, uvIdx, waterIdx, elemIdx, vertexCount, x + 1, x + 1, expBottom, topY, z + 1, z, 1, 0, 0, data, uvB, 1.0f);
+                        renderFace = shouldRenderFace(world, worldX + 1, y, worldZ, data);
+                        if (renderFace || isPartialSideExposure(world, worldX + 1, y, worldZ, data)) {
+                            float expBottom = getSideBottomY(world, worldX + 1, y, worldZ, bottomY, data);
+                            float uvB = calculateSideUvBottom(expBottom, bottomY, topY);
+                            int newVertexCount = addSideQuadDirect(posBuffer, normBuffer, uvBuffer, waterBuffer, indexBuffer, posIdx, normIdx, uvIdx, waterIdx, elemIdx, vertexCount, x + 1, x + 1, expBottom, topY, z + 1, z, 1, 0, 0, data, uvB, 1.0f);
 
-                        if (newVertexCount != vertexCount) {
-                            vertexCount = newVertexCount;
-                            posIdx += 12;
-                            normIdx += 12;
-                            uvIdx += 8;
-                            waterIdx += 4;
-                            elemIdx += 6;
+                            if (newVertexCount != vertexCount) {
+                                vertexCount = newVertexCount;
+                                posIdx += 12;
+                                normIdx += 12;
+                                uvIdx += 8;
+                                waterIdx += 4;
+                                elemIdx += 6;
+                            }
                         }
-                    }
 
-                    renderFace = shouldRenderFace(world, worldX - 1, y, worldZ, data);
-                    if (renderFace || isPartialSideExposure(world, worldX - 1, y, worldZ, data)) {
-                        float expBottom = getSideBottomY(world, worldX - 1, y, worldZ, bottomY, data);
-                        float uvB = calculateSideUvBottom(expBottom, bottomY, topY);
-                        int newVertexCount = addSideQuadDirect(posBuffer, normBuffer, uvBuffer, waterBuffer, indexBuffer, posIdx, normIdx, uvIdx, waterIdx, elemIdx, vertexCount, x, x, expBottom, topY, z, z + 1, -1, 0, 0, data, uvB, 1.0f);
+                        renderFace = shouldRenderFace(world, worldX - 1, y, worldZ, data);
+                        if (renderFace || isPartialSideExposure(world, worldX - 1, y, worldZ, data)) {
+                            float expBottom = getSideBottomY(world, worldX - 1, y, worldZ, bottomY, data);
+                            float uvB = calculateSideUvBottom(expBottom, bottomY, topY);
+                            int newVertexCount = addSideQuadDirect(posBuffer, normBuffer, uvBuffer, waterBuffer, indexBuffer, posIdx, normIdx, uvIdx, waterIdx, elemIdx, vertexCount, x, x, expBottom, topY, z, z + 1, -1, 0, 0, data, uvB, 1.0f);
 
-                        if (newVertexCount != vertexCount) {
-                            vertexCount = newVertexCount;
-                            posIdx += 12;
-                            normIdx += 12;
-                            uvIdx += 8;
-                            waterIdx += 4;
-                            elemIdx += 6;
+                            if (newVertexCount != vertexCount) {
+                                vertexCount = newVertexCount;
+                                posIdx += 12;
+                                normIdx += 12;
+                                uvIdx += 8;
+                                waterIdx += 4;
+                                elemIdx += 6;
+                            }
                         }
                     }
                 }
@@ -211,10 +226,12 @@ public class ChunkMeshBuilder {
         if (worldY < 0 || worldY >= Chunk.SIZE_Y || !world.isChunkLoadedAt(worldX, worldZ)) {
             return 0.0f;
         }
+
         byte blockId = world.getBlockTypeAt(worldX, worldY, worldZ);
         if (blockId == 0) {
             return 0.0f;
         }
+
         BlockData data = BLOCK_LUT[blockId & 0xFF];
         if (data == null) {
             return 0.0f;
@@ -226,14 +243,17 @@ public class ChunkMeshBuilder {
         if (worldY < 0 || worldY >= Chunk.SIZE_Y || !world.isChunkLoadedAt(worldX, worldZ)) {
             return 0.0f;
         }
+
         byte blockId = world.getBlockTypeAt(worldX, worldY, worldZ);
         if (blockId == 0) {
             return 0.0f;
         }
+
         BlockData data = BLOCK_LUT[blockId & 0xFF];
         if (data == null) {
             return 0.0f;
         }
+
         return getBlockTopY(data, worldY);
     }
 
@@ -319,20 +339,21 @@ public class ChunkMeshBuilder {
         if (!world.isChunkLoadedAt(worldX, worldZ) || worldY < 0 || worldY >= Chunk.SIZE_Y) {
             return currentBottomY;
         }
+
         byte neighborId = world.getBlockTypeAt(worldX, worldY, worldZ);
         if (neighborId == 0) {
             return currentBottomY;
         }
+
         BlockData neighborData = BLOCK_LUT[neighborId & 0xFF];
         if (neighborData == null) {
             return currentBottomY;
         }
+
         if (neighborData == BlockData.TILLED_DIRT && currentBlock != BlockData.TILLED_DIRT) {
             return currentBottomY + TILLED_HEIGHT;
         }
-        if (neighborData == BlockData.WATER && currentBlock != BlockData.WATER) {
-            return currentBottomY + TILLED_HEIGHT;
-        }
+
         return currentBottomY;
     }
 

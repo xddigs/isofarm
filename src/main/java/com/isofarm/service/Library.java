@@ -29,9 +29,9 @@ public class Library implements Service<GameMaster> {
         registerDefault(itemR, Sword::new);
 
         registerDefault(itemR, () -> new Material(Tier.NONE, MaterialID.STICK));
-        registerDefault(itemR, () -> new MiningComponent(Tier.COPPER, MaterialID.ORE));
+        registerDefault(itemR, () -> new MiningComponent(Tier.COPPER, MaterialID.RAW_ORE));
         registerDefault(itemR, () -> new MiningComponent(Tier.COPPER, MaterialID.INGOT));
-        registerDefault(itemR, () -> new MiningComponent(Tier.IRON, MaterialID.ORE));
+        registerDefault(itemR, () -> new MiningComponent(Tier.IRON, MaterialID.RAW_ORE));
         registerDefault(itemR, () -> new MiningComponent(Tier.IRON, MaterialID.INGOT));
 
         registerDefault(itemR, () -> new CraftingKit(ToolType.CRAFTING_KIT, Tier.COPPER));
@@ -49,6 +49,38 @@ public class Library implements Service<GameMaster> {
         registerDefault(itemR, () -> new Shovel(Tier.IRON));
         registerDefault(itemR, () -> new Axe(Tier.IRON));
         registerDefault(itemR, () -> new Sword(Tier.IRON));
+
+        registerDefault(itemR, () -> new CraftingKit(ToolType.CRAFTING_KIT, Tier.STEEL));
+        registerDefault(itemR, () -> new Backpack(ToolType.BACKPACK, Tier.STEEL));
+        registerDefault(itemR, () -> new Hoe(Tier.STEEL));
+        registerDefault(itemR, () -> new Pickaxe(Tier.STEEL));
+        registerDefault(itemR, () -> new Shovel(Tier.STEEL));
+        registerDefault(itemR, () -> new Axe(Tier.STEEL));
+        registerDefault(itemR, () -> new Sword(Tier.STEEL));
+
+        registerDefault(itemR, () -> new CraftingKit(ToolType.CRAFTING_KIT, Tier.GOLD));
+        registerDefault(itemR, () -> new Backpack(ToolType.BACKPACK, Tier.GOLD));
+        registerDefault(itemR, () -> new Hoe(Tier.GOLD));
+        registerDefault(itemR, () -> new Pickaxe(Tier.GOLD));
+        registerDefault(itemR, () -> new Shovel(Tier.GOLD));
+        registerDefault(itemR, () -> new Axe(Tier.GOLD));
+        registerDefault(itemR, () -> new Sword(Tier.GOLD));
+
+        registerDefault(itemR, () -> new CraftingKit(ToolType.CRAFTING_KIT, Tier.PLATINUM));
+        registerDefault(itemR, () -> new Backpack(ToolType.BACKPACK, Tier.PLATINUM));
+        registerDefault(itemR, () -> new Hoe(Tier.PLATINUM));
+        registerDefault(itemR, () -> new Pickaxe(Tier.PLATINUM));
+        registerDefault(itemR, () -> new Shovel(Tier.PLATINUM));
+        registerDefault(itemR, () -> new Axe(Tier.PLATINUM));
+        registerDefault(itemR, () -> new Sword(Tier.PLATINUM));
+
+        registerDefault(itemR, () -> new CraftingKit(ToolType.CRAFTING_KIT, Tier.DIAMOND));
+        registerDefault(itemR, () -> new Backpack(ToolType.BACKPACK, Tier.DIAMOND));
+        registerDefault(itemR, () -> new Hoe(Tier.DIAMOND));
+        registerDefault(itemR, () -> new Pickaxe(Tier.DIAMOND));
+        registerDefault(itemR, () -> new Shovel(Tier.DIAMOND));
+        registerDefault(itemR, () -> new Axe(Tier.DIAMOND));
+        registerDefault(itemR, () -> new Sword(Tier.DIAMOND));
         registerDefault(itemR, Seed::new);
 
         for (CropType type : new CropType[]{CropType.CARROT, CropType.POTATO, CropType.BEETROOT}) {
