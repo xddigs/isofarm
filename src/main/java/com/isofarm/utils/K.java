@@ -70,7 +70,8 @@ public final class K {
         public static final int ICON_TOOL_COLS = 7;
         public static final int ICON_TOOL_ROWS = 7;
 
-        public static final int ICON_MATERIAL_COLS = 13;
+        public static final int ICON_MATERIAL_COLS = 12;
+        public static final int ICON_MATERIAL_ROWS = 2;
         public static final int ICON_INV_COLS = 4;
 
         public static final int DESTROY_FRAMES = 9;
