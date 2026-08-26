@@ -19,14 +19,21 @@ public class Mesh {
     private final int posVboId;
     private final int normalVboId;
     private final int uvVboId;
+    private int waterVboId = 0;
     private final int eboId;
     private final int vertexCount;
 
     public Mesh(float[] positions, float[] normals, float[] textCoords, int[] indices) {
+        this(positions, normals, textCoords, null, indices);
+    }
+
+    public Mesh(float[] positions, float[] normals, float[] textCoords, float[] water, int[] indices) {
         this.vertexCount = indices.length;
+
         FloatBuffer posBuffer = null;
         FloatBuffer normalBuffer = null;
         FloatBuffer texBuffer = null;
+        FloatBuffer waterBuffer = null;
         IntBuffer idxBuffer = null;
 
         try {
@@ -57,6 +64,16 @@ public class Mesh {
             glVertexAttribPointer(2, 2, GL_FLOAT, false, 0, 0);
             glEnableVertexAttribArray(2);
 
+            if (water != null && water.length > 0) {
+                waterBuffer = MemoryUtil.memAllocFloat(water.length);
+                waterBuffer.put(water).flip();
+                waterVboId = glGenBuffers();
+                glBindBuffer(GL_ARRAY_BUFFER, waterVboId);
+                glBufferData(GL_ARRAY_BUFFER, waterBuffer, GL_STATIC_DRAW);
+                glVertexAttribPointer(3, 1, GL_FLOAT, false, 0, 0);
+                glEnableVertexAttribArray(3);
+            }
+
             idxBuffer = MemoryUtil.memAllocInt(indices.length);
             idxBuffer.put(indices).flip();
             eboId = glGenBuffers();
@@ -64,10 +81,12 @@ public class Mesh {
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, idxBuffer, GL_STATIC_DRAW);
 
             glBindVertexArray(0);
+
         } finally {
             if (posBuffer != null) MemoryUtil.memFree(posBuffer);
             if (normalBuffer != null) MemoryUtil.memFree(normalBuffer);
             if (texBuffer != null) MemoryUtil.memFree(texBuffer);
+            if (waterBuffer != null) MemoryUtil.memFree(waterBuffer);
             if (idxBuffer != null) MemoryUtil.memFree(idxBuffer);
         }
 
@@ -159,78 +178,26 @@ public class Mesh {
                 6, 7, 4
         };
 
-        return new Mesh(
-                positions,
-                normals,
-                texCoords,
-                indices
-        );
+        return new Mesh(positions, normals, texCoords, indices);
     }
 
     public static Mesh createDestroyOverlayMesh() {
-
         float[] positions = new float[]{
-                0, 1, 0,
-                0, 1, 1,
-                1, 1, 1,
-                1, 1, 0,
-
-                0, 0, 1,
-                0, 1, 1,
-                1, 1, 1,
-                1, 0, 1,
-
-                1, 0, 1,
-                1, 1, 1,
-                1, 1, 0,
-                1, 0, 0,
-
-                1, 0, 0,
-                1, 1, 0,
-                0, 1, 0,
-                0, 0, 0,
-
-                0, 0, 0,
-                0, 1, 0,
-                0, 1, 1,
-                0, 0, 1,
-
-                0, 0, 1,
-                0, 0, 0,
-                1, 0, 0,
-                1, 0, 1
+                0, 1, 0,  0, 1, 1,  1, 1, 1,  1, 1, 0,
+                0, 0, 1,  0, 1, 1,  1, 1, 1,  1, 0, 1,
+                1, 0, 1,  1, 1, 1,  1, 1, 0,  1, 0, 0,
+                1, 0, 0,  1, 1, 0,  0, 1, 0,  0, 0, 0,
+                0, 0, 0,  0, 1, 0,  0, 1, 1,  0, 0, 1,
+                0, 0, 1,  0, 0, 0,  1, 0, 0,  1, 0, 1
         };
 
         float[] normals = new float[]{
-                0, 1, 0,
-                0, 1, 0,
-                0, 1, 0,
-                0, 1, 0,
-
-                0, 0, 1,
-                0, 0, 1,
-                0, 0, 1,
-                0, 0, 1,
-
-                1, 0, 0,
-                1, 0, 0,
-                1, 0, 0,
-                1, 0, 0,
-
-                0, 0, -1,
-                0, 0, -1,
-                0, 0, -1,
-                0, 0, -1,
-
-                -1, 0, 0,
-                -1, 0, 0,
-                -1, 0, 0,
-                -1, 0, 0,
-
-                0, -1, 0,
-                0, -1, 0,
-                0, -1, 0,
-                0, -1, 0
+                0, 1, 0,  0, 1, 0,  0, 1, 0,  0, 1, 0,
+                0, 0, 1,  0, 0, 1,  0, 0, 1,  0, 0, 1,
+                1, 0, 0,  1, 0, 0,  1, 0, 0,  1, 0, 0,
+                0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1,
+                -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0,
+                0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0
         };
 
         float[] texCoords = new float[]{
@@ -243,7 +210,6 @@ public class Mesh {
         };
 
         int[] indices = new int[36];
-
         for (int i = 0; i < 6; i++) {
             int v = i * 4;
             int idx = i * 6;
@@ -256,12 +222,7 @@ public class Mesh {
             indices[idx + 5] = v + 2;
         }
 
-        return new Mesh(
-                positions,
-                normals,
-                texCoords,
-                indices
-        );
+        return new Mesh(positions, normals, texCoords, indices);
     }
 
     public static Mesh createCenteredQuad() {
@@ -454,25 +415,10 @@ public class Mesh {
 
     public static Mesh createCrop() {
         float[] positions = new float[]{
-                -0.4f, 0.0f, -0.25f,
-                0.4f, 0.0f, -0.25f,
-                0.4f, 0.8f, -0.25f,
-                -0.4f, 0.8f, -0.25f,
-
-                -0.4f, 0.0f, 0.25f,
-                0.4f, 0.0f, 0.25f,
-                0.4f, 0.8f, 0.25f,
-                -0.4f, 0.8f, 0.25f,
-
-                -0.25f, 0.0f, -0.4f,
-                -0.25f, 0.0f, 0.4f,
-                -0.25f, 0.8f, 0.4f,
-                -0.25f, 0.8f, -0.4f,
-
-                0.25f, 0.0f, -0.4f,
-                0.25f, 0.0f, 0.4f,
-                0.25f, 0.8f, 0.4f,
-                0.25f, 0.8f, -0.4f
+                -0.4f, 0.0f, -0.25f, 0.4f, 0.0f, -0.25f, 0.4f, 0.8f, -0.25f, -0.4f, 0.8f, -0.25f,
+                -0.4f, 0.0f, 0.25f, 0.4f, 0.0f, 0.25f, 0.4f, 0.8f, 0.25f, -0.4f, 0.8f, 0.25f,
+                -0.25f, 0.0f, -0.4f, -0.25f, 0.0f, 0.4f, -0.25f, 0.8f, 0.4f, -0.25f, 0.8f, -0.4f,
+                0.25f, 0.0f, -0.4f, 0.25f, 0.0f, 0.4f, 0.25f, 0.8f, 0.4f, 0.25f, 0.8f, -0.4f
         };
 
         float[] normals = new float[]{
@@ -501,67 +447,21 @@ public class Mesh {
 
     public static Mesh createCube() {
         float[] positions = new float[]{
-                -0.5f,  0.5f, -0.5f,
-                -0.5f,  0.5f,  0.5f,
-                0.5f,  0.5f,  0.5f,
-                0.5f,  0.5f, -0.5f,
-
-                -0.5f, -0.5f,  0.5f,
-                -0.5f,  0.5f,  0.5f,
-                0.5f,  0.5f,  0.5f,
-                0.5f, -0.5f,  0.5f,
-
-                0.5f, -0.5f,  0.5f,
-                0.5f,  0.5f,  0.5f,
-                0.5f,  0.5f, -0.5f,
-                0.5f, -0.5f, -0.5f,
-
-                0.5f, -0.5f, -0.5f,
-                0.5f,  0.5f, -0.5f,
-                -0.5f,  0.5f, -0.5f,
-                -0.5f, -0.5f, -0.5f,
-
-                -0.5f, -0.5f, -0.5f,
-                -0.5f,  0.5f, -0.5f,
-                -0.5f,  0.5f,  0.5f,
-                -0.5f, -0.5f,  0.5f,
-
-                -0.5f, -0.5f,  0.5f,
-                -0.5f, -0.5f, -0.5f,
-                0.5f, -0.5f, -0.5f,
-                0.5f, -0.5f,  0.5f
+                -0.5f,  0.5f, -0.5f, -0.5f,  0.5f,  0.5f, 0.5f,  0.5f,  0.5f, 0.5f,  0.5f, -0.5f,
+                -0.5f, -0.5f,  0.5f, -0.5f,  0.5f,  0.5f, 0.5f,  0.5f,  0.5f, 0.5f, -0.5f,  0.5f,
+                0.5f, -0.5f,  0.5f, 0.5f,  0.5f,  0.5f, 0.5f,  0.5f, -0.5f, 0.5f, -0.5f, -0.5f,
+                0.5f, -0.5f, -0.5f, 0.5f,  0.5f, -0.5f, -0.5f,  0.5f, -0.5f, -0.5f, -0.5f, -0.5f,
+                -0.5f, -0.5f, -0.5f, -0.5f,  0.5f, -0.5f, -0.5f,  0.5f,  0.5f, -0.5f, -0.5f,  0.5f,
+                -0.5f, -0.5f,  0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f,  0.5f
         };
 
         float[] normals = new float[]{
-                0.0f,  1.0f,  0.0f,
-                0.0f,  1.0f,  0.0f,
-                0.0f,  1.0f,  0.0f,
-                0.0f,  1.0f,  0.0f,
-
-                0.0f,  0.0f,  1.0f,
-                0.0f,  0.0f,  1.0f,
-                0.0f,  0.0f,  1.0f,
-                0.0f,  0.0f,  1.0f,
-
-                1.0f,  0.0f,  0.0f,
-                1.0f,  0.0f,  0.0f,
-                1.0f,  0.0f,  0.0f,
-                1.0f,  0.0f,  0.0f,
-
-                0.0f,  0.0f, -1.0f,
-                0.0f,  0.0f, -1.0f,
-                0.0f,  0.0f, -1.0f,
-                0.0f,  0.0f, -1.0f,
-
-                -1.0f,  0.0f,  0.0f,
-                -1.0f,  0.0f,  0.0f,
-                -1.0f,  0.0f,  0.0f,
-                -1.0f,  0.0f,  0.0f,
-
-                0.0f, -1.0f,  0.0f,
-                0.0f, -1.0f,  0.0f,
-                0.0f, -1.0f,  0.0f,
-                0.0f, -1.0f, 0.0f
+                0.0f,  1.0f,  0.0f, 0.0f,  1.0f,  0.0f, 0.0f,  1.0f,  0.0f, 0.0f,  1.0f,  0.0f,
+                0.0f,  0.0f,  1.0f, 0.0f,  0.0f,  1.0f, 0.0f,  0.0f,  1.0f, 0.0f,  0.0f,  1.0f,
+                1.0f,  0.0f,  0.0f, 1.0f,  0.0f,  0.0f, 1.0f,  0.0f,  0.0f, 1.0f,  0.0f,  0.0f,
+                0.0f,  0.0f, -1.0f, 0.0f,  0.0f, -1.0f, 0.0f,  0.0f, -1.0f, 0.0f,  0.0f, -1.0f,
+                -1.0f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
+                0.0f, -1.0f,  0.0f, 0.0f, -1.0f,  0.0f, 0.0f, -1.0f,  0.0f, 0.0f, -1.0f, 0.0f
         };
 
         float[] textCoords = new float[]{
@@ -574,7 +474,6 @@ public class Mesh {
         };
 
         int[] indices = new int[36];
-
         for (int i = 0; i < 6; i++) {
             int v = i * 4;
             int idx = i * 6;
@@ -599,11 +498,17 @@ public class Mesh {
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
         glDisableVertexAttribArray(2);
+        if (waterVboId != 0) {
+            glDisableVertexAttribArray(3);
+        }
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glDeleteBuffers(posVboId);
         glDeleteBuffers(normalVboId);
         glDeleteBuffers(uvVboId);
+        if (waterVboId != 0) {
+            glDeleteBuffers(waterVboId);
+        }
         glDeleteBuffers(eboId);
 
         glBindVertexArray(0);

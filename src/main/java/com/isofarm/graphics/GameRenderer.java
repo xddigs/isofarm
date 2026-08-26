@@ -191,6 +191,7 @@ public class GameRenderer {
         glEnable(GL_CULL_FACE);
         glDepthMask(true);
         defaultShader.setUniform("uParticleAlpha", 1.0f);
+        defaultShader.setUniform("uWaterAlpha", 1.0f);
 
         glDisable(GL_DEPTH_TEST);
         gameMaster.getParticles().render(defaultShader, rm.getSpriteMesh(),
@@ -255,11 +256,8 @@ public class GameRenderer {
             glBindTexture(GL_TEXTURE_2D, maskFbo.getTextureId());
 
             rm.getScreenQuadMesh().render();
-
             outlineShader.unbind();
-
             glEnable(GL_DEPTH_TEST);
-
             defaultShader.bind();
             defaultShader.setUniform("uIsMaskPass", false);
         }

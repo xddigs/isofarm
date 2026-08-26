@@ -4,6 +4,7 @@ in vec3 vNormal;
 in vec2 vTexCoord;
 in vec3 vFragPos;
 in vec4 vLightSpacePosition;
+in float vIsWater;
 
 out vec4 FragColor;
 
@@ -22,6 +23,7 @@ uniform float uAmbientIntensity;
 
 uniform bool uIsMaskPass;
 uniform float uParticleAlpha;
+uniform float uWaterAlpha;
 uniform bool uEnableShadows;
 
 float calculateShadow(vec4 lightSpacePosition, vec3 normal) {
@@ -81,5 +83,9 @@ void main() {
     vec3 ambient = uSkyColor * uAmbientIntensity;
     vec3 directLight = uSunColor * diffuse * uLightIntensity * (1.0 - shadow);
     vec3 totalLight = ambient + directLight;
-    FragColor = vec4(texColor.rgb * totalLight, texColor.a * uParticleAlpha);
+    float alpha = texColor.a * uParticleAlpha;
+    if (vIsWater > 0.5) {
+        alpha *= 0.50;
+    }
+    FragColor = vec4(texColor.rgb * totalLight, alpha);
 }
