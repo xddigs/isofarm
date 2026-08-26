@@ -102,9 +102,7 @@ public class Chunk {
 
         plantIndices = new int[count];
         System.arraycopy(temp, 0, plantIndices, 0, count);
-
         plantCacheDirty = false;
-
         return plantIndices;
     }
 

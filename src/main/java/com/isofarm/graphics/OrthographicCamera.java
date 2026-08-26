@@ -1,5 +1,6 @@
 package com.isofarm.graphics;
 
+import com.isofarm.data.BlockData;
 import com.isofarm.data.Hit;
 import com.isofarm.data.Ray;
 import com.isofarm.utils.K;
@@ -159,6 +160,7 @@ public class OrthographicCamera implements CameraView {
         float tMaxX = stepX > 0 ? ((x + 1) * tileSize - origin.x) / direction.x : stepX < 0 ? (x * tileSize - origin.x) / direction.x : Float.POSITIVE_INFINITY;
         float tMaxY = stepY > 0 ? ((y + 1) * tileSize - origin.y) / direction.y : stepY < 0 ? (y * tileSize - origin.y) / direction.y : Float.POSITIVE_INFINITY;
         float tMaxZ = stepZ > 0 ? ((z + 1) * tileSize - origin.z) / direction.z : stepZ < 0 ? (z * tileSize - origin.z) / direction.z : Float.POSITIVE_INFINITY;
+
         float distance = 0.0f;
 
         int hitNormalX = 0;
@@ -167,8 +169,18 @@ public class OrthographicCamera implements CameraView {
 
         while (distance <= Settings.getMaxInteractionDistance()) {
             byte block = world.getBlockTypeAt(x, y, z);
-            if (block != 0) {
-                return new Hit(x, y, z, hitNormalX, hitNormalY, hitNormalZ);
+            byte waterLevel = world.getWaterLevelAt(x, y, z);
+
+            boolean hasBlock = block != BlockData.AIR.getId();
+            boolean hasWater = waterLevel > 0;
+
+            if (hasBlock || hasWater) {
+                return new Hit(
+                        x, y, z,
+                        hitNormalX,
+                        hitNormalY,
+                        hitNormalZ
+                );
             }
 
             if (tMaxX < tMaxY) {

@@ -14,7 +14,7 @@ import java.util.List;
 public enum BlockData implements Craftable {
     AIR((byte) 0, (byte) 0, "Empty", false, 0, null, SoundGroup.SILENT, 0f, true, null, new Object[]{}, Tier.NONE),
     DIRT((byte) 1, (byte) 0, "Dirt", true, 100, "assets/textures/blocks/dirt.png", SoundGroup.SOIL, 0.9f, false, null, new Object[]{}, Tier.NONE),
-    GRASS((byte) 2, (byte) 0, "Grass", true, 120, "assets/textures/blocks/grass.png", SoundGroup.SOIL, 1.0f, false, DIRT, new Object[]{}, Tier.NONE),
+    GRASS((byte) 2, (byte) 0, "Grass", true, 120, "assets/textures/blocks/grass.png", SoundGroup.SOIL, 1.0f, false, DIRT, new Object[]{DIRT}, Tier.NONE),
     STONE((byte) 3, (byte) 0, "Stone", false, 150, "assets/textures/blocks/stone.png", SoundGroup.HARD, 6.0f, false, null, new Object[]{}, Tier.NONE),
     TILLED_DIRT((byte) 4, (byte) 0, "Tilled Dirt", true, 110, "assets/textures/blocks/dirt_tilled.png", "assets/textures/blocks/dirt.png", "assets/textures/blocks/dirt.png", SoundGroup.SOIL, 0.9f, false, DIRT, new Object[]{}, Tier.NONE),
     VOIDSTONE((byte) 5, (byte) 0, "Voidstone", false, 999, "assets/textures/blocks/voidstone.png", SoundGroup.HARD, 999999.0f, false, null, new Object[]{}, Tier.NONE),
@@ -140,10 +140,6 @@ public enum BlockData implements Craftable {
         return ORES[(int) (Math.random() * ORES.length)];
     }
 
-    public boolean isSolid() {
-        return this != AIR && !isPlant() && this != WATER;
-    }
-
     public void initRegions(TextureAtlas atlas) {
         if (atlas == null) return;
         if (topPath != null) this.topRegion = atlas.getRegion(topPath);
@@ -186,6 +182,14 @@ public enum BlockData implements Craftable {
 
     public boolean isTransparent() {
         return isTransparent;
+    }
+
+    public boolean isSolid() {
+        return this != AIR && !isPlant() && !isFluid();
+    }
+
+    public boolean isFluid() {
+        return this == WATER;
     }
 
     public String getTopPath() {

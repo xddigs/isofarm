@@ -1,11 +1,11 @@
 package com.isofarm.item;
 
-import com.isofarm.data.BlockData;
-import com.isofarm.data.Enchantment;
-import com.isofarm.data.Tier;
-import com.isofarm.data.ToolType;
+import com.isofarm.data.*;
 import com.isofarm.entity.Player;
+import com.isofarm.utils.HoveredCell;
 import com.isofarm.wrld.GameMaster;
+import com.isofarm.wrld.World;
+import org.joml.Vector3i;
 
 public class Bucket extends Tool {
     private final Tier tier;
@@ -26,6 +26,14 @@ public class Bucket extends Tool {
         return type;
     }
 
+    public void fill() {
+        this.type = BlockData.WATER;
+    }
+
+    public void empty() {
+        this.type = BlockData.AIR;
+    }
+
     public Tier getTier() {
         return tier;
     }
@@ -40,12 +48,29 @@ public class Bucket extends Tool {
     }
 
     public int getFrame() {
-        return type.equals(BlockData.WATER) ? 1 : 0;
+        return type.equals(BlockData.WATER) ? 8 : 7;
     }
 
     public void use(GameMaster gameMaster) {
         Player player = gameMaster.getPlayer();
+        Hit hoveredCell = HoveredCell.get(gameMaster);
+        World world = gameMaster.getWorld();
 
+        if (player == null || hoveredCell == null) return;
+        byte waterLevel = world.getWaterLevelAt(hoveredCell);
+        if (isFull()) {
+            if (waterLevel == 0 && world.getBlockTypeAt(hoveredCell) == BlockData.AIR.getId()) {
+                world.setWaterLevelAt(hoveredCell, (byte) 8);
+                empty();
+                gameMaster.rebuildChunkMeshAt(hoveredCell.x(), hoveredCell.z());
+            }
+        } else {
+            if (waterLevel > 0) {
+                world.setWaterLevelAt(hoveredCell, (byte) 0);
+                fill();
+                gameMaster.rebuildChunkMeshAt(hoveredCell);
+            }
+        }
     }
 
     @Override

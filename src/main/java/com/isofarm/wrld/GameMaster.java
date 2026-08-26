@@ -603,6 +603,10 @@ public class GameMaster {
         }
     }
 
+    public void rebuildChunkMeshAt(Hit pos) {
+        rebuildChunkMeshAt(pos.x(), pos.z());
+    }
+
     public List<Recipe> getRecipesFor(Craftable material) {
         return recipes.stream()
                 .filter(r -> r.ingredients().stream().anyMatch(

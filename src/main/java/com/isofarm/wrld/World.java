@@ -1,5 +1,6 @@
 package com.isofarm.wrld;
 
+import com.isofarm.data.Hit;
 import com.isofarm.item.Block;
 import com.isofarm.data.BlockData;
 import com.isofarm.data.Crop;
@@ -60,8 +61,8 @@ public class World {
         return new Block(data, x, y, z);
     }
 
-    public Block getBlockAt(Vector3f pos) {
-        return getBlockAt((int) pos.x(), (int) pos.y(), (int) pos.z());
+    public Block getBlockAt(Hit pos) {
+        return getBlockAt(pos.x(), pos.y(), pos.z());
     }
 
     public void addBlock(Block block) {
@@ -128,6 +129,10 @@ public class World {
         return chunk.getBlock(localX, y, localZ);
     }
 
+    public byte getBlockTypeAt(Hit pos) {
+        return getBlockTypeAt(pos.x(), pos.y(), pos.z());
+    }
+
     public void setBlockTypeAt(int x, int y, int z, byte blockId) {
         if (y < 0 || y >= Chunk.SIZE_Y) return;
         int chunkX = Math.floorDiv(x, Chunk.SIZE_X);
@@ -137,6 +142,10 @@ public class World {
         int localX = Math.floorMod(x, Chunk.SIZE_X);
         int localZ = Math.floorMod(z, Chunk.SIZE_Z);
         chunk.setBlock(localX, y, localZ, blockId);
+    }
+
+    public void setBlockTypeAt(Hit pos, byte blockId) {
+        setBlockTypeAt(pos.x(), pos.y(), pos.z(), blockId);
     }
 
     public byte getWaterLevelAt(int x, int y, int z) {
@@ -159,6 +168,10 @@ public class World {
         return chunk.getWaterLevel(localX, y, localZ);
     }
 
+    public byte getWaterLevelAt(Hit pos) {
+        return getWaterLevelAt(pos.x(), pos.y(), pos.z());
+    }
+
     public void setWaterLevelAt(int x, int y, int z, byte waterLevel) {
         if (y < 0 || y >= Chunk.SIZE_Y) {
             return;
@@ -173,6 +186,10 @@ public class World {
         int localZ = Math.floorMod(z, Chunk.SIZE_Z);
 
         chunk.setWaterLevel(localX, y, localZ, waterLevel);
+    }
+
+    public void setWaterLevelAt(Hit pos, byte waterLevel) {
+        setWaterLevelAt(pos.x(), pos.y(), pos.z(), waterLevel);
     }
 
     public long getBlockKey(int x, int y, int z) {
