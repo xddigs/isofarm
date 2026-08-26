@@ -7,28 +7,22 @@ import com.isofarm.entity.Player;
 import com.isofarm.wrld.GameMaster;
 
 public class Bucket extends Tool {
-    private final ToolType tool;
     private final Tier tier;
     private BlockData type;
 
-    public Bucket(BlockData blockData, ToolType tool, Tier tier) {
-        super((byte) 7, tier.getName() + " " + blockData.getName() + tool.getName(),
-                blockData.getValue(), tool, tier, tier.getDurability() + tool.getBaseDurability());
+    public Bucket(BlockData blockData, Tier tier) {
+        super((byte) 7, tier.getName() + " " + blockData.getName() + ToolType.BUCKET.getName(),
+                blockData.getValue(), ToolType.BUCKET, tier, tier.getDurability() + ToolType.BUCKET.getBaseDurability());
         this.type = blockData;
-        this.tool = tool;
         this.tier = tier;
     }
 
     public Bucket() {
-        this(BlockData.AIR, ToolType.BUCKET, Tier.WOOD);
+        this(BlockData.AIR, Tier.WOOD);
     }
 
     public BlockData getBlockType() {
         return type;
-    }
-
-    public ToolType getTool() {
-        return tool;
     }
 
     public Tier getTier() {
@@ -37,7 +31,7 @@ public class Bucket extends Tool {
 
     @Override
     public Item copy() {
-        return new Bucket(getBlockType(), getTool(), getTier());
+        return new Bucket(getBlockType(), getTier());
     }
 
     public boolean isFull() {
@@ -45,7 +39,7 @@ public class Bucket extends Tool {
     }
 
     public int getFrame() {
-        return !isFull() ? 2 : 1;
+        return type.equals(BlockData.WATER) ? 1 : 0;
     }
 
     public void use(GameMaster gameMaster) {
