@@ -332,6 +332,8 @@ public class GameRenderer {
         shadowMap.bind();
         glEnable(GL_DEPTH_TEST);
         glDepthMask(true);
+        glEnable(GL_POLYGON_OFFSET_FILL);
+        glPolygonOffset(4.0f, 8.0f);
         shadowShader.bind();
         shadowShader.setUniform("uLightSpaceMatrix", lightSpaceMatrix);
         chunkMeshes.forEach((chunk, mesh) -> {
@@ -368,6 +370,8 @@ public class GameRenderer {
             rm.getFlowerMesh().render();
         });
 
+        glDisable(GL_POLYGON_OFFSET_FILL);
+        glPolygonOffset(0.0f, 0.0f);
         shadowShader.unbind();
         shadowMap.unbind((int) gameMaster.getWindowWidth(), (int) gameMaster.getWindowHeight());
     }
