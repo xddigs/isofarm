@@ -420,23 +420,14 @@ public class Inventory {
             return false;
         }
 
-        if (a instanceof Seed s1 && b instanceof Seed s2) {
-            return s1.getType() == s2.getType();
-        }
+        return switch (a) {
+            case Seed s1 when b instanceof Seed s2 -> s1.getType() == s2.getType();
+            case Crop c1 when b instanceof Crop c2 -> c1.getCropType() == c2.getCropType();
+            case Block b1 when b instanceof Block b2 -> b1.getType() == b2.getType();
+            case Tool t1 when b instanceof Tool t2 -> t1.getId() == t2.getId() && t1.getTier() == t2.getTier();
+            default -> Objects.equals(a.getName(), b.getName());
+        };
 
-        if (a instanceof Crop c1 && b instanceof Crop c2) {
-            return c1.getCropType() == c2.getCropType();
-        }
-
-        if (a instanceof Block b1 && b instanceof Block b2) {
-            return b1.getType() == b2.getType();
-        }
-
-        if (a instanceof Tool t1 && b instanceof Tool t2) {
-            return t1.getId() == t2.getId();
-        }
-
-        return Objects.equals(a.getName(), b.getName());
     }
 
     private boolean isValidIndex(int index) {

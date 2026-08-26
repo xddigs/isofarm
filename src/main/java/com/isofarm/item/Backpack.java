@@ -19,7 +19,7 @@ public class Backpack extends Tool {
 
     @Override
     public Item copy() {
-        return new Backpack(ToolType.BACKPACK, Tier.LEATHER);
+        return new Backpack(this.getType(), this.getTier());
     }
 
     public boolean use(GameMaster gameMaster) {
