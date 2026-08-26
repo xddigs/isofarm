@@ -110,6 +110,18 @@ public abstract class Tool implements Item, Enchantable {
                 0, tier.getDurability());
     }
 
+    public Enchantment[] getEnchantments() {
+        return enchantments;
+    }
+
+    public void enchant(Enchantment enchantment) {
+        enchantments[enchantment.getType().ordinal()] = enchantment;
+    }
+
+    public void unenchant(Enchantment enchantment) {
+        enchantments[enchantment.getType().ordinal()] = null;
+    }
+
     public boolean canBeUsed() {
         return durability > 0;
     }
