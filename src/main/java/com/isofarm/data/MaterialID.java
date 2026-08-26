@@ -6,7 +6,7 @@ import com.isofarm.item.Item;
 @DataClass
 public enum MaterialID implements Craftable {
     STICK((byte) 0, "Stick", 1),
-    ORE((byte) 1, " Ore", 15),
+    RAW_ORE((byte) 1, " Raw Ore", 15),
     INGOT((byte) 2, " Ingot", 50);
 
     private final byte id;
