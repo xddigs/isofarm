@@ -33,6 +33,14 @@ public class Library implements Service<GameMaster> {
         registerDefault(itemR, () -> new MiningComponent(Tier.COPPER, MaterialID.INGOT));
         registerDefault(itemR, () -> new MiningComponent(Tier.IRON, MaterialID.RAW_ORE));
         registerDefault(itemR, () -> new MiningComponent(Tier.IRON, MaterialID.INGOT));
+        registerDefault(itemR, () -> new MiningComponent(Tier.STEEL, MaterialID.RAW_ORE));
+        registerDefault(itemR, () -> new MiningComponent(Tier.STEEL, MaterialID.INGOT));
+        registerDefault(itemR, () -> new MiningComponent(Tier.GOLD, MaterialID.RAW_ORE));
+        registerDefault(itemR, () -> new MiningComponent(Tier.GOLD, MaterialID.INGOT));
+        registerDefault(itemR, () -> new MiningComponent(Tier.PLATINUM, MaterialID.RAW_ORE));
+        registerDefault(itemR, () -> new MiningComponent(Tier.PLATINUM, MaterialID.INGOT));
+        registerDefault(itemR, () -> new MiningComponent(Tier.DIAMOND, MaterialID.RAW_ORE));
+        registerDefault(itemR, () -> new MiningComponent(Tier.DIAMOND, MaterialID.INGOT));
 
         registerDefault(itemR, () -> new CraftingKit(ToolType.CRAFTING_KIT, Tier.COPPER));
         registerDefault(itemR, () -> new Backpack(ToolType.BACKPACK, Tier.COPPER));
