@@ -241,20 +241,38 @@ public class ChunkMeshBuilder {
         if (worldY < 0) {
             return false;
         }
+
         if (worldY >= Chunk.SIZE_Y) {
             return true;
         }
+
         if (!world.isChunkLoadedAt(worldX, worldZ)) {
             return false;
         }
+
         byte neighborId = world.getBlockTypeAt(worldX, worldY, worldZ);
+
         if (neighborId == 0) {
             return true;
         }
+
         BlockData neighborData = BLOCK_LUT[neighborId & 0xFF];
+
         if (neighborData == null) {
             return true;
         }
+
+        if (currentBlock == BlockData.WATER) {
+            if (neighborData == BlockData.WATER) {
+                return false;
+            }
+            return neighborData.isTransparent();
+        }
+
+        if (neighborData == BlockData.WATER) {
+            return true;
+        }
+
         return neighborData.isTransparent() && neighborData != currentBlock;
     }
 
@@ -262,21 +280,39 @@ public class ChunkMeshBuilder {
         if (!world.isChunkLoadedAt(worldX, worldZ) || worldY < 0 || worldY >= Chunk.SIZE_Y) {
             return false;
         }
+
         byte neighborId = world.getBlockTypeAt(worldX, worldY, worldZ);
+
         if (neighborId == 0) {
             return true;
         }
+
         BlockData neighborData = BLOCK_LUT[neighborId & 0xFF];
         if (neighborData == null) {
             return true;
         }
-        if (neighborData == BlockData.TILLED_DIRT && currentBlock != BlockData.TILLED_DIRT) {
+
+        if (currentBlock == BlockData.WATER
+                && neighborData == BlockData.WATER) {
+            return false;
+        }
+
+        if (currentBlock == BlockData.WATER) {
+            return neighborData.isTransparent();
+        }
+
+        if (neighborData == BlockData.TILLED_DIRT
+                && currentBlock != BlockData.TILLED_DIRT) {
             return true;
         }
-        if (neighborData == BlockData.WATER && currentBlock != BlockData.WATER) {
+
+        if (neighborData == BlockData.WATER
+                && currentBlock != BlockData.WATER) {
             return true;
         }
-        return neighborData.isTransparent() && neighborData != currentBlock;
+
+        return neighborData.isTransparent()
+                && neighborData != currentBlock;
     }
 
     private static float getSideBottomY(World world, int worldX, int worldY, int worldZ, float currentBottomY, BlockData currentBlock) {
@@ -309,7 +345,7 @@ public class ChunkMeshBuilder {
             return 1.0f;
         }
         float totalHeight = topY - bottomY;
-        return Math.max(0.0f, Math.min(1.0f, 1.0f - (exposedHeight / totalHeight)));
+        return Math.clamp(1.0f - (exposedHeight / totalHeight), 0.0f, 1.0f);
     }
 
     private static int addQuadPos(float[] buf, int idx, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4) {
