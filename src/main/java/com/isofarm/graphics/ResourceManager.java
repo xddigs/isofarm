@@ -161,29 +161,38 @@ public class ResourceManager {
 
     private static int getMaterialFrame(Material material) {
         MaterialID materialID = material.getMaterialID();
-        if (materialID == MaterialID.STICK) {
-            return 0;
+        int row = materialID.getRow();
+        if (row == 1) {
+            int col = switch (materialID) {
+                case STICK -> 0;
+                case PAPER -> 1;
+                case LEATHER -> 2;
+                case BOOK -> 3;
+                default -> 0;
+            };
+            return (row * K.UI.ICON_MATERIAL_COLS) + col;
         }
 
-        int baseCol = switch (material.getTier()) {
-            case COPPER -> 0;
-            case IRON -> 2;
-            case STEEL -> 4;
-            case GOLD -> 6;
-            case PLATINUM -> 8;
-            case DIAMOND -> 10;
-            default -> 1;
-        };
+        if (material.getTier() != null) {
+            int baseCol = switch (material.getTier()) {
+                case COPPER -> 0;
+                case IRON -> 2;
+                case PLATINUM -> 4;
+                case GOLD -> 6;
+                case STEEL -> 8;
+                case DIAMOND -> 10;
+                default -> 0;
+            };
 
-        int column = materialID == MaterialID.INGOT
-                ? baseCol + 1
-                : baseCol;
-        return materialID.getRow() * K.UI.ICON_MATERIAL_COLS + column;
+            int column = (materialID == MaterialID.INGOT) ? baseCol + 1 : baseCol;
+            return (row * K.UI.ICON_MATERIAL_COLS) + column;
+        }
+        return 0;
     }
 
     public static int getItemFrame(Item item) {
         if (item instanceof Block block && block.getType() != null) {
-            return block.getType().getId() - 1;
+           return block.getType().getId() - 1;
         }
 
         if (item instanceof Produce produce && produce.getType() != null) {
@@ -199,17 +208,13 @@ public class ResourceManager {
         }
 
         if (item instanceof Tool tool) {
-            return tool.getId() - 1;
-        }
-
-        if (item instanceof Bucket bucket) {
-            return bucket.getId() - 1;
+            int row = tool.getRow();
+            int col = tool.getId();
+            return (row * K.UI.ICON_TOOL_COLS) + col;
         }
 
         if (item instanceof Material material) {
-            int col = getMaterialFrame(material);
-            int row = material.getMaterialID().getRow();
-            return row * K.UI.ICON_MATERIAL_COLS + col;
+            return getMaterialFrame(material);
         }
 
         return 0;

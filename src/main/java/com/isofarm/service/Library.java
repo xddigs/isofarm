@@ -39,7 +39,7 @@ public class Library implements Service<GameMaster> {
 
         Tier.forEach(tier -> {
             if (tier.equals(Tier.NONE) || tier.equals(Tier.LEATHER)) return;
-            registerDefault(itemR, () -> new Bucket(BlockData.WATER, ToolType.BUCKET, tier));
+            registerDefault(itemR, () -> new Bucket(BlockData.AIR, tier));
             registerDefault(itemR, () -> new Hoe(tier));
             registerDefault(itemR, () -> new Pickaxe(tier));
             registerDefault(itemR, () -> new Shovel(tier));

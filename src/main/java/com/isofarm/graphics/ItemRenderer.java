@@ -311,10 +311,8 @@ public class ItemRenderer {
                 .scale(ITEM_SCALE * animation.scaleX, -ITEM_SCALE * animation.scaleY, ITEM_SCALE * animation.scaleZ);
 
         int frameIndex = ResourceManager.getItemFrame(item);
-        frameIndex = Math.clamp(frameIndex, 0, spriteSheet.getTotalFrames() - 1);
         Vector4f uvBounds = spriteSheet.getUVBounds(frameIndex);
         int textureUnit = K.Render.PRIMARY_TEXTURE_UNIT;
-
         shader.bind();
         glActiveTexture(GL_TEXTURE0 + textureUnit);
         spriteSheet.bind();

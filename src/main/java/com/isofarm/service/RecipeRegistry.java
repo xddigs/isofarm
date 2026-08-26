@@ -17,7 +17,7 @@ public class RecipeRegistry implements Service<Recipe> {
         create(Tier.LEATHER).result(new Block(BlockData.OAK_WOOD), 4).with(BlockData.OAK_LOG, 1).add();
         create(Tier.LEATHER).result(new Material(Tier.NONE, MaterialID.STICK), 4).with(BlockData.OAK_WOOD, 1).add();
         create(Tier.LEATHER).result(new Material(Tier.NONE, MaterialID.BOOK), 2).with(MaterialID.LEATHER, 3).with(MaterialID.PAPER, 2).add();
-        create(Tier.LEATHER).result(new Bucket(BlockData.AIR, ToolType.BUCKET, Tier.WOOD), 1).with(BlockData.OAK_WOOD, 1).add();
+        create(Tier.LEATHER).result(new Bucket(BlockData.AIR, Tier.WOOD), 1).with(BlockData.OAK_WOOD, 1).add();
         registerToolSet(Tier.LEATHER, Tier.WOOD, BlockData.OAK_WOOD);
 
         Map<Tier, Tier> metalProgression = Map.of(
@@ -40,7 +40,7 @@ public class RecipeRegistry implements Service<Recipe> {
                     .result(new CraftingKit(ToolType.CRAFTING_KIT, toolTier), 1)
                     .with(mainMaterial, 3).with(MaterialID.LEATHER, 2).add();
             create(toolTier)
-                    .result(new Bucket(BlockData.AIR, ToolType.BUCKET, toolTier), 1)
+                    .result(new Bucket(BlockData.AIR, toolTier), 1)
                     .with(mainMaterial, 4).add();
         });
 

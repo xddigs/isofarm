@@ -43,6 +43,10 @@ public abstract class Tool implements Item {
         return value;
     }
 
+    public int getRow() {
+        return tier.getId();
+    }
+
     public float getBaseDamage() {
         return baseDamage;
     }
