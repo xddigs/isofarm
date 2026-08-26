@@ -35,7 +35,7 @@ public class GameRenderer {
     private float blurY;
 
     public void render(GameMaster gameMaster, ResourceManager rm,
-                       Map<Chunk, Mesh> chunkMeshes) {
+                       Map<Chunk, ChunkMeshBuilder.ChunkRenderMesh> chunkMeshes) {
         renderShadowPass(gameMaster, rm, chunkMeshes);
         CameraView camera = gameMaster.getActiveCamera();
         float windowWidth = gameMaster.getWindowWidth();
@@ -97,8 +97,9 @@ public class GameRenderer {
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        chunkMeshes.forEach((chunk, mesh) -> {
-            if (mesh != null && mesh.getIndicesCount() > 0) {
+
+        chunkMeshes.forEach((chunk, chunkMesh) -> {
+            if (chunkMesh != null && chunkMesh.solidMesh() != null && chunkMesh.solidMesh().getIndicesCount() > 0) {
                 float minX = chunk.getChunkX() * Chunk.SIZE_X;
                 float minY = 0;
                 float minZ = chunk.getChunkZ() * Chunk.SIZE_Z;
@@ -108,7 +109,7 @@ public class GameRenderer {
                 if (frustum.testAab(minX, minY, minZ, maxX, maxY, maxZ)) {
                     modelMatrix.identity().translate(minX, 0, minZ);
                     defaultShader.setUniform("uModel", modelMatrix);
-                    mesh.render();
+                    chunkMesh.solidMesh().render();
                 }
             }
         });
@@ -147,9 +148,7 @@ public class GameRenderer {
         gameMaster.getWorld().forEachPlant(plant -> {
             BlockData data = plant.data();
             TextureAtlas.TextureRegion region = data.getTopRegion();
-            if (region == null) {
-                return;
-            }
+            if (region == null) return;
 
             float renderX = plant.x() + 0.5f;
             float renderY = plant.y();
@@ -177,33 +176,49 @@ public class GameRenderer {
             glEnable(GL_CULL_FACE);
         });
 
+        if (blockAtlas != null) {
+            glActiveTexture(GL_TEXTURE0 + textureUnit);
+            blockAtlas.bind();
+            defaultShader.setUniform("uUseTexture", true);
+            defaultShader.setUniform("uUseFaceAtlas", false);
+        }
+
+        chunkMeshes.forEach((chunk, chunkMesh) -> {
+            if (chunkMesh != null && chunkMesh.waterMesh() != null && chunkMesh.waterMesh().getIndicesCount() > 0) {
+                float minX = chunk.getChunkX() * Chunk.SIZE_X;
+                float minY = 0;
+                float minZ = chunk.getChunkZ() * Chunk.SIZE_Z;
+                float maxX = minX + Chunk.SIZE_X;
+                float maxY = Chunk.SIZE_Y;
+                float maxZ = minZ + Chunk.SIZE_Z;
+                if (frustum.testAab(minX, minY, minZ, maxX, maxY, maxZ)) {
+                    modelMatrix.identity().translate(minX, 0, minZ);
+                    defaultShader.setUniform("uModel", modelMatrix);
+                    chunkMesh.waterMesh().render();
+                }
+            }
+        });
+
         renderDestroyOverlay(gameMaster.getGameInteraction(), defaultShader,
                 rm.getDestroyOverlayMesh(), rm.getDestroyTexture(), camera);
 
         gameMaster.getEntities().removeIf(e -> !e.isAlive());
         gameMaster.getEntities().forEach(entity -> {
-            if (entity instanceof Player && !gameMaster.isOrthographicCamera()) {
-                return;
-            }
+            if (entity instanceof Player && !gameMaster.isOrthographicCamera()) return;
             entity.render(gameMaster);
         });
 
         defaultShader.setUniform("uParticleAlpha", 1.0f);
 
-        glDisable(GL_DEPTH_TEST);
-        gameMaster.getParticles().render(defaultShader, rm.getSpriteMesh(),
-                gameMaster.getActiveCamera());
         glEnable(GL_DEPTH_TEST);
+        glDepthMask(false);
+        gameMaster.getParticles().render(defaultShader, rm.getSpriteMesh(), gameMaster.getActiveCamera());
+        glDepthMask(true);
 
         if (WeatherService.isRaining()) {
-            Vector3f rainTargetPos;
-            if (gameMaster.isOrthographicCamera() && player != null) {
-                rainTargetPos = new Vector3f(player.getPosition().x(),
-                        player.getPosition().y() + 10.0f,
-                        player.getPosition().z());
-            } else {
-                rainTargetPos = camera.getPosition();
-            }
+            Vector3f rainTargetPos = (gameMaster.isOrthographicCamera() && player != null)
+                    ? new Vector3f(player.getPosition().x(), player.getPosition().y() + 10.0f, player.getPosition().z())
+                    : camera.getPosition();
 
             gameMaster.getRainEngine().render(rm.getRainShader(),
                     camera.getViewMatrix(), camera.getProjectionMatrix(),
@@ -227,7 +242,6 @@ public class GameRenderer {
 
         if (hoveredCell != null) {
             maskFbo.bind();
-
             glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -324,7 +338,7 @@ public class GameRenderer {
     }
 
     private void renderShadowPass(GameMaster gameMaster, ResourceManager rm,
-                                  Map<Chunk, Mesh> chunkMeshes) {
+                                  Map<Chunk, ChunkMeshBuilder.ChunkRenderMesh> chunkMeshes) {
         ShadowMap shadowMap = gameMaster.getShadowMap();
         Shader shadowShader = rm.getShadowMapShader();
 
@@ -333,29 +347,29 @@ public class GameRenderer {
         glEnable(GL_DEPTH_TEST);
         glDepthMask(true);
         glEnable(GL_POLYGON_OFFSET_FILL);
-        glPolygonOffset(4.0f, 8.0f);
+        glPolygonOffset(-1.1f, -1.0f);
         shadowShader.bind();
         shadowShader.setUniform("uLightSpaceMatrix", lightSpaceMatrix);
-        chunkMeshes.forEach((chunk, mesh) -> {
-            if (mesh == null || mesh.getIndicesCount() <= 0) {
-                return;
-            }
+        chunkMeshes.forEach((chunk, chunkMesh) -> {
+            if (chunkMesh == null) return;
             float minX = chunk.getChunkX() * Chunk.SIZE_X;
             float minZ = chunk.getChunkZ() * Chunk.SIZE_Z;
             modelMatrix.identity().translate(minX, 0.0f, minZ);
             shadowShader.setUniform("uModel", modelMatrix);
-            mesh.render();
+
+            if (chunkMesh.solidMesh() != null && chunkMesh.solidMesh().getIndicesCount() > 0) {
+                chunkMesh.solidMesh().render();
+            }
+            if (chunkMesh.waterMesh() != null && chunkMesh.waterMesh().getIndicesCount() > 0) {
+                chunkMesh.waterMesh().render();
+            }
         });
 
         gameMaster.getWorld().forEach(block -> {
-            if (!(block instanceof Crop crop)) {
-                return;
-            }
-
+            if (!(block instanceof Crop crop)) return;
             float renderX = crop.getX() + 0.5f;
             float renderY = crop.getY() + K.World.SHORTER_BLOCK_HEIGHT;
             float renderZ = crop.getZ() + 0.5f;
-
             modelMatrix.identity().translate(renderX, renderY, renderZ);
             shadowShader.setUniform("uModel", modelMatrix);
             rm.getSpriteMesh().render();
@@ -406,16 +420,9 @@ public class GameRenderer {
         lightSpaceMatrix.set(lightProjection).mul(lightView);
     }
 
-    public void renderDestroyOverlay(GameInteraction interaction,
-                                     Shader shader,
-                                     Mesh blockMesh,
-                                     SpriteSheet destroyTexture,
-                                     CameraView camera) {
-
-        if (!interaction.isBreakingBlock() || destroyTexture == null) {
-            return;
-        }
-
+    public void renderDestroyOverlay(GameInteraction interaction, Shader shader, Mesh blockMesh,
+                                     SpriteSheet destroyTexture, CameraView camera) {
+        if (!interaction.isBreakingBlock() || destroyTexture == null) return;
         Vector3i pos = interaction.getBreakingBlockPos();
 
         glEnable(GL_BLEND);
@@ -445,9 +452,7 @@ public class GameRenderer {
         Vector4f uvBounds = new Vector4f(uv.x, uv.w, uv.z, uv.y);
         shader.setUniform("uUVBounds", uvBounds);
 
-        modelMatrix.identity()
-                .translate(pos.x, pos.y, pos.z)
-                .scale(1.0001f);
+        modelMatrix.identity().translate(pos.x, pos.y, pos.z).scale(1.0001f);
 
         shader.setUniform("uModel", modelMatrix);
         blockMesh.render();

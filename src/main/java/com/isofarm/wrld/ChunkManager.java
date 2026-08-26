@@ -3,11 +3,12 @@ package com.isofarm.wrld;
 import com.isofarm.data.BlockData;
 import com.isofarm.data.SoilPosition;
 import com.isofarm.graphics.ChunkMeshBuilder;
-import com.isofarm.graphics.Mesh;
 import com.isofarm.utils.Settings;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -16,10 +17,12 @@ public class ChunkManager {
     private static final float SOIL_GRASS_TIME = 10.0f;
     private final World world;
     private final WorldGenerator generator;
-    private final Map<Chunk, Mesh> chunkMeshes;
+    private final Map<Chunk, ChunkMeshBuilder.ChunkRenderMesh> chunkMeshes;
     private final Map<SoilPosition, Float> soilTimers;
     private final ExecutorService meshExecutor;
     private final ConcurrentLinkedQueue<MeshBuildResult> completedMeshes = new ConcurrentLinkedQueue<>();
+    private final Set<Long> buildingChunks = ConcurrentHashMap.newKeySet();
+
     private int lastPlayerChunkX = Integer.MAX_VALUE;
     private int lastPlayerChunkZ = Integer.MAX_VALUE;
 
@@ -51,10 +54,10 @@ public class ChunkManager {
         if (chunk == null) return;
 
         if (!chunkMeshes.containsKey(chunk)) {
-            ChunkMeshBuilder.MeshData data = ChunkMeshBuilder.buildMesh(world, chunk);
-            Mesh mesh = ChunkMeshBuilder.createMesh(data);
-            if (mesh != null) {
-                chunkMeshes.put(chunk, mesh);
+            ChunkMeshBuilder.ChunkMeshData data = ChunkMeshBuilder.buildMesh(world, chunk);
+            ChunkMeshBuilder.ChunkRenderMesh renderMesh = ChunkMeshBuilder.createMesh(data);
+            if (renderMesh != null) {
+                chunkMeshes.put(chunk, renderMesh);
             }
         }
     }
@@ -62,38 +65,36 @@ public class ChunkManager {
     public void updateLoadedChunks(int centerChunkX, int centerChunkZ) {
         int r = Settings.getRenderDistance();
         int unloadDist = r + Settings.getUnloadMargin();
+        int rSquared = r * r;
 
         chunkMeshes.entrySet().removeIf(entry -> {
             Chunk chunk = entry.getKey();
-
             int dx = Math.abs(chunk.getChunkX() - centerChunkX);
             int dz = Math.abs(chunk.getChunkZ() - centerChunkZ);
 
             if (dx > unloadDist || dz > unloadDist) {
-                Mesh mesh = entry.getValue();
-
-                if (mesh != null) {
-                    mesh.dispose();
+                ChunkMeshBuilder.ChunkRenderMesh renderMesh = entry.getValue();
+                if (renderMesh != null) {
+                    renderMesh.dispose();
                 }
 
-                world.getChunks().remove(world.get2DKey(chunk.getChunkX(), chunk.getChunkZ()));
+                long key = world.get2DKey(chunk.getChunkX(), chunk.getChunkZ());
+                world.getChunks().remove(key);
+                buildingChunks.remove(key);
                 cleanupSoilTimersForChunk(chunk);
                 return true;
             }
-
             return false;
         });
 
         for (int cx = centerChunkX - r; cx <= centerChunkX + r; cx++) {
             for (int cz = centerChunkZ - r; cz <= centerChunkZ + r; cz++) {
-
-                if ((cx - centerChunkX) * (cx - centerChunkX) + (cz - centerChunkZ) * (cz - centerChunkZ) > r * r) {
+                if ((cx - centerChunkX) * (cx - centerChunkX) + (cz - centerChunkZ) * (cz - centerChunkZ) > rSquared) {
                     continue;
                 }
 
-                Chunk chunk = world.getOrCreateChunk(cx, cz);
-
-                if (!chunkMeshes.containsKey(chunk)) {
+                long key = world.get2DKey(cx, cz);
+                if (!world.getChunks().containsKey(key)) {
                     generator.generateChunk(cx, cz);
                     updateGrass(cx, cz);
                 }
@@ -102,8 +103,7 @@ public class ChunkManager {
 
         for (int cx = centerChunkX - r; cx <= centerChunkX + r; cx++) {
             for (int cz = centerChunkZ - r; cz <= centerChunkZ + r; cz++) {
-
-                if ((cx - centerChunkX) * (cx - centerChunkX) + (cz - centerChunkZ) * (cz - centerChunkZ) > r * r) {
+                if ((cx - centerChunkX) * (cx - centerChunkX) + (cz - centerChunkZ) * (cz - centerChunkZ) > rSquared) {
                     continue;
                 }
 
@@ -118,10 +118,19 @@ public class ChunkManager {
     }
 
     private void queueMeshBuild(Chunk chunk) {
-        meshExecutor.submit(() -> {
-            ChunkMeshBuilder.MeshData data = ChunkMeshBuilder.buildMesh(world, chunk);
+        long key = world.get2DKey(chunk.getChunkX(), chunk.getChunkZ());
 
-            completedMeshes.add(new MeshBuildResult(chunk, data));
+        if (!buildingChunks.add(key)) {
+            return;
+        }
+
+        meshExecutor.submit(() -> {
+            try {
+                ChunkMeshBuilder.ChunkMeshData data = ChunkMeshBuilder.buildMesh(world, chunk);
+                completedMeshes.add(new MeshBuildResult(chunk, data));
+            } finally {
+                buildingChunks.remove(key);
+            }
         });
     }
 
@@ -129,30 +138,41 @@ public class ChunkManager {
         MeshBuildResult result;
         while ((result = completedMeshes.poll()) != null) {
             Chunk chunk = result.chunk();
-            if (!world.getChunks().containsKey(world.get2DKey(chunk.getChunkX(), chunk.getChunkZ()))) {
+            long key = world.get2DKey(chunk.getChunkX(), chunk.getChunkZ());
+
+            if (!world.getChunks().containsKey(key)) {
                 continue;
             }
 
-            Mesh oldMesh = chunkMeshes.get(chunk);
+            ChunkMeshBuilder.ChunkRenderMesh oldMesh = chunkMeshes.get(chunk);
             if (oldMesh != null) {
                 oldMesh.dispose();
             }
 
-            Mesh mesh = ChunkMeshBuilder.createMesh(result.data());
-            chunkMeshes.put(chunk, mesh);
+            ChunkMeshBuilder.ChunkRenderMesh renderMesh = ChunkMeshBuilder.createMesh(result.data());
+            if (renderMesh != null) {
+                chunkMeshes.put(chunk, renderMesh);
+            }
         }
-    }
-
-    public Map<Chunk, Mesh> getChunkMeshes() {
-        return chunkMeshes;
     }
 
     public void rebuildChunkMeshAt(int worldX, int worldZ) {
         int chunkX = Math.floorDiv(worldX, Chunk.SIZE_X);
         int chunkZ = Math.floorDiv(worldZ, Chunk.SIZE_Z);
 
-        Chunk chunk = world.getChunks().get(world.get2DKey(chunkX, chunkZ));
+        rebuildSingleChunk(chunkX, chunkZ);
 
+        int localX = Math.floorMod(worldX, Chunk.SIZE_X);
+        int localZ = Math.floorMod(worldZ, Chunk.SIZE_Z);
+
+        if (localX == 0) rebuildSingleChunk(chunkX - 1, chunkZ);
+        if (localX == Chunk.SIZE_X - 1) rebuildSingleChunk(chunkX + 1, chunkZ);
+        if (localZ == 0) rebuildSingleChunk(chunkX, chunkZ - 1);
+        if (localZ == Chunk.SIZE_Z - 1) rebuildSingleChunk(chunkX, chunkZ + 1);
+    }
+
+    private void rebuildSingleChunk(int cx, int cz) {
+        Chunk chunk = world.getChunks().get(world.get2DKey(cx, cz));
         if (chunk != null) {
             queueMeshBuild(chunk);
         }
@@ -179,7 +199,6 @@ public class ChunkManager {
                             startSoilTimer(worldX, y, worldZ);
                         }
                     }
-
                     break;
                 }
             }
@@ -205,6 +224,7 @@ public class ChunkManager {
             }
 
             if (!isExposedToAir(x, y, z)) {
+                iterator.remove();
                 continue;
             }
 
@@ -241,9 +261,7 @@ public class ChunkManager {
         for (int dx = -1; dx <= 1; dx++) {
             for (int dz = -1; dz <= 1; dz++) {
                 if (dx == 0 && dz == 0) continue;
-                int nx = x + dx;
-                int nz = z + dz;
-                if (world.getBlockTypeAt(nx, y, nz) == BlockData.WATER.getId()) {
+                if (world.getBlockTypeAt(x + dx, y, z + dz) == BlockData.WATER.getId()) {
                     return true;
                 }
             }
@@ -260,6 +278,10 @@ public class ChunkManager {
         soilTimers.keySet().removeIf(pos -> pos.x() >= minX && pos.x() < maxX && pos.z() >= minZ && pos.z() < maxZ);
     }
 
+    public Map<Chunk, ChunkMeshBuilder.ChunkRenderMesh> getChunkMeshes() {
+        return chunkMeshes;
+    }
+
     public void shutdown() {
         meshExecutor.shutdownNow();
     }
@@ -267,31 +289,17 @@ public class ChunkManager {
     public void dispose() {
         meshExecutor.shutdownNow();
         completedMeshes.clear();
-        chunkMeshes.values().forEach(Mesh::dispose);
+        buildingChunks.clear();
+        chunkMeshes.values().forEach(ChunkMeshBuilder.ChunkRenderMesh::dispose);
         chunkMeshes.clear();
         soilTimers.clear();
     }
 
-    public int getLastPlayerChunkX() {
-        return lastPlayerChunkX;
-    }
+    public int getLastPlayerChunkX() { return lastPlayerChunkX; }
+    public void setLastPlayerChunkX(int x) { this.lastPlayerChunkX = x; }
+    public int getLastPlayerChunkZ() { return lastPlayerChunkZ; }
+    public void setLastPlayerChunkZ(int z) { this.lastPlayerChunkZ = z; }
+    public WorldGenerator getGenerator() { return generator; }
 
-    public void setLastPlayerChunkX(int x) {
-        this.lastPlayerChunkX = x;
-    }
-
-    public int getLastPlayerChunkZ() {
-        return lastPlayerChunkZ;
-    }
-
-    public void setLastPlayerChunkZ(int z) {
-        this.lastPlayerChunkZ = z;
-    }
-
-    public WorldGenerator getGenerator() {
-        return generator;
-    }
-
-    private record MeshBuildResult(Chunk chunk, ChunkMeshBuilder.MeshData data) {
-    }
+    private record MeshBuildResult(Chunk chunk, ChunkMeshBuilder.ChunkMeshData data) {}
 }
