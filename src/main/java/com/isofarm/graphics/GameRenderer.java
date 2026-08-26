@@ -21,8 +21,6 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;
 
 public class GameRenderer {
-    private static final float WATER_ANIMATION_SPEED = 8.0f;
-
     private final Matrix4f modelMatrix = new Matrix4f();
     private final Matrix4f viewProjMatrix = new Matrix4f();
     private final FrustumIntersection frustum = new FrustumIntersection();
