@@ -12,12 +12,12 @@ public class WeatherService implements Service<WeatherType> {
     private final static Random random = new Random();
     private final RainEngine rainEngine;
     private final Camera camera;
-    private WeatherType weather;
+    private static WeatherType weather;
 
     public WeatherService(RainEngine rainEngine, Camera camera) {
         this.rainEngine = rainEngine;
         this.camera = camera;
-        this.weather = WeatherType.CLEAR;
+        weather = WeatherType.CLEAR;
     }
 
     public void setWeather(WeatherType weather) {
@@ -36,7 +36,7 @@ public class WeatherService implements Service<WeatherType> {
         return weather;
     }
 
-    public boolean isRaining() {
+    public static boolean isRaining() {
         return weather == WeatherType.RAIN ||
                 weather == WeatherType.HEAVY_STORM;
     }

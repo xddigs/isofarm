@@ -18,6 +18,7 @@ public class WorldGenerator {
 
     private static final int FLOWER_MAX_HEIGHT = BASE_HEIGHT + 10;
     private static final float FLOWER_CHANCE = 0.08f;
+    private static final float LARGE_TREE_CHANCE = 0.1f;
 
     private final World world;
 
@@ -84,7 +85,8 @@ public class WorldGenerator {
 
                 if (height < BASE_HEIGHT + 12 && chunkRandom.nextDouble() < 0.01 &&
                         canPlaceTree(heightMap, x, z)) {
-                    generateCompactTree(worldX, height, worldZ);
+                    generateCompactTree(worldX, height, worldZ,
+                            chunkRandom.nextFloat() < LARGE_TREE_CHANCE);
                 }
             }
         }
@@ -122,7 +124,8 @@ public class WorldGenerator {
         return true;
     }
 
-    private void generateCompactTree(int worldX, int groundY, int worldZ) {
+    private void generateCompactTree(int worldX, int groundY, int worldZ,
+                                     boolean isLargeTree) {
         int trunkHeight = 4 + chunkRandom.nextInt(2);
         int topY = groundY + trunkHeight;
 

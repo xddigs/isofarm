@@ -1,6 +1,7 @@
 package com.isofarm.service;
 
 import com.isofarm.data.Season;
+import com.isofarm.data.WeatherType;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,11 +121,19 @@ public class TimeService {
 
     public static Vector3f getSkyColor() {
         float time = hour + minute / 60.0f;
+        Vector3f cloudy = new Vector3f(0.48f, 0.48f, 0.48f);
         Vector3f night = new Vector3f(0.025f, 0.035f, 0.09f);
         Vector3f dawn = new Vector3f(0.85f, 0.40f, 0.22f);
         Vector3f day = new Vector3f(0.35f, 0.65f, 0.95f);
         Vector3f dusk = new Vector3f(0.70f, 0.25f, 0.30f);
         Vector3f result = new Vector3f();
+
+        boolean isRaining = WeatherService.isRaining();
+        if (isRaining) {
+            float t = smoothStep(5.0f, 7.0f, time);
+            cloudy.lerp(cloudy, t, result);
+            return result;
+        }
 
         if (time < 5.0f) {
             result.set(night);
