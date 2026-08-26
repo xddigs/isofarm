@@ -3,33 +3,27 @@ package com.isofarm.item;
 import com.isofarm.data.BlockData;
 import com.isofarm.data.Tier;
 import com.isofarm.data.ToolType;
+import com.isofarm.entity.Player;
 import com.isofarm.wrld.GameMaster;
 
-public class Bucket implements Craftable {
-    private final BlockData type;
+public class Bucket extends Tool {
     private final ToolType tool;
     private final Tier tier;
-    private final byte id;
-    private final String name;
-    private final int value;
-    private final int durability;
+    private BlockData type;
 
-    public Bucket(BlockData type, ToolType tool, Tier tier) {
-        this.type = type;
+    public Bucket(BlockData blockData, ToolType tool, Tier tier) {
+        super((byte) 7, tier.getName() + " " + blockData.getName() + tool.getName(),
+                blockData.getValue(), tool, tier, tier.getDurability() + tool.getBaseDurability());
+        this.type = blockData;
         this.tool = tool;
         this.tier = tier;
-
-        this.id = type.getId();
-        this.name = tier.getName() + " " + type.getName() + tool.getName();
-        this.value = type.getValue();
-        this.durability = tier.getDurability() + tool.getBaseDurability();
     }
 
     public Bucket() {
-        this(BlockData.WATER, ToolType.BUCKET, Tier.WOOD);
+        this(BlockData.AIR, ToolType.BUCKET, Tier.WOOD);
     }
 
-    public BlockData getType() {
+    public BlockData getBlockType() {
         return type;
     }
 
@@ -42,27 +36,8 @@ public class Bucket implements Craftable {
     }
 
     @Override
-    public byte getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public int getValue() {
-        return value;
-    }
-
-    @Override
     public Item copy() {
-        return new Bucket(getType(), getTool(), getTier());
-    }
-
-    public int getDurability() {
-        return durability;
+        return new Bucket(getBlockType(), getTool(), getTier());
     }
 
     public boolean isFull() {
@@ -70,10 +45,11 @@ public class Bucket implements Craftable {
     }
 
     public int getFrame() {
-        return isFull() ? 1 : 0;
+        return !isFull() ? 2 : 1;
     }
 
     public void use(GameMaster gameMaster) {
+        Player player = gameMaster.getPlayer();
 
     }
 }

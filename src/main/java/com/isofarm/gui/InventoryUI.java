@@ -371,10 +371,10 @@ public class InventoryUI extends UIElement {
 
     private void updateItemSprite(InventorySlotUI slotUI) {
         Item item = slotUI.getItem();
+
         if (item == null) {
             slotUI.setSpriteSheet(null);
-            slotUI.setSpriteColumn(0);
-            slotUI.setSpriteRow(0);
+            slotUI.setSpriteFrame(0);
             slotUI.setTooltipText(null);
             return;
         }
@@ -383,15 +383,13 @@ public class InventoryUI extends UIElement {
 
         if (spriteSheet == null) {
             slotUI.setSpriteSheet(null);
-            slotUI.setSpriteColumn(0);
-            slotUI.setSpriteRow(0);
+            slotUI.setSpriteFrame(0);
             slotUI.setTooltipText(null);
             return;
         }
 
         slotUI.setSpriteSheet(spriteSheet);
-        slotUI.setSpriteColumn(ResourceManager.getItemIconColumn(item));
-        slotUI.setSpriteRow(ResourceManager.getItemIconRow(item));
+        slotUI.setSpriteFrame(ResourceManager.getItemFrame(item));
         slotUI.setTooltipText(item.getName());
     }
 
@@ -831,10 +829,9 @@ public class InventoryUI extends UIElement {
         float iconSize = Settings.getScaledIcon();
         float x = Mouse.getX() - iconSize / 2f;
         float y = Mouse.getY() - iconSize / 2f;
-        int column = ResourceManager.getItemIconColumn(carriedItem);
-        int row = ResourceManager.getItemIconRow(carriedItem);
+        int frame = ResourceManager.getItemFrame(carriedItem);
 
-        GUI.drawSprite(sheet, column, row, x, y,
+        GUI.drawSprite(sheet, frame, x, y,
                 iconSize, iconSize, K.UI.UI_ITEM_TINT);
 
         if (carriedAmount > 1) {

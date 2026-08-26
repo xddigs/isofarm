@@ -159,10 +159,31 @@ public class ResourceManager {
         };
     }
 
-    public static int getItemIconColumn(Item item) {
+    private static int getMaterialFrame(Material material) {
+        MaterialID materialID = material.getMaterialID();
+        if (materialID == MaterialID.STICK) {
+            return 0;
+        }
+
+        int baseCol = switch (material.getTier()) {
+            case COPPER -> 0;
+            case IRON -> 2;
+            case STEEL -> 4;
+            case GOLD -> 6;
+            case PLATINUM -> 8;
+            case DIAMOND -> 10;
+            default -> 1;
+        };
+
+        int column = materialID == MaterialID.INGOT
+                ? baseCol + 1
+                : baseCol;
+        return materialID.getRow() * K.UI.ICON_MATERIAL_COLS + column;
+    }
+
+    public static int getItemFrame(Item item) {
         if (item instanceof Block block && block.getType() != null) {
-            int index = block.getType().getId() - 1;
-            return index % K.UI.ICON_BLOCK_COLS;
+            return block.getType().getId() - 1;
         }
 
         if (item instanceof Produce produce && produce.getType() != null) {
@@ -178,61 +199,20 @@ public class ResourceManager {
         }
 
         if (item instanceof Tool tool) {
-            return tool.getId();
+            return tool.getId() - 1;
+        }
+
+        if (item instanceof Bucket bucket) {
+            return bucket.getId() - 1;
         }
 
         if (item instanceof Material material) {
-            return getMaterialIconColumn(material.getTier(),
-                    material.getMaterialID());
+            int col = getMaterialFrame(material);
+            int row = material.getMaterialID().getRow();
+            return row * K.UI.ICON_MATERIAL_COLS + col;
         }
 
         return 0;
-    }
-
-    private static int getMaterialIconColumn(Tier tier, MaterialID materialID) {
-        if (materialID == MaterialID.STICK) return 0;
-        int baseCol = switch (tier) {
-            case COPPER -> 0;
-            case IRON -> 2;
-            case STEEL -> 4;
-            case GOLD -> 6;
-            case PLATINUM -> 8;
-            case DIAMOND -> 10;
-            default -> 1;
-        };
-        return materialID == MaterialID.INGOT ? baseCol + 1 : baseCol;
-    }
-
-    public static int getItemIconRow(Item item) {
-        if (item instanceof Block block && block.getType() != null) {
-            int index = block.getType().getId() - 1;
-            return index / K.UI.ICON_BLOCK_COLS;
-        }
-
-        if (item instanceof Tool tool) {
-            int index = tool.getTier().getId();
-            return index / K.UI.ICON_TOOL_COLS;
-        }
-
-        return 0;
-    }
-
-    public static int getItemIconFrame(Item item) {
-        if (item instanceof Block block && block.getType() != null) {
-            return block.getType().getId() - 1;
-        }
-
-        if (item instanceof Material material) {
-            return getMaterialIconColumn(material.getTier(), material.getMaterialID());
-        }
-
-        if (item instanceof Tool tool) {
-            int col = getItemIconColumn(tool);
-            int row = getItemIconRow(tool);
-            return row * K.UI.ICON_TOOL_COLS + col;
-        }
-
-        return getItemIconColumn(item);
     }
 
     public Shader getShader(String name) {

@@ -192,6 +192,13 @@ public class GUI {
         spriteSheet.unbind();
     }
 
+    public static void drawSprite(SpriteSheet spriteSheet, int frame,
+                                  float x, float y, float width, float height, Vector4f tint) {
+        Vector4f uv = spriteSheet.getUVBounds(frame);
+        drawSprite(spriteSheet, frame % spriteSheet.getCols(),
+                frame / spriteSheet.getCols(), x, y, width, height, tint);
+    }
+
     public static void drawString(String text, float x, float y,
                                   UIFont font, Vector4f color) {
         drawString(text, x, y, font, color, 1.0f);

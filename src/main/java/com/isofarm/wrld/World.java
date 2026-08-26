@@ -4,6 +4,7 @@ import com.isofarm.item.Block;
 import com.isofarm.data.BlockData;
 import com.isofarm.data.Crop;
 import com.isofarm.pathfinding.GridPos;
+import org.joml.Vector3f;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,6 +58,10 @@ public class World {
         }
 
         return new Block(data, x, y, z);
+    }
+
+    public Block getBlockAt(Vector3f pos) {
+        return getBlockAt((int) pos.x(), (int) pos.y(), (int) pos.z());
     }
 
     public void addBlock(Block block) {

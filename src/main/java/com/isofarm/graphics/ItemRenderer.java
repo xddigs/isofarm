@@ -2,7 +2,6 @@ package com.isofarm.graphics;
 
 import com.isofarm.entity.WorldItem;
 import com.isofarm.input.CameraController;
-import com.isofarm.item.Block;
 import com.isofarm.item.Item;
 import com.isofarm.item.Tool;
 import com.isofarm.utils.K;
@@ -247,7 +246,7 @@ public class ItemRenderer {
                 .rotateY((float) Math.toRadians(worldItem.getRotation()))
                 .rotateZ((float) Math.toRadians(180.0f)).scale(scale, scale, scale);
 
-        int frameIndex = ResourceManager.getItemIconFrame(item);
+        int frameIndex = ResourceManager.getItemFrame(item);
         frameIndex = Math.clamp(frameIndex, 0, spriteSheet.getTotalFrames() - 1);
         Vector4f uvBounds = spriteSheet.getUVBounds(frameIndex);
         int textureUnit = K.Render.PRIMARY_TEXTURE_UNIT;
@@ -311,7 +310,7 @@ public class ItemRenderer {
                 .rotateZ((float) Math.toRadians(rotateZ + animation.rotateZ))
                 .scale(ITEM_SCALE * animation.scaleX, -ITEM_SCALE * animation.scaleY, ITEM_SCALE * animation.scaleZ);
 
-        int frameIndex = ResourceManager.getItemIconFrame(item);
+        int frameIndex = ResourceManager.getItemFrame(item);
         frameIndex = Math.clamp(frameIndex, 0, spriteSheet.getTotalFrames() - 1);
         Vector4f uvBounds = spriteSheet.getUVBounds(frameIndex);
         int textureUnit = K.Render.PRIMARY_TEXTURE_UNIT;

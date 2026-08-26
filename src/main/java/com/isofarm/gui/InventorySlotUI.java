@@ -16,8 +16,7 @@ public class InventorySlotUI extends UIElement {
     private InventorySlot slot;
     private InventorySlot backpackSlot;
     private SpriteSheet spriteSheet;
-    private int spriteCol;
-    private int spriteRow;
+    private int spriteFrame;
     private UIFont countFont = GUI.getNormalFont();
     private boolean selected;
     private boolean hovered;
@@ -119,7 +118,7 @@ public class InventorySlotUI extends UIElement {
         float x = Math.round(getAbsoluteX() + (getAbsoluteWidth() - renderWidth) * 0.5f);
         float y = Math.round(getAbsoluteY() + (getAbsoluteHeight() - renderHeight) * 0.5f);
 
-        GUI.drawSprite(spriteSheet, spriteCol, spriteRow, x, y, renderWidth, renderHeight,
+        GUI.drawSprite(spriteSheet, spriteFrame, x, y, renderWidth, renderHeight,
                 new Vector4f(K.UI.UI_ITEM_TINT.x, K.UI.UI_ITEM_TINT.y, K.UI.UI_ITEM_TINT.z,
                         K.UI.UI_ITEM_TINT.w * getWorldOpacity()));
 
@@ -230,20 +229,12 @@ public class InventorySlotUI extends UIElement {
         this.spriteSheet = spriteSheet;
     }
 
-    public int getSpriteCol() {
-        return spriteCol;
+    public int getSpriteFrame() {
+        return spriteFrame;
     }
 
-    public void setSpriteColumn(int spriteFrame) {
-        this.spriteCol = Math.max(0, spriteFrame);
-    }
-
-    public int getSpriteRow() {
-        return spriteRow;
-    }
-
-    public void setSpriteRow(int spriteRow) {
-        this.spriteRow = Math.max(0, spriteRow);
+    public void setSpriteFrame(int spriteFrame) {
+        this.spriteFrame = Math.max(0, spriteFrame);
     }
 
     public boolean isSelected() {

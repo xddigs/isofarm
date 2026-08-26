@@ -9,8 +9,10 @@ public class StartingKit extends Kit {
                 new Backpack(),
                 new CraftingKit(),
                 new Bucket(),
+                new Block(BlockData.DIRT),
                 new Material(Tier.NONE, MaterialID.STICK),
-                new MiningComponent(Tier.DIAMOND, MaterialID.RAW_ORE)
+                new MiningComponent(Tier.DIAMOND, MaterialID.RAW_ORE),
+                new Material(Tier.NONE, MaterialID.LEATHER)
         });
     }
 }

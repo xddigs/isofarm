@@ -5,8 +5,8 @@ import com.isofarm.item.Item;
 
 @DataClass
 public enum MaterialID implements Craftable {
-    RAW_ORE((byte) 1, (byte) 0, " Raw Ore", 15),
-    INGOT((byte) 2, (byte) 0, " Ingot", 50),
+    RAW_ORE((byte) 0, (byte) 0, " Raw Ore", 15),
+    INGOT((byte) 1, (byte) 0, " Ingot", 50),
     STICK((byte) 0, (byte) 1, "Stick", 1),
     PAPER((byte) 1, (byte) 1, "Paper", 10),
     LEATHER((byte) 2, (byte) 1, "Leather", 40),
