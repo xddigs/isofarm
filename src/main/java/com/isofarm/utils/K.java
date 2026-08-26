@@ -141,12 +141,12 @@ public final class K {
         public static final String POTATO_TEXTURE = "assets/crops/potato_crop.png";
         public static final String BEETROOT_TEXTURE = "assets/crops/beetroot_crop.png";
 
-        public static final String SEED_ICONS = "assets/icons/seed_icons.png";
-        public static final String CROP_ICONS = "assets/icons/crop_icons.png";
-        public static final String TOOL_ICONS = "assets/icons/tool_icons.png";
-        public static final String BLOCK_ICONS = "assets/icons/block_icons.png";
-        public static final String MATERIAL_ICONS = "assets/icons/material_icons.png";
-        public static final String INVENTORY_ICONS = "assets/icons/inventory_icons.png";
+        public static final String SEED_ICONS = "assets/gui/seed_icons.png";
+        public static final String CROP_ICONS = "assets/gui/crop_icons.png";
+        public static final String TOOL_ICONS = "assets/gui/tool_icons.png";
+        public static final String BLOCK_ICONS = "assets/gui/block_icons.png";
+        public static final String MATERIAL_ICONS = "assets/gui/material_icons.png";
+        public static final String INVENTORY_ICONS = "assets/gui/inventory_icons.png";
         public static final String PLAYER_SPRITESHEET = "assets/sprites/gb.png";
         public static final String WATER = "assets/textures/blocks/water.png";
         public static final String DESTROY_STAGES = "assets/textures/blocks/destroy.png";

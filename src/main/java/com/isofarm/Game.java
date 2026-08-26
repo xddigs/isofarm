@@ -106,7 +106,7 @@ public class Game {
 
             int initialSize = 16;
             for (int i = 0; i < pixels.length; i++) {
-                pixels[i] = loadIcon(icons, i, "/assets/icons/iconx" + initialSize + ".png", stack);
+                pixels[i] = loadIcon(icons, i, "/assets/gui/iconx" + initialSize + ".png", stack);
                 initialSize *= 2;
             }
             glfwSetWindowIcon(window, icons);
