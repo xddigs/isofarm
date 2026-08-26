@@ -44,7 +44,9 @@ public enum BlockData implements Craftable {
     WATER((byte) 127, (byte) -1, "Water", false, 80, "assets/textures/blocks/water.png", SoundGroup.WATER, 0.0f, true, new MaterialID[]{}, Tier.NONE);
 
     private static final BlockData[] BY_ID = createById();
-    public static final BlockData[] ORES = {COPPER_ORE, IRON_ORE};
+    public static final BlockData[] ORES = {
+            COPPER_ORE, IRON_ORE, STEEL_ORE, GOLD_ORE, PLATINUM_ORE, DIAMOND_ORE
+    };
     public static final BlockData[] PLANTS = {
             BLUE_FLOWER, BRIGHT_FLOWER, GHOSTFLOWER, LILLY,
             RED_MUSHROOM, ROSE, ROSE_SHORT, ROSEBUSH, ROSES,
