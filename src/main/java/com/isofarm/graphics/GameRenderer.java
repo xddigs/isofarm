@@ -5,7 +5,6 @@ import com.isofarm.data.Crop;
 import com.isofarm.data.Hit;
 import com.isofarm.entity.Player;
 import com.isofarm.input.GameInteraction;
-import com.isofarm.item.Water;
 import com.isofarm.service.TimeService;
 import com.isofarm.service.WeatherService;
 import com.isofarm.utils.HoveredCell;
@@ -18,7 +17,6 @@ import org.joml.*;
 import java.lang.Math;
 import java.util.Map;
 
-import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;
 
@@ -142,7 +140,9 @@ public class GameRenderer {
 
             modelMatrix.identity().translate(renderX, renderY, renderZ);
             defaultShader.setUniform("uModel", modelMatrix);
+            defaultShader.setUniform("uEnableShadows", false);
             rm.getSpriteMesh().render();
+            defaultShader.setUniform("uEnableShadows", Settings.doEnableShadows());
             sheet.unbind();
         });
 
@@ -173,7 +173,9 @@ public class GameRenderer {
             glDisable(GL_CULL_FACE);
             glActiveTexture(GL_TEXTURE0 + K.Render.PRIMARY_TEXTURE_UNIT);
             rm.getBlocksAtlas().bind();
+            defaultShader.setUniform("uAmbientIntensity", 1.0f);
             rm.getFlowerMesh().render();
+            defaultShader.setUniform("uAmbientIntensity", lighting.getAmbientIntensity());
             glEnable(GL_CULL_FACE);
         });
 

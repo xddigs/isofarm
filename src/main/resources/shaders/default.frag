@@ -55,7 +55,7 @@ void main() {
 
     if (uUseTexture) {
         texColor = texture(uTexture, vTexCoord);
-        if (texColor.a < 0.1) {
+        if (texColor.a < 0.01) {
             discard;
         }
     }
@@ -66,6 +66,10 @@ void main() {
     }
 
     vec3 normal = normalize(vNormal);
+    if (!gl_FrontFacing) {
+        normal = -normal;
+    }
+
     vec3 lightDir = normalize(-uLightDirection);
     float diffuse = max(dot(normal, lightDir), 0.0);
 
