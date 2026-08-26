@@ -46,7 +46,8 @@ public class ChunkMeshBuilder {
                     int worldX = chunkX * Chunk.SIZE_X + x;
                     int worldZ = chunkZ * Chunk.SIZE_Z + z;
                     float bottomY = (float) y;
-                    float topY = (data == BlockData.TILLED_DIRT) ? (float) y + TILLED_HEIGHT : (float) y + 1.0f;
+                    float topY = (data.equals(BlockData.TILLED_DIRT) || data.equals(BlockData.WATER)) ?
+                            (float) y + TILLED_HEIGHT : (float) y + 1.0f;
 
                     boolean renderFace = shouldRenderFace(world, worldX, y + 1, worldZ, data);
                     float aboveBottomY = getBlockBottomY(world, worldX, y + 1, worldZ);
@@ -157,7 +158,7 @@ public class ChunkMeshBuilder {
     }
 
     private static float getBlockTopY(BlockData data, float y) {
-        return (data == BlockData.TILLED_DIRT) ? y + TILLED_HEIGHT : y + 1.0f;
+        return (data.equals(BlockData.TILLED_DIRT) || data.equals(BlockData.WATER)) ? y + TILLED_HEIGHT : y + 1.0f;
     }
 
     private static float getBlockBottomY(World world, int worldX, int worldY, int worldZ) {
@@ -196,6 +197,7 @@ public class ChunkMeshBuilder {
         BlockData neighborData = BLOCK_LUT[neighborId & 0xFF];
         if (neighborData == null) return true;
         if (neighborData == BlockData.TILLED_DIRT && currentBlock != BlockData.TILLED_DIRT) return true;
+        if (neighborData == BlockData.WATER && currentBlock != BlockData.WATER) return true;
         return neighborData.isTransparent() && neighborData != currentBlock;
     }
 
@@ -206,6 +208,7 @@ public class ChunkMeshBuilder {
         BlockData neighborData = BLOCK_LUT[neighborId & 0xFF];
         if (neighborData == null) return currentBottomY;
         if (neighborData == BlockData.TILLED_DIRT && currentBlock != BlockData.TILLED_DIRT) return currentBottomY + TILLED_HEIGHT;
+        if (neighborData == BlockData.WATER && currentBlock != BlockData.WATER) return currentBottomY + TILLED_HEIGHT;
         return currentBottomY;
     }
 

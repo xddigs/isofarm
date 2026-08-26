@@ -238,6 +238,16 @@ public class ChunkManager {
     }
 
     private boolean hasWaterNearby(int x, int y, int z) {
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dz = -1; dz <= 1; dz++) {
+                if (dx == 0 && dz == 0) continue;
+                int nx = x + dx;
+                int nz = z + dz;
+                if (world.getBlockTypeAt(nx, y, nz) == BlockData.WATER.getId()) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
