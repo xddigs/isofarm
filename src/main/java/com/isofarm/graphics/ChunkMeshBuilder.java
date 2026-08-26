@@ -41,6 +41,7 @@ public class ChunkMeshBuilder {
 
                     BlockData data = BLOCK_LUT[blockId & 0xFF];
                     if (data == null) continue;
+                    if (data.isPlant()) continue;
 
                     int worldX = chunkX * Chunk.SIZE_X + x;
                     int worldZ = chunkZ * Chunk.SIZE_Z + z;

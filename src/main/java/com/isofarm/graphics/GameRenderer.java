@@ -354,13 +354,20 @@ public class GameRenderer {
                 renderY = crop.getY() + K.World.SHORTER_BLOCK_HEIGHT;
                 renderZ = crop.getZ() + 0.5f;
                 isRenderableSprite = true;
+
+                modelMatrix.identity().translate(renderX, renderY, renderZ);
+                shadowShader.setUniform("uModel", modelMatrix);
+                rm.getSpriteMesh().render();
             } else {
                 BlockData data = BlockData.fromId(block.getId());
-                if (data != null && data.isTransparent() && data != BlockData.AIR) {
+                if (data != null && data.isPlant()) {
                     renderX = block.getX() + 0.5f;
                     renderY = block.getY();
                     renderZ = block.getZ() + 0.5f;
-                    isRenderableSprite = true;
+
+                    modelMatrix.identity().translate(renderX, renderY, renderZ);
+                    shadowShader.setUniform("uModel", modelMatrix);
+                    rm.getFlowerMesh().render();
                 }
             }
 
