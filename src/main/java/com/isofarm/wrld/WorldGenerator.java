@@ -17,7 +17,7 @@ public class WorldGenerator {
     private static final float ORE_CHANCE = 0.015f;
 
     private static final int FLOWER_MAX_HEIGHT = BASE_HEIGHT + 10;
-    private static final float FLOWER_CHANCE = 0.04f;
+    private static final float FLOWER_CHANCE = 0.08f;
 
     private final World world;
 
