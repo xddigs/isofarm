@@ -52,15 +52,19 @@ public class ItemRenderer {
     }
 
     public void playAttackAnimation() {
+        if (currentAnimation == ActionAnimation.ATTACK ||
+                currentAnimation == ActionAnimation.BREAK) return;
         startAnimation(ActionAnimation.ATTACK);
     }
 
     public void playBreakAnimation() {
-        if (currentAnimation == ActionAnimation.BREAK) return;
+        if (currentAnimation == ActionAnimation.BREAK ||
+                currentAnimation == ActionAnimation.ATTACK) return;
         startAnimation(ActionAnimation.BREAK);
     }
 
     public void playInteractAnimation() {
+        if (currentAnimation == ActionAnimation.INTERACT) return;
         startAnimation(ActionAnimation.INTERACT);
     }
 

@@ -14,7 +14,7 @@ import java.util.List;
 public enum BlockData implements Craftable {
     AIR((byte) 0, (byte) 0, "Empty", false, 0, null, null, null, SoundGroup.SILENT, 0f, true, new MaterialID[]{}, Tier.NONE),
     DIRT((byte) 1, (byte) 0, "Dirt", true, 100, "assets/textures/blocks/dirt.png", SoundGroup.SOIL, 0.9f, false, new MaterialID[]{}, Tier.NONE),
-    GRASS((byte) 2, (byte) 0, "Grass", true, 120, "assets/textures/blocks/grass.png", SoundGroup.SOIL, 1.0f, false, new Seed[]{new Seed(CropType.WHEAT)}, Tier.NONE),
+    GRASS((byte) 2, (byte) 0, "Grass", true, 120, "assets/textures/blocks/grass.png", SoundGroup.SOIL, 1.0f, false, new MaterialID[]{}, Tier.NONE),
     STONE((byte) 3, (byte) 0, "Stone", false, 150, "assets/textures/blocks/stone.png", SoundGroup.HARD, 6.0f, false, new MaterialID[]{}, Tier.NONE),
     TILLED_DIRT((byte) 4, (byte) 0, "Tilled Dirt", true, 110, "assets/textures/blocks/dirt_tilled.png", "assets/textures/blocks/dirt.png", "assets/textures/blocks/dirt.png", SoundGroup.SOIL, 0.9f, false, new MaterialID[]{}, Tier.NONE),
     VOIDSTONE((byte) 5, (byte) 0, "Voidstone", false, 999, "assets/textures/blocks/voidstone.png", SoundGroup.HARD, 999999.0f, false, new MaterialID[]{}, Tier.NONE),
@@ -38,8 +38,8 @@ public enum BlockData implements Craftable {
     ROSE_SHORT((byte) 25, (byte) 0, "Short Rose", false, 10, "assets/textures/blocks/rose_short.png", SoundGroup.SOIL, 0.0f, true, new MaterialID[]{}, Tier.NONE),
     ROSEBUSH((byte) 26, (byte) 0, "Rosebush", false, 20, "assets/textures/blocks/rosebush.png", SoundGroup.SOIL, 0.0f, true, new MaterialID[]{}, Tier.NONE),
     ROSES((byte) 27, (byte) 0, "Roses Cluster", false, 15, "assets/textures/blocks/roses.png", SoundGroup.SOIL, 0.0f, true, new MaterialID[]{}, Tier.NONE),
-    SHORT_GRASS((byte) 28, (byte) 0, "Short Grass", false, 5, "assets/textures/blocks/short_grass.png", SoundGroup.SOIL, 0.0f, true, new MaterialID[]{}, Tier.NONE),
-    TALL_GRASS((byte) 29, (byte) 0, "Tall Grass", false, 5, "assets/textures/blocks/tall_grass.png", SoundGroup.SOIL, 0.0f, true, new MaterialID[]{}, Tier.NONE),
+    SHORT_GRASS((byte) 28, (byte) 0, "Short Grass", false, 5, "assets/textures/blocks/short_grass.png", SoundGroup.SOIL, 0.01f, true, new Seed[]{new Seed(CropType.WHEAT)}, Tier.NONE),
+    TALL_GRASS((byte) 29, (byte) 0, "Tall Grass", false, 5, "assets/textures/blocks/tall_grass.png", SoundGroup.SOIL, 0.01f, true, new Seed[]{new Seed(CropType.WHEAT)}, Tier.NONE),
     TULIP((byte) 30, (byte) 0, "Tulip", false, 10, "assets/textures/blocks/tulip.png", SoundGroup.SOIL, 0.0f, true, new MaterialID[]{}, Tier.NONE),
     WATER((byte) 127, (byte) -1, "Water", false, 80, "assets/textures/blocks/water.png", SoundGroup.WATER, 0.0f, true, new MaterialID[]{}, Tier.NONE);
 

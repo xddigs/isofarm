@@ -138,7 +138,7 @@ public class InventorySlotUI extends UIElement {
         float progress = durability / maxDurability;
 
         float padding = Settings.scale(2.0f);
-        float barHeight = Settings.getScaledBorder();
+        float barHeight = Settings.getScaledBorder() - 2f;
         float barWidth = getAbsoluteWidth() - padding * 2.0f;
         float x = getAbsoluteX() + padding;
         float y = getAbsoluteY() + getAbsoluteHeight() - barHeight - padding;

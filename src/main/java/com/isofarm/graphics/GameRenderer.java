@@ -179,6 +179,7 @@ public class GameRenderer {
 
         renderDestroyOverlay(gameMaster.getGameInteraction(), defaultShader,
                 rm.getDestroyOverlayMesh(), rm.getDestroyTexture(), camera);
+        glDepthMask(true);
 
         gameMaster.getEntities().forEach(entity -> {
             if (entity instanceof Player && !gameMaster.isOrthographicCamera()) {
@@ -189,7 +190,6 @@ public class GameRenderer {
         });
 
         glEnable(GL_CULL_FACE);
-        glDepthMask(true);
         defaultShader.setUniform("uParticleAlpha", 1.0f);
         defaultShader.setUniform("uWaterAlpha", 1.0f);
 
@@ -419,23 +419,20 @@ public class GameRenderer {
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
         glEnable(GL_DEPTH_TEST);
         glDepthMask(false);
         glDisable(GL_CULL_FACE);
 
         glEnable(GL_POLYGON_OFFSET_FILL);
         glPolygonOffset(-1.0f, -1.0f);
-
         shader.bind();
+        glActiveTexture(GL_TEXTURE0 + K.Render.PRIMARY_TEXTURE_UNIT);
         destroyTexture.bind();
 
         shader.setUniform("uUseTexture", true);
         shader.setUniform("uUseFaceAtlas", false);
         shader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
-
         shader.setUniform("uParticleAlpha", 1.0f);
-
         shader.setUniform("uProjection", camera.getProjectionMatrix());
         shader.setUniform("uView", camera.getViewMatrix());
 
@@ -449,10 +446,11 @@ public class GameRenderer {
 
         modelMatrix.identity()
                 .translate(pos.x, pos.y, pos.z)
-                .scale(1.001f);
+                .scale(1.0001f);
 
         shader.setUniform("uModel", modelMatrix);
         blockMesh.render();
+
         destroyTexture.unbind();
         shader.unbind();
 
@@ -460,6 +458,7 @@ public class GameRenderer {
         glDepthMask(true);
         glEnable(GL_CULL_FACE);
         glDisable(GL_BLEND);
+        glActiveTexture(GL_TEXTURE0);
     }
 
     private void updateBlur(CameraView camera) {
