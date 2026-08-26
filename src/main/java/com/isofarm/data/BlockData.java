@@ -36,7 +36,8 @@ public enum BlockData implements Craftable {
     ROSES((byte) 27, (byte) 0, "Roses Cluster", false, 15, "assets/textures/blocks/roses.png", SoundGroup.SOIL, 0.0f, true, new MaterialID[]{}, Tier.NONE),
     SHORT_GRASS((byte) 28, (byte) 0, "Short Grass", false, 5, "assets/textures/blocks/short_grass.png", SoundGroup.SOIL, 0.0f, true, new MaterialID[]{}, Tier.NONE),
     TALL_GRASS((byte) 29, (byte) 0, "Tall Grass", false, 5, "assets/textures/blocks/tall_grass.png", SoundGroup.SOIL, 0.0f, true, new MaterialID[]{}, Tier.NONE),
-    TULIP((byte) 30, (byte) 0, "Tulip", false, 10, "assets/textures/blocks/tulip.png", SoundGroup.SOIL, 0.0f, true, new MaterialID[]{}, Tier.NONE);
+    TULIP((byte) 30, (byte) 0, "Tulip", false, 10, "assets/textures/blocks/tulip.png", SoundGroup.SOIL, 0.0f, true, new MaterialID[]{}, Tier.NONE),
+    WATER((byte) 999, (byte) -1, "Water", false, 80, "assets/textures/blocks/water.png", SoundGroup.WATER, 0.0f, true, new MaterialID[]{}, Tier.NONE);
 
     private static final BlockData[] BY_ID = createById();
     public static final BlockData[] ORES = {COPPER_ORE, IRON_ORE};

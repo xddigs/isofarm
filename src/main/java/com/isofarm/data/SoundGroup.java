@@ -18,6 +18,9 @@ public enum SoundGroup {
     ENTITY(new String[]{}, new String[]{"fx/entity/fall.ogg"}, new String[]{}, new String[]{"fx/entity/hurt.ogg"}, new String[]{}, new String[]{}, new String[]{}),
     RAIN(new String[]{}, new String[]{}, new String[]{}, new String[]{}, new String[]{"fx/ambient/rain.ogg"}, new String[]{}, new String[]{}),
     NATURE(new String[]{}, new String[]{}, new String[]{}, new String[]{}, new String[]{"fx/ambient/nature.ogg"}, new String[]{}, new String[]{}),
+    WATER(
+        new String[]{"fx/steps/steps_water_01.ogg", "fx/steps/steps_water_02.ogg", "fx/steps/steps_water_03.ogg", "fx/steps/steps_water_04.ogg"},
+        new String[]{}, new String[]{}, new String[]{}, new String[]{}, new String[]{}, new String[]{}),
     SILENT(new String[]{}, new String[]{}, new String[]{}, new String[]{}, new String[]{}, new String[]{}, new String[]{});
 
     private final String[] stepSounds;
