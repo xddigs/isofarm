@@ -6,298 +6,75 @@ import com.isofarm.item.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
 public class RecipeRegistry implements Service<Recipe> {
     private static final List<Recipe> recipes = new LinkedList<>();
 
     public static List<Recipe> init() {
-        create(Tier.COPPER)
-                .result(new MiningComponent(Tier.COPPER, MaterialID.INGOT), 1)
-                .with(new MiningComponent(Tier.COPPER, MaterialID.RAW_ORE), 1).add();
+        registerSmeltingRecipes();
+        create(Tier.LEATHER).result(new Block(BlockData.OAK_WOOD), 4).with(BlockData.OAK_LOG, 1).add();
+        create(Tier.LEATHER).result(new Material(Tier.NONE, MaterialID.STICK), 4).with(BlockData.OAK_WOOD, 1).add();
+        create(Tier.LEATHER).result(new Material(Tier.NONE, MaterialID.BOOK), 2).with(MaterialID.LEATHER, 3).with(MaterialID.PAPER, 2).add();
+        create(Tier.LEATHER).result(new Bucket(BlockData.AIR, ToolType.BUCKET, Tier.WOOD), 1).with(BlockData.OAK_WOOD, 1).add();
+        registerToolSet(Tier.LEATHER, Tier.WOOD, BlockData.OAK_WOOD);
 
-        create(Tier.COPPER)
-                .result(new MiningComponent(Tier.IRON, MaterialID.INGOT), 1)
-                .with(new MiningComponent(Tier.IRON, MaterialID.RAW_ORE), 1).add();
+        Map<Tier, Tier> metalProgression = Map.of(
+                Tier.COPPER, Tier.COPPER,
+                Tier.IRON, Tier.COPPER,
+                Tier.STEEL, Tier.IRON,
+                Tier.GOLD, Tier.STEEL,
+                Tier.PLATINUM, Tier.GOLD,
+                Tier.DIAMOND, Tier.PLATINUM
+        );
 
-        create(Tier.IRON)
-                .result(new MiningComponent(Tier.STEEL, MaterialID.INGOT), 1)
-                .with(new MiningComponent(Tier.STEEL, MaterialID.RAW_ORE), 1).add();
+        metalProgression.forEach((toolTier, requiredStationTier) -> {
+            Craftable mainMaterial = new MiningComponent(toolTier, MaterialID.INGOT);
+            registerToolSet(requiredStationTier, toolTier, mainMaterial);
+            create(requiredStationTier)
+                    .result(new Backpack(ToolType.BACKPACK, toolTier), 1)
+                    .with(mainMaterial, 3).with(MaterialID.LEATHER, 2).add();
 
-        create(Tier.STEEL)
-                .result(new MiningComponent(Tier.GOLD, MaterialID.INGOT), 1)
-                .with(new MiningComponent(Tier.GOLD, MaterialID.RAW_ORE), 1).add();
-
-        create(Tier.GOLD)
-                .result(new MiningComponent(Tier.PLATINUM, MaterialID.INGOT), 1)
-                .with(new MiningComponent(Tier.PLATINUM, MaterialID.RAW_ORE), 1).add();
-
-        create(Tier.PLATINUM)
-                .result(new MiningComponent(Tier.DIAMOND, MaterialID.INGOT), 1)
-                .with(new MiningComponent(Tier.DIAMOND, MaterialID.RAW_ORE), 1).add();
-
-
-        create(Tier.LEATHER)
-                .result(new Block(BlockData.OAK_WOOD), 4)
-                .with(BlockData.OAK_LOG, 1).add();
-
-        create(Tier.LEATHER)
-                .result(new Material(Tier.NONE, MaterialID.STICK), 4)
-                .with(BlockData.OAK_WOOD, 1).add();
-
-        create(Tier.LEATHER)
-                .result(new Material(Tier.NONE, MaterialID.BOOK), 2)
-                .with(MaterialID.LEATHER, 3)
-                .with(MaterialID.PAPER, 2).add();
-
-        create(Tier.LEATHER)
-                .result(new Hoe(Tier.WOOD), 1)
-                .with(BlockData.OAK_WOOD, 2)
-                .with(MaterialID.STICK, 3).add();
-
-        create(Tier.LEATHER)
-                .result(new Pickaxe(Tier.WOOD), 1)
-                .with(BlockData.OAK_WOOD, 3)
-                .with(MaterialID.STICK, 2).add();
-
-        create(Tier.LEATHER)
-                .result(new Shovel(Tier.WOOD), 1)
-                .with(BlockData.OAK_WOOD, 2)
-                .with(MaterialID.STICK, 2).add();
-
-        create(Tier.LEATHER)
-                .result(new Axe(Tier.WOOD), 1)
-                .with(BlockData.OAK_WOOD, 3)
-                .with(MaterialID.STICK, 2).add();
-
-        create(Tier.LEATHER)
-                .result(new Sword(Tier.WOOD), 1)
-                .with(BlockData.OAK_WOOD, 2)
-                .with(MaterialID.STICK, 1).add();
-
-        create(Tier.LEATHER)
-                .result(new Backpack(ToolType.BACKPACK, Tier.WOOD), 1)
-                .with(BlockData.OAK_WOOD, 4)
-                .with(MaterialID.STICK, 2).add();
-
-        create(Tier.LEATHER)
-                .result(new CraftingKit(ToolType.CRAFTING_KIT, Tier.WOOD), 1)
-                .with(BlockData.OAK_WOOD, 4)
-                .with(MaterialID.STICK, 4).add();
-
-
-        create(Tier.COPPER)
-                .result(new Hoe(Tier.COPPER), 1)
-                .with(new MiningComponent(Tier.COPPER, MaterialID.INGOT), 2)
-                .with(MaterialID.STICK, 3).add();
-
-        create(Tier.COPPER)
-                .result(new Pickaxe(Tier.COPPER), 1)
-                .with(new MiningComponent(Tier.COPPER, MaterialID.INGOT), 3)
-                .with(MaterialID.STICK, 2).add();
-
-        create(Tier.COPPER)
-                .result(new Shovel(Tier.COPPER), 1)
-                .with(new MiningComponent(Tier.COPPER, MaterialID.INGOT), 1)
-                .with(MaterialID.STICK, 2).add();
-
-        create(Tier.COPPER)
-                .result(new Axe(Tier.COPPER), 1)
-                .with(new MiningComponent(Tier.COPPER, MaterialID.INGOT), 3)
-                .with(MaterialID.STICK, 2).add();
-
-        create(Tier.COPPER)
-                .result(new Sword(Tier.COPPER), 1)
-                .with(new MiningComponent(Tier.COPPER, MaterialID.INGOT), 2)
-                .with(MaterialID.STICK, 1).add();
-
-        create(Tier.COPPER)
-                .result(new Backpack(ToolType.BACKPACK, Tier.COPPER), 1)
-                .with(new Material(Tier.COPPER, MaterialID.INGOT), 3)
-                .with(MaterialID.LEATHER, 2).add();
-
-        create(Tier.LEATHER)
-                .result(new CraftingKit(ToolType.CRAFTING_KIT, Tier.COPPER), 1)
-                .with(new Material(Tier.COPPER, MaterialID.RAW_ORE), 3)
-                .with(MaterialID.LEATHER, 2).add();
-
-
-        create(Tier.IRON)
-                .result(new Hoe(Tier.IRON), 1)
-                .with(new MiningComponent(Tier.IRON, MaterialID.INGOT), 2)
-                .with(MaterialID.STICK, 3).add();
-
-        create(Tier.IRON)
-                .result(new Pickaxe(Tier.IRON), 1)
-                .with(new MiningComponent(Tier.IRON, MaterialID.INGOT), 3)
-                .with(MaterialID.STICK, 2).add();
-
-        create(Tier.IRON)
-                .result(new Shovel(Tier.IRON), 1)
-                .with(new MiningComponent(Tier.IRON, MaterialID.INGOT), 1)
-                .with(MaterialID.STICK, 2).add();
-
-        create(Tier.IRON)
-                .result(new Axe(Tier.IRON), 1)
-                .with(new MiningComponent(Tier.IRON, MaterialID.INGOT), 3)
-                .with(MaterialID.STICK, 2).add();
-
-        create(Tier.IRON)
-                .result(new Sword(Tier.IRON), 1)
-                .with(new MiningComponent(Tier.IRON, MaterialID.INGOT), 2)
-                .with(MaterialID.STICK, 1).add();
-
-        create(Tier.COPPER)
-                .result(new Backpack(ToolType.BACKPACK, Tier.IRON), 1)
-                .with(new Material(Tier.IRON, MaterialID.INGOT), 3)
-                .with(MaterialID.LEATHER, 2).add();
-
-        create(Tier.IRON)
-                .result(new CraftingKit(ToolType.CRAFTING_KIT, Tier.IRON), 1)
-                .with(new MiningComponent(Tier.IRON, MaterialID.INGOT), 3)
-                .with(MaterialID.LEATHER, 2).add();
-
-
-        create(Tier.IRON)
-                .result(new Hoe(Tier.STEEL), 1)
-                .with(new MiningComponent(Tier.STEEL, MaterialID.INGOT), 2)
-                .with(MaterialID.STICK, 3).add();
-
-        create(Tier.IRON)
-                .result(new Pickaxe(Tier.STEEL), 1)
-                .with(new MiningComponent(Tier.STEEL, MaterialID.INGOT), 3)
-                .with(MaterialID.STICK, 2).add();
-
-        create(Tier.IRON)
-                .result(new Shovel(Tier.STEEL), 1)
-                .with(new MiningComponent(Tier.STEEL, MaterialID.INGOT), 1)
-                .with(MaterialID.STICK, 2).add();
-
-        create(Tier.IRON)
-                .result(new Axe(Tier.STEEL), 1)
-                .with(new MiningComponent(Tier.STEEL, MaterialID.INGOT), 3)
-                .with(MaterialID.STICK, 2).add();
-
-        create(Tier.IRON)
-                .result(new Sword(Tier.STEEL), 1)
-                .with(new MiningComponent(Tier.STEEL, MaterialID.INGOT), 2)
-                .with(MaterialID.STICK, 1).add();
-
-        create(Tier.IRON)
-                .result(new Backpack(ToolType.BACKPACK, Tier.STEEL), 1)
-                .with(new Material(Tier.STEEL, MaterialID.INGOT), 3)
-                .with(MaterialID.LEATHER, 2).add();
-
-        create(Tier.IRON)
-                .result(new CraftingKit(ToolType.CRAFTING_KIT, Tier.STEEL), 1)
-                .with(new MiningComponent(Tier.STEEL, MaterialID.INGOT), 3)
-                .with(MaterialID.LEATHER, 2).add();
-
-        create(Tier.STEEL)
-                .result(new Hoe(Tier.GOLD), 1)
-                .with(new MiningComponent(Tier.GOLD, MaterialID.INGOT), 2)
-                .with(MaterialID.STICK, 3).add();
-
-        create(Tier.STEEL)
-                .result(new Pickaxe(Tier.GOLD), 1)
-                .with(new MiningComponent(Tier.GOLD, MaterialID.INGOT), 3)
-                .with(MaterialID.STICK, 2).add();
-
-        create(Tier.STEEL)
-                .result(new Shovel(Tier.GOLD), 1)
-                .with(new MiningComponent(Tier.GOLD, MaterialID.INGOT), 1)
-                .with(MaterialID.STICK, 2).add();
-
-        create(Tier.STEEL)
-                .result(new Axe(Tier.GOLD), 1)
-                .with(new MiningComponent(Tier.GOLD, MaterialID.INGOT), 3)
-                .with(MaterialID.STICK, 2).add();
-
-        create(Tier.STEEL)
-                .result(new Sword(Tier.GOLD), 1)
-                .with(new MiningComponent(Tier.GOLD, MaterialID.INGOT), 2)
-                .with(MaterialID.STICK, 1).add();
-
-        create(Tier.STEEL)
-                .result(new Backpack(ToolType.BACKPACK, Tier.GOLD), 1)
-                .with(new Material(Tier.GOLD, MaterialID.INGOT), 3)
-                .with(MaterialID.LEATHER, 2).add();
-
-        create(Tier.STEEL)
-                .result(new CraftingKit(ToolType.CRAFTING_KIT, Tier.GOLD), 1)
-                .with(new MiningComponent(Tier.GOLD, MaterialID.INGOT), 3)
-                .with(MaterialID.LEATHER, 2).add();
-
-        create(Tier.GOLD)
-                .result(new Hoe(Tier.PLATINUM), 1)
-                .with(new MiningComponent(Tier.PLATINUM, MaterialID.INGOT), 2)
-                .with(MaterialID.STICK, 3).add();
-
-        create(Tier.GOLD)
-                .result(new Pickaxe(Tier.PLATINUM), 1)
-                .with(new MiningComponent(Tier.PLATINUM, MaterialID.INGOT), 3)
-                .with(MaterialID.STICK, 2).add();
-
-        create(Tier.GOLD)
-                .result(new Shovel(Tier.PLATINUM), 1)
-                .with(new MiningComponent(Tier.PLATINUM, MaterialID.INGOT), 1)
-                .with(MaterialID.STICK, 2).add();
-
-        create(Tier.GOLD)
-                .result(new Axe(Tier.PLATINUM), 1)
-                .with(new MiningComponent(Tier.PLATINUM, MaterialID.INGOT), 3)
-                .with(MaterialID.STICK, 2).add();
-
-        create(Tier.GOLD)
-                .result(new Sword(Tier.PLATINUM), 1)
-                .with(new MiningComponent(Tier.PLATINUM, MaterialID.INGOT), 2)
-                .with(MaterialID.STICK, 1).add();
-
-        create(Tier.GOLD)
-                .result(new Backpack(ToolType.BACKPACK, Tier.PLATINUM), 1)
-                .with(new Material(Tier.PLATINUM, MaterialID.INGOT), 3)
-                .with(MaterialID.LEATHER, 2).add();
-
-        create(Tier.GOLD)
-                .result(new CraftingKit(ToolType.CRAFTING_KIT, Tier.PLATINUM), 1)
-                .with(new MiningComponent(Tier.PLATINUM, MaterialID.INGOT), 3)
-                .with(MaterialID.LEATHER, 2).add();
-
-        create(Tier.PLATINUM)
-                .result(new Hoe(Tier.DIAMOND), 1)
-                .with(new MiningComponent(Tier.DIAMOND, MaterialID.INGOT), 2)
-                .with(MaterialID.STICK, 3).add();
-
-        create(Tier.PLATINUM)
-                .result(new Pickaxe(Tier.DIAMOND), 1)
-                .with(new MiningComponent(Tier.DIAMOND, MaterialID.INGOT), 3)
-                .with(MaterialID.STICK, 2).add();
-
-        create(Tier.PLATINUM)
-                .result(new Shovel(Tier.DIAMOND), 1)
-                .with(new MiningComponent(Tier.DIAMOND, MaterialID.INGOT), 1)
-                .with(MaterialID.STICK, 2).add();
-
-        create(Tier.PLATINUM)
-                .result(new Axe(Tier.DIAMOND), 1)
-                .with(new MiningComponent(Tier.DIAMOND, MaterialID.INGOT), 3)
-                .with(MaterialID.STICK, 2).add();
-
-        create(Tier.PLATINUM)
-                .result(new Sword(Tier.DIAMOND), 1)
-                .with(new MiningComponent(Tier.DIAMOND, MaterialID.INGOT), 2)
-                .with(MaterialID.STICK, 1).add();
-
-        create(Tier.PLATINUM)
-                .result(new Backpack(ToolType.BACKPACK, Tier.DIAMOND), 1)
-                .with(new Material(Tier.DIAMOND, MaterialID.INGOT), 3)
-                .with(MaterialID.LEATHER, 2).add();
-
-        create(Tier.PLATINUM)
-                .result(new CraftingKit(ToolType.CRAFTING_KIT, Tier.DIAMOND), 1)
-                .with(new MiningComponent(Tier.DIAMOND, MaterialID.INGOT), 3)
-                .with(MaterialID.LEATHER, 2).add();
+            create(requiredStationTier)
+                    .result(new CraftingKit(ToolType.CRAFTING_KIT, toolTier), 1)
+                    .with(mainMaterial, 3).with(MaterialID.LEATHER, 2).add();
+            create(toolTier)
+                    .result(new Bucket(BlockData.AIR, ToolType.BUCKET, toolTier), 1)
+                    .with(mainMaterial, 4).add();
+        });
 
         return recipes;
+    }
+
+    private static void registerToolSet(Tier stationTier, Tier itemTier, Craftable primaryMat) {
+        registerTool(stationTier, primaryMat, 2, 3, Hoe::new);
+        registerTool(stationTier, primaryMat, 3, 2, Pickaxe::new);
+        registerTool(stationTier, primaryMat, 1, 2, Shovel::new);
+        registerTool(stationTier, primaryMat, 3, 2, Axe::new);
+        registerTool(stationTier, primaryMat, 2, 1, Sword::new);
+    }
+
+    private static void registerTool(Tier stationTier, Craftable mat, int matAmount, int stickAmount,
+                                     Function<Tier, Item> constructor) {
+        create(stationTier)
+                .result(constructor.apply(getTierFromMaterial(mat)), 1)
+                .with(mat, matAmount)
+                .with(MaterialID.STICK, stickAmount)
+                .add();
+    }
+
+    private static Tier getTierFromMaterial(Craftable mat) {
+        return (mat instanceof MiningComponent mc) ? mc.getTier() : Tier.WOOD;
+    }
+
+    private static void registerSmeltingRecipes() {
+        Tier[] metalTiers = {Tier.COPPER, Tier.IRON, Tier.STEEL, Tier.GOLD, Tier.PLATINUM, Tier.DIAMOND};
+        for (Tier tier : metalTiers) {
+            create(tier)
+                .result(new MiningComponent(tier, MaterialID.INGOT), 1)
+                .with(new MiningComponent(tier, MaterialID.RAW_ORE), 1).add();
+        }
     }
 
     public static RecipeBuilder create(Tier tier) {

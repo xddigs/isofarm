@@ -20,86 +20,39 @@ public class Library implements Service<GameMaster> {
     private static final Logger log = LoggerFactory.getLogger(Library.class);
 
     public static void initItems(ItemRegistry itemR, Player player) {
-        registerDefault(itemR, Backpack::new);
-        registerDefault(itemR, CraftingKit::new);
-        registerDefault(itemR, Hoe::new);
-        registerDefault(itemR, Pickaxe::new);
-        registerDefault(itemR, Shovel::new);
-        registerDefault(itemR, Axe::new);
-        registerDefault(itemR, Sword::new);
-
-        registerDefault(itemR, () -> new MiningComponent(Tier.COPPER, MaterialID.RAW_ORE));
-        registerDefault(itemR, () -> new MiningComponent(Tier.COPPER, MaterialID.INGOT));
-        registerDefault(itemR, () -> new MiningComponent(Tier.IRON, MaterialID.RAW_ORE));
-        registerDefault(itemR, () -> new MiningComponent(Tier.IRON, MaterialID.INGOT));
-        registerDefault(itemR, () -> new MiningComponent(Tier.STEEL, MaterialID.RAW_ORE));
-        registerDefault(itemR, () -> new MiningComponent(Tier.STEEL, MaterialID.INGOT));
-        registerDefault(itemR, () -> new MiningComponent(Tier.GOLD, MaterialID.RAW_ORE));
-        registerDefault(itemR, () -> new MiningComponent(Tier.GOLD, MaterialID.INGOT));
-        registerDefault(itemR, () -> new MiningComponent(Tier.PLATINUM, MaterialID.RAW_ORE));
-        registerDefault(itemR, () -> new MiningComponent(Tier.PLATINUM, MaterialID.INGOT));
-        registerDefault(itemR, () -> new MiningComponent(Tier.DIAMOND, MaterialID.RAW_ORE));
-        registerDefault(itemR, () -> new MiningComponent(Tier.DIAMOND, MaterialID.INGOT));
-
         registerDefault(itemR, () -> new Material(Tier.NONE, MaterialID.STICK));
         registerDefault(itemR, () -> new Material(Tier.NONE, MaterialID.PAPER));
         registerDefault(itemR, () -> new Material(Tier.NONE, MaterialID.LEATHER));
         registerDefault(itemR, () -> new Material(Tier.NONE, MaterialID.BOOK));
 
-        registerDefault(itemR, () -> new CraftingKit(ToolType.CRAFTING_KIT, Tier.COPPER));
-        registerDefault(itemR, () -> new Backpack(ToolType.BACKPACK, Tier.COPPER));
-        registerDefault(itemR, () -> new Hoe(Tier.COPPER));
-        registerDefault(itemR, () -> new Pickaxe(Tier.COPPER));
-        registerDefault(itemR, () -> new Shovel(Tier.COPPER));
-        registerDefault(itemR, () -> new Axe(Tier.COPPER));
-        registerDefault(itemR, () -> new Sword(Tier.COPPER));
+        Tier.forEach(tier -> {
+            if (tier.equals(Tier.NONE) || tier.equals(Tier.LEATHER) || tier.equals(Tier.WOOD)) return;
+            registerDefault(itemR, () -> new MiningComponent(tier, MaterialID.RAW_ORE));
+            registerDefault(itemR, () -> new MiningComponent(tier, MaterialID.INGOT));
+        });
 
-        registerDefault(itemR, () -> new CraftingKit(ToolType.CRAFTING_KIT, Tier.IRON));
-        registerDefault(itemR, () -> new Backpack(ToolType.BACKPACK, Tier.IRON));
-        registerDefault(itemR, () -> new Hoe(Tier.IRON));
-        registerDefault(itemR, () -> new Pickaxe(Tier.IRON));
-        registerDefault(itemR, () -> new Shovel(Tier.IRON));
-        registerDefault(itemR, () -> new Axe(Tier.IRON));
-        registerDefault(itemR, () -> new Sword(Tier.IRON));
+        Tier.forEach(tier -> {
+            if (tier.equals(Tier.NONE) || tier.equals(Tier.WOOD)) return;
+            registerDefault(itemR, () -> new CraftingKit(ToolType.CRAFTING_KIT, tier));
+            registerDefault(itemR, () -> new Backpack(ToolType.BACKPACK, tier));
+        });
 
-        registerDefault(itemR, () -> new CraftingKit(ToolType.CRAFTING_KIT, Tier.STEEL));
-        registerDefault(itemR, () -> new Backpack(ToolType.BACKPACK, Tier.STEEL));
-        registerDefault(itemR, () -> new Hoe(Tier.STEEL));
-        registerDefault(itemR, () -> new Pickaxe(Tier.STEEL));
-        registerDefault(itemR, () -> new Shovel(Tier.STEEL));
-        registerDefault(itemR, () -> new Axe(Tier.STEEL));
-        registerDefault(itemR, () -> new Sword(Tier.STEEL));
+        Tier.forEach(tier -> {
+            if (tier.equals(Tier.NONE) || tier.equals(Tier.LEATHER)) return;
+            registerDefault(itemR, () -> new Bucket(BlockData.WATER, ToolType.BUCKET, tier));
+            registerDefault(itemR, () -> new Hoe(tier));
+            registerDefault(itemR, () -> new Pickaxe(tier));
+            registerDefault(itemR, () -> new Shovel(tier));
+            registerDefault(itemR, () -> new Axe(tier));
+            registerDefault(itemR, () -> new Sword(tier));
+        });
 
-        registerDefault(itemR, () -> new CraftingKit(ToolType.CRAFTING_KIT, Tier.GOLD));
-        registerDefault(itemR, () -> new Backpack(ToolType.BACKPACK, Tier.GOLD));
-        registerDefault(itemR, () -> new Hoe(Tier.GOLD));
-        registerDefault(itemR, () -> new Pickaxe(Tier.GOLD));
-        registerDefault(itemR, () -> new Shovel(Tier.GOLD));
-        registerDefault(itemR, () -> new Axe(Tier.GOLD));
-        registerDefault(itemR, () -> new Sword(Tier.GOLD));
-
-        registerDefault(itemR, () -> new CraftingKit(ToolType.CRAFTING_KIT, Tier.PLATINUM));
-        registerDefault(itemR, () -> new Backpack(ToolType.BACKPACK, Tier.PLATINUM));
-        registerDefault(itemR, () -> new Hoe(Tier.PLATINUM));
-        registerDefault(itemR, () -> new Pickaxe(Tier.PLATINUM));
-        registerDefault(itemR, () -> new Shovel(Tier.PLATINUM));
-        registerDefault(itemR, () -> new Axe(Tier.PLATINUM));
-        registerDefault(itemR, () -> new Sword(Tier.PLATINUM));
-
-        registerDefault(itemR, () -> new CraftingKit(ToolType.CRAFTING_KIT, Tier.DIAMOND));
-        registerDefault(itemR, () -> new Backpack(ToolType.BACKPACK, Tier.DIAMOND));
-        registerDefault(itemR, () -> new Hoe(Tier.DIAMOND));
-        registerDefault(itemR, () -> new Pickaxe(Tier.DIAMOND));
-        registerDefault(itemR, () -> new Shovel(Tier.DIAMOND));
-        registerDefault(itemR, () -> new Axe(Tier.DIAMOND));
-        registerDefault(itemR, () -> new Sword(Tier.DIAMOND));
-        registerDefault(itemR, Seed::new);
-
-        for (CropType type : new CropType[]{CropType.CARROT, CropType.POTATO, CropType.BEETROOT}) {
+        for (CropType type : new CropType[]{
+                CropType.WHEAT, CropType.CARROT,
+                CropType.POTATO, CropType.BEETROOT}) {
             registerDefault(itemR, () -> new Seed(type));
             registerDefault(itemR, () -> new Produce(type));
         }
-        registerDefault(itemR, () -> new Produce(CropType.WHEAT));
 
         for (BlockData block : BlockData.values()) {
             if (block.getId() > 0) {

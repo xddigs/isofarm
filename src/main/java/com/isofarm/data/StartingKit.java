@@ -7,7 +7,8 @@ public class StartingKit extends Kit {
     public StartingKit() {
         setItems(new Item[]{
                 new Backpack(),
-                new CraftingKit()
+                new CraftingKit(),
+                new Bucket()
         });
     }
 }
