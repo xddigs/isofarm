@@ -188,33 +188,7 @@ public class GameRenderer {
             entity.render(gameMaster);
         });
 
-        float totalTime = (float) glfwGetTime();
-        int currentFrame = (int) (totalTime * WATER_ANIMATION_SPEED) % rm.getWaterTexture().getTotalFrames();
-
-        Vector4f uvBounds = rm.getWaterTexture().getUVBounds(currentFrame);
-        glActiveTexture(GL_TEXTURE0 + K.Render.PRIMARY_TEXTURE_UNIT);
-        rm.getWaterTexture().bind();
-
-        defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
-        defaultShader.setUniform("uUseTexture", true);
-        defaultShader.setUniform("uUseFaceAtlas", false);
-        defaultShader.setUniform("uUVBounds", uvBounds);
-        defaultShader.setUniform("uParticleAlpha", 0.65f);
-
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glDepthMask(false);
-
-        gameMaster.getWorld().forEach(block -> {
-            if (!(block instanceof Water water)) return;
-            float renderX = water.getX();
-            float renderY = water.getY();
-            float renderZ = water.getZ();
-            modelMatrix.identity().translate(renderX, renderY, renderZ);
-            defaultShader.setUniform("uModel", modelMatrix);
-            rm.getBlockMesh().render();
-        });
-
+        glEnable(GL_CULL_FACE);
         glDepthMask(true);
         defaultShader.setUniform("uParticleAlpha", 1.0f);
 

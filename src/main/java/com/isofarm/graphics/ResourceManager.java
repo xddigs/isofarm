@@ -28,7 +28,7 @@ public class ResourceManager {
     private final Mesh destroyOverlayMesh;
 
     private final TextureAtlas blocksAtlas;
-    private final SpriteSheet waterTexture;
+
     private final SpriteSheet wheat;
     private final SpriteSheet carrot;
     private final SpriteSheet potato;
@@ -66,7 +66,6 @@ public class ResourceManager {
             block.initRegions(this.blocksAtlas);
         }
 
-        this.waterTexture = new SpriteSheet(K.Paths.WATER, K.UI.WATER_FRAMES, 1);
         this.wheat = new SpriteSheet(K.Paths.WHEAT_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
         this.carrot = new SpriteSheet(K.Paths.CARROT_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
         this.potato = new SpriteSheet(K.Paths.POTATO_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
@@ -101,7 +100,6 @@ public class ResourceManager {
         destroyOverlayMesh.dispose();
 
         blocksAtlas.dispose();
-        if (waterTexture != null) waterTexture.dispose();
 
         wheat.dispose();
         carrot.dispose();
@@ -139,7 +137,6 @@ public class ResourceManager {
     public Mesh getSpriteMesh() { return spriteMesh; }
     public Mesh getPlayerMesh() { return playerMesh; }
     public TextureAtlas getBlocksAtlas() { return blocksAtlas; }
-    public SpriteSheet getWaterTexture() { return waterTexture; }
     public SpriteSheet getDestroyTexture() { return destroyTexture; }
     public SpriteSheet getSeedIcons() { return seedIcons; }
     public SpriteSheet getCropIcons() { return cropIcons; }
