@@ -128,6 +128,13 @@ public class GameInteraction {
             isRightPressed = false;
         }
 
+        if (selectedItem instanceof Bucket bucket) {
+            if (isRightPressed && !gameMaster.isInventoryOpen()) {
+                bucket.use(gameMaster);
+                isRightPressed = false;
+            }
+        }
+
         Hit hoveredCell;
         if (gameMaster.isOrthographicCamera()) {
             hoveredCell = HoveredCell.get(gameMaster);

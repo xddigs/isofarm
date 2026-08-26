@@ -1,9 +1,13 @@
 package com.isofarm.data;
 
+import java.util.function.Consumer;
+
 public enum Tier {
     NONE((byte) -1, "None", 0),
     LEATHER((byte) 0, "Leather", 1),
+
     WOOD((byte) 0, "Wooden", 64),
+
     COPPER((byte) 1, "Copper", 128),
     IRON((byte) 2, "Iron", 160),
     STEEL((byte) 3, "Steel", 192),
@@ -31,5 +35,11 @@ public enum Tier {
 
     public int getDurability() {
         return durability;
+    }
+
+    public static void forEach(Consumer<Tier> consumer) {
+        for (Tier tier : values()) {
+            consumer.accept(tier);
+        }
     }
 }

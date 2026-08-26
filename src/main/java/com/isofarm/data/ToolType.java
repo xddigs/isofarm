@@ -3,6 +3,7 @@ package com.isofarm.data;
 public enum ToolType {
     BACKPACK(" Backpack", 0, BlockData.all(), 1, new float[]{}),
     CRAFTING_KIT(" Crafting Kit", 0, BlockData.all(), 1, new float[]{}),
+    BUCKET(" Bucket", 0, BlockData.all(), 1, new float[]{}),
     HOE(" Hoe", 5, new BlockData[]{BlockData.GRASS, BlockData.DIRT, BlockData.TILLED_DIRT}, 8, new float[]{0.5f, 0.25f, 0.75f}),
     AXE(" Axe", 8, new BlockData[]{BlockData.OAK_LOG, BlockData.OAK_WOOD}, 10, new float[]{1.0f, 0.5f}),
     PICKAXE(" Pickaxe", 6, new BlockData[]{BlockData.GRASS, BlockData.DIRT, BlockData.OAK_LEAVES, BlockData.STONE, BlockData.COPPER_ORE}, 7, new float[]{0.8f, 0.7f, 1.2f, 0.65f, 0.56f}),
