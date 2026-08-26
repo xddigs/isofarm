@@ -44,6 +44,10 @@ public class RecipeRegistry implements Service<Recipe> {
                 .result(new Material(Tier.NONE, MaterialID.STICK), 4)
                 .with(BlockData.OAK_WOOD, 1).add();
 
+        create(Tier.LEATHER)
+                .result(new Material(Tier.NONE, MaterialID.BOOK), 2)
+                .with(MaterialID.LEATHER, 3)
+                .with(MaterialID.PAPER, 2).add();
 
         create(Tier.LEATHER)
                 .result(new Hoe(Tier.WOOD), 1)
@@ -109,12 +113,12 @@ public class RecipeRegistry implements Service<Recipe> {
         create(Tier.COPPER)
                 .result(new Backpack(ToolType.BACKPACK, Tier.COPPER), 1)
                 .with(new Material(Tier.COPPER, MaterialID.INGOT), 3)
-                .with(BlockData.OAK_WOOD, 2).add();
+                .with(MaterialID.LEATHER, 2).add();
 
         create(Tier.LEATHER)
                 .result(new CraftingKit(ToolType.CRAFTING_KIT, Tier.COPPER), 1)
                 .with(new Material(Tier.COPPER, MaterialID.RAW_ORE), 3)
-                .with(BlockData.OAK_WOOD, 2).add();
+                .with(MaterialID.LEATHER, 2).add();
 
 
         create(Tier.IRON)
@@ -145,12 +149,12 @@ public class RecipeRegistry implements Service<Recipe> {
         create(Tier.COPPER)
                 .result(new Backpack(ToolType.BACKPACK, Tier.IRON), 1)
                 .with(new Material(Tier.IRON, MaterialID.INGOT), 3)
-                .with(BlockData.OAK_WOOD, 2).add();
+                .with(MaterialID.LEATHER, 2).add();
 
         create(Tier.IRON)
                 .result(new CraftingKit(ToolType.CRAFTING_KIT, Tier.IRON), 1)
                 .with(new MiningComponent(Tier.IRON, MaterialID.INGOT), 3)
-                .with(BlockData.OAK_WOOD, 2).add();
+                .with(MaterialID.LEATHER, 2).add();
 
 
         create(Tier.IRON)
@@ -181,13 +185,12 @@ public class RecipeRegistry implements Service<Recipe> {
         create(Tier.IRON)
                 .result(new Backpack(ToolType.BACKPACK, Tier.STEEL), 1)
                 .with(new Material(Tier.STEEL, MaterialID.INGOT), 3)
-                .with(BlockData.OAK_WOOD, 2).add();
+                .with(MaterialID.LEATHER, 2).add();
 
         create(Tier.IRON)
                 .result(new CraftingKit(ToolType.CRAFTING_KIT, Tier.STEEL), 1)
                 .with(new MiningComponent(Tier.STEEL, MaterialID.INGOT), 3)
-                .with(BlockData.OAK_WOOD, 2).add();
-
+                .with(MaterialID.LEATHER, 2).add();
 
         create(Tier.STEEL)
                 .result(new Hoe(Tier.GOLD), 1)
@@ -217,13 +220,12 @@ public class RecipeRegistry implements Service<Recipe> {
         create(Tier.STEEL)
                 .result(new Backpack(ToolType.BACKPACK, Tier.GOLD), 1)
                 .with(new Material(Tier.GOLD, MaterialID.INGOT), 3)
-                .with(BlockData.OAK_WOOD, 2).add();
+                .with(MaterialID.LEATHER, 2).add();
 
         create(Tier.STEEL)
                 .result(new CraftingKit(ToolType.CRAFTING_KIT, Tier.GOLD), 1)
                 .with(new MiningComponent(Tier.GOLD, MaterialID.INGOT), 3)
-                .with(BlockData.OAK_WOOD, 2).add();
-
+                .with(MaterialID.LEATHER, 2).add();
 
         create(Tier.GOLD)
                 .result(new Hoe(Tier.PLATINUM), 1)
@@ -253,13 +255,12 @@ public class RecipeRegistry implements Service<Recipe> {
         create(Tier.GOLD)
                 .result(new Backpack(ToolType.BACKPACK, Tier.PLATINUM), 1)
                 .with(new Material(Tier.PLATINUM, MaterialID.INGOT), 3)
-                .with(BlockData.OAK_WOOD, 2).add();
+                .with(MaterialID.LEATHER, 2).add();
 
         create(Tier.GOLD)
                 .result(new CraftingKit(ToolType.CRAFTING_KIT, Tier.PLATINUM), 1)
                 .with(new MiningComponent(Tier.PLATINUM, MaterialID.INGOT), 3)
-                .with(BlockData.OAK_WOOD, 2).add();
-
+                .with(MaterialID.LEATHER, 2).add();
 
         create(Tier.PLATINUM)
                 .result(new Hoe(Tier.DIAMOND), 1)
@@ -289,12 +290,12 @@ public class RecipeRegistry implements Service<Recipe> {
         create(Tier.PLATINUM)
                 .result(new Backpack(ToolType.BACKPACK, Tier.DIAMOND), 1)
                 .with(new Material(Tier.DIAMOND, MaterialID.INGOT), 3)
-                .with(BlockData.OAK_WOOD, 2).add();
+                .with(MaterialID.LEATHER, 2).add();
 
         create(Tier.PLATINUM)
                 .result(new CraftingKit(ToolType.CRAFTING_KIT, Tier.DIAMOND), 1)
                 .with(new MiningComponent(Tier.DIAMOND, MaterialID.INGOT), 3)
-                .with(BlockData.OAK_WOOD, 2).add();
+                .with(MaterialID.LEATHER, 2).add();
 
         return recipes;
     }

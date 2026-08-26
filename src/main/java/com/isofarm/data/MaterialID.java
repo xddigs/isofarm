@@ -5,21 +5,27 @@ import com.isofarm.item.Item;
 
 @DataClass
 public enum MaterialID implements Craftable {
-    STICK((byte) 0, "Stick", 1),
-    RAW_ORE((byte) 1, " Raw Ore", 15),
-    INGOT((byte) 2, " Ingot", 50);
+    RAW_ORE((byte) 1, (byte) 0, " Raw Ore", 15),
+    INGOT((byte) 2, (byte) 0, " Ingot", 50),
+    STICK((byte) 0, (byte) 1, "Stick", 1),
+    PAPER((byte) 1, (byte) 1, "Paper", 10),
+    LEATHER((byte) 2, (byte) 1, "Leather", 40),
+    BOOK((byte) 3, (byte) 1, "Book", 100);
 
     private final byte id;
+    private final byte row;
     private final String name;
     private final int value;
 
-    MaterialID(byte id, String name, int value) {
+    MaterialID(byte id, byte row, String name, int value) {
         this.id = id;
+        this.row = row;
         this.name = name;
         this.value = value;
     }
 
     public byte getId() { return id; }
+    public byte getRow() { return row; }
     public String getName() { return name; }
     public int getValue() { return value; }
 

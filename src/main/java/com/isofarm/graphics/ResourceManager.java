@@ -75,7 +75,7 @@ public class ResourceManager {
         toolIcons = new SpriteSheet(K.Paths.TOOL_ICONS, K.UI.ICON_TOOL_COLS, K.UI.ICON_TOOL_ROWS);
         cropIcons = new SpriteSheet(K.Paths.CROP_ICONS, K.UI.ICON_SEED_CROPS_COLS, 1);
         seedIcons = new SpriteSheet(K.Paths.SEED_ICONS, K.UI.ICON_SEED_CROPS_COLS, 1);
-        materialIcons = new SpriteSheet(K.Paths.MATERIAL_ICONS, K.UI.ICON_MATERIAL_COLS, 1);
+        materialIcons = new SpriteSheet(K.Paths.MATERIAL_ICONS, K.UI.ICON_MATERIAL_COLS, 2);
         inventoryIcons = new SpriteSheet(K.Paths.INVENTORY_ICONS, K.UI.ICON_INV_COLS, 1);
 
         this.playerSpriteSheet = new SpriteSheet(K.Paths.PLAYER_SPRITESHEET,
@@ -192,15 +192,14 @@ public class ResourceManager {
     private static int getMaterialIconColumn(Tier tier, MaterialID materialID) {
         if (materialID == MaterialID.STICK) return 0;
         int baseCol = switch (tier) {
-            case COPPER -> 1;
-            case IRON -> 3;
-            case STEEL -> 5;
-            case GOLD -> 7;
-            case PLATINUM -> 9;
-            case DIAMOND -> 11;
+            case COPPER -> 0;
+            case IRON -> 2;
+            case STEEL -> 4;
+            case GOLD -> 6;
+            case PLATINUM -> 8;
+            case DIAMOND -> 10;
             default -> 1;
         };
-
         return materialID == MaterialID.INGOT ? baseCol + 1 : baseCol;
     }
 
@@ -211,7 +210,8 @@ public class ResourceManager {
         }
 
         if (item instanceof Tool tool) {
-            return tool.getTier().getId();
+            int index = tool.getTier().getId();
+            return index / K.UI.ICON_TOOL_COLS;
         }
 
         return 0;
