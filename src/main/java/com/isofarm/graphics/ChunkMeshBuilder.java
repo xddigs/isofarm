@@ -276,7 +276,7 @@ public class ChunkMeshBuilder {
             if (neighborData.isFluid()) {
                 return false;
             }
-            return neighborData.isTransparent();
+            return neighborData.isTransparent() && !neighborData.isSolid();
         }
 
         if (neighborData.isFluid()) {
@@ -297,6 +297,10 @@ public class ChunkMeshBuilder {
     }
 
     private static boolean isPartialSideExposure(World world, int worldX, int worldY, int worldZ, BlockData currentBlock) {
+        if (currentBlock.isFluid()) {
+            return false;
+        }
+
         if (!world.isChunkLoadedAt(worldX, worldZ) || worldY < 0 || worldY >= Chunk.SIZE_Y) {
             return false;
         }
@@ -308,15 +312,6 @@ public class ChunkMeshBuilder {
 
         BlockData neighborData = BLOCK_LUT[neighborId & 0xFF];
         if (neighborData == null) {
-            return false;
-        }
-
-        if (currentBlock.isFluid()
-                && neighborData.isFluid()) {
-            return false;
-        }
-
-        if (currentBlock.isFluid()) {
             return false;
         }
 

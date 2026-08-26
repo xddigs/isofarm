@@ -7,12 +7,12 @@ import java.util.Random;
 
 @SuppressWarnings("all")
 public class WorldGenerator {
-    private static final float CONTINENTAL_SCALE = 0.005f;
+    private static final float CONTINENTAL_SCALE = 0.008f;
     private static final float DETAIL_SCALE = 0.025f;
 
-    private static final int BASE_HEIGHT = 18;
-    private static final int MOUNTAIN_HEIGHT = 150;
-    private static final int WATER_LEVEL = 16;
+    private static final int BASE_HEIGHT = 14;
+    private static final int MOUNTAIN_HEIGHT = 50;
+    private static final int WATER_LEVEL = 17;
 
     private static final int ORE_MAX_HEIGHT = 45;
     private static final float ORE_CHANCE = 0.015f;
@@ -53,10 +53,9 @@ public class WorldGenerator {
                 float sampleZ = worldZ + offsetZ;
 
                 float continental = (SimplexNoise.noise(sampleX * CONTINENTAL_SCALE, sampleZ * CONTINENTAL_SCALE) + 1.0f) * 0.5f;
-                float mountainFactor = (float) Math.pow(continental, 2.5f);
+                float mountainFactor = (float) Math.pow(continental, 4.0f);
                 float detailNoise = SimplexNoise.noise(sampleX * DETAIL_SCALE, sampleZ * DETAIL_SCALE);
-
-                int height = (int) (BASE_HEIGHT + (detailNoise * 3.0f) + (mountainFactor * MOUNTAIN_HEIGHT));
+                int height = (int) (BASE_HEIGHT + (detailNoise * 4.0f) + (mountainFactor * MOUNTAIN_HEIGHT));
                 height = Math.clamp(height, 1, Chunk.SIZE_Y - 1);
                 heightMap[x][z] = height;
 
