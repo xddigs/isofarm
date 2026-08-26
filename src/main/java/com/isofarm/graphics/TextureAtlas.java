@@ -77,12 +77,9 @@ public class TextureAtlas {
                 float uMax = (float) (offsetX + tileWidth) / atlasWidth;
                 float vMax = (float) (offsetY + tileHeight) / atlasHeight;
 
-                regions.put(originalPath, new TextureRegion(
-                        new Vector2f(uMin, vMin),
-                        new Vector2f(uMax, vMax),
-                        new Vector2f((float) tileWidth / atlasWidth, (float) tileHeight / atlasHeight),
-                        new Vector2f(uMin, vMin)
-                ));
+                regions.put(originalPath, new TextureRegion(new Vector2f(uMin, vMin),
+                        new Vector2f(uMax, vMax), new Vector2f((float) tileWidth / atlasWidth,
+                        (float) tileHeight / atlasHeight), new Vector2f(uMin, vMin)));
             }
         }
 

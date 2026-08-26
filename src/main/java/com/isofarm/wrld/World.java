@@ -203,4 +203,28 @@ public class World {
         }
         return new GridPos(blockX, 0, blockZ);
     }
+
+    public void forEachPlant(Consumer<PlantInstance> consumer) {
+        for (Chunk chunk : chunks.values()) {
+            int[] plantIndices = chunk.getPlantIndices();
+
+            for (int index : plantIndices) {
+                int localX = Chunk.indexToX(index);
+                int localY = Chunk.indexToY(index);
+                int localZ = Chunk.indexToZ(index);
+                int worldX = chunk.getChunkX() * Chunk.SIZE_X + localX;
+                int worldZ = chunk.getChunkZ() * Chunk.SIZE_Z + localZ;
+
+                byte blockId = chunk.getBlock(localX, localY, localZ);
+                BlockData data = BlockData.fromId(blockId);
+                if (data == null || !data.isPlant()) {
+                    continue;
+                }
+
+                consumer.accept(new PlantInstance(chunk, worldX, localY, worldZ, data));
+            }
+        }
+    }
+
+    public record PlantInstance(Chunk chunk, int x, int y, int z, BlockData data) {}
 }

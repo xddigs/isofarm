@@ -38,6 +38,7 @@ public enum BlockData implements Craftable {
     TALL_GRASS((byte) 29, (byte) 0, "Tall Grass", false, 5, "assets/textures/blocks/tall_grass.png", SoundGroup.SOIL, 0.0f, true, new MaterialID[]{}, Tier.NONE),
     TULIP((byte) 30, (byte) 0, "Tulip", false, 10, "assets/textures/blocks/tulip.png", SoundGroup.SOIL, 0.0f, true, new MaterialID[]{}, Tier.NONE);
 
+    private static final BlockData[] BY_ID = createById();
     public static final BlockData[] ORES = {COPPER_ORE, IRON_ORE};
     public static final BlockData[] PLANTS = {
             BLUE_FLOWER, BRIGHT_FLOWER, GHOSTFLOWER, LILLY,
@@ -100,11 +101,28 @@ public enum BlockData implements Craftable {
         return this != AIR && !isPlant();
     }
 
-    public static BlockData fromId(byte id) {
+    private static BlockData[] createById() {
+        byte maxId = 0;
         for (BlockData block : values()) {
-            if (block.getId() == id) return block;
+            if (block.id > maxId) {
+                maxId = block.id;
+            }
         }
-        return null;
+
+        BlockData[] result = new BlockData[maxId + 1];
+        for (BlockData block : values()) {
+            result[block.id] = block;
+        }
+
+        return result;
+    }
+
+    public static BlockData fromId(byte id) {
+        int index = Byte.toUnsignedInt(id);
+        if (index < 0 || index >= BY_ID.length) {
+            return null;
+        }
+        return BY_ID[index];
     }
 
     public static BlockData[] all() {

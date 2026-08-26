@@ -1,5 +1,6 @@
 package com.isofarm.wrld;
 
+import com.isofarm.data.BlockData;
 import com.isofarm.data.DataClass;
 
 @DataClass
@@ -12,6 +13,9 @@ public class Chunk {
     private final int chunkZ;
     private final byte[] blocks;
     private final byte[] waterLevels;
+
+    private int[] plantIndices;
+    private boolean plantCacheDirty = true;
 
     public Chunk(int chunkX, int chunkZ) {
         this.chunkX = chunkX;
@@ -65,6 +69,55 @@ public class Chunk {
 
     public int getChunkZ() {
         return chunkZ;
+    }
+
+    public int[] getPlantIndices() {
+        if (!plantCacheDirty && plantIndices != null) {
+            return plantIndices;
+        }
+
+        int[] temp = new int[64];
+        int count = 0;
+
+        for (int index = 0; index < blocks.length; index++) {
+            byte blockId = blocks[index];
+
+            if (blockId == BlockData.AIR.getId()) {
+                continue;
+            }
+
+            BlockData data = BlockData.fromId(blockId);
+            if (data == null || !data.isPlant()) {
+                continue;
+            }
+
+            if (count >= temp.length) {
+                int[] expanded = new int[temp.length * 2];
+                System.arraycopy(temp, 0, expanded, 0, temp.length);
+                temp = expanded;
+            }
+
+            temp[count++] = index;
+        }
+
+        plantIndices = new int[count];
+        System.arraycopy(temp, 0, plantIndices, 0, count);
+
+        plantCacheDirty = false;
+
+        return plantIndices;
+    }
+
+    public static int indexToX(int index) {
+        return index % SIZE_X;
+    }
+
+    public static int indexToZ(int index) {
+        return (index / SIZE_X) % SIZE_Z;
+    }
+
+    public static int indexToY(int index) {
+        return index / (SIZE_X * SIZE_Z);
     }
 
     private int getIndex(int x, int y, int z) {

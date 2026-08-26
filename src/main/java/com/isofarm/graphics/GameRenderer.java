@@ -141,39 +141,35 @@ public class GameRenderer {
             sheet.unbind();
         });
 
-        gameMaster.getWorld().forEach(block -> {
-            BlockData data = BlockData.fromId(block.getId());
-            if (data == null || !data.isPlant() || data == BlockData.AIR) return;
-
-            if (blockAtlas != null) {
-                glActiveTexture(GL_TEXTURE0 + K.Render.PRIMARY_TEXTURE_UNIT);
-                blockAtlas.bind();
-
-                defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
-                defaultShader.setUniform("uUseTexture", true);
-                defaultShader.setUniform("uUseFaceAtlas", false);
-
-                TextureAtlas.TextureRegion region = data.getSideRegion();
-                if (region != null) {
-                    defaultShader.setUniform("uUVBounds", new Vector4f(
-                            region.uvMin().x, region.uvMin().y,
-                            region.uvMax().x, region.uvMax().y
-                    ));
-                    defaultShader.setUniform("uAtlasScale", region.scale());
-                    defaultShader.setUniform("uAtlasOffset", region.offset());
-                }
-
-                float renderX = block.getX() + 0.5f;
-                float renderY = block.getY();
-                float renderZ = block.getZ() + 0.5f;
-
-                modelMatrix.identity().translate(renderX, renderY, renderZ);
-                defaultShader.setUniform("uModel", modelMatrix);
-
-                glDisable(GL_CULL_FACE);
-                rm.getFlowerMesh().render();
-                glEnable(GL_CULL_FACE);
+        gameMaster.getWorld().forEachPlant(plant -> {
+            BlockData data = plant.data();
+            TextureAtlas.TextureRegion region = data.getTopRegion();
+            if (region == null) {
+                return;
             }
+
+            float renderX = plant.x() + 0.5f;
+            float renderY = plant.y();
+            float renderZ = plant.z() + 0.5f;
+
+            modelMatrix.identity().translate(renderX, renderY, renderZ);
+            defaultShader.setUniform("uModel", modelMatrix);
+            defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
+            defaultShader.setUniform("uUseTexture", true);
+            defaultShader.setUniform("uUseFaceAtlas", false);
+
+            defaultShader.setUniform("uUVBounds", new Vector4f(
+                    region.uvMin().x, region.uvMax().y,
+                    region.uvMax().x, region.uvMin().y));
+
+            defaultShader.setUniform("uAtlasScale", region.scale());
+            defaultShader.setUniform("uAtlasOffset", region.offset());
+
+            glDisable(GL_CULL_FACE);
+            glActiveTexture(GL_TEXTURE0 + K.Render.PRIMARY_TEXTURE_UNIT);
+            rm.getBlocksAtlas().bind();
+            rm.getFlowerMesh().render();
+            glEnable(GL_CULL_FACE);
         });
 
         renderDestroyOverlay(gameMaster.getGameInteraction(), defaultShader,
@@ -346,36 +342,26 @@ public class GameRenderer {
         });
 
         gameMaster.getWorld().forEach(block -> {
-            float renderX = 0f, renderY = 0f, renderZ = 0f;
-            boolean isRenderableSprite = false;
-
-            if (block instanceof Crop crop) {
-                renderX = crop.getX() + 0.5f;
-                renderY = crop.getY() + K.World.SHORTER_BLOCK_HEIGHT;
-                renderZ = crop.getZ() + 0.5f;
-                isRenderableSprite = true;
-
-                modelMatrix.identity().translate(renderX, renderY, renderZ);
-                shadowShader.setUniform("uModel", modelMatrix);
-                rm.getSpriteMesh().render();
-            } else {
-                BlockData data = BlockData.fromId(block.getId());
-                if (data != null && data.isPlant()) {
-                    renderX = block.getX() + 0.5f;
-                    renderY = block.getY();
-                    renderZ = block.getZ() + 0.5f;
-
-                    modelMatrix.identity().translate(renderX, renderY, renderZ);
-                    shadowShader.setUniform("uModel", modelMatrix);
-                    rm.getFlowerMesh().render();
-                }
+            if (!(block instanceof Crop crop)) {
+                return;
             }
 
-            if (isRenderableSprite) {
-                modelMatrix.identity().translate(renderX, renderY, renderZ);
-                shadowShader.setUniform("uModel", modelMatrix);
-                rm.getSpriteMesh().render();
-            }
+            float renderX = crop.getX() + 0.5f;
+            float renderY = crop.getY() + K.World.SHORTER_BLOCK_HEIGHT;
+            float renderZ = crop.getZ() + 0.5f;
+
+            modelMatrix.identity().translate(renderX, renderY, renderZ);
+            shadowShader.setUniform("uModel", modelMatrix);
+            rm.getSpriteMesh().render();
+        });
+
+        gameMaster.getWorld().forEachPlant(plant -> {
+            float renderX = plant.x() + 0.5f;
+            float renderY = plant.y();
+            float renderZ = plant.z() + 0.5f;
+            modelMatrix.identity().translate(renderX, renderY, renderZ);
+            shadowShader.setUniform("uModel", modelMatrix);
+            rm.getFlowerMesh().render();
         });
 
         shadowShader.unbind();
