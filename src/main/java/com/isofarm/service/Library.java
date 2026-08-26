@@ -172,6 +172,7 @@ public class Library implements Service<GameMaster> {
                 return;
             }
             player.setGamemode(targetMode);
+            if (targetMode.isNoClip()) gameMaster.toggleHUD();
             log.info("Command gamemode executed: {}", targetMode);
             ToastFactory.success("You changed gamemode to " + targetMode.name().toLowerCase());
         }));

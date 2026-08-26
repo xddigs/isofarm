@@ -295,12 +295,8 @@ public class ItemRenderer {
 
     public void render(GameMaster gameMaster, Item item, SpriteSheet spriteSheet,
                        Shader shader, CelestialLighting lighting) {
-
-        if (item == null || spriteSheet == null || quadMesh == null) {
-            return;
-        }
-
-        if (gameMaster.isOrthographicCamera()) {
+        if (item == null || spriteSheet == null || quadMesh == null ||
+                gameMaster.isOrthographicCamera() || gameMaster.getPlayer().getGamemode().isNoClip()) {
             return;
         }
 
