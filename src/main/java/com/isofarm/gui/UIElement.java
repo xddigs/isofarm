@@ -976,6 +976,19 @@ public abstract class UIElement {
         parent = null;
     }
 
+    @Override
+    public String toString() {
+        return "UIElement {" +
+                "name=" + getClass().getSimpleName() +
+                ", children=" + children.size() +
+                ", parent=" + parent.getClass().getSimpleName() +
+                ", x=" + x +
+                ", y=" + y +
+                ", width=" + width +
+                ", height=" + height +
+               '}';
+    }
+
     public enum Anchor {
         TOP_LEFT,
         TOP_CENTER,
