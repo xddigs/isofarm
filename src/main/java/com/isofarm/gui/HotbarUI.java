@@ -36,7 +36,7 @@ public class HotbarUI extends UIElement {
         super(x, y, getInitialHotbarWidth(), getHotbarHeight());
         setFocusable(true);
         createSlots();
-        setLayer(150);
+        setLayer(50);
     }
 
     private static float getInitialHotbarWidth() {

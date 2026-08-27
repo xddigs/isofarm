@@ -232,7 +232,7 @@ public class InventoryUI extends UIElement {
             }
         }
 
-        if (backpackUI != null && (isBackpackOpen || isBackpackClosing)) {
+        if (backpackUI != null && backpackUI.isVisible()) {
             float bpX = getX() + (getWidth() - backpackUI.getWidth()) / 2.0f;
             if (Math.abs(backpackTargetY - backpackCurrentY) > 0.1f) {
                 backpackCurrentY += (backpackTargetY - backpackCurrentY) * Math.min(1.0f, delta * 15.0f);
@@ -269,7 +269,7 @@ public class InventoryUI extends UIElement {
         this.isBackpackClosing = true;
         this.targetY = this.defaultY;
         if (backpackUI != null) {
-            this.backpackTargetY = -backpackUI.getHeight();
+            this.backpackTargetY = this.defaultY - backpackUI.getHeight() - Settings.getScaledSpacing() * 2.0f;
         }
     }
 
@@ -286,7 +286,6 @@ public class InventoryUI extends UIElement {
             show();
             onOpen();
         } else if (!isOpen && wasOpen) {
-            hide();
             onClose();
         }
 
@@ -332,9 +331,8 @@ public class InventoryUI extends UIElement {
 
     @Override
     public UIElement hide() {
-        if (isVisible() && !isClosing) {
-            onClose();
-        }
+        super.hide();
+        this.isClosing = false;
         return this;
     }
 

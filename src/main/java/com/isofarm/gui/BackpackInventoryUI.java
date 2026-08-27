@@ -11,11 +11,10 @@ public class BackpackInventoryUI extends InventoryUI {
         getButtons().forEach(this::removeChild);
         setBackpackUI(this);
 
+        hide();
         setWidth(getBackpackWidth());
         setHeight(getBackpackHeight());
-
         setLayer(150);
-        hide();
     }
 
     @Override
@@ -37,7 +36,9 @@ public class BackpackInventoryUI extends InventoryUI {
 
     @Override
     public void update(float delta) {
-        super.update(delta);
+        if (getBackpack() == null) return;
+        syncInventory();
+        getChildren().forEach(child -> child.update(delta));
     }
 
     @Override
