@@ -21,9 +21,11 @@ public record OrthographicCameraController(OrthographicCamera camera)
     private static final float DISTANCE = 500.0f;
     private static boolean mouseCaptured = false;
     private static final float CAMERA_ROTATION_SPEED = 120.0f;
+    private static GridPos lastGoal = null;
 
     public void update(GameMaster gameMaster, float delta) {
         if (gameMaster.isInventoryOpen() || gameMaster.isChatOpen()) {
+            lastGoal = null;
             return;
         }
 
@@ -65,13 +67,15 @@ public record OrthographicCameraController(OrthographicCamera camera)
     }
 
     private void click(GameMaster gameMaster, Player player, World world) {
-        boolean wasRightClickPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_RIGHT);
-        boolean hasItemSelected = gameMaster.getGameUIService().getHotbarUI().getSelectedItem() == null;
-        if (!wasRightClickPressed || !hasItemSelected) return;
+        boolean isRightClickDown = Mouse.isButtonDown(GLFW_MOUSE_BUTTON_RIGHT);
+
+        if (!isRightClickDown) {
+            lastGoal = null;
+            return;
+        }
 
         float mouseX = Mouse.getX();
         float mouseY = Mouse.getY();
-
         float screenWidth = gameMaster.getWindowWidth();
         float screenHeight = gameMaster.getWindowHeight();
 
@@ -79,17 +83,15 @@ public record OrthographicCameraController(OrthographicCamera camera)
                 screenWidth, screenHeight);
 
         if (hit == null) return;
-
         GridPos start = PathFinder.getPlayerGridPosition(player);
         GridPos goal = getGoalPosition(world, hit);
-
         if (goal == null) return;
         if (start.equals(goal)) return;
-
+        if (goal.equals(lastGoal)) return;
         var path = PathFinder.findPath(world, player, start, goal);
-
         if (path.isEmpty()) return;
         player.setPath(path);
+        lastGoal = goal;
     }
 
     private void followPath(Player player, World world, float delta) {
