@@ -8,7 +8,6 @@ import com.isofarm.graphics.ItemRenderer;
 import com.isofarm.graphics.ParticleEngine;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.graphics.TextureAtlas;
-import com.isofarm.gui.GUI;
 import com.isofarm.gui.GameUIService;
 import com.isofarm.item.*;
 import com.isofarm.service.CropService;
