@@ -153,7 +153,7 @@ public final class K {
         public static final String BLOCK_ICONS = "assets/gui/block_icons.png";
         public static final String MATERIAL_ICONS = "assets/gui/material_icons.png";
         public static final String INVENTORY_ICONS = "assets/gui/inventory_icons.png";
-        public static final String PLAYER_SPRITESHEET = "assets/sprites/default.png";
+        public static final String PLAYER_SPRITESHEET = "assets/sprites/steve.png";
         public static final String DESTROY_STAGES = "assets/textures/blocks/destroy.png";
         public static final String HEARTS_SPRITESHEET = "assets/gui/hearts.png";
         public static final String STAMINA_SPRITESHEET = "assets/gui/stamina.png";
