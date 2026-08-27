@@ -1,6 +1,7 @@
 package com.isofarm.input;
 
 import com.isofarm.entity.Player;
+import com.isofarm.entity.states.CrouchingState;
 import com.isofarm.graphics.Camera;
 import com.isofarm.service.Service;
 import com.isofarm.utils.K;
@@ -13,7 +14,7 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class CameraController implements Service<Camera> {
     private static final float DOUBLE_TAP_TIME = 0.3f;
-    private static final float FLY_SPEED_MULTIPLIER = 1.2f;
+    private static final float FLY_SPEED_MULTIPLIER = 3.0f;
     private static final float FLY_DAMPING = 12.0f;
     private static final float DAMAGE_TILT_MAX = 10.0f;
     private static final float DAMAGE_TILT_STIFFNESS = 90.0f;
@@ -177,9 +178,9 @@ public class CameraController implements Service<Camera> {
         boolean isSprinting = Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)
                 && !gameMaster.isInventoryOpen() && !gameMaster.isChatOpen()
                 && hasMovementInput && player.getStamina() > 0
-                && !player.isCrounching();
+                && !(player.getCurrentState() instanceof CrouchingState);
 
-        boolean isCrounching = !isSprinting && player.isCrounching();
+        boolean isCrounching = !isSprinting && (player.getCurrentState() instanceof CrouchingState);
         float speed = isCrounching ? player.getSpeed() / 2f : player.getSpeed();
         float fov = Settings.getFov();
 

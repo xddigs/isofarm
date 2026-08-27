@@ -1,5 +1,6 @@
 package com.isofarm.entity;
 
+import com.isofarm.data.BlockData;
 import com.isofarm.data.DataClass;
 import com.isofarm.data.Hit;
 import com.isofarm.utils.K;
@@ -312,6 +313,39 @@ public abstract class Entity {
 
     public float getCurrentEyeHeight() {
         return currentEyeHeight;
+    }
+
+    public boolean isUnderFluid(World world) {
+        float epsilon = 0.001f;
+        float minX = position.x - dimensions.x / 2.0f + epsilon;
+        float maxX = position.x + dimensions.x / 2.0f - epsilon;
+        float minY = position.y + epsilon;
+        float maxY = position.y + dimensions.y - epsilon;
+        float minZ = position.z - dimensions.z / 2.0f + epsilon;
+        float maxZ = position.z + dimensions.z / 2.0f - epsilon;
+
+        int blockMinX = (int) Math.floor(minX);
+        int blockMaxX = (int) Math.floor(maxX);
+        int blockMinY = (int) Math.floor(minY);
+        int blockMaxY = (int) Math.floor(maxY);
+        int blockMinZ = (int) Math.floor(minZ);
+        int blockMaxZ = (int) Math.floor(maxZ);
+
+        for (int x = blockMinX; x <= blockMaxX; x++) {
+            for (int y = blockMinY; y <= blockMaxY; y++) {
+                for (int z = blockMinZ; z <= blockMaxZ; z++) {
+                    byte blockId = world.getBlockTypeAt(x, (int) (y + getDimensions().y()), z);
+                    if (BlockData.fromId(blockId).isFluid()) {
+                        return true;
+                    }
+
+                    if (world.getWaterLevelAt(x, y, z) > 0) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public abstract void update(Hit hit, float delta);

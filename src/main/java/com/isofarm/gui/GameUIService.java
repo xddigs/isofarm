@@ -296,7 +296,7 @@ public class GameUIService implements Service<GameMaster> {
         int maxHp = (int) player.getMaxHitpoints();
 
         int totalHearts = (maxHp + 1) / 2;
-        int heartsPerRow = 8;
+        int heartsPerRow = 10;
 
         float heartSize = Settings.getScaledIcon() / 2f;
         float spacing = Settings.getScaledSpacing() - 5.0f;
