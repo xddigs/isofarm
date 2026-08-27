@@ -12,7 +12,6 @@ import com.isofarm.gui.GameUIService;
 import com.isofarm.item.*;
 import com.isofarm.service.CropService;
 import com.isofarm.service.TimeService;
-import com.isofarm.service.Woodcutter;
 import com.isofarm.utils.HoveredCell;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
@@ -423,14 +422,6 @@ public class GameInteraction {
         Block removedBlock = new Block(blockData, cell);
         Item itemToDrop = null;
         BlockData removedBlockData = removedBlock.getType();
-
-        if (removedBlockData.equals(BlockData.OAK_LOG) && selectedItem instanceof Axe axe) {
-            if (Woodcutter.chop(gameMaster, axe, particles, removedBlock.getX(),
-                    removedBlock.getY(), removedBlock.getZ())) {
-                this.breakTimeout = TIMEOUT;
-                return;
-            }
-        }
 
         if (selectedItem instanceof Tool tool) {
             if (tool instanceof Backpack || tool instanceof CraftingKit) return;
