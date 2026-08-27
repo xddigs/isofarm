@@ -14,7 +14,7 @@ public class BackpackInventoryUI extends InventoryUI {
         hide();
         setWidth(getBackpackWidth());
         setHeight(getBackpackHeight());
-        setLayer(150);
+        setLayer(50);
     }
 
     @Override
