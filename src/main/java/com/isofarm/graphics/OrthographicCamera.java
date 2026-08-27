@@ -138,7 +138,8 @@ public class OrthographicCamera implements CameraView {
         return new Ray(rayOrigin, getForwardVector());
     }
 
-    public Hit highlight(World world, Vector3f playerPos, float mouseX, float mouseY, float screenWidth, float screenHeight) {
+    public Hit highlight(World world, Vector3f playerPos, float mouseX, float mouseY,
+                         float screenWidth, float screenHeight) {
         Ray ray = getMouseRay(mouseX, mouseY, screenWidth, screenHeight);
         return raycast(world, playerPos, ray.origin(), ray.direction());
     }

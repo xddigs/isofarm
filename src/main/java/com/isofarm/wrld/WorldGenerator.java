@@ -10,9 +10,9 @@ public class WorldGenerator {
     private static final float CONTINENTAL_SCALE = 0.008f;
     private static final float DETAIL_SCALE = 0.025f;
 
-    private static final int BASE_HEIGHT = 14;
-    private static final int MOUNTAIN_HEIGHT = 50;
-    private static final int WATER_LEVEL = 17;
+    private static final int BASE_HEIGHT = 64;
+    private static final int WATER_LEVEL = 60;
+    private static final int MOUNTAIN_HEIGHT = 80;
 
     private static final int ORE_MAX_HEIGHT = 45;
     private static final float ORE_CHANCE = 0.015f;

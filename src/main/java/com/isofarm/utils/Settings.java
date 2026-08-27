@@ -13,7 +13,7 @@ public class Settings {
     private static boolean doKeepInventory = false;
     private static boolean doEnableMotions = true;
     private static boolean isOrthographic = true;
-    private static float maxInteractionDistance = 5.0f;
+    private static float maxInteractionDistance = 8.0f;
     private static boolean doEnableMusic = true;
     private static boolean doEnableDebugInfo = true;
     private static boolean doEnableShadows = false;
@@ -102,7 +102,7 @@ public class Settings {
     }
 
     public static float getMaxInteractionDistance() {
-        return maxInteractionDistance;
+        return isOrthographic() ? maxInteractionDistance : maxInteractionDistance - 3.0f;
     }
 
     public static void setMaxInteractionDistance(float maxInteractionDistance) {
