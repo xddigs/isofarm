@@ -33,6 +33,10 @@ public class Settings {
         return value * getScale();
     }
 
+    public static float getScaledEntity() {
+        return scale(0.5f);
+    }
+
     public static float getScaledIcon() {
         return scale(BASE_ICON_SIZE);
     }
@@ -87,10 +91,6 @@ public class Settings {
 
     public static float getScaledHeader() {
         return getScaledIcon();
-    }
-
-    public static float getScaledGUI() {
-        return scale(20.0f);
     }
 
     public static boolean isOrthographic() {

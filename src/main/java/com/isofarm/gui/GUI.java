@@ -1,16 +1,14 @@
 package com.isofarm.gui;
 
-import com.isofarm.graphics.Mesh;
-import com.isofarm.graphics.Shader;
-import com.isofarm.graphics.SpriteSheet;
-import com.isofarm.graphics.Texture;
+import com.isofarm.graphics.*;
+import com.isofarm.input.Mouse;
+import com.isofarm.item.Item;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Utils;
+import com.isofarm.wrld.GameMaster;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.lwjgl.stb.STBTTBakedChar;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -429,6 +427,28 @@ public class GUI {
                 screenHeight,
                 0.0f
         );
+    }
+
+    public static void drawCursor(GameMaster gameMaster) {
+        if (gameMaster == null) return;
+
+        var hotbarUI = gameMaster.getGameUIService().getHotbarUI();
+        if (hotbarUI == null) return;
+
+        Item selectedItem = hotbarUI.getSelectedItem();
+        if (selectedItem == null) return;
+
+        SpriteSheet spriteSheet = ResourceManager.getItemSpriteSheet(selectedItem);
+        if (spriteSheet == null) return;
+
+        int frameIndex = ResourceManager.getItemFrame(selectedItem);
+        float iconSize = 32.0f;
+        float offsetX = 12.0f;
+        float offsetY = 12.0f;
+
+        float renderX = Mouse.getX() + offsetX;
+        float renderY = Mouse.getY() + offsetY;
+        drawSprite(spriteSheet, frameIndex, renderX, renderY, iconSize, iconSize, new Vector4f(1.0f));
     }
 
     public static int getScreenWidth() {

@@ -61,7 +61,7 @@ public class Player extends Character {
         GridPos highestAltitude = world.getHighestY(spawnX, spawnZ);
         setPosition(new Vector3f(spawnX, highestAltitude.y(), spawnZ));
         setVelocity(new Vector3f(0.0f, 0.0f, 0.0f));
-        setDimensions(new Vector3f(0.5f, 1.0f, 0.5f));
+        setDimensions(new Vector3f(1.0f, 2.0f, 1.0f));
         setMaxHitpoints(20);
         setHitpoints(getMaxHitpoints());
         setMaxStamina(100);
@@ -97,13 +97,28 @@ public class Player extends Character {
         currentState.update(this, delta);
 
         if (velocity.x != 0.0f || velocity.z != 0.0f) {
-            float absX = Math.abs(velocity.x);
-            float absZ = Math.abs(velocity.z);
+            float threshold = 0.3f;
+            boolean right = velocity.x > threshold;
+            boolean left = velocity.x < -threshold;
+            boolean down = velocity.z > threshold;
+            boolean up = velocity.z < -threshold;
 
-            if (absX > absZ) {
-                direction = velocity.x > 0 ? Direction.EAST : Direction.WEST;
-            } else {
-                direction = velocity.z > 0 ? Direction.SOUTH : Direction.NORTH;
+            if (up && right) {
+                direction = Direction.NORTH_EAST;
+            } else if (up && left) {
+                direction = Direction.NORTH_WEST;
+            } else if (down && right) {
+                direction = Direction.SOUTH_EAST;
+            } else if (down && left) {
+                direction = Direction.SOUTH_WEST;
+            } else if (right) {
+                direction = Direction.EAST;
+            } else if (left) {
+                direction = Direction.WEST;
+            } else if (down) {
+                direction = Direction.SOUTH;
+            } else if (up) {
+                direction = Direction.NORTH;
             }
         }
 
@@ -149,15 +164,14 @@ public class Player extends Character {
         if (isMoving) {
             rowIndex = 4 + directionOffset;
             totalFramesInRow = K.UI.PLAYER_SPRITE_COLS_RUN;
-            startSpriteIndex = K.UI.PLAYER_SPRITE_COLS * 4 + (directionOffset * K.UI.PLAYER_SPRITE_COLS_RUN);
         } else {
             rowIndex = directionOffset;
             totalFramesInRow = K.UI.PLAYER_SPRITE_COLS;
-            startSpriteIndex = rowIndex * K.UI.PLAYER_SPRITE_COLS;
         }
 
         int currentFrame = (int) (getAnimTimer() / getFrameDuration()) % totalFramesInRow;
-        int spriteIndex = startSpriteIndex + currentFrame;
+        int spriteIndex = (rowIndex * K.UI.PLAYER_SPRITE_COLS) + currentFrame;
+
         Vector4f uvBounds = sheet.getUVBounds(spriteIndex);
         shader.bind();
 
@@ -187,14 +201,22 @@ public class Player extends Character {
         shader.setUniform("uProjection", camera.getProjectionMatrix());
         shader.setUniform("uView", camera.getViewMatrix());
 
-        float scale = Settings.getScaledSlot();
         float aspect = sheet.getFrameHeight() > 0 ? (float) sheet.getFrameWidth() / (float) sheet.getFrameHeight() : 1.0f;
-        float baseScaleY = (dimensions == null || dimensions.y <= 0 ? 1.0f : dimensions.y) * 2.0f;
-        float baseScaleX = baseScaleY * aspect;
-        float baseScaleZ = dimensions == null || dimensions.z <= 0 ? 1.0f : dimensions.z;
+        float baseScaleY = (dimensions == null || dimensions.y <= 0) ? 2.0f : dimensions.y;
+        float baseScaleX = (dimensions == null || dimensions.x <= 0) ? 1.0f : dimensions.x;
+        float baseScaleZ = (dimensions == null || dimensions.z <= 0) ? 1.0f : dimensions.z;
+        float globalScale = Settings.getScaledEntity();
+
+        float finalScaleX = baseScaleX * globalScale;
+        float finalScaleY = baseScaleY * globalScale;
+        float finalScaleZ = baseScaleZ * globalScale;
 
         float yawRad = (float) Math.toRadians(-camera.getYaw());
-        modelMatrix.identity().translate(position).rotateY(yawRad).scale(baseScaleX, baseScaleY, baseScaleZ);
+        modelMatrix.identity()
+                .translate(position)
+                .rotateY(yawRad)
+                .scale(finalScaleX, finalScaleY, finalScaleZ);
+
         shader.setUniform("uModel", modelMatrix);
 
         glDisable(GL_CULL_FACE);
@@ -304,7 +326,7 @@ public class Player extends Character {
         GridPos highestAltitude = gameMaster.getWorld().getHighestY(spawnX, spawnZ);
         setPosition(new Vector3f(spawnX, highestAltitude.y() + 1.0f, spawnZ));
         setVelocity(new Vector3f(0.0f, 0.0f, 0.0f));
-        setDimensions(new Vector3f(0.5f, 1.0f, 0.5f));
+        setDimensions(new Vector3f(1.0f, 2.0f, 1.0f));
         setSpeed(6.0f);
 
         setReputation(Reputation.NEUTRAL);

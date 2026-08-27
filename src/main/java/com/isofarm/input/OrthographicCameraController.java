@@ -4,6 +4,7 @@ import com.isofarm.data.Hit;
 import com.isofarm.entity.Player;
 import com.isofarm.entity.states.SwimmingState;
 import com.isofarm.graphics.OrthographicCamera;
+import com.isofarm.gui.GUI;
 import com.isofarm.pathfinding.GridPos;
 import com.isofarm.pathfinding.PathFinder;
 import com.isofarm.service.Service;
@@ -39,6 +40,8 @@ public record OrthographicCameraController(OrthographicCamera camera)
             }
         }
 
+        GUI.drawCursor(gameMaster);
+
         click(gameMaster, player, gameMaster.getWorld());
         followPath(player, gameMaster.getWorld(), delta);
         followPlayer(player);
@@ -65,8 +68,9 @@ public record OrthographicCameraController(OrthographicCamera camera)
     }
 
     private void click(GameMaster gameMaster, Player player, World world) {
-        boolean wasLeftClickPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
-        if (!wasLeftClickPressed) return;
+        boolean wasRightClickPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_RIGHT);
+        boolean hasItemSelected = gameMaster.getGameUIService().getHotbarUI().getSelectedItem() == null;
+        if (!wasRightClickPressed || !hasItemSelected) return;
 
         float mouseX = Mouse.getX();
         float mouseY = Mouse.getY();
