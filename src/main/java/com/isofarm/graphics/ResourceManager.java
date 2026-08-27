@@ -201,7 +201,9 @@ public class ResourceManager {
 
     public static int getItemFrame(Item item) {
         if (item instanceof Block block && block.getType() != null) {
-           return block.getType().getId() - 1;
+            int col = block.getType().getCol() - 1;
+            int row = block.getType().getRow();
+            return (row * K.UI.ICON_BLOCK_COLS) + col;
         }
 
         if (item instanceof Produce produce && produce.getType() != null) {
@@ -218,7 +220,7 @@ public class ResourceManager {
 
         if (item instanceof Tool tool) {
             int row = tool.getRow();
-            int col = tool.getId();
+            int col = tool.getCol();
             return (row * K.UI.ICON_TOOL_COLS) + col;
         }
 

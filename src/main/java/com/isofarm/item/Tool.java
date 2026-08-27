@@ -46,6 +46,10 @@ public abstract class Tool implements Item, Enchantable {
         return value;
     }
 
+    public int getCol() {
+        return getId();
+    }
+
     public int getRow() {
         return tier.getId();
     }
