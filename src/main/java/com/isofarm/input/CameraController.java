@@ -2,6 +2,7 @@ package com.isofarm.input;
 
 import com.isofarm.entity.Player;
 import com.isofarm.entity.states.CrouchingState;
+import com.isofarm.entity.states.SwimmingState;
 import com.isofarm.graphics.Camera;
 import com.isofarm.service.Service;
 import com.isofarm.utils.K;
@@ -178,7 +179,8 @@ public class CameraController implements Service<Camera> {
         boolean isSprinting = Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)
                 && !gameMaster.isInventoryOpen() && !gameMaster.isChatOpen()
                 && hasMovementInput && player.getStamina() > 0
-                && !(player.getCurrentState() instanceof CrouchingState);
+                && !(player.getCurrentState() instanceof CrouchingState)
+                && !(player.getCurrentState() instanceof SwimmingState);
 
         boolean isCrounching = !isSprinting && (player.getCurrentState() instanceof CrouchingState);
         float speed = isCrounching ? player.getSpeed() / 2f : player.getSpeed();
