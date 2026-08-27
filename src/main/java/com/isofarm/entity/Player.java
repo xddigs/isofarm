@@ -212,8 +212,9 @@ public class Player extends Character {
         float finalScaleZ = baseScaleZ * globalScale;
 
         float yawRad = (float) Math.toRadians(-camera.getYaw());
+        float yOffset = finalScaleY * -0.20f;
         modelMatrix.identity()
-                .translate(position)
+                .translate(position.x, position.y + yOffset, position.z)
                 .rotateY(yawRad)
                 .scale(finalScaleX, finalScaleY, finalScaleZ);
 
