@@ -19,12 +19,10 @@ environment driven by custom 3D mesh rendering, particle systems, and dynamic da
 ## Featured Controls
 | Action                             | Key / Input                   |
 |------------------------------------|-------------------------------|
-| **Change View**                    | `V`<br>                       |
 | **Rotate Camera in Iso**           | `Arrow Keys` or `A` & `D`<br> |
-| **Movement**                       | `W` `A` `S` `D`<br>           |
+| **Movement**                       | `Mouse`<br>                   |
 | **Sprint**                         | `Left Shift`<br>              |
 | **Jump**                           | `Space`<br>                   |
-| **Look around**                    | `Mouse Movement`<br>          |
 | **Zoom Camera**                    | `C`<br>                       |
 | **Break Block / Harvest**          | `Left Mouse Button`<br>       |
 | **Place Block / Use Tool / Plant** | `Right Mouse Button`<br>      |

@@ -110,12 +110,6 @@ public class GameInteraction {
             }
         }
 
-        if (!gameMaster.isChatOpen() && !gameMaster.isInventoryOpen()) {
-            if (Keyboard.isKeyPressed(GLFW_KEY_V) || Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_MIDDLE)) {
-                gameMaster.changeCamera();
-            }
-        }
-
         if (Keyboard.isKeyPressed(GLFW_KEY_M) && !gameMaster.isChatOpen()) {
             Settings.toggleMusic();
         }
