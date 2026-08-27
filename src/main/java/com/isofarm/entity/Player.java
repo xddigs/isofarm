@@ -113,6 +113,7 @@ public class Player extends Character {
 
         setAnimTimer(getAnimTimer() + delta);
         heal(((0.5f + getLevel()) * delta) / getDifficultyRegen());
+        autoJump(gameMaster.getWorld(), getVelocity(), delta);
         checkDurability();
     }
 
@@ -129,27 +130,25 @@ public class Player extends Character {
         Shader shader = rm.getDefaultShader();
         int textureUnit = K.Render.PRIMARY_TEXTURE_UNIT;
 
-        boolean isMoving = (getVelocity().x * getVelocity().x + getVelocity().z * getVelocity().z) > 0.001f;
-        boolean flipHorizontal = false;
+        boolean isMoving = (getVelocity().x * getVelocity().x +
+                getVelocity().z * getVelocity().z) > 0.001f;
         int baseRow = 0;
 
         if (direction != null) {
             switch (direction) {
-                case NORTH, NORTH_WEST, NORTH_EAST -> baseRow = 4;
-                case WEST -> {
-                    baseRow = 2;
-                    flipHorizontal = true;
-                }
-                case EAST -> baseRow = 2;
-                default -> baseRow = 0;
+                case NORTH_WEST, NORTH -> baseRow = 0;
+                case SOUTH_WEST, WEST -> baseRow = 1;
+                case SOUTH_EAST, SOUTH, EAST -> baseRow = 2;
+                case NORTH_EAST -> baseRow = 3;
             }
         }
 
         int rowIndex = isMoving ? baseRow + 1 : baseRow;
-        int totalFramesInRow = isMoving ? 8 : 4;
+
+        int totalFramesInRow = isMoving ? 8 : 12;
         int currentFrame = (int) (getAnimTimer() / getFrameDuration()) % totalFramesInRow;
 
-        int sheetColumns = 8;
+        int sheetColumns = 12;
         int spriteIndex = (rowIndex * sheetColumns) + currentFrame;
 
         Vector4f uvBounds = sheet.getUVBounds(spriteIndex);
@@ -183,7 +182,7 @@ public class Player extends Character {
 
         float aspect = sheet.getFrameHeight() > 0 ? (float) sheet.getFrameWidth() / (float) sheet.getFrameHeight() : 1.0f;
         float baseScaleY = dimensions == null || dimensions.y <= 0 ? 1.0f : dimensions.y;
-        float baseScaleX = (baseScaleY * aspect) * (flipHorizontal ? -1.0f : 1.0f);
+        float baseScaleX = baseScaleY * aspect;
         float baseScaleZ = dimensions == null || dimensions.z <= 0 ? 1.0f : dimensions.z;
 
         float yawRad = (float) Math.toRadians(-camera.getYaw());
@@ -233,6 +232,31 @@ public class Player extends Character {
         }
         currentState = newState;
         currentState.enter(this);
+    }
+
+    public void autoJump(World world, Vector3f velocity, float delta) {
+        if (!isOnGround() || (velocity.x == 0.0f && velocity.z == 0.0f)) {
+            return;
+        }
+
+        Vector3f originalPos = new Vector3f(getPosition());
+        getPosition().x += velocity.x * delta;
+        getPosition().z += velocity.z * delta;
+        boolean isBlockedAtFeet = checkCollision(world);
+        setPosition(originalPos);
+
+        if (isBlockedAtFeet) {
+            getPosition().y += 1.05f;
+            getPosition().x += velocity.x * delta;
+            getPosition().z += velocity.z * delta;
+
+            boolean canClearStep = !checkCollision(world);
+            setPosition(originalPos);
+
+            if (canClearStep) {
+                jump();
+            }
+        }
     }
 
     private void checkDurability() {

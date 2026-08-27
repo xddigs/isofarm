@@ -13,7 +13,6 @@ public final class K {
         public static final float DEFAULT_PITCH = 35.264f;
         public static final float DEFAULT_YAW = -45.0f;
         public static final float SPRINT_MULTIPLIER = 1.5f;
-        public static final float UNDERWATER_MULTIPLIER = -2.0f;
 
         public static final float BOB_FREQUENCY = 10.0f;
         public static final float BOB_AMOUNT = 0.08f;
@@ -61,7 +60,6 @@ public final class K {
         public static final int INVENTORY_COLUMNS = 9;
         public static final int INVENTORY_ROWS = 4;
         public static final int INVENTORY_SLOTS = INVENTORY_COLUMNS * INVENTORY_ROWS;
-        public static final float INVENTORY_BACKPACK_OFFSET = 50f;
 
         public static final float SQUISH_DURATION = 0.25f;
 
@@ -151,7 +149,7 @@ public final class K {
         public static final String BLOCK_ICONS = "assets/gui/block_icons.png";
         public static final String MATERIAL_ICONS = "assets/gui/material_icons.png";
         public static final String INVENTORY_ICONS = "assets/gui/inventory_icons.png";
-        public static final String PLAYER_SPRITESHEET = "assets/sprites/gb.png";
+        public static final String PLAYER_SPRITESHEET = "assets/sprites/default.png";
         public static final String DESTROY_STAGES = "assets/textures/blocks/destroy.png";
         public static final String HEARTS_SPRITESHEET = "assets/gui/hearts.png";
         public static final String STAMINA_SPRITESHEET = "assets/gui/stamina.png";
