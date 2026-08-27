@@ -1,30 +1,22 @@
 package com.isofarm.wrld;
 
 import com.isofarm.data.BlockData;
-import org.joml.SimplexNoise;
 
 import java.util.Random;
 
-@SuppressWarnings("all")
 public class WorldGenerator {
-    private static final float CONTINENTAL_SCALE = 0.008f;
-    private static final float DETAIL_SCALE = 0.025f;
-
-    private static final int BASE_HEIGHT = 32;
-    private static final int WATER_LEVEL = 30;
-    private static final int MOUNTAIN_HEIGHT = 50;
-
-    private static final int ORE_MAX_HEIGHT = 45;
-    private static final float ORE_CHANCE = 0.015f;
-
-    private static final int FLOWER_MAX_HEIGHT = BASE_HEIGHT + 10;
-    private static final float FLOWER_CHANCE = 0.08f;
-    private static final float LARGE_TREE_CHANCE = 0.1f;
+    private static final int ISLAND_CENTER_X = 0;
+    private static final int ISLAND_CENTER_Z = 0;
+    private static final float ISLAND_RADIUS = 8.0f;
+    private static final int SURFACE_Y = 25;
+    private static final int MAX_DEPTH = 16;
 
     private final World world;
     private final long seed;
-    private final float offsetX;
-    private final float offsetZ;
+
+    private final int poolMinX;
+    private final int poolMinZ;
+    private int treeX, treeZ;
 
     public WorldGenerator(World world) {
         this(world, new Random().nextLong());
@@ -33,14 +25,23 @@ public class WorldGenerator {
     public WorldGenerator(World world, long seed) {
         this.world = world;
         this.seed = seed;
-        this.offsetX = (seed & 0xFFFFL) * 311.7f;
-        this.offsetZ = ((seed >> 16) & 0xFFFFL) * 137.3f;
+
+        Random islandRandom = new Random(seed);
+        this.poolMinX = islandRandom.nextInt(10) - 5;
+        this.poolMinZ = islandRandom.nextInt(10) - 5;
+
+        do {
+            this.treeX = islandRandom.nextInt(14) - 7;
+            this.treeZ = islandRandom.nextInt(14) - 7;
+        } while (isInsidePool(treeX, treeZ));
+    }
+
+    private boolean isInsidePool(int x, int z) {
+        return (x >= poolMinX && x <= poolMinX + 1) && (z >= poolMinZ && z <= poolMinZ + 1);
     }
 
     public void generateChunk(int chunkX, int chunkZ) {
         Chunk chunk = world.getOrCreateChunk(chunkX, chunkZ);
-        int[][] heightMap = new int[Chunk.SIZE_X][Chunk.SIZE_Z];
-
         long chunkSeed = seed ^ ((long) chunkX * 341873128712L + (long) chunkZ * 132897987541L);
         Random chunkRandom = new Random(chunkSeed);
 
@@ -49,134 +50,84 @@ public class WorldGenerator {
                 int worldX = chunkX * Chunk.SIZE_X + x;
                 int worldZ = chunkZ * Chunk.SIZE_Z + z;
 
-                float sampleX = worldX + offsetX;
-                float sampleZ = worldZ + offsetZ;
+                float dx = worldX - ISLAND_CENTER_X;
+                float dz = worldZ - ISLAND_CENTER_Z;
+                float distToCenter = (float) Math.sqrt(dx * dx + dz * dz);
 
-                float continental = (SimplexNoise.noise(sampleX * CONTINENTAL_SCALE, sampleZ * CONTINENTAL_SCALE) + 1.0f) * 0.5f;
-                float mountainFactor = (float) Math.pow(continental, 4.0f);
-                float detailNoise = SimplexNoise.noise(sampleX * DETAIL_SCALE, sampleZ * DETAIL_SCALE);
-                int height = (int) (BASE_HEIGHT + (detailNoise * 4.0f) + (mountainFactor * MOUNTAIN_HEIGHT));
-                height = Math.clamp(height, 1, Chunk.SIZE_Y - 1);
-                heightMap[x][z] = height;
+                boolean isWaterBlock = isInsidePool(worldX, worldZ);
 
-                int maxY = Math.max(height, WATER_LEVEL);
-                for (int y = 0; y <= maxY; y++) {
-                    byte blockId = BlockData.AIR.getId();
+                for (int y = SURFACE_Y; y >= SURFACE_Y - MAX_DEPTH; y--) {
+                    float depthFactor = (float) (y - (SURFACE_Y - MAX_DEPTH)) / MAX_DEPTH;
+                    float currentAllowedRadius = (ISLAND_RADIUS * (0.3f + 0.7f * depthFactor));
 
-                    if (y <= height) {
-                        blockId = getBlockId(y, height, mountainFactor, y < WATER_LEVEL, chunkRandom);
-                        if (generateOre(worldX, worldZ, y, height)) {
-                            blockId = BlockData.getRandomOre().getId();
+                    if (distToCenter <= currentAllowedRadius) {
+                        byte blockId;
+                        if (y == SURFACE_Y) {
+                            blockId = isWaterBlock ? BlockData.WATER.getId() : BlockData.GRASS.getId();
+                        } else if (y >= SURFACE_Y - 3) {
+                            blockId = BlockData.DIRT.getId();
+                        } else {
+                            if (chunkRandom.nextFloat() < 0.03f && y < SURFACE_Y - 5) {
+                                blockId = BlockData.getRandomOre().getId();
+                            } else {
+                                blockId = BlockData.STONE.getId();
+                            }
                         }
-                    } else if (y <= WATER_LEVEL) {
-                        blockId = BlockData.WATER.getId();
-                    }
 
-                    if (blockId != BlockData.AIR.getId()) {
-                        chunk.setBlock(x, y, z, blockId);
+                        if (blockId != BlockData.AIR.getId()) {
+                            chunk.setBlock(x, y, z, blockId);
+                        }
                     }
                 }
             }
         }
 
-        for (int x = 2; x < Chunk.SIZE_X - 2; x++) {
-            for (int z = 2; z < Chunk.SIZE_Z - 2; z++) {
-                int height = heightMap[x][z];
-                int worldX = chunkX * Chunk.SIZE_X + x;
-                int worldZ = chunkZ * Chunk.SIZE_Z + z;
+        if (chunkX == 0 && chunkZ == 0) {
+            generateVegetation(chunkRandom);
+        }
+    }
 
-                if (height > WATER_LEVEL) {
-                    if (height <= FLOWER_MAX_HEIGHT && chunkRandom.nextDouble() < FLOWER_CHANCE) {
-                        BlockData plant = BlockData.PLANTS[chunkRandom.nextInt(BlockData.PLANTS.length)];
-                        chunk.setBlock(x, height + 1, z, plant.getId());
-                    }
+    private void generateVegetation(Random random) {
+        generateTree(treeX, treeZ, random);
 
-                    if (height < BASE_HEIGHT + 12 && chunkRandom.nextDouble() < 0.01 && canPlaceTree(heightMap, x, z)) {
-                        generateCompactTree(worldX, height, worldZ, chunkRandom.nextFloat() < LARGE_TREE_CHANCE, chunkRandom);
-                    }
-                }
+        for (int i = 0; i < 6; i++) {
+            int fx = random.nextInt(14) - 7;
+            int fz = random.nextInt(14) - 7;
+
+            if (!isInsidePool(fx, fz) && (fx != treeX || fz != treeZ)) {
+                byte plant = BlockData.PLANTS[random.nextInt(BlockData.PLANTS.length)].getId();
+                world.setBlockTypeAt(fx, SURFACE_Y + 1, fz, plant);
             }
         }
     }
 
-    private byte getBlockId(int y, int height, float mountainFactor, boolean isUnderwater, Random random) {
-        boolean isHighMountain = mountainFactor > 0.45f;
-
-        if (y == height) {
-            if (isUnderwater) {
-                return BlockData.DIRT.getId();
-            }
-            if (isHighMountain && y > BASE_HEIGHT + 14) {
-                return BlockData.SNOW.getId();
-            }
-            return BlockData.GRASS.getId();
-        } else if (y > height - 3) {
-            if (isUnderwater) return BlockData.DIRT.getId();
-            return isHighMountain ? BlockData.STONE.getId() : BlockData.DIRT.getId();
-        } else if (random.nextDouble() < 0.01) {
-            return BlockData.VOIDSTONE.getId();
-        } else {
-            return BlockData.STONE.getId();
-        }
-    }
-
-    private boolean canPlaceTree(int[][] heightMap, int centerX, int centerZ) {
-        for (int dx = -2; dx <= 2; dx++) {
-            for (int dz = -2; dz <= 2; dz++) {
-                int nx = centerX + dx;
-                int nz = centerZ + dz;
-                if (nx >= 0 && nx < Chunk.SIZE_X && nz >= 0 && nz < Chunk.SIZE_Z) {
-                    if (Math.abs(heightMap[nx][nz] - heightMap[centerX][centerZ]) > 1) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
-    }
-
-    private void generateCompactTree(int worldX, int groundY, int worldZ, boolean isLargeTree, Random random) {
+    private void generateTree(int worldX, int worldZ, Random random) {
         int trunkHeight = 4 + random.nextInt(2);
-        int topY = groundY + trunkHeight;
 
         for (int y = 1; y <= trunkHeight; y++) {
-            world.setBlockTypeAt(worldX, groundY + y, worldZ, BlockData.OAK_LOG.getId());
+            world.setBlockTypeAt(worldX, SURFACE_Y + y, worldZ, BlockData.OAK_LOG.getId());
         }
 
+        int topY = SURFACE_Y + trunkHeight;
         int leafRadius = 2;
+
         for (int ly = topY - 2; ly <= topY + 1; ly++) {
             int subRadius = (ly == topY + 1) ? 1 : leafRadius;
 
             for (int dx = -subRadius; dx <= subRadius; dx++) {
                 for (int dz = -subRadius; dz <= subRadius; dz++) {
-                    if (Math.abs(dx) == subRadius && Math.abs(dz) == subRadius && random.nextDouble() < 0.5) {
+                    if (Math.abs(dx) == subRadius && Math.abs(dz) == subRadius && random.nextDouble() < 0.4) {
                         continue;
                     }
 
                     int targetX = worldX + dx;
                     int targetZ = worldZ + dz;
                     byte currentBlock = world.getBlockTypeAt(targetX, ly, targetZ);
-                    if (currentBlock == 0) {
+                    if (currentBlock == BlockData.AIR.getId()) {
                         world.setBlockTypeAt(targetX, ly, targetZ, BlockData.OAK_LEAVES.getId());
                     }
                 }
             }
         }
-    }
-
-    private boolean generateOre(int worldX, int worldZ, int y, int surfaceHeight) {
-        if (y >= surfaceHeight || y > ORE_MAX_HEIGHT || y >= surfaceHeight - 3) {
-            return false;
-        }
-        long hash = seed;
-        hash ^= worldX * 341873128712L;
-        hash ^= worldZ * 132897987541L;
-        hash ^= y * 42317861L;
-        hash ^= (hash >>> 33);
-        hash *= 0xff51afd7ed558ccdl;
-        hash ^= (hash >>> 33);
-
-        long positiveHash = hash & Long.MAX_VALUE;
-        return (positiveHash / (double) Long.MAX_VALUE) < ORE_CHANCE;
     }
 }
