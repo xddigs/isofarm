@@ -81,7 +81,7 @@ public class CameraController implements Service<Camera> {
 
             movement(gameMaster, delta);
 
-            if (!isFlying) {
+            if (!isFlying && !(player.getCurrentState() instanceof SwimmingState)) {
                 if (!gameMaster.isInventoryOpen() && !gameMaster.isChatOpen()
                         && Keyboard.isKeyPressed(GLFW_KEY_SPACE)) {
                     player.jump();
@@ -116,7 +116,7 @@ public class CameraController implements Service<Camera> {
         if (player.getDamageSequence() != lastDamageSequence) {
             lastDamageSequence = player.getDamageSequence();
             float damage = player.getLastDamageAmount();
-            float intensity = Math.clamp(damage / 20.0f, 0.0f, 1.0f);
+            float intensity = Math.clamp(damage / 15.0f, 0.0f, 1.0f);
             float direction = Math.random() < 0.5f ? -1.0f : 1.0f;
             damageTiltVelocity += direction * (20.0f + intensity * 40.0f);
         }
