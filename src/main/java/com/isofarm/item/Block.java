@@ -2,6 +2,7 @@ package com.isofarm.item;
 
 import com.isofarm.data.BlockData;
 import com.isofarm.data.DataClass;
+import com.isofarm.data.Hit;
 import com.isofarm.utils.K;
 
 @DataClass
@@ -24,8 +25,8 @@ public class Block implements Craftable {
         this.z = z;
     }
 
-    public Block(BlockData type, int x, int z) {
-        this(type, x, 0, z);
+    public Block(BlockData type, Hit pos) {
+        this(type, pos.x(), 0, pos.y());
     }
 
     public Block(BlockData type) {

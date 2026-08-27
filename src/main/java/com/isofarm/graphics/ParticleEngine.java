@@ -1,6 +1,7 @@
 package com.isofarm.graphics;
 
 import com.isofarm.data.BlockData;
+import com.isofarm.data.Hit;
 import com.isofarm.data.Particle;
 import com.isofarm.service.Service;
 import com.isofarm.utils.K;
@@ -84,7 +85,7 @@ public class ParticleEngine implements Service<Particle> {
         shader.unbind();
     }
 
-    public void spawn(float blockX, float blockY, float blockZ, BlockData blockData) {
+    public void spawn(Hit blockPos, BlockData blockData) {
         if (blockData == null || blockData == BlockData.AIR) return;
 
         TextureAtlas.TextureRegion region = blockData.getSideRegion();
@@ -101,9 +102,9 @@ public class ParticleEngine implements Service<Particle> {
         float particleUvHeight = baseScale.y / 4.0f;
 
         for (int i = 0; i < totalParticles; i++) {
-            float px = blockX + random.nextFloat();
-            float py = blockY + random.nextFloat();
-            float pz = blockZ + random.nextFloat();
+            float px = blockPos.x() + random.nextFloat();
+            float py = blockPos.y() + random.nextFloat();
+            float pz = blockPos.z() + random.nextFloat();
 
             float vx = (random.nextFloat() - 0.5f) * 2.5f;
             float vy = random.nextFloat() * 2.5f + 1.0f;

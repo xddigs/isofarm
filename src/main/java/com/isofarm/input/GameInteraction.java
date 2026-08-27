@@ -410,16 +410,12 @@ public class GameInteraction {
     private void breakBlock(GameMaster gameMaster, Hit cell, BlockData blockData,
                             byte blockId, Item selectedItem) {
         World world = gameMaster.getWorld();
-        int x = cell.x();
-        int y = cell.y();
-        int z = cell.z();
-
         if (blockData.getSoundGroup() != null) {
             gameMaster.getSoundService().playBreakSound(blockData.getSoundGroup(),
                     getDistanceToBlock(gameMaster, cell), Settings.getMaxInteractionDistance());
         }
 
-        world.setBlockTypeAt(x, y, z, BlockData.AIR.getId());
+        world.setBlockTypeAt(cell, BlockData.AIR.getId());
         itemRenderer.playBreakAnimation();
 
         if (selectedItem instanceof Tool tool) {
@@ -434,11 +430,11 @@ public class GameInteraction {
             }
         }
 
-        gameMaster.rebuildChunkMeshAt(x, z);
-        particles.spawn(x, y, z, blockData);
+        gameMaster.rebuildChunkMeshAt(cell);
+        particles.spawn(cell, blockData);
 
-        Vector3f position = new Vector3f(x + 0.5f, y + 0.5f, z + 0.5f);
-        Block removedBlock = new Block(blockData, x, y, z);
+        Vector3f position = new Vector3f(cell.x() + 0.5f, cell.y() + 0.5f, cell.z() + 0.5f);
+        Block removedBlock = new Block(blockData, cell);
         Item itemToDrop = null;
         BlockData removedBlockData = removedBlock.getType();
 
@@ -461,7 +457,7 @@ public class GameInteraction {
         gameMaster.addEntity(dropEntity);
 
         gameUIservice.logAction(cell);
-        log.info("Block removed: {} at {},{},{}", blockData.getName(), x, y, z);
+        log.info("Block removed: {} at {},{},{}", blockData.getName(), cell.x(), cell.y(), cell.z());
         this.breakTimeout = TIMEOUT;
     }
 
