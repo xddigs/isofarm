@@ -238,7 +238,7 @@ public class Player extends Character {
     private void checkDurability() {
         for (InventorySlot slot : getInventory().getSlots()) {
             if (slot.getItem() instanceof Tool tool) {
-                if (tool.getDurability() % 4 == 0) {
+                if (tool.getDurability() == 10) {
                     ToastFactory.warning("Your " + tool.getName() + " is about to break!");
                     return;
                 }
