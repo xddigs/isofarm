@@ -39,6 +39,7 @@ public class Player extends Character {
     private int damageSequence = 0;
     private float lastDamageAmount = 0.0f;
     private float fallStartY = 0.0f;
+    private float respawnTimer = -1.0f;
     private boolean isFalling = false;
 
     public Player(String name, World world, GameMaster gameMaster) {
@@ -66,8 +67,19 @@ public class Player extends Character {
 
     @Override
     public void update(Hit hit, float delta) {
-        if (!isAlive()) {
-            dropLoot();
+        if (!this.isAlive()) {
+            if (respawnTimer <= 0.0f) {
+                respawnTimer = 5.0f;
+                dropLoot();
+                gameMaster.toggleHUD();
+                setGamemode(Gamemode.NO_CLIP);
+            }
+
+            respawnTimer -= delta;
+            if (respawnTimer <= 0.0f) {
+                respawn();
+            }
+
             return;
         }
 
@@ -89,6 +101,7 @@ public class Player extends Character {
                     fallDamage(damage);
                     getSoundService().playBreakSound(SoundGroup.ENTITY, 1.0f, 1.0f);
                 }
+
                 isFalling = false;
             }
         }
@@ -196,29 +209,39 @@ public class Player extends Character {
 
     @Override
     protected void dropLoot() {
-        for (Item i : getInventory().getItems().keySet()) {
+        for (Item i : List.copyOf(getInventory().getItems().keySet())) {
+            if (i == null) continue;
             switch (i) {
                 case Backpack ignored -> { continue; }
                 case CraftingKit ignored -> { continue; }
                 default -> {}
             }
-            WorldItem item = new WorldItem(i, getInventory().getAmount(i),
-                    new Vector3f(position.x, position.y, position.z));
+
+            int amount = getInventory().getAmount(i);
+            if (amount <= 0) continue;
+            WorldItem item = new WorldItem(i, amount, new Vector3f(position.x, position.y, position.z));
+            remove(i, amount);
             gameMaster.addEntity(item);
         }
     }
 
     public void respawn() {
-        if (!Settings.doKeepInventory()) clear();
+        if (!Settings.doKeepInventory()) {
+            clear();
+        }
+
         float spawnX = 0.5f;
         float spawnZ = 0.5f;
+
         GridPos highestAltitude = gameMaster.getWorld().getHighestY(spawnX, spawnZ);
         setPosition(new Vector3f(spawnX, highestAltitude.y() + 1.0f, spawnZ));
         setVelocity(new Vector3f(0.0f, 0.0f, 0.0f));
         setDimensions(new Vector3f(0.5f, 1.0f, 0.5f));
         setSpeed(6.0f);
+
         setReputation(Reputation.NEUTRAL);
         setGamemode(Gamemode.SURVIVAL);
+
         setIsOffGroundTimer(0.0f);
         setWasOnGround(false);
 
@@ -231,6 +254,8 @@ public class Player extends Character {
         setExperience(0);
         setLevel(1);
         resetAttributes();
+        respawnTimer = -1.0f;
+        gameMaster.toggleHUD();
     }
 
     public void resetAttributes() {
@@ -461,5 +486,13 @@ public class Player extends Character {
     public void clearPath() {
         this.path = List.of();
         this.pathIndex = 0;
+    }
+
+    public float getRespawnTimer() {
+        return respawnTimer;
+    }
+
+    public void setRespawnTimer(float respawnTimer) {
+        this.respawnTimer = respawnTimer;
     }
 }

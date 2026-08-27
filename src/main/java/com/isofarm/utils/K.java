@@ -69,11 +69,11 @@ public final class K {
         public static final int ICON_BLOCK_COLS = 10;
         public static final int ICON_TOOL_COLS = 9;
         public static final int ICON_TOOL_ROWS = 7;
+        public static final int ICON_HEARTS_ROWS = 4;
 
         public static final int ICON_MATERIAL_COLS = 12;
         public static final int ICON_MATERIAL_ROWS = 2;
         public static final int ICON_INV_COLS = 4;
-        public static final int ICON_HEARTS_COLS = 4;
         public static final int ICON_STAMINA_COLS = 10;
 
         public static final int DESTROY_FRAMES = 9;

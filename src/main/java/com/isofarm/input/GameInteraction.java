@@ -60,6 +60,14 @@ public class GameInteraction {
     }
 
     public Hit update(GameMaster gameMaster, Item selectedItem) {
+        Player player = gameMaster.getPlayer();
+        boolean isCtrlHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL) || Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
+        boolean isLeftPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
+        boolean isLeftHeld = Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT);
+        boolean isRightPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_RIGHT);
+        boolean canInteract = player != null && !player.getGamemode().isNoClip()
+                && !isCtrlHeld && !gameMaster.isInventoryOpen() && !gameMaster.isChatOpen();
+
         if (Keyboard.isKeyPressed(GLFW_KEY_ENTER)) {
             if (!gameMaster.isChatOpen()) {
                 gameMaster.setChatOpen(true);
@@ -82,19 +90,21 @@ public class GameInteraction {
             Settings.toggleDebugInfo();
         }
 
-        if (Keyboard.isKeyPressed(GLFW_KEY_Q)) {
+        if (Keyboard.isKeyPressed(GLFW_KEY_Q) && canInteract) {
             boolean dropAll = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL);
             dropItem(gameMaster, selectedItem, dropAll);
         }
 
-        if (Keyboard.isKeyPressed(GLFW_KEY_E) && !gameMaster.isChatOpen()) {
+        if (Keyboard.isKeyPressed(GLFW_KEY_E) && !gameMaster.isChatOpen() && canInteract) {
             gameMaster.toggleInventory();
         }
 
-        if (!gameMaster.isOrthographicCamera()) {
-            pickUp(gameMaster);
-        } else {
-            addItem(gameMaster);
+        if (!gameMaster.getPlayer().getGamemode().isNoClip()) {
+            if (!gameMaster.isOrthographicCamera()) {
+                pickUp(gameMaster);
+            } else {
+                addItem(gameMaster);
+            }
         }
 
         if (!gameMaster.isChatOpen() && !gameMaster.isInventoryOpen()) {
@@ -106,13 +116,6 @@ public class GameInteraction {
         if (Keyboard.isKeyPressed(GLFW_KEY_M) && !gameMaster.isChatOpen()) {
             Settings.toggleMusic();
         }
-
-        boolean isCtrlHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL) || Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
-        boolean canInteract = !isCtrlHeld && !gameMaster.isInventoryOpen() && !gameMaster.isChatOpen();
-
-        boolean isLeftPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
-        boolean isLeftHeld = Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT);
-        boolean isRightPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_RIGHT);
 
         if (isLeftPressed && canInteract) {
             itemRenderer.playAttackAnimation();

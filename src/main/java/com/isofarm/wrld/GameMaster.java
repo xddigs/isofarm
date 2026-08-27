@@ -420,14 +420,15 @@ public class GameMaster {
     }
 
     private void updateEntities(float delta) {
+        if (player != null) {
+            player.update(HoveredCell.get(this), delta);
+        }
+
         for (Entity entity : entities) {
-            if (entity instanceof Player player
-                    && !player.isAlive()) {
-                player.respawn();
-            }
-            entities.removeIf(e -> !e.isAlive());
+            if (entity instanceof Player) continue;
             entity.update(HoveredCell.get(this), delta);
         }
+        entities.removeIf(e -> e != player && !e.isAlive());
     }
 
     public float getGenDelta() {

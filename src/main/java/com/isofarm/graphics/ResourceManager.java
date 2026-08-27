@@ -83,7 +83,7 @@ public class ResourceManager {
 
         this.playerSpriteSheet = new SpriteSheet(K.Paths.PLAYER_SPRITESHEET,
                 Direction.values().length, 6);
-        this.heartsSpriteSheet = new SpriteSheet(K.Paths.HEARTS_SPRITESHEET, K.UI.ICON_HEARTS_COLS, 1);
+        this.heartsSpriteSheet = new SpriteSheet(K.Paths.HEARTS_SPRITESHEET, 1, K.UI.ICON_HEARTS_ROWS);
         this.staminaSpriteSheet = new SpriteSheet(K.Paths.STAMINA_SPRITESHEET, K.UI.ICON_STAMINA_COLS, 1);
 
         this.destroyTexture = new SpriteSheet(K.Paths.DESTROY_STAGES, K.UI.DESTROY_FRAMES, 1);
