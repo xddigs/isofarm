@@ -129,28 +129,35 @@ public class Player extends Character {
 
         Shader shader = rm.getDefaultShader();
         int textureUnit = K.Render.PRIMARY_TEXTURE_UNIT;
-
         boolean isMoving = (getVelocity().x * getVelocity().x +
                 getVelocity().z * getVelocity().z) > 0.001f;
-        int baseRow = 0;
 
+        int directionOffset = 0;
         if (direction != null) {
             switch (direction) {
-                case NORTH_WEST, NORTH -> baseRow = 0;
-                case SOUTH_WEST, WEST -> baseRow = 1;
-                case SOUTH_EAST, SOUTH, EAST -> baseRow = 2;
-                case NORTH_EAST -> baseRow = 3;
+                case NORTH_WEST, NORTH -> directionOffset = 0;
+                case SOUTH_WEST, WEST  -> directionOffset = 1;
+                case SOUTH_EAST, SOUTH, EAST -> directionOffset = 2;
+                case NORTH_EAST        -> directionOffset = 3;
             }
         }
 
-        int rowIndex = isMoving ? baseRow + 1 : baseRow;
+        int rowIndex;
+        int totalFramesInRow;
+        int startSpriteIndex;
 
-        int totalFramesInRow = isMoving ? 8 : 12;
+        if (isMoving) {
+            rowIndex = 4 + directionOffset;
+            totalFramesInRow = K.UI.PLAYER_SPRITE_COLS_RUN;
+            startSpriteIndex = K.UI.PLAYER_SPRITE_COLS * 4 + (directionOffset * K.UI.PLAYER_SPRITE_COLS_RUN);
+        } else {
+            rowIndex = directionOffset;
+            totalFramesInRow = K.UI.PLAYER_SPRITE_COLS;
+            startSpriteIndex = rowIndex * K.UI.PLAYER_SPRITE_COLS;
+        }
+
         int currentFrame = (int) (getAnimTimer() / getFrameDuration()) % totalFramesInRow;
-
-        int sheetColumns = 12;
-        int spriteIndex = (rowIndex * sheetColumns) + currentFrame;
-
+        int spriteIndex = startSpriteIndex + currentFrame;
         Vector4f uvBounds = sheet.getUVBounds(spriteIndex);
         shader.bind();
 
@@ -180,8 +187,9 @@ public class Player extends Character {
         shader.setUniform("uProjection", camera.getProjectionMatrix());
         shader.setUniform("uView", camera.getViewMatrix());
 
+        float scale = Settings.getScaledSlot();
         float aspect = sheet.getFrameHeight() > 0 ? (float) sheet.getFrameWidth() / (float) sheet.getFrameHeight() : 1.0f;
-        float baseScaleY = dimensions == null || dimensions.y <= 0 ? 1.0f : dimensions.y;
+        float baseScaleY = (dimensions == null || dimensions.y <= 0 ? 1.0f : dimensions.y) * 2.0f;
         float baseScaleX = baseScaleY * aspect;
         float baseScaleZ = dimensions == null || dimensions.z <= 0 ? 1.0f : dimensions.z;
 

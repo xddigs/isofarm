@@ -65,14 +65,8 @@ public record OrthographicCameraController(OrthographicCamera camera)
     }
 
     private void click(GameMaster gameMaster, Player player, World world) {
-        boolean isCtrlHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)
-                || Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
-
         boolean wasLeftClickPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
-
-        if (!isCtrlHeld || !wasLeftClickPressed) {
-            return;
-        }
+        if (!wasLeftClickPressed) return;
 
         float mouseX = Mouse.getX();
         float mouseY = Mouse.getY();

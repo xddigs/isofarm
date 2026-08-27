@@ -81,7 +81,7 @@ public class ResourceManager {
 
         inventoryIcons = new SpriteSheet(K.Paths.INVENTORY_ICONS, K.UI.ICON_INV_COLS, 1);
 
-        this.playerSpriteSheet = new SpriteSheet(K.Paths.PLAYER_SPRITESHEET, 12, 8);
+        this.playerSpriteSheet = new SpriteSheet(K.Paths.PLAYER_SPRITESHEET, K.UI.PLAYER_SPRITE_COLS, K.UI.PLAYER_SPRITE_ROWS);
         this.heartsSpriteSheet = new SpriteSheet(K.Paths.HEARTS_SPRITESHEET, 1, K.UI.ICON_HEARTS_ROWS);
         this.staminaSpriteSheet = new SpriteSheet(K.Paths.STAMINA_SPRITESHEET, K.UI.ICON_STAMINA_COLS, 1);
 
