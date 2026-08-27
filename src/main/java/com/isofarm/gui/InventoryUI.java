@@ -6,6 +6,7 @@ import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.input.Mouse;
 import com.isofarm.item.Block;
+import com.isofarm.item.Craftable;
 import com.isofarm.item.Item;
 import com.isofarm.item.Tool;
 import com.isofarm.utils.K;
@@ -510,7 +511,7 @@ public class InventoryUI extends UIElement {
                     return;
                 }
 
-                tryCraft(slot);
+                attemptCraft(slot);
             }
         }
     }
@@ -581,7 +582,7 @@ public class InventoryUI extends UIElement {
             }
 
             case CRAFTING -> {
-                if (tryCraftOne(slot)) {
+                if (attemptCraftOne(slot)) {
                     return;
                 }
 
@@ -595,12 +596,12 @@ public class InventoryUI extends UIElement {
                     return;
                 }
 
-                tryCraft(slot);
+                attemptCraft(slot);
             }
         }
     }
 
-    private boolean tryCraftOne(InventorySlot slot) {
+    private boolean attemptCraftOne(InventorySlot slot) {
         if (slot == null || slot.isEmpty()) {
             return false;
         }
@@ -659,7 +660,7 @@ public class InventoryUI extends UIElement {
         }
     }
 
-    private void tryCraft(InventorySlot targetSlot) {
+    private void attemptCraft(InventorySlot targetSlot) {
         if (carriedItem == null || targetSlot == null || targetSlot.isEmpty()) {
             return;
         }
@@ -711,7 +712,13 @@ public class InventoryUI extends UIElement {
         if (ingredient == null || item == null) {
             return false;
         }
-        return ingredient.craftable().getId() == item.getId();
+
+        Craftable required = ingredient.craftable();
+        if (required.getClass() != item.getClass()) {
+            return false;
+        }
+
+        return isSameType((Item) required, item);
     }
 
     private boolean canCraft(Recipe recipe, Item first,
@@ -831,7 +838,7 @@ public class InventoryUI extends UIElement {
             case Seed s1 when b instanceof Seed s2 -> s1.getType() == s2.getType();
             case Crop c1 when b instanceof Crop c2 -> c1.getCropType() == c2.getCropType();
             case Block b1 when b instanceof Block b2 -> b1.getType() == b2.getType();
-            case Tool t1 when b instanceof Tool t2 -> t1.getId() == t2.getId();
+            case Tool t1 when b instanceof Tool t2 -> t1.getId() == t2.getId() && t1.getType() == t2.getType();
             default -> a.getName().equals(b.getName());
         };
     }
