@@ -41,6 +41,8 @@ public class ResourceManager {
     private final SpriteSheet inventoryIcons;
 
     private final SpriteSheet playerSpriteSheet;
+    private final SpriteSheet heartsSpriteSheet;
+    private final SpriteSheet staminaSpriteSheet;
     private final SpriteSheet destroyTexture;
     private static Map<CropType, SpriteSheet> cropSpritesheets;
 
@@ -76,10 +78,13 @@ public class ResourceManager {
         cropIcons = new SpriteSheet(K.Paths.CROP_ICONS, K.UI.ICON_SEED_CROPS_COLS, 1);
         seedIcons = new SpriteSheet(K.Paths.SEED_ICONS, K.UI.ICON_SEED_CROPS_COLS, 1);
         materialIcons = new SpriteSheet(K.Paths.MATERIAL_ICONS, K.UI.ICON_MATERIAL_COLS, K.UI.ICON_MATERIAL_ROWS);
+
         inventoryIcons = new SpriteSheet(K.Paths.INVENTORY_ICONS, K.UI.ICON_INV_COLS, 1);
 
         this.playerSpriteSheet = new SpriteSheet(K.Paths.PLAYER_SPRITESHEET,
                 Direction.values().length, 6);
+        this.heartsSpriteSheet = new SpriteSheet(K.Paths.HEARTS_SPRITESHEET, K.UI.ICON_HEARTS_COLS, 1);
+        this.staminaSpriteSheet = new SpriteSheet(K.Paths.STAMINA_SPRITESHEET, K.UI.ICON_STAMINA_COLS, 1);
 
         this.destroyTexture = new SpriteSheet(K.Paths.DESTROY_STAGES, K.UI.DESTROY_FRAMES, 1);
 
@@ -114,6 +119,8 @@ public class ResourceManager {
         inventoryIcons.dispose();
 
         playerSpriteSheet.dispose();
+        heartsSpriteSheet.dispose();
+        staminaSpriteSheet.dispose();
 
         defaultShader.dispose();
         outlineShader.dispose();
@@ -145,6 +152,8 @@ public class ResourceManager {
     public SpriteSheet getMaterialIcons() { return materialIcons; }
     public SpriteSheet getInventoryIcons() { return inventoryIcons; }
     public SpriteSheet getPlayerSpriteSheet() { return playerSpriteSheet; }
+    public SpriteSheet getHeartsSpriteSheet() { return heartsSpriteSheet; }
+    public SpriteSheet getStaminaSpriteSheet() { return staminaSpriteSheet; }
     public Map<CropType, SpriteSheet> getCropSpritesheets() { return cropSpritesheets; }
 
     public static SpriteSheet getItemSpriteSheet(Item item) {

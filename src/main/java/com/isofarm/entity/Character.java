@@ -35,12 +35,6 @@ public abstract class Character extends Entity implements Levelable {
         this.purse = new Purse();
         this.reputation = Reputation.NEUTRAL;
 
-        this.hitpoints = 100;
-        this.maxHitpoints = 100;
-
-        this.stamina = 100;
-        this.maxStamina = 100;
-
         this.level = 1;
         this.experience = 0;
         this.experienceForNextLevel = 100;
@@ -94,8 +88,8 @@ public abstract class Character extends Entity implements Levelable {
 
             int levelUpScaling = (int) (level * 0.8f);
             scale(levelUpScaling);
-            maxHitpoints *= levelUpScaling / 2f;
-            maxStamina *= levelUpScaling / 2f;
+            maxHitpoints += 1;
+            maxStamina += 1;
             experienceForNextLevel = calcNextLevel();
         }
     }

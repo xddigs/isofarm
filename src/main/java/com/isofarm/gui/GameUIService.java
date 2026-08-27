@@ -49,8 +49,6 @@ public class GameUIService implements Service<GameMaster> {
     private final SpriteSheet blockIcons;
     private final SpriteSheet toolIcons;
     private final SpriteSheet materialIcons;
-    private UIProgressBar healthBar;
-    private UIProgressBar staminaBar;
     private Player player;
     private Shop shop;
     private float windowWidth;
@@ -61,6 +59,8 @@ public class GameUIService implements Service<GameMaster> {
     private String hotbarLabel = null;
     private float chatHistoryTimer = 0.0f;
     private float hardwareUpdateTimer = 0.0f;
+    private int lastRenderedDamageSequence = -1;
+    private float flashTimer = 0.0f;
 
     public GameUIService(
             long windowHandle,
@@ -172,28 +172,6 @@ public class GameUIService implements Service<GameMaster> {
         float totalBarsWidth = (barWidth * 2) + gapBetweenBars;
         float startX = (windowWidth - totalBarsWidth) / 2.0f;
         float barY = windowHeight - hotbarUI.getHeight() - K.UI.HOTBAR_OFFSET - barHeight - offsetAboveHotbar;
-
-        this.healthBar = new UIProgressBar(startX, barY, barWidth, barHeight,
-                100, 100, true);
-
-        this.healthBar.setColors(
-                new Vector4f(0.8f, 0.1f, 0.1f, 1.0f),
-                new Vector4f(0.2f, 0.05f, 0.05f, 0.8f));
-        this.healthBar.setLayer(10);
-        uiManager.getRoot().addChild(this.healthBar);
-
-        float staminaX = startX + barWidth + gapBetweenBars;
-        this.staminaBar = new UIProgressBar(staminaX, barY, barWidth, barHeight,
-                100, 100, true);
-
-        this.staminaBar.setColors(
-                new Vector4f(0.1f, 0.8f, 0.2f, 1.0f),
-                new Vector4f(0.05f, 0.2f, 0.05f, 0.8f));
-        this.staminaBar.setLayer(10);
-        uiManager.getRoot().addChild(this.staminaBar);
-
-        inventoryUI.setHealthBar(healthBar);
-        inventoryUI.setStaminaBar(staminaBar);
     }
 
     public InventoryUI getInventoryUI() {
@@ -235,6 +213,15 @@ public class GameUIService implements Service<GameMaster> {
             updateHardwareInfo();
         }
 
+        if (player.getDamageSequence() != lastRenderedDamageSequence) {
+            lastRenderedDamageSequence = player.getDamageSequence();
+            flashTimer = 0.2f;
+        }
+
+        if (flashTimer > 0) {
+            flashTimer -= delta;
+        }
+
         if (actionDisplayTimer > 0.0f) {
             actionDisplayTimer -= delta;
         }
@@ -260,8 +247,6 @@ public class GameUIService implements Service<GameMaster> {
         fps.setText(gameMaster.getFps());
         if (player != null) {
             coords.setText(player.getPositionString());
-            healthBar.setValues(player.getHitpoints(), player.getMaxHitpoints());
-            staminaBar.setValues(player.getStamina(), player.getMaxStamina());
         }
 
         if (Settings.doEnableDebugInfo()) {
@@ -307,10 +292,13 @@ public class GameUIService implements Service<GameMaster> {
         GUI.begin(windowWidth, windowHeight);
         if (isHUDShown) {
             uiManager.render();
+            float startX = hotbarUI.getAbsoluteX() + 10.0f;
+            float startY = hotbarUI.getAbsoluteY() - 30.0f;
+            renderHearts(gameMaster.getResourceManager().getHeartsSpriteSheet(),
+                    startX, startY, player);
             renderHotbarLabel();
             renderToasts();
-        } else {
-        }
+        } else {}
 
         renderChatHistory();
         if (!gameMaster.isInventoryOpen() && !gameMaster.isOrthographicCamera()) {
@@ -319,6 +307,40 @@ public class GameUIService implements Service<GameMaster> {
 
         GUI.end();
         glEnable(GL_DEPTH_TEST);
+    }
+
+    public void renderHearts(SpriteSheet heartsSheet, float startX, float startY, Player player) {
+        if (player == null || heartsSheet == null) return;
+
+        int currentHp = (int) player.getHitpoints();
+        int maxHp = (int) player.getMaxHitpoints();
+
+        int totalHearts = (maxHp + 1) / 2;
+        int heartsPerRow = 8;
+
+        float heartSize = Settings.getScaledIcon() / 2f;
+        float spacing = Settings.getScaledSpacing() - 2.0f;
+        float rowSpacing = spacing;
+
+        heartsSheet.bind();
+        for (int i = 0; i < totalHearts; i++) {
+            int col = i % heartsPerRow;
+            int row = i / heartsPerRow;
+
+            float posX = startX + col * (heartSize + spacing);
+            float posY = startY - row * (heartSize + rowSpacing);
+            int heartHp = Math.min(2, Math.max(0, currentHp - (i * 2)));
+            int frame = (heartHp == 2) ? 0 : (heartHp == 1 ? 1 : 2);
+
+            Vector4f uvBounds = heartsSheet.getUVBounds(frame);
+            GUI.drawSprite(heartsSheet, frame, posX, posY, heartSize, heartSize, uvBounds);
+
+            if (flashTimer > 0.0f) {
+                int overlayFrame = 3;
+                Vector4f overlayUV = heartsSheet.getUVBounds(overlayFrame);
+                GUI.drawSprite(heartsSheet, overlayFrame, posX, posY, heartSize, heartSize, overlayUV);
+            }
+        }
     }
 
     private void renderChatHistory() {
@@ -370,18 +392,6 @@ public class GameUIService implements Service<GameMaster> {
         float hotbarX = windowWidth / 2.0f - hotbarUI.getWidth() / 2.0f;
         float hotbarY = windowHeight - hotbarUI.getHeight() - K.UI.HOTBAR_OFFSET;
         hotbarUI.setPosition(hotbarX, hotbarY);
-
-        float barWidth = healthBar.getWidth();
-        float barHeight = healthBar.getHeight();
-        float gapBetweenBars = 12.0f;
-        float offsetAboveHotbar = 10.0f;
-
-        float totalBarsWidth = (barWidth * 2.0f) + gapBetweenBars;
-        float startX = (windowWidth - totalBarsWidth) / 2.0f;
-        float barY = hotbarY - barHeight - offsetAboveHotbar;
-
-        healthBar.setPosition(startX, barY);
-        staminaBar.setPosition(startX + barWidth + gapBetweenBars, barY);
     }
 
     public void renderToasts() {
@@ -543,21 +553,6 @@ public class GameUIService implements Service<GameMaster> {
         ToastFactory.setWindowWidth(width);
         ToastFactory.info("Resized to " + width + "x" + height);
         resetHotbarPosition();
-
-        if (healthBar != null && staminaBar != null) {
-            float barWidth = healthBar.getWidth();
-            float barHeight = healthBar.getHeight();
-            float gapBetweenBars = 12.0f;
-            float offsetAboveHotbar = 10.0f;
-
-            float totalBarsWidth = (barWidth * 2.0f) + gapBetweenBars;
-            float startX = (width - totalBarsWidth) / 2.0f;
-            float barY = height - hotbarUI.getHeight() - K.UI.HOTBAR_OFFSET -
-                    barHeight - offsetAboveHotbar;
-
-            healthBar.setPosition(startX, barY);
-            staminaBar.setPosition(startX + barWidth + gapBetweenBars, barY);
-        }
 
         if (inventoryUI != null) {
             float inventoryX = (width - inventoryUI.getAbsoluteWidth()) / 2.0f;

@@ -54,6 +54,10 @@ public class Player extends Character {
         setPosition(new Vector3f(spawnX, highestAltitude.y(), spawnZ));
         setVelocity(new Vector3f(0.0f, 0.0f, 0.0f));
         setDimensions(new Vector3f(0.5f, 1.0f, 0.5f));
+        setMaxHitpoints(8);
+        setHitpoints(getMaxHitpoints());
+        setMaxStamina(100);
+        setStamina(getMaxStamina());
         setSpeed(6.0f);
         setReputation(Reputation.NEUTRAL);
         setGamemode(Gamemode.SURVIVAL);
@@ -185,7 +189,7 @@ public class Player extends Character {
     }
 
     @Override
-    protected void onDamageTaken(float amount) {
+    public void onDamageTaken(float amount) {
         lastDamageAmount = amount;
         damageSequence++;
         getSoundService().playEntitySound(SoundGroup.ENTITY);
@@ -219,7 +223,7 @@ public class Player extends Character {
         setIsOffGroundTimer(0.0f);
         setWasOnGround(false);
 
-        setMaxHitpoints(100);
+        setMaxHitpoints(8);
         setHitpoints(getMaxHitpoints());
 
         setMaxStamina(100);
