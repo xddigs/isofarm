@@ -138,12 +138,12 @@ public class OrthographicCamera implements CameraView {
         return new Ray(rayOrigin, getForwardVector());
     }
 
-    public Hit highlight(World world, float mouseX, float mouseY, float screenWidth, float screenHeight) {
+    public Hit highlight(World world, Vector3f playerPos, float mouseX, float mouseY, float screenWidth, float screenHeight) {
         Ray ray = getMouseRay(mouseX, mouseY, screenWidth, screenHeight);
-        return raycast(world, ray.origin(), ray.direction());
+        return raycast(world, playerPos, ray.origin(), ray.direction());
     }
 
-    private Hit raycast(World world, Vector3f origin, Vector3f direction) {
+    private Hit raycast(World world, Vector3f playerPos, Vector3f origin, Vector3f direction) {
         float tileSize = K.World.TILE_SIZE;
 
         int x = (int) Math.floor(origin.x / tileSize);
@@ -157,17 +157,14 @@ public class OrthographicCamera implements CameraView {
         float tDeltaX = stepX != 0 ? Math.abs(tileSize / direction.x) : Float.POSITIVE_INFINITY;
         float tDeltaY = stepY != 0 ? Math.abs(tileSize / direction.y) : Float.POSITIVE_INFINITY;
         float tDeltaZ = stepZ != 0 ? Math.abs(tileSize / direction.z) : Float.POSITIVE_INFINITY;
+
         float tMaxX = stepX > 0 ? ((x + 1) * tileSize - origin.x) / direction.x : stepX < 0 ? (x * tileSize - origin.x) / direction.x : Float.POSITIVE_INFINITY;
         float tMaxY = stepY > 0 ? ((y + 1) * tileSize - origin.y) / direction.y : stepY < 0 ? (y * tileSize - origin.y) / direction.y : Float.POSITIVE_INFINITY;
         float tMaxZ = stepZ > 0 ? ((z + 1) * tileSize - origin.z) / direction.z : stepZ < 0 ? (z * tileSize - origin.z) / direction.z : Float.POSITIVE_INFINITY;
 
-        float distance = 0.0f;
+        int hitNormalX = 0, hitNormalY = 0, hitNormalZ = 0;
 
-        int hitNormalX = 0;
-        int hitNormalY = 0;
-        int hitNormalZ = 0;
-
-        while (distance <= Settings.getMaxInteractionDistance()) {
+        while (true) {
             byte block = world.getBlockTypeAt(x, y, z);
             byte waterLevel = world.getWaterLevelAt(x, y, z);
 
@@ -175,51 +172,37 @@ public class OrthographicCamera implements CameraView {
             boolean hasWater = waterLevel > 0;
 
             if (hasBlock || hasWater) {
-                return new Hit(
-                        x, y, z,
-                        hitNormalX,
-                        hitNormalY,
-                        hitNormalZ
-                );
+                float blockCenterX = x + 0.5f;
+                float blockCenterY = y + 0.5f;
+                float blockCenterZ = z + 0.5f;
+                float distToPlayer = playerPos.distance(blockCenterX, blockCenterY, blockCenterZ);
+
+                if (distToPlayer <= Settings.getMaxInteractionDistance()) {
+                    return new Hit(x, y, z, hitNormalX, hitNormalY, hitNormalZ);
+                } else {
+                    return null;
+                }
             }
 
             if (tMaxX < tMaxY) {
                 if (tMaxX < tMaxZ) {
-                    x += stepX;
-                    distance = tMaxX;
-                    tMaxX += tDeltaX;
-
-                    hitNormalX = -stepX;
-                    hitNormalY = 0;
-                    hitNormalZ = 0;
+                    x += stepX; tMaxX += tDeltaX;
+                    hitNormalX = -stepX; hitNormalY = 0; hitNormalZ = 0;
                 } else {
-                    z += stepZ;
-                    distance = tMaxZ;
-                    tMaxZ += tDeltaZ;
-
-                    hitNormalX = 0;
-                    hitNormalY = 0;
-                    hitNormalZ = -stepZ;
+                    z += stepZ; tMaxZ += tDeltaZ;
+                    hitNormalX = 0; hitNormalY = 0; hitNormalZ = -stepZ;
                 }
             } else {
                 if (tMaxY < tMaxZ) {
-                    y += stepY;
-                    distance = tMaxY;
-                    tMaxY += tDeltaY;
-
-                    hitNormalX = 0;
-                    hitNormalY = -stepY;
-                    hitNormalZ = 0;
+                    y += stepY; tMaxY += tDeltaY;
+                    hitNormalX = 0; hitNormalY = -stepY; hitNormalZ = 0;
                 } else {
-                    z += stepZ;
-                    distance = tMaxZ;
-                    tMaxZ += tDeltaZ;
-
-                    hitNormalX = 0;
-                    hitNormalY = 0;
-                    hitNormalZ = -stepZ;
+                    z += stepZ; tMaxZ += tDeltaZ;
+                    hitNormalX = 0; hitNormalY = 0; hitNormalZ = -stepZ;
                 }
             }
+
+            if (tMaxX > 2000.0f && tMaxY > 2000.0f && tMaxZ > 2000.0f) break;
         }
 
         return null;

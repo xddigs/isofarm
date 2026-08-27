@@ -9,7 +9,8 @@ public class HoveredCell {
 
     public static Hit get(GameMaster gameMaster) {
         return gameMaster.getOrthoCamera().highlight(gameMaster.getWorld(),
-                Mouse.getX(), Mouse.getY(), gameMaster.getWindowWidth(),
+                gameMaster.getPlayer().getPosition(), Mouse.getX(), Mouse.getY(),
+                gameMaster.getWindowWidth(),
                 gameMaster.getWindowHeight());
     }
 }

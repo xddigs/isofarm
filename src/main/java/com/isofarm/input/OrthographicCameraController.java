@@ -78,7 +78,7 @@ public record OrthographicCameraController(OrthographicCamera camera)
         float screenWidth = gameMaster.getWindowWidth();
         float screenHeight = gameMaster.getWindowHeight();
 
-        Hit hit = camera.highlight(world, mouseX, mouseY,
+        Hit hit = camera.highlight(world, player.getPosition(), mouseX, mouseY,
                 screenWidth, screenHeight);
 
         if (hit == null) return;

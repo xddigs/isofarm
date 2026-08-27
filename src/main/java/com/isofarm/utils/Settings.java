@@ -102,7 +102,7 @@ public class Settings {
     }
 
     public static float getMaxInteractionDistance() {
-        return isOrthographic() ? 1500f : maxInteractionDistance;
+        return maxInteractionDistance;
     }
 
     public static void setMaxInteractionDistance(float maxInteractionDistance) {
