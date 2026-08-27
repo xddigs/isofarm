@@ -17,20 +17,25 @@ public final class Components {
     private static final GlobalMemory MEMORY = HARDWARE.getMemory();
     private static final Sensors SENSORS = HARDWARE.getSensors();
 
-    private Components() {}
+    private static final String CPU_NAME = CPU.getProcessorIdentifier().getName();
+    private static final String GPU_NAME = loadGpuName();
 
-    public static String getCpu() {
-        return CPU.getProcessorIdentifier().getName();
-    }
-
-    public static String getGpu() {
+    private static String loadGpuName() {
         List<GraphicsCard> graphicsCards = HARDWARE.getGraphicsCards();
-
         if (graphicsCards.isEmpty()) {
             return "GPU: N/A";
         }
+        return graphicsCards.getFirst().getName();
+    }
 
-        return graphicsCards.get(0).getName();
+    private Components() {}
+
+    public static String getCpu() {
+        return CPU_NAME;
+    }
+
+    public static String getGpu() {
+        return GPU_NAME;
     }
 
     public static String getCpuTemperature() {

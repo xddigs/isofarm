@@ -201,10 +201,12 @@ public class GameUIService implements Service<GameMaster> {
     }
 
     public void update(float delta) {
-        hardwareUpdateTimer -= delta;
-        if (hardwareUpdateTimer <= 0.0f) {
-            hardwareUpdateTimer = HARDWARE_UPDATE_INTERVAL;
-            updateHardwareInfo();
+        if (Settings.doEnableDebugInfo()) {
+            hardwareUpdateTimer -= delta;
+            if (hardwareUpdateTimer <= 0.0f) {
+                hardwareUpdateTimer = HARDWARE_UPDATE_INTERVAL;
+                updateHardwareInfo();
+            }
         }
 
         if (player.getDamageSequence() != lastRenderedDamageSequence) {
