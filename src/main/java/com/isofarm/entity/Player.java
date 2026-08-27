@@ -1,6 +1,8 @@
 package com.isofarm.entity;
 
 import com.isofarm.data.*;
+import com.isofarm.entity.states.CrouchingState;
+import com.isofarm.entity.states.GroundedState;
 import com.isofarm.graphics.CameraView;
 import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.Shader;
@@ -35,12 +37,17 @@ public class Player extends Character {
     private Direction direction = Direction.SOUTH;
     private List<GridPos> path;
 
+    private float currentEyeHeight = 1.6f;
+    private float targetEyeHeight = 1.6f;
+
     private int pathIndex = 0;
     private int damageSequence = 0;
     private float lastDamageAmount = 0.0f;
     private float fallStartY = 0.0f;
     private float respawnTimer = -1.0f;
     private boolean isFalling = false;
+
+    private PlayerState currentState;
 
     public Player(String name, World world, GameMaster gameMaster) {
         super(name);
@@ -63,6 +70,9 @@ public class Player extends Character {
         setReputation(Reputation.NEUTRAL);
         setGamemode(Gamemode.SURVIVAL);
         setUpInventory();
+
+        this.currentState = new GroundedState();
+        this.currentState.enter(this);
     }
 
     @Override
@@ -83,37 +93,16 @@ public class Player extends Character {
             return;
         }
 
+        currentState.input(this, gameMaster);
+        currentState.update(this, delta);
+
+        float lerpSpeed = 10.0f;
+        currentEyeHeight = org.joml.Math.lerp(currentEyeHeight, targetEyeHeight,
+                Math.clamp(delta * lerpSpeed, 0.0f, 1.0f));
+
         setAnimTimer(getAnimTimer() + delta);
-        updateCrouching(delta);
         heal((0.5f + getLevel()) * delta);
-
-        if (!isOnGround()) {
-            if (getVelocity().y < 0.0f && !isFalling) {
-                isFalling = true;
-                fallStartY = getPosition().y;
-            }
-
-        } else {
-            if (isFalling) {
-                float fallDistance = fallStartY - getPosition().y;
-                if (fallDistance > 3.0f) {
-                    float damage = (fallDistance - 3.0f) * 2.0f;
-                    fallDamage(damage);
-                    getSoundService().playBreakSound(SoundGroup.ENTITY, 1.0f, 1.0f);
-                }
-
-                isFalling = false;
-            }
-        }
-
-        for (InventorySlot slot : getInventory().getSlots()) {
-            if (slot.getItem() instanceof Tool tool && tool.getDurability() <= 0) {
-                remove(tool);
-                ToastFactory.error("Your " + tool.getName() + " broke!");
-                getSoundService().playBreakSound(SoundGroup.ITEMS, 1.0f,
-                        Settings.getMaxInteractionDistance());
-            }
-        }
+        checkDurability();
     }
 
     @Override
@@ -225,6 +214,40 @@ public class Player extends Character {
         }
     }
 
+    public void changeState(PlayerState newState) {
+        if (currentState != null) {
+            currentState.exit(this);
+        }
+        currentState = newState;
+        currentState.enter(this);
+    }
+
+    private void checkDurability() {
+        for (InventorySlot slot : getInventory().getSlots()) {
+            if (slot.getItem() instanceof Tool tool) {
+                if (tool.getDurability() % 4 == 0) {
+                    ToastFactory.warning("Your " + tool.getName() + " is about to break!");
+                    return;
+                }
+
+                if (tool.getDurability() <= 0) {
+                    remove(tool);
+                    ToastFactory.error("Your " + tool.getName() + " broke!");
+                    getSoundService().playBreakSound(SoundGroup.ITEMS, 1.0f,
+                            Settings.getMaxInteractionDistance());
+                }
+            }
+        }
+    }
+
+    public PlayerState getCurrentState() {
+        return currentState;
+    }
+
+    public void setCurrentState(PlayerState currentState) {
+        this.currentState = currentState;
+    }
+
     public void respawn() {
         if (!Settings.doKeepInventory()) {
             clear();
@@ -312,7 +335,7 @@ public class Player extends Character {
             direction.normalize();
         }
 
-        float speed = isCrounching() ? getSpeed()/3f : getSpeed();
+        float speed = (currentState instanceof CrouchingState) ? getSpeed()/3f : getSpeed();
         Vector3f velocity = new Vector3f(direction).mul(speed);
         velocity.y = getVelocity().y;
         setVelocity(velocity);
@@ -454,6 +477,11 @@ public class Player extends Character {
         return new Vector3f(position.x, position.y + getCurrentEyeHeight(), position.z);
     }
 
+    @Override
+    public float getCurrentEyeHeight() {
+        return currentEyeHeight;
+    }
+
     public float getForward() {
         return (float) Math.atan2(velocity.z, velocity.x);
     }
@@ -494,5 +522,21 @@ public class Player extends Character {
 
     public void setRespawnTimer(float respawnTimer) {
         this.respawnTimer = respawnTimer;
+    }
+
+    public float getTargetEyeHeight() {
+        return targetEyeHeight;
+    }
+
+    public void setTargetEyeHeight(float targetEyeHeight) {
+        this.targetEyeHeight = targetEyeHeight;
+    }
+
+    public boolean isFalling() {
+        return isFalling;
+    }
+
+    public void setFalling(boolean falling) {
+        isFalling = falling;
     }
 }
