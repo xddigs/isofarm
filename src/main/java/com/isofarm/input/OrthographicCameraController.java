@@ -4,7 +4,6 @@ import com.isofarm.data.Hit;
 import com.isofarm.entity.Player;
 import com.isofarm.entity.states.SwimmingState;
 import com.isofarm.graphics.OrthographicCamera;
-import com.isofarm.gui.GUI;
 import com.isofarm.pathfinding.GridPos;
 import com.isofarm.pathfinding.PathFinder;
 import com.isofarm.service.Service;
@@ -39,8 +38,6 @@ public record OrthographicCameraController(OrthographicCamera camera)
                 player.getVelocity().y = -3.0f;
             }
         }
-
-        GUI.drawCursor(gameMaster);
 
         click(gameMaster, player, gameMaster.getWorld());
         followPath(player, gameMaster.getWorld(), delta);
