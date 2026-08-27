@@ -14,19 +14,18 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("all")
 public class Library implements Service<GameMaster> {
-
     public static final String DEFAULT_ID = "isofarm";
     public static final char SEPARATOR = ':';
     private static final Logger log = LoggerFactory.getLogger(Library.class);
 
     public static void initItems(ItemRegistry itemR, Player player) {
-        registerDefault(itemR, () -> new Material(Tier.NONE, MaterialID.STICK));
-        registerDefault(itemR, () -> new Material(Tier.NONE, MaterialID.PAPER));
-        registerDefault(itemR, () -> new Material(Tier.NONE, MaterialID.LEATHER));
-        registerDefault(itemR, () -> new Material(Tier.NONE, MaterialID.BOOK));
+        for (MaterialID material : MaterialID.values()) {
+            if (material.equals(MaterialID.INGOT) || material.equals(MaterialID.RAW_ORE)) continue;
+            registerDefault(itemR, () -> new Material(Tier.NONE, material));
+        }
 
         Tier.forEach(tier -> {
-            if (tier.equals(Tier.NONE) || tier.equals(Tier.LEATHER) || tier.equals(Tier.WOOD)) return;
+            if (tier.isInvalidTier()) return;
             registerDefault(itemR, () -> new MiningComponent(tier, MaterialID.RAW_ORE));
             registerDefault(itemR, () -> new MiningComponent(tier, MaterialID.INGOT));
         });

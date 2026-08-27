@@ -37,6 +37,10 @@ public enum Tier {
         return durability;
     }
 
+    public boolean isInvalidTier() {
+        return this == NONE || this == LEATHER || this == WOOD;
+    }
+
     public static void forEach(Consumer<Tier> consumer) {
         for (Tier tier : values()) {
             consumer.accept(tier);

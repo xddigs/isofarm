@@ -18,7 +18,7 @@ public class RecipeRegistry implements Service<Recipe> {
         create(Tier.LEATHER).result(new Material(Tier.NONE, MaterialID.STICK), 4).with(BlockData.OAK_WOOD, 1).add();
         create(Tier.LEATHER).result(new Material(Tier.NONE, MaterialID.BOOK), 2).with(MaterialID.LEATHER, 3).with(MaterialID.PAPER, 2).add();
         create(Tier.LEATHER).result(new Bucket(BlockData.AIR, Tier.WOOD), 1).with(BlockData.OAK_WOOD, 1).add();
-        registerToolSet(Tier.LEATHER, Tier.WOOD, BlockData.OAK_WOOD);
+        registerToolSet(Tier.LEATHER, BlockData.OAK_WOOD);
 
         Map<Tier, Tier> metalProgression = Map.of(
                 Tier.COPPER, Tier.COPPER,
@@ -31,7 +31,7 @@ public class RecipeRegistry implements Service<Recipe> {
 
         metalProgression.forEach((toolTier, requiredStationTier) -> {
             Craftable mainMaterial = new MiningComponent(toolTier, MaterialID.INGOT);
-            registerToolSet(requiredStationTier, toolTier, mainMaterial);
+            registerToolSet(requiredStationTier, mainMaterial);
             create(requiredStationTier)
                     .result(new Backpack(ToolType.BACKPACK, toolTier), 1)
                     .with(mainMaterial, 3).with(MaterialID.LEATHER, 2).add();
@@ -47,7 +47,7 @@ public class RecipeRegistry implements Service<Recipe> {
         return recipes;
     }
 
-    private static void registerToolSet(Tier stationTier, Tier itemTier, Craftable primaryMat) {
+    private static void registerToolSet(Tier stationTier, Craftable primaryMat) {
         registerTool(stationTier, primaryMat, 2, 3, Hoe::new);
         registerTool(stationTier, primaryMat, 3, 2, Pickaxe::new);
         registerTool(stationTier, primaryMat, 1, 2, Shovel::new);
