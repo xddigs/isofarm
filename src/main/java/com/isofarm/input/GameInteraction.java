@@ -13,6 +13,7 @@ import com.isofarm.gui.GameUIService;
 import com.isofarm.item.*;
 import com.isofarm.service.CropService;
 import com.isofarm.service.TimeService;
+import com.isofarm.service.Woodcutter;
 import com.isofarm.utils.HoveredCell;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
@@ -419,8 +420,18 @@ public class GameInteraction {
                     getDistanceToBlock(gameMaster, cell), Settings.getMaxInteractionDistance());
         }
 
-        world.setBlockTypeAt(cell, BlockData.AIR.getId());
-        itemRenderer.playBreakAnimation();
+        Vector3f position = new Vector3f(cell.x() + 0.5f, cell.y() + 0.5f, cell.z() + 0.5f);
+        Block removedBlock = new Block(blockData, cell);
+        Item itemToDrop = null;
+        BlockData removedBlockData = removedBlock.getType();
+
+        if (removedBlockData.equals(BlockData.OAK_LOG) && selectedItem instanceof Axe axe) {
+            if (Woodcutter.chop(gameMaster, axe, particles, removedBlock.getX(),
+                    removedBlock.getY(), removedBlock.getZ())) {
+                this.breakTimeout = TIMEOUT;
+                return;
+            }
+        }
 
         if (selectedItem instanceof Tool tool) {
             if (tool instanceof Backpack || tool instanceof CraftingKit) return;
@@ -434,13 +445,11 @@ public class GameInteraction {
             }
         }
 
+        world.setBlockTypeAt(cell, BlockData.AIR.getId());
+        itemRenderer.playBreakAnimation();
+
         gameMaster.rebuildChunkMeshAt(cell);
         particles.spawn(cell, blockData);
-
-        Vector3f position = new Vector3f(cell.x() + 0.5f, cell.y() + 0.5f, cell.z() + 0.5f);
-        Block removedBlock = new Block(blockData, cell);
-        Item itemToDrop = null;
-        BlockData removedBlockData = removedBlock.getType();
 
         if (removedBlock.getType().hasDrops()) {
             Object dropObj = removedBlock.getType().getRandomDrop();
