@@ -96,12 +96,23 @@ public class Player extends Character {
         currentState.input(this, gameMaster);
         currentState.update(this, delta);
 
+        if (velocity.x != 0.0f || velocity.z != 0.0f) {
+            float absX = Math.abs(velocity.x);
+            float absZ = Math.abs(velocity.z);
+
+            if (absX > absZ) {
+                direction = velocity.x > 0 ? Direction.EAST : Direction.WEST;
+            } else {
+                direction = velocity.z > 0 ? Direction.SOUTH : Direction.NORTH;
+            }
+        }
+
         float lerpSpeed = 10.0f;
         currentEyeHeight = org.joml.Math.lerp(currentEyeHeight, targetEyeHeight,
                 Math.clamp(delta * lerpSpeed, 0.0f, 1.0f));
 
         setAnimTimer(getAnimTimer() + delta);
-        heal((0.5f + getLevel()) * delta);
+        heal(((0.5f + getLevel()) * delta) / getDifficultyRegen());
         checkDurability();
     }
 
@@ -117,12 +128,14 @@ public class Player extends Character {
 
         Shader shader = rm.getDefaultShader();
         int textureUnit = K.Render.PRIMARY_TEXTURE_UNIT;
-        boolean isMoving = getVelocity().lengthSquared() > 0.001f;
+
+        boolean isMoving = (getVelocity().x * getVelocity().x + getVelocity().z * getVelocity().z) > 0.001f;
         boolean flipHorizontal = false;
         int baseRow = 0;
+
         if (direction != null) {
             switch (direction) {
-                case NORTH_WEST, NORTH_EAST -> baseRow = 4;
+                case NORTH, NORTH_WEST, NORTH_EAST -> baseRow = 4;
                 case WEST -> {
                     baseRow = 2;
                     flipHorizontal = true;
@@ -538,5 +551,9 @@ public class Player extends Character {
 
     public void setFalling(boolean falling) {
         isFalling = falling;
+    }
+
+    public float getDifficultyRegen() {
+        return gameMaster.getDifficulty().getMultiplier();
     }
 }

@@ -2,6 +2,7 @@ package com.isofarm.input;
 
 import com.isofarm.data.Hit;
 import com.isofarm.entity.Player;
+import com.isofarm.entity.states.SwimmingState;
 import com.isofarm.graphics.OrthographicCamera;
 import com.isofarm.pathfinding.GridPos;
 import com.isofarm.pathfinding.PathFinder;
@@ -30,6 +31,13 @@ public record OrthographicCameraController(OrthographicCamera camera)
         if (player == null) return;
 
         rotateCamera(delta);
+        if (player.getCurrentState() instanceof SwimmingState) {
+            if (Keyboard.isKeyDown(GLFW_KEY_SPACE)) {
+                player.getVelocity().y = 4.0f;
+            } else if (Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
+                player.getVelocity().y = -3.0f;
+            }
+        }
 
         click(gameMaster, player, gameMaster.getWorld());
         followPath(player, gameMaster.getWorld(), delta);
@@ -58,7 +66,7 @@ public record OrthographicCameraController(OrthographicCamera camera)
 
     private void click(GameMaster gameMaster, Player player, World world) {
         boolean isCtrlHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)
-                        || Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
+                || Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
 
         boolean wasLeftClickPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
 

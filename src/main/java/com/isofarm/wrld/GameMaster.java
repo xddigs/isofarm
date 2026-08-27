@@ -64,6 +64,8 @@ public class GameMaster {
     private float windowHeight;
     private Player player;
     private Shop shop;
+    private Difficulty difficulty;
+
     private boolean isChatOpen = false;
     private boolean isInventoryOpen = false;
     private boolean isHUDShown = true;
@@ -91,6 +93,8 @@ public class GameMaster {
         this.itemRegistry = new ItemRegistry();
         this.rainEngine = new RainEngine();
         this.entities = new LinkedList<>();
+
+        this.difficulty = Difficulty.NORMAL;
     }
 
     public void loadResources(Consumer<Float> progressCallback) {
@@ -385,6 +389,14 @@ public class GameMaster {
         gameRenderer.initCamera(getActiveCamera());
         ToastFactory.info("Camera changed to " + (Settings.isOrthographic() ?
                 "orthographic" : "first person"));
+    }
+
+    public void setDifficulty(Difficulty difficulty) {
+        this.difficulty = difficulty;
+    }
+
+    public Difficulty getDifficulty() {
+        return difficulty;
     }
 
     public boolean isOrthographicCamera() {
