@@ -23,7 +23,6 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
-@SuppressWarnings("unused")
 public class Game {
     private static final Logger log = LoggerFactory.getLogger(Game.class);
     private static final String WINDOW_TITLE = "Isofarm";
