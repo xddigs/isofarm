@@ -6,7 +6,6 @@ import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.input.Mouse;
 import com.isofarm.item.Block;
-import com.isofarm.item.Craftable;
 import com.isofarm.item.Item;
 import com.isofarm.item.Tool;
 import com.isofarm.utils.K;
@@ -712,13 +711,7 @@ public class InventoryUI extends UIElement {
         if (ingredient == null || item == null) {
             return false;
         }
-
-        Craftable required = ingredient.craftable();
-        if (required.getClass() != item.getClass()) {
-            return false;
-        }
-
-        return isSameType((Item) required, item);
+        return isSameType((Item) ingredient.craftable(), item);
     }
 
     private boolean canCraft(Recipe recipe, Item first,
