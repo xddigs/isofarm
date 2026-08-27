@@ -7,10 +7,10 @@ import com.isofarm.input.CommandCompletionProvider;
 import com.isofarm.input.Mouse;
 import com.isofarm.item.Item;
 import com.isofarm.service.Service;
-import com.isofarm.utils.ToastFactory;
 import com.isofarm.utils.Components;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
+import com.isofarm.utils.ToastFactory;
 import com.isofarm.wrld.GameMaster;
 import org.joml.Vector2i;
 import org.joml.Vector4f;
@@ -22,7 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.glEnable;
 
 @SuppressWarnings("all")
 public class GameUIService implements Service<GameMaster> {
@@ -163,15 +164,6 @@ public class GameUIService implements Service<GameMaster> {
                 DEBUG_LABEL_WIDTH, 25f, null);
         this.memory.show();
         uiManager.getRoot().addChild(memory);
-
-        int barWidth = 160;
-        int barHeight = 16;
-        int gapBetweenBars = 12;
-        int offsetAboveHotbar = 10;
-
-        float totalBarsWidth = (barWidth * 2) + gapBetweenBars;
-        float startX = (windowWidth - totalBarsWidth) / 2.0f;
-        float barY = windowHeight - hotbarUI.getHeight() - K.UI.HOTBAR_OFFSET - barHeight - offsetAboveHotbar;
     }
 
     public InventoryUI getInventoryUI() {
@@ -288,12 +280,13 @@ public class GameUIService implements Service<GameMaster> {
     }
 
     public void render(boolean isHUDShown, GameMaster gameMaster) {
-        glDisable(GL_DEPTH_TEST);
+        if (!gameMaster.getPlayer().isAlive()) return;
+
         GUI.begin(windowWidth, windowHeight);
         if (isHUDShown) {
             uiManager.render();
             float startX = hotbarUI.getAbsoluteX() + 10.0f;
-            float startY = hotbarUI.getAbsoluteY() - 30.0f;
+            float startY = hotbarUI.getAbsoluteY() - 25.0f;
             renderHearts(gameMaster.getResourceManager().getHeartsSpriteSheet(),
                     startX, startY, player);
             renderHotbarLabel();
@@ -330,14 +323,12 @@ public class GameUIService implements Service<GameMaster> {
             float posY = startY - row * (heartSize + rowSpacing);
             int heartHp = Math.min(2, Math.max(0, currentHp - (i * 2)));
             int frame = (heartHp == 2) ? 0 : (heartHp == 1 ? 1 : 2);
+            Vector4f color = new Vector4f(1.0f);
 
-            Vector4f uvBounds = heartsSheet.getUVBounds(frame);
-            GUI.drawSprite(heartsSheet, frame, posX, posY, heartSize, heartSize, uvBounds);
-
+            GUI.drawSprite(heartsSheet, frame, posX, posY, heartSize, heartSize, color);
             if (flashTimer > 0.0f) {
                 int overlayFrame = 3;
-                Vector4f overlayUV = heartsSheet.getUVBounds(overlayFrame);
-                GUI.drawSprite(heartsSheet, overlayFrame, posX, posY, heartSize, heartSize, overlayUV);
+                GUI.drawSprite(heartsSheet, overlayFrame, posX, posY, heartSize, heartSize, color);
             }
         }
     }

@@ -25,7 +25,6 @@ public class GUI {
     private static final Mesh mesh = Mesh.createQuad();
     private static final Matrix4f projection = new Matrix4f();
     private static final Matrix4f model = new Matrix4f();
-    private static final Logger log = LoggerFactory.getLogger(GUI.class);
 
     private static final UIFont small = new UIFont(K.Paths.FONT, 16.0f);
     private static final UIFont normal = new UIFont(K.Paths.FONT, 24.0f);
@@ -206,7 +205,6 @@ public class GUI {
 
     public static void drawSprite(SpriteSheet spriteSheet, int frame,
                                   float x, float y, float width, float height, Vector4f tint) {
-        Vector4f uv = spriteSheet.getUVBounds(frame);
         drawSprite(spriteSheet, frame % spriteSheet.getCols(),
                 frame / spriteSheet.getCols(), x, y, width, height, tint);
     }
