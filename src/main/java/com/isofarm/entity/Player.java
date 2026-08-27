@@ -138,7 +138,6 @@ public class Player extends Character {
         int spriteIndex = (rowIndex * sheetColumns) + currentFrame;
 
         Vector4f uvBounds = sheet.getUVBounds(spriteIndex);
-
         shader.bind();
 
         glActiveTexture(GL_TEXTURE0 + textureUnit);

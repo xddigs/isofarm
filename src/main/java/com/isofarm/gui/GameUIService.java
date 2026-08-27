@@ -311,7 +311,6 @@ public class GameUIService implements Service<GameMaster> {
 
     public void renderHearts(SpriteSheet heartsSheet, float startX, float startY, Player player) {
         if (player == null || heartsSheet == null) return;
-
         int currentHp = (int) player.getHitpoints();
         int maxHp = (int) player.getMaxHitpoints();
 
