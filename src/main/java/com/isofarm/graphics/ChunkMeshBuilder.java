@@ -278,7 +278,8 @@ public class ChunkMeshBuilder {
         addQuadPos(pos, posI, x1, y1, z1, x2, y1, z2, x2, y2, z2, x1, y2, z1);
         float u1 = region.uvMin().x; float u2 = region.uvMax().x;
         float heightUV = region.uvMax().y - region.uvMin().y;
-        float v1 = region.uvMin().y + heightUV * uvB; float v2 = region.uvMin().y + heightUV * uvT;
+        float v1 = region.uvMin().y + heightUV * (1.0f - uvB);
+        float v2 = region.uvMin().y + heightUV * (1.0f - uvT);
         addQuadUV(uv, uvI, u1, v1, u2, v1, u2, v2, u1, v2);
         addQuadNorm(norm, normI, nx, ny, nz);
         addQuadIndices(idx, elemI, vertexCount);
