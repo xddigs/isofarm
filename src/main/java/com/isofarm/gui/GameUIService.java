@@ -299,7 +299,7 @@ public class GameUIService implements Service<GameMaster> {
         int heartsPerRow = 8;
 
         float heartSize = Settings.getScaledIcon() / 2f;
-        float spacing = Settings.getScaledSpacing() - 2.0f;
+        float spacing = Settings.getScaledSpacing() - 5.0f;
         float rowSpacing = spacing;
 
         heartsSheet.bind();

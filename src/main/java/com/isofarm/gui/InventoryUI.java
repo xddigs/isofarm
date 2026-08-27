@@ -450,12 +450,17 @@ public class InventoryUI extends UIElement {
 
     public void slotInteract() {
         if (hotbarUI == null) return;
+
         InventorySlotUI[] hotbarSlots = hotbarUI.getSlotUIs();
-        InventorySlotUI[] backpackSlots = getBackpackSlotUIs();
+        InventorySlotUI[] backpackSlots = (backpackUI != null && backpackUI.isVisible()) ?
+                getBackpackSlotUIs() : new InventorySlotUI[0];
+
         InventorySlotUI[] allSlots = new InventorySlotUI[slotUIs.length + hotbarSlots.length + backpackSlots.length];
         System.arraycopy(slotUIs, 0, allSlots, 0, slotUIs.length);
         System.arraycopy(hotbarSlots, 0, allSlots, slotUIs.length, hotbarSlots.length);
-        System.arraycopy(backpackSlots, 0, allSlots, slotUIs.length + hotbarSlots.length, backpackSlots.length);
+        if (backpackSlots.length > 0) {
+            System.arraycopy(backpackSlots, 0, allSlots, slotUIs.length + hotbarSlots.length, backpackSlots.length);
+        }
 
         for (InventorySlotUI slotUI : allSlots) {
             if (slotUI == null || !slotUI.isHovered()) continue;
@@ -528,7 +533,7 @@ public class InventoryUI extends UIElement {
     }
 
     private void mergeCarriedStack(InventorySlot slot) {
-        int maxStack = inventory.getMaxStack(carriedItem);
+        int maxStack = K.World.MAX_STACK;
         int space = maxStack - slot.getAmount();
 
         if (space <= 0) {
@@ -784,7 +789,7 @@ public class InventoryUI extends UIElement {
     }
 
     private void placeOne(InventorySlot slot) {
-        int maxStack = inventory.getMaxStack(carriedItem);
+        int maxStack = K.World.MAX_STACK;
         if (maxStack <= 0) {
             return;
         }
@@ -798,7 +803,7 @@ public class InventoryUI extends UIElement {
     }
 
     private void addOneToSlot(InventorySlot slot) {
-        int maxStack = inventory.getMaxStack(slot.getItem());
+        int maxStack = K.World.MAX_STACK;
 
         if (slot.getAmount() >= maxStack) {
             return;

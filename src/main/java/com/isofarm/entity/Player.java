@@ -55,7 +55,7 @@ public class Player extends Character {
         setPosition(new Vector3f(spawnX, highestAltitude.y(), spawnZ));
         setVelocity(new Vector3f(0.0f, 0.0f, 0.0f));
         setDimensions(new Vector3f(0.5f, 1.0f, 0.5f));
-        setMaxHitpoints(8);
+        setMaxHitpoints(20);
         setHitpoints(getMaxHitpoints());
         setMaxStamina(100);
         setStamina(getMaxStamina());
