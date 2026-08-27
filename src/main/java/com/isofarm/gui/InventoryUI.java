@@ -12,6 +12,8 @@ import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import com.isofarm.utils.ToastFactory;
 import com.isofarm.wrld.GameMaster;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,11 +21,12 @@ import java.util.List;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_RIGHT;
 
+@SuppressWarnings("all")
 public class InventoryUI extends UIElement {
     private static final int BACKPACK_SLOTS = 16;
     private static final int BACKPACK_COLUMNS = 4;
     private static final int BACKPACK_ROWS = 4;
-    private static final float animationSpeed = 800.0f;
+    private static final Logger log = LoggerFactory.getLogger(InventoryUI.class);
 
     private final InventorySlotUI[] slotUIs;
     private final InventorySlotUI[] backpackSlotUIs;
@@ -46,17 +49,27 @@ public class InventoryUI extends UIElement {
     private int carriedAmount;
     private HotbarUI hotbarUI;
     private BackpackInventoryUI backpackUI;
-    private UIProgressBar healthBar;
-    private UIProgressBar staminaBar;
     private GameMaster gameMaster;
+
     private float defaultX;
     private float targetX;
+    private float defaultY;
+    private float targetY;
+    private boolean isClosing = false;
+
     private boolean isBackpackOpen = false;
+    private boolean isBackpackClosing = false;
+    private float backpackTargetY;
+    private float backpackCurrentY;
 
     public InventoryUI(float x, float y) {
         super(x, y, getInventoryWidth(), getInventoryHeight());
         defaultX = x;
         targetX = x;
+        defaultY = y;
+        targetY = y + 1000.0f;
+        setPosition(x, targetY);
+
         int totalVisualSlots = (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
         this.slotUIs = new InventorySlotUI[totalVisualSlots];
         this.backpackSlotUIs = new InventorySlotUI[BACKPACK_SLOTS];
@@ -64,6 +77,9 @@ public class InventoryUI extends UIElement {
         this.currentTab = Tab.INVENTORY;
         setFocusable(true);
         createButtons();
+
+        setLayer(150);
+        hide();
     }
 
     private static float getInventoryWidth() {
@@ -115,11 +131,10 @@ public class InventoryUI extends UIElement {
         sortButton.setOnClick(this::sortInventory);
         groupButton.setOnClick(this::groupInventory);
         backpackButton.setOnClick(() -> {
-            if (isBackpackOpen) {
+            if (isBackpackOpen && !isBackpackClosing) {
                 closeBackpack();
-            } else {
-                openBackpack(gameMaster.getGameUIService()
-                        .getBackpackInventoryUI());
+            } else if (!isBackpackOpen) {
+                openBackpack(gameMaster.getGameUIService().getBackpackInventoryUI());
             }
         });
 
@@ -129,7 +144,8 @@ public class InventoryUI extends UIElement {
             } else {
                 currentTab = Tab.INVENTORY;
             }
-            ToastFactory.info("Crafting menu clicked. Current tab: " + currentTab);
+            ToastFactory.info("Crafting is..." +
+                    (currentTab.equals(Tab.INVENTORY) ? "disabled" : "enabled"));
         });
 
         sortButton.setTooltipText("Sort");
@@ -196,51 +212,64 @@ public class InventoryUI extends UIElement {
 
     private void updatePosition(float delta) {
         float currentX = getX();
-        if (Math.abs(targetX - currentX) < 0.5f) {
-            setPosition(targetX, getY());
-        } else {
-            float direction = Math.signum(targetX - currentX);
-            float movement = animationSpeed * delta;
+        float currentY = getY();
 
-            float newX = currentX + direction * movement;
-
-            if ((direction > 0 && newX > targetX) ||
-                    (direction < 0 && newX < targetX)) {
-                newX = targetX;
-            }
+        if (Math.abs(targetX - currentX) > 0.1f) {
+            float newX = currentX + (targetX - currentX) * Math.min(1.0f, delta * 15.0f);
             setPosition(newX, getY());
+        } else {
+            setPosition(targetX, getY());
         }
 
-        if (backpackUI != null && isBackpackOpen) {
-            float spacing = Settings.getScaledSpacing();
-            backpackUI.setPosition(getX() + getWidth() + spacing, getY());
+        if (Math.abs(targetY - currentY) > 0.1f) {
+            float newY = currentY + (targetY - currentY) * Math.min(1.0f, delta * 15.0f);
+            setPosition(getX(), newY);
+        } else {
+            setPosition(getX(), targetY);
+            if (isClosing) {
+                super.hide();
+                isClosing = false;
+            }
+        }
+
+        if (backpackUI != null && (isBackpackOpen || isBackpackClosing)) {
+            float bpX = getX() + (getWidth() - backpackUI.getWidth()) / 2.0f;
+            if (Math.abs(backpackTargetY - backpackCurrentY) > 0.1f) {
+                backpackCurrentY += (backpackTargetY - backpackCurrentY) * Math.min(1.0f, delta * 15.0f);
+            } else {
+                backpackCurrentY = backpackTargetY;
+                if (isBackpackClosing) {
+                    backpackUI.hide();
+                    isBackpackOpen = false;
+                    isBackpackClosing = false;
+                }
+            }
+            backpackUI.setPosition(bpX, backpackCurrentY);
         }
     }
 
     public void openBackpack(BackpackInventoryUI backpackUI) {
         if (backpackUI == null) return;
-        backpackUI.show();
-        isBackpackOpen = true;
-        float spacing = Settings.getScaledSpacing();
-        float shift = (backpackUI.getAbsoluteWidth() + spacing) / 3.0f;
-        targetX = defaultX - shift;
+        this.backpackUI = backpackUI;
+        this.isBackpackOpen = true;
+        this.isBackpackClosing = false;
+        this.backpackUI.show();
+
+        float spacing = Settings.getScaledSpacing() * 2.0f;
+        float pushOffset = (backpackUI.getHeight() + spacing) / 2.0f;
+        this.targetY = this.defaultY + pushOffset;
+        this.backpackCurrentY = -backpackUI.getHeight();
+        this.backpackTargetY = this.targetY - backpackUI.getHeight() - spacing;
+
+        this.backpackUI.setPosition(getX() + (getWidth() - backpackUI.getWidth()) / 2.0f, backpackCurrentY);
     }
 
     public void closeBackpack() {
-        isBackpackOpen = false;
-        targetX = defaultX;
-        if (gameMaster == null || gameMaster.getGameUIService() == null) {
-            if (backpackUI != null) {
-                backpackUI.hide();
-            }
-            return;
-        }
-
-        BackpackInventoryUI backpackUI =
-                gameMaster.getGameUIService().getBackpackInventoryUI();
-
+        if (!isBackpackOpen || isBackpackClosing) return;
+        this.isBackpackClosing = true;
+        this.targetY = this.defaultY;
         if (backpackUI != null) {
-            backpackUI.hide();
+            this.backpackTargetY = -backpackUI.getHeight();
         }
     }
 
@@ -267,47 +296,50 @@ public class InventoryUI extends UIElement {
     }
 
     private void onOpen() {
+        isClosing = false;
         closeBackpack();
-        if (hotbarUI == null || healthBar == null || staminaBar == null) {
-            return;
+
+        if (gameMaster != null) {
+            this.defaultX = (gameMaster.getWindowWidth() - getWidth()) / 2.0f;
+            this.targetX = defaultX;
+            this.defaultY = (gameMaster.getWindowHeight() - getHeight()) / 2.0f;
+            this.targetY = defaultY;
+            setPosition(defaultX, gameMaster.getWindowHeight());
         }
 
-        if (gameMaster != null && !isBackpackOpen) {
-            defaultX = (gameMaster.getWindowWidth() - getWidth()) / 2.0f;
-            targetX = defaultX;
-            setPosition(targetX, getY());
+        if (hotbarUI != null) {
+            hotbarUI.setInventoryMode(true);
         }
-
-        float hotbarX = getAbsoluteX() + (getWidth() - hotbarUI.getWidth()) / 2.0f;
-        float hotbarY = getAbsoluteY() + getHeight() + K.UI.HOTBAR_OFFSET;
-        hotbarUI.setPosition(hotbarX, hotbarY);
-        hotbarUI.setInventoryMode(true);
-
-        float barWidth = healthBar.getWidth();
-        float barHeight = healthBar.getHeight();
-        float gapBetweenBars = 12.0f;
-        float offsetAboveHotbar = 10.0f;
-
-        float totalBarsWidth = (barWidth * 2.0f) + gapBetweenBars;
-        float startX = hotbarX + (hotbarUI.getWidth() - totalBarsWidth) / 2.0f;
-        float barY = hotbarY - barHeight - offsetAboveHotbar;
-        healthBar.setPosition(startX, barY);
-        staminaBar.setPosition(startX + barWidth + gapBetweenBars, barY);
     }
 
     private void onClose() {
+        if (backpackUI != null) {
+            backpackUI.hide();
+            isBackpackOpen = false;
+            isBackpackClosing = false;
+        }
+
+        if (gameMaster != null) {
+            this.targetY = gameMaster.getWindowHeight();
+            this.isClosing = true;
+        }
+
         if (hotbarUI != null) {
-            if (gameMaster != null && gameMaster.getGameUIService() != null) {
-                gameMaster.getGameUIService().resetHotbarPosition();
-            }
             hotbarUI.setInventoryMode(false);
         }
         returnCarriedItem();
     }
 
+    @Override
+    public UIElement hide() {
+        if (isVisible() && !isClosing) {
+            onClose();
+        }
+        return this;
+    }
+
     private void returnCarriedItem() {
         if (carriedItem == null || carriedAmount <= 0 || player == null) {
-
             clearCarriedItem();
             return;
         }
@@ -341,16 +373,16 @@ public class InventoryUI extends UIElement {
             updateItemSprite(slotUI);
         }
 
+        Inventory backpackInv = (player != null) ? player.getBackpack() : null;
         for (int i = 0; i < backpackSlotUIs.length; i++) {
             InventorySlotUI slotUI = backpackSlotUIs[i];
             if (slotUI == null) continue;
 
-            if (i < (inventory.getSlots().size())) {
-                slotUI.setSlot((inventory.getSlot(i)));
+            if (backpackInv != null && i < backpackInv.getSlots().size()) {
+                slotUI.setSlot(backpackInv.getSlot(i));
             } else {
                 slotUI.setSlot(null);
             }
-
             updateItemSprite(slotUI);
         }
 
@@ -411,7 +443,6 @@ public class InventoryUI extends UIElement {
 
         if (hotbarUI != null) {
             for (InventorySlotUI slotUI : hotbarUI.getSlotUIs()) {
-
                 if (slotUI != null) {
                     slotUI.setHovered(slotUI.contains(mouseX, mouseY));
                 }
@@ -528,7 +559,6 @@ public class InventoryUI extends UIElement {
 
     private void rightClick(InventorySlot slot) {
         switch (currentTab) {
-
             case INVENTORY -> {
                 if (carriedItem == null) {
                     takeHalf(slot);
@@ -805,15 +835,15 @@ public class InventoryUI extends UIElement {
 
     @Override
     public void render() {
+        renderChildren();
+        renderCarriedItem();
+
         if (inventory != null && inventory.getBackpackSlot() != null
                 && inventory.getBackpackSlot().getItem() != null) {
             backpackButton.show();
         } else {
             backpackButton.hide();
         }
-
-        renderChildren();
-        renderCarriedItem();
     }
 
     private void renderCarriedItem() {
@@ -842,29 +872,24 @@ public class InventoryUI extends UIElement {
         }
     }
 
-    public UIProgressBar getHealthBar() {
-        return healthBar;
-    }
-
-    public void setHealthBar(UIProgressBar healthBar) {
-        this.healthBar = healthBar;
-    }
-
-    public UIProgressBar getStaminaBar() {
-        return staminaBar;
-    }
-
-    public void setStaminaBar(UIProgressBar staminaBar) {
-        this.staminaBar = staminaBar;
-    }
-
     public void setIcons(SpriteSheet seed, SpriteSheet crop,
-                         SpriteSheet block, SpriteSheet tool, SpriteSheet inv) {
+                         SpriteSheet block, SpriteSheet tool,
+                         SpriteSheet material, SpriteSheet inv) {
         this.seedIcons = seed;
         this.cropIcons = crop;
         this.blockIcons = block;
         this.toolIcons = tool;
+        this.materialIcons = material;
         this.inventoryIcons = inv;
+
+        if (hotbarUI != null) {
+            hotbarUI.setSeedIcons(seedIcons);
+            hotbarUI.setCropIcons(cropIcons);
+            hotbarUI.setBlockIcons(blockIcons);
+            hotbarUI.setToolIcons(toolIcons);
+            hotbarUI.setMaterialIcons(materialIcons);
+            hotbarUI.setInventoryIcons(inventoryIcons);
+        }
     }
 
     public void setPlayer(Player player) {
@@ -883,54 +908,6 @@ public class InventoryUI extends UIElement {
 
     public void setInventory(Inventory inventory) {
         this.inventory = inventory;
-    }
-
-    public void setSeedIcons(SpriteSheet seedIcons) {
-        this.seedIcons = seedIcons;
-
-        if (hotbarUI != null) {
-            hotbarUI.setSeedIcons(seedIcons);
-        }
-    }
-
-    public void setCropIcons(SpriteSheet cropIcons) {
-        this.cropIcons = cropIcons;
-
-        if (hotbarUI != null) {
-            hotbarUI.setCropIcons(cropIcons);
-        }
-    }
-
-    public void setBlockIcons(SpriteSheet blockIcons) {
-        this.blockIcons = blockIcons;
-
-        if (hotbarUI != null) {
-            hotbarUI.setBlockIcons(blockIcons);
-        }
-    }
-
-    public void setToolIcons(SpriteSheet toolIcons) {
-        this.toolIcons = toolIcons;
-
-        if (hotbarUI != null) {
-            hotbarUI.setToolIcons(toolIcons);
-        }
-    }
-
-    public void setMaterialIcons(SpriteSheet materialIcons) {
-        this.materialIcons = materialIcons;
-
-        if (hotbarUI != null) {
-            hotbarUI.setMaterialIcons(materialIcons);
-        }
-    }
-
-    public void setInventoryIcons(SpriteSheet inventoryIcons) {
-        this.inventoryIcons = inventoryIcons;
-
-        if (hotbarUI != null) {
-            hotbarUI.setInventoryIcons(inventoryIcons);
-        }
     }
 
     public void setHotbarUI(GameMaster gameMaster, HotbarUI hotbarUI) {

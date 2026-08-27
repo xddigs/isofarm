@@ -87,10 +87,7 @@ public class GameUIService implements Service<GameMaster> {
 
         this.chatHistory = new ArrayList<>();
         this.inventoryUI = new InventoryUI(windowWidth, windowHeight);
-        this.inventoryUI.setLayer(100);
-        this.inventoryUI.hide();
         this.hotbarUI = new HotbarUI(windowWidth, windowHeight);
-        this.hotbarUI.setLayer(50);
 
         this.inventoryUI.setPosition(
                 windowWidth / 2.0f - inventoryUI.getAbsoluteWidth() / 2.0f,
@@ -100,21 +97,12 @@ public class GameUIService implements Service<GameMaster> {
                 windowWidth / 2.0f - hotbarUI.getAbsoluteWidth() / 2.0f,
                 windowHeight - hotbarUI.getAbsoluteHeight() - K.UI.HOTBAR_OFFSET);
 
-        this.backpackUI = new BackpackInventoryUI(
-                inventoryUI.getAbsoluteX() + inventoryUI.getAbsoluteWidth() -
-                        K.UI.INVENTORY_BACKPACK_OFFSET,
-                inventoryUI.getAbsoluteY());
+        this.backpackUI = new BackpackInventoryUI(0,0);
 
-        backpackUI.setLayer(100);
-        backpackUI.hide();
-
-        inventoryUI.setSeedIcons(seedIcons);
-        inventoryUI.setCropIcons(cropIcons);
-        inventoryUI.setBlockIcons(blockIcons);
-        inventoryUI.setToolIcons(toolIcons);
-        inventoryUI.setMaterialIcons(materialIcons);
-        inventoryUI.setInventoryIcons(inventoryIcons);
         inventoryUI.setHotbarUI(gameMaster, hotbarUI);
+        inventoryUI.setIcons(seedIcons, cropIcons, blockIcons,
+                toolIcons, materialIcons, inventoryIcons);
+
         inventoryUI.setGameMaster(gameMaster);
         backpackUI.setGameMaster(gameMaster);
 
@@ -123,9 +111,6 @@ public class GameUIService implements Service<GameMaster> {
         uiManager.getRoot().addChild(backpackUI);
 
         this.chatField = new UITextField(10, windowHeight - 40, windowWidth - 20, 30);
-        this.chatField.setLayer(1000);
-        this.chatField.hide();
-
         chatField.setCompletionProvider(
                 new CommandCompletionProvider(gameMaster.getCommandRegistry()));
 
@@ -165,7 +150,7 @@ public class GameUIService implements Service<GameMaster> {
         this.memory.show();
         uiManager.getRoot().addChild(memory);
         uiManager.getRoot().getChildren().forEach(uiElement ->
-                log.info(String.valueOf(uiElement)));
+                log.debug(String.valueOf(uiElement)));
     }
 
     public InventoryUI getInventoryUI() {
@@ -285,7 +270,6 @@ public class GameUIService implements Service<GameMaster> {
 
     public void render(boolean isHUDShown, GameMaster gameMaster) {
         if (!gameMaster.getPlayer().isAlive()) return;
-
         GUI.begin(windowWidth, windowHeight);
         if (isHUDShown) {
             uiManager.render();
