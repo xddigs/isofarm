@@ -11,7 +11,6 @@ import org.joml.Vector3f;
 
 import static org.joml.Math.lerp;
 
-@SuppressWarnings("unused")
 public class OrthographicCamera implements CameraView {
     private static final float MIN_ZOOM = 1.0f;
     private static final float MAX_ZOOM = 80.0f;
@@ -22,8 +21,6 @@ public class OrthographicCamera implements CameraView {
 
     private static final float NEAR_PLANE = 0.1f;
     private static final float FAR_PLANE = 2000.0f;
-
-    private static final float MAX_RAY_DISTANCE = Settings.getMaxInteractionDistance();
 
     private final Vector3f position;
     private final Matrix4f projectionMatrix;
@@ -165,7 +162,7 @@ public class OrthographicCamera implements CameraView {
 
         int hitNormalX = 0, hitNormalY = 0, hitNormalZ = 0;
 
-        while (true) {
+        do {
             byte block = world.getBlockTypeAt(x, y, z);
             byte waterLevel = world.getWaterLevelAt(x, y, z);
 
@@ -187,25 +184,34 @@ public class OrthographicCamera implements CameraView {
 
             if (tMaxX < tMaxY) {
                 if (tMaxX < tMaxZ) {
-                    x += stepX; tMaxX += tDeltaX;
-                    hitNormalX = -stepX; hitNormalY = 0; hitNormalZ = 0;
+                    x += stepX;
+                    tMaxX += tDeltaX;
+                    hitNormalX = -stepX;
+                    hitNormalY = 0;
+                    hitNormalZ = 0;
                 } else {
-                    z += stepZ; tMaxZ += tDeltaZ;
-                    hitNormalX = 0; hitNormalY = 0; hitNormalZ = -stepZ;
+                    z += stepZ;
+                    tMaxZ += tDeltaZ;
+                    hitNormalX = 0;
+                    hitNormalY = 0;
+                    hitNormalZ = -stepZ;
                 }
             } else {
                 if (tMaxY < tMaxZ) {
-                    y += stepY; tMaxY += tDeltaY;
-                    hitNormalX = 0; hitNormalY = -stepY; hitNormalZ = 0;
+                    y += stepY;
+                    tMaxY += tDeltaY;
+                    hitNormalX = 0;
+                    hitNormalY = -stepY;
+                    hitNormalZ = 0;
                 } else {
-                    z += stepZ; tMaxZ += tDeltaZ;
-                    hitNormalX = 0; hitNormalY = 0; hitNormalZ = -stepZ;
+                    z += stepZ;
+                    tMaxZ += tDeltaZ;
+                    hitNormalX = 0;
+                    hitNormalY = 0;
+                    hitNormalZ = -stepZ;
                 }
             }
-
-            if (tMaxX > 2000.0f && tMaxY > 2000.0f && tMaxZ > 2000.0f) break;
-        }
-
+        } while (!(tMaxX > 2000.0f) || !(tMaxY > 2000.0f) || !(tMaxZ > 2000.0f));
         return null;
     }
 }
