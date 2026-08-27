@@ -34,6 +34,8 @@ public class UITextField extends UIElement {
     public UITextField(float x, float y, float width, float height) {
         super(x, y, width, height);
         setFocusable(true);
+        setLayer(1000);
+        hide();
     }
 
     @Override

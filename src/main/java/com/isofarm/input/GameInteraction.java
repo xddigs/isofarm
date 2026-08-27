@@ -65,8 +65,11 @@ public class GameInteraction {
         boolean isLeftPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
         boolean isLeftHeld = Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT);
         boolean isRightPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_RIGHT);
-        boolean canInteract = player != null && !player.getGamemode().isNoClip()
-                && !isCtrlHeld && !gameMaster.isInventoryOpen() && !gameMaster.isChatOpen();
+        boolean canInteract = player != null
+                && !player.getGamemode().isNoClip()
+                && !isCtrlHeld
+                && !gameMaster.isInventoryOpen()
+                && !gameMaster.isChatOpen();
 
         if (Keyboard.isKeyPressed(GLFW_KEY_ENTER)) {
             if (!gameMaster.isChatOpen()) {
@@ -95,7 +98,7 @@ public class GameInteraction {
             dropItem(gameMaster, selectedItem, dropAll);
         }
 
-        if (Keyboard.isKeyPressed(GLFW_KEY_E) && !gameMaster.isChatOpen() && canInteract) {
+        if (Keyboard.isKeyPressed(GLFW_KEY_E) && !gameMaster.isChatOpen()) {
             gameMaster.toggleInventory();
         }
 

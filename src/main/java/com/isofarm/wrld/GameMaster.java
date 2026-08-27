@@ -336,13 +336,6 @@ public class GameMaster {
 
     public void setInventoryOpen(boolean isInventoryOpen) {
         this.isInventoryOpen = isInventoryOpen;
-        if (isInventoryOpen) {
-            if (gameUIservice != null) {
-                gameUIservice.getInventoryUI().closeBackpack();
-            }
-        } else {
-            this.cameraController.release(this);
-        }
     }
 
     public boolean isHUDShown() {
