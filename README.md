@@ -1,7 +1,7 @@
 ![isofarm_logo](./src/main/resources/assets/gui/logo.png)
 
-# Isofarm
-Isofarm is a 3D open-world farming simulation game built in Java using LWJGL 
+**Isofarm** is a 3D open-world farming simulation game built in Java using 
+LWJGL 
 and OpenGL. 
 Explore a voxel-based island generated through chunk management, cultivate 
 crops featuring real-time seasonal and weather cycles, manage your inventory, and trade items in a dynamic 
