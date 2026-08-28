@@ -31,8 +31,10 @@ public enum BlockData implements Craftable {
     GOLD_ORE((byte) 14, (byte) 4, (byte) 1, "Golden Ore Block", false, 500, "assets/textures/blocks/gold_ore.png", SoundGroup.HARD, 12.0f, false, new MiningComponent[]{new MiningComponent(Tier.GOLD, MaterialID.RAW_ORE)}, Tier.GOLD),
     PLATINUM_ORE((byte) 15, (byte) 5, (byte) 1, "Platinum Ore Block", false, 800, "assets/textures/blocks/platinum_ore.png", SoundGroup.HARD, 14.0f, false, new MiningComponent[]{new MiningComponent(Tier.PLATINUM, MaterialID.RAW_ORE)}, Tier.PLATINUM),
     DIAMOND_ORE((byte) 16, (byte) 6, (byte) 1, "Diamond Ore Block", false, 1000, "assets/textures/blocks/diamond_ore.png", SoundGroup.HARD, 16.0f, false, new MiningComponent[]{new MiningComponent(Tier.DIAMOND, MaterialID.RAW_ORE)}, Tier.DIAMOND),
-    GRAVEL((byte) 17, (byte) 7, (byte) 1, "Gravel", false, 100, "assets/textures/blocks/gravel.png", SoundGroup.SOIL, 0.8f, false, new Object[]{}, Tier.NONE),
-    SAND((byte) 18, (byte) 8, (byte) 1, "Sand", false, 100, "assets/textures/blocks/sand.png", SoundGroup.SOIL, 0.8f, false, new Object[]{}, Tier.NONE),
+    GRAVEL((byte) 17, (byte) 7, (byte) 1, "Gravel", false, 100, "assets/textures/blocks/gravel.png", SoundGroup.SOIL, 0.9f, false, new Object[]{}, Tier.NONE),
+    SAND((byte) 18, (byte) 8, (byte) 1, "Sand", false, 100, "assets/textures/blocks/sand.png", SoundGroup.SOIL,0.9f, false, new Object[]{}, Tier.NONE),
+    FOSSIL((byte) 19, (byte) 9, (byte) 1, "Fossil", false, 100, "assets/textures/blocks/fossil.png", SoundGroup.HARD, 8.0f, false, new Object[]{}, Tier.NONE),
+    BASALT((byte) 20,(byte) 10,(byte) 1, "Basalt", false, 100, "assets/textures/blocks/basalt.png", SoundGroup.HARD, 6.0f, false, new Object[]{}, Tier.NONE),
 
     TALL_GRASS((byte) 21, (byte) 1, (byte) (K.UI.ICON_BLOCK_ROWS - 1), "Tall Grass", false, 5, "assets/textures/blocks/tall_grass.png", SoundGroup.SOIL, 0.01f, true, new Object[]{new Seed(CropType.WHEAT)}, Tier.NONE),
     ROSE((byte) 22, (byte) 2, (byte) (K.UI.ICON_BLOCK_ROWS - 1), "Rose", false, 10, "assets/textures/blocks/rose.png", SoundGroup.SOIL, 0.01f, true, new Object[]{}, Tier.NONE),
