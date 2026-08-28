@@ -49,11 +49,10 @@ public record CameraController(Camera camera) implements Service<Camera> {
             }
         }
 
-//        click(gameMaster, player, gameMaster.getWorld());
-//        followPath(player, gameMaster.getWorld(), delta);
+        click(gameMaster, player, gameMaster.getWorld());
+        followPath(player, gameMaster.getWorld(), delta);
         updateZoom();
         followPlayer(gameMaster, player, delta);
-
     }
 
     private void updateZoom() {
@@ -130,7 +129,9 @@ public record CameraController(Camera camera) implements Service<Camera> {
     }
 
     private void followPath(Player player, World world, float delta) {
-        player.move(world, delta, camera.getYaw());
+        if (player.isFollowingPath()) {
+            player.move(world, delta, camera.getYaw());
+        }
     }
 
     private GridPos getGoalPosition(World world, Hit hit) {

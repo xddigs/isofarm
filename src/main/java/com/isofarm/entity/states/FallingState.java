@@ -30,15 +30,16 @@ public class FallingState implements PlayerState {
             return;
         }
 
+        float yaw = player.getGameMaster().getActiveCamera().getYaw();
+        player.wasd(world, delta, yaw);
+
         if (player.isOnGround()) {
             float fallDistance = fallStartY - player.getPosition().y;
+
             if (fallDistance > 3.0f) {
                 float damage = (fallDistance - 3.0f) * 2.0f;
                 player.fallDamage(damage);
                 player.getSoundService().playBreakSound(SoundGroup.ENTITY, 1.0f, 1.0f);
-            } else {
-                float yaw = player.getGameMaster().getActiveCamera().getYaw();
-                player.wasd(player.getGameMaster().getWorld(), delta, yaw);
             }
 
             player.setFalling(false);
