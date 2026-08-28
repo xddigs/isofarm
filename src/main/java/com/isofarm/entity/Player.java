@@ -37,7 +37,6 @@ public class Player extends Character {
     private final GameMaster gameMaster;
     private Direction direction = Direction.SOUTH;
     private List<GridPos> path;
-    private int currentFrame;
 
     private float currentEyeHeight = 1.6f;
     private float targetEyeHeight = 1.6f;
@@ -191,7 +190,7 @@ public class Player extends Character {
             totalFramesInRow = K.UI.PLAYER_SPRITE_COLS;
         }
 
-        currentFrame = (int) (getAnimTimer() / getFrameDuration()) % totalFramesInRow;
+        int currentFrame = (int) (getAnimTimer() / getFrameDuration()) % totalFramesInRow;
         int spriteIndex = (rowIndex * K.UI.PLAYER_SPRITE_COLS) + currentFrame;
 
         Vector4f uvBounds = sheet.getUVBounds(spriteIndex);
@@ -674,9 +673,5 @@ public class Player extends Character {
 
     public float getDifficultyRegen() {
         return gameMaster.getDifficulty().getMultiplier();
-    }
-
-    public int getCurrentFrame() {
-        return currentFrame;
     }
 }
