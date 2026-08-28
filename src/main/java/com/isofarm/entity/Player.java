@@ -222,7 +222,6 @@ public class Player extends Character {
         shader.setUniform("uProjection", camera.getProjectionMatrix());
         shader.setUniform("uView", camera.getViewMatrix());
 
-        float aspect = sheet.getFrameHeight() > 0 ? (float) sheet.getFrameWidth() / (float) sheet.getFrameHeight() : 1.0f;
         float baseScaleY = (dimensions == null || dimensions.y <= 0) ? 2.0f : dimensions.y;
         float baseScaleX = (dimensions == null || dimensions.x <= 0) ? 1.0f : dimensions.x;
         float baseScaleZ = (dimensions == null || dimensions.z <= 0) ? 1.0f : dimensions.z;
@@ -233,7 +232,7 @@ public class Player extends Character {
         float finalScaleZ = baseScaleZ * globalScale;
 
         float yawRad = (float) Math.toRadians(-camera.getYaw());
-        float yOffset = finalScaleY * -0.20f;
+        float yOffset = finalScaleY * -0.15f;
 
         modelMatrix.identity()
                 .translate(position.x, position.y + yOffset, position.z)
