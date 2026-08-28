@@ -6,20 +6,39 @@ import com.isofarm.utils.Settings;
 
 public class BackpackInventoryUI extends InventoryUI {
     private static final int BACKPACK_SLOTS = 16;
-
-    private final InventorySlotUI[] slotUIs;
+    private final InventorySlotUI[] backpackSlots = new InventorySlotUI[BACKPACK_SLOTS];
     private Inventory backpack;
 
     public BackpackInventoryUI(float x, float y) {
         super(x, y);
         setBackpackUI(this);
         getButtons().forEach(this::removeChild);
-        this.slotUIs = new InventorySlotUI[BACKPACK_SLOTS];
 
         hide();
         setWidth(getBackpackWidth());
         setHeight(getBackpackHeight());
         setLayer(50);
+        createBackpackSlots();
+    }
+
+    private void createBackpackSlots() {
+        for (int i = 0; i < BACKPACK_SLOTS; i++) {
+            int column = i % 4;
+            int row = i / 4;
+            float x = Settings.getScaledPadding() + column * (Settings.getScaledSlot() + Settings.getScaledSpacing());
+            float y = Settings.getScaledPadding() + Settings.getScaledHeader() + row * (Settings.getScaledSlot() + Settings.getScaledSpacing());
+
+            InventorySlotUI slotUI = new InventorySlotUI(x, y, Settings.getScaledSlot(), Settings.getScaledSlot(),
+                    InventorySlotUI.SlotType.BACKPACK);
+
+            backpackSlots[i] = slotUI;
+            addChild(slotUI);
+        }
+    }
+
+    @Override
+    public InventorySlotUI[] getSlotUIs() {
+        return backpackSlots;
     }
 
     @Override
@@ -32,22 +51,6 @@ public class BackpackInventoryUI extends InventoryUI {
         } else {
             backpack = null;
             setInventory(null);
-        }
-    }
-
-    @Override
-    public void createSlots() {
-        for (int i = 0; i < 16; i++) {
-            int column = i % 4;
-            int row = i / 4;
-            float x = Settings.getScaledPadding() + column * (Settings.getScaledSlot() + Settings.getScaledSpacing());
-            float y = Settings.getScaledPadding() + Settings.getScaledHeader() + row * (Settings.getScaledSlot() + Settings.getScaledSpacing());
-
-            InventorySlotUI slotUI = new InventorySlotUI(x, y, Settings.getScaledSlot(), Settings.getScaledSlot(),
-                    InventorySlotUI.SlotType.BACKPACK);
-
-            slotUIs[i] = slotUI;
-            addChild(slotUI);
         }
     }
 
