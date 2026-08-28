@@ -100,10 +100,10 @@ public class Game {
 
     private void setWindowIcon() {
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            GLFWImage.Buffer icons = GLFWImage.malloc(4, stack);
-            ByteBuffer[] pixels = new ByteBuffer[4];
+            GLFWImage.Buffer icons = GLFWImage.malloc(6, stack);
+            ByteBuffer[] pixels = new ByteBuffer[6];
 
-            int initialSize = 16;
+            int initialSize = 32;
             for (int i = 0; i < pixels.length; i++) {
                 pixels[i] = loadIcon(icons, i, "/assets/gui/iconx" + initialSize + ".png", stack);
                 initialSize *= 2;
