@@ -102,7 +102,7 @@ public class WorldGenerator {
     }
 
     private void generateTree(int worldX, int worldZ, Random random) {
-        int trunkHeight = 4 + random.nextInt(2);
+        int trunkHeight = 4 + random.nextInt(5);
 
         for (int y = 1; y <= trunkHeight; y++) {
             world.setBlockTypeAt(worldX, SURFACE_Y + y, worldZ, BlockData.OAK_LOG.getId());
