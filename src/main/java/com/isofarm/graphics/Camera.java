@@ -11,7 +11,7 @@ import org.joml.Vector3f;
 
 import static org.joml.Math.lerp;
 
-public class MainCamera implements CameraView {
+public class Camera implements CameraView {
     private static final float MIN_ZOOM = 1.0f;
     private static final float MAX_ZOOM = 80.0f;
 
@@ -28,7 +28,7 @@ public class MainCamera implements CameraView {
     private float zoom = 25.0f;
     private float aspectRatio = 1.0f;
 
-    public MainCamera(float width, float height, int renderDistanceChunks) {
+    public Camera(float width, float height, int renderDistanceChunks) {
         this.position = new Vector3f();
         this.projectionMatrix = new Matrix4f();
         updateProjection(width, height, renderDistanceChunks);
@@ -68,11 +68,6 @@ public class MainCamera implements CameraView {
     @Override
     public float getYaw() {
         return yaw;
-    }
-
-    public void setPosition(float x, float z) {
-        position.x = x;
-        position.z = z;
     }
 
     public void setPosition(float x, float y, float z) {

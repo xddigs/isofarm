@@ -178,7 +178,7 @@ public class GameUIService implements Service<GameMaster> {
         hotbarUI.setInventory(player.getInventory());
         backpackUI.setPlayer(player);
         backpackUI.setInventory(player.getBackpack());
-        backpackUI.createBackpackSlots();
+        backpackUI.createSlots();
     }
 
     public void setShop(Shop shop) {

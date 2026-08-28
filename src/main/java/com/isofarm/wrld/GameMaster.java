@@ -55,7 +55,7 @@ public class GameMaster {
     private Framebuffer maskFbo;
     private Framebuffer sceneFbo;
     private Framebuffer blurFbo;
-    private MainCamera orthoCamera;
+    private Camera orthoCamera;
     private CameraController orthoCameraController;
     private StepController stepController;
     private float windowWidth;
@@ -123,7 +123,7 @@ public class GameMaster {
         this.shop = new Shop();
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
-        this.orthoCamera = new MainCamera(windowWidth, windowHeight, Settings.getRenderDistance());
+        this.orthoCamera = new Camera(windowWidth, windowHeight, Settings.getRenderDistance());
 
         this.orthoCameraController = new CameraController(orthoCamera);
         this.stepController = new StepController();
@@ -280,7 +280,7 @@ public class GameMaster {
         return windowHeight;
     }
 
-    public MainCamera getOrthoCamera() {
+    public Camera getOrthoCamera() {
         return orthoCamera;
     }
 

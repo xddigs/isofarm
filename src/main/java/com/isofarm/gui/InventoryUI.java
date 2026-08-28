@@ -21,13 +21,11 @@ import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_RIGHT;
 
 @SuppressWarnings("all")
 public class InventoryUI extends UIElement {
-    private static final int BACKPACK_SLOTS = 16;
     private static final int BACKPACK_COLUMNS = 4;
     private static final int BACKPACK_ROWS = 4;
     private static final Logger log = LoggerFactory.getLogger(InventoryUI.class);
 
     private final InventorySlotUI[] slotUIs;
-    private final InventorySlotUI[] backpackSlotUIs;
 
     private final List<UIButton> buttons;
     private UIButton sortButton;
@@ -70,7 +68,6 @@ public class InventoryUI extends UIElement {
 
         int totalVisualSlots = (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
         this.slotUIs = new InventorySlotUI[totalVisualSlots];
-        this.backpackSlotUIs = new InventorySlotUI[BACKPACK_SLOTS];
         this.buttons = new ArrayList<>();
         this.currentTab = Tab.INVENTORY;
         setFocusable(true);
@@ -106,10 +103,6 @@ public class InventoryUI extends UIElement {
 
     public InventorySlotUI[] getSlotUIs() {
         return slotUIs;
-    }
-
-    public InventorySlotUI[] getBackpackSlotUIs() {
-        return backpackSlotUIs;
     }
 
     private void createButtons() {
@@ -175,20 +168,6 @@ public class InventoryUI extends UIElement {
 
             slotUIs[i] = slotUI;
             addChild(slotUI);
-        }
-    }
-
-    public void createBackpackSlots() {
-        for (int i = 0; i < BACKPACK_SLOTS; i++) {
-            int column = i % BACKPACK_COLUMNS;
-            int row = i / BACKPACK_COLUMNS;
-            float x = Settings.getScaledPadding() + column * (Settings.getScaledSlot() + Settings.getScaledSpacing());
-            float y = Settings.getScaledPadding() + Settings.getScaledHeader() + row * (Settings.getScaledSlot() + Settings.getScaledSpacing());
-            InventorySlotUI slotUI = new InventorySlotUI(x, y, Settings.getScaledSlot(), Settings.getScaledSlot(),
-                    InventorySlotUI.SlotType.BACKPACK);
-
-            getBackpackSlotUIs()[i] = slotUI;
-            backpackUI.addChild(slotUI);
         }
     }
 
@@ -356,6 +335,7 @@ public class InventoryUI extends UIElement {
 
     protected void syncInventory() {
         if (inventory == null) return;
+
         for (int i = 0; i < slotUIs.length; i++) {
             InventorySlotUI slotUI = slotUIs[i];
             if (slotUI == null) continue;
@@ -369,17 +349,19 @@ public class InventoryUI extends UIElement {
             updateItemSprite(slotUI);
         }
 
-        Inventory backpackInv = (player != null) ? player.getBackpack() : null;
-        for (int i = 0; i < backpackSlotUIs.length; i++) {
-            InventorySlotUI slotUI = backpackSlotUIs[i];
-            if (slotUI == null) continue;
+        if (backpackUI != null && backpackUI.getSlotUIs() != null) {
+            Inventory backpackInv = (player != null) ? player.getBackpack() : null;
+            for (int i = 0; i < backpackUI.getSlotUIs().length; i++) {
+                InventorySlotUI slotUI = backpackUI.getSlotUIs()[i];
+                if (slotUI == null) continue;
 
-            if (backpackInv != null && i < backpackInv.getSlots().size()) {
-                slotUI.setSlot(backpackInv.getSlot(i));
-            } else {
-                slotUI.setSlot(null);
+                if (backpackInv != null && i < backpackInv.getSlots().size()) {
+                    slotUI.setSlot(backpackInv.getSlot(i));
+                } else {
+                    slotUI.setSlot(null);
+                }
+                updateItemSprite(slotUI);
             }
-            updateItemSprite(slotUI);
         }
 
         if (sortButton.getSpriteSheet() == null && inventoryIcons != null) {
@@ -431,9 +413,11 @@ public class InventoryUI extends UIElement {
             }
         }
 
-        for (InventorySlotUI slotUI : getBackpackSlotUIs()) {
-            if (slotUI != null) {
-                slotUI.setHovered(slotUI.contains(mouseX, mouseY));
+        if (backpackUI != null && backpackUI.isVisible()) {
+            for (InventorySlotUI slotUI : backpackUI.getSlotUIs()) {
+                if (slotUI != null) {
+                    slotUI.setHovered(slotUI.contains(mouseX, mouseY));
+                }
             }
         }
 
@@ -451,7 +435,7 @@ public class InventoryUI extends UIElement {
 
         InventorySlotUI[] hotbarSlots = hotbarUI.getSlotUIs();
         InventorySlotUI[] backpackSlots = (backpackUI != null && backpackUI.isVisible()) ?
-                getBackpackSlotUIs() : new InventorySlotUI[0];
+                backpackUI.getSlotUIs() : new InventorySlotUI[0];
 
         InventorySlotUI[] allSlots = new InventorySlotUI[slotUIs.length + hotbarSlots.length + backpackSlots.length];
         System.arraycopy(slotUIs, 0, allSlots, 0, slotUIs.length);
