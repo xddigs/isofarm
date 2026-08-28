@@ -226,7 +226,6 @@ public class GUI {
         shader.setUniform("uColor", color);
 
         float cursorX = x;
-
         for (int i = 0; i < text.length(); ) {
             int codePoint = text.codePointAt(i);
             STBTTBakedChar glyph = font.getGlyph(codePoint);

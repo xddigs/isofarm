@@ -505,10 +505,6 @@ public class GameUIService implements Service<GameMaster> {
         };
     }
 
-    public String getPlayerName() {
-        return "Gabi";
-    }
-
     public void logAction(Hit cell) {
         this.lastActionCell = new Vector2i(cell.x(), cell.y());
         this.actionDisplayTimer = K.UI.COORD_DISPLAY_DURATION;

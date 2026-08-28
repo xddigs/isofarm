@@ -32,7 +32,6 @@ import static org.lwjgl.opengl.GL13.*;
 @DataClass
 public class Player extends Character {
     private static final Logger log = LoggerFactory.getLogger(Player.class);
-    private final String name;
     private final Matrix4f modelMatrix;
     private final GameMaster gameMaster;
     private Direction direction = Direction.SOUTH;
@@ -52,7 +51,6 @@ public class Player extends Character {
 
     public Player(String name, World world, GameMaster gameMaster) {
         super(name);
-        this.name = name;
         this.gameMaster = gameMaster;
         this.modelMatrix = new Matrix4f();
         this.path = new LinkedList<>();
@@ -444,10 +442,6 @@ public class Player extends Character {
         }
 
         collide(world, getVelocity(), delta);
-    }
-
-    public String getName() {
-        return name;
     }
 
     private void setUpInventory() {

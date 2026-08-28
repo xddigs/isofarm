@@ -168,7 +168,7 @@ public class GameMaster {
         gameUIservice.setPlayer(this.player);
         commandService.setGameUIService(gameUIservice);
         gameUIservice.setShop(shop);
-        player.setName(gameUIservice.getPlayerName());
+        player.setName("Gabi");
         ToastFactory.info("Press E to open inventory");
     }
 
