@@ -895,18 +895,33 @@ public class InventoryUI extends UIElement {
         float scale = Settings.getScaledEntity() * 3.0f;
         float width = sheet.getFrameWidth() * scale;
         float height = sheet.getFrameHeight() * scale;
-        float x = getAbsoluteX() - K.UI.INVENTORY_CHARACTER_OFFSET;
-        float y = getAbsoluteY() + height / 2.0f;
 
-        int frontDirectionOffset = 0;
-        int idleFrame = 0;
+        float slotSize = Settings.getScaledSlot();
+        float spacing = Settings.getScaledSpacing();
+
+        float slotsTotalHeight = K.UI.INVENTORY_ROWS * slotSize + (K.UI.INVENTORY_ROWS - 1) * spacing;
+        float bottomY = getAbsoluteY() + Settings.getScaledPadding() + slotsTotalHeight;
+        float backgroundWidth = width + 20.0f;
+        float backgroundHeight = height + 20.0f;
+
+        float bgX = getAbsoluteX() - K.UI.INVENTORY_CHARACTER_OFFSET;
+        float bgY = bottomY - backgroundHeight;
+
+        GUI.drawRect(bgX, bgY, backgroundWidth, backgroundHeight, K.UI.UI_BACKGROUND_COLOR_SLOT);
+        float spriteX = bgX + (backgroundWidth - width) / 2.0f;
+        float spriteY = bgY + (backgroundHeight - height) / 2.0f;
+
+        int frontDirectionOffset = 2;
+        int idleFrameCount = 4;
+        int idleFrame = (int) ((System.currentTimeMillis() / 200) % idleFrameCount);
+
         int baseSpriteIndex = (frontDirectionOffset * K.UI.PLAYER_SPRITE_COLS) + idleFrame;
-        GUI.drawSprite(sheet, baseSpriteIndex, x, y, width, height, new Vector4f(1.0f));
+        GUI.drawSprite(sheet, baseSpriteIndex, spriteX, spriteY, width, height, new Vector4f(1.0f));
 
         if (player.getInventory() != null && player.getInventory().hasBackpackEquipped()) {
             int backpackRowOffset = 8;
             int backpackSpriteIndex = baseSpriteIndex + (backpackRowOffset * K.UI.PLAYER_SPRITE_COLS);
-            GUI.drawSprite(sheet, backpackSpriteIndex, x, y, width, height, new Vector4f(1.0f));
+            GUI.drawSprite(sheet, backpackSpriteIndex, spriteX, spriteY, width, height, new Vector4f(1.0f));
         }
     }
 
