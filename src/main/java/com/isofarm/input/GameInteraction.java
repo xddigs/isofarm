@@ -50,6 +50,8 @@ public class GameInteraction {
     private float dropTimer = TIMER_MAX;
     private long lastBreakTime = 0L;
 
+    private boolean isSmartShift = false;
+
     public GameInteraction(GameMaster gameMaster, TextureAtlas blockTexture) {
         this.cropService = gameMaster.getCropService();
         this.gameUIservice = gameMaster.getGameUIService();
@@ -62,7 +64,7 @@ public class GameInteraction {
         Player player = gameMaster.getPlayer();
         boolean isCtrlHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL) || Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
         boolean isShiftHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT);
-        boolean isLeftPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
+        isSmartShift = isShiftHeld && !gameMaster.isInventoryOpen();
         boolean isLeftHeld = Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT);
         boolean isRightPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_RIGHT);
         boolean canInteract = player != null
@@ -445,7 +447,7 @@ public class GameInteraction {
             itemToDrop = removedBlock;
         }
 
-        WorldItem dropEntity = new WorldItem(itemToDrop, (int)(Math.random()) + 1, position);
+        WorldItem dropEntity = new WorldItem(itemToDrop, (int) (Math.random()) + 1, position);
         gameMaster.addEntity(dropEntity);
 
         gameUIservice.logAction(cell);
@@ -557,5 +559,9 @@ public class GameInteraction {
 
     public TextureAtlas getBlocksTexture() {
         return blocksTexture;
+    }
+
+    public boolean isSmartShiftActive() {
+        return isSmartShift;
     }
 }
