@@ -208,7 +208,6 @@ public class GameRenderer {
 
         gameMaster.getEntities().removeIf(e -> !e.isAlive());
         gameMaster.getEntities().forEach(entity -> {
-            if (entity instanceof Player) return;
             entity.render(gameMaster);
         });
 
