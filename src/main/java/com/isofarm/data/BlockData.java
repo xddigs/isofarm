@@ -4,6 +4,7 @@ import com.isofarm.graphics.TextureAtlas;
 import com.isofarm.item.Craftable;
 import com.isofarm.item.Item;
 import com.isofarm.item.MiningComponent;
+import com.isofarm.utils.K;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,16 +32,16 @@ public enum BlockData implements Craftable {
     PLATINUM_ORE((byte) 15, (byte) 5, (byte) 1, "Platinum Ore Block", false, 800, "assets/textures/blocks/platinum_ore.png", SoundGroup.HARD, 14.0f, false, new MiningComponent[]{new MiningComponent(Tier.PLATINUM, MaterialID.RAW_ORE)}, Tier.PLATINUM),
     DIAMOND_ORE((byte) 16, (byte) 6, (byte) 1, "Diamond Ore Block", false, 1000, "assets/textures/blocks/diamond_ore.png", SoundGroup.HARD, 16.0f, false, new MiningComponent[]{new MiningComponent(Tier.DIAMOND, MaterialID.RAW_ORE)}, Tier.DIAMOND),
 
-    TALL_GRASS((byte) 21, (byte) 1, (byte) 2, "Tall Grass", false, 5, "assets/textures/blocks/tall_grass.png", SoundGroup.SOIL, 0.01f, true, new Object[]{new Seed(CropType.WHEAT)}, Tier.NONE),
-    ROSE((byte) 22, (byte) 2, (byte) 2, "Rose", false, 10, "assets/textures/blocks/rose.png", SoundGroup.SOIL, 0.01f, true, new Object[]{}, Tier.NONE),
-    ROSEBUSH((byte) 23, (byte) 3, (byte) 2, "Rosebush", false, 20, "assets/textures/blocks/rosebush.png", SoundGroup.SOIL, 0.01f, true,  new Object[]{}, Tier.NONE),
-    LILY((byte) 24, (byte) 4, (byte) 2, "Lily", false, 10, "assets/textures/blocks/lily.png", SoundGroup.SOIL, 0.01f, true, new Object[]{}, Tier.NONE),
-    GHOSTFLOWER((byte) 25, (byte) 5, (byte) 2, "Ghostflower", false, 15, "assets/textures/blocks/ghostflower.png", SoundGroup.SOIL, 0.01f, true,  new Object[]{}, Tier.NONE),
-    RED_MUSHROOM((byte) 26, (byte) 6, (byte) 2, "Red Mushroom", false, 15, "assets/textures/blocks/red_mushroom.png", SoundGroup.SOIL, 0.01f, true,  new Object[]{}, Tier.NONE),
-    BRIGHT_FLOWER((byte) 27, (byte) 7, (byte) 2, "Bright Flower", false, 10, "assets/textures/blocks/bright_flower.png", SoundGroup.SOIL, 0.01f, true,  new Object[]{}, Tier.NONE),
-    BLUE_FLOWER((byte) 28, (byte) 8, (byte) 2, "Blue Flower", false, 10, "assets/textures/blocks/blue_flower.png", SoundGroup.SOIL, 0.01f, true,  new Object[]{}, Tier.NONE),
-    ROSES((byte) 29, (byte) 9, (byte) 2, "Roses Cluster", false, 15, "assets/textures/blocks/roses.png", SoundGroup.SOIL, 0.01f, true,  new Object[]{}, Tier.NONE),
-    TULIP((byte) 30, (byte) 10, (byte) 2, "Tulip", false, 10, "assets/textures/blocks/tulip.png", SoundGroup.SOIL, 0.01f, true, new Object[]{}, Tier.NONE),
+    TALL_GRASS((byte) 21, (byte) 1, (byte) (K.UI.ICON_BLOCK_ROWS - 1), "Tall Grass", false, 5, "assets/textures/blocks/tall_grass.png", SoundGroup.SOIL, 0.01f, true, new Object[]{new Seed(CropType.WHEAT)}, Tier.NONE),
+    ROSE((byte) 22, (byte) 2, (byte) (K.UI.ICON_BLOCK_ROWS - 1), "Rose", false, 10, "assets/textures/blocks/rose.png", SoundGroup.SOIL, 0.01f, true, new Object[]{}, Tier.NONE),
+    ROSEBUSH((byte) 23, (byte) 3, (byte) (K.UI.ICON_BLOCK_ROWS - 1), "Rosebush", false, 20, "assets/textures/blocks/rosebush.png", SoundGroup.SOIL, 0.01f, true,  new Object[]{}, Tier.NONE),
+    LILY((byte) 24, (byte) 4, (byte) (K.UI.ICON_BLOCK_ROWS - 1), "Lily", false, 10, "assets/textures/blocks/lily.png", SoundGroup.SOIL, 0.01f, true, new Object[]{}, Tier.NONE),
+    GHOSTFLOWER((byte) 25, (byte) 5, (byte) (K.UI.ICON_BLOCK_ROWS - 1), "Ghostflower", false, 15, "assets/textures/blocks/ghostflower.png", SoundGroup.SOIL, 0.01f, true,  new Object[]{}, Tier.NONE),
+    RED_MUSHROOM((byte) 26, (byte) 6, (byte) (K.UI.ICON_BLOCK_ROWS - 1), "Red Mushroom", false, 15, "assets/textures/blocks/red_mushroom.png", SoundGroup.SOIL, 0.01f, true,  new Object[]{}, Tier.NONE),
+    BRIGHT_FLOWER((byte) 27, (byte) 7, (byte) (K.UI.ICON_BLOCK_ROWS - 1), "Bright Flower", false, 10, "assets/textures/blocks/bright_flower.png", SoundGroup.SOIL, 0.01f, true,  new Object[]{}, Tier.NONE),
+    BLUE_FLOWER((byte) 28, (byte) 8, (byte) (K.UI.ICON_BLOCK_ROWS - 1), "Blue Flower", false, 10, "assets/textures/blocks/blue_flower.png", SoundGroup.SOIL, 0.01f, true,  new Object[]{}, Tier.NONE),
+    ROSES((byte) 29, (byte) 9, (byte) (K.UI.ICON_BLOCK_ROWS - 1), "Roses Cluster", false, 15, "assets/textures/blocks/roses.png", SoundGroup.SOIL, 0.01f, true,  new Object[]{}, Tier.NONE),
+    TULIP((byte) 30, (byte) 10, (byte) (K.UI.ICON_BLOCK_ROWS - 1), "Tulip", false, 10, "assets/textures/blocks/tulip.png", SoundGroup.SOIL, 0.01f, true, new Object[]{}, Tier.NONE),
 
     WATER((byte) 127, (byte) -1, (byte) -1, "Water", false, 80, "assets/textures/blocks/water.png", SoundGroup.WATER, 0.0f, true, new Object[]{}, Tier.NONE);
 
