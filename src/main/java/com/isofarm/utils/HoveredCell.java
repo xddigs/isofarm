@@ -7,10 +7,15 @@ import com.isofarm.wrld.GameMaster;
 @Utils
 public class HoveredCell {
 
-    public static Hit get(GameMaster gameMaster) {
+    public static Hit get(GameMaster gameMaster, boolean isShiftHeld) {
         return gameMaster.getOrthoCamera().highlight(gameMaster.getWorld(),
                 gameMaster.getPlayer().getPosition(), Mouse.getX(), Mouse.getY(),
                 gameMaster.getWindowWidth(),
-                gameMaster.getWindowHeight());
+                gameMaster.getWindowHeight(),
+                isShiftHeld);
+    }
+
+    public static Hit get(GameMaster gameMaster) {
+        return get(gameMaster, false);
     }
 }

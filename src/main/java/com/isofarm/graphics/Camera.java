@@ -121,12 +121,13 @@ public class Camera implements CameraView {
     }
 
     public Hit highlight(World world, Vector3f playerPos, float mouseX, float mouseY,
-                         float screenWidth, float screenHeight) {
+                         float screenWidth, float screenHeight, boolean smartFilter) {
         Ray ray = getMouseRay(mouseX, mouseY, screenWidth, screenHeight);
-        return raycast(world, playerPos, ray.origin(), ray.direction());
+        return raycast(world, playerPos, ray.origin(), ray.direction(), smartFilter);
     }
 
-    private Hit raycast(World world, Vector3f playerPos, Vector3f origin, Vector3f direction) {
+    private Hit raycast(World world, Vector3f playerPos, Vector3f origin, Vector3f direction,
+                        boolean smartFilter) {
         float tileSize = K.World.TILE_SIZE;
 
         int x = (int) Math.floor(origin.x / tileSize);
@@ -155,15 +156,18 @@ public class Camera implements CameraView {
             boolean hasWater = waterLevel > 0;
 
             if (hasBlock || hasWater) {
-                float blockCenterX = x + 0.5f;
-                float blockCenterY = y + 0.5f;
-                float blockCenterZ = z + 0.5f;
-                float distToPlayer = playerPos.distance(blockCenterX, blockCenterY, blockCenterZ);
+                boolean isTransparentObject = block == BlockData.OAK_LEAVES.getId();
+                if (!smartFilter || !isTransparentObject) {
+                    float blockCenterX = x + 0.5f;
+                    float blockCenterY = y + 0.5f;
+                    float blockCenterZ = z + 0.5f;
+                    float distToPlayer = playerPos.distance(blockCenterX, blockCenterY, blockCenterZ);
 
-                if (distToPlayer <= Settings.getMaxInteractionDistance()) {
-                    return new Hit(x, y, z, hitNormalX, hitNormalY, hitNormalZ);
-                } else {
-                    return null;
+                    if (distToPlayer <= Settings.getMaxInteractionDistance()) {
+                        return new Hit(x, y, z, hitNormalX, hitNormalY, hitNormalZ);
+                    } else {
+                        return null;
+                    }
                 }
             }
 
@@ -197,6 +201,7 @@ public class Camera implements CameraView {
                 }
             }
         } while (!(tMaxX > 2000.0f) || !(tMaxY > 2000.0f) || !(tMaxZ > 2000.0f));
+
         return null;
     }
 }

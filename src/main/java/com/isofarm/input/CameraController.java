@@ -67,7 +67,7 @@ public record CameraController(Camera camera)
         float screenHeight = gameMaster.getWindowHeight();
 
         Hit hit = camera.highlight(world, player.getPosition(), mouseX, mouseY,
-                screenWidth, screenHeight);
+                screenWidth, screenHeight, false);
 
         if (hit == null) return;
         GridPos start = PathFinder.getPlayerGridPosition(player);

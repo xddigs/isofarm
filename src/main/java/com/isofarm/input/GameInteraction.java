@@ -61,6 +61,7 @@ public class GameInteraction {
     public Hit update(GameMaster gameMaster, Item selectedItem) {
         Player player = gameMaster.getPlayer();
         boolean isCtrlHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL) || Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
+        boolean isShiftHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT);
         boolean isLeftPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
         boolean isLeftHeld = Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT);
         boolean isRightPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_RIGHT);
@@ -131,8 +132,20 @@ public class GameInteraction {
             }
         }
 
-        Hit hoveredCell = HoveredCell
-                .get(gameMaster);
+        Hit hoveredCell = HoveredCell.get(gameMaster, isShiftHeld);
+        if (isShiftHeld && hoveredCell != null) {
+            byte blockType = gameMaster.getWorld().getBlockTypeAt(hoveredCell);
+            if (blockType == BlockData.OAK_LOG.getId()) {
+                int bottomY = hoveredCell.y();
+                while (bottomY > 0 && gameMaster.getWorld().getBlockTypeAt(
+                        hoveredCell.x(), bottomY - 1, hoveredCell.z()) == BlockData.OAK_LOG.getId()) {
+                    bottomY--;
+                }
+                hoveredCell = new Hit(hoveredCell.x(), bottomY, hoveredCell.z(), hoveredCell.normalX(),
+                        hoveredCell.normalY(), hoveredCell.normalZ());
+            }
+        }
+
 
         if (hoveredCell == null) {
             resetBreaking();
