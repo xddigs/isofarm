@@ -145,7 +145,7 @@ public class Player extends Character {
                 getVelocity().z * getVelocity().z) > 0.001f;
 
         float moveAngle = 0.0f;
-        boolean hasVelocity = (getVelocity().x * getVelocity().x + getVelocity().z * getVelocity().z) > 0.001f;
+        boolean hasVelocity = isMoving;
 
         if (hasVelocity) {
             moveAngle = (float) Math.toDegrees(Math.atan2(getVelocity().z, getVelocity().x));
@@ -198,14 +198,12 @@ public class Player extends Character {
         shader.bind();
 
         glActiveTexture(GL_TEXTURE0 + textureUnit);
-        sheet.bind();
 
         shader.setUniform("uTexture", textureUnit);
         shader.setUniform("uUseTexture", true);
         shader.setUniform("uUseFaceAtlas", false);
 
         CelestialLighting lighting = gameMaster.getCelestialLighting();
-        shader.setUniform("uUVBounds", uvBounds);
         shader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
         shader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
         shader.setUniform("uTopAtlasOffset", new Vector2f(0.0f, 0.0f));
@@ -250,20 +248,81 @@ public class Player extends Character {
         glEnable(GL_DEPTH_TEST);
         glDepthMask(true);
 
-        boolean backpackInFront = (directionOffset == 0 || directionOffset == 1);
+        boolean backpackInFront = (directionOffset == 2);
         if (getInventory().hasBackpackEquipped() && !backpackInFront) {
-            renderBackpack(shader, rm, camera, directionOffset, isMoving, isAttacking, currentFrame);
+            renderBackpack(shader, rm, camera, directionOffset, isMoving, isAttacking,
+                    currentFrame, yawRad, finalScaleX, finalScaleY, finalScaleZ, yOffset);
         }
 
+        sheet.bind();
         shader.setUniform("uUVBounds", uvBounds);
+        shader.setUniform("uModel", modelMatrix);
         rm.getPlayerMesh().render();
 
         if (getInventory().hasBackpackEquipped() && backpackInFront) {
-            renderBackpack(shader, rm, camera, directionOffset, isMoving, isAttacking, currentFrame);
+            renderBackpack(shader, rm, camera, directionOffset, isMoving, isAttacking,
+                    currentFrame, yawRad, finalScaleX, finalScaleY, finalScaleZ, yOffset);
         }
 
         sheet.unbind();
         shader.unbind();
+    }
+
+    private void renderBackpack(Shader shader, ResourceManager rm, CameraView camera,
+                                int directionOffset, boolean isMoving,
+                                boolean isAttacking, int currentFrame,
+                                float yawRad, float scaleX, float scaleY, float scaleZ, float yOffset) {
+
+        SpriteSheet bpSheet = ResourceManager.getBackpackSpriteSheet();
+        if (bpSheet == null) return;
+        int backpackModelIndex;
+        boolean flipHorizontal = false;
+
+        switch (directionOffset) {
+            case 0 -> {
+                backpackModelIndex = 0;
+            }
+            case 1 -> {
+                backpackModelIndex = 1;
+                flipHorizontal = true;
+            }
+            case 2 -> {
+                backpackModelIndex = 2;
+            }
+            case 3 -> {
+                backpackModelIndex = 3;
+                flipHorizontal = false;
+            }
+            default -> backpackModelIndex = 0;
+        }
+
+        float bobbingOffsetY = 0.0f;
+        if (isMoving) {
+            bobbingOffsetY = (float) Math.sin(getAnimTimer() * 12.0f) * 0.03f;
+        }
+
+        Matrix4f bpModelMatrix = new Matrix4f();
+        bpModelMatrix.identity()
+                .translate(position.x, position.y + yOffset + bobbingOffsetY, position.z)
+                .rotateY(yawRad)
+                .scale(scaleX, scaleY, scaleZ);
+
+        shader.setUniform("uModel", bpModelMatrix);
+
+        Vector4f uv = bpSheet.getUVBounds(backpackModelIndex);
+        if (flipHorizontal) {
+            float temp = uv.x;
+            uv.x = uv.z;
+            uv.z = temp;
+        }
+
+        bpSheet.bind();
+        shader.setUniform("uUVBounds", uv);
+
+        glEnable(GL_POLYGON_OFFSET_FILL);
+        glPolygonOffset(-2.0f, -2.0f);
+        rm.getPlayerMesh().render();
+        glDisable(GL_POLYGON_OFFSET_FILL);
     }
 
     @Override
@@ -344,6 +403,7 @@ public class Player extends Character {
             uv.z = temp;
         }
 
+        bpSheet.bind();
         shader.setUniform("uUVBounds", uv);
 
         glEnable(GL_POLYGON_OFFSET_FILL);
