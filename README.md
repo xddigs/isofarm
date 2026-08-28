@@ -3,8 +3,8 @@
 # Isofarm
 Isofarm is a 3D open-world farming simulation game built in Java using LWJGL 
 and OpenGL. 
-Explore a voxel-based world generated through chunk management, cultivate crops featuring 
-real-time seasonal and weather cycles, manage your inventory, and trade items in a dynamic 
+Explore a voxel-based island generated through chunk management, cultivate 
+crops featuring real-time seasonal and weather cycles, manage your inventory, and trade items in a dynamic 
 environment driven by custom 3D mesh rendering, particle systems, and dynamic day-night lighting.
 
 ## Featured Controls
