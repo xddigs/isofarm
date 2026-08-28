@@ -1,5 +1,6 @@
 package com.isofarm.input;
 
+import com.isofarm.data.Gamemode;
 import com.isofarm.data.Hit;
 import com.isofarm.entity.Player;
 import com.isofarm.entity.states.SwimmingState;
@@ -32,7 +33,7 @@ public record OrthographicCameraController(OrthographicCamera camera)
         Player player = gameMaster.getPlayer();
         if (player == null) return;
 
-        rotateCamera(delta);
+        rotateCamera(delta, gameMaster);
         if (player.getCurrentState() instanceof SwimmingState) {
             if (Keyboard.isKeyDown(GLFW_KEY_SPACE)) {
                 player.getVelocity().y = 4.0f;
@@ -47,7 +48,7 @@ public record OrthographicCameraController(OrthographicCamera camera)
         updateZoom();
     }
 
-    private void rotateCamera(float delta) {
+    private void rotateCamera(float delta, GameMaster gameMaster) {
         boolean rotateLeft = Keyboard.isKeyDown(GLFW_KEY_LEFT);
         boolean rotateRight = Keyboard.isKeyDown(GLFW_KEY_RIGHT);
 
@@ -55,7 +56,10 @@ public record OrthographicCameraController(OrthographicCamera camera)
             return;
         }
         float direction = rotateRight ? 1.0f : -1.0f;
-        camera.rotateYaw(direction * CAMERA_ROTATION_SPEED * delta);
+
+        if (gameMaster.getPlayer() != null) {
+            gameMaster.getPlayer().rotateView(direction * CAMERA_ROTATION_SPEED * delta);
+        }
     }
 
     private void updateZoom() {

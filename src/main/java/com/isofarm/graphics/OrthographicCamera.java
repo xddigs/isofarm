@@ -16,7 +16,7 @@ public class OrthographicCamera implements CameraView {
     private static final float MAX_ZOOM = 80.0f;
 
     private static final float DEFAULT_YAW = 45.0f;
-    private float yaw = DEFAULT_YAW;
+    private final float yaw = DEFAULT_YAW;
     private static final float PITCH = 35.2643897f;
 
     private static final float NEAR_PLANE = 0.1f;
@@ -70,19 +70,9 @@ public class OrthographicCamera implements CameraView {
         return yaw;
     }
 
-    public Vector3f getMovementForwardVector() {
-        float yawRad = (float) Math.toRadians(yaw);
-        return new Vector3f((float) Math.sin(yawRad),
-                0.0f, (float) -Math.cos(yawRad)).normalize();
-    }
-
     public void setPosition(float x, float z) {
         position.x = x;
         position.z = z;
-    }
-
-    public void rotateYaw(float value) {
-        yaw += value;
     }
 
     public void setPosition(float x, float y, float z) {

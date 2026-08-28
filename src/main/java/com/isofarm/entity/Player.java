@@ -44,6 +44,7 @@ public class Player extends Character {
     private int damageSequence = 0;
     private float lastDamageAmount = 0.0f;
     private float fallStartY = 0.0f;
+    private float viewAngle = 0.0f;
     private float respawnTimer = -1.0f;
     private boolean isFalling = false;
 
@@ -147,14 +148,36 @@ public class Player extends Character {
         boolean isMoving = (getVelocity().x * getVelocity().x +
                 getVelocity().z * getVelocity().z) > 0.001f;
 
-        int directionOffset = 0;
-        if (direction != null) {
-            switch (direction) {
-                case NORTH_WEST, NORTH -> directionOffset = 0;
-                case SOUTH_WEST, WEST  -> directionOffset = 1;
-                case SOUTH_EAST, SOUTH, EAST -> directionOffset = 2;
-                case NORTH_EAST        -> directionOffset = 3;
-            }
+        float moveAngle = 0.0f;
+        boolean hasVelocity = (getVelocity().x * getVelocity().x + getVelocity().z * getVelocity().z) > 0.001f;
+
+        if (hasVelocity) {
+            moveAngle = (float) Math.toDegrees(Math.atan2(getVelocity().z, getVelocity().x));
+        } else {
+            moveAngle = switch (this.direction) {
+                case EAST -> 0.0f;
+                case SOUTH_EAST -> 45.0f;
+                case SOUTH -> 90.0f;
+                case SOUTH_WEST -> 135.0f;
+                case WEST -> 180.0f;
+                case NORTH_WEST -> -135.0f;
+                case NORTH -> -90.0f;
+                case NORTH_EAST -> -45.0f;
+            };
+        }
+
+        float relativeAngle = moveAngle - viewAngle;
+        relativeAngle = (relativeAngle % 360.0f + 360.0f) % 360.0f;
+
+        int directionOffset;
+        if (relativeAngle >= 225.0f && relativeAngle < 315.0f) {
+            directionOffset = 0;
+        } else if (relativeAngle >= 135.0f && relativeAngle < 225.0f) {
+            directionOffset = 1;
+        } else if (relativeAngle >= 45.0f && relativeAngle < 135.0f) {
+            directionOffset = 2;
+        } else {
+            directionOffset = 3;
         }
 
         int rowIndex;
@@ -213,6 +236,7 @@ public class Player extends Character {
 
         float yawRad = (float) Math.toRadians(-camera.getYaw());
         float yOffset = finalScaleY * -0.20f;
+
         modelMatrix.identity()
                 .translate(position.x, position.y + yOffset, position.z)
                 .rotateY(yawRad)
@@ -227,6 +251,19 @@ public class Player extends Character {
         glDepthMask(true);
 
         rm.getPlayerMesh().render();
+
+        if (getInventory().hasBackpackEquipped()) {
+            int backpackRowOffset = 8;
+            int backpackSpriteIndex = spriteIndex + (backpackRowOffset * K.UI.PLAYER_SPRITE_COLS);
+
+            Vector4f backpackUVBounds = sheet.getUVBounds(backpackSpriteIndex);
+            shader.setUniform("uUVBounds", backpackUVBounds);
+
+            glEnable(GL_POLYGON_OFFSET_FILL);
+            glPolygonOffset(-1.0f, -1.0f);
+            rm.getPlayerMesh().render();
+            glDisable(GL_POLYGON_OFFSET_FILL);
+        }
 
         sheet.unbind();
         shader.unbind();
@@ -263,6 +300,26 @@ public class Player extends Character {
         }
         currentState = newState;
         currentState.enter(this);
+    }
+
+    public void rotateView(float amount) {
+        this.viewAngle += amount;
+        this.viewAngle = (this.viewAngle % 360.0f + 360.0f) % 360.0f;
+
+        if ((getVelocity().x * getVelocity().x + getVelocity().z * getVelocity().z) <= 0.001f) {
+            if (viewAngle >= 337.5f || viewAngle < 22.5f) this.direction = Direction.EAST;
+            else if (viewAngle >= 22.5f && viewAngle < 67.5f) this.direction = Direction.SOUTH_EAST;
+            else if (viewAngle >= 67.5f && viewAngle < 112.5f) this.direction = Direction.SOUTH;
+            else if (viewAngle >= 112.5f && viewAngle < 157.5f) this.direction = Direction.SOUTH_WEST;
+            else if (viewAngle >= 157.5f && viewAngle < 202.5f) this.direction = Direction.WEST;
+            else if (viewAngle >= 202.5f && viewAngle < 247.5f) this.direction = Direction.NORTH_WEST;
+            else if (viewAngle >= 247.5f && viewAngle < 292.5f) this.direction = Direction.NORTH;
+            else if (viewAngle >= 292.5f && viewAngle < 337.5f) this.direction = Direction.NORTH_EAST;
+        }
+    }
+
+    public float getViewAngle() {
+        return viewAngle;
     }
 
     public void autoJump(World world, Vector3f velocity, float delta) {
