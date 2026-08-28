@@ -5,9 +5,7 @@ import com.isofarm.entity.Player;
 import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.input.Mouse;
-import com.isofarm.item.Block;
-import com.isofarm.item.Item;
-import com.isofarm.item.Tool;
+import com.isofarm.item.*;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import com.isofarm.utils.ToastFactory;
@@ -711,7 +709,20 @@ public class InventoryUI extends UIElement {
         if (ingredient == null || item == null) {
             return false;
         }
-        return isSameType((Item) ingredient.craftable(), item);
+
+        Craftable craftable = ingredient.craftable();
+        if (craftable instanceof BlockData bd && item instanceof Block b) {
+            return b.getType() == bd;
+        }
+
+        if (craftable instanceof MaterialID mid && item instanceof Material m) {
+            return m.getId() == mid.getId();
+        }
+
+        if (craftable instanceof Item craftableItem) {
+            return isSameType(craftableItem, item);
+        }
+        return false;
     }
 
     private boolean canCraft(Recipe recipe, Item first,
@@ -742,36 +753,36 @@ public class InventoryUI extends UIElement {
         Ingredient secondIngredient = ingredients.get(1);
 
         Item firstItem = carriedItem;
-        int firstAmount = carriedAmount;
-
         Item secondItem = targetSlot.getItem();
-        int secondAmount = targetSlot.getAmount();
 
         int firstCost;
         int secondCost;
 
         if (matchesIngredient(firstIngredient, firstItem)
                 && matchesIngredient(secondIngredient, secondItem)) {
-
             firstCost = firstIngredient.amount();
             secondCost = secondIngredient.amount();
-
         } else {
-
             firstCost = secondIngredient.amount();
             secondCost = firstIngredient.amount();
         }
 
-        firstAmount -= firstCost;
-        secondAmount -= secondCost;
-
-        targetSlot.setItem(recipe.result().copy());
-        targetSlot.setAmount(recipe.resultAmount());
-
-        if (firstAmount > 0) {
-            carriedAmount = firstAmount;
-        } else {
+        carriedAmount -= firstCost;
+        if (carriedAmount <= 0) {
             clearCarriedItem();
+        }
+
+        targetSlot.setAmount(targetSlot.getAmount() - secondCost);
+        if (targetSlot.getAmount() <= 0) {
+            targetSlot.clear();
+        }
+
+        Item result = recipe.result().copy();
+        int resultAmount = recipe.resultAmount();
+
+        int remaining = inventory.add(result, resultAmount);
+        if (remaining > 0 && player != null) {
+            player.addToBackpack(result, remaining);
         }
     }
 
