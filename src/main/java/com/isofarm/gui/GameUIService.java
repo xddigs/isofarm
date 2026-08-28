@@ -286,7 +286,9 @@ public class GameUIService implements Service<GameMaster> {
             renderCrosshair(windowWidth, windowHeight);
         }
 
-        if (gameMaster.isOrthographicCamera()) GUI.drawCursor(gameMaster);
+        if (gameMaster.isOrthographicCamera() && !gameMaster.isInventoryOpen()) {
+            GUI.drawCursor(gameMaster);
+        }
 
         GUI.end();
         glEnable(GL_DEPTH_TEST);
