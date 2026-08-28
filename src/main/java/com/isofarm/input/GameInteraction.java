@@ -32,6 +32,7 @@ import static org.lwjgl.glfw.GLFW.*;
 public class GameInteraction {
     private static final float PICKUP_DISTANCE = 1.5f;
     private static final float TIMEOUT = 0.4f;
+    private static final float TIMER_MAX = 3.0f;
 
     private static final Logger log = LoggerFactory.getLogger(GameInteraction.class);
     private final CropService cropService;
@@ -46,6 +47,7 @@ public class GameInteraction {
 
     private float breakProgress = 0.0f;
     private float breakTimeout = TIMEOUT;
+    private float dropTimer = TIMER_MAX;
     private long lastBreakTime = 0L;
 
     public GameInteraction(GameMaster gameMaster, TextureAtlas blockTexture) {
@@ -101,6 +103,11 @@ public class GameInteraction {
 
         if (!gameMaster.getPlayer().getGamemode().isNoClip()) {
             pickUp(gameMaster);
+            dropTimer -= gameMaster.getGenDelta();
+            if (dropTimer <= 0.0f) {
+                addItem(gameMaster);
+                dropTimer = TIMER_MAX;
+            }
         }
 
         if (Keyboard.isKeyPressed(GLFW_KEY_M) && !gameMaster.isChatOpen()) {
