@@ -153,8 +153,7 @@ public abstract class Entity {
         position.y += velocity.y * delta;
         if (checkCollision(world)) {
             position.y -= velocity.y * delta;
-
-            if (velocity.y < 0.0f) {
+            if (velocity.y <= 0.0f) {
                 setOnGround(true);
             }
 
