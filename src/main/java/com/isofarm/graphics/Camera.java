@@ -1,7 +1,7 @@
 package com.isofarm.graphics;
 
 import com.isofarm.data.BlockData;
-import com.isofarm.data.Hit;
+import com.isofarm.data.BlockPos;
 import com.isofarm.data.Ray;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
@@ -120,14 +120,14 @@ public class Camera implements CameraView {
         return new Ray(rayOrigin, getForwardVector());
     }
 
-    public Hit highlight(World world, Vector3f playerPos, float mouseX, float mouseY,
-                         float screenWidth, float screenHeight, boolean smartFilter) {
+    public BlockPos highlight(World world, Vector3f playerPos, float mouseX, float mouseY,
+                              float screenWidth, float screenHeight, boolean smartFilter) {
         Ray ray = getMouseRay(mouseX, mouseY, screenWidth, screenHeight);
         return raycast(world, playerPos, ray.origin(), ray.direction(), smartFilter);
     }
 
-    private Hit raycast(World world, Vector3f playerPos, Vector3f origin, Vector3f direction,
-                        boolean smartFilter) {
+    private BlockPos raycast(World world, Vector3f playerPos, Vector3f origin, Vector3f direction,
+                             boolean smartFilter) {
         float tileSize = K.World.TILE_SIZE;
 
         int x = (int) Math.floor(origin.x / tileSize);
@@ -146,8 +146,6 @@ public class Camera implements CameraView {
         float tMaxY = stepY > 0 ? ((y + 1) * tileSize - origin.y) / direction.y : stepY < 0 ? (y * tileSize - origin.y) / direction.y : Float.POSITIVE_INFINITY;
         float tMaxZ = stepZ > 0 ? ((z + 1) * tileSize - origin.z) / direction.z : stepZ < 0 ? (z * tileSize - origin.z) / direction.z : Float.POSITIVE_INFINITY;
 
-        int hitNormalX = 0, hitNormalY = 0, hitNormalZ = 0;
-
         do {
             byte block = world.getBlockTypeAt(x, y, z);
             byte waterLevel = world.getWaterLevelAt(x, y, z);
@@ -164,7 +162,7 @@ public class Camera implements CameraView {
                     float distToPlayer = playerPos.distance(blockCenterX, blockCenterY, blockCenterZ);
 
                     if (distToPlayer <= Settings.getMaxInteractionDistance()) {
-                        return new Hit(x, y, z, hitNormalX, hitNormalY, hitNormalZ);
+                        return new BlockPos(BlockData.fromId(block), x, y, z);
                     } else {
                         return null;
                     }
@@ -175,29 +173,17 @@ public class Camera implements CameraView {
                 if (tMaxX < tMaxZ) {
                     x += stepX;
                     tMaxX += tDeltaX;
-                    hitNormalX = -stepX;
-                    hitNormalY = 0;
-                    hitNormalZ = 0;
                 } else {
                     z += stepZ;
                     tMaxZ += tDeltaZ;
-                    hitNormalX = 0;
-                    hitNormalY = 0;
-                    hitNormalZ = -stepZ;
                 }
             } else {
                 if (tMaxY < tMaxZ) {
                     y += stepY;
                     tMaxY += tDeltaY;
-                    hitNormalX = 0;
-                    hitNormalY = -stepY;
-                    hitNormalZ = 0;
                 } else {
                     z += stepZ;
                     tMaxZ += tDeltaZ;
-                    hitNormalX = 0;
-                    hitNormalY = 0;
-                    hitNormalZ = -stepZ;
                 }
             }
         } while (!(tMaxX > 2000.0f) || !(tMaxY > 2000.0f) || !(tMaxZ > 2000.0f));

@@ -1,6 +1,6 @@
 package com.isofarm.entity;
 
-import com.isofarm.data.Hit;
+import com.isofarm.data.BlockPos;
 import com.isofarm.wrld.GameMaster;
 import org.joml.Vector3f;
 
@@ -29,7 +29,7 @@ public class Sun extends Entity {
     }
 
     @Override
-    public void update(Hit hit, float timeOfDay) {
+    public void update(BlockPos blockPos, float timeOfDay) {
         float angle = ((timeOfDay - 6.0f) / 24.0f) * ((float) Math.PI * 2.0f);
         float x = (float) Math.cos(angle);
         float y = (float) Math.sin(angle);

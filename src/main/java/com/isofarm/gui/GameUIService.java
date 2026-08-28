@@ -55,7 +55,6 @@ public class GameUIService implements Service<GameMaster> {
     private float windowWidth;
     private float windowHeight;
     private Vector2i lastActionCell = null;
-    private float actionDisplayTimer = 0.0f;
     private float hotbarLabelTimer = 0.0f;
     private String hotbarLabel = null;
     private float chatHistoryTimer = 0.0f;
@@ -200,10 +199,6 @@ public class GameUIService implements Service<GameMaster> {
 
         if (flashTimer > 0) {
             flashTimer -= delta;
-        }
-
-        if (actionDisplayTimer > 0.0f) {
-            actionDisplayTimer -= delta;
         }
 
         if (hotbarLabelTimer > 0.0f) {
@@ -505,9 +500,8 @@ public class GameUIService implements Service<GameMaster> {
         };
     }
 
-    public void logAction(Hit cell) {
+    public void logAction(BlockPos cell) {
         this.lastActionCell = new Vector2i(cell.x(), cell.y());
-        this.actionDisplayTimer = K.UI.COORD_DISPLAY_DURATION;
     }
 
     public void onResize(int width, int height) {

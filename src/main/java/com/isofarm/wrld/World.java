@@ -2,7 +2,7 @@ package com.isofarm.wrld;
 
 import com.isofarm.data.BlockData;
 import com.isofarm.data.Crop;
-import com.isofarm.data.Hit;
+import com.isofarm.data.BlockPos;
 import com.isofarm.item.Block;
 import com.isofarm.pathfinding.GridPos;
 
@@ -62,7 +62,7 @@ public class World {
         return new Block(data, x, y, z);
     }
 
-    public Block getBlockAt(Hit pos) {
+    public Block getBlockAt(BlockPos pos) {
         return getBlockAt(pos.x(), pos.y(), pos.z());
     }
 
@@ -130,7 +130,7 @@ public class World {
         return chunk.getBlock(localX, y, localZ);
     }
 
-    public byte getBlockTypeAt(Hit pos) {
+    public byte getBlockTypeAt(BlockPos pos) {
         return getBlockTypeAt(pos.x(), pos.y(), pos.z());
     }
 
@@ -145,7 +145,7 @@ public class World {
         chunk.setBlock(localX, y, localZ, blockId);
     }
 
-    public void setBlockTypeAt(Hit pos, byte blockId) {
+    public void setBlockTypeAt(BlockPos pos, byte blockId) {
         setBlockTypeAt(pos.x(), pos.y(), pos.z(), blockId);
     }
 
@@ -169,7 +169,7 @@ public class World {
         return chunk.getWaterLevel(localX, y, localZ);
     }
 
-    public byte getWaterLevelAt(Hit pos) {
+    public byte getWaterLevelAt(BlockPos pos) {
         return getWaterLevelAt(pos.x(), pos.y(), pos.z());
     }
 
@@ -189,7 +189,7 @@ public class World {
         chunk.setWaterLevel(localX, y, localZ, waterLevel);
     }
 
-    public void setWaterLevelAt(Hit pos, byte waterLevel) {
+    public void setWaterLevelAt(BlockPos pos, byte waterLevel) {
         setWaterLevelAt(pos.x(), pos.y(), pos.z(), waterLevel);
     }
 

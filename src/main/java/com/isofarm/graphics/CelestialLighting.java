@@ -1,6 +1,6 @@
 package com.isofarm.graphics;
 
-import com.isofarm.data.Hit;
+import com.isofarm.data.BlockPos;
 import com.isofarm.entity.Moon;
 import com.isofarm.entity.Sun;
 import org.joml.Vector3f;
@@ -22,7 +22,7 @@ public class CelestialLighting {
         this.color = new Vector3f();
     }
 
-    public void update(Hit hoveredCell, float timeOfDay) {
+    public void update(BlockPos hoveredCell, float timeOfDay) {
         sun.update(hoveredCell, timeOfDay);
         moon.update(hoveredCell, timeOfDay);
 

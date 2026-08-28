@@ -11,6 +11,7 @@ import com.isofarm.gui.GameUIService;
 import com.isofarm.item.*;
 import com.isofarm.service.CropService;
 import com.isofarm.service.TimeService;
+import com.isofarm.service.TreeService;
 import com.isofarm.utils.HoveredCell;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
@@ -25,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import static org.joml.Math.lerp;
 import static org.lwjgl.glfw.GLFW.*;
@@ -60,7 +62,7 @@ public class GameInteraction {
         this.blocksTexture = blockTexture;
     }
 
-    public Hit update(GameMaster gameMaster, Item selectedItem) {
+    public BlockPos update(GameMaster gameMaster, Item selectedItem) {
         Player player = gameMaster.getPlayer();
         boolean isCtrlHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL) || Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
         boolean isShiftHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT);
@@ -134,7 +136,7 @@ public class GameInteraction {
             }
         }
 
-        Hit hoveredCell = HoveredCell.get(gameMaster, isShiftHeld);
+        BlockPos hoveredCell = HoveredCell.get(gameMaster, isShiftHeld);
         if (isShiftHeld && hoveredCell != null) {
             byte blockType = gameMaster.getWorld().getBlockTypeAt(hoveredCell);
             if (blockType == BlockData.OAK_LOG.getId()) {
@@ -143,8 +145,8 @@ public class GameInteraction {
                         hoveredCell.x(), bottomY - 1, hoveredCell.z()) == BlockData.OAK_LOG.getId()) {
                     bottomY--;
                 }
-                hoveredCell = new Hit(hoveredCell.x(), bottomY, hoveredCell.z(), hoveredCell.normalX(),
-                        hoveredCell.normalY(), hoveredCell.normalZ());
+                hoveredCell = new BlockPos(getBlockData(blockType), hoveredCell.x(), bottomY,
+                        hoveredCell.z());
             }
         }
 
@@ -298,12 +300,12 @@ public class GameInteraction {
         }
     }
 
-    private boolean isWithinRange(GameMaster gameMaster, Hit cell) {
+    private boolean isWithinRange(GameMaster gameMaster, BlockPos cell) {
         float distance = getDistanceToBlock(gameMaster, cell);
         return distance <= Settings.getMaxInteractionDistance();
     }
 
-    public float getDistanceToBlock(GameMaster gameMaster, Hit cell) {
+    public float getDistanceToBlock(GameMaster gameMaster, BlockPos cell) {
         if (cell == null) return Float.MAX_VALUE;
         if (gameMaster.getPlayer() == null) return Float.MAX_VALUE;
 
@@ -318,7 +320,7 @@ public class GameInteraction {
         return (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
 
-    private void breakAction(GameMaster gameMaster, Hit cell) {
+    private void breakAction(GameMaster gameMaster, BlockPos cell) {
         World world = gameMaster.getWorld();
         int x = cell.x();
         int y = cell.y();
@@ -341,7 +343,7 @@ public class GameInteraction {
             }
 
             if (sheet != null) {
-                particles.spawn(x, y + K.World.SHORTER_BLOCK_HEIGHT, z, sheet, frameIndex);
+                particles.spawnCrop(x, y + K.World.SHORTER_BLOCK_HEIGHT, z, sheet, frameIndex);
             }
 
             gameUIservice.logAction(cell);
@@ -403,7 +405,7 @@ public class GameInteraction {
         }
     }
 
-    private void breakBlock(GameMaster gameMaster, Hit cell, BlockData blockData,
+    private void breakBlock(GameMaster gameMaster, BlockPos cell, BlockData blockData,
                             byte blockId, Item selectedItem) {
         World world = gameMaster.getWorld();
         if (blockData.getSoundGroup() != null) {
@@ -425,16 +427,51 @@ public class GameInteraction {
             } else {
                 tool.use();
             }
+
+            if (tool instanceof Axe axe && isSmartShift) {
+                List<BlockPos> destroyedBlocks = TreeService.chop(gameMaster, axe);
+                for (BlockPos pos : destroyedBlocks) {
+                    gameUIservice.logAction(new BlockPos(blockData, pos.x(), pos.y(), pos.z()));
+
+                    BlockData bData = pos.data();
+                    Block brokenBlock = new Block(bData, pos.x(), pos.y(), pos.z());
+
+                    if (bData.hasDrops()) {
+                        Object dropObj = bData.getRandomDrop();
+                        if (dropObj instanceof MaterialID mid) {
+                            itemToDrop = new Material(bData.getTier(), mid);
+                        } else if (dropObj instanceof MiningComponent mc) {
+                            itemToDrop = mc;
+                        } else if (dropObj instanceof Item item) {
+                            itemToDrop = item;
+                        }
+                    }
+
+                    if (itemToDrop == null) {
+                        itemToDrop = brokenBlock;
+                    }
+
+                    particles.spawnBlock(pos, bData);
+                    Vector3f dropPos = new Vector3f(pos.x() + 0.5f, pos.y() + 0.5f, pos.z() + 0.5f);
+
+                    int count = (int) (Math.random() * 2) + 1;
+                    WorldItem dropEntity = new WorldItem(itemToDrop, count, dropPos);
+                    gameMaster.addEntity(dropEntity);
+                }
+
+                log.info("Tree chopped successfully at base {},{},{}", cell.x(), cell.y(), cell.z());
+                return;
+            }
         }
 
         world.setBlockTypeAt(cell, BlockData.AIR.getId());
         gameMaster.rebuildChunkMeshAt(cell);
-        particles.spawn(cell, blockData);
+        particles.spawnBlock(HoveredCell.get(gameMaster), blockData);
 
         if (removedBlock.getType().hasDrops()) {
             Object dropObj = removedBlock.getType().getRandomDrop();
             if (dropObj instanceof MaterialID mid) {
-                itemToDrop = new Material(blockData.getTier(), mid);
+                itemToDrop = new Material(removedBlock.getType().getTier(), mid);
             } else if (dropObj instanceof MiningComponent mc) {
                 itemToDrop = mc;
             } else if (dropObj instanceof Item item) {
@@ -463,15 +500,15 @@ public class GameInteraction {
         lastBreakTime = 0L;
     }
 
-    private void placeAction(GameMaster gameMaster, Hit cell,
+    private void placeAction(GameMaster gameMaster, BlockPos cell,
                              Item selectedItem) {
         World world = gameMaster.getWorld();
         if (gameMaster.getPlayer().checkCollision(world)) return;
 
         if (selectedItem instanceof Block block) {
-            int x = cell.x() + cell.normalX();
-            int y = cell.y() + cell.normalY();
-            int z = cell.z() + cell.normalZ();
+            int x = cell.x();
+            int y = cell.y();
+            int z = cell.z();
             if (gameMaster.getPlayer().intersectsBlock(x, y, z)) return;
 
             if (y < 0 || y >= Chunk.SIZE_Y) {
@@ -491,7 +528,7 @@ public class GameInteraction {
                 gameMaster.getSoundService().playBreakSound(newBlock.getType()
                         .getSoundGroup(), getDistanceToBlock(gameMaster, cell), Settings.getMaxInteractionDistance());
                 gameMaster.rebuildChunkMeshAt(x, z);
-                gameUIservice.logAction(new Hit(x, y, z, cell.normalX(), cell.normalY(), cell.normalZ()));
+                gameUIservice.logAction(new BlockPos(newBlock.getType(), x, y, z));
                 log.info("Block placed: {} at {},{},{}", newBlock.getType().getName(), x, y, z);
             }
             return;

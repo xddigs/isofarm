@@ -5,7 +5,6 @@ import com.isofarm.entity.Player;
 import com.isofarm.utils.HoveredCell;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
-import org.joml.Vector3i;
 
 public class Bucket extends Tool {
     private final Tier tier;
@@ -53,7 +52,7 @@ public class Bucket extends Tool {
 
     public void use(GameMaster gameMaster) {
         Player player = gameMaster.getPlayer();
-        Hit hoveredCell = HoveredCell.get(gameMaster);
+        BlockPos hoveredCell = HoveredCell.get(gameMaster);
         World world = gameMaster.getWorld();
 
         if (player == null || hoveredCell == null) return;

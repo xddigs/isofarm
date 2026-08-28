@@ -1,7 +1,7 @@
 package com.isofarm.graphics;
 
 import com.isofarm.data.BlockData;
-import com.isofarm.data.Hit;
+import com.isofarm.data.BlockPos;
 import com.isofarm.data.Particle;
 import com.isofarm.service.Service;
 import com.isofarm.utils.K;
@@ -85,7 +85,7 @@ public class ParticleEngine implements Service<Particle> {
         shader.unbind();
     }
 
-    public void spawn(Hit blockPos, BlockData blockData) {
+    public void spawnBlock(BlockPos blockPos, BlockData blockData) {
         if (blockData == null || blockData == BlockData.AIR) return;
 
         TextureAtlas.TextureRegion region = blockData.getSideRegion();
@@ -124,7 +124,7 @@ public class ParticleEngine implements Service<Particle> {
         }
     }
 
-    public void spawn(float x, float y, float z, SpriteSheet cropSheet, int frameIndex) {
+    public void spawnCrop(float x, float y, float z, SpriteSheet cropSheet, int frameIndex) {
         if (cropSheet == null) return;
 
         int totalParticles = K.World.MAX_PARTICLES;

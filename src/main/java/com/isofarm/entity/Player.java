@@ -72,7 +72,7 @@ public class Player extends Character {
     }
 
     @Override
-    public void update(Hit hit, float delta) {
+    public void update(BlockPos blockPos, float delta) {
         if (!this.isAlive()) {
             if (respawnTimer <= 0.0f) {
                 respawnTimer = 5.0f;

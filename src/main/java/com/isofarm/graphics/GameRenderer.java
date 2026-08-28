@@ -2,7 +2,7 @@ package com.isofarm.graphics;
 
 import com.isofarm.data.BlockData;
 import com.isofarm.data.Crop;
-import com.isofarm.data.Hit;
+import com.isofarm.data.BlockPos;
 import com.isofarm.entity.Player;
 import com.isofarm.input.GameInteraction;
 import com.isofarm.service.TimeService;
@@ -115,7 +115,7 @@ public class GameRenderer {
         });
 
         Player player = gameMaster.getPlayer();
-        Hit hoveredCell = HoveredCell.get(gameMaster);
+        BlockPos hoveredCell = HoveredCell.get(gameMaster);
 
         gameMaster.getWorld().forEach(block -> {
             if (!(block instanceof Crop crop)) return;

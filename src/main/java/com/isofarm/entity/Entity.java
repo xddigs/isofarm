@@ -2,7 +2,7 @@ package com.isofarm.entity;
 
 import com.isofarm.data.BlockData;
 import com.isofarm.data.DataClass;
-import com.isofarm.data.Hit;
+import com.isofarm.data.BlockPos;
 import com.isofarm.utils.K;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
@@ -311,7 +311,7 @@ public abstract class Entity {
         return false;
     }
 
-    public abstract void update(Hit hit, float delta);
+    public abstract void update(BlockPos blockPos, float delta);
 
     public abstract void render(GameMaster gameMaster);
 

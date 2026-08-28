@@ -555,7 +555,7 @@ public class GameMaster {
         }
     }
 
-    public void rebuildChunkMeshAt(Hit pos) {
+    public void rebuildChunkMeshAt(BlockPos pos) {
         rebuildChunkMeshAt(pos.x(), pos.z());
     }
 

@@ -1,6 +1,6 @@
 package com.isofarm.input;
 
-import com.isofarm.data.Hit;
+import com.isofarm.data.BlockPos;
 import com.isofarm.data.Ray;
 import com.isofarm.entity.Player;
 import com.isofarm.entity.states.SwimmingState;
@@ -112,12 +112,12 @@ public record CameraController(Camera camera) implements Service<Camera> {
         float screenWidth = gameMaster.getWindowWidth();
         float screenHeight = gameMaster.getWindowHeight();
 
-        Hit hit = camera.highlight(world, player.getPosition(), mouseX, mouseY,
+        BlockPos blockPos = camera.highlight(world, player.getPosition(), mouseX, mouseY,
                 screenWidth, screenHeight, false);
 
-        if (hit == null) return;
+        if (blockPos == null) return;
         GridPos start = PathFinder.getPlayerGridPosition(player);
-        GridPos goal = getGoalPosition(world, hit);
+        GridPos goal = getGoalPosition(world, blockPos);
         if (goal == null) return;
         if (start.equals(goal)) return;
         if (goal.equals(lastGoal)) return;
@@ -133,14 +133,9 @@ public record CameraController(Camera camera) implements Service<Camera> {
         }
     }
 
-    private GridPos getGoalPosition(World world, Hit hit) {
-        int x = hit.x();
-        int y = hit.y();
-        int z = hit.z();
-
-        if (hit.normalY() > 0) {
-            return new GridPos(x, y + 1, z);
-        }
+    private GridPos getGoalPosition(World world, BlockPos blockPos) {
+        int x = blockPos.x();
+        int z = blockPos.z();
 
         GridPos highestAltitude = world.getHighestY(x + 0.5f, z + 0.5f);
         int walkY = highestAltitude.y();

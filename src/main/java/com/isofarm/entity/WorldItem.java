@@ -1,7 +1,7 @@
 package com.isofarm.entity;
 
 import com.isofarm.data.DataClass;
-import com.isofarm.data.Hit;
+import com.isofarm.data.BlockPos;
 import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.Shader;
 import com.isofarm.graphics.SpriteSheet;
@@ -52,7 +52,7 @@ public class WorldItem extends Entity {
     }
 
     @Override
-    public void update(Hit hit, float delta) {
+    public void update(BlockPos blockPos, float delta) {
         if (world == null || delta <= 0.0f) {
             return;
         }
