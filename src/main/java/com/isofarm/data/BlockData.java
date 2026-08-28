@@ -47,10 +47,12 @@ public enum BlockData implements Craftable {
     ROSES((byte) 29, (byte) 9, (byte) (K.UI.ICON_BLOCK_ROWS - 1), "Roses Cluster", false, 15, "assets/textures/blocks/roses.png", SoundGroup.SOIL, 0.01f, true,  new Object[]{}, Tier.NONE),
     TULIP((byte) 30, (byte) 10, (byte) (K.UI.ICON_BLOCK_ROWS - 1), "Tulip", false, 10, "assets/textures/blocks/tulip.png", SoundGroup.SOIL, 0.01f, true, new Object[]{}, Tier.NONE),
 
+    OAK_BONSAI((byte) 31, (byte) 1, (byte) 2, "Oak Bonsai", false, 100, "assets/textures/blocks/oak_bonsai.png", SoundGroup.SOIL, 0.01f, false, new Object[]{}, Tier.NONE),
+
     WATER((byte) 127, (byte) -1, (byte) -1, "Water", false, 80, "assets/textures/blocks/water.png", SoundGroup.WATER, 0.0f, true, new Object[]{}, Tier.NONE);
 
     public static final BlockData[] ORES = {COPPER_ORE, IRON_ORE, STEEL_ORE, GOLD_ORE, PLATINUM_ORE, DIAMOND_ORE};
-    public static final BlockData[] PLANTS = {TALL_GRASS, ROSE, ROSEBUSH, LILY, GHOSTFLOWER, RED_MUSHROOM, BRIGHT_FLOWER, BLUE_FLOWER, ROSES, TULIP};
+    public static final BlockData[] PLANTS = {TALL_GRASS, ROSE, ROSEBUSH, LILY, GHOSTFLOWER, RED_MUSHROOM, BRIGHT_FLOWER, BLUE_FLOWER, ROSES, TULIP, OAK_BONSAI};
     private static final BlockData[] BY_ID = createById();
     private final byte id;
     private final byte col;
