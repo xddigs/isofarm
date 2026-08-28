@@ -7,11 +7,14 @@ import com.isofarm.graphics.CameraView;
 import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.Shader;
 import com.isofarm.graphics.SpriteSheet;
-import com.isofarm.item.*;
+import com.isofarm.item.Backpack;
+import com.isofarm.item.CraftingKit;
+import com.isofarm.item.Item;
+import com.isofarm.item.Tool;
 import com.isofarm.pathfinding.GridPos;
-import com.isofarm.utils.ToastFactory;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
+import com.isofarm.utils.ToastFactory;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
 import org.joml.Matrix4f;
@@ -32,9 +35,9 @@ public class Player extends Character {
     private final String name;
     private final Matrix4f modelMatrix;
     private final GameMaster gameMaster;
-
     private Direction direction = Direction.SOUTH;
     private List<GridPos> path;
+    private int currentFrame;
 
     private float currentEyeHeight = 1.6f;
     private float targetEyeHeight = 1.6f;
@@ -42,7 +45,6 @@ public class Player extends Character {
     private int pathIndex = 0;
     private int damageSequence = 0;
     private float lastDamageAmount = 0.0f;
-    private float fallStartY = 0.0f;
     private float respawnTimer = -1.0f;
     private boolean isFalling = false;
 
@@ -135,7 +137,7 @@ public class Player extends Character {
     public void render(GameMaster gameMaster) {
         ResourceManager rm = gameMaster.getResourceManager();
         CameraView camera = gameMaster.getActiveCamera();
-        SpriteSheet sheet = rm.getPlayerSpriteSheet();
+        SpriteSheet sheet = ResourceManager.getPlayerSpriteSheet();
 
         if (sheet == null || rm.getPlayerMesh() == null) {
             return;
@@ -190,7 +192,7 @@ public class Player extends Character {
             totalFramesInRow = K.UI.PLAYER_SPRITE_COLS;
         }
 
-        int currentFrame = (int) (getAnimTimer() / getFrameDuration()) % totalFramesInRow;
+        currentFrame = (int) (getAnimTimer() / getFrameDuration()) % totalFramesInRow;
         int spriteIndex = (rowIndex * K.UI.PLAYER_SPRITE_COLS) + currentFrame;
 
         Vector4f uvBounds = sheet.getUVBounds(spriteIndex);
@@ -278,9 +280,14 @@ public class Player extends Character {
         for (Item i : List.copyOf(getInventory().getItems().keySet())) {
             if (i == null) continue;
             switch (i) {
-                case Backpack ignored -> { continue; }
-                case CraftingKit ignored -> { continue; }
-                default -> {}
+                case Backpack ignored -> {
+                    continue;
+                }
+                case CraftingKit ignored -> {
+                    continue;
+                }
+                default -> {
+                }
             }
 
             int amount = getInventory().getAmount(i);
@@ -429,7 +436,7 @@ public class Player extends Character {
                     direction.normalize();
                 }
 
-                float speed = (currentState instanceof CrouchingState) ? getSpeed()/3f : getSpeed();
+                float speed = (currentState instanceof CrouchingState) ? getSpeed() / 3f : getSpeed();
                 Vector3f velocity = new Vector3f(direction).mul(speed);
                 velocity.y = getVelocity().y;
                 setVelocity(velocity);
@@ -447,9 +454,12 @@ public class Player extends Character {
         switch (getGamemode()) {
             case SURVIVAL -> {
                 Kit kit = new StartingKit();
-                for (Item item : kit.getItems()) { add(item, 1); }
+                for (Item item : kit.getItems()) {
+                    add(item, 1);
+                }
             }
-            case GODMODE -> {}
+            case GODMODE -> {
+            }
         }
     }
 
@@ -639,5 +649,9 @@ public class Player extends Character {
 
     public float getDifficultyRegen() {
         return gameMaster.getDifficulty().getMultiplier();
+    }
+
+    public int getCurrentFrame() {
+        return currentFrame;
     }
 }

@@ -10,6 +10,7 @@ import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import com.isofarm.utils.ToastFactory;
 import com.isofarm.wrld.GameMaster;
+import org.joml.Vector4f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -878,6 +879,34 @@ public class InventoryUI extends UIElement {
             backpackButton.show();
         } else {
             backpackButton.hide();
+        }
+
+        renderCharacter();
+    }
+
+    private void renderCharacter() {
+        if (player == null) {
+            return;
+        }
+
+        SpriteSheet sheet = ResourceManager.getPlayerSpriteSheet();
+        if (sheet == null) return;
+
+        float scale = Settings.getScaledEntity() * 3.0f;
+        float width = sheet.getFrameWidth() * scale;
+        float height = sheet.getFrameHeight() * scale;
+        float x = getAbsoluteX() - K.UI.INVENTORY_CHARACTER_OFFSET;
+        float y = getAbsoluteY() + height / 2.0f;
+
+        int frontDirectionOffset = 0;
+        int idleFrame = 0;
+        int baseSpriteIndex = (frontDirectionOffset * K.UI.PLAYER_SPRITE_COLS) + idleFrame;
+        GUI.drawSprite(sheet, baseSpriteIndex, x, y, width, height, new Vector4f(1.0f));
+
+        if (player.getInventory() != null && player.getInventory().hasBackpackEquipped()) {
+            int backpackRowOffset = 8;
+            int backpackSpriteIndex = baseSpriteIndex + (backpackRowOffset * K.UI.PLAYER_SPRITE_COLS);
+            GUI.drawSprite(sheet, backpackSpriteIndex, x, y, width, height, new Vector4f(1.0f));
         }
     }
 

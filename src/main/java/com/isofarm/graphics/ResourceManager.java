@@ -12,13 +12,19 @@ import java.util.Map;
 
 public class ResourceManager {
     private static final Logger log = LoggerFactory.getLogger(ResourceManager.class);
+    private static SpriteSheet seedIcons;
+    private static SpriteSheet cropIcons;
+    private static SpriteSheet toolIcons;
+    private static SpriteSheet blockIcons;
+    private static SpriteSheet materialIcons;
+    private static SpriteSheet playerSpriteSheet;
+    private static Map<CropType, SpriteSheet> cropSpritesheets;
     private final Shader defaultShader;
     private final Shader outlineShader;
     private final Shader rainShader;
     private final Shader motionBlurShader;
     private final Shader shadowMapShader;
     private final Shader blurShader;
-
     private final Mesh screenQuadMesh;
     private final Mesh blockMesh;
     private final Mesh selectionMesh;
@@ -26,25 +32,15 @@ public class ResourceManager {
     private final Mesh flowerMesh;
     private final Mesh playerMesh;
     private final Mesh destroyOverlayMesh;
-
     private final TextureAtlas blocksAtlas;
-
     private final SpriteSheet wheat;
     private final SpriteSheet carrot;
     private final SpriteSheet potato;
     private final SpriteSheet beetroot;
-    private static SpriteSheet seedIcons;
-    private static SpriteSheet cropIcons;
-    private static SpriteSheet toolIcons;
-    private static SpriteSheet blockIcons;
-    private static SpriteSheet materialIcons;
     private final SpriteSheet inventoryIcons;
-
-    private final SpriteSheet playerSpriteSheet;
     private final SpriteSheet heartsSpriteSheet;
     private final SpriteSheet staminaSpriteSheet;
     private final SpriteSheet destroyTexture;
-    private static Map<CropType, SpriteSheet> cropSpritesheets;
 
     public ResourceManager() {
         this.defaultShader = new Shader(K.Paths.DEFAULT_VERT_SHADER, K.Paths.DEFAULT_FRAG_SHADER);
@@ -81,7 +77,7 @@ public class ResourceManager {
 
         inventoryIcons = new SpriteSheet(K.Paths.INVENTORY_ICONS, K.UI.ICON_INV_COLS, 1);
 
-        this.playerSpriteSheet = new SpriteSheet(K.Paths.PLAYER_SPRITESHEET, K.UI.PLAYER_SPRITE_COLS, K.UI.PLAYER_SPRITE_ROWS);
+        playerSpriteSheet = new SpriteSheet(K.Paths.PLAYER_SPRITESHEET, K.UI.PLAYER_SPRITE_COLS, K.UI.PLAYER_SPRITE_ROWS);
         this.heartsSpriteSheet = new SpriteSheet(K.Paths.HEARTS_SPRITESHEET, 1, K.UI.ICON_HEARTS_ROWS);
         this.staminaSpriteSheet = new SpriteSheet(K.Paths.STAMINA_SPRITESHEET, K.UI.ICON_STAMINA_COLS, 1);
 
@@ -94,66 +90,9 @@ public class ResourceManager {
         cropSpritesheets.put(CropType.BEETROOT, beetroot);
     }
 
-    public void dispose() {
-        blockMesh.dispose();
-        flowerMesh.dispose();
-        selectionMesh.dispose();
-        spriteMesh.dispose();
-        screenQuadMesh.dispose();
-        playerMesh.dispose();
-        destroyOverlayMesh.dispose();
-
-        blocksAtlas.dispose();
-
-        wheat.dispose();
-        carrot.dispose();
-        potato.dispose();
-        beetroot.dispose();
-
-        cropIcons.dispose();
-        seedIcons.dispose();
-        toolIcons.dispose();
-        blockIcons.dispose();
-        materialIcons.dispose();
-        inventoryIcons.dispose();
-
-        playerSpriteSheet.dispose();
-        heartsSpriteSheet.dispose();
-        staminaSpriteSheet.dispose();
-
-        defaultShader.dispose();
-        outlineShader.dispose();
-        motionBlurShader.dispose();
-        rainShader.dispose();
-        shadowMapShader.dispose();
-        blurShader.dispose();
+    public static SpriteSheet getPlayerSpriteSheet() {
+        return playerSpriteSheet;
     }
-
-    public Shader getDefaultShader() { return defaultShader; }
-    public Shader getOutlineShader() { return outlineShader; }
-    public Shader getRainShader() { return rainShader; }
-    public Shader getMotionBlurShader() { return motionBlurShader; }
-    public Shader getShadowMapShader() { return shadowMapShader; }
-    public Shader getBlurShader() { return blurShader; }
-    public Mesh getScreenQuadMesh() { return screenQuadMesh; }
-    public Mesh getBlockMesh() { return blockMesh; }
-    public Mesh getFlowerMesh() { return flowerMesh; }
-    public Mesh getDestroyOverlayMesh() { return destroyOverlayMesh; }
-    public Mesh getSelectionMesh() { return selectionMesh; }
-    public Mesh getSpriteMesh() { return spriteMesh; }
-    public Mesh getPlayerMesh() { return playerMesh; }
-    public TextureAtlas getBlocksAtlas() { return blocksAtlas; }
-    public SpriteSheet getDestroyTexture() { return destroyTexture; }
-    public SpriteSheet getSeedIcons() { return seedIcons; }
-    public SpriteSheet getCropIcons() { return cropIcons; }
-    public SpriteSheet getToolIcons() { return toolIcons; }
-    public SpriteSheet getBlockIcons() { return blockIcons; }
-    public SpriteSheet getMaterialIcons() { return materialIcons; }
-    public SpriteSheet getInventoryIcons() { return inventoryIcons; }
-    public SpriteSheet getPlayerSpriteSheet() { return playerSpriteSheet; }
-    public SpriteSheet getHeartsSpriteSheet() { return heartsSpriteSheet; }
-    public SpriteSheet getStaminaSpriteSheet() { return staminaSpriteSheet; }
-    public Map<CropType, SpriteSheet> getCropSpritesheets() { return cropSpritesheets; }
 
     public static SpriteSheet getItemSpriteSheet(Item item) {
         return switch (item) {
@@ -230,8 +169,139 @@ public class ResourceManager {
         return 0;
     }
 
+    public void dispose() {
+        blockMesh.dispose();
+        flowerMesh.dispose();
+        selectionMesh.dispose();
+        spriteMesh.dispose();
+        screenQuadMesh.dispose();
+        playerMesh.dispose();
+        destroyOverlayMesh.dispose();
+
+        blocksAtlas.dispose();
+
+        wheat.dispose();
+        carrot.dispose();
+        potato.dispose();
+        beetroot.dispose();
+
+        cropIcons.dispose();
+        seedIcons.dispose();
+        toolIcons.dispose();
+        blockIcons.dispose();
+        materialIcons.dispose();
+        inventoryIcons.dispose();
+
+        playerSpriteSheet.dispose();
+        heartsSpriteSheet.dispose();
+        staminaSpriteSheet.dispose();
+
+        defaultShader.dispose();
+        outlineShader.dispose();
+        motionBlurShader.dispose();
+        rainShader.dispose();
+        shadowMapShader.dispose();
+        blurShader.dispose();
+    }
+
+    public Shader getDefaultShader() {
+        return defaultShader;
+    }
+
+    public Shader getOutlineShader() {
+        return outlineShader;
+    }
+
+    public Shader getRainShader() {
+        return rainShader;
+    }
+
+    public Shader getMotionBlurShader() {
+        return motionBlurShader;
+    }
+
+    public Shader getShadowMapShader() {
+        return shadowMapShader;
+    }
+
+    public Shader getBlurShader() {
+        return blurShader;
+    }
+
+    public Mesh getScreenQuadMesh() {
+        return screenQuadMesh;
+    }
+
+    public Mesh getBlockMesh() {
+        return blockMesh;
+    }
+
+    public Mesh getFlowerMesh() {
+        return flowerMesh;
+    }
+
+    public Mesh getDestroyOverlayMesh() {
+        return destroyOverlayMesh;
+    }
+
+    public Mesh getSelectionMesh() {
+        return selectionMesh;
+    }
+
+    public Mesh getSpriteMesh() {
+        return spriteMesh;
+    }
+
+    public Mesh getPlayerMesh() {
+        return playerMesh;
+    }
+
+    public TextureAtlas getBlocksAtlas() {
+        return blocksAtlas;
+    }
+
+    public SpriteSheet getDestroyTexture() {
+        return destroyTexture;
+    }
+
+    public SpriteSheet getSeedIcons() {
+        return seedIcons;
+    }
+
+    public SpriteSheet getCropIcons() {
+        return cropIcons;
+    }
+
+    public SpriteSheet getToolIcons() {
+        return toolIcons;
+    }
+
+    public SpriteSheet getBlockIcons() {
+        return blockIcons;
+    }
+
+    public SpriteSheet getMaterialIcons() {
+        return materialIcons;
+    }
+
+    public SpriteSheet getInventoryIcons() {
+        return inventoryIcons;
+    }
+
+    public SpriteSheet getHeartsSpriteSheet() {
+        return heartsSpriteSheet;
+    }
+
+    public SpriteSheet getStaminaSpriteSheet() {
+        return staminaSpriteSheet;
+    }
+
+    public Map<CropType, SpriteSheet> getCropSpritesheets() {
+        return cropSpritesheets;
+    }
+
     public Shader getShader(String name) {
-        if (name == null)  return defaultShader;
+        if (name == null) return defaultShader;
         return switch (name.toLowerCase()) {
             case "outline" -> outlineShader;
             case "rain" -> rainShader;
