@@ -118,8 +118,8 @@ public final class K {
     }
 
     public static final class Paths {
-        public static final String FONT = "font/JetBrainsMonoNL-SemiBold.ttf";
-        public static final String FONT_BOLD = "font/JetBrainsMonoNL-Bold.ttf";
+        public static final String FONT = "font/LeagueSpartan-Regular.ttf";
+        public static final String FONT_BOLD = "font/LeagueSpartan-Medium.ttf";
 
         public static final String DEFAULT_VERT_SHADER = "shaders/default.vert";
         public static final String DEFAULT_FRAG_SHADER = "shaders/default.frag";
