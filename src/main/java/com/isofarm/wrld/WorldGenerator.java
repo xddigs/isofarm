@@ -96,7 +96,9 @@ public class WorldGenerator {
 
             if (!isInsidePool(fx, fz) && (fx != treeX || fz != treeZ)) {
                 byte plant = BlockData.PLANTS[random.nextInt(BlockData.PLANTS.length)].getId();
-                world.setBlockTypeAt(fx, SURFACE_Y + 1, fz, plant);
+                if (world.getBlockTypeAt(fx, SURFACE_Y, fz) != BlockData.AIR.getId()) {
+                    world.setBlockTypeAt(fx, SURFACE_Y + 1, fz, plant);
+                }
             }
         }
     }
