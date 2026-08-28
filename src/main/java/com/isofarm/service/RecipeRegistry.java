@@ -26,19 +26,21 @@ public class RecipeRegistry implements Service<Recipe> {
                 Tier.STEEL, Tier.IRON,
                 Tier.GOLD, Tier.STEEL,
                 Tier.PLATINUM, Tier.GOLD,
-                Tier.DIAMOND, Tier.PLATINUM
-        );
+                Tier.DIAMOND, Tier.PLATINUM);
 
         metalProgression.forEach((toolTier, requiredStationTier) -> {
             Craftable mainMaterial = new MiningComponent(toolTier, MaterialID.INGOT);
             registerToolSet(requiredStationTier, mainMaterial);
             create(requiredStationTier)
                     .result(new Backpack(ToolType.BACKPACK, toolTier), 1)
-                    .with(mainMaterial, 3).with(MaterialID.LEATHER, 2).add();
+                    .with(mainMaterial, 3)
+                    .with(MaterialID.LEATHER, 3).add();
 
             create(requiredStationTier)
                     .result(new CraftingKit(ToolType.CRAFTING_KIT, toolTier), 1)
-                    .with(mainMaterial, 3).with(MaterialID.LEATHER, 2).add();
+                    .with(mainMaterial, 3)
+                    .with(MaterialID.LEATHER, 2).add();
+
             create(toolTier)
                     .result(new Bucket(BlockData.AIR, toolTier), 1)
                     .with(mainMaterial, 3)
@@ -52,7 +54,7 @@ public class RecipeRegistry implements Service<Recipe> {
         registerTool(stationTier, primaryMat, 2, 3, Hoe::new);
         registerTool(stationTier, primaryMat, 3, 2, Pickaxe::new);
         registerTool(stationTier, primaryMat, 1, 2, Shovel::new);
-        registerTool(stationTier, primaryMat, 3, 2, Axe::new);
+        registerTool(stationTier, primaryMat, 3, 3, Axe::new);
         registerTool(stationTier, primaryMat, 2, 1, Sword::new);
     }
 
