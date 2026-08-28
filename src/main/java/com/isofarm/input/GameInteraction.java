@@ -34,7 +34,7 @@ import static org.lwjgl.glfw.GLFW.*;
 public class GameInteraction {
     private static final float PICKUP_DISTANCE = 1.5f;
     private static final float TIMEOUT = 0.4f;
-    private static final float TIMER_MAX = 3.0f;
+    private static final float TIMER_MAX = 5.0f;
 
     private static final Logger log = LoggerFactory.getLogger(GameInteraction.class);
     private final CropService cropService;
