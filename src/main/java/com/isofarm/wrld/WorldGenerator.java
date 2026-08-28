@@ -11,7 +11,7 @@ public class WorldGenerator {
     private static final int SURFACE_Y = 25;
     private static final int MAX_DEPTH = 16;
 
-    private final World world;
+    private static World world;
     private final long seed;
 
     private final int poolMinX;
@@ -23,7 +23,7 @@ public class WorldGenerator {
     }
 
     public WorldGenerator(World world, long seed) {
-        this.world = world;
+        WorldGenerator.world = world;
         this.seed = seed;
 
         Random islandRandom = new Random(seed);
@@ -101,7 +101,7 @@ public class WorldGenerator {
         }
     }
 
-    private void generateTree(int worldX, int worldZ, Random random) {
+    public static void generateTree(int worldX, int worldZ, Random random) {
         int trunkHeight = 4 + random.nextInt(5);
 
         for (int y = 1; y <= trunkHeight; y++) {
