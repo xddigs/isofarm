@@ -6,6 +6,7 @@ public class Settings {
     private static final float[] GUI_SCALES = {1.0f, 2.0f, 3.0f};
     private static final float SHADOW_MAP_SIZE = 4096.0f;
     private static float fov = 80f;
+    private static float ticks = 12f;
     private static float mouseSensitivity = 0.4f;
     private static int renderDistance = 16;
     private static int unloadMargin = 4;
@@ -182,5 +183,9 @@ public class Settings {
 
     public static int getGuiScaleIndex() {
         return guiScaleIndex;
+    }
+
+    public static float getTicks() {
+        return ticks;
     }
 }

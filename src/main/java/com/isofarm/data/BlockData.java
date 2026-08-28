@@ -22,7 +22,7 @@ public enum BlockData implements Craftable {
     GLASS((byte) 6, (byte) 6, (byte) 0, "Glass", false, 200, "assets/textures/blocks/glass.png", SoundGroup.GLASS, 1.2f, true, new Object[]{}, Tier.NONE),
     OAK_LOG((byte) 7, (byte) 7, (byte) 0, "Oak Log", false, 100, "assets/textures/blocks/oak_log_top.png", "assets/textures/blocks/oak_log_bottom.png", "assets/textures/blocks/oak_log_side.png", SoundGroup.HARD, 2.2f, false,  new Object[]{}, Tier.WOOD),
     OAK_WOOD((byte) 8, (byte) 8, (byte) 0, "Oak Wood", false, 100, "assets/textures/blocks/oak_plank.png", SoundGroup.HARD, 4.0f, false,  new Object[]{}, Tier.WOOD),
-    OAK_LEAVES((byte) 9, (byte) 9, (byte) 0, "Oak Leaves", false, 100, "assets/textures/blocks/oak_leaves.png", SoundGroup.SOIL, 1.1f, false,  new Object[]{MaterialID.STICK}, Tier.NONE),
+    OAK_LEAVES((byte) 9, (byte) 9, (byte) 0, "Oak Leaves", false, 100, "assets/textures/blocks/oak_leaves.png", SoundGroup.SOIL, 1.1f, false,  new Object[]{MaterialID.STICK, "OAK_BONSAI"}, Tier.NONE),
     SNOW((byte) 10, (byte) 10, (byte) 0, "Snow", false, 120, "assets/textures/blocks/snow.png", SoundGroup.SNOW, 0.8f, false, new Object[]{}, Tier.NONE),
 
     COPPER_ORE((byte) 11, (byte) 1, (byte) 1, "Copper Ore Block", false, 150, "assets/textures/blocks/copper_ore.png", SoundGroup.HARD, 6.0f, false, new MiningComponent[]{new MiningComponent(Tier.COPPER, MaterialID.RAW_ORE)}, Tier.COPPER),
@@ -131,6 +131,13 @@ public enum BlockData implements Craftable {
             return null;
         }
         return BY_ID[index];
+    }
+
+    public static BlockData fromName(String name) {
+        for (BlockData block : all()) {
+            if (block.name.equals(name)) return block;
+        }
+        return null;
     }
 
     public static BlockData[] all() {
@@ -252,7 +259,13 @@ public enum BlockData implements Craftable {
         if (!hasDrops()) return null;
         if (Math.random() < 0.50f) {
             int index = (int) (Math.random() * drops.length);
-            return drops[index];
+            Object rawDrop = drops[index];
+
+            if (rawDrop instanceof String blockKey) {
+                return BlockData.valueOf(blockKey);
+            }
+
+            return rawDrop;
         }
         return null;
     }

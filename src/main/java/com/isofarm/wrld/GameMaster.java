@@ -38,6 +38,7 @@ public class GameMaster {
     private final SoundService soundService;
     private final UIManager uiManager;
     private final CropService cropService;
+    private final TreeService treeService;
     private final TimeService timeService;
     private final CommandService commandService;
     private final ParticleEngine particles;
@@ -87,6 +88,7 @@ public class GameMaster {
         this.soundService = new SoundService();
         this.particles = new ParticleEngine();
         this.cropService = new CropService(world, particles);
+        this.treeService = new TreeService(world);
         this.timeService = new TimeService();
         this.commandRegistry = new CommandRegistry();
         this.commandService = new CommandService(commandRegistry);
@@ -438,6 +440,7 @@ public class GameMaster {
         celestialLighting.update(HoveredCell.get(this), timeOfDay);
         shop.update(timeService);
         cropService.update(delta, weatherService.getWeather());
+        treeService.update(delta);
         updateEntities(delta);
         orthoCameraController.update(this, delta);
         particles.update(delta);
