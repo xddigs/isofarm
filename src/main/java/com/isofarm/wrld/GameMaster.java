@@ -80,7 +80,7 @@ public class GameMaster {
         this.windowWidth = K.Window.DEFAULT_WIDTH;
         this.windowHeight = K.Window.DEFAULT_HEIGHT;
 
-        this.world = new World();
+        this.world = new World(this);
         this.sun = new Sun("Sun");
         this.moon = new Moon("Moon");
         this.celestialLighting = new CelestialLighting(sun, moon);
@@ -250,6 +250,10 @@ public class GameMaster {
 
     public CropService getCropService() {
         return cropService;
+    }
+
+    public TreeService getTreeService() {
+        return treeService;
     }
 
     public CommandRegistry getCommandRegistry() {
@@ -440,7 +444,7 @@ public class GameMaster {
         celestialLighting.update(HoveredCell.get(this), timeOfDay);
         shop.update(timeService);
         cropService.update(delta, weatherService.getWeather());
-        treeService.update(delta);
+        treeService.update();
         updateEntities(delta);
         orthoCameraController.update(this, delta);
         particles.update(delta);

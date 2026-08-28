@@ -414,7 +414,6 @@ public class GameInteraction {
         Vector3f position = new Vector3f(cell.x() + 0.5f, cell.y() + 0.5f, cell.z() + 0.5f);
         Block removedBlock = new Block(blockData, cell);
         Item itemToDrop = null;
-        BlockData removedBlockData = removedBlock.getType();
 
         if (selectedItem instanceof Tool tool) {
             if (tool instanceof Backpack || tool instanceof CraftingKit) return;
@@ -482,18 +481,22 @@ public class GameInteraction {
             byte existingBlock = world.getBlockTypeAt(x, y, z);
             if (existingBlock == 0) {
                 Block newBlock = new Block(block.getType(), x, y, z);
-                world.setBlockTypeAt(x, y, z, block.getType().getId());
-                gameMaster.getSoundService().playBreakSound(newBlock.getType()
-                        .getSoundGroup(), getDistanceToBlock(gameMaster, cell), Settings.getMaxInteractionDistance());
+                if (block.getType().equals(BlockData.OAK_BONSAI)) {
+                    gameMaster.getTreeService().plant(x, y, z, BlockData.OAK_BONSAI);
+                } else {
+                    world.setBlockTypeAt(x, y, z, block.getType().getId());
+                }
 
                 gameMaster.getPlayer().remove(selectedItem);
+                gameMaster.getSoundService().playBreakSound(newBlock.getType()
+                        .getSoundGroup(), getDistanceToBlock(gameMaster, cell), Settings.getMaxInteractionDistance());
                 gameMaster.rebuildChunkMeshAt(x, z);
                 gameUIservice.logAction(new Hit(x, y, z, cell.normalX(), cell.normalY(), cell.normalZ()));
                 log.info("Block placed: {} at {},{},{}", newBlock.getType().getName(), x, y, z);
             }
-
             return;
         }
+
 
         if (selectedItem instanceof Hoe hoe) {
             Block block = world.getBlockAt(cell.x(), cell.y(), cell.z());

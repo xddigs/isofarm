@@ -49,8 +49,8 @@ public record CameraController(Camera camera) implements Service<Camera> {
             }
         }
 
-        click(gameMaster, player, gameMaster.getWorld());
-        followPath(player, gameMaster.getWorld(), delta);
+//        click(gameMaster, player, gameMaster.getWorld());
+//        followPath(player, gameMaster.getWorld(), delta);
         updateZoom();
         followPlayer(gameMaster, player, delta);
     }
@@ -102,7 +102,6 @@ public record CameraController(Camera camera) implements Service<Camera> {
 
     private void click(GameMaster gameMaster, Player player, World world) {
         boolean isRightClickDown = Mouse.isButtonDown(GLFW_MOUSE_BUTTON_RIGHT);
-
         if (!isRightClickDown) {
             lastGoal = null;
             return;

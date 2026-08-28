@@ -2,16 +2,14 @@ package com.isofarm.entity;
 
 import com.isofarm.data.*;
 import com.isofarm.entity.states.GroundedState;
-import com.isofarm.graphics.CameraView;
-import com.isofarm.graphics.ResourceManager;
-import com.isofarm.graphics.Shader;
-import com.isofarm.graphics.SpriteSheet;
+import com.isofarm.graphics.*;
 import com.isofarm.input.Keyboard;
 import com.isofarm.item.Backpack;
 import com.isofarm.item.CraftingKit;
 import com.isofarm.item.Item;
 import com.isofarm.item.Tool;
 import com.isofarm.pathfinding.GridPos;
+import com.isofarm.service.TimeService;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import com.isofarm.utils.ToastFactory;
@@ -43,7 +41,6 @@ public class Player extends Character {
 
     private int pathIndex = 0;
     private int damageSequence = 0;
-    private float lastDamageAmount = 0.0f;
     private float respawnTimer = -1.0f;
     private boolean isFalling = false;
 
@@ -180,7 +177,6 @@ public class Player extends Character {
 
         int rowIndex;
         int totalFramesInRow;
-        int startSpriteIndex;
 
         if (isMoving) {
             rowIndex = 4 + directionOffset;
@@ -203,18 +199,20 @@ public class Player extends Character {
         shader.setUniform("uUseTexture", true);
         shader.setUniform("uUseFaceAtlas", false);
 
+        CelestialLighting lighting = gameMaster.getCelestialLighting();
         shader.setUniform("uUVBounds", uvBounds);
         shader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
         shader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
         shader.setUniform("uTopAtlasOffset", new Vector2f(0.0f, 0.0f));
         shader.setUniform("uBottomAtlasOffset", new Vector2f(0.0f, 0.0f));
         shader.setUniform("uSideAtlasOffset", new Vector2f(0.0f, 0.0f));
-        shader.setUniform("uSunColor", new Vector3f(1.0f));
-        shader.setUniform("uLightIntensity", 0.0f);
-        shader.setUniform("uLightDirection", new Vector3f(0.0f, -1.0f, 0.0f));
-        shader.setUniform("uAmbientIntensity", 1.0f);
-        shader.setUniform("uSkyColor", new Vector3f(1.0f));
+        shader.setUniform("uSunColor", lighting.getSun().getColor());
+        shader.setUniform("uLightIntensity", lighting.getIntensity());
+        shader.setUniform("uLightDirection", lighting.getDirection());
+        shader.setUniform("uAmbientIntensity", lighting.getAmbientIntensity());
+        shader.setUniform("uSkyColor", TimeService.getSkyColor());
         shader.setUniform("uBaseColor", new Vector3f(1.0f));
+
         shader.setUniform("uParticleAlpha", 1.0f);
         shader.setUniform("uIsMaskPass", false);
         shader.setUniform("uEnableShadows", false);
@@ -268,7 +266,6 @@ public class Player extends Character {
 
     @Override
     public void onDamageTaken(float amount) {
-        lastDamageAmount = amount;
         damageSequence++;
         getSoundService().playEntitySound(SoundGroup.ENTITY);
     }
@@ -401,10 +398,6 @@ public class Player extends Character {
         return damageSequence;
     }
 
-    public float getLastDamageAmount() {
-        return lastDamageAmount;
-    }
-
     public void move(World world, Vector3f direction, float delta) {
         collide(world, direction, delta);
     }
@@ -479,11 +472,10 @@ public class Player extends Character {
             case SURVIVAL -> {
                 Kit kit = new StartingKit();
                 for (Item item : kit.getItems()) {
-                    add(item, 1);
+                    add(item);
                 }
             }
-            case GODMODE -> {
-            }
+            case GODMODE -> {}
         }
     }
 

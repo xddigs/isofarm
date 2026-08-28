@@ -13,8 +13,10 @@ import java.util.function.Consumer;
 public class World {
     private final Map<Long, Block> blocks;
     private final Map<Long, Chunk> chunks;
+    private final GameMaster gameMaster;
 
-    public World() {
+    public World(GameMaster gameMaster) {
+        this.gameMaster = gameMaster;
         this.blocks = new HashMap<>();
         this.chunks = new HashMap<>();
     }
@@ -248,4 +250,8 @@ public class World {
     }
 
     public record PlantInstance(Chunk chunk, int x, int y, int z, BlockData data) {}
+
+    public GameMaster getGameMaster() {
+        return gameMaster;
+    }
 }

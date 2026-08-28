@@ -18,11 +18,6 @@ public class GroundedState implements PlayerState {
     @Override
     public void input(Player player, GameMaster gameMaster) {
         if (gameMaster.isInventoryOpen() || gameMaster.isChatOpen()) return;
-
-        if (Keyboard.isKeyPressed(GLFW_KEY_SPACE)) {
-            player.jump();
-            player.changeState(new JumpingState());
-        }
     }
 
     @Override

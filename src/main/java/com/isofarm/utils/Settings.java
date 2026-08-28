@@ -6,7 +6,7 @@ public class Settings {
     private static final float[] GUI_SCALES = {1.0f, 2.0f, 3.0f};
     private static final float SHADOW_MAP_SIZE = 4096.0f;
     private static float fov = 80f;
-    private static float ticks = 12f;
+    private static float ticks = 12000f;
     private static float mouseSensitivity = 0.4f;
     private static int renderDistance = 16;
     private static int unloadMargin = 4;
@@ -16,10 +16,9 @@ public class Settings {
     private static float maxInteractionDistance = 6.0f;
     private static boolean doEnableMusic = true;
     private static boolean doEnableDebugInfo = true;
-    private static boolean doEnableShadows = false;
+    private static boolean doEnableShadows = true;
 
-    private Settings() {
-    }
+    private Settings() {}
 
     public static float getShadowMapSize() {
         return SHADOW_MAP_SIZE;
