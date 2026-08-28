@@ -216,7 +216,7 @@ public class CameraController implements Service<Camera> {
             player.getVelocity().set(0, 0, 0);
         } else {
             targetVelocity.set(moveX, 0.0f, moveZ);
-            player.moveAndCollide(gameMaster.getWorld(), targetVelocity, delta);
+            player.collide(gameMaster.getWorld(), targetVelocity, delta);
         }
     }
 

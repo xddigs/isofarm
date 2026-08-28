@@ -367,47 +367,42 @@ public class Player extends Character {
     }
 
     public void move(World world, Vector3f direction, float delta) {
-        moveAndCollide(world, direction, delta);
+        collide(world, direction, delta);
     }
 
     public void move(World world, float delta, float cameraYaw) {
         if (!isFollowingPath()) {
-            setVelocity(new Vector3f(0.0f, 0.0f, 0.0f));
-            return;
-        }
+            setVelocity(new Vector3f(0.0f, getVelocity().y, 0.0f));
+        } else {
+            GridPos target = path.get(pathIndex);
+            float targetX = target.x() + 0.5f;
+            float targetZ = target.z() + 0.5f;
 
-        GridPos target = path.get(pathIndex);
+            Vector3f position = getPosition();
+            float dx = targetX - position.x;
+            float dz = targetZ - position.z;
 
-        float targetX = target.x() + 0.5f;
-        float targetY = target.y();
-        float targetZ = target.z() + 0.5f;
+            float distanceSquared = dx * dx + dz * dz;
 
-        Vector3f position = getPosition();
+            if (distanceSquared < 0.01f) {
+                pathIndex++;
+                if (!isFollowingPath()) {
+                    setVelocity(new Vector3f(0.0f, getVelocity().y, 0.0f));
+                }
+            } else {
+                Vector3f direction = new Vector3f(dx, 0.0f, dz);
+                if (direction.lengthSquared() > 0.0f) {
+                    direction.normalize();
+                }
 
-        float dx = targetX - position.x;
-        float dz = targetZ - position.z;
-
-        float distanceSquared = dx * dx + dz * dz;
-
-        if (distanceSquared < 0.01f) {
-            pathIndex++;
-
-            if (!isFollowingPath()) {
-                setVelocity(new Vector3f(0.0f, 0.0f, 0.0f));
+                float speed = (currentState instanceof CrouchingState) ? getSpeed()/3f : getSpeed();
+                Vector3f velocity = new Vector3f(direction).mul(speed);
+                velocity.y = getVelocity().y;
+                setVelocity(velocity);
             }
-            return;
         }
 
-        Vector3f direction = new Vector3f(dx, 0.0f, dz);
-        if (direction.lengthSquared() > 0.0f) {
-            direction.normalize();
-        }
-
-        float speed = (currentState instanceof CrouchingState) ? getSpeed()/3f : getSpeed();
-        Vector3f velocity = new Vector3f(direction).mul(speed);
-        velocity.y = getVelocity().y;
-        setVelocity(velocity);
-        moveAndCollide(world, velocity, delta);
+        collide(world, getVelocity(), delta);
     }
 
     public String getName() {
