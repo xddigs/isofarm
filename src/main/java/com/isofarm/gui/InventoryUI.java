@@ -1,5 +1,8 @@
 package com.isofarm.gui;
 
+import com.isofarm.craft.Ingredient;
+import com.isofarm.craft.Recipe;
+import com.isofarm.craft.RecipeMatcher;
 import com.isofarm.data.*;
 import com.isofarm.entity.Player;
 import com.isofarm.graphics.ResourceManager;
@@ -16,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_RIGHT;
@@ -587,58 +591,16 @@ public class InventoryUI extends UIElement {
             return false;
         }
 
-        Item item = slot.getItem();
-        Recipe recipe = findSingleIngredientRecipe(item);
-        if (recipe == null) {
+        InventorySlot[] inputSlots = new InventorySlot[]{ slot };
+        Optional<Recipe> matchedRecipe = RecipeMatcher.match(inputSlots, gameMaster.getRecipes());
+
+        if (matchedRecipe.isEmpty()) {
             return false;
         }
 
-        Ingredient ingredient = recipe.ingredients().getFirst();
-        if (slot.getAmount() < ingredient.amount()) {
-            ToastFactory.info("Not enough materials");
-            return true;
-        }
-
-        craftSingleIngredient(recipe, slot);
+        Recipe recipe = matchedRecipe.get();
+        craftFromSlots(recipe, inputSlots);
         return true;
-    }
-
-    private Recipe findSingleIngredientRecipe(Item item) {
-        if (gameMaster == null || item == null) {
-            return null;
-        }
-
-        for (Recipe recipe : gameMaster.getRecipes()) {
-            if (recipe.ingredients().size() != 1) {
-                continue;
-            }
-
-            Ingredient ingredient = recipe.ingredients().getFirst();
-            if (matchesIngredient(ingredient, item)) {
-                return recipe;
-            }
-        }
-
-        return null;
-    }
-
-    private void craftSingleIngredient(Recipe recipe, InventorySlot slot) {
-        Ingredient ingredient = recipe.ingredients().getFirst();
-        int cost = ingredient.amount();
-        if (slot.getAmount() < cost) {
-            return;
-        }
-
-        slot.setAmount(slot.getAmount() - cost);
-        if (slot.getAmount() <= 0) {
-            slot.clear();
-        }
-
-        Item result = recipe.result().copy();
-        int remaining = inventory.add(result, recipe.resultAmount());
-        if (!player.hasSpace()) {
-            player.addToBackpack(result, remaining);
-        }
     }
 
     private void attemptCraft(InventorySlot targetSlot) {
@@ -646,51 +608,53 @@ public class InventoryUI extends UIElement {
             return;
         }
 
-        Item targetItem = targetSlot.getItem();
-        Recipe recipe = findRecipe(carriedItem, carriedAmount, targetItem, targetSlot.getAmount());
-        if (recipe == null) {
+        InventorySlot carriedSlot = new InventorySlot();
+        carriedSlot.setItem(carriedItem);
+        carriedSlot.setAmount(carriedAmount);
+
+        InventorySlot[] inputSlots = new InventorySlot[]{ carriedSlot, targetSlot };
+        Optional<Recipe> matchedRecipe = RecipeMatcher.match(inputSlots, gameMaster.getRecipes());
+        if (matchedRecipe.isEmpty()) {
             ToastFactory.error("These materials cannot be combined");
             return;
         }
 
-        craft(recipe, targetSlot);
+        Recipe recipe = matchedRecipe.get();
+        craftFromSlots(recipe, inputSlots);
+        if (carriedSlot.isEmpty()) {
+            clearCarriedItem();
+        } else {
+            this.carriedAmount = carriedSlot.getAmount();
+        }
     }
 
-    private Recipe findRecipe(Item first, int firstAmount,
-                              Item second, int secondAmount) {
-        if (gameMaster == null) {
-            return null;
-        }
+    private void craftFromSlots(Recipe recipe, InventorySlot[] inputSlots) {
+        for (Ingredient ing : recipe.ingredients()) {
+            int remainingToDeduct = ing.amount();
 
-        for (Recipe recipe : gameMaster.getRecipes()) {
-            if (!recipeMatches(recipe, first, second)) {
-                continue;
+            for (InventorySlot slot : inputSlots) {
+                if (slot == null || slot.isEmpty()) continue;
+
+                if (matchesIngredient(ing, slot.getItem())) {
+                    int amountInSlot = slot.getAmount();
+                    int toTake = Math.min(remainingToDeduct, amountInSlot);
+
+                    slot.setAmount(amountInSlot - toTake);
+                    if (slot.getAmount() <= 0) {
+                        slot.clear();
+                    }
+
+                    remainingToDeduct -= toTake;
+                    if (remainingToDeduct <= 0) break;
+                }
             }
-
-            if (canCraft(recipe, first, firstAmount, second, secondAmount)) {
-                return recipe;
-            }
         }
 
-        return null;
-    }
-
-    private boolean recipeMatches(Recipe recipe, Item first, Item second) {
-        List<Ingredient> ingredients = recipe.ingredients();
-        if (ingredients.size() == 1) {
-            Ingredient single = ingredients.get(0);
-            return matchesIngredient(single, first) && isSameType(first, second);
+        Item result = recipe.result().copy();
+        int remaining = inventory.add(result, recipe.resultAmount());
+        if (remaining > 0 && player != null) {
+            player.addToBackpack(result, remaining);
         }
-
-        if (ingredients.size() == 2) {
-            Ingredient a = ingredients.get(0);
-            Ingredient b = ingredients.get(1);
-
-            return (matchesIngredient(a, first) && matchesIngredient(b, second)) ||
-                    (matchesIngredient(a, second) && matchesIngredient(b, first));
-        }
-
-        return false;
     }
 
     private boolean matchesIngredient(Ingredient ingredient, Item item) {
@@ -720,92 +684,6 @@ public class InventoryUI extends UIElement {
         }
 
         return false;
-    }
-
-    private boolean canCraft(Recipe recipe, Item first, int firstAmount,
-                             Item second, int secondAmount) {
-        List<Ingredient> ingredients = recipe.ingredients();
-
-        if (ingredients.size() == 1) {
-            Ingredient single = ingredients.get(0);
-            if (matchesIngredient(single, first)) {
-                return (firstAmount + secondAmount) >= single.amount();
-            }
-        }
-
-        if (ingredients.size() == 2) {
-            Ingredient ing0 = ingredients.get(0);
-            Ingredient ing1 = ingredients.get(1);
-
-            if (matchesIngredient(ing0, first) && matchesIngredient(ing1, second)) {
-                return firstAmount >= ing0.amount() && secondAmount >= ing1.amount();
-            }
-
-            if (matchesIngredient(ing1, first) && matchesIngredient(ing0, second)) {
-                return firstAmount >= ing1.amount() && secondAmount >= ing0.amount();
-            }
-        }
-
-        return false;
-    }
-
-    private void craft(Recipe recipe, InventorySlot targetSlot) {
-        List<Ingredient> ingredients = recipe.ingredients();
-
-        if (ingredients.size() == 1) {
-            Ingredient ingredient = ingredients.get(0);
-            int cost = ingredient.amount();
-
-            int takenFromCarried = Math.min(carriedAmount, cost);
-            carriedAmount -= takenFromCarried;
-            int remainingCost = cost - takenFromCarried;
-
-            if (carriedAmount <= 0) {
-                clearCarriedItem();
-            }
-
-            if (remainingCost > 0) {
-                targetSlot.setAmount(targetSlot.getAmount() - remainingCost);
-                if (targetSlot.getAmount() <= 0) {
-                    targetSlot.clear();
-                }
-            }
-        } else if (ingredients.size() == 2) {
-            Ingredient ing0 = ingredients.get(0);
-            Ingredient ing1 = ingredients.get(1);
-
-            Item firstItem = carriedItem;
-            Item secondItem = targetSlot.getItem();
-
-            int carriedCost;
-            int targetCost;
-
-            if (matchesIngredient(ing0, firstItem) && matchesIngredient(ing1, secondItem)) {
-                carriedCost = ing0.amount();
-                targetCost = ing1.amount();
-            } else {
-                carriedCost = ing1.amount();
-                targetCost = ing0.amount();
-            }
-
-            carriedAmount -= carriedCost;
-            if (carriedAmount <= 0) {
-                clearCarriedItem();
-            }
-
-            targetSlot.setAmount(targetSlot.getAmount() - targetCost);
-            if (targetSlot.getAmount() <= 0) {
-                targetSlot.clear();
-            }
-        }
-
-        Item result = recipe.result().copy();
-        int resultAmount = recipe.resultAmount();
-
-        int remaining = inventory.add(result, resultAmount);
-        if (remaining > 0 && player != null) {
-            player.addToBackpack(result, remaining);
-        }
     }
 
     private void takeHalf(InventorySlot slot) {

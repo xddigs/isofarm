@@ -1,4 +1,4 @@
-package com.isofarm.service;
+package com.isofarm.craft;
 
 import com.isofarm.data.*;
 import com.isofarm.item.*;
@@ -9,15 +9,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class RecipeRegistry implements Service<Recipe> {
+public class RecipeRegistry {
     private static final List<Recipe> recipes = new LinkedList<>();
 
     public static List<Recipe> init() {
+        recipes.clear();
         registerSmeltingRecipes();
+
         create(Tier.LEATHER).result(new Block(BlockData.OAK_WOOD), 4).with(BlockData.OAK_LOG, 1).add();
         create(Tier.LEATHER).result(new Material(Tier.NONE, MaterialID.STICK), 4).with(BlockData.OAK_WOOD, 1).add();
         create(Tier.LEATHER).result(new Material(Tier.NONE, MaterialID.BOOK), 2).with(MaterialID.LEATHER, 3).with(MaterialID.PAPER, 2).add();
         create(Tier.LEATHER).result(new Bucket(BlockData.AIR, Tier.WOOD), 1).with(BlockData.OAK_WOOD, 3).add();
+
         registerToolSet(Tier.LEATHER, BlockData.OAK_WOOD);
 
         Map<Tier, Tier> metalProgression = Map.of(
@@ -31,6 +34,7 @@ public class RecipeRegistry implements Service<Recipe> {
         metalProgression.forEach((toolTier, requiredStationTier) -> {
             Craftable mainMaterial = new MiningComponent(toolTier, MaterialID.INGOT);
             registerToolSet(requiredStationTier, mainMaterial);
+
             create(requiredStationTier)
                     .result(new Backpack(ToolType.BACKPACK, toolTier), 1)
                     .with(mainMaterial, 3)
@@ -46,7 +50,6 @@ public class RecipeRegistry implements Service<Recipe> {
                     .with(mainMaterial, 3)
                     .with(MaterialID.STICK, 2).add();
         });
-
         return recipes;
     }
 
@@ -75,8 +78,8 @@ public class RecipeRegistry implements Service<Recipe> {
         Tier[] metalTiers = {Tier.COPPER, Tier.IRON, Tier.STEEL, Tier.GOLD, Tier.PLATINUM, Tier.DIAMOND};
         for (Tier tier : metalTiers) {
             create(tier)
-                .result(new MiningComponent(tier, MaterialID.INGOT), 1)
-                .with(new MiningComponent(tier, MaterialID.RAW_ORE), 1).add();
+                    .result(new MiningComponent(tier, MaterialID.INGOT), 1)
+                    .with(new MiningComponent(tier, MaterialID.RAW_ORE), 1).add();
         }
     }
 
@@ -106,7 +109,7 @@ public class RecipeRegistry implements Service<Recipe> {
         }
 
         public Recipe add() {
-            Recipe recipe = new Recipe(tier, result, amount, ingredients);
+            Recipe recipe = new Recipe(tier, result, amount, List.copyOf(ingredients));
             recipes.add(recipe);
             return recipe;
         }

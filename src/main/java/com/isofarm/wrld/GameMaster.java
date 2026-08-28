@@ -1,5 +1,7 @@
 package com.isofarm.wrld;
 
+import com.isofarm.craft.Recipe;
+import com.isofarm.craft.RecipeRegistry;
 import com.isofarm.data.*;
 import com.isofarm.entity.*;
 import com.isofarm.graphics.*;
