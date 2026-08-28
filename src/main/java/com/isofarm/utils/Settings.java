@@ -16,7 +16,7 @@ public class Settings {
     private static float maxInteractionDistance = 6.0f;
     private static boolean doEnableMusic = true;
     private static boolean doEnableDebugInfo = true;
-    private static boolean doEnableShadows = true;
+    private static boolean doEnableShadows = false;
 
     private Settings() {}
 

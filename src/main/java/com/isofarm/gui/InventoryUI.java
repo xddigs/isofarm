@@ -771,12 +771,13 @@ public class InventoryUI extends UIElement {
             return;
         }
 
-        SpriteSheet sheet = ResourceManager.getPlayerSpriteSheet();
-        if (sheet == null) return;
+        SpriteSheet playerSheet = ResourceManager.getPlayerSpriteSheet();
+        SpriteSheet bpSheet = ResourceManager.getBackpackSpriteSheet();
+        if (playerSheet == null || bpSheet == null) return;
 
         float scale = Settings.getScaledEntity() * 3.0f;
-        float width = sheet.getFrameWidth() * scale;
-        float height = sheet.getFrameHeight() * scale;
+        float width = playerSheet.getFrameWidth() * scale;
+        float height = playerSheet.getFrameHeight() * scale;
 
         float slotSize = Settings.getScaledSlot();
         float spacing = Settings.getScaledSpacing();
@@ -802,18 +803,19 @@ public class InventoryUI extends UIElement {
         float spriteX = bgX + (backgroundWidth - width) / 2.0f;
         float spriteY = bgY + (backgroundHeight - height) / 2.0f;
 
-        int frontDirectionOffset = 2;
-        int idleFrameCount = 4;
+        int frontDirectionOffset = 3;
+        int idleFrameCount = K.UI.PLAYER_SPRITE_COLS;
         int idleFrame = (int) ((System.currentTimeMillis() / 200) % idleFrameCount);
-
         int baseSpriteIndex = (frontDirectionOffset * K.UI.PLAYER_SPRITE_COLS) + idleFrame;
-        GUI.drawSprite(sheet, baseSpriteIndex, spriteX, spriteY, width, height, new Vector4f(1.0f));
 
         if (player.getInventory() != null && player.getInventory().hasBackpackEquipped()) {
-            int backpackRowOffset = 8;
-            int backpackSpriteIndex = baseSpriteIndex + (backpackRowOffset * K.UI.PLAYER_SPRITE_COLS);
-            GUI.drawSprite(sheet, backpackSpriteIndex, spriteX, spriteY, width, height, new Vector4f(1.0f));
+            int backpackSpriteIndex = idleFrame;
+            GUI.drawSprite(bpSheet, backpackSpriteIndex, spriteX, spriteY,
+                    width, height, new Vector4f(1.0f));
         }
+
+        GUI.drawSprite(playerSheet, baseSpriteIndex, spriteX, spriteY,
+                width, height, new Vector4f(1.0f));
     }
 
     private void renderCarriedItem() {

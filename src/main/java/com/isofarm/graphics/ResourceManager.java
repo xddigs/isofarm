@@ -18,7 +18,10 @@ public class ResourceManager {
     private static SpriteSheet blockIcons;
     private static SpriteSheet materialIcons;
     private static SpriteSheet playerSpriteSheet;
+    private static SpriteSheet backpackSpriteSheet;
     private static Map<CropType, SpriteSheet> cropSpritesheets;
+    private static SpriteSheet heartsSpriteSheet;
+    private static SpriteSheet destroyTexture;
     private final Shader defaultShader;
     private final Shader outlineShader;
     private final Shader rainShader;
@@ -33,14 +36,11 @@ public class ResourceManager {
     private final Mesh playerMesh;
     private final Mesh destroyOverlayMesh;
     private final TextureAtlas blocksAtlas;
-    private final SpriteSheet wheat;
-    private final SpriteSheet carrot;
-    private final SpriteSheet potato;
-    private final SpriteSheet beetroot;
-    private final SpriteSheet inventoryIcons;
-    private final SpriteSheet heartsSpriteSheet;
-    private final SpriteSheet staminaSpriteSheet;
-    private final SpriteSheet destroyTexture;
+    private static SpriteSheet wheat;
+    private static SpriteSheet carrot;
+    private static SpriteSheet potato;
+    private static SpriteSheet beetroot;
+    private static SpriteSheet inventoryIcons;
 
     public ResourceManager() {
         this.defaultShader = new Shader(K.Paths.DEFAULT_VERT_SHADER, K.Paths.DEFAULT_FRAG_SHADER);
@@ -64,10 +64,10 @@ public class ResourceManager {
             block.initRegions(this.blocksAtlas);
         }
 
-        this.wheat = new SpriteSheet(K.Paths.WHEAT_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
-        this.carrot = new SpriteSheet(K.Paths.CARROT_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
-        this.potato = new SpriteSheet(K.Paths.POTATO_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
-        this.beetroot = new SpriteSheet(K.Paths.BEETROOT_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
+        wheat = new SpriteSheet(K.Paths.WHEAT_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
+        carrot = new SpriteSheet(K.Paths.CARROT_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
+        potato = new SpriteSheet(K.Paths.POTATO_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
+        beetroot = new SpriteSheet(K.Paths.BEETROOT_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
 
         blockIcons = new SpriteSheet(K.Paths.BLOCK_ICONS, K.UI.ICON_BLOCK_COLS, K.UI.ICON_BLOCK_ROWS);
         toolIcons = new SpriteSheet(K.Paths.TOOL_ICONS, K.UI.ICON_TOOL_COLS, K.UI.ICON_TOOL_ROWS);
@@ -78,20 +78,16 @@ public class ResourceManager {
         inventoryIcons = new SpriteSheet(K.Paths.INVENTORY_ICONS, K.UI.ICON_INV_COLS, 1);
 
         playerSpriteSheet = new SpriteSheet(K.Paths.PLAYER_SPRITESHEET, K.UI.PLAYER_SPRITE_COLS, K.UI.PLAYER_SPRITE_ROWS);
-        this.heartsSpriteSheet = new SpriteSheet(K.Paths.HEARTS_SPRITESHEET, 1, K.UI.ICON_HEARTS_ROWS);
-        this.staminaSpriteSheet = new SpriteSheet(K.Paths.STAMINA_SPRITESHEET, K.UI.ICON_STAMINA_COLS, 1);
+        backpackSpriteSheet = new SpriteSheet(K.Paths.BACKPACK_SPRITESHEET, 4, 1);
+        heartsSpriteSheet = new SpriteSheet(K.Paths.HEARTS_SPRITESHEET, 1, K.UI.ICON_HEARTS_ROWS);
 
-        this.destroyTexture = new SpriteSheet(K.Paths.DESTROY_STAGES, K.UI.DESTROY_FRAMES, 1);
+        destroyTexture = new SpriteSheet(K.Paths.DESTROY_STAGES, K.UI.DESTROY_FRAMES, 1);
 
         cropSpritesheets = new EnumMap<>(CropType.class);
         cropSpritesheets.put(CropType.WHEAT, wheat);
         cropSpritesheets.put(CropType.CARROT, carrot);
         cropSpritesheets.put(CropType.POTATO, potato);
         cropSpritesheets.put(CropType.BEETROOT, beetroot);
-    }
-
-    public static SpriteSheet getPlayerSpriteSheet() {
-        return playerSpriteSheet;
     }
 
     public static SpriteSheet getItemSpriteSheet(Item item) {
@@ -193,8 +189,8 @@ public class ResourceManager {
         inventoryIcons.dispose();
 
         playerSpriteSheet.dispose();
+        backpackSpriteSheet.dispose();
         heartsSpriteSheet.dispose();
-        staminaSpriteSheet.dispose();
 
         defaultShader.dispose();
         outlineShader.dispose();
@@ -288,12 +284,17 @@ public class ResourceManager {
         return inventoryIcons;
     }
 
-    public SpriteSheet getHeartsSpriteSheet() {
-        return heartsSpriteSheet;
+    public static SpriteSheet getPlayerSpriteSheet() {
+        return playerSpriteSheet;
     }
 
-    public SpriteSheet getStaminaSpriteSheet() {
-        return staminaSpriteSheet;
+
+    public static SpriteSheet getBackpackSpriteSheet() {
+        return backpackSpriteSheet;
+    }
+
+    public SpriteSheet getHeartsSpriteSheet() {
+        return heartsSpriteSheet;
     }
 
     public Map<CropType, SpriteSheet> getCropSpritesheets() {

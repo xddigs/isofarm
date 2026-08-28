@@ -2,6 +2,7 @@ package com.isofarm.entity;
 
 import com.isofarm.data.*;
 import com.isofarm.entity.states.GroundedState;
+import com.isofarm.entity.states.InteractingState;
 import com.isofarm.graphics.*;
 import com.isofarm.input.Keyboard;
 import com.isofarm.item.Backpack;
@@ -177,8 +178,12 @@ public class Player extends Character {
 
         int rowIndex;
         int totalFramesInRow;
+        boolean isAttacking = (currentState instanceof InteractingState);
 
-        if (isMoving) {
+        if (isAttacking) {
+            rowIndex = 8 + directionOffset;
+            totalFramesInRow = K.UI.PLAYER_SPRITE_ROWS_ACTION;
+        } else if (isMoving) {
             rowIndex = 4 + directionOffset;
             totalFramesInRow = K.UI.PLAYER_SPRITE_COLS_RUN;
         } else {
@@ -245,19 +250,16 @@ public class Player extends Character {
         glEnable(GL_DEPTH_TEST);
         glDepthMask(true);
 
+        boolean backpackInFront = (directionOffset == 0 || directionOffset == 1);
+        if (getInventory().hasBackpackEquipped() && !backpackInFront) {
+            renderBackpack(shader, rm, camera, directionOffset, isMoving, isAttacking, currentFrame);
+        }
+
+        shader.setUniform("uUVBounds", uvBounds);
         rm.getPlayerMesh().render();
 
-        if (getInventory().hasBackpackEquipped()) {
-            int backpackRowOffset = 8;
-            int backpackSpriteIndex = spriteIndex + (backpackRowOffset * K.UI.PLAYER_SPRITE_COLS);
-
-            Vector4f backpackUVBounds = sheet.getUVBounds(backpackSpriteIndex);
-            shader.setUniform("uUVBounds", backpackUVBounds);
-
-            glEnable(GL_POLYGON_OFFSET_FILL);
-            glPolygonOffset(-1.0f, -1.0f);
-            rm.getPlayerMesh().render();
-            glDisable(GL_POLYGON_OFFSET_FILL);
+        if (getInventory().hasBackpackEquipped() && backpackInFront) {
+            renderBackpack(shader, rm, camera, directionOffset, isMoving, isAttacking, currentFrame);
         }
 
         sheet.unbind();
@@ -272,7 +274,8 @@ public class Player extends Character {
 
     @Override
     protected void dropLoot() {
-        for (Item i : List.copyOf(getInventory().getItems().keySet())) {
+        for (Item i : List.copyOf(getInventory()
+                .getItems().keySet())) {
             if (i == null) continue;
             switch (i) {
                 case Backpack ignored -> {
@@ -287,10 +290,66 @@ public class Player extends Character {
 
             int amount = getInventory().getAmount(i);
             if (amount <= 0) continue;
-            WorldItem item = new WorldItem(i, amount, new Vector3f(position.x, position.y, position.z));
+            WorldItem item = new WorldItem(i, amount, new Vector3f(position.x,
+                    position.y, position.z));
             remove(i, amount);
             gameMaster.addEntity(item);
         }
+    }
+
+    private void renderBackpack(Shader shader, ResourceManager rm, CameraView camera,
+                                int directionOffset, boolean isMoving,
+                                boolean isAttacking, int currentFrame) {
+
+        SpriteSheet bpSheet = ResourceManager.getBackpackSpriteSheet();
+        if (bpSheet == null) return;
+
+        int backpackModelIndex = 0;
+        boolean flipHorizontal = false;
+
+        if (!isMoving) {
+            if (directionOffset == 0) {
+                backpackModelIndex = 0;
+                flipHorizontal = false;
+            } else if (directionOffset == 1) {
+                backpackModelIndex = 0;
+                flipHorizontal = true;
+            } else if (directionOffset == 2) {
+                backpackModelIndex = 1;
+                flipHorizontal = true;
+            } else if (directionOffset == 3) {
+                backpackModelIndex = 1;
+                flipHorizontal = false;
+            }
+        } else {
+            if (directionOffset == 0) {
+                backpackModelIndex = 3;
+                flipHorizontal = false;
+            } else if (directionOffset == 1) {
+                backpackModelIndex = 3;
+                flipHorizontal = true;
+            } else if (directionOffset == 2) {
+                backpackModelIndex = 2;
+                flipHorizontal = true;
+            } else if (directionOffset == 3) {
+                backpackModelIndex = 2;
+                flipHorizontal = false;
+            }
+        }
+
+        Vector4f uv = bpSheet.getUVBounds(backpackModelIndex);
+        if (flipHorizontal) {
+            float temp = uv.x;
+            uv.x = uv.z;
+            uv.z = temp;
+        }
+
+        shader.setUniform("uUVBounds", uv);
+
+        glEnable(GL_POLYGON_OFFSET_FILL);
+        glPolygonOffset(-1.0f, -1.0f);
+        rm.getPlayerMesh().render();
+        glDisable(GL_POLYGON_OFFSET_FILL);
     }
 
     public void changeState(PlayerState newState) {

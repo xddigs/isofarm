@@ -68,8 +68,9 @@ public final class K {
         public static final int ICON_HEARTS_ROWS = 4;
 
         public static final int PLAYER_SPRITE_COLS = 12;
-        public static final int PLAYER_SPRITE_ROWS = 16;
+        public static final int PLAYER_SPRITE_ROWS = 12;
         public static final int PLAYER_SPRITE_COLS_RUN = 8;
+        public static final int PLAYER_SPRITE_ROWS_ACTION = 6;
 
         public static final int ICON_MATERIAL_COLS = 12;
         public static final int ICON_MATERIAL_ROWS = 2;
@@ -150,9 +151,9 @@ public final class K {
         public static final String MATERIAL_ICONS = "assets/gui/material_icons.png";
         public static final String INVENTORY_ICONS = "assets/gui/inventory_icons.png";
         public static final String PLAYER_SPRITESHEET = "assets/sprites/steve.png";
+        public static final String BACKPACK_SPRITESHEET = "assets/sprites/backpack.png";
         public static final String DESTROY_STAGES = "assets/textures/blocks/destroy.png";
         public static final String HEARTS_SPRITESHEET = "assets/gui/hearts.png";
-        public static final String STAMINA_SPRITESHEET = "assets/gui/stamina.png";
     }
 
     public static final class Render {

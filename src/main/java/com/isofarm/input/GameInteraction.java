@@ -4,6 +4,7 @@ import com.isofarm.data.*;
 import com.isofarm.entity.Entity;
 import com.isofarm.entity.Player;
 import com.isofarm.entity.WorldItem;
+import com.isofarm.entity.states.InteractingState;
 import com.isofarm.graphics.ParticleEngine;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.graphics.TextureAtlas;
@@ -328,6 +329,11 @@ public class GameInteraction {
 
         Item selectedItem = gameMaster.getGameUIService().getHotbarUI().getSelectedItem();
 
+        if (gameMaster.getPlayer() != null &&
+                !(gameMaster.getPlayer().getCurrentState() instanceof InteractingState)) {
+            gameMaster.getPlayer().changeState(new InteractingState());
+        }
+
         byte blockId = world.getBlockTypeAt(x, y, z);
         BlockData blockData = getBlockData(blockId);
 
@@ -504,6 +510,11 @@ public class GameInteraction {
                              Item selectedItem) {
         World world = gameMaster.getWorld();
         if (gameMaster.getPlayer().checkCollision(world)) return;
+
+        if (gameMaster.getPlayer() != null &&
+                !(gameMaster.getPlayer().getCurrentState() instanceof InteractingState)) {
+            gameMaster.getPlayer().changeState(new InteractingState());
+        }
 
         if (selectedItem instanceof Block block) {
             int x = cell.x();

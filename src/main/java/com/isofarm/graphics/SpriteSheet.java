@@ -3,7 +3,6 @@ package com.isofarm.graphics;
 import org.joml.Vector4f;
 
 public class SpriteSheet {
-
     private final Texture texture;
     private final int totalFrames;
     private final int cols;
