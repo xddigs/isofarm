@@ -907,6 +907,15 @@ public class InventoryUI extends UIElement {
         float bgX = getAbsoluteX() - K.UI.INVENTORY_CHARACTER_OFFSET;
         float bgY = bottomY - backgroundHeight;
 
+        String name = player.getName();
+        if (name != null && !name.isEmpty()) {
+            float nameWidth = GUI.getStringWidth(name, GUI.getNormalFont());
+            float nameX = bgX + (backgroundWidth - nameWidth) / 2.0f;
+            float fontHeight = GUI.getNormalFont().getSize();
+            float nameY = bgY - fontHeight;
+            GUI.drawString(name, nameX, nameY, GUI.getNormalFont(), new Vector4f(1.0f));
+        }
+
         GUI.drawRect(bgX, bgY, backgroundWidth, backgroundHeight, K.UI.UI_BACKGROUND_COLOR_SLOT);
         float spriteX = bgX + (backgroundWidth - width) / 2.0f;
         float spriteY = bgY + (backgroundHeight - height) / 2.0f;

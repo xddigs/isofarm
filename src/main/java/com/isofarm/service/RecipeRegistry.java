@@ -51,7 +51,7 @@ public class RecipeRegistry implements Service<Recipe> {
     }
 
     private static void registerToolSet(Tier stationTier, Craftable primaryMat) {
-        registerTool(stationTier, primaryMat, 2, 3, Hoe::new);
+        registerTool(stationTier, primaryMat, 2, 2, Hoe::new);
         registerTool(stationTier, primaryMat, 3, 2, Pickaxe::new);
         registerTool(stationTier, primaryMat, 1, 2, Shovel::new);
         registerTool(stationTier, primaryMat, 3, 3, Axe::new);
