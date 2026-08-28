@@ -55,8 +55,8 @@ public class GameMaster {
     private Framebuffer maskFbo;
     private Framebuffer sceneFbo;
     private Framebuffer blurFbo;
-    private OrthographicCamera orthoCamera;
-    private OrthographicCameraController orthoCameraController;
+    private MainCamera orthoCamera;
+    private CameraController orthoCameraController;
     private StepController stepController;
     private float windowWidth;
     private float windowHeight;
@@ -123,9 +123,9 @@ public class GameMaster {
         this.shop = new Shop();
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
-        this.orthoCamera = new OrthographicCamera(windowWidth, windowHeight, Settings.getRenderDistance());
+        this.orthoCamera = new MainCamera(windowWidth, windowHeight, Settings.getRenderDistance());
 
-        this.orthoCameraController = new OrthographicCameraController(orthoCamera);
+        this.orthoCameraController = new CameraController(orthoCamera);
         this.stepController = new StepController();
         this.weatherService = new WeatherService(rainEngine);
         notifyProgress(progressCallback, ++currentStep / totalSteps);
@@ -280,11 +280,11 @@ public class GameMaster {
         return windowHeight;
     }
 
-    public OrthographicCamera getOrthoCamera() {
+    public MainCamera getOrthoCamera() {
         return orthoCamera;
     }
 
-    public OrthographicCameraController getOrthoCameraController() {
+    public CameraController getOrthoCameraController() {
         return orthoCameraController;
     }
 
@@ -366,10 +366,6 @@ public class GameMaster {
 
     public Difficulty getDifficulty() {
         return difficulty;
-    }
-
-    public boolean isOrthographicCamera() {
-        return Settings.isOrthographic();
     }
 
     public CameraView getActiveCamera() {

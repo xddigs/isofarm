@@ -12,7 +12,6 @@ public class Settings {
     private static int guiScaleIndex = 2;
     private static boolean doKeepInventory = false;
     private static boolean doEnableMotions = true;
-    private static boolean isOrthographic = true;
     private static float maxInteractionDistance = 6.0f;
     private static boolean doEnableMusic = true;
     private static boolean doEnableDebugInfo = true;
@@ -93,14 +92,6 @@ public class Settings {
         return getScaledIcon();
     }
 
-    public static boolean isOrthographic() {
-        return isOrthographic;
-    }
-
-    public static void setOrthographic(boolean isOrthographic) {
-        Settings.isOrthographic = isOrthographic;
-    }
-
     public static float getMaxInteractionDistance() {
         return maxInteractionDistance;
     }
@@ -155,10 +146,6 @@ public class Settings {
 
     public static void toggleShadows() {
         doEnableShadows = !doEnableShadows;
-    }
-
-    public static void toggleOrthographic() {
-        isOrthographic = !isOrthographic;
     }
 
     public static void toggleMusic() {

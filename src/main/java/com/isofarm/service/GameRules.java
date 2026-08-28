@@ -16,7 +16,6 @@ public final class GameRules {
     static {
         RULES.put("doKeepInventory", Settings.doKeepInventory());
         RULES.put("doEnableMotions", Settings.doEnableMotions());
-        RULES.put("isOrthographic", Settings.isOrthographic());
         RULES.put("renderDistance", Settings.getRenderDistance());
         RULES.put("fov", Settings.getFov());
         RULES.put("unloadMargin", Settings.getUnloadMargin());
@@ -105,10 +104,6 @@ public final class GameRules {
 
                 case "doEnableMotions" -> {
                     Settings.setDoEnableMotions((Boolean) value);
-                }
-
-                case "isOrthographic" -> {
-                    Settings.setOrthographic((Boolean) value);
                 }
 
                 case "renderDistance" -> {

@@ -11,7 +11,7 @@ import org.joml.Vector3f;
 
 import static org.joml.Math.lerp;
 
-public class OrthographicCamera implements CameraView {
+public class MainCamera implements CameraView {
     private static final float MIN_ZOOM = 1.0f;
     private static final float MAX_ZOOM = 80.0f;
 
@@ -28,7 +28,7 @@ public class OrthographicCamera implements CameraView {
     private float zoom = 25.0f;
     private float aspectRatio = 1.0f;
 
-    public OrthographicCamera(float width, float height, int renderDistanceChunks) {
+    public MainCamera(float width, float height, int renderDistanceChunks) {
         this.position = new Vector3f();
         this.projectionMatrix = new Matrix4f();
         updateProjection(width, height, renderDistanceChunks);

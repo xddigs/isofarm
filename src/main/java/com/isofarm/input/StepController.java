@@ -17,7 +17,6 @@ public class StepController {
 
     public void update(GameMaster gameMaster, Player player, SoundService soundService, float delta) {
         if (player == null) return;
-        if (gameMaster.isOrthographicCamera()) return;
         Vector3f currentPos = player.getPosition();
         float dx = currentPos.x - lastPosition.x;
         float dz = currentPos.z - lastPosition.z;

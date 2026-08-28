@@ -281,11 +281,7 @@ public class GameUIService implements Service<GameMaster> {
         } else {}
 
         renderChatHistory();
-        if (!gameMaster.isInventoryOpen() && !gameMaster.isOrthographicCamera()) {
-            renderCrosshair(windowWidth, windowHeight);
-        }
-
-        if (gameMaster.isOrthographicCamera() && !gameMaster.isInventoryOpen()) {
+        if (!gameMaster.isInventoryOpen()) {
             GUI.drawCursor(gameMaster);
         }
 
@@ -383,15 +379,6 @@ public class GameUIService implements Service<GameMaster> {
         for (Toast toast : ToastFactory.getToasts()) {
             renderToast(toast);
         }
-    }
-
-    public void renderCrosshair(float windowWidth, float windowHeight) {
-        float centerX = Math.round(windowWidth * 0.5f);
-        float centerY = Math.round(windowHeight * 0.5f);
-        Vector4f color = new Vector4f(1.0f);
-        float thickness = 3.0f;
-
-        GUI.drawRect(centerX, centerY, thickness, thickness, color);
     }
 
     public void selectItem(int direction) {

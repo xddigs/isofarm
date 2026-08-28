@@ -3,7 +3,7 @@ package com.isofarm.input;
 import com.isofarm.data.Hit;
 import com.isofarm.entity.Player;
 import com.isofarm.entity.states.SwimmingState;
-import com.isofarm.graphics.OrthographicCamera;
+import com.isofarm.graphics.MainCamera;
 import com.isofarm.pathfinding.GridPos;
 import com.isofarm.pathfinding.PathFinder;
 import com.isofarm.service.Service;
@@ -13,8 +13,8 @@ import org.joml.Vector3f;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-public record OrthographicCameraController(OrthographicCamera camera)
-        implements Service<OrthographicCamera> {
+public record CameraController(MainCamera camera)
+        implements Service<MainCamera> {
     private static final float NORMAL_ZOOM = 18.0f;
     private static final float ZOOMED_ZOOM = NORMAL_ZOOM / 2.5f;
     private static final float VERTICAL_OFFSET = 0.0f;

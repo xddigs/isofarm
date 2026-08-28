@@ -208,7 +208,7 @@ public class GameRenderer {
 
         gameMaster.getEntities().removeIf(e -> !e.isAlive());
         gameMaster.getEntities().forEach(entity -> {
-            if (entity instanceof Player && !gameMaster.isOrthographicCamera()) return;
+            if (entity instanceof Player) return;
             entity.render(gameMaster);
         });
 
@@ -220,7 +220,7 @@ public class GameRenderer {
         glDepthMask(true);
 
         if (WeatherService.isRaining()) {
-            Vector3f rainTargetPos = (gameMaster.isOrthographicCamera() && player != null)
+            Vector3f rainTargetPos = (player != null)
                     ? new Vector3f(player.getPosition().x(), player.getPosition().y() + 10.0f, player.getPosition().z())
                     : camera.getPosition();
 

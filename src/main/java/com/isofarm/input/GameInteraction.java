@@ -100,11 +100,7 @@ public class GameInteraction {
         }
 
         if (!gameMaster.getPlayer().getGamemode().isNoClip()) {
-            if (!gameMaster.isOrthographicCamera()) {
-                pickUp(gameMaster);
-            } else {
-                addItem(gameMaster);
-            }
+            pickUp(gameMaster);
         }
 
         if (Keyboard.isKeyPressed(GLFW_KEY_M) && !gameMaster.isChatOpen()) {
