@@ -56,8 +56,6 @@ public class GameMaster {
     private Framebuffer sceneFbo;
     private Framebuffer blurFbo;
     private OrthographicCamera orthoCamera;
-    private Camera camera;
-    private CameraController cameraController;
     private OrthographicCameraController orthoCameraController;
     private StepController stepController;
     private float windowWidth;
@@ -125,14 +123,11 @@ public class GameMaster {
         this.shop = new Shop();
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
-        this.camera = new Camera(windowWidth, windowHeight, Settings.getRenderDistance());
         this.orthoCamera = new OrthographicCamera(windowWidth, windowHeight, Settings.getRenderDistance());
 
-        this.camera.setPosition(0.0f, 0.0f, 0.0f);
-        this.cameraController = new CameraController(camera);
         this.orthoCameraController = new OrthographicCameraController(orthoCamera);
         this.stepController = new StepController();
-        this.weatherService = new WeatherService(rainEngine, camera);
+        this.weatherService = new WeatherService(rainEngine);
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
         this.recenter();
@@ -182,7 +177,6 @@ public class GameMaster {
         GridPos spawn = world.getHighestY(0.5f, 0.5f);
         float spawnY = spawn.y() + 1.8f;
         player.setPosition(0.5f, spawnY, 0.5f);
-        camera.setPosition(0.5f, spawnY, 0.5f);
         orthoCamera.setPosition(0.5f, spawnY + 10.0f, 0.5f);
     }
 
@@ -286,14 +280,6 @@ public class GameMaster {
         return windowHeight;
     }
 
-    public Camera getCamera() {
-        return camera;
-    }
-
-    public CameraController getCameraController() {
-        return cameraController;
-    }
-
     public OrthographicCamera getOrthoCamera() {
         return orthoCamera;
     }
@@ -374,23 +360,6 @@ public class GameMaster {
         this.recipes = recipes;
     }
 
-    public void changeCamera() {
-        Settings.toggleOrthographic();
-        if (Settings.isOrthographic()) {
-            orthoCamera.setPosition(camera.getPosition().x,
-                    orthoCamera.getPosition().y, camera.getPosition().z);
-            cameraController.release(this);
-        } else {
-            camera.setPosition(orthoCamera.getPosition().x,
-                    camera.getPosition().y, orthoCamera.getPosition().z);
-            orthoCameraController.release(this);
-        }
-
-        gameRenderer.initCamera(getActiveCamera());
-        ToastFactory.info("Camera changed to " + (Settings.isOrthographic() ?
-                "orthographic" : "first person"));
-    }
-
     public void setDifficulty(Difficulty difficulty) {
         this.difficulty = difficulty;
     }
@@ -404,7 +373,7 @@ public class GameMaster {
     }
 
     public CameraView getActiveCamera() {
-        return Settings.isOrthographic() ? orthoCamera : camera;
+        return orthoCamera;
     }
 
     public void addEntity(Entity entity) {
@@ -472,17 +441,7 @@ public class GameMaster {
         shop.update(timeService);
         cropService.update(delta, weatherService.getWeather());
         updateEntities(delta);
-        itemRenderer.update(this, delta);
-
-        if (Settings.isOrthographic()) {
-            orthoCameraController.update(this, delta);
-        } else {
-            if (!isChatOpen()) {
-                cameraController.update(this, delta);
-            }
-            camera.update(delta);
-        }
-
+        orthoCameraController.update(this, delta);
         particles.update(delta);
         stepController.update(this, player, soundService, delta);
 
@@ -500,17 +459,6 @@ public class GameMaster {
 
     public void render() {
         gameRenderer.render(this, resourceManager, chunkManager.getChunkMeshes());
-        Item selectedItem = gameUIservice.getHotbarUI().getSelectedItem();
-
-        if (selectedItem != null && !isInventoryOpen() && isHUDShown()) {
-            SpriteSheet spriteSheet = resourceManager.getItemSpriteSheet(selectedItem);
-            Shader itemShader = resourceManager.getShader("item");
-
-            glClear(GL_DEPTH_BUFFER_BIT);
-            itemRenderer.render(this, selectedItem, spriteSheet,
-                    itemShader, celestialLighting);
-        }
-
         gameUIservice.render(isHUDShown(), this);
     }
 
@@ -527,7 +475,6 @@ public class GameMaster {
         rainEngine.dispose();
         shadowMap.dispose();
 
-        cameraController.release(this);
         orthoCameraController.release(this);
         soundService.cleanup();
         log.info("GameMaster resources successfully cleaned up");
@@ -536,7 +483,6 @@ public class GameMaster {
     public void recenter() {
         float center = (K.World.MAP_WORLD_SIZE - 1) / 2.0f;
         float worldCenter = center * K.World.TILE_SIZE;
-        this.camera.setPosition(worldCenter, 0.0f, worldCenter);
     }
 
     public WorldItem getWorldItem(Item item) {
@@ -555,11 +501,6 @@ public class GameMaster {
     public void onResize(int newWidth, int newHeight) {
         this.windowWidth = newWidth;
         this.windowHeight = newHeight;
-
-        if (camera != null) {
-            camera.updateProjection(newWidth, newHeight,
-                    Settings.getRenderDistance());
-        }
 
         if (orthoCamera != null) {
             orthoCamera.updateProjection(newWidth, newHeight,

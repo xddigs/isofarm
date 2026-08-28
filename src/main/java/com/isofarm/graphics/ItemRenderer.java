@@ -1,10 +1,8 @@
 package com.isofarm.graphics;
 
 import com.isofarm.entity.WorldItem;
-import com.isofarm.input.CameraController;
 import com.isofarm.item.Bucket;
 import com.isofarm.item.Item;
-import com.isofarm.item.Tool;
 import com.isofarm.utils.K;
 import com.isofarm.wrld.GameMaster;
 import org.joml.Matrix4f;
@@ -17,129 +15,24 @@ import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 
 public class ItemRenderer {
-    private static final float OFFSET_X = 1.1f;
-    private static final float OFFSET_Y = -0.60f;
-    private static final float OFFSET_Z = -1.0f;
-    private static final float SWAY_LAG = 50.0f;
-
-    private static final float ITEM_SCALE = 1.2f;
     private static final int THICKNESS_LAYERS = 24;
     private static final float LAYER_DEPTH = 0.0025f;
 
-    private static final float ANIMATION_DURATION = 0.38f;
-
     private final Matrix4f baseModelMatrix;
     private final Mesh quadMesh;
-
-    private enum ActionAnimation {
-        NONE,
-        ATTACK,
-        BREAK,
-        INTERACT
-    }
-
-    private ActionAnimation currentAnimation = ActionAnimation.NONE;
-    private float animationTime = 0.0f;
-
-    private float swayX;
-    private float swayY;
-
-    private float previousYaw;
-    private float previousPitch;
 
     public ItemRenderer() {
         this.baseModelMatrix = new Matrix4f();
         this.quadMesh = Mesh.createCenteredQuad();
     }
 
-    public void playAttackAnimation() {
-        if (currentAnimation == ActionAnimation.ATTACK ||
-                currentAnimation == ActionAnimation.BREAK) return;
-        startAnimation(ActionAnimation.ATTACK);
-    }
-
-    public void playBreakAnimation() {
-        if (currentAnimation == ActionAnimation.BREAK ||
-                currentAnimation == ActionAnimation.ATTACK) return;
-        startAnimation(ActionAnimation.BREAK);
-    }
-
-    public void playInteractAnimation() {
-        if (currentAnimation == ActionAnimation.INTERACT) return;
-        startAnimation(ActionAnimation.INTERACT);
-    }
-
-    public void playPlaceAnimation() {
-        playInteractAnimation();
-    }
-
-    public void stopAnimation() {
-        currentAnimation = ActionAnimation.NONE;
-        animationTime = 0.0f;
-    }
-
-    private void startAnimation(ActionAnimation animation) {
-        currentAnimation = animation;
-        animationTime = 0.0f;
-    }
-
-    public void update(GameMaster gameMaster, float delta) {
-        CameraController cameraController = gameMaster.getCameraController();
-        updateCameraSway(cameraController);
-
-        if (currentAnimation == ActionAnimation.NONE) {
-            return;
-        }
-
-        animationTime += delta;
-        if (animationTime >= ANIMATION_DURATION) {
-            if (currentAnimation == ActionAnimation.BREAK) {
-                animationTime -= ANIMATION_DURATION;
-            } else {
-                animationTime = ANIMATION_DURATION;
-                currentAnimation = ActionAnimation.NONE;
-            }
-        }
-    }
-
-    public boolean isAnimationPlaying() {
-        return currentAnimation != ActionAnimation.NONE && animationTime < ANIMATION_DURATION;
-    }
-
-    public boolean isAttackAnimationPlaying() {
-        return currentAnimation == ActionAnimation.ATTACK && animationTime < ANIMATION_DURATION;
-    }
-
-    public boolean isBreakAnimationPlaying() {
-        return currentAnimation == ActionAnimation.BREAK && animationTime < ANIMATION_DURATION;
-    }
-
-    public boolean isInteractAnimationPlaying() {
-        return currentAnimation == ActionAnimation.INTERACT && animationTime < ANIMATION_DURATION;
-    }
-
-    private float animationProgress() {
-        if (ANIMATION_DURATION <= 0.0f) return 1.0f;
-        return clamp01(animationTime / ANIMATION_DURATION);
-    }
-
-    private float clamp01(float value) {
+    private float clamp(float value) {
         return Math.clamp(value, 0.0f, 1.0f);
     }
 
     private float easeOutCubic(float t) {
-        t = clamp01(t);
+        t = clamp(t);
         return 1.0f - (float) Math.pow(1.0f - t, 3.0f);
-    }
-
-    private AnimationTransform getAnimationTransform() {
-        float t = animationProgress();
-        return switch (currentAnimation) {
-            case ATTACK -> getAttackTransform(t);
-            case BREAK -> getBreakTransform(t);
-            case INTERACT -> getInteractTransform(t);
-            case NONE -> new AnimationTransform();
-        };
     }
 
     private AnimationTransform getAttackTransform(float t) {
@@ -206,25 +99,6 @@ public class ItemRenderer {
         return transform;
     }
 
-    private void updateCameraSway(CameraController camera) {
-        float yaw = camera.getCamera().getYaw();
-        float pitch = camera.getCamera().getPitch();
-        float yawDelta = yaw - previousYaw;
-        float pitchDelta = pitch - previousPitch;
-
-        if (yawDelta > 180.0f) yawDelta -= 360.0f;
-        if (yawDelta < -180.0f) yawDelta += 360.0f;
-
-        swayX = Math.clamp(swayX - yawDelta * 0.0025f, -0.08f, 0.08f);
-        swayY = Math.clamp(swayY + pitchDelta * 0.0025f, -0.08f, 0.08f);
-
-        swayX *= 0.85f;
-        swayY *= 0.85f;
-
-        previousYaw = yaw;
-        previousPitch = pitch;
-    }
-
     public void renderWorldItem(GameMaster gameMaster, WorldItem worldItem,
                                 CelestialLighting lighting) {
         if (worldItem == null) return;
@@ -288,68 +162,6 @@ public class ItemRenderer {
             shader.setUniform("uModel", layerMatrix);
             quadMesh.render();
         }
-        glEnable(GL_CULL_FACE);
-        spriteSheet.unbind();
-        shader.unbind();
-    }
-
-    public void render(GameMaster gameMaster, Item item, SpriteSheet spriteSheet,
-                       Shader shader, CelestialLighting lighting) {
-        if (item == null || spriteSheet == null || quadMesh == null || !gameMaster.isHUDShown() ||
-                gameMaster.isOrthographicCamera() || gameMaster.getPlayer().getGamemode().isNoClip()) {
-            return;
-        }
-
-        boolean isTool = item instanceof Tool;
-        float rotateX = isTool ? 10.0f : 0.0f;
-        float rotateY = isTool ? -90.0f : -15.0f;
-        float rotateZ = isTool ? 48.0f : 0.0f;
-
-        AnimationTransform animation = getAnimationTransform();
-        float x = OFFSET_X + animation.x + swayX;
-        float y = OFFSET_Y + animation.y + swayY;
-        float z = OFFSET_Z + animation.z;
-
-        baseModelMatrix.identity().translate(x, y, z)
-                .rotateX((float) Math.toRadians(rotateX + animation.rotateX + swayY * SWAY_LAG))
-                .rotateY((float) Math.toRadians(rotateY + animation.rotateY + swayX * SWAY_LAG))
-                .rotateZ((float) Math.toRadians(rotateZ + animation.rotateZ))
-                .scale(ITEM_SCALE * animation.scaleX, -ITEM_SCALE * animation.scaleY, ITEM_SCALE * animation.scaleZ);
-
-        int frameIndex = ResourceManager.getItemFrame(item);
-
-        if (item instanceof Bucket bucket) {
-            frameIndex = bucket.getFrame();
-        }
-
-        Vector4f uvBounds = spriteSheet.getUVBounds(frameIndex);
-        int textureUnit = K.Render.PRIMARY_TEXTURE_UNIT;
-        shader.bind();
-        glActiveTexture(GL_TEXTURE0 + textureUnit);
-        spriteSheet.bind();
-        shader.setUniform("uTexture", textureUnit);
-        shader.setUniform("uUseTexture", true);
-        shader.setUniform("uUseFaceAtlas", false);
-        shader.setUniform("uUVBounds", uvBounds);
-        shader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
-        shader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
-        shader.setUniform("uTopAtlasOffset", new Vector2f(0.0f, 0.0f));
-        shader.setUniform("uBottomAtlasOffset", new Vector2f(0.0f, 0.0f));
-        shader.setUniform("uSideAtlasOffset", new Vector2f(0.0f, 0.0f));
-        shader.setUniform("uProjection", gameMaster.getActiveCamera().getProjectionMatrix());
-        shader.setUniform("uView", new Matrix4f().identity());
-        shader.setUniform("uParticleAlpha", 1.0f);
-        shader.setUniform("uIsMaskPass", false);
-        shader.setUniform("uEnableShadows", false);
-        shader.setUniform("uBaseColor", new Vector3f(1.0f));
-        setupCommonShaderUniforms(shader, gameMaster, lighting);
-        glDisable(GL_CULL_FACE);
-        for (int i = THICKNESS_LAYERS - 1; i >= 0; i--) {
-            Matrix4f layerMatrix = new Matrix4f(baseModelMatrix).translate(0.0f, 0.0f, -i * LAYER_DEPTH);
-            shader.setUniform("uModel", layerMatrix);
-            quadMesh.render();
-        }
-
         glEnable(GL_CULL_FACE);
         spriteSheet.unbind();
         shader.unbind();

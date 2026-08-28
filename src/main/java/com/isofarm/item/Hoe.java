@@ -33,7 +33,6 @@ public class Hoe extends Tool {
                 target.getZ(), BlockData.TILLED_DIRT.getId());
 
         gameMaster.rebuildChunkMeshAt(target.getX(), target.getZ());
-        gameMaster.getItemRenderer().playPlaceAnimation();
         gameMaster.getSoundService().playPlaceSound(block.getType().getSoundGroup(),
                 interaction.getDistanceToBlock(gameMaster, HoveredCell.get(gameMaster)),
                 Settings.getMaxInteractionDistance());

@@ -256,7 +256,6 @@ public class GameUIService implements Service<GameMaster> {
 
             if (scroll != 0) {
                 selectItem(scroll > 0 ? -1 : 1);
-                gameMaster.getItemRenderer().playPlaceAnimation();
             }
         }
     }

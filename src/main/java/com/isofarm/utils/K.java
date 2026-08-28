@@ -10,12 +10,6 @@ public final class K {
     }
 
     public static final class Camera {
-        public static final float DEFAULT_PITCH = 35.264f;
-        public static final float DEFAULT_YAW = -45.0f;
-        public static final float SPRINT_MULTIPLIER = 1.5f;
-
-        public static final float BOB_FREQUENCY = 10.0f;
-        public static final float BOB_AMOUNT = 0.08f;
         public static final float FULL_DEGREES = 360.0f;
         public static final float HALF_DEGREES = 180.0f;
     }

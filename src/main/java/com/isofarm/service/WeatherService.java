@@ -1,22 +1,18 @@
 package com.isofarm.service;
 
 import com.isofarm.data.WeatherType;
-import com.isofarm.graphics.Camera;
 import com.isofarm.graphics.RainEngine;
 import com.isofarm.utils.K;
-import com.isofarm.wrld.World;
 
 import java.util.Random;
 
 public class WeatherService implements Service<WeatherType> {
     private final static Random random = new Random();
     private final RainEngine rainEngine;
-    private final Camera camera;
     private static WeatherType weather;
 
-    public WeatherService(RainEngine rainEngine, Camera camera) {
+    public WeatherService(RainEngine rainEngine) {
         this.rainEngine = rainEngine;
-        this.camera = camera;
         weather = WeatherType.CLEAR;
     }
 

@@ -4,7 +4,6 @@ import com.isofarm.data.*;
 import com.isofarm.entity.Entity;
 import com.isofarm.entity.Player;
 import com.isofarm.entity.WorldItem;
-import com.isofarm.graphics.ItemRenderer;
 import com.isofarm.graphics.ParticleEngine;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.graphics.TextureAtlas;
@@ -40,7 +39,6 @@ public class GameInteraction {
     private final TimeService timeService;
     private final ParticleEngine particles;
     private final TextureAtlas blocksTexture;
-    private final ItemRenderer itemRenderer;
 
     private int breakingX = Integer.MIN_VALUE;
     private int breakingY = Integer.MIN_VALUE;
@@ -56,7 +54,6 @@ public class GameInteraction {
         this.timeService = gameMaster.getTimeService();
         this.particles = gameMaster.getParticles();
         this.blocksTexture = blockTexture;
-        this.itemRenderer = gameMaster.getItemRenderer();
     }
 
     public Hit update(GameMaster gameMaster, Item selectedItem) {
@@ -114,10 +111,6 @@ public class GameInteraction {
             Settings.toggleMusic();
         }
 
-        if (isLeftPressed && canInteract) {
-            itemRenderer.playAttackAnimation();
-        }
-
         if (selectedItem instanceof Backpack backpack &&
                 isRightPressed && !gameMaster.isInventoryOpen()) {
             if (isCtrlHeld) {
@@ -135,12 +128,8 @@ public class GameInteraction {
             }
         }
 
-        Hit hoveredCell;
-        if (gameMaster.isOrthographicCamera()) {
-            hoveredCell = HoveredCell.get(gameMaster);
-        } else {
-            hoveredCell = gameMaster.getCamera().highlight(gameMaster.getWorld());
-        }
+        Hit hoveredCell = HoveredCell
+                .get(gameMaster);
 
         if (hoveredCell == null) {
             resetBreaking();
@@ -160,7 +149,6 @@ public class GameInteraction {
                 breakAction(gameMaster, hoveredCell);
             }
         } else {
-            itemRenderer.stopAnimation();
             resetBreaking();
         }
 
@@ -235,7 +223,6 @@ public class GameInteraction {
 
             player.remove(item, amount);
             gameMaster.addEntity(worldItem);
-            itemRenderer.playPlaceAnimation();
             gameMaster.getSoundService().playEntitySound(SoundGroup.ITEMS);
 
             log.trace("Dropped x{} {} with velocity ({}, {}, {})", amount,
@@ -336,7 +323,6 @@ public class GameInteraction {
             }
 
             if (sheet != null) {
-                itemRenderer.playBreakAnimation();
                 particles.spawn(x, y + K.World.SHORTER_BLOCK_HEIGHT, z, sheet, frameIndex);
             }
 
@@ -360,7 +346,6 @@ public class GameInteraction {
             breakingZ = z;
             breakProgress = 0.0f;
             lastBreakTime = System.nanoTime();
-            itemRenderer.playBreakAnimation();
         }
 
         Gamemode gamemode = gameMaster.getPlayer().getGamemode();
@@ -394,10 +379,6 @@ public class GameInteraction {
         lastBreakTime = now;
         breakProgress += deltaTime / destroyTime;
 
-        if (!gameMaster.getItemRenderer().isBreakAnimationPlaying()) {
-            gameMaster.getItemRenderer().playBreakAnimation();
-        }
-
         if (breakProgress >= 1.0f) {
             breakBlock(gameMaster, cell, blockData, blockId, selectedItem);
             resetBreaking();
@@ -430,8 +411,6 @@ public class GameInteraction {
         }
 
         world.setBlockTypeAt(cell, BlockData.AIR.getId());
-        itemRenderer.playBreakAnimation();
-
         gameMaster.rebuildChunkMeshAt(cell);
         particles.spawn(cell, blockData);
 
@@ -486,7 +465,6 @@ public class GameInteraction {
             if (existingBlock == 0) {
                 Block newBlock = new Block(block.getType(), x, y, z);
                 world.setBlockTypeAt(x, y, z, block.getType().getId());
-                itemRenderer.playPlaceAnimation();
                 gameMaster.getSoundService().playBreakSound(newBlock.getType()
                         .getSoundGroup(), getDistanceToBlock(gameMaster, cell), Settings.getMaxInteractionDistance());
 
