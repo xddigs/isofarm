@@ -16,12 +16,12 @@ public class OrthographicCamera implements CameraView {
     private static final float MAX_ZOOM = 80.0f;
 
     private static final float DEFAULT_YAW = 45.0f;
-    private final float yaw = DEFAULT_YAW;
     private static final float PITCH = 35.2643897f;
 
     private static final float NEAR_PLANE = 0.1f;
     private static final float FAR_PLANE = 2000.0f;
 
+    private final float yaw = DEFAULT_YAW;
     private final Vector3f position;
     private final Matrix4f projectionMatrix;
 

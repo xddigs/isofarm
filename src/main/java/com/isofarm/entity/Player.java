@@ -26,7 +26,6 @@ import java.util.List;
 
 import static org.lwjgl.opengl.GL13.*;
 
-@SuppressWarnings("all")
 @DataClass
 public class Player extends Character {
     private static final Logger log = LoggerFactory.getLogger(Player.class);
@@ -44,7 +43,6 @@ public class Player extends Character {
     private int damageSequence = 0;
     private float lastDamageAmount = 0.0f;
     private float fallStartY = 0.0f;
-    private float viewAngle = 0.0f;
     private float respawnTimer = -1.0f;
     private boolean isFalling = false;
 
@@ -166,7 +164,7 @@ public class Player extends Character {
             };
         }
 
-        float relativeAngle = moveAngle - viewAngle;
+        float relativeAngle = moveAngle - camera.getYaw();
         relativeAngle = (relativeAngle % 360.0f + 360.0f) % 360.0f;
 
         int directionOffset;
@@ -300,26 +298,6 @@ public class Player extends Character {
         }
         currentState = newState;
         currentState.enter(this);
-    }
-
-    public void rotateView(float amount) {
-        this.viewAngle += amount;
-        this.viewAngle = (this.viewAngle % 360.0f + 360.0f) % 360.0f;
-
-        if ((getVelocity().x * getVelocity().x + getVelocity().z * getVelocity().z) <= 0.001f) {
-            if (viewAngle >= 337.5f || viewAngle < 22.5f) this.direction = Direction.EAST;
-            else if (viewAngle >= 22.5f && viewAngle < 67.5f) this.direction = Direction.SOUTH_EAST;
-            else if (viewAngle >= 67.5f && viewAngle < 112.5f) this.direction = Direction.SOUTH;
-            else if (viewAngle >= 112.5f && viewAngle < 157.5f) this.direction = Direction.SOUTH_WEST;
-            else if (viewAngle >= 157.5f && viewAngle < 202.5f) this.direction = Direction.WEST;
-            else if (viewAngle >= 202.5f && viewAngle < 247.5f) this.direction = Direction.NORTH_WEST;
-            else if (viewAngle >= 247.5f && viewAngle < 292.5f) this.direction = Direction.NORTH;
-            else if (viewAngle >= 292.5f && viewAngle < 337.5f) this.direction = Direction.NORTH_EAST;
-        }
-    }
-
-    public float getViewAngle() {
-        return viewAngle;
     }
 
     public void autoJump(World world, Vector3f velocity, float delta) {

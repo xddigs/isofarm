@@ -1,6 +1,5 @@
 package com.isofarm.input;
 
-import com.isofarm.data.Gamemode;
 import com.isofarm.data.Hit;
 import com.isofarm.entity.Player;
 import com.isofarm.entity.states.SwimmingState;
@@ -21,7 +20,6 @@ public record OrthographicCameraController(OrthographicCamera camera)
     private static final float VERTICAL_OFFSET = 0.0f;
     private static final float DISTANCE = 500.0f;
     private static boolean mouseCaptured = false;
-    private static final float CAMERA_ROTATION_SPEED = 120.0f;
     private static GridPos lastGoal = null;
 
     public void update(GameMaster gameMaster, float delta) {
@@ -33,7 +31,6 @@ public record OrthographicCameraController(OrthographicCamera camera)
         Player player = gameMaster.getPlayer();
         if (player == null) return;
 
-        rotateCamera(delta, gameMaster);
         if (player.getCurrentState() instanceof SwimmingState) {
             if (Keyboard.isKeyDown(GLFW_KEY_SPACE)) {
                 player.getVelocity().y = 4.0f;
@@ -46,20 +43,6 @@ public record OrthographicCameraController(OrthographicCamera camera)
         followPath(player, gameMaster.getWorld(), delta);
         followPlayer(player);
         updateZoom();
-    }
-
-    private void rotateCamera(float delta, GameMaster gameMaster) {
-        boolean rotateLeft = Keyboard.isKeyDown(GLFW_KEY_LEFT);
-        boolean rotateRight = Keyboard.isKeyDown(GLFW_KEY_RIGHT);
-
-        if (rotateLeft == rotateRight) {
-            return;
-        }
-        float direction = rotateRight ? 1.0f : -1.0f;
-
-        if (gameMaster.getPlayer() != null) {
-            gameMaster.getPlayer().rotateView(direction * CAMERA_ROTATION_SPEED * delta);
-        }
     }
 
     private void updateZoom() {
