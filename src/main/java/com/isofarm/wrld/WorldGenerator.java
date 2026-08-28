@@ -90,7 +90,7 @@ public class WorldGenerator {
     private void generateVegetation(Random random) {
         generateTree(treeX, treeZ, random);
 
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 16; i++) {
             int fx = random.nextInt(14) - 7;
             int fz = random.nextInt(14) - 7;
 
