@@ -24,7 +24,6 @@ public abstract class Entity {
     private float crouchingHeight;
     private boolean onGround;
     private boolean wasOnGround;
-    private boolean isCrounching;
 
     private float currentEyeHeight = 1.6f;
     private float speed;
@@ -37,7 +36,6 @@ public abstract class Entity {
         this.velocity = new Vector3f();
         this.dimensions = new Vector3f();
 
-        this.isCrounching = false;
         this.standingHeight = 2.0f;
         this.crouchingHeight = 1.4f;
 
@@ -121,14 +119,6 @@ public abstract class Entity {
 
     public void setCrouchingHeight(float crouchingHeight) {
         this.crouchingHeight = crouchingHeight;
-    }
-
-    public boolean isCrounching() {
-        return isCrounching;
-    }
-
-    public void setCrounching(boolean isCrounching) {
-        this.isCrounching = isCrounching;
     }
 
     public boolean isOnGround() {
@@ -242,18 +232,6 @@ public abstract class Entity {
         setOnGround(false);
     }
 
-    public void crunch() {
-        isCrounching = true;
-    }
-
-    public void uncrouch(World world) {
-        if (!isCrounching) return;
-
-        if (canStandUp(world)) {
-            isCrounching = false;
-        }
-    }
-
     public void lerp(Vector3f target, float delta) {
         float speed = 12.0f;
         float amount = 1.0f - (float) Math.exp(-speed * delta);
@@ -295,20 +273,6 @@ public abstract class Entity {
 
     public void setSpeed(float speed) {
         this.speed = speed;
-    }
-
-    public void updateCrouching(float delta) {
-        float targetHeight = isCrounching ? crouchingHeight : standingHeight;
-        if (Math.abs(dimensions.y - targetHeight) < 0.001f) {
-            dimensions.y = targetHeight;
-        } else {
-            float smoothFactor = 1.0f - (float) Math.exp(-14.0f * delta);
-            dimensions.y += (targetHeight - dimensions.y) * smoothFactor;
-        }
-
-        float targetEyeHeight = isCrounching ? (crouchingHeight * 0.85f) : (standingHeight * 0.85f);
-        float eyeSmooth = 1.0f - (float) Math.exp(-14.0f * delta);
-        currentEyeHeight += (targetEyeHeight - currentEyeHeight) * eyeSmooth;
     }
 
     public float getCurrentEyeHeight() {

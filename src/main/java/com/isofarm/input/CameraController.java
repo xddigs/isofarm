@@ -28,13 +28,17 @@ public record CameraController(Camera camera) implements Service<Camera> {
     private static GridPos lastGoal = null;
 
     public void update(GameMaster gameMaster, float delta) {
+        Player player = gameMaster.getPlayer();
+        if (player == null) return;
         if (gameMaster.isInventoryOpen() || gameMaster.isChatOpen()) {
             lastGoal = null;
             return;
         }
 
-        Player player = gameMaster.getPlayer();
-        if (player == null) return;
+        if (Keyboard.isKeyDown(GLFW_KEY_W) || Keyboard.isKeyDown(GLFW_KEY_A) ||
+                Keyboard.isKeyDown(GLFW_KEY_S) || Keyboard.isKeyDown(GLFW_KEY_D)) {
+            player.clearPath();
+        }
 
         if (player.getCurrentState() instanceof SwimmingState) {
             if (Keyboard.isKeyDown(GLFW_KEY_SPACE)) {

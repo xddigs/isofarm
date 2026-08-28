@@ -17,11 +17,11 @@ public class GroundedState implements PlayerState {
 
     @Override
     public void input(Player player, GameMaster gameMaster) {
+        if (gameMaster.isInventoryOpen() || gameMaster.isChatOpen()) return;
+
         if (Keyboard.isKeyPressed(GLFW_KEY_SPACE)) {
             player.jump();
             player.changeState(new JumpingState());
-        } else if (Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
-            player.changeState(new CrouchingState());
         }
     }
 
@@ -34,8 +34,13 @@ public class GroundedState implements PlayerState {
 
         if (!player.isOnGround()) {
             player.changeState(new FallingState());
+            return;
         }
+
+        float yaw = player.getGameMaster().getActiveCamera().getYaw();
+        player.wasd(player.getGameMaster().getWorld(), delta, yaw);
     }
 
-    @Override public void exit(Player player) {}
+    @Override
+    public void exit(Player player) {}
 }

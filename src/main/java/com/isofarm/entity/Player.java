@@ -1,12 +1,12 @@
 package com.isofarm.entity;
 
 import com.isofarm.data.*;
-import com.isofarm.entity.states.CrouchingState;
 import com.isofarm.entity.states.GroundedState;
 import com.isofarm.graphics.CameraView;
 import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.Shader;
 import com.isofarm.graphics.SpriteSheet;
+import com.isofarm.input.Keyboard;
 import com.isofarm.item.Backpack;
 import com.isofarm.item.CraftingKit;
 import com.isofarm.item.Item;
@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL13.*;
 
 @DataClass
@@ -434,14 +435,44 @@ public class Player extends Character {
                     direction.normalize();
                 }
 
-                float speed = (currentState instanceof CrouchingState) ? getSpeed() / 3f : getSpeed();
-                Vector3f velocity = new Vector3f(direction).mul(speed);
+                Vector3f velocity = new Vector3f(direction).mul(getSpeed());
                 velocity.y = getVelocity().y;
                 setVelocity(velocity);
             }
         }
 
         collide(world, getVelocity(), delta);
+    }
+
+    public void wasd(World world, float delta, float cameraYaw) {
+        if (isFollowingPath()) {
+            move(world, delta, cameraYaw);
+            return;
+        }
+
+        float moveX = 0.0f;
+        float moveZ = 0.0f;
+
+        if (Keyboard.isKeyDown(GLFW_KEY_W)) moveZ -= 1.0f;
+        if (Keyboard.isKeyDown(GLFW_KEY_S)) moveZ += 1.0f;
+        if (Keyboard.isKeyDown(GLFW_KEY_A)) moveX -= 1.0f;
+        if (Keyboard.isKeyDown(GLFW_KEY_D)) moveX += 1.0f;
+
+        Vector3f inputDir = new Vector3f(moveX, 0.0f, moveZ);
+
+        if (inputDir.lengthSquared() > 0.0f) {
+            inputDir.normalize();
+
+            float yawRad = (float) Math.toRadians(cameraYaw);
+            float worldX = inputDir.x * (float) Math.cos(yawRad) - inputDir.z * (float) Math.sin(yawRad);
+            float worldZ = inputDir.x * (float) Math.sin(yawRad) + inputDir.z * (float) Math.cos(yawRad);
+
+            Vector3f targetVelocity = new Vector3f(worldX * getSpeed(), getVelocity().y, worldZ * getSpeed());
+            collide(world, targetVelocity, delta);
+        } else {
+            Vector3f targetVelocity = new Vector3f(0.0f, getVelocity().y, 0.0f);
+            collide(world, targetVelocity, delta);
+        }
     }
 
     private void setUpInventory() {
