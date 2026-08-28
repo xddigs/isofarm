@@ -270,6 +270,10 @@ public class InventoryUI extends UIElement {
         craftingButton.setTooltipText("Crafting Kit: " +
                 (currentTab.equals(Tab.CRAFTING) ? "ON" : "OFF"));
 
+        if (!backpackButton.isVisible()) {
+            craftingButton.setX(backpackButton.getX());
+        }
+
         syncInventory();
         updateSlots();
         slotInteract();

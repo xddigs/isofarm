@@ -206,7 +206,7 @@ public class Player extends Character {
         shader.setUniform("uTopAtlasOffset", new Vector2f(0.0f, 0.0f));
         shader.setUniform("uBottomAtlasOffset", new Vector2f(0.0f, 0.0f));
         shader.setUniform("uSideAtlasOffset", new Vector2f(0.0f, 0.0f));
-        shader.setUniform("uSunColor", lighting.getSun().getColor());
+        shader.setUniform("uSunColor", new Vector3f(1.0f));
         shader.setUniform("uLightIntensity", lighting.getIntensity());
         shader.setUniform("uLightDirection", lighting.getDirection());
         shader.setUniform("uAmbientIntensity", lighting.getAmbientIntensity());
