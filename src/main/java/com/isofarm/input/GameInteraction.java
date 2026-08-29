@@ -516,31 +516,31 @@ public class GameInteraction {
             gameMaster.getPlayer().changeState(new InteractingState());
         }
 
+        int normalX = gameMaster.getOrthoCamera().getLastHitNormalX();
+        int normalY = gameMaster.getOrthoCamera().getLastHitNormalY();
+        int normalZ = gameMaster.getOrthoCamera().getLastHitNormalZ();
+
         if (selectedItem instanceof Block block) {
-            int x = cell.x();
-            int y = cell.y();
-            int z = cell.z();
-            if (gameMaster.getPlayer().intersectsBlock(x, y, z)) return;
+            int placeX = cell.x() + normalX;
+            int placeY = cell.y() + normalY;
+            int placeZ = cell.z() + normalZ;
+            if (gameMaster.getPlayer().intersectsBlock(placeX, placeY, placeZ)) return;
 
-            if (y < 0 || y >= Chunk.SIZE_Y) {
-                return;
-            }
-
-            byte existingBlock = world.getBlockTypeAt(x, y, z);
-            if (existingBlock == 0) {
-                Block newBlock = new Block(block.getType(), x, y, z);
+            byte targetBlock = world.getBlockTypeAt(placeX, placeY, placeZ);
+            if (targetBlock == 0) {
+                Block newBlock = new Block(block.getType(), placeX, placeY, placeZ);
                 if (block.getType().equals(BlockData.OAK_BONSAI)) {
-                    gameMaster.getTreeService().plant(x, y, z, BlockData.OAK_BONSAI);
+                    gameMaster.getTreeService().plant(placeX, placeY, placeZ, BlockData.OAK_BONSAI);
                 } else {
-                    world.setBlockTypeAt(x, y, z, block.getType().getId());
+                    world.setBlockTypeAt(placeX, placeY, placeZ, block.getType().getId());
                 }
 
                 gameMaster.getPlayer().remove(selectedItem);
                 gameMaster.getSoundService().playBreakSound(newBlock.getType()
                         .getSoundGroup(), getDistanceToBlock(gameMaster, cell), Settings.getMaxInteractionDistance());
-                gameMaster.rebuildChunkMeshAt(x, z);
-                gameUIservice.logAction(new BlockPos(newBlock.getType(), x, y, z));
-                log.info("Block placed: {} at {},{},{}", newBlock.getType().getName(), x, y, z);
+                gameMaster.rebuildChunkMeshAt(placeX, placeZ);
+                gameUIservice.logAction(new BlockPos(newBlock.getType(), placeX, placeY, placeZ));
+                log.info("Block placed: {} at {},{},{}", newBlock.getType().getName(), placeX, placeY, placeZ);
             }
             return;
         }

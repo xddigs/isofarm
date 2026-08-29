@@ -28,6 +28,11 @@ public class Camera implements CameraView {
     private float zoom = 25.0f;
     private float aspectRatio = 1.0f;
 
+    private BlockPos lastHit;
+    private int lastHitNormalX;
+    private int lastHitNormalY;
+    private int lastHitNormalZ;
+
     public Camera(float width, float height, int renderDistanceChunks) {
         this.position = new Vector3f();
         this.projectionMatrix = new Matrix4f();
@@ -123,7 +128,11 @@ public class Camera implements CameraView {
     public BlockPos highlight(World world, Vector3f playerPos, float mouseX, float mouseY,
                               float screenWidth, float screenHeight, boolean smartFilter) {
         Ray ray = getMouseRay(mouseX, mouseY, screenWidth, screenHeight);
-        return raycast(world, playerPos, ray.origin(), ray.direction(), smartFilter);
+        lastHit = raycast(world, playerPos, ray.origin(), ray.direction(), smartFilter);
+        if (lastHit == null) {
+            return null;
+        }
+        return lastHit;
     }
 
     private BlockPos raycast(World world, Vector3f playerPos, Vector3f origin, Vector3f direction,
@@ -146,6 +155,10 @@ public class Camera implements CameraView {
         float tMaxY = stepY > 0 ? ((y + 1) * tileSize - origin.y) / direction.y : stepY < 0 ? (y * tileSize - origin.y) / direction.y : Float.POSITIVE_INFINITY;
         float tMaxZ = stepZ > 0 ? ((z + 1) * tileSize - origin.z) / direction.z : stepZ < 0 ? (z * tileSize - origin.z) / direction.z : Float.POSITIVE_INFINITY;
 
+        int previousX = x;
+        int previousY = y;
+        int previousZ = z;
+
         do {
             byte block = world.getBlockTypeAt(x, y, z);
             byte waterLevel = world.getWaterLevelAt(x, y, z);
@@ -162,12 +175,19 @@ public class Camera implements CameraView {
                     float distToPlayer = playerPos.distance(blockCenterX, blockCenterY, blockCenterZ);
 
                     if (distToPlayer <= Settings.getMaxInteractionDistance()) {
+                        lastHitNormalX = previousX - x;
+                        lastHitNormalY = previousY - y;
+                        lastHitNormalZ = previousZ - z;
                         return new BlockPos(BlockData.fromId(block), x, y, z);
                     } else {
                         return null;
                     }
                 }
             }
+
+            previousX = x;
+            previousY = y;
+            previousZ = z;
 
             if (tMaxX < tMaxY) {
                 if (tMaxX < tMaxZ) {
@@ -189,5 +209,17 @@ public class Camera implements CameraView {
         } while (!(tMaxX > 2000.0f) || !(tMaxY > 2000.0f) || !(tMaxZ > 2000.0f));
 
         return null;
+    }
+
+    public int getLastHitNormalX() {
+        return lastHitNormalX;
+    }
+
+    public int getLastHitNormalY() {
+        return lastHitNormalY;
+    }
+
+    public int getLastHitNormalZ() {
+        return lastHitNormalZ;
     }
 }
