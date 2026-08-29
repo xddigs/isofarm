@@ -444,7 +444,7 @@ public class GameMaster {
         celestialLighting.update(HoveredCell.get(this), timeOfDay);
         shop.update(timeService);
         cropService.update(delta, weatherService.getWeather());
-        treeService.update();
+        treeService.update(this);
         updateEntities(delta);
         orthoCameraController.update(this, delta);
         particles.update(delta);

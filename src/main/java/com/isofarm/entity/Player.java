@@ -17,7 +17,6 @@ import com.isofarm.utils.ToastFactory;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
 import org.joml.Matrix4f;
-import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.slf4j.Logger;
@@ -167,14 +166,8 @@ public class Player extends Character {
 
         shader.setUniform("uTexture", textureUnit);
         shader.setUniform("uUseTexture", true);
-        shader.setUniform("uUseFaceAtlas", false);
 
         CelestialLighting lighting = gameMaster.getCelestialLighting();
-        shader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
-        shader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
-        shader.setUniform("uTopAtlasOffset", new Vector2f(0.0f, 0.0f));
-        shader.setUniform("uBottomAtlasOffset", new Vector2f(0.0f, 0.0f));
-        shader.setUniform("uSideAtlasOffset", new Vector2f(0.0f, 0.0f));
         shader.setUniform("uSunColor", new Vector3f(1.0f));
         shader.setUniform("uLightIntensity", lighting.getIntensity());
         shader.setUniform("uLightDirection", lighting.getDirection());
