@@ -94,19 +94,25 @@ public class Player extends Character {
         currentState.update(this, delta);
 
         if (Math.abs(velocity.x) > 0.05f || Math.abs(velocity.z) > 0.05f) {
-            boolean right = velocity.x > 0.05f;
-            boolean left = velocity.x < -0.05f;
-            boolean down = velocity.z > 0.05f;
-            boolean up = velocity.z < -0.05f;
+            float cameraYaw = gameMaster.getActiveCamera().getYaw();
+            float yawRad = (float) Math.toRadians(-cameraYaw);
 
-            if (up && right) direction = Direction.NE;
-            else if (up && left) direction = Direction.NW;
+            float camRelX = velocity.x * (float) Math.cos(yawRad) - velocity.z * (float) Math.sin(yawRad);
+            float camRelZ = velocity.x * (float) Math.sin(yawRad) + velocity.z * (float) Math.cos(yawRad);
+
+            boolean right = camRelX > 0.1f;
+            boolean left  = camRelX < -0.1f;
+            boolean down  = camRelZ > 0.1f;
+            boolean up    = camRelZ < -0.1f;
+
+            if (up && right)       direction = Direction.NE;
+            else if (up && left)   direction = Direction.NW;
             else if (down && right) direction = Direction.SE;
             else if (down && left) direction = Direction.SW;
-            else if (right) direction = Direction.E;
-            else if (left) direction = Direction.W;
-            else if (down) direction = Direction.S;
-            else if (up) direction = Direction.N;
+            else if (right)        direction = Direction.E;
+            else if (left)         direction = Direction.W;
+            else if (down)         direction = Direction.S;
+            else if (up)           direction = Direction.N;
         }
 
         float lerpSpeed = 10.0f;
