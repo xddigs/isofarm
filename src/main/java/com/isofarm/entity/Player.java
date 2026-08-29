@@ -1,6 +1,7 @@
 package com.isofarm.entity;
 
 import com.isofarm.data.*;
+import com.isofarm.entity.states.FallingState;
 import com.isofarm.entity.states.GroundedState;
 import com.isofarm.entity.states.InteractingState;
 import com.isofarm.graphics.*;
@@ -140,12 +141,17 @@ public class Player extends Character {
                         getVelocity().z * getVelocity().z) > 0.001f;
 
         boolean isAttacking = currentState instanceof InteractingState;
+        boolean isFalling = currentState instanceof FallingState;
 
         int rowIndex;
         int totalFramesInRow;
         int actionIndex = 16;
+        int fallIndex = 24;
 
-        if (isAttacking) {
+        if (isFalling) {
+            rowIndex = fallIndex;
+            totalFramesInRow = K.UI.PLAYER_SPRITE_COLS_FALL;
+        } else if (isAttacking) {
             rowIndex = actionIndex + getActionOffset();
             totalFramesInRow = K.UI.PLAYER_SPRITE_COLS_ACTION;
         } else if (isMoving) {
