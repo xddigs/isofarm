@@ -93,30 +93,20 @@ public class Player extends Character {
         currentState.input(this, gameMaster);
         currentState.update(this, delta);
 
-        if (velocity.x != 0.0f || velocity.z != 0.0f) {
-            float threshold = 0.3f;
-            boolean right = velocity.x > threshold;
-            boolean left = velocity.x < -threshold;
-            boolean down = velocity.z > threshold;
-            boolean up = velocity.z < -threshold;
+        if (Math.abs(velocity.x) > 0.05f || Math.abs(velocity.z) > 0.05f) {
+            boolean right = velocity.x > 0.05f;
+            boolean left = velocity.x < -0.05f;
+            boolean down = velocity.z > 0.05f;
+            boolean up = velocity.z < -0.05f;
 
-            if (up && right) {
-                direction = Direction.NE;
-            } else if (up && left) {
-                direction = Direction.NW;
-            } else if (down && right) {
-                direction = Direction.SE;
-            } else if (down && left) {
-                direction = Direction.SW;
-            } else if (right) {
-                direction = Direction.E;
-            } else if (left) {
-                direction = Direction.W;
-            } else if (down) {
-                direction = Direction.S;
-            } else if (up) {
-                direction = Direction.N;
-            }
+            if (up && right) direction = Direction.NE;
+            else if (up && left) direction = Direction.NW;
+            else if (down && right) direction = Direction.SE;
+            else if (down && left) direction = Direction.SW;
+            else if (right) direction = Direction.E;
+            else if (left) direction = Direction.W;
+            else if (down) direction = Direction.S;
+            else if (up) direction = Direction.N;
         }
 
         float lerpSpeed = 10.0f;
@@ -219,7 +209,7 @@ public class Player extends Character {
 
         boolean backpackInFront = isBackpackInFront(direction);
         if (getInventory().hasBackpackEquipped() && !backpackInFront) {
-            renderBackpack(shader, rm, direction, false);
+            renderBackpack(shader, rm, direction, backpackInFront, isMoving);
         }
 
         sheet.bind();
@@ -228,7 +218,7 @@ public class Player extends Character {
         rm.getPlayerMesh().render();
 
         if (getInventory().hasBackpackEquipped() && backpackInFront) {
-            renderBackpack(shader, rm, direction, true);
+            renderBackpack(shader, rm, direction, backpackInFront, isMoving);
         }
 
         sheet.unbind();
@@ -267,37 +257,36 @@ public class Player extends Character {
     }
 
     private int getPlayerRow(Direction direction, boolean isMoving) {
-        return switch (direction) {
-            case N          -> isMoving ? 4 : 0;
-            case S          -> isMoving ? 5 : 1;
-            case E, W       -> isMoving ? 6 : 2;
-            case SE, SW     -> isMoving ? 7 : 3;
-            case NE, NW     -> isMoving ? 4 : 0;
+        int baseOffset = isMoving ? 8 : 0;
+        return baseOffset + switch (direction) {
+            case NW -> 0;
+            case W  -> 1;
+            case SW -> 2;
+            case S  -> 3;
+            case SE -> 4;
+            case E  -> 5;
+            case NE -> 6;
+            case N  -> 7;
         };
     }
 
     private boolean isBackpackInFront(Direction direction) {
         return switch (direction) {
             case N, NE, NW -> true;
-            case S, SE, SW -> false;
-            case E, W      -> false;
+            default -> false;
         };
     }
 
-    private int getBackpackFrame(Direction direction) {
+    private int getBackpackFrame(Direction direction, boolean isMoving) {
         return switch (direction) {
-            case N          -> 0;
-            case S          -> 1;
-            case E, W       -> 2;
-            case SE, SW     -> 2;
-            case NE, NW     -> 3;
-        };
-    }
-
-    private boolean shouldFlip(Direction direction) {
-        return switch (direction) {
-            case W, NW, SW -> true;
-            default        -> false;
+            case NW -> 0;
+            case W  -> 1;
+            case SW -> 2;
+            case S  -> 3;
+            case NE -> 4;
+            case E  -> 5;
+            case SE -> 6;
+            case N  -> 7;
         };
     }
 
@@ -309,25 +298,14 @@ public class Player extends Character {
         };
     }
 
-    private Vector4f flipUV(Vector4f uv) {
-        float temp = uv.x;
-        uv.x = uv.z;
-        uv.z = temp;
-        return uv;
-    }
-
     private void renderBackpack(Shader shader, ResourceManager rm, Direction direction,
-                                boolean backpackInFront) {
+                                boolean backpackInFront, boolean isMoving) {
 
         SpriteSheet bpSheet = ResourceManager.getBackpackSpriteSheet();
         if (bpSheet == null) return;
 
-        int backpackFrame = getBackpackFrame(direction);
-        Vector4f uv = new Vector4f(bpSheet.getUVBounds(backpackFrame));
-
-        if (shouldFlip(direction)) {
-            uv = flipUV(uv);
-        }
+        int backpackFrame = getBackpackFrame(direction, isMoving);
+        Vector4f uv = bpSheet.getUVBounds(backpackFrame);
 
         bpSheet.bind();
         shader.setUniform("uUVBounds", uv);

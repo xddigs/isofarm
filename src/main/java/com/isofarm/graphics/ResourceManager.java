@@ -78,7 +78,7 @@ public class ResourceManager {
         inventoryIcons = new SpriteSheet(K.Paths.INVENTORY_ICONS, K.UI.ICON_INV_COLS, 1);
 
         playerSpriteSheet = new SpriteSheet(K.Paths.PLAYER_SPRITESHEET, K.UI.PLAYER_SPRITE_COLS, K.UI.PLAYER_SPRITE_ROWS);
-        backpackSpriteSheet = new SpriteSheet(K.Paths.BACKPACK_SPRITESHEET, 4, 1);
+        backpackSpriteSheet = new SpriteSheet(K.Paths.BACKPACK_SPRITESHEET, K.UI.PLAYER_SPRITE_COLS / 3, 2);
         heartsSpriteSheet = new SpriteSheet(K.Paths.HEARTS_SPRITESHEET, 1, K.UI.ICON_HEARTS_ROWS);
 
         destroyTexture = new SpriteSheet(K.Paths.DESTROY_STAGES, K.UI.DESTROY_FRAMES, 1);
