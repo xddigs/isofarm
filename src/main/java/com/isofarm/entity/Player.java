@@ -144,9 +144,10 @@ public class Player extends Character {
 
         int rowIndex;
         int totalFramesInRow;
+        int actionIndex = 16;
 
         if (isAttacking) {
-            rowIndex = 8 + getActionOffset();
+            rowIndex = actionIndex + getActionOffset();
             totalFramesInRow = K.UI.PLAYER_SPRITE_COLS_ACTION;
         } else if (isMoving) {
             rowIndex = getPlayerRow(direction, true);
