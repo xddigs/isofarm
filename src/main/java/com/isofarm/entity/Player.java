@@ -67,7 +67,6 @@ public class Player extends Character {
         setReputation(Reputation.NEUTRAL);
         setGamemode(Gamemode.SURVIVAL);
         setUpInventory();
-
         this.currentState = new GroundedState();
         this.currentState.enter(this);
     }
