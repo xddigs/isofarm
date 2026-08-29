@@ -35,6 +35,7 @@ public class ResourceManager {
     private final Mesh flowerMesh;
     private final Mesh playerMesh;
     private final Mesh destroyOverlayMesh;
+    private final Texture backgroundGUI;
     private final TextureAtlas blocksAtlas;
     private static SpriteSheet wheat;
     private static SpriteSheet carrot;
@@ -63,6 +64,8 @@ public class ResourceManager {
         for (BlockData block : BlockData.values()) {
             block.initRegions(this.blocksAtlas);
         }
+
+        this.backgroundGUI = new Texture(K.Paths.DEFAULT_BACKGROUND_GUI);
 
         wheat = new SpriteSheet(K.Paths.WHEAT_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
         carrot = new SpriteSheet(K.Paths.CARROT_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
@@ -111,6 +114,7 @@ public class ResourceManager {
                 case PAPER -> 1;
                 case LEATHER -> 2;
                 case BOOK -> 3;
+                case CRAFTING_BOOK -> 4;
                 default -> 0;
             };
             return (row * K.UI.ICON_MATERIAL_COLS) + col;
@@ -174,6 +178,7 @@ public class ResourceManager {
         playerMesh.dispose();
         destroyOverlayMesh.dispose();
 
+        backgroundGUI.dispose();
         blocksAtlas.dispose();
 
         wheat.dispose();
@@ -250,6 +255,10 @@ public class ResourceManager {
 
     public Mesh getPlayerMesh() {
         return playerMesh;
+    }
+
+    public Texture getBackgroundGUI() {
+        return backgroundGUI;
     }
 
     public TextureAtlas getBlocksAtlas() {
