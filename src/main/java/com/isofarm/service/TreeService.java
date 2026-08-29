@@ -147,6 +147,7 @@ public class TreeService {
                         gameMaster.addEntity(worldItem);
                         gameMaster.getGameInteraction().addItem(gameMaster);
                         world.getGameMaster().rebuildChunkMeshAt(worldX, worldZ);
+                        // TODO
                     }
                 }
             }
