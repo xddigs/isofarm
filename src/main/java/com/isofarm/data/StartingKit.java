@@ -6,8 +6,8 @@ public class StartingKit extends Kit {
 
     public StartingKit() {
         setItems(new Item[]{
-                new CraftingKit(),
-                new Block(BlockData.OAK_BONSAI)
+                new Backpack(),
+                new CraftingKit()
         });
     }
 }
