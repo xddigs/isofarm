@@ -298,9 +298,14 @@ public class Player extends Character {
 
     private int getActionOffset() {
         return switch (direction) {
-            case S, SE, SW -> 0;
-            case N, NE, NW -> 1;
-            case E, W -> 2;
+            case NW -> 0;
+            case W  -> 1;
+            case SW -> 2;
+            case S  -> 3;
+            case SE -> 4;
+            case E  -> 5;
+            case NE -> 6;
+            case N  -> 7;
         };
     }
 
