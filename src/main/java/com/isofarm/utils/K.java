@@ -77,7 +77,7 @@ public final class K {
 
         public static final int DESTROY_FRAMES = 9;
 
-        public static final float TOAST_WIDTH = 400f;
+        public static final float TOAST_WIDTH = 500f;
         public static final float TOAST_HEIGHT = 64.0f;
         public static final float TOAST_MARGIN_TOP = 24.0f;
         public static final float TOAST_SPACING = 8.0f;

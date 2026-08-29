@@ -10,7 +10,8 @@ public enum MaterialID implements Craftable {
     STICK((byte) 0, (byte) 1, "Stick", 1),
     PAPER((byte) 1, (byte) 1, "Paper", 10),
     LEATHER((byte) 2, (byte) 1, "Leather", 40),
-    BOOK((byte) 3, (byte) 1, "Book", 100);
+    BOOK((byte) 3, (byte) 1, "Book", 100),
+    CRAFTING_BOOK((byte) 4, (byte) 1, "Crafting Book", 200);
 
     private final byte id;
     private final byte row;
