@@ -111,7 +111,7 @@ public class TreeService {
 
         saplings.removeIf(t -> world.getBlockTypeAt(
                 t.getX(), t.getY(), t.getZ()) == BlockData.AIR.getId());
-        processLeafDecay(gameMaster);
+        updateLeaves(gameMaster);
     }
 
     private void growTree(TreeSapling sapling) {
@@ -124,7 +124,7 @@ public class TreeService {
         world.getGameMaster().rebuildChunkMeshAt(x, z);
     }
 
-    private void processLeafDecay(GameMaster gameMaster) {
+    private void updateLeaves(GameMaster gameMaster) {
         for (Chunk chunk : world.getChunks().values()) {
             int chunkStartX = chunk.getChunkX() * Chunk.SIZE_X;
             int chunkStartZ = chunk.getChunkZ() * Chunk.SIZE_Z;
@@ -145,6 +145,7 @@ public class TreeService {
                         world.setBlockTypeAt(worldX, localY, worldZ, BlockData.AIR.getId());
                         WorldItem worldItem = new WorldItem(item, 1, new Vector3f(worldX, localY, worldZ));
                         gameMaster.addEntity(worldItem);
+                        gameMaster.getGameInteraction().addItem(gameMaster);
                         world.getGameMaster().rebuildChunkMeshAt(worldX, worldZ);
                     }
                 }
@@ -166,7 +167,6 @@ public class TreeService {
             }
 
             byte currentId = world.getBlockTypeAt(current.x(), current.y(), current.z());
-
             if (currentId == BlockData.OAK_LOG.getId()) {
                 return true;
             }
@@ -191,7 +191,6 @@ public class TreeService {
                 }
             }
         }
-
         return false;
     }
 }

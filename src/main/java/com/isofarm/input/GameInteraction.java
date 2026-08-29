@@ -179,7 +179,7 @@ public class GameInteraction {
         return hoveredCell;
     }
 
-    private void addItem(GameMaster gameMaster) {
+    public void addItem(GameMaster gameMaster) {
         Player player = gameMaster.getPlayer();
         if (player == null) return;
         Iterator<Entity> iterator = gameMaster.getEntities().iterator();
