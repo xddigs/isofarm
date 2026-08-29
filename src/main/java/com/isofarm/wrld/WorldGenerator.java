@@ -7,9 +7,9 @@ import java.util.Random;
 public class WorldGenerator {
     private static final int ISLAND_CENTER_X = 0;
     private static final int ISLAND_CENTER_Z = 0;
-    private static final float ISLAND_RADIUS = 8.0f;
+    private static final float ISLAND_RADIUS = 16.0f;
     private static final int SURFACE_Y = 25;
-    private static final int MAX_DEPTH = 16;
+    private static final int MAX_DEPTH = 24;
 
     private static World world;
     private final long seed;
