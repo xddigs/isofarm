@@ -803,13 +803,13 @@ public class InventoryUI extends UIElement {
         float spriteX = bgX + (backgroundWidth - width) / 2.0f;
         float spriteY = bgY + (backgroundHeight - height) / 2.0f;
 
-        int frontDirectionOffset = 3;
+        int frontDirectionOffset = 4;
         int idleFrameCount = K.UI.PLAYER_SPRITE_COLS;
         int idleFrame = (int) ((System.currentTimeMillis() / 200) % idleFrameCount);
         int baseSpriteIndex = (frontDirectionOffset * K.UI.PLAYER_SPRITE_COLS) + idleFrame;
 
         if (player.getInventory() != null && player.getInventory().hasBackpackEquipped()) {
-            int backpackSpriteIndex = idleFrame;
+            int backpackSpriteIndex = 6 % 8;
             GUI.drawSprite(bpSheet, backpackSpriteIndex, spriteX, spriteY,
                     width, height, new Vector4f(1.0f));
         }
