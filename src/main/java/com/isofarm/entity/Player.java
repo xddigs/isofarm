@@ -34,7 +34,7 @@ public class Player extends Character {
     private static final Logger log = LoggerFactory.getLogger(Player.class);
     private final Matrix4f modelMatrix;
     private final GameMaster gameMaster;
-    private Direction direction = Direction.SOUTH;
+    private Direction direction = Direction.S;
     private List<GridPos> path;
 
     private float currentEyeHeight = 1.6f;
@@ -101,21 +101,21 @@ public class Player extends Character {
             boolean up = velocity.z < -threshold;
 
             if (up && right) {
-                direction = Direction.NORTH_EAST;
+                direction = Direction.NE;
             } else if (up && left) {
-                direction = Direction.NORTH_WEST;
+                direction = Direction.NW;
             } else if (down && right) {
-                direction = Direction.SOUTH_EAST;
+                direction = Direction.SE;
             } else if (down && left) {
-                direction = Direction.SOUTH_WEST;
+                direction = Direction.SW;
             } else if (right) {
-                direction = Direction.EAST;
+                direction = Direction.E;
             } else if (left) {
-                direction = Direction.WEST;
+                direction = Direction.W;
             } else if (down) {
-                direction = Direction.SOUTH;
+                direction = Direction.S;
             } else if (up) {
-                direction = Direction.NORTH;
+                direction = Direction.N;
             }
         }
 
@@ -142,57 +142,26 @@ public class Player extends Character {
         Shader shader = rm.getDefaultShader();
         int textureUnit = K.Render.PRIMARY_TEXTURE_UNIT;
         boolean isMoving = (getVelocity().x * getVelocity().x +
-                getVelocity().z * getVelocity().z) > 0.001f;
+                        getVelocity().z * getVelocity().z) > 0.001f;
 
-        float moveAngle = 0.0f;
-        boolean hasVelocity = isMoving;
-
-        if (hasVelocity) {
-            moveAngle = (float) Math.toDegrees(Math.atan2(getVelocity().z, getVelocity().x));
-        } else {
-            moveAngle = switch (this.direction) {
-                case EAST -> 0.0f;
-                case SOUTH_EAST -> 45.0f;
-                case SOUTH -> 90.0f;
-                case SOUTH_WEST -> 135.0f;
-                case WEST -> 180.0f;
-                case NORTH_WEST -> -135.0f;
-                case NORTH -> -90.0f;
-                case NORTH_EAST -> -45.0f;
-            };
-        }
-
-        float relativeAngle = moveAngle - camera.getYaw();
-        relativeAngle = (relativeAngle % 360.0f + 360.0f) % 360.0f;
-
-        int directionOffset;
-        if (relativeAngle >= 225.0f && relativeAngle < 315.0f) {
-            directionOffset = 0;
-        } else if (relativeAngle >= 135.0f && relativeAngle < 225.0f) {
-            directionOffset = 1;
-        } else if (relativeAngle >= 45.0f && relativeAngle < 135.0f) {
-            directionOffset = 2;
-        } else {
-            directionOffset = 3;
-        }
+        boolean isAttacking = currentState instanceof InteractingState;
 
         int rowIndex;
         int totalFramesInRow;
-        boolean isAttacking = (currentState instanceof InteractingState);
 
         if (isAttacking) {
-            rowIndex = 8 + directionOffset;
-            totalFramesInRow = K.UI.PLAYER_SPRITE_ROWS_ACTION;
+            rowIndex = 8 + getActionOffset();
+            totalFramesInRow = K.UI.PLAYER_SPRITE_COLS_ACTION;
         } else if (isMoving) {
-            rowIndex = 4 + directionOffset;
+            rowIndex = getPlayerRow(direction, true);
             totalFramesInRow = K.UI.PLAYER_SPRITE_COLS_RUN;
         } else {
-            rowIndex = directionOffset;
+            rowIndex = getPlayerRow(direction, false);
             totalFramesInRow = K.UI.PLAYER_SPRITE_COLS;
         }
 
         int currentFrame = (int) (getAnimTimer() / getFrameDuration()) % totalFramesInRow;
-        int spriteIndex = (rowIndex * K.UI.PLAYER_SPRITE_COLS) + currentFrame;
+        int spriteIndex = rowIndex * K.UI.PLAYER_SPRITE_COLS + currentFrame;
 
         Vector4f uvBounds = sheet.getUVBounds(spriteIndex);
         shader.bind();
@@ -248,10 +217,9 @@ public class Player extends Character {
         glEnable(GL_DEPTH_TEST);
         glDepthMask(true);
 
-        boolean backpackInFront = (directionOffset == 2);
+        boolean backpackInFront = isBackpackInFront(direction);
         if (getInventory().hasBackpackEquipped() && !backpackInFront) {
-            renderBackpack(shader, rm, camera, directionOffset, isMoving, isAttacking,
-                    currentFrame, yawRad, finalScaleX, finalScaleY, finalScaleZ, yOffset);
+            renderBackpack(shader, rm, direction, false);
         }
 
         sheet.bind();
@@ -260,69 +228,11 @@ public class Player extends Character {
         rm.getPlayerMesh().render();
 
         if (getInventory().hasBackpackEquipped() && backpackInFront) {
-            renderBackpack(shader, rm, camera, directionOffset, isMoving, isAttacking,
-                    currentFrame, yawRad, finalScaleX, finalScaleY, finalScaleZ, yOffset);
+            renderBackpack(shader, rm, direction, true);
         }
 
         sheet.unbind();
         shader.unbind();
-    }
-
-    private void renderBackpack(Shader shader, ResourceManager rm, CameraView camera,
-                                int directionOffset, boolean isMoving,
-                                boolean isAttacking, int currentFrame,
-                                float yawRad, float scaleX, float scaleY, float scaleZ, float yOffset) {
-
-        SpriteSheet bpSheet = ResourceManager.getBackpackSpriteSheet();
-        if (bpSheet == null) return;
-        int backpackModelIndex;
-        boolean flipHorizontal = false;
-
-        switch (directionOffset) {
-            case 0 -> {
-                backpackModelIndex = 0;
-            }
-            case 1 -> {
-                backpackModelIndex = 1;
-                flipHorizontal = true;
-            }
-            case 2 -> {
-                backpackModelIndex = 2;
-            }
-            case 3 -> {
-                backpackModelIndex = 3;
-                flipHorizontal = false;
-            }
-            default -> backpackModelIndex = 0;
-        }
-
-        float bobbingOffsetY = 0.0f;
-        if (isMoving) {
-            bobbingOffsetY = (float) Math.sin(getAnimTimer() * 12.0f) * 0.03f;
-        }
-
-        Matrix4f bpModelMatrix = new Matrix4f();
-        bpModelMatrix.identity()
-                .translate(position.x, position.y + yOffset + bobbingOffsetY, position.z)
-                .rotateY(yawRad)
-                .scale(scaleX, scaleY, scaleZ);
-
-        shader.setUniform("uModel", bpModelMatrix);
-
-        Vector4f uv = bpSheet.getUVBounds(backpackModelIndex);
-        if (flipHorizontal) {
-            float temp = uv.x;
-            uv.x = uv.z;
-            uv.z = temp;
-        }
-
-        bpSheet.bind();
-        shader.setUniform("uUVBounds", uv);
-
-        glEnable(GL_POLYGON_OFFSET_FILL);
-        glPolygonOffset(-2.0f, -2.0f);
-        rm.getPlayerMesh().render();
-        glDisable(GL_POLYGON_OFFSET_FILL);
     }
 
     @Override
@@ -356,58 +266,79 @@ public class Player extends Character {
         }
     }
 
-    private void renderBackpack(Shader shader, ResourceManager rm, CameraView camera,
-                                int directionOffset, boolean isMoving,
-                                boolean isAttacking, int currentFrame) {
+    private int getPlayerRow(Direction direction, boolean isMoving) {
+        return switch (direction) {
+            case N          -> isMoving ? 4 : 0;
+            case S          -> isMoving ? 5 : 1;
+            case E, W       -> isMoving ? 6 : 2;
+            case SE, SW     -> isMoving ? 7 : 3;
+            case NE, NW     -> isMoving ? 4 : 0;
+        };
+    }
+
+    private boolean isBackpackInFront(Direction direction) {
+        return switch (direction) {
+            case N, NE, NW -> true;
+            case S, SE, SW -> false;
+            case E, W      -> false;
+        };
+    }
+
+    private int getBackpackFrame(Direction direction) {
+        return switch (direction) {
+            case N          -> 0;
+            case S          -> 1;
+            case E, W       -> 2;
+            case SE, SW     -> 2;
+            case NE, NW     -> 3;
+        };
+    }
+
+    private boolean shouldFlip(Direction direction) {
+        return switch (direction) {
+            case W, NW, SW -> true;
+            default        -> false;
+        };
+    }
+
+    private int getActionOffset() {
+        return switch (direction) {
+            case S, SE, SW -> 0;
+            case N, NE, NW -> 1;
+            case E, W -> 2;
+        };
+    }
+
+    private Vector4f flipUV(Vector4f uv) {
+        float temp = uv.x;
+        uv.x = uv.z;
+        uv.z = temp;
+        return uv;
+    }
+
+    private void renderBackpack(Shader shader, ResourceManager rm, Direction direction,
+                                boolean backpackInFront) {
 
         SpriteSheet bpSheet = ResourceManager.getBackpackSpriteSheet();
         if (bpSheet == null) return;
 
-        int backpackModelIndex = 0;
-        boolean flipHorizontal = false;
+        int backpackFrame = getBackpackFrame(direction);
+        Vector4f uv = new Vector4f(bpSheet.getUVBounds(backpackFrame));
 
-        if (!isMoving) {
-            if (directionOffset == 0) {
-                backpackModelIndex = 0;
-                flipHorizontal = false;
-            } else if (directionOffset == 1) {
-                backpackModelIndex = 0;
-                flipHorizontal = true;
-            } else if (directionOffset == 2) {
-                backpackModelIndex = 1;
-                flipHorizontal = true;
-            } else if (directionOffset == 3) {
-                backpackModelIndex = 1;
-                flipHorizontal = false;
-            }
-        } else {
-            if (directionOffset == 0) {
-                backpackModelIndex = 3;
-                flipHorizontal = false;
-            } else if (directionOffset == 1) {
-                backpackModelIndex = 3;
-                flipHorizontal = true;
-            } else if (directionOffset == 2) {
-                backpackModelIndex = 2;
-                flipHorizontal = true;
-            } else if (directionOffset == 3) {
-                backpackModelIndex = 2;
-                flipHorizontal = false;
-            }
-        }
-
-        Vector4f uv = bpSheet.getUVBounds(backpackModelIndex);
-        if (flipHorizontal) {
-            float temp = uv.x;
-            uv.x = uv.z;
-            uv.z = temp;
+        if (shouldFlip(direction)) {
+            uv = flipUV(uv);
         }
 
         bpSheet.bind();
         shader.setUniform("uUVBounds", uv);
 
         glEnable(GL_POLYGON_OFFSET_FILL);
-        glPolygonOffset(-1.0f, -1.0f);
+        if (backpackInFront) {
+            glPolygonOffset(-1.0f, -1.0f);
+        } else {
+            glPolygonOffset(1.0f, 1.0f);
+        }
+
         rm.getPlayerMesh().render();
         glDisable(GL_POLYGON_OFFSET_FILL);
     }
@@ -418,6 +349,36 @@ public class Player extends Character {
         }
         currentState = newState;
         currentState.enter(this);
+    }
+
+    private int getDirectionOffset(CameraView camera) {
+        float angle = switch (direction) {
+            case E  -> 0.0f;
+            case SE -> 45.0f;
+            case S  -> 90.0f;
+            case SW -> 135.0f;
+            case W  -> 180.0f;
+            case NW -> -135.0f;
+            case N  -> -90.0f;
+            case NE -> -45.0f;
+        };
+
+        float relativeAngle = angle - camera.getYaw();
+        relativeAngle = (relativeAngle % 360.0f + 360.0f) % 360.0f;
+
+        if (relativeAngle >= 225.0f && relativeAngle < 315.0f) {
+            return 0;
+        }
+
+        if (relativeAngle >= 135.0f && relativeAngle < 225.0f) {
+            return 1;
+        }
+
+        if (relativeAngle >= 45.0f && relativeAngle < 135.0f) {
+            return 2;
+        }
+
+        return 3;
     }
 
     public void autoJump(World world, Vector3f velocity, float delta) {

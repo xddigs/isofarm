@@ -58,8 +58,6 @@ public final class K {
 
         public static final float SQUISH_DURATION = 0.25f;
 
-        public static final float COORD_DISPLAY_DURATION = 3.0f;
-
         public static final int ICON_SEED_CROPS_COLS = 4;
         public static final int ICON_BLOCK_COLS = 10;
         public static final int ICON_BLOCK_ROWS = 4;
@@ -70,6 +68,7 @@ public final class K {
         public static final int PLAYER_SPRITE_COLS = 12;
         public static final int PLAYER_SPRITE_ROWS = 12;
         public static final int PLAYER_SPRITE_COLS_RUN = 8;
+        public static final int PLAYER_SPRITE_COLS_ACTION = 6;
         public static final int PLAYER_SPRITE_ROWS_ACTION = 6;
 
         public static final int ICON_MATERIAL_COLS = 12;
