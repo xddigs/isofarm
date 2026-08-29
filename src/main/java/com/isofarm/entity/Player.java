@@ -168,12 +168,16 @@ public class Player extends Character {
         shader.setUniform("uUseTexture", true);
 
         CelestialLighting lighting = gameMaster.getCelestialLighting();
-        shader.setUniform("uSunColor", new Vector3f(1.0f));
-        shader.setUniform("uLightIntensity", lighting.getIntensity());
-        shader.setUniform("uLightDirection", lighting.getDirection());
-        shader.setUniform("uAmbientIntensity", lighting.getAmbientIntensity());
+        float ambient = lighting.getAmbientIntensity();
+        float intensity = lighting.getIntensity();
+        Vector3f lightDirection = lighting.getDirection();
+
+        shader.setUniform("uLightIntensity", intensity);
+        shader.setUniform("uLightDirection", lightDirection);
+        shader.setUniform("uAmbientIntensity", ambient);
         shader.setUniform("uSkyColor", TimeService.getSkyColor());
-        shader.setUniform("uBaseColor", lighting.getColor());
+        shader.setUniform("uBaseColor", new Vector3f(1.0f));
+        shader.setUniform("uIsSprite", true);
 
         shader.setUniform("uParticleAlpha", 1.0f);
         shader.setUniform("uIsMaskPass", false);

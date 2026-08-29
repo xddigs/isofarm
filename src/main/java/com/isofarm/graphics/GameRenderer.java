@@ -80,6 +80,7 @@ public class GameRenderer {
         defaultShader.setUniform("uUVBounds", new Vector4f(0.0f, 0.0f, 1.0f, 1.0f));
         defaultShader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
         defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
+        defaultShader.setUniform("uIsSprite", false);
 
         TextureAtlas blockAtlas = rm.getBlocksAtlas();
         if (blockAtlas != null) {
@@ -211,6 +212,7 @@ public class GameRenderer {
             entity.render(gameMaster);
         });
 
+        defaultShader.setUniform("uIsSprite", false);
         defaultShader.setUniform("uParticleAlpha", 1.0f);
 
         glEnable(GL_DEPTH_TEST);

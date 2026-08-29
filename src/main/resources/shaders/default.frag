@@ -25,6 +25,7 @@ uniform bool uIsMaskPass;
 uniform float uParticleAlpha;
 uniform float uWaterAlpha;
 uniform bool uEnableShadows;
+uniform bool uIsSprite;
 
 float calculateShadow(vec4 lightSpacePosition, vec3 normal) {
     vec3 projectionCoordinates = lightSpacePosition.xyz / lightSpacePosition.w;
@@ -77,6 +78,14 @@ void main() {
 
     float shadow = 0.0;
     if (uEnableShadows) {
+        shadow = calculateShadow(vLightSpacePosition, normal);
+    }
+
+    if (uIsSprite) {
+        diffuse = 0.95;
+    }
+
+    if (uEnableShadows && !uIsSprite) {
         shadow = calculateShadow(vLightSpacePosition, normal);
     }
 
