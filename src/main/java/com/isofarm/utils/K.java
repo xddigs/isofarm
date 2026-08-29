@@ -152,6 +152,7 @@ public final class K {
         public static final String BACKPACK_SPRITESHEET = "assets/sprites/backpack.png";
         public static final String DESTROY_STAGES = "assets/textures/blocks/destroy.png";
         public static final String HEARTS_SPRITESHEET = "assets/gui/hearts.png";
+        public static final String DEFAULT_BACKGROUND_GUI = "assets/gui/background_gui.png";
     }
 
     public static final class Render {
