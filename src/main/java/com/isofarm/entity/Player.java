@@ -479,6 +479,7 @@ public class Player extends Character {
     }
 
     public void wasd(World world, float delta, float cameraYaw) {
+        if (gameMaster.isChatOpen()) return;
         if (isFollowingPath()) {
             move(world, delta, cameraYaw);
             return;
