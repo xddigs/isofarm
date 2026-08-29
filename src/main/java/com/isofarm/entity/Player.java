@@ -180,7 +180,7 @@ public class Player extends Character {
         shader.setUniform("uLightDirection", lighting.getDirection());
         shader.setUniform("uAmbientIntensity", lighting.getAmbientIntensity());
         shader.setUniform("uSkyColor", TimeService.getSkyColor());
-        shader.setUniform("uBaseColor", new Vector3f(1.0f));
+        shader.setUniform("uBaseColor", lighting.getColor());
 
         shader.setUniform("uParticleAlpha", 1.0f);
         shader.setUniform("uIsMaskPass", false);
@@ -279,7 +279,7 @@ public class Player extends Character {
 
     private boolean isBackpackInFront(Direction direction) {
         return switch (direction) {
-            case N, NE, NW -> true;
+            case N, NE, NW, W, E -> true;
             default -> false;
         };
     }
@@ -339,36 +339,6 @@ public class Player extends Character {
         }
         currentState = newState;
         currentState.enter(this);
-    }
-
-    private int getDirectionOffset(CameraView camera) {
-        float angle = switch (direction) {
-            case E  -> 0.0f;
-            case SE -> 45.0f;
-            case S  -> 90.0f;
-            case SW -> 135.0f;
-            case W  -> 180.0f;
-            case NW -> -135.0f;
-            case N  -> -90.0f;
-            case NE -> -45.0f;
-        };
-
-        float relativeAngle = angle - camera.getYaw();
-        relativeAngle = (relativeAngle % 360.0f + 360.0f) % 360.0f;
-
-        if (relativeAngle >= 225.0f && relativeAngle < 315.0f) {
-            return 0;
-        }
-
-        if (relativeAngle >= 135.0f && relativeAngle < 225.0f) {
-            return 1;
-        }
-
-        if (relativeAngle >= 45.0f && relativeAngle < 135.0f) {
-            return 2;
-        }
-
-        return 3;
     }
 
     public void autoJump(World world, Vector3f velocity, float delta) {
