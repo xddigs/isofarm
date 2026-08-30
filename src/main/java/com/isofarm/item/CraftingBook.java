@@ -8,11 +8,10 @@ import com.isofarm.data.Tier;
 import java.util.List;
 
 public class CraftingBook extends Book {
-    private final List<Recipe> recipes;
 
     public CraftingBook() {
         super(Tier.NONE, MaterialID.CRAFTING_BOOK, true);
-        this.recipes = RecipeRegistry.getRecipes();
+        List<Recipe> recipes = RecipeRegistry.getRecipes();
         System.out.println(recipes.size());
         if (!hasContent()) {
             return;
