@@ -18,7 +18,6 @@ public class RecipeRegistry {
         create(Tier.LEATHER).result(new Material(Tier.NONE, MaterialID.STICK), 4).with(BlockData.OAK_WOOD, 1).add();
         create(Tier.LEATHER).result(new Material(Tier.NONE, MaterialID.BOOK), 1).with(MaterialID.LEATHER, 3).with(MaterialID.PAPER, 2).add();
         create(Tier.LEATHER).result(new Bucket(BlockData.AIR, Tier.WOOD), 1).with(BlockData.OAK_WOOD, 3).add();
-        create(Tier.LEATHER).result(new CraftingBook(), 1).with(MaterialID.LEATHER, 2).add();
 
         registerToolSet(Tier.LEATHER, BlockData.OAK_WOOD);
 
