@@ -17,7 +17,6 @@ import com.isofarm.utils.HoveredCell;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import com.isofarm.utils.ToastFactory;
-import com.isofarm.wrld.Chunk;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
 import org.joml.Vector3f;
@@ -584,6 +583,10 @@ public class GameInteraction {
                 gameUIservice.logAction(cell);
                 log.info("Planted {} at {},{},{}", seed.getType().getName(), x, y, z);
             }
+        }
+
+        if (selectedItem instanceof Book book) {
+            book.use(gameMaster);
         }
     }
 

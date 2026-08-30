@@ -20,9 +20,11 @@ public class Book extends Usable {
 
     @Override
     public void use(GameMaster gameMaster) {
-        BookService.bs.isOpen();
-        BookService.bs.getOpenedBook();
-        BookService.bs.close();
+        if (isOpen) {
+            BookService.bs.close();
+        } else {
+            BookService.bs.open(this);
+        }
     }
 
     public void open() {
