@@ -66,7 +66,7 @@ public final class K {
         public static final int ICON_HEARTS_ROWS = 4;
 
         public static final int PLAYER_SPRITE_COLS = 12;
-        public static final int PLAYER_SPRITE_ROWS = 25;
+        public static final int PLAYER_SPRITE_ROWS = 26;
         public static final int PLAYER_SPRITE_COLS_RUN = 8;
         public static final int PLAYER_SPRITE_COLS_ACTION = 6;
         public static final int PLAYER_SPRITE_COLS_FALL = 8;

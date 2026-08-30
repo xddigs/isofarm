@@ -6,21 +6,24 @@ import com.isofarm.input.Keyboard;
 import com.isofarm.wrld.GameMaster;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_CONTROL;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 
-public class GroundedState implements PlayerState {
+public class SneakingState implements PlayerState {
+    private static final float SNEAK_EYE_HEIGHT = 1.2f;
 
     @Override
     public void enter(Player player) {
-        player.setTargetEyeHeight(1.6f);
+        player.setTargetEyeHeight(SNEAK_EYE_HEIGHT);
+        player.setSpeed(player.getSpeed() * 0.5f);
     }
 
     @Override
     public void input(Player player, GameMaster gameMaster) {
-        if (gameMaster.isInventoryOpen() || gameMaster.isChatOpen()) return;
+        if (gameMaster.isInventoryOpen() || gameMaster.isChatOpen()) {
+            return;
+        }
 
-        if (Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
-            player.changeState(new SneakingState());
+        if (!Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
+            player.changeState(new GroundedState());
         }
     }
 
@@ -41,5 +44,8 @@ public class GroundedState implements PlayerState {
     }
 
     @Override
-    public void exit(Player player) {}
+    public void exit(Player player) {
+        player.setTargetEyeHeight(1.6f);
+        player.setSpeed(player.getSpeed() * 2.0f);
+    }
 }

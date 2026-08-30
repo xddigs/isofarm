@@ -4,6 +4,7 @@ import com.isofarm.data.*;
 import com.isofarm.entity.states.FallingState;
 import com.isofarm.entity.states.GroundedState;
 import com.isofarm.entity.states.InteractingState;
+import com.isofarm.entity.states.SneakingState;
 import com.isofarm.graphics.*;
 import com.isofarm.input.Keyboard;
 import com.isofarm.item.Backpack;
@@ -137,16 +138,19 @@ public class Player extends Character {
 
         Shader shader = rm.getDefaultShader();
         int textureUnit = K.Render.PRIMARY_TEXTURE_UNIT;
+
         boolean isMoving = (getVelocity().x * getVelocity().x +
-                        getVelocity().z * getVelocity().z) > 0.001f;
+                getVelocity().z * getVelocity().z) > 0.001f;
 
         boolean isAttacking = currentState instanceof InteractingState;
         boolean isFalling = currentState instanceof FallingState;
+        boolean isSneaking = currentState instanceof SneakingState;
 
         int rowIndex;
         int totalFramesInRow;
         int actionIndex = 16;
         int fallIndex = 24;
+        int sneakIndex = 25;
 
         if (isFalling) {
             rowIndex = fallIndex;
@@ -154,6 +158,9 @@ public class Player extends Character {
         } else if (isAttacking) {
             rowIndex = actionIndex + getActionOffset();
             totalFramesInRow = K.UI.PLAYER_SPRITE_COLS_ACTION;
+        } else if (isSneaking) {
+            rowIndex = sneakIndex;
+            totalFramesInRow = K.UI.PLAYER_SPRITE_COLS;
         } else if (isMoving) {
             rowIndex = getPlayerRow(direction, true);
             totalFramesInRow = K.UI.PLAYER_SPRITE_COLS_RUN;
@@ -162,9 +169,24 @@ public class Player extends Character {
             totalFramesInRow = K.UI.PLAYER_SPRITE_COLS;
         }
 
-        int currentFrame = (int) (getAnimTimer() / getFrameDuration()) % totalFramesInRow;
-        int spriteIndex = rowIndex * K.UI.PLAYER_SPRITE_COLS + currentFrame;
+        int currentFrame;
 
+        if (isSneaking) {
+            currentFrame = switch (direction) {
+                case NW -> 0;
+                case W  -> 1;
+                case SW -> 2;
+                case S  -> 3;
+                case SE -> 4;
+                case E  -> 5;
+                case NE -> 6;
+                case N  -> 7;
+            };
+        } else {
+            currentFrame = (int) (getAnimTimer() / getFrameDuration()) % totalFramesInRow;
+        }
+
+        int spriteIndex = rowIndex * K.UI.PLAYER_SPRITE_COLS + currentFrame;
         Vector4f uvBounds = sheet.getUVBounds(spriteIndex);
         shader.bind();
 
