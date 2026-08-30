@@ -149,8 +149,8 @@ public class Player extends Character {
         int rowIndex;
         int totalFramesInRow;
         int actionIndex = 16;
-        int fallIndex = 24;
-        int sneakIndex = 25;
+        int sneakIndex = K.UI.PLAYER_SPRITE_ROWS - 1;
+        int fallIndex = sneakIndex - 1;
 
         if (isFalling) {
             rowIndex = fallIndex;
@@ -224,7 +224,7 @@ public class Player extends Character {
         float finalScaleZ = baseScaleZ * globalScale;
 
         float yawRad = (float) Math.toRadians(-camera.getYaw());
-        float yOffset = finalScaleY * -0.15f;
+        float yOffset = finalScaleY * (currentState instanceof SneakingState ? -0.10f : -0.15f);
 
         modelMatrix.identity()
                 .translate(position.x, position.y + yOffset, position.z)
@@ -527,6 +527,21 @@ public class Player extends Character {
             float worldZ = inputDir.x * (float) Math.sin(yawRad) + inputDir.z * (float) Math.cos(yawRad);
 
             Vector3f targetVelocity = new Vector3f(worldX * getSpeed(), getVelocity().y, worldZ * getSpeed());
+
+            if (currentState instanceof SneakingState) {
+                Vector3f nextPosition = new Vector3f(position).add(targetVelocity.x * delta,
+                        0.0f, targetVelocity.z * delta);
+
+                int blockX = (int) Math.floor(nextPosition.x);
+                int blockZ = (int) Math.floor(nextPosition.z);
+                int blockY = (int) Math.floor(position.y - 0.05f);
+
+                if (world.getBlockTypeAt(blockX, blockY, blockZ) == BlockData.AIR.getId()) {
+                    targetVelocity.x = 0.0f;
+                    targetVelocity.z = 0.0f;
+                }
+            }
+
             collide(world, targetVelocity, delta);
         } else {
             Vector3f targetVelocity = new Vector3f(0.0f, getVelocity().y, 0.0f);
