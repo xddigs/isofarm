@@ -10,6 +10,7 @@ import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.graphics.TextureAtlas;
 import com.isofarm.gui.GameUIService;
 import com.isofarm.item.*;
+import com.isofarm.service.BookService;
 import com.isofarm.service.CropService;
 import com.isofarm.service.TimeService;
 import com.isofarm.service.TreeService;
@@ -102,7 +103,8 @@ public class GameInteraction {
             dropItem(gameMaster, selectedItem, dropAll);
         }
 
-        if (Keyboard.isKeyPressed(GLFW_KEY_E) && !gameMaster.isChatOpen()) {
+        if (Keyboard.isKeyPressed(GLFW_KEY_E) && !gameMaster.isChatOpen() &&
+                !BookService.bs.isOpen()) {
             gameMaster.toggleInventory();
         }
 

@@ -12,19 +12,23 @@ public class Book extends Usable {
     private final List<Page> pages;
     private int currentPage;
     private boolean isOpen = false;
+    private final boolean hasContent;
 
-    public Book() {
+    public Book(boolean hasContent) {
         super(Tier.NONE, MaterialID.BOOK);
         this.pages = new ArrayList<>();
+        this.hasContent = hasContent;
     }
 
-    public Book(Tier tier, MaterialID materialID) {
+    public Book(Tier tier, MaterialID materialID, boolean hasContent) {
         super(tier, materialID);
+        this.hasContent = hasContent;
         this.pages = new ArrayList<>();
     }
 
     @Override
     public void use(GameMaster gameMaster) {
+        if (!hasContent) return;
         if (isOpen) {
             BookService.bs.close();
         } else {
