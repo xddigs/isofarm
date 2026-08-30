@@ -424,9 +424,10 @@ public class GameInteraction {
         Item itemToDrop = null;
 
         if (selectedItem instanceof Tool tool) {
-            if (tool instanceof Backpack || tool instanceof CraftingKit) return;
             boolean isUsableOn = Arrays.stream(tool.getType().getUsableOn())
-                    .anyMatch(b -> b.getId() == blockId);
+                    .anyMatch(b -> b.getId() == blockId) &&
+                    !(tool instanceof Backpack || tool instanceof CraftingKit);
+
             tool.setPlayer(gameMaster.getPlayer());
             if (!isUsableOn) {
                 tool.misuse();
