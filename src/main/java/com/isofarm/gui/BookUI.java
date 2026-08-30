@@ -36,12 +36,13 @@ public class BookUI {
         Page page = book.getPage(book.getCurrentPage());
         float paddingX = K.UI.UI_BOOK_PADDING_X;
         float paddingTop = K.UI.UI_BOOK_PADDING_TOP;
-        float lineHeight = GUI.getNormalFont().getSize() * 2.0f;
+        float lineHeight = GUI.getNormalFont().getSize();
 
         float textX = x + paddingX;
         float textY = y + paddingTop;
 
         for (String line : page.getLines()) {
+            if (line.startsWith("-")) line = line.replace("-", "");
             if (line.startsWith("**")) {
                 line = line.replace("**", "");
                 GUI.drawBoldString(line, textX, textY, K.UI.UI_BOOK_TEXT_COLOR);

@@ -77,6 +77,7 @@ public record Recipe(Tier tier, Item result, int resultAmount, List<Ingredient> 
             lines.add(ingredient.getName() + " x " + ingredient.amount());
         }
 
+        lines.add("-");
         return lines;
     }
 

@@ -18,7 +18,7 @@ public class CraftingBook extends Book {
             return;
         }
 
-        final int linesPerPage = 8;
+        final int linesPerPage = 16;
         Page page = new Page();
         addPage(page);
         int lineCount = 0;
