@@ -34,6 +34,7 @@ public class CraftingService {
         Inventory inventory = player.getInventory();
         consume(inventory, recipe);
         give(player, recipe);
+        SoundService.fx.playEntitySound(SoundGroup.ITEMS);
         ToastFactory.success("Crafted " + recipe.result().getName());
         return true;
     }

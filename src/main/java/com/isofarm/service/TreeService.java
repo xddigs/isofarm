@@ -145,9 +145,7 @@ public class TreeService {
                         world.setBlockTypeAt(worldX, localY, worldZ, BlockData.AIR.getId());
                         WorldItem worldItem = new WorldItem(item, 1, new Vector3f(worldX, localY, worldZ));
                         gameMaster.addEntity(worldItem);
-                        gameMaster.getGameInteraction().addItem(gameMaster);
                         world.getGameMaster().rebuildChunkMeshAt(worldX, worldZ);
-                        // TODO fix items not dropping
                     }
                 }
             }

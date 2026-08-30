@@ -479,7 +479,7 @@ public class GameInteraction {
 
         world.setBlockTypeAt(cell, BlockData.AIR.getId());
         gameMaster.rebuildChunkMeshAt(cell);
-        particles.spawnBlock(HoveredCell.get(gameMaster), blockData);
+        particles.spawnBlock(cell, blockData);
 
         if (removedBlock.getType().hasDrops()) {
             Object dropObj = removedBlock.getType().getRandomDrop();

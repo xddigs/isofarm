@@ -102,6 +102,8 @@ public class ParticleEngine implements Service<Particle> {
         float particleUvHeight = baseScale.y / 4.0f;
 
         for (int i = 0; i < totalParticles; i++) {
+            // TODO blockPos being null??
+            if (blockPos == null) continue;
             float px = blockPos.x() + random.nextFloat();
             float py = blockPos.y() + random.nextFloat();
             float pz = blockPos.z() + random.nextFloat();
