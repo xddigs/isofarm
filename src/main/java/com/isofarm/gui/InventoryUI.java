@@ -1,17 +1,15 @@
 package com.isofarm.gui;
 
-import com.isofarm.craft.Ingredient;
-import com.isofarm.craft.Recipe;
-import com.isofarm.craft.RecipeMatcher;
 import com.isofarm.data.*;
 import com.isofarm.entity.Player;
 import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.input.Mouse;
-import com.isofarm.item.*;
+import com.isofarm.item.Block;
+import com.isofarm.item.Item;
+import com.isofarm.item.Tool;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
-import com.isofarm.utils.ToastFactory;
 import com.isofarm.wrld.GameMaster;
 import org.joml.Vector4f;
 import org.slf4j.Logger;
@@ -19,7 +17,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_RIGHT;
@@ -118,10 +115,10 @@ public class InventoryUI extends UIElement {
         groupButton = new UIButton(Settings.getScaledPadding() + btnWidth + Settings.getScaledSpacing(),
                 Settings.getScaledPadding() - Settings.getScaledSpacing(), btnWidth, btnHeight);
 
-        backpackButton = new UIButton(Settings.getScaledPadding() + btnWidth * 2 + Settings.getScaledSpacing() * 2,
+        craftingButton = new UIButton(Settings.getScaledPadding() + btnWidth * 2 + Settings.getScaledSpacing() * 2,
                 Settings.getScaledPadding() - Settings.getScaledSpacing(), btnWidth, btnHeight);
 
-        craftingButton = new UIButton(Settings.getScaledPadding() + btnWidth * 3 + Settings.getScaledSpacing() * 3,
+        backpackButton = new UIButton(Settings.getScaledPadding() + btnWidth * 3 + Settings.getScaledSpacing() * 3,
                 Settings.getScaledPadding() - Settings.getScaledSpacing(), btnWidth, btnHeight);
 
         sortButton.setOnClick(this::sortInventory);
@@ -269,10 +266,6 @@ public class InventoryUI extends UIElement {
 
         craftingButton.setTooltipText("Crafting Kit: " +
                 (currentTab.equals(Tab.CRAFTING) ? "ON" : "OFF"));
-
-        if (!backpackButton.isVisible()) {
-            craftingButton.setX(backpackButton.getX());
-        }
 
         syncInventory();
         updateSlots();
@@ -470,38 +463,20 @@ public class InventoryUI extends UIElement {
     }
 
     private void leftClick(InventorySlot slot) {
-        switch (currentTab) {
-            case INVENTORY -> {
-                if (carriedItem == null) {
-                    pickEntireStack(slot);
-                    return;
-                }
+        if (carriedItem == null) {
+            pickEntireStack(slot);
+            return;
+        }
 
-                if (slot.isEmpty()) {
-                    placeEntireStack(slot);
-                    return;
-                }
+        if (slot.isEmpty()) {
+            placeEntireStack(slot);
+            return;
+        }
 
-                if (isSameType(carriedItem, slot.getItem())) {
-                    mergeCarriedStack(slot);
-                } else {
-                    swapStacks(slot);
-                }
-            }
-
-            case CRAFTING -> {
-                if (carriedItem == null) {
-                    pickEntireStack(slot);
-                    return;
-                }
-
-                if (slot.isEmpty()) {
-                    placeEntireStack(slot);
-                    return;
-                }
-
-                attemptCraft(slot);
-            }
+        if (isSameType(carriedItem, slot.getItem())) {
+            mergeCarriedStack(slot);
+        } else {
+            swapStacks(slot);
         }
     }
 
@@ -551,143 +526,21 @@ public class InventoryUI extends UIElement {
     }
 
     private void rightClick(InventorySlot slot) {
-        switch (currentTab) {
-            case INVENTORY -> {
-                if (carriedItem == null) {
-                    takeHalf(slot);
-                    return;
-                }
-
-                if (slot.isEmpty()) {
-                    placeOne(slot);
-                    return;
-                }
-
-                if (!isSameType(carriedItem, slot.getItem())) {
-                    return;
-                }
-
-                addOneToSlot(slot);
-            }
-
-            case CRAFTING -> {
-                if (attemptCraftOne(slot)) {
-                    return;
-                }
-
-                if (carriedItem == null) {
-                    pickEntireStack(slot);
-                    return;
-                }
-
-                if (slot.isEmpty()) {
-                    placeEntireStack(slot);
-                    return;
-                }
-
-                attemptCraft(slot);
-            }
-        }
-    }
-
-    private boolean attemptCraftOne(InventorySlot slot) {
-        if (slot == null || slot.isEmpty()) {
-            return false;
-        }
-
-        InventorySlot[] inputSlots = new InventorySlot[]{ slot };
-        Optional<Recipe> matchedRecipe = RecipeMatcher.match(inputSlots, gameMaster.getRecipes());
-
-        if (matchedRecipe.isEmpty()) {
-            return false;
-        }
-
-        Recipe recipe = matchedRecipe.get();
-        craftFromSlots(recipe, inputSlots);
-        return true;
-    }
-
-    private void attemptCraft(InventorySlot targetSlot) {
-        if (carriedItem == null || targetSlot == null || targetSlot.isEmpty()) {
+        if (carriedItem == null) {
+            takeHalf(slot);
             return;
         }
 
-        InventorySlot carriedSlot = new InventorySlot();
-        carriedSlot.setItem(carriedItem);
-        carriedSlot.setAmount(carriedAmount);
-
-        InventorySlot[] inputSlots = new InventorySlot[]{ carriedSlot, targetSlot };
-        Optional<Recipe> matchedRecipe = RecipeMatcher.match(inputSlots, gameMaster.getRecipes());
-        if (matchedRecipe.isEmpty()) {
-            ToastFactory.error("These materials cannot be combined");
+        if (slot.isEmpty()) {
+            placeOne(slot);
             return;
         }
 
-        Recipe recipe = matchedRecipe.get();
-        craftFromSlots(recipe, inputSlots);
-        if (carriedSlot.isEmpty()) {
-            clearCarriedItem();
-        } else {
-            this.carriedAmount = carriedSlot.getAmount();
-        }
-    }
-
-    private void craftFromSlots(Recipe recipe, InventorySlot[] inputSlots) {
-        for (Ingredient ing : recipe.ingredients()) {
-            int remainingToDeduct = ing.amount();
-
-            for (InventorySlot slot : inputSlots) {
-                if (slot == null || slot.isEmpty()) continue;
-
-                if (matchesIngredient(ing, slot.getItem())) {
-                    int amountInSlot = slot.getAmount();
-                    int toTake = Math.min(remainingToDeduct, amountInSlot);
-
-                    slot.setAmount(amountInSlot - toTake);
-                    if (slot.getAmount() <= 0) {
-                        slot.clear();
-                    }
-
-                    remainingToDeduct -= toTake;
-                    if (remainingToDeduct <= 0) break;
-                }
-            }
+        if (!isSameType(carriedItem, slot.getItem())) {
+            return;
         }
 
-        Item result = recipe.result().copy();
-        int remaining = inventory.add(result, recipe.resultAmount());
-        if (remaining > 0 && player != null) {
-            player.addToBackpack(result, remaining);
-        }
-    }
-
-    private boolean matchesIngredient(Ingredient ingredient, Item item) {
-        if (ingredient == null || item == null) {
-            return false;
-        }
-
-        Craftable craftable = ingredient.craftable();
-        if (craftable instanceof BlockData bd
-                && item instanceof Block b) {
-            return b.getType() == bd;
-        }
-
-        if (craftable instanceof MaterialID mid
-                && item instanceof Material m) {
-            return m.getId() == mid.getId();
-        }
-
-        if (craftable instanceof MiningComponent mc
-                && item instanceof MiningComponent itemMc) {
-            return mc.getTier() == itemMc.getTier()
-                    && mc.getId() == itemMc.getId();
-        }
-
-        if (craftable instanceof Item craftableItem) {
-            return isSameType(craftableItem, item);
-        }
-
-        return false;
+        addOneToSlot(slot);
     }
 
     private void takeHalf(InventorySlot slot) {
