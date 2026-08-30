@@ -69,8 +69,10 @@ public class Book extends Usable {
     }
 
     @Override
-    public void update() {
+    public void update() {}
 
+    public boolean hasContent() {
+        return hasContent;
     }
 
     public int getCurrentPage() {

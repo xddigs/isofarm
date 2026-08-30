@@ -69,6 +69,17 @@ public record Recipe(Tier tier, Item result, int resultAmount, List<Ingredient> 
 
     @Override
     public String toString() {
-        return "Recipe=" + result.getName() + " x " + resultAmount;
+        StringBuilder sb = new StringBuilder();
+        for (Ingredient ingredient : ingredients) {
+            sb.append(ingredient.getName())
+                    .append(" x ")
+                    .append(ingredient.amount())
+                    .append(", ");
+        }
+
+        sb.append(result.getName())
+                .append(" x ")
+                .append(resultAmount);
+        return String.valueOf(sb);
     }
 }

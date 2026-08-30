@@ -6,7 +6,6 @@ public class StartingKit extends Kit {
 
     public StartingKit() {
         setItems(new Item[]{
-                new CraftingKit(),
                 new CraftingBook()
         });
     }

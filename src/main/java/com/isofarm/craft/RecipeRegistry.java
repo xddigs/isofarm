@@ -84,6 +84,10 @@ public class RecipeRegistry {
         }
     }
 
+    public static List<Recipe> getRecipes() {
+        return recipes;
+    }
+
     public static RecipeBuilder create(Tier tier) {
         return new RecipeBuilder(tier);
     }

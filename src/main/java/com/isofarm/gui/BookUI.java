@@ -4,7 +4,6 @@ import com.isofarm.graphics.Texture;
 import com.isofarm.item.Book;
 import com.isofarm.item.Page;
 import com.isofarm.utils.K;
-import com.isofarm.utils.Settings;
 import org.joml.Vector4f;
 
 public class BookUI {
@@ -34,8 +33,7 @@ public class BookUI {
             return;
         }
 
-        Page page = book.getPage(0);
-
+        Page page = book.getPage(book.getCurrentPage());
         float paddingX = 50.0f;
         float paddingTop = 60.0f;
         float lineHeight = 28.0f;
@@ -44,7 +42,7 @@ public class BookUI {
         float textY = y + paddingTop;
 
         for (String line : page.getLines()) {
-            GUI.drawNormalString(line, textX, textY, K.UI.UI_TEXT_COLOR);
+            GUI.drawNormalString(line, textX, textY, K.UI.UI_BOOK_TEXT_COLOR);
             textY += lineHeight;
         }
     }

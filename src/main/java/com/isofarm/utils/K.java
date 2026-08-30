@@ -109,6 +109,7 @@ public final class K {
         public static final Vector4f UI_SELECTED_BORDER_COLOR = new Vector4f(0.0f);
         public static final Vector4f UI_ITEM_TINT = new Vector4f(1.0f);
         public static final Vector4f UI_TEXT_COLOR = new Vector4f(1.0f);
+        public static final Vector4f UI_BOOK_TEXT_COLOR = new Vector4f(0.0f, 0.0f, 0.0f, 1.0f);
         public static final Vector4f UI_HOTBAR_SELECTED_COLOR = new Vector4f(0.35f, 0.9f, 0.35f, 1.0f);
     }
 
