@@ -15,7 +15,7 @@ import java.util.List;
 public enum BlockData implements Craftable {
     AIR((byte) 0, (byte) 0, (byte) 0, "Empty", false, false, 0, null, SoundGroup.SILENT, 0f, true, new Object[]{}, Tier.NONE),
     DIRT((byte) 1, (byte) 1, (byte) 0, "Dirt", true, false, 100, "assets/textures/blocks/dirt.png", SoundGroup.SOIL, 0.9f, false, new Object[]{}, Tier.NONE),
-    GRASS((byte) 2, (byte) 2, (byte) 0, "Grass", true, false, 120, "assets/textures/blocks/grass_top.png", "assets/textures/blocks/grass_bottom.png","assets/textures/blocks/grass.png",SoundGroup.SOIL, 1.0f, false, new Object[]{}, Tier.NONE),
+    GRASS((byte) 2, (byte) 2, (byte) 0, "Grass", true, false, 120, "assets/textures/blocks/grass_top.png", "assets/textures/blocks/grass_bottom.png","assets/textures/blocks/grass.png",SoundGroup.SOIL, 1.0f, false, new Seed[]{new Seed()}, Tier.NONE),
     STONE((byte) 3, (byte) 3, (byte) 0, "Stone", false, false, 150, "assets/textures/blocks/stone.png", SoundGroup.HARD, 6.0f, false, new Object[]{}, Tier.NONE),
     TILLED_DIRT((byte) 4, (byte) 4, (byte) 0, "Tilled Dirt", true, false,  110, "assets/textures/blocks/dirt_tilled.png", "assets/textures/blocks/dirt.png", "assets/textures/blocks/dirt.png", SoundGroup.SOIL, 0.9f, false, new Object[]{}, Tier.NONE),
     VOIDSTONE((byte) 5, (byte) 5, (byte) 0, "Voidstone", false, false, 999, "assets/textures/blocks/voidstone.png", SoundGroup.HARD, 999999.0f, false,  new Object[]{}, Tier.NONE),
