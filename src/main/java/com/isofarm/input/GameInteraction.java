@@ -103,6 +103,10 @@ public class GameInteraction {
             dropItem(gameMaster, selectedItem, dropAll);
         }
 
+        if (Keyboard.isKeyPressed(GLFW_KEY_E) && BookService.bs.isOpen()) {
+            BookService.bs.close();
+        }
+
         if (Keyboard.isKeyPressed(GLFW_KEY_E) && !gameMaster.isChatOpen() &&
                 !BookService.bs.isOpen()) {
             gameMaster.toggleInventory();
