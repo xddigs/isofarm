@@ -22,6 +22,7 @@ import static org.lwjgl.openal.ALC10.*;
 import static org.lwjgl.stb.STBVorbis.stb_vorbis_decode_memory;
 
 public class SoundService implements Service<SoundGroup> {
+    public static final SoundService fx = new SoundService();
     private static final Logger log = LoggerFactory.getLogger(SoundService.class);
     private long device;
     private long context;
@@ -36,9 +37,15 @@ public class SoundService implements Service<SoundGroup> {
     private int useSource;
 
     private String currentBackgroundSound;
+    private boolean hasLoaded = false;
 
     public SoundService() {
-        this.init();
+        soundBuffers.clear();
+        if (!hasLoaded) {
+            this.init();
+            hasLoaded = true;
+        }
+
         for (SoundGroup group : SoundGroup.values()) {
             loadSoundArray(group.getStepSounds());
             loadSoundArray(group.getBreakSounds());
