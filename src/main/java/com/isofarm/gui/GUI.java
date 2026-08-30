@@ -276,6 +276,10 @@ public class GUI {
         drawString(text, x, y, normal, color);
     }
 
+    public static void drawBoldString(String line, float textX, float textY, Vector4f uiBookTextColor) {
+        drawString(line, textX, textY, normalBold, uiBookTextColor);
+    }
+
     public static void drawBigString(String text, float x, float y, Vector4f color) {
         drawString(text, x, y, big, color);
     }

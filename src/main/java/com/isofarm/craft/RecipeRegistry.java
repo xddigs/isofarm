@@ -3,10 +3,7 @@ package com.isofarm.craft;
 import com.isofarm.data.*;
 import com.isofarm.item.*;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 public class RecipeRegistry {
@@ -18,7 +15,7 @@ public class RecipeRegistry {
 
         create(Tier.LEATHER).result(new Block(BlockData.OAK_WOOD), 4).with(BlockData.OAK_LOG, 1).add();
         create(Tier.LEATHER).result(new Material(Tier.NONE, MaterialID.STICK), 4).with(BlockData.OAK_WOOD, 1).add();
-        create(Tier.LEATHER).result(new Material(Tier.NONE, MaterialID.BOOK), 2).with(MaterialID.LEATHER, 3).with(MaterialID.PAPER, 2).add();
+        create(Tier.LEATHER).result(new Material(Tier.NONE, MaterialID.BOOK), 1).with(MaterialID.LEATHER, 3).with(MaterialID.PAPER, 2).add();
         create(Tier.LEATHER).result(new Bucket(BlockData.AIR, Tier.WOOD), 1).with(BlockData.OAK_WOOD, 3).add();
         create(Tier.LEATHER).result(new CraftingBook(), 1).with(MaterialID.LEATHER, 2).add();
 
@@ -51,6 +48,9 @@ public class RecipeRegistry {
                     .with(mainMaterial, 3)
                     .with(MaterialID.STICK, 2).add();
         });
+
+        recipes.sort(Comparator.comparing(recipe -> recipe.result().getName(),
+                String.CASE_INSENSITIVE_ORDER));
         return recipes;
     }
 

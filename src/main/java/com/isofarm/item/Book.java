@@ -1,12 +1,18 @@
 package com.isofarm.item;
 
 import com.isofarm.data.MaterialID;
+import com.isofarm.data.SoundGroup;
 import com.isofarm.data.Tier;
+import com.isofarm.input.Keyboard;
 import com.isofarm.service.BookService;
+import com.isofarm.service.SoundService;
 import com.isofarm.wrld.GameMaster;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
 
 public class Book extends Usable {
     private final List<Page> pages;
@@ -69,7 +75,10 @@ public class Book extends Usable {
     }
 
     @Override
-    public void update() {}
+    public void update() {
+        if (Keyboard.isKeyPressed(GLFW_KEY_LEFT)) previousPage();
+        if (Keyboard.isKeyPressed(GLFW_KEY_RIGHT)) nextPage();
+    }
 
     public boolean hasContent() {
         return hasContent;
@@ -82,12 +91,14 @@ public class Book extends Usable {
     public void nextPage() {
         if (currentPage + 1 < pages.size()) {
             currentPage++;
+            SoundService.fx.playUseSound(SoundGroup.BOOKS);
         }
     }
 
     public void previousPage() {
         if (currentPage > 0) {
             currentPage--;
+            SoundService.fx.playUseSound(SoundGroup.BOOKS);
         }
     }
 

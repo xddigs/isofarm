@@ -25,24 +25,29 @@ public class BookUI {
         float y = (screenHeight - bookHeight) * 0.5f;
 
         GUI.drawTexture(page, x, y, bookWidth, bookHeight, new Vector4f(1.0f));
-        renderPage(book, x, y, bookWidth, bookHeight);
+        renderPage(book, x, y);
     }
 
-    private static void renderPage(Book book, float x, float y, float width, float height) {
+    private static void renderPage(Book book, float x, float y) {
         if (book.getPages().isEmpty()) {
             return;
         }
 
         Page page = book.getPage(book.getCurrentPage());
-        float paddingX = 50.0f;
-        float paddingTop = 60.0f;
-        float lineHeight = 28.0f;
+        float paddingX = K.UI.UI_BOOK_PADDING_X;
+        float paddingTop = K.UI.UI_BOOK_PADDING_TOP;
+        float lineHeight = GUI.getNormalFont().getSize() * 2.0f;
 
         float textX = x + paddingX;
         float textY = y + paddingTop;
 
         for (String line : page.getLines()) {
-            GUI.drawNormalString(line, textX, textY, K.UI.UI_BOOK_TEXT_COLOR);
+            if (line.startsWith("**")) {
+                line = line.replace("**", "");
+                GUI.drawBoldString(line, textX, textY, K.UI.UI_BOOK_TEXT_COLOR);
+            } else {
+                GUI.drawNormalString(line, textX, textY, K.UI.UI_BOOK_TEXT_COLOR);
+            }
             textY += lineHeight;
         }
     }

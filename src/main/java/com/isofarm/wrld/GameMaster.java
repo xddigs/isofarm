@@ -137,6 +137,9 @@ public class GameMaster {
         this.recenter();
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
+        recipes = RecipeRegistry.init();
+        notifyProgress(progressCallback, ++currentStep / totalSteps);
+
         this.player = new Player(null, world, this);
         player.setSoundService(soundService);
         addEntity(player);
@@ -147,9 +150,6 @@ public class GameMaster {
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
         Library.initCommands(genDelta, this);
-        notifyProgress(progressCallback, ++currentStep / totalSteps);
-
-        recipes = RecipeRegistry.init();
         notifyProgress(progressCallback, ++currentStep / totalSteps);
     }
 

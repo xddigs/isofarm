@@ -13,19 +13,27 @@ public class CraftingBook extends Book {
     public CraftingBook() {
         super(Tier.NONE, MaterialID.CRAFTING_BOOK, true);
         this.recipes = RecipeRegistry.getRecipes();
+        System.out.println(recipes.size());
         if (!hasContent()) {
             return;
         }
 
-        final int recipesPerPage = 10;
+        final int linesPerPage = 8;
         Page page = new Page();
         addPage(page);
-        for (int i = 0; i < recipes.size(); i++) {
-            if (i > 0 && i % recipesPerPage == 0) {
+        int lineCount = 0;
+        for (Recipe recipe : recipes) {
+            List<String> lines = recipe.toBookLines();
+            if (lineCount + lines.size() > linesPerPage) {
                 page = new Page();
                 addPage(page);
+                lineCount = 0;
             }
-            page.addLine(recipes.get(i).toString());
+
+            for (String line : lines) {
+                page.addLine(line);
+                lineCount++;
+            }
         }
     }
 }

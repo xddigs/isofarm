@@ -5,6 +5,7 @@ import com.isofarm.data.MaterialID;
 import com.isofarm.data.Tier;
 import com.isofarm.item.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -56,30 +57,43 @@ public record Recipe(Tier tier, Item result, int resultAmount, List<Ingredient> 
         if (a == b) return true;
         if (a == null || b == null) return false;
 
-        if (a instanceof BlockData bd1 && b instanceof BlockData bd2) return bd1 == bd2;
-        if (a instanceof MaterialID mid1 && b instanceof MaterialID mid2) return mid1 == mid2;
-        if (a instanceof MiningComponent mc1 && b instanceof MiningComponent mc2) {
-            return mc1.getTier() == mc2.getTier() && mc1.getId() == mc2.getId();
-        }
-        if (a instanceof Block blk1 && b instanceof Block blk2) return blk1.getType() == blk2.getType();
-        if (a instanceof Material mat1 && b instanceof Material mat2) return mat1.getId() == mat2.getId();
+        return switch (a) {
+            case BlockData bd1 when b instanceof BlockData bd2 -> bd1 == bd2;
+            case MaterialID mid1 when b instanceof MaterialID mid2 -> mid1 == mid2;
+            case MiningComponent mc1 when b instanceof MiningComponent mc2 -> mc1.getTier() == mc2.getTier()
+                    && mc1.getId() == mc2.getId();
+            case Block blk1 when b instanceof Block blk2 -> blk1.getType() == blk2.getType();
+            case Material mat1 when b instanceof Material mat2 -> mat1.getId() == mat2.getId();
+            default -> a.getId() == b.getId();
+        };
 
-        return a.getId() == b.getId();
+    }
+
+    public List<String> toBookLines() {
+        List<String> lines = new ArrayList<>();
+        lines.add("**" + result.getName() + " x " + resultAmount);
+
+        for (Ingredient ingredient : ingredients) {
+            lines.add(ingredient.getName() + " x " + ingredient.amount());
+        }
+
+        return lines;
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        sb.append("[").append(result.getName())
+                .append(" x ")
+                .append(resultAmount)
+                .append("]");
+
         for (Ingredient ingredient : ingredients) {
             sb.append(ingredient.getName())
                     .append(" x ")
                     .append(ingredient.amount())
                     .append(", ");
         }
-
-        sb.append(result.getName())
-                .append(" x ")
-                .append(resultAmount);
-        return String.valueOf(sb);
+        return sb.toString();
     }
 }
