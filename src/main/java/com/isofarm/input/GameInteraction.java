@@ -323,6 +323,7 @@ public class GameInteraction {
     }
 
     private void breakAction(GameMaster gameMaster, BlockPos cell) {
+        if (BookService.bs.isOpen()) return;
         World world = gameMaster.getWorld();
         int x = cell.x();
         int y = cell.y();
@@ -511,6 +512,7 @@ public class GameInteraction {
     private void placeAction(GameMaster gameMaster, BlockPos cell,
                              Item selectedItem) {
         World world = gameMaster.getWorld();
+        if (BookService.bs.isOpen()) return;
         if (gameMaster.getPlayer().checkCollision(world)) return;
 
         if (gameMaster.getPlayer() != null &&

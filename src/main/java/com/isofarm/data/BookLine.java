@@ -2,15 +2,15 @@ package com.isofarm.data;
 
 import java.util.function.Consumer;
 
-public class Line {
+public class BookLine {
     private String text;
-    private Consumer<Line> action;
+    private Consumer<BookLine> action;
 
-    public Line(String text) {
+    public BookLine(String text) {
         this(text, null);
     }
 
-    public Line(String text, Consumer<Line> action) {
+    public BookLine(String text, Consumer<BookLine> action) {
         this.text = text;
         this.action = action;
     }
@@ -27,7 +27,7 @@ public class Line {
         return action != null;
     }
 
-    public void setClick(Consumer<Line> action) {
+    public void setClick(Consumer<BookLine> action) {
         this.action = action;
     }
 

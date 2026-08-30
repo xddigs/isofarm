@@ -1,11 +1,14 @@
 package com.isofarm.gui;
 
-import com.isofarm.data.Line;
+import com.isofarm.data.BookLine;
 import com.isofarm.graphics.Texture;
+import com.isofarm.input.Mouse;
 import com.isofarm.item.Book;
 import com.isofarm.item.Page;
 import com.isofarm.utils.K;
 import org.joml.Vector4f;
+
+import static org.lwjgl.glfw.GLFW.*;
 
 public class BookUI {
     private static final Texture page = new Texture(K.Paths.DEFAULT_BOOK_UI);
@@ -14,6 +17,8 @@ public class BookUI {
 
     private static boolean isOpening = false;
     private static boolean isClosing = false;
+
+    private static BookLine hoveredBookLine;
 
     public static void open() {
         isClosing = false;
@@ -102,33 +107,67 @@ public class BookUI {
     }
 
     private static void renderPage(Book book, float x, float y) {
-        if (book.getPages().isEmpty()) {
-            return;
-        }
-
+        if (book.getPages().isEmpty()) return;
         Page page = book.getPage(book.getCurrentPage());
 
         float paddingX = K.UI.UI_BOOK_PADDING_X;
         float paddingTop = K.UI.UI_BOOK_PADDING_TOP;
-        float lineHeight = GUI.getNormalFont().getSize();
+        float lineHeight = GUI.getNormalFont().getSize() + 2.0f;
 
         float textX = x + paddingX;
         float textY = y + paddingTop;
 
-        for (Line bl : page.getLines()) {
-            String line = bl.getText();
-            if (line.startsWith("-")) {
-                line = line.replace("-", "");
+        hoveredBookLine = null;
+
+        for (BookLine bookLine : page.getLines()) {
+            String text = bookLine.getText();
+
+            if (bookLine.isInteractive() && isMouseHovering(textX, textY, text,
+                    lineHeight)) {
+                hoveredBookLine = bookLine;
             }
 
-            if (line.startsWith("**")) {
-                line = line.replace("**", "");
-                GUI.drawBoldString(line, textX, textY, K.UI.UI_BOOK_TEXT_COLOR);
+            String renderText = text;
+            if (renderText.startsWith("-")) {
+                renderText = renderText.replace("-", "");
+            }
+
+            Vector4f textColor = (bookLine == hoveredBookLine) ? new Vector4f(0.1f, 0.4f, 0.9f, 1.0f) :
+                    K.UI.UI_BOOK_TEXT_COLOR;
+
+            if (renderText.startsWith("**")) {
+                renderText = renderText.replace("**", "");
+                GUI.drawBoldString(renderText, textX, textY, textColor);
             } else {
-                GUI.drawNormalString(line, textX, textY, K.UI.UI_BOOK_TEXT_COLOR);
+                GUI.drawNormalString(renderText, textX, textY, textColor);
             }
 
             textY += lineHeight;
+        }
+
+        if (isOpen()) click();
+    }
+
+    public static boolean isMouseHovering(float x, float y, String text, float lineHeight) {
+        float mouseX = Mouse.getX();
+        float mouseY = Mouse.getY();
+
+        String cleanText = text.replace("**", "").replace("-", "").trim();
+        float width = GUI.getStringWidth(cleanText, GUI.getNormalFont());
+
+        float verticalPadding = 4.0f;
+        float horizontalPadding = 6.0f;
+
+        return mouseX >= (x - horizontalPadding)
+                && mouseX <= (x + width + horizontalPadding)
+                && mouseY >= (y - verticalPadding)
+                && mouseY <= (y + lineHeight + verticalPadding);
+    }
+
+    public static void click() {
+        if (hoveredBookLine == null || !hoveredBookLine.isInteractive()) return;
+        if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
+            hoveredBookLine.click();
         }
     }
 }

@@ -2,89 +2,46 @@ package com.isofarm.service;
 
 import com.isofarm.craft.Ingredient;
 import com.isofarm.craft.Recipe;
-import com.isofarm.craft.RecipeMatcher;
-import com.isofarm.craft.RecipeRegistry;
 import com.isofarm.data.*;
 import com.isofarm.entity.Player;
 import com.isofarm.item.*;
 import com.isofarm.utils.ToastFactory;
 
-import java.util.Optional;
-
 public class CraftingService {
     public static final CraftingService cs = new CraftingService();
 
-    public Optional<Recipe> find(InventorySlot[] inputSlots) {
-        if (inputSlots == null) {
-            return Optional.empty();
-        }
-        return RecipeMatcher.match(inputSlots, RecipeRegistry.reg.getRecipes());
-    }
-
     public boolean canCraft(Player player, Recipe recipe) {
-        if (player == null || recipe == null) {
-            return false;
-        }
-
+        if (player == null || recipe == null) return false;
         Inventory inventory = player.getInventory();
-        if (inventory == null) {
-            return false;
-        }
+        if (inventory == null) return false;
 
         for (Ingredient ingredient : recipe.ingredients()) {
-
             if (count(inventory, ingredient) < ingredient.amount()) {
                 return false;
             }
         }
-
         return true;
     }
 
     public boolean craft(Player player, Recipe recipe) {
-        if (player == null || recipe == null) {
-            return false;
-        }
+        if (player == null || recipe == null) return false;
 
         if (!canCraft(player, recipe)) {
-            ToastFactory.error("Missing materials");
+            ToastFactory.error("You don't have enough ingredients");
             return false;
         }
 
         Inventory inventory = player.getInventory();
         consume(inventory, recipe);
         give(player, recipe);
+        ToastFactory.success("Crafted " + recipe.result().getName());
         return true;
-    }
-
-    public boolean craft(Player player, Recipe recipe, InventorySlot[] inputSlots) {
-        if (player == null || recipe == null || inputSlots == null) {
-
-            return false;
-        }
-
-        consume(inputSlots, recipe);
-        give(player, recipe);
-        return true;
-    }
-
-    public boolean craft(Player player, InventorySlot[] inputSlots) {
-        Optional<Recipe> matchedRecipe = find(inputSlots);
-        return matchedRecipe.filter(recipe -> craft(player, recipe, inputSlots)).isPresent();
-
-    }
-
-    public Optional<Recipe> getMatchingRecipe(InventorySlot[] inputSlots) {
-        return find(inputSlots);
     }
 
     private void consume(InventorySlot[] inputSlots, Recipe recipe) {
         for (Ingredient ingredient : recipe.ingredients()) {
-
             int remainingToDeduct = ingredient.amount();
-
             for (InventorySlot slot : inputSlots) {
-
                 if (slot == null || slot.isEmpty()) {
                     continue;
                 }
@@ -161,16 +118,13 @@ public class CraftingService {
 
     private void give(Player player, Recipe recipe) {
         Item result = recipe.result().copy();
-
         Inventory inventory = player.getInventory();
-
         int remaining = inventory.add(result, recipe.resultAmount());
-
-        if (remaining > 0) {
+        if (!player.hasSpace()) {
             player.addToBackpack(result, remaining);
         }
 
-        if (remaining > 0) {
+        if (!player.hasSpace()) {
             ToastFactory.error("Not enough inventory space");
         }
     }

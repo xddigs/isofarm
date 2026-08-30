@@ -1,6 +1,7 @@
 package com.isofarm.service;
 
 import com.isofarm.gui.BookUI;
+import com.isofarm.input.Mouse;
 import com.isofarm.item.Book;
 
 public class BookService implements Service<Book> {
@@ -38,11 +39,11 @@ public class BookService implements Service<Book> {
         if (openedBook != null && !BookUI.isAnimating()) {
             openedBook.update();
         }
+
         if (BookUI.isClosed()) {
             if (openedBook != null) {
                 openedBook.close();
             }
-
             openedBook = null;
         }
     }

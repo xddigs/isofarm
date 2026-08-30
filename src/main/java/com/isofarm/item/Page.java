@@ -1,55 +1,55 @@
 package com.isofarm.item;
 
-import com.isofarm.data.Line;
+import com.isofarm.data.BookLine;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
 public class Page {
-    private final List<Line> lines;
+    private final List<BookLine> bookLines;
 
     public Page() {
-        this.lines = new ArrayList<>();
+        this.bookLines = new ArrayList<>();
     }
 
-    public List<Line> getLines() {
-        return lines;
+    public List<BookLine> getLines() {
+        return bookLines;
     }
 
     public void addLine(String line) {
-        lines.add(new Line(line));
+        bookLines.add(new BookLine(line));
     }
 
-    public void addLine(String line, Consumer<Line> action) {
-        lines.add(new Line(line, action));
+    public void addLine(String line, Consumer<BookLine> action) {
+        bookLines.add(new BookLine(line, action));
     }
 
-    public Line getLine(int index) {
-        return lines.get(index);
+    public BookLine getLine(int index) {
+        return bookLines.get(index);
     }
 
     public void setLine(int index, String line) {
-        lines.set(index, new Line(line));
+        bookLines.set(index, new BookLine(line));
     }
 
     public void insertLine(int index, String line) {
-        lines.add(index, new Line(line));
+        bookLines.add(index, new BookLine(line));
     }
 
     public void removeLine(int index) {
-        lines.remove(index);
+        bookLines.remove(index);
     }
 
     public void clear() {
-        lines.clear();
+        bookLines.clear();
     }
 
     public int size() {
-        return lines.size();
+        return bookLines.size();
     }
 
-    public void forEachLine(Consumer<Line> consumer) {
-        lines.forEach(consumer);
+    public void forEachLine(Consumer<BookLine> consumer) {
+        bookLines.forEach(consumer);
     }
 }
