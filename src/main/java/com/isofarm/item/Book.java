@@ -18,6 +18,11 @@ public class Book extends Usable {
         this.pages = new ArrayList<>();
     }
 
+    public Book(Tier tier, MaterialID materialID) {
+        super(tier, materialID);
+        this.pages = new ArrayList<>();
+    }
+
     @Override
     public void use(GameMaster gameMaster) {
         if (isOpen) {
