@@ -11,7 +11,7 @@ public class CraftingBook extends Book {
 
     public CraftingBook() {
         super(Tier.NONE, MaterialID.CRAFTING_BOOK, true);
-        List<Recipe> recipes = RecipeRegistry.getRecipes();
+        List<Recipe> recipes = RecipeRegistry.reg.getRecipes();
         System.out.println(recipes.size());
         if (!hasContent()) {
             return;

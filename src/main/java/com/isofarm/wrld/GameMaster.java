@@ -137,7 +137,7 @@ public class GameMaster {
         this.recenter();
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
-        recipes = RecipeRegistry.init();
+        recipes = RecipeRegistry.reg.init();
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
         this.player = new Player(null, world, this);

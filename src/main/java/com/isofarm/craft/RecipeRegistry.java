@@ -7,9 +7,10 @@ import java.util.*;
 import java.util.function.Function;
 
 public class RecipeRegistry {
+    public static final RecipeRegistry reg = new RecipeRegistry();
     private static final List<Recipe> recipes = new LinkedList<>();
 
-    public static List<Recipe> init() {
+    public List<Recipe> init() {
         recipes.clear();
         registerSmeltingRecipes();
 
@@ -54,7 +55,7 @@ public class RecipeRegistry {
         return recipes;
     }
 
-    private static void registerToolSet(Tier stationTier, Craftable primaryMat) {
+    private void registerToolSet(Tier stationTier, Craftable primaryMat) {
         registerTool(stationTier, primaryMat, 2, 2, Hoe::new);
         registerTool(stationTier, primaryMat, 3, 2, Pickaxe::new);
         registerTool(stationTier, primaryMat, 1, 2, Shovel::new);
@@ -62,7 +63,7 @@ public class RecipeRegistry {
         registerTool(stationTier, primaryMat, 2, 1, Sword::new);
     }
 
-    private static void registerTool(Tier stationTier, Craftable mat, int matAmount, int stickAmount,
+    private void registerTool(Tier stationTier, Craftable mat, int matAmount, int stickAmount,
                                      Function<Tier, Item> constructor) {
         create(stationTier)
                 .result(constructor.apply(getTierFromMaterial(mat)), 1)
@@ -71,11 +72,11 @@ public class RecipeRegistry {
                 .add();
     }
 
-    private static Tier getTierFromMaterial(Craftable mat) {
+    private Tier getTierFromMaterial(Craftable mat) {
         return (mat instanceof MiningComponent mc) ? mc.getTier() : Tier.WOOD;
     }
 
-    private static void registerSmeltingRecipes() {
+    private void registerSmeltingRecipes() {
         Tier[] metalTiers = {Tier.COPPER, Tier.IRON, Tier.STEEL, Tier.GOLD, Tier.PLATINUM, Tier.DIAMOND};
         for (Tier tier : metalTiers) {
             create(tier)
@@ -84,11 +85,11 @@ public class RecipeRegistry {
         }
     }
 
-    public static List<Recipe> getRecipes() {
+    public List<Recipe> getRecipes() {
         return recipes;
     }
 
-    public static RecipeBuilder create(Tier tier) {
+    public RecipeBuilder create(Tier tier) {
         return new RecipeBuilder(tier);
     }
 

@@ -74,7 +74,7 @@ public record Recipe(Tier tier, Item result, int resultAmount, List<Ingredient> 
         lines.add("**" + result.getName() + " x " + resultAmount);
 
         for (Ingredient ingredient : ingredients) {
-            lines.add(ingredient.getName() + " x " + ingredient.amount());
+            lines.add(ingredient.craftable().getName() + " x " + ingredient.amount());
         }
 
         lines.add("-");
@@ -90,7 +90,7 @@ public record Recipe(Tier tier, Item result, int resultAmount, List<Ingredient> 
                 .append("]");
 
         for (Ingredient ingredient : ingredients) {
-            sb.append(ingredient.getName())
+            sb.append(ingredient.craftable().getName())
                     .append(" x ")
                     .append(ingredient.amount())
                     .append(", ");
