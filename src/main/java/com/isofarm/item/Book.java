@@ -10,6 +10,7 @@ import java.util.List;
 
 public class Book extends Usable {
     private final List<Page> pages;
+    private int currentPage;
     private boolean isOpen = false;
 
     public Book() {
@@ -19,7 +20,9 @@ public class Book extends Usable {
 
     @Override
     public void use(GameMaster gameMaster) {
-        BookService.bs.add(this);
+        BookService.bs.isOpen();
+        BookService.bs.getOpenedBook();
+        BookService.bs.close();
     }
 
     public void open() {
@@ -57,5 +60,29 @@ public class Book extends Usable {
     @Override
     public void update() {
 
+    }
+
+    public int getCurrentPage() {
+        return currentPage;
+    }
+
+    public void nextPage() {
+        if (currentPage + 1 < pages.size()) {
+            currentPage++;
+        }
+    }
+
+    public void previousPage() {
+        if (currentPage > 0) {
+            currentPage--;
+        }
+    }
+
+    public boolean hasNextPage() {
+        return currentPage + 1 < pages.size();
+    }
+
+    public boolean hasPreviousPage() {
+        return currentPage > 0;
     }
 }

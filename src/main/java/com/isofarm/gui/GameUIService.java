@@ -6,6 +6,7 @@ import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.input.CommandCompletionProvider;
 import com.isofarm.input.Mouse;
 import com.isofarm.item.Item;
+import com.isofarm.service.BookService;
 import com.isofarm.service.Service;
 import com.isofarm.utils.Components;
 import com.isofarm.utils.K;
@@ -36,6 +37,7 @@ public class GameUIService implements Service<GameMaster> {
     private final InventoryUI inventoryUI;
     private final BackpackInventoryUI backpackUI;
     private final HotbarUI hotbarUI;
+
     private final UITextField chatField;
     private final UILabel time;
     private final UILabel coords;
@@ -277,6 +279,10 @@ public class GameUIService implements Service<GameMaster> {
         renderChatHistory();
         if (!gameMaster.isInventoryOpen()) {
             GUI.drawCursor(gameMaster);
+        }
+
+        if (BookService.bs.isOpen()) {
+            BookUI.render(BookService.bs.getOpenedBook());
         }
 
         GUI.end();

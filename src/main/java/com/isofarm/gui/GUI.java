@@ -37,7 +37,8 @@ public class GUI {
     private static int screenWidth;
     private static int screenHeight;
 
-    private GUI() {}
+    private GUI() {
+    }
 
     public static void begin(float screenWidth, float screenHeight) {
         glDisable(GL_DEPTH_TEST);
@@ -216,8 +217,8 @@ public class GUI {
         float[] px = {x, x + leftBorder, x + width - rightBorder, x + width};
         float[] py = {y, y + topBorder, y + height - bottomBorder, y + height};
 
-        float[] us = { u0, u1, u2, u3 };
-        float[] vs = { v0, v1, v2, v3 };
+        float[] us = {u0, u1, u2, u3};
+        float[] vs = {v0, v1, v2, v3};
 
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {

@@ -446,6 +446,7 @@ public class GameMaster {
         cropService.update(delta, weatherService.getWeather());
         treeService.update(this);
         updateEntities(delta);
+        BookService.bs.update();
         orthoCameraController.update(this, delta);
         particles.update(delta);
         stepController.update(this, player, soundService, delta);

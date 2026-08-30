@@ -7,7 +7,7 @@ public class StartingKit extends Kit {
     public StartingKit() {
         setItems(new Item[]{
                 new CraftingKit(),
-                new Material(Tier.NONE, MaterialID.CRAFTING_BOOK)
+                new Book()
         });
     }
 }

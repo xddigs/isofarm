@@ -1,37 +1,45 @@
 package com.isofarm.service;
-
 import com.isofarm.item.Book;
-
-import java.util.LinkedList;
-import java.util.List;
 
 public class BookService implements Service<Book> {
     public static final BookService bs = new BookService();
-    private final List<Book> books = new LinkedList<>();
+    private Book openedBook;
 
     private BookService() {}
 
-    public List<Book> getBooks() {
-        return books;
+    public Book getOpenedBook() {
+        return openedBook;
     }
 
-    public void add(Book book) {
-        books.add(book);
+    public boolean isOpen() {
+        return openedBook != null;
     }
 
-    public Book get(int id) {
-        return books.get(id);
+    public void open(Book book) {
+        if (book == null) {
+            return;
+        }
+
+        if (openedBook != null) {
+            openedBook.close();
+        }
+
+        openedBook = book;
+        openedBook.open();
     }
 
-    public void remove(Book book) {
-        books.remove(book);
+    public void close() {
+        if (openedBook == null) {
+            return;
+        }
+
+        openedBook.close();
+        openedBook = null;
     }
 
     public void update() {
-        books.forEach(Book::update);
-        books.removeIf(Book::isClosed);
-    }
-
-    public void render() {
+        if (openedBook != null) {
+            openedBook.update();
+        }
     }
 }
