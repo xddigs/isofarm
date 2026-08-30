@@ -1,5 +1,6 @@
 package com.isofarm.gui;
 
+import com.isofarm.data.BookLine;
 import com.isofarm.graphics.Texture;
 import com.isofarm.item.Book;
 import com.isofarm.item.Page;
@@ -114,7 +115,8 @@ public class BookUI {
         float textX = x + paddingX;
         float textY = y + paddingTop;
 
-        for (String line : page.getLines()) {
+        for (BookLine bl : page.getLines()) {
+            String line = bl.getText();
             if (line.startsWith("-")) {
                 line = line.replace("-", "");
             }
