@@ -1,4 +1,6 @@
 package com.isofarm.service;
+
+import com.isofarm.gui.BookUI;
 import com.isofarm.item.Book;
 
 public class BookService implements Service<Book> {
@@ -16,30 +18,32 @@ public class BookService implements Service<Book> {
     }
 
     public void open(Book book) {
-        if (book == null) {
+        if (book == null || openedBook != null) {
             return;
         }
 
-        if (openedBook != null) {
-            openedBook.close();
-        }
-
         openedBook = book;
-        openedBook.open();
+        book.open();
+        BookUI.open();
     }
 
     public void close() {
         if (openedBook == null) {
             return;
         }
-
-        openedBook.close();
-        openedBook = null;
+        BookUI.close();
     }
 
     public void update() {
-        if (openedBook != null) {
+        if (openedBook != null && !BookUI.isAnimating()) {
             openedBook.update();
+        }
+        if (BookUI.isClosed()) {
+            if (openedBook != null) {
+                openedBook.close();
+            }
+
+            openedBook = null;
         }
     }
 }

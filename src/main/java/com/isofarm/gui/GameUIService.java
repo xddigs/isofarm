@@ -282,7 +282,8 @@ public class GameUIService implements Service<GameMaster> {
         }
 
         if (BookService.bs.isOpen()) {
-            BookUI.render(BookService.bs.getOpenedBook());
+            BookUI.render(BookService.bs.getOpenedBook(),
+                    gameMaster.getGenDelta());
         }
 
         GUI.end();
