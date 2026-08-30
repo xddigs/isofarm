@@ -162,80 +162,18 @@ public class GUI {
                                    float width, float height, Vector4f tint) {
         if (texture == null) return;
         texture.bind();
+
         model.identity()
-                .translate(x + width * 0.5f, y + height * 0.5f, 0.0f)
+                .translate(x, y, 0.0f)
                 .scale(width, height, 1.0f);
 
         shader.setUniform("uModel", model);
         shader.setUniform("uColor", tint);
         shader.setUniform("uUseTexture", true);
         shader.setUniform("uUseFont", false);
-        shader.setUniform("uUVBounds", new Vector4f(0.0f, 0.0f, 1.0f, 1.0f));
+        shader.setUniform("uUVBounds", new Vector4f(0.0f, 1.0f, 1.0f, 0.0f));
+
         mesh.render();
-        texture.unbind();
-    }
-
-    public static void drawNineSlice(Texture texture, float x, float y,
-                                     float width, float height,
-                                     float sliceX, float sliceY, float sliceWidth,
-                                     float sliceHeight, Vector4f tint) {
-        if (texture == null || width <= 0.0f || height <= 0.0f) return;
-        texture.bind();
-        shader.setUniform("uColor", tint);
-        shader.setUniform("uUseTexture", true);
-        shader.setUniform("uUseFont", false);
-
-        float texW = texture.getWidth();
-        float texH = texture.getHeight();
-
-        float u0 = 0.0f;
-        float u1 = sliceX / texW;
-        float u2 = (sliceX + sliceWidth) / texW;
-        float u3 = 1.0f;
-
-        float v0 = 0.0f;
-        float v1 = sliceY / texH;
-        float v2 = (sliceY + sliceHeight) / texH;
-        float v3 = 1.0f;
-
-        float leftBorder = sliceX;
-        float rightBorder = texW - (sliceX + sliceWidth);
-        float topBorder = sliceY;
-        float bottomBorder = texH - (sliceY + sliceHeight);
-
-        if (leftBorder + rightBorder > width) {
-            float ratio = width / (leftBorder + rightBorder);
-            leftBorder *= ratio;
-            rightBorder *= ratio;
-        }
-        if (topBorder + bottomBorder > height) {
-            float ratio = height / (topBorder + bottomBorder);
-            topBorder *= ratio;
-            bottomBorder *= ratio;
-        }
-
-        float[] px = {x, x + leftBorder, x + width - rightBorder, x + width};
-        float[] py = {y, y + topBorder, y + height - bottomBorder, y + height};
-
-        float[] us = {u0, u1, u2, u3};
-        float[] vs = {v0, v1, v2, v3};
-
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 3; col++) {
-                float patchW = px[col + 1] - px[col];
-                float patchH = py[row + 1] - py[row];
-                if (patchW <= 0.0f || patchH <= 0.0f) continue;
-
-                model.identity()
-                        .translate(px[col] + patchW * 0.5f, py[row] + patchH * 0.5f, 0.0f)
-                        .scale(patchW, patchH, 1.0f);
-
-                shader.setUniform("uModel", model);
-                shader.setUniform("uUVBounds", new Vector4f(us[col], vs[row], us[col + 1], vs[row + 1]));
-
-                mesh.render();
-            }
-        }
         texture.unbind();
     }
 

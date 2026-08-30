@@ -4,6 +4,7 @@ import com.isofarm.graphics.Texture;
 import com.isofarm.item.Book;
 import com.isofarm.item.Page;
 import com.isofarm.utils.K;
+import com.isofarm.utils.Settings;
 import org.joml.Vector4f;
 
 public class BookUI {
@@ -16,16 +17,15 @@ public class BookUI {
 
         float screenWidth = GUI.getScreenWidth();
         float screenHeight = GUI.getScreenHeight();
+        float scale = 2.0f;
 
-        float bookWidth = 500.0f;
-        float bookHeight = 650.0f;
+        float bookWidth = page.getWidth() * scale;
+        float bookHeight = page.getHeight() * scale;
 
-        float width = page.getWidth();
-        float height = page.getHeight();
-        float x = (screenWidth - width) * 0.5f;
-        float y = (screenHeight - height) * 0.5f;
+        float x = (screenWidth - bookWidth) * 0.5f;
+        float y = (screenHeight - bookHeight) * 0.5f;
 
-        GUI.drawTexture(page, x, y, width, height, new Vector4f(1.0f));
+        GUI.drawTexture(page, x, y, bookWidth, bookHeight, new Vector4f(1.0f));
         renderPage(book, x, y, bookWidth, bookHeight);
     }
 
@@ -36,11 +36,12 @@ public class BookUI {
 
         Page page = book.getPage(0);
 
-        float padding = 40.0f;
+        float paddingX = 50.0f;
+        float paddingTop = 60.0f;
         float lineHeight = 28.0f;
 
-        float textX = x + padding;
-        float textY = y + padding;
+        float textX = x + paddingX;
+        float textY = y + paddingTop;
 
         for (String line : page.getLines()) {
             GUI.drawNormalString(line, textX, textY, K.UI.UI_TEXT_COLOR);

@@ -11,6 +11,7 @@ import com.isofarm.item.CraftingKit;
 import com.isofarm.item.Item;
 import com.isofarm.item.Tool;
 import com.isofarm.pathfinding.GridPos;
+import com.isofarm.service.BookService;
 import com.isofarm.service.TimeService;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
@@ -479,7 +480,8 @@ public class Player extends Character {
     }
 
     public void wasd(World world, float delta, float cameraYaw) {
-        if (gameMaster.isChatOpen()) return;
+        if (gameMaster.isChatOpen() || gameMaster.isInventoryOpen() ||
+                BookService.bs.isOpen()) return;
         if (isFollowingPath()) {
             move(world, delta, cameraYaw);
             return;

@@ -5,6 +5,7 @@ import com.isofarm.data.Crop;
 import com.isofarm.data.BlockPos;
 import com.isofarm.entity.Player;
 import com.isofarm.input.GameInteraction;
+import com.isofarm.service.BookService;
 import com.isofarm.service.TimeService;
 import com.isofarm.service.WeatherService;
 import com.isofarm.utils.HoveredCell;
@@ -284,7 +285,7 @@ public class GameRenderer {
         defaultShader.unbind();
         sceneFbo.unbind((int) windowWidth, (int) windowHeight);
 
-        if (gameMaster.isInventoryOpen()) {
+        if (gameMaster.isInventoryOpen() || BookService.bs.isOpen()) {
             glDisable(GL_DEPTH_TEST);
             Shader blurShader = rm.getBlurShader();
             Vector2f resolution = new Vector2f(windowWidth, windowHeight);
