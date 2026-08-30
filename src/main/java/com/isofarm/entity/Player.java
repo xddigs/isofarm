@@ -552,7 +552,7 @@ public class Player extends Character {
     private void setUpInventory() {
         switch (getGamemode()) {
             case SURVIVAL -> {
-                Kit kit = new StartingKit();
+                Kit kit = new StartingKit(this);
                 for (Item item : kit.getItems()) {
                     add(item);
                 }
