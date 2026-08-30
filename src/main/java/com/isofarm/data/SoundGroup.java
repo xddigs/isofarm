@@ -15,6 +15,7 @@ public enum SoundGroup {
         new String[]{"fx/blocks/mining.ogg", "fx/blocks/chop.ogg"}, new String[]{}),
     GLASS(new String[]{}, new String[]{"fx/blocks/fragile_break.ogg", "fx/blocks/fragile_break2.ogg"}, new String[]{}, new String[]{}, new String[]{}, new String[]{}, new String[]{}),
     ITEMS(new String[]{}, new String[]{"fx/items/broke.ogg"}, new String[]{}, new String[]{"fx/items/drop.ogg", "fx/items/pickup.ogg"}, new String[]{}, new String[]{}, new String[]{"fx/items/equip.ogg"}),
+    BOOKS(new String[]{}, new String[]{}, new String[]{}, new String[]{}, new String[]{}, new String[]{}, new String[]{"fx/items/page.ogg"}),
     ENTITY(new String[]{}, new String[]{"fx/entity/fall.ogg"}, new String[]{}, new String[]{"fx/entity/hurt.ogg"}, new String[]{}, new String[]{}, new String[]{}),
     RAIN(new String[]{}, new String[]{}, new String[]{}, new String[]{}, new String[]{"fx/ambient/rain.ogg"}, new String[]{}, new String[]{}),
     NATURE(new String[]{}, new String[]{}, new String[]{}, new String[]{}, new String[]{"fx/ambient/nature.ogg"}, new String[]{}, new String[]{}),
