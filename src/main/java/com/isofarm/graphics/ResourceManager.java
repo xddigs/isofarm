@@ -1,6 +1,8 @@
 package com.isofarm.graphics;
 
 import com.isofarm.data.*;
+import com.isofarm.graphics.gltf.GLTFLoader;
+import com.isofarm.graphics.gltf.GLTFModel;
 import com.isofarm.item.*;
 import com.isofarm.utils.K;
 import org.slf4j.Logger;
@@ -29,6 +31,7 @@ public class ResourceManager {
     private static SpriteSheet carrot;
     private static SpriteSheet potato;
     private static SpriteSheet beetroot;
+    private static GLTFModel playerModel;
     private final Shader defaultShader;
     private final Shader outlineShader;
     private final Shader rainShader;
@@ -88,6 +91,7 @@ public class ResourceManager {
         heartsSpriteSheet = new SpriteSheet(K.Paths.HEARTS_SPRITESHEET, 1, K.UI.ICON_HEARTS_ROWS);
 
         destroyTexture = new SpriteSheet(K.Paths.DESTROY_STAGES, K.UI.DESTROY_FRAMES, 1);
+        playerModel = GLTFLoader.load(K.Paths.PLAYER_MODEL);
 
         cropSpritesheets = new EnumMap<>(CropType.class);
         cropSpritesheets.put(CropType.WHEAT, wheat);
@@ -176,14 +180,6 @@ public class ResourceManager {
         return 0;
     }
 
-    public static SpriteSheet getPlayerSpriteSheet() {
-        return playerSpriteSheet;
-    }
-
-    public static SpriteSheet getBackpackSpriteSheet() {
-        return backpackSpriteSheet;
-    }
-
     public void dispose() {
         blockMesh.dispose();
         flowerMesh.dispose();
@@ -209,6 +205,7 @@ public class ResourceManager {
         usablesIcons.dispose();
         inventoryIcons.dispose();
 
+        playerModel.dispose();
         playerSpriteSheet.dispose();
         backpackSpriteSheet.dispose();
         bookAnimationSheet.dispose();
@@ -286,6 +283,10 @@ public class ResourceManager {
         return destroyTexture;
     }
 
+    public static GLTFModel getPlayerModel() {
+        return playerModel;
+    }
+
     public static SpriteSheet getSeedIcons() {
         return seedIcons;
     }
@@ -316,6 +317,14 @@ public class ResourceManager {
 
     public static SpriteSheet getBookAnimationSheet() {
         return bookAnimationSheet;
+    }
+
+    public static SpriteSheet getPlayerSpriteSheet() {
+        return playerSpriteSheet;
+    }
+
+    public static SpriteSheet getBackpackSpriteSheet() {
+        return backpackSpriteSheet;
     }
 
     public SpriteSheet getHeartsSpriteSheet() {

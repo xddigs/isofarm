@@ -157,6 +157,9 @@ public final class K {
         public static final String MATERIAL_ICONS = "assets/gui/materials.png";
         public static final String USABLES_ICONS = "assets/gui/usables.png";
         public static final String INVENTORY_ICONS = "assets/gui/inventory.png";
+
+        public static final String PLAYER_MODEL = "assets/models/player/steve.gltf";
+
         public static final String PLAYER_SPRITESHEET = "assets/sprites/steve.png";
         public static final String BACKPACK_SPRITESHEET = "assets/sprites/backpack.png";
         public static final String DESTROY_STAGES = "assets/textures/blocks/destroy.png";
