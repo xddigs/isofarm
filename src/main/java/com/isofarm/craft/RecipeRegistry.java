@@ -40,6 +40,7 @@ public class RecipeRegistry {
     }
 
     private void registerToolSet(Tier stationTier, Craftable primaryMat) {
+        if (stationTier.equals(Tier.NONE) || stationTier.equals(Tier.LEATHER)) return;
         registerTool(stationTier, primaryMat, 2, 1, Sword::new);
         registerTool(stationTier, primaryMat, 3, 2, Pickaxe::new);
         registerTool(stationTier, primaryMat, 3, 3, Axe::new);

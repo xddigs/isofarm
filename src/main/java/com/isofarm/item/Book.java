@@ -19,13 +19,13 @@ public class Book extends Usable {
     private final boolean hasContent;
 
     public Book(boolean hasContent) {
-        super(Usables.BOOK);
+        super(Usables.BOOK, "Book");
         this.pages = new ArrayList<>();
         this.hasContent = hasContent;
     }
 
     public Book() {
-        super(Usables.CRAFTING_BOOK);
+        super(Usables.CRAFTING_BOOK, "Crafting Book");
         this.pages = new ArrayList<>();
         this.hasContent = true;
     }

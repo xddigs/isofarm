@@ -7,7 +7,7 @@ import com.isofarm.wrld.GameMaster;
 public class Backpack extends Usable {
 
     public Backpack() {
-        super(Usables.BACKPACK);
+        super(Usables.BACKPACK, "Backpack");
     }
 
     @Override

@@ -10,9 +10,8 @@ public class Bucket extends Usable {
     private BlockData type;
 
     public Bucket(BlockData type) {
-        super(Usables.BUCKET);
+        super(Usables.BUCKET, type.getName() + " Bucket");
         this.type = type;
-        setName(type.getName() + getUsablesID().getName());
     }
 
     public Bucket() {
