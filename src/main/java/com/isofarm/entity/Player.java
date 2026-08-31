@@ -422,6 +422,7 @@ public class Player extends Character {
         float spawnZ = 0.5f;
 
         GridPos highestAltitude = gameMaster.getWorld().getHighestY(spawnX, spawnZ);
+        gameMaster.addEntity(this);
         setPosition(new Vector3f(spawnX, highestAltitude.y() + 1.0f, spawnZ));
         setVelocity(new Vector3f(0.0f, 0.0f, 0.0f));
         setDimensions(new Vector3f(1.0f, 2.0f, 1.0f));
@@ -433,7 +434,7 @@ public class Player extends Character {
         setIsOffGroundTimer(0.0f);
         setWasOnGround(false);
 
-        setMaxHitpoints(8);
+        setMaxHitpoints(20);
         setHitpoints(getMaxHitpoints());
 
         setMaxStamina(100);
