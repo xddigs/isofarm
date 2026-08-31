@@ -1,14 +1,17 @@
 package com.isofarm.item;
 
+import com.isofarm.craft.Ingredient;
 import com.isofarm.craft.Recipe;
 import com.isofarm.craft.RecipeRegistry;
 import com.isofarm.entity.Player;
 import com.isofarm.service.CraftingService;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CraftingBook extends Book {
-    private static final int LINES_PER_PAGE = 16;
+    private static final int LINES_PER_PAGE = 8;
 
     public CraftingBook(Player player) {
         super();
@@ -17,10 +20,33 @@ public class CraftingBook extends Book {
         }
 
         List<Recipe> recipes = RecipeRegistry.reg.getRecipes();
+        if (recipes.isEmpty()) return;
+
+        Map<Item, Integer> recipePageMap = new HashMap<>();
+        int tempLineCount = 0;
+        int tempPageIndex = 0;
+
+        for (Recipe recipe : recipes) {
+            List<String> lines = recipe.toBookLines();
+            if (lines.isEmpty()) continue;
+
+            if (tempLineCount + lines.size() > LINES_PER_PAGE) {
+                tempPageIndex++;
+                tempLineCount = 0;
+            }
+
+            if (recipe.result() != null) {
+                recipePageMap.putIfAbsent(recipe.result(), tempPageIndex);
+            }
+
+            tempLineCount += lines.size();
+        }
+
         Page page = new Page();
         addPage(page);
 
         int lineCount = 0;
+        int currentPageIndex = 0;
 
         for (Recipe recipe : recipes) {
             List<String> lines = recipe.toBookLines();
@@ -29,6 +55,7 @@ public class CraftingBook extends Book {
             if (lineCount + lines.size() > LINES_PER_PAGE) {
                 page = new Page();
                 addPage(page);
+                currentPageIndex++;
                 lineCount = 0;
             }
 
@@ -37,7 +64,24 @@ public class CraftingBook extends Book {
             lineCount++;
 
             for (int i = 1; i < lines.size(); i++) {
-                page.addLine(lines.get(i));
+                String lineText = lines.get(i);
+                Ingredient targetIngredient = null;
+                for (Ingredient ingredient : recipe.ingredients()) {
+                    if (ingredient != null && lineText.contains(ingredient.craftable().getName())) {
+                        if (recipePageMap.containsKey(ingredient)) {
+                            targetIngredient = ingredient;
+                            break;
+                        }
+                    }
+                }
+
+                if (targetIngredient != null) {
+                    int targetPage = recipePageMap.get(targetIngredient);
+                    page.addLine(lineText, line -> navigateTo(targetPage));
+                } else {
+                    page.addLine(lineText);
+                }
+
                 lineCount++;
             }
         }

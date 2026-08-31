@@ -95,7 +95,7 @@ public final class K {
         public static final float HOTBAR_LABEL_OFFSET_Y = 20.0f;
         public static final float HOTBAR_OFFSET = 20;
 
-        public static final float UI_BOOK_PADDING_X = 200.0f;
+        public static final float UI_BOOK_PADDING_X = 125.0f;
         public static final float UI_BOOK_PADDING_TOP = 100.0f;
 
         public static final float CHAT_HISTORY_X = 10.0f;
@@ -105,7 +105,10 @@ public final class K {
         public static final Vector4f CHAT_HISTORY_TEXT_COLOR = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 
         public static final Vector4f UI_BACKGROUND_COLOR = new Vector4f(0.25f, 0.25f, 0.25f, 1.0f);
-        public static final Vector4f UI_BACKGROUND_COLOR_SLOT = new Vector4f(UI_BACKGROUND_COLOR.x, UI_BACKGROUND_COLOR.y, UI_BACKGROUND_COLOR.z, 0.6f);
+
+        public static final Vector4f UI_BACKGROUND_COLOR_SLOT = new Vector4f(UI_BACKGROUND_COLOR.x,
+                UI_BACKGROUND_COLOR.y, UI_BACKGROUND_COLOR.z, 0.6f);
+
         public static final Vector4f UI_BORDER_COLOR = new Vector4f(0.06f, 0.06f, 0.06f, 1.0f);
         public static final Vector4f UI_HOVERED_COLOR = new Vector4f(0.12f, 0.12f, 0.12f, 1.0f);
         public static final Vector4f UI_SELECTED_COLOR = new Vector4f(0.16f, 0.16f, 0.16f, 1.0f);
@@ -119,6 +122,7 @@ public final class K {
     public static final class Paths {
         public static final String FONT = "font/LeagueSpartan-Regular.ttf";
         public static final String FONT_BOLD = "font/LeagueSpartan-SemiBold.ttf";
+        public static final String FONT_BOOK = "font/PatrickHand-Regular.ttf";
 
         public static final String DEFAULT_VERT_SHADER = "shaders/default.vert";
         public static final String DEFAULT_FRAG_SHADER = "shaders/default.frag";

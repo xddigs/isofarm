@@ -77,7 +77,7 @@ public class Library implements Service<GameMaster> {
                 return;
             }
             if (args.length < 2) {
-                log.warn("Usage: /add <namespace:item> <amount>");
+                log.warn("Usage: /give <namespace:item> <amount>");
                 return;
             }
             String itemId = args[0];

@@ -1,6 +1,7 @@
 package com.isofarm.item;
 
 import com.isofarm.data.*;
+import com.isofarm.gui.BookUI;
 import com.isofarm.input.Keyboard;
 import com.isofarm.service.BookService;
 import com.isofarm.service.SoundService;
@@ -88,25 +89,47 @@ public class Book extends Usable {
     }
 
     public void nextPage() {
-        if (currentPage + 1 < pages.size()) {
-            currentPage++;
+        if (hasNextPage()) {
+            currentPage += 2;
             SoundService.fx.playUseSound(SoundGroup.BOOKS);
+            BookUI.nextPage();
         }
     }
 
     public void previousPage() {
-        if (currentPage > 0) {
-            currentPage--;
+        if (hasPreviousPage()) {
+            currentPage -= 2;
             SoundService.fx.playUseSound(SoundGroup.BOOKS);
+            BookUI.previousPage();
+        }
+    }
+
+    public void navigateTo(int targetPage) {
+        if (targetPage < 0 || targetPage >= pages.size() || targetPage == currentPage) {
+            return;
+        }
+
+        if (targetPage % 2 != 0) {
+            targetPage--;
+        }
+
+        if (targetPage > currentPage) {
+            currentPage = targetPage;
+            SoundService.fx.playUseSound(SoundGroup.BOOKS);
+            BookUI.nextPage();
+        } else if (targetPage < currentPage) {
+            currentPage = targetPage;
+            SoundService.fx.playUseSound(SoundGroup.BOOKS);
+            BookUI.previousPage();
         }
     }
 
     public boolean hasNextPage() {
-        return currentPage + 1 < pages.size();
+        return currentPage + 2 < pages.size();
     }
 
     public boolean hasPreviousPage() {
-        return currentPage > 0;
+        return currentPage - 2 >= 0;
     }
 
     @Override
