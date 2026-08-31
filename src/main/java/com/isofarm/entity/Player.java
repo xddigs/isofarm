@@ -247,19 +247,6 @@ public class Player extends Character {
         }
     }
 
-    private float getDirectionYaw(Direction direction) {
-        return switch (direction) {
-            case N  -> 0.0f;
-            case NE -> 45.0f;
-            case E  -> 90.0f;
-            case SE -> 135.0f;
-            case S  -> 180.0f;
-            case SW -> 225.0f;
-            case W  -> 270.0f;
-            case NW -> 315.0f;
-        };
-    }
-
     private void updateRotation(float delta) {
         float difference = targetModelYaw - modelYaw;
 
@@ -285,74 +272,16 @@ public class Player extends Character {
         }
     }
 
-    private int getPlayerRow(Direction direction, boolean isMoving) {
-        int baseOffset = isMoving ? 8 : 0;
-        return baseOffset + switch (direction) {
-            case NW -> 0;
-            case W -> 1;
-            case SW -> 2;
-            case S -> 3;
-            case SE -> 4;
-            case E -> 5;
-            case NE -> 6;
-            case N -> 7;
-        };
-    }
+    public Matrix4f getHandTransform(boolean rightHand) {
+        GLTFNode handNode = rightHand ? rightArmNode : leftArmNode;
+        Matrix4f handMatrix = new Matrix4f();
 
-    private boolean isBackpackInFront(Direction direction) {
-        return switch (direction) {
-            case N, NE, NW, W, E -> true;
-            default -> false;
-        };
-    }
-
-    private int getBackpackFrame(Direction direction, boolean isMoving) {
-        return switch (direction) {
-            case NW -> 0;
-            case W -> 1;
-            case SW -> 2;
-            case S -> 3;
-            case NE -> 4;
-            case E -> 5;
-            case SE -> 6;
-            case N -> 7;
-        };
-    }
-
-    private int getActionOffset() {
-        return switch (direction) {
-            case NW -> 0;
-            case W -> 1;
-            case SW -> 2;
-            case S -> 3;
-            case SE -> 4;
-            case E -> 5;
-            case NE -> 6;
-            case N -> 7;
-        };
-    }
-
-    private void renderBackpack(Shader shader, ResourceManager rm, Direction direction,
-                                boolean backpackInFront, boolean isMoving) {
-
-        SpriteSheet bpSheet = ResourceManager.getBackpackSpriteSheet();
-        if (bpSheet == null) return;
-
-        int backpackFrame = getBackpackFrame(direction, isMoving);
-        Vector4f uv = bpSheet.getUVBounds(backpackFrame);
-
-        bpSheet.bind();
-        shader.setUniform("uUVBounds", uv);
-
-        glEnable(GL_POLYGON_OFFSET_FILL);
-        if (backpackInFront) {
-            glPolygonOffset(-1.0f, -1.0f);
+        if (handNode != null) {
+            handMatrix.set(this.modelMatrix).mul(handNode.getWorldMatrix());
         } else {
-            glPolygonOffset(1.0f, 1.0f);
+            handMatrix.set(this.modelMatrix);
         }
-
-        rm.getPlayerMesh().render();
-        glDisable(GL_POLYGON_OFFSET_FILL);
+        return handMatrix;
     }
 
     public void changeState(PlayerState newState) {

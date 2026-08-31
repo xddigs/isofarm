@@ -30,75 +30,6 @@ public class ItemRenderer {
         return Math.clamp(value, 0.0f, 1.0f);
     }
 
-    private float easeOutCubic(float t) {
-        t = clamp(t);
-        return 1.0f - (float) Math.pow(1.0f - t, 3.0f);
-    }
-
-    private AnimationTransform getAttackTransform(float t) {
-        AnimationTransform transform = new AnimationTransform();
-        if (t < 0.22f) {
-            float p = easeOutCubic(t / 0.22f);
-            transform.x = -0.04f * p;
-            transform.y = 0.10f * p;
-            transform.z = -0.10f * p;
-            transform.rotateX = -22.0f * p;
-            transform.rotateY = 8.0f * p;
-            transform.rotateZ = 10.0f * p;
-        } else {
-            float p = easeOutCubic((t - 0.22f) / 0.78f);
-            transform.x = -0.04f + 0.08f * p;
-            transform.y = 0.10f - 0.25f * p;
-            transform.z = -0.10f + 0.28f * p;
-            transform.rotateX = -22.0f + 82.0f * p;
-            transform.rotateY = 8.0f - 12.0f * p;
-            transform.rotateZ = 10.0f - 25.0f * p;
-            transform.scaleX = 1.0f + 0.04f * p;
-            transform.scaleY = 1.0f - 0.05f * p;
-            transform.scaleZ = 1.0f + 0.04f * p;
-        }
-        return transform;
-    }
-
-    private AnimationTransform getBreakTransform(float t) {
-        AnimationTransform transform = new AnimationTransform();
-        if (t < 0.28f) {
-            float p = easeOutCubic(t / 0.28f);
-            transform.y = 0.12f * p;
-            transform.z = -0.08f * p;
-            transform.rotateX = -25.0f * p;
-            transform.rotateZ = 6.0f * p;
-        } else {
-            float p = easeOutCubic((t - 0.28f) / 0.72f);
-            transform.y = 0.12f - 0.28f * p;
-            transform.z = -0.08f + 0.24f * p;
-            transform.rotateX = -25.0f + 88.0f * p;
-            transform.rotateZ = 6.0f - 18.0f * p;
-            transform.scaleX = 1.0f + 0.05f * p;
-            transform.scaleY = 1.0f - 0.07f * p;
-            transform.scaleZ = 1.0f + 0.05f * p;
-        }
-        return transform;
-    }
-
-    private AnimationTransform getInteractTransform(float t) {
-        AnimationTransform transform = new AnimationTransform();
-        if (t < 0.35f) {
-            float p = easeOutCubic(t / 0.35f);
-            transform.y = 0.06f * p;
-            transform.z = -0.04f * p;
-            transform.rotateX = -8.0f * p;
-            transform.rotateZ = 4.0f * p;
-        } else {
-            float p = easeOutCubic((t - 0.35f) / 0.65f);
-            transform.y = 0.06f - 0.12f * p;
-            transform.z = -0.04f + 0.08f * p;
-            transform.rotateX = -8.0f + 18.0f * p;
-            transform.rotateZ = 4.0f - 8.0f * p;
-        }
-        return transform;
-    }
-
     public void renderWorldItem(GameMaster gameMaster, WorldItem worldItem,
                                 CelestialLighting lighting) {
         if (worldItem == null) return;
@@ -190,13 +121,5 @@ public class ItemRenderer {
         if (quadMesh != null) {
             quadMesh.dispose();
         }
-    }
-
-    private static final class AnimationTransform {
-        float x, y, z;
-        float rotateX, rotateY, rotateZ;
-        float scaleX = 1.0f;
-        float scaleY = 1.0f;
-        float scaleZ = 1.0f;
     }
 }
