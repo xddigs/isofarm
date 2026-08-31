@@ -159,7 +159,8 @@ public class ResourceManager {
         if (item instanceof Tool tool) {
             int row = tool.getRow();
             int col = tool.getCol();
-            return (row * K.UI.ICON_TOOL_COLS) + col;
+            int bucketOffset = (tool instanceof Bucket bucket && bucket.isFull()) ? 1 : 0;
+            return (row * K.UI.ICON_TOOL_COLS) + col + bucketOffset;
         }
 
         if (item instanceof Material material) {

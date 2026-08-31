@@ -56,19 +56,17 @@ public class Bucket extends Tool {
         World world = gameMaster.getWorld();
 
         if (player == null || hoveredCell == null) return;
-        byte waterLevel = world.getWaterLevelAt(hoveredCell);
         if (isFull()) {
-            if (waterLevel == 0 && world.getBlockTypeAt(hoveredCell) == BlockData.AIR.getId()) {
+            if (world.getBlockTypeAt(hoveredCell) == BlockData.AIR.getId()) {
                 world.setWaterLevelAt(hoveredCell, (byte) 8);
                 empty();
+                world.setBlockTypeAt(hoveredCell, type.getId());
                 gameMaster.rebuildChunkMeshAt(hoveredCell.x(), hoveredCell.z());
             }
         } else {
-            if (waterLevel > 0) {
-                world.setWaterLevelAt(hoveredCell, (byte) 0);
-                fill();
-                gameMaster.rebuildChunkMeshAt(hoveredCell);
-            }
+            world.setWaterLevelAt(hoveredCell, (byte) 0);
+            fill();
+            gameMaster.rebuildChunkMeshAt(hoveredCell);
         }
     }
 
