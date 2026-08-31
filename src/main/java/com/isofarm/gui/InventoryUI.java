@@ -33,7 +33,6 @@ public class InventoryUI extends UIElement {
     private UIButton sortButton;
     private UIButton groupButton;
     private UIButton backpackButton;
-    private UIButton craftingButton;
     private Player player;
     private Inventory inventory;
     private Tab currentTab;
@@ -115,10 +114,7 @@ public class InventoryUI extends UIElement {
         groupButton = new UIButton(Settings.getScaledPadding() + btnWidth + Settings.getScaledSpacing(),
                 Settings.getScaledPadding() - Settings.getScaledSpacing(), btnWidth, btnHeight);
 
-        craftingButton = new UIButton(Settings.getScaledPadding() + btnWidth * 2 + Settings.getScaledSpacing() * 2,
-                Settings.getScaledPadding() - Settings.getScaledSpacing(), btnWidth, btnHeight);
-
-        backpackButton = new UIButton(Settings.getScaledPadding() + btnWidth * 3 + Settings.getScaledSpacing() * 3,
+        backpackButton = new UIButton(Settings.getScaledPadding() + btnWidth * 2 + Settings.getScaledSpacing() * 3,
                 Settings.getScaledPadding() - Settings.getScaledSpacing(), btnWidth, btnHeight);
 
         sortButton.setOnClick(this::sortInventory);
@@ -131,14 +127,6 @@ public class InventoryUI extends UIElement {
             }
         });
 
-        craftingButton.setOnClick(() -> {
-            if (currentTab.equals(Tab.INVENTORY)) {
-                currentTab = Tab.CRAFTING;
-            } else {
-                currentTab = Tab.INVENTORY;
-            }
-        });
-
         sortButton.setTooltipText("Sort");
         groupButton.setTooltipText("Group");
         backpackButton.setTooltipText("Backpack");
@@ -147,12 +135,10 @@ public class InventoryUI extends UIElement {
         buttons.add(sortButton);
         buttons.add(groupButton);
         buttons.add(backpackButton);
-        buttons.add(craftingButton);
 
         addChild(sortButton);
         addChild(groupButton);
         addChild(backpackButton);
-        addChild(craftingButton);
     }
 
     public void createSlots() {
@@ -264,9 +250,6 @@ public class InventoryUI extends UIElement {
             onClose();
         }
 
-        craftingButton.setTooltipText("Crafting Kit: " +
-                (currentTab.equals(Tab.CRAFTING) ? "ON" : "OFF"));
-
         syncInventory();
         updateSlots();
         slotInteract();
@@ -374,9 +357,6 @@ public class InventoryUI extends UIElement {
 
             backpackButton.setSpriteSheet(inventoryIcons);
             backpackButton.setSpriteColumn(2);
-
-            craftingButton.setSpriteSheet(inventoryIcons);
-            craftingButton.setSpriteColumn(3);
         }
     }
 
