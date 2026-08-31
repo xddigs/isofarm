@@ -10,7 +10,7 @@ public class Bucket extends Usable {
     private BlockData type;
 
     public Bucket(BlockData type) {
-        super(Usables.BUCKET, type.getName() + " Bucket");
+        super(Usables.BUCKET, (type.equals(BlockData.AIR)) ? "Bucket" : type.getName() + " Bucket");
         this.type = type;
     }
 
@@ -35,33 +35,30 @@ public class Bucket extends Usable {
         return new Bucket(getBlockType());
     }
 
-    public boolean isFull() {
-        return type.equals(BlockData.WATER);
-    }
-
+    @Override
     public boolean use(GameMaster gameMaster) {
         Player player = gameMaster.getPlayer();
-        BlockPos hoveredCell = HoveredCell.get(gameMaster);
+        BlockPos targetBlock = HoveredCell.get(gameMaster);
         World world = gameMaster.getWorld();
 
-        byte waterID = BlockData.WATER.getId();
-        byte airID = BlockData.AIR.getId();
-
-        if (player == null || hoveredCell == null) return false;
+        if (player == null || targetBlock == null) return false;
         if (isFull()) {
-            if (world.getBlockTypeAt(hoveredCell) == airID) {
-                world.setWaterLevelAt(hoveredCell, (byte) 8);
+            BlockPos placePos = HoveredCell.get(gameMaster);
+            if (placePos != null && world.getBlockTypeAt(placePos) == BlockData.AIR.getId()) {
+                gameMaster.getWaterSimulation().addSource(placePos.x(), placePos.y(), placePos.z());
                 empty();
-                world.setBlockTypeAt(hoveredCell, waterID);
-                gameMaster.rebuildChunkMeshAt(hoveredCell.x(), hoveredCell.z());
+                setName("Bucket");
+                return true;
             }
         } else {
-            world.setWaterLevelAt(hoveredCell, (byte) 0);
-            world.setBlockTypeAt(hoveredCell, airID);
-            fill();
-            gameMaster.rebuildChunkMeshAt(hoveredCell);
+            if (world.getBlockTypeAt(targetBlock) == BlockData.WATER.getId()) {
+                gameMaster.getWaterSimulation().remove(targetBlock.x(), targetBlock.y(), targetBlock.z());
+                fill();
+                setName(type.getName() + " Bucket");
+                return true;
+            }
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -70,5 +67,9 @@ public class Bucket extends Usable {
     @Override
     public boolean enchanting(Enchantment enchantment) {
         return false;
+    }
+
+    public boolean isFull() {
+        return type.equals(BlockData.WATER);
     }
 }
