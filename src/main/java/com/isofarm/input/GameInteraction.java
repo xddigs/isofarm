@@ -432,7 +432,8 @@ public class GameInteraction {
         if (selectedItem instanceof Tool tool) {
             boolean isUsableOn = Arrays.stream(tool.getType().getUsableOn())
                     .anyMatch(b -> b.getId() == blockId) &&
-                    !(tool instanceof Backpack || tool instanceof CraftingKit);
+                    !(tool instanceof Backpack || tool instanceof CraftingKit ||
+                            tool instanceof Bucket);
 
             tool.setPlayer(gameMaster.getPlayer());
             if (!isUsableOn) {
