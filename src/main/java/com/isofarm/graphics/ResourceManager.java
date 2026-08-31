@@ -101,6 +101,7 @@ public class ResourceManager {
             case Seed ignored -> seedIcons;
             case Tool ignored -> toolIcons;
             case Material ignored -> materialIcons;
+            case Usable ignored -> usablesIcons;
             case Block ignored -> blockIcons;
             case null, default -> null;
         };
@@ -160,8 +161,8 @@ public class ResourceManager {
         }
 
         if (item instanceof Usable usable) {
-            int row = usable.getUsablesID().getRow();
             int col = usable.getUsablesID().getCol();
+            int row = usable.getUsablesID().getRow();
             int bucketOffset = (usable instanceof Bucket bucket && bucket.isFull()) ? 1 : 0;
             return (row * K.UI.ICON_USABLES_COLS) + col + bucketOffset;
         }
