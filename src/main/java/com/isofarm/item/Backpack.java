@@ -1,28 +1,16 @@
 package com.isofarm.item;
 
-import com.isofarm.data.Enchantment;
-import com.isofarm.data.SoundGroup;
-import com.isofarm.data.Tier;
-import com.isofarm.data.ToolType;
+import com.isofarm.data.*;
 import com.isofarm.entity.Player;
 import com.isofarm.wrld.GameMaster;
 
-public class Backpack extends Tool {
-
-    public Backpack(ToolType type, Tier tier) {
-        super((byte) 1, tier.getName() + type.getName(), 100, type, tier,
-                tier.getDurability() + type.getBaseDurability());
-    }
+public class Backpack extends Usable {
 
     public Backpack() {
-        this(ToolType.BACKPACK, Tier.LEATHER);
+        super(Usables.BACKPACK);
     }
 
     @Override
-    public Item copy() {
-        return new Backpack(this.getType(), this.getTier());
-    }
-
     public boolean use(GameMaster gameMaster) {
         Player player = gameMaster.getPlayer();
         if (player == null) return false;
@@ -43,12 +31,21 @@ public class Backpack extends Tool {
         return false;
     }
 
+    @Override
+    public void update() {}
+
     public void unequip(GameMaster gameMaster) {
         if (getPlayer() != null && getPlayer().getInventory().hasBackpackEquipped()) {
             gameMaster.getSoundService().playUseSound(SoundGroup.ITEMS);
             getPlayer().getInventory().unequipBackpack();
             getPlayer().getGameMaster().getGameUIService().resetHotbarPosition();
         }
+    }
+
+
+    @Override
+    public Item copy() {
+        return new Backpack();
     }
 
     @Override

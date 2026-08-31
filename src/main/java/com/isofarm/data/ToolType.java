@@ -3,14 +3,11 @@ package com.isofarm.data;
 import com.isofarm.item.Item;
 
 public enum ToolType implements Item {
-    BACKPACK((byte) 0, " Backpack", 0, BlockData.all(), 1, new float[]{}),
-    CRAFTING_KIT((byte) 1, " Crafting Kit", 0, BlockData.all(), 1, new float[]{}),
-    BUCKET((byte) 2, " Bucket", 0, BlockData.all(), 1, new float[]{}),
+    SWORD((byte) 0, " Sword", 7, BlockData.all(), 10, new float[]{}),
+    PICKAXE((byte) 1, " Pickaxe", 6, new BlockData[]{BlockData.GRASS, BlockData.DIRT, BlockData.OAK_LEAVES, BlockData.STONE, BlockData.COPPER_ORE}, 7, new float[]{0.8f, 0.7f, 1.2f, 0.65f, 0.56f}),
+    AXE((byte) 2, " Axe", 8, new BlockData[]{BlockData.OAK_LOG, BlockData.OAK_WOOD}, 10, new float[]{1.0f, 0.5f}),
     HOE((byte) 3, " Hoe", 5, new BlockData[]{BlockData.GRASS, BlockData.DIRT, BlockData.TILLED_DIRT}, 8, new float[]{0.5f, 0.25f, 0.75f}),
-    AXE((byte) 4, " Axe", 8, new BlockData[]{BlockData.OAK_LOG, BlockData.OAK_WOOD}, 10, new float[]{1.0f, 0.5f}),
-    PICKAXE((byte) 5, " Pickaxe", 6, new BlockData[]{BlockData.GRASS, BlockData.DIRT, BlockData.OAK_LEAVES, BlockData.STONE, BlockData.COPPER_ORE}, 7, new float[]{0.8f, 0.7f, 1.2f, 0.65f, 0.56f}),
-    SHOVEL((byte) 6, " Shovel", 4, new BlockData[]{BlockData.GRASS, BlockData.DIRT}, 5, new float[]{0.3f, 0.25f}),
-    SWORD((byte) 7, " Sword", 7, BlockData.all(), 10, new float[]{});
+    SHOVEL((byte) 4, " Shovel", 4, new BlockData[]{BlockData.GRASS, BlockData.DIRT}, 5, new float[]{0.3f, 0.25f});
 
     private final byte id;
     private final String name;

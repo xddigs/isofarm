@@ -19,6 +19,12 @@ public class Library implements Service<GameMaster> {
     private static final Logger log = LoggerFactory.getLogger(Library.class);
 
     public static void initItems(ItemRegistry itemR, Player player) {
+        registerDefault(itemR, Backpack::new);
+        registerDefault(itemR, () -> new Book(false));
+        registerDefault(itemR, () -> new CraftingBook(player));
+        registerDefault(itemR, () -> new Bucket(BlockData.AIR));
+        registerDefault(itemR, () -> new Bucket(BlockData.WATER));
+
         for (MaterialID material : MaterialID.values()) {
             if (material.equals(MaterialID.INGOT) || material.equals(MaterialID.RAW_ORE)) continue;
             registerDefault(itemR, () -> new Material(Tier.NONE, material));
@@ -31,19 +37,12 @@ public class Library implements Service<GameMaster> {
         });
 
         Tier.forEach(tier -> {
-            if (tier.equals(Tier.NONE) || tier.equals(Tier.WOOD)) return;
-            registerDefault(itemR, () -> new CraftingKit(ToolType.CRAFTING_KIT, tier));
-            registerDefault(itemR, () -> new Backpack(ToolType.BACKPACK, tier));
-        });
-
-        Tier.forEach(tier -> {
             if (tier.equals(Tier.NONE) || tier.equals(Tier.LEATHER)) return;
-            registerDefault(itemR, () -> new Bucket(BlockData.AIR, tier));
-            registerDefault(itemR, () -> new Hoe(tier));
-            registerDefault(itemR, () -> new Pickaxe(tier));
-            registerDefault(itemR, () -> new Shovel(tier));
-            registerDefault(itemR, () -> new Axe(tier));
             registerDefault(itemR, () -> new Sword(tier));
+            registerDefault(itemR, () -> new Pickaxe(tier));
+            registerDefault(itemR, () -> new Axe(tier));
+            registerDefault(itemR, () -> new Hoe(tier));
+            registerDefault(itemR, () -> new Shovel(tier));
         });
 
         for (CropType type : new CropType[]{
@@ -71,7 +70,8 @@ public class Library implements Service<GameMaster> {
         ItemRegistry ir = gameMaster.getItemRegistry();
         WeatherService weatherService = gameMaster.getWeatherService();
 
-        cr.register(new Command("/add", new CommandArgument[]{dynamic("item", ir::getIds), new CommandArgument("amount")}, args -> {
+        cr.register(new Command("/give", new CommandArgument[]{dynamic("item", ir::getIds),
+                new CommandArgument("amount")}, args -> {
             if (player == null) {
                 log.warn("Cannot execute command: player does not exist.");
                 return;
@@ -133,7 +133,8 @@ public class Library implements Service<GameMaster> {
             }
         }));
 
-        cr.register(new Command("/time", new CommandArgument[]{literal("action", "set"), new CommandArgument("amount")}, args -> {
+        cr.register(new Command("/time", new CommandArgument[]{literal("action", "set"),
+                new CommandArgument("amount")}, args -> {
             if (player == null) {
                 log.warn("Cannot execute command: player does not exist.");
                 return;
@@ -156,7 +157,8 @@ public class Library implements Service<GameMaster> {
             gameMaster.getTimeService().setTimeScale(amount / 24000.0f);
         }));
 
-        cr.register(new Command("/gm", new CommandArgument[]{dynamic("mode", () -> Arrays.stream(Gamemode.values()).map(Enum::name).toList())}, args -> {
+        cr.register(new Command("/gm", new CommandArgument[]{dynamic("mode", () ->
+                Arrays.stream(Gamemode.values()).map(Enum::name).toList())}, args -> {
             if (player == null) {
                 log.warn("Cannot execute command: player does not exist.");
                 return;
@@ -176,7 +178,8 @@ public class Library implements Service<GameMaster> {
             ToastFactory.success("You changed gamemode to " + targetMode.name().toLowerCase());
         }));
 
-        cr.register(new Command("/gamerule", new CommandArgument[]{dynamic("rule", () -> GameRules.getRules().keySet()), new CommandArgument("value")}, args -> {
+        cr.register(new Command("/gamerule", new CommandArgument[]{dynamic("rule", () ->
+                GameRules.getRules().keySet()), new CommandArgument("value")}, args -> {
             if (player == null) {
                 log.warn("Cannot execute command: player does not exist.");
                 return;
@@ -243,7 +246,8 @@ public class Library implements Service<GameMaster> {
     private static CommandArgument literal(String name, String... values) {
         return CommandArgument.of(name, (text, cursorPosition) -> {
             String prefix = text == null ? "" : text.substring(0, Math.min(cursorPosition, text.length()));
-            return Arrays.stream(values).filter(value -> value.regionMatches(true, 0, prefix, 0, prefix.length())).sorted(String.CASE_INSENSITIVE_ORDER).toList();
+            return Arrays.stream(values).filter(value ->
+                    value.regionMatches(true, 0, prefix, 0, prefix.length())).sorted(String.CASE_INSENSITIVE_ORDER).toList();
         });
     }
 
@@ -254,7 +258,9 @@ public class Library implements Service<GameMaster> {
             if (values == null) {
                 return java.util.List.of();
             }
-            return values.stream().filter(value -> value != null).filter(value -> value.regionMatches(true, 0, prefix, 0, prefix.length())).sorted(String.CASE_INSENSITIVE_ORDER).toList();
+            return values.stream().filter(value -> value != null).filter(
+                    value -> value.regionMatches(true, 0, prefix, 0, prefix.length()))
+                    .sorted(String.CASE_INSENSITIVE_ORDER).toList();
         });
     }
 

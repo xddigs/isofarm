@@ -1,8 +1,6 @@
 package com.isofarm.item;
 
-import com.isofarm.data.MaterialID;
-import com.isofarm.data.SoundGroup;
-import com.isofarm.data.Tier;
+import com.isofarm.data.*;
 import com.isofarm.input.Keyboard;
 import com.isofarm.service.BookService;
 import com.isofarm.service.SoundService;
@@ -21,25 +19,26 @@ public class Book extends Usable {
     private final boolean hasContent;
 
     public Book(boolean hasContent) {
-        super(Tier.NONE, MaterialID.BOOK);
+        super(Usables.BOOK);
         this.pages = new ArrayList<>();
         this.hasContent = hasContent;
     }
 
-    public Book(Tier tier, MaterialID materialID, boolean hasContent) {
-        super(tier, materialID);
-        this.hasContent = hasContent;
+    public Book() {
+        super(Usables.CRAFTING_BOOK);
         this.pages = new ArrayList<>();
+        this.hasContent = true;
     }
 
     @Override
-    public void use(GameMaster gameMaster) {
-        if (!hasContent) return;
+    public boolean use(GameMaster gameMaster) {
+        if (!hasContent) return false;
         if (isOpen) {
             BookService.bs.close();
         } else {
             BookService.bs.open(this);
         }
+        return true;
     }
 
     public void open() {
@@ -108,5 +107,15 @@ public class Book extends Usable {
 
     public boolean hasPreviousPage() {
         return currentPage > 0;
+    }
+
+    @Override
+    public Item copy() {
+        return new Book(hasContent);
+    }
+
+    @Override
+    public boolean enchanting(Enchantment enchantment) {
+        return false;
     }
 }

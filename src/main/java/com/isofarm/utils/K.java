@@ -61,19 +61,20 @@ public final class K {
         public static final int ICON_SEED_CROPS_COLS = 4;
         public static final int ICON_BLOCK_COLS = 10;
         public static final int ICON_BLOCK_ROWS = 4;
-        public static final int ICON_TOOL_COLS = 9;
+        public static final int ICON_TOOL_COLS = 5;
         public static final int ICON_TOOL_ROWS = 7;
+        public static final int ICON_USABLES_COLS = 4;
         public static final int ICON_HEARTS_ROWS = 4;
+
+        public static final int ICON_MATERIAL_COLS = 12;
+        public static final int ICON_MATERIAL_ROWS = 2;
+        public static final int ICON_INV_COLS = 3;
 
         public static final int PLAYER_SPRITE_COLS = 12;
         public static final int PLAYER_SPRITE_ROWS = 26;
         public static final int PLAYER_SPRITE_COLS_RUN = 8;
         public static final int PLAYER_SPRITE_COLS_ACTION = 6;
         public static final int PLAYER_SPRITE_COLS_FALL = 8;
-
-        public static final int ICON_MATERIAL_COLS = 12;
-        public static final int ICON_MATERIAL_ROWS = 2;
-        public static final int ICON_INV_COLS = 4;
 
         public static final int DESTROY_FRAMES = 9;
 
@@ -145,12 +146,13 @@ public final class K {
         public static final String POTATO_TEXTURE = "assets/crops/potato_crop.png";
         public static final String BEETROOT_TEXTURE = "assets/crops/beetroot_crop.png";
 
-        public static final String SEED_ICONS = "assets/gui/seed_icons.png";
-        public static final String CROP_ICONS = "assets/gui/crop_icons.png";
-        public static final String TOOL_ICONS = "assets/gui/tool_icons.png";
-        public static final String BLOCK_ICONS = "assets/gui/block_icons.png";
-        public static final String MATERIAL_ICONS = "assets/gui/material_icons.png";
-        public static final String INVENTORY_ICONS = "assets/gui/inventory_icons.png";
+        public static final String SEED_ICONS = "assets/gui/seeds.png";
+        public static final String CROP_ICONS = "assets/gui/crops.png";
+        public static final String TOOL_ICONS = "assets/gui/tools.png";
+        public static final String BLOCK_ICONS = "assets/gui/blocks.png";
+        public static final String MATERIAL_ICONS = "assets/gui/materials.png";
+        public static final String USABLES_ICONS = "assets/gui/usables.png";
+        public static final String INVENTORY_ICONS = "assets/gui/inventory.png";
         public static final String PLAYER_SPRITESHEET = "assets/sprites/steve.png";
         public static final String BACKPACK_SPRITESHEET = "assets/sprites/backpack.png";
         public static final String DESTROY_STAGES = "assets/textures/blocks/destroy.png";

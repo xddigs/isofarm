@@ -8,7 +8,7 @@ import com.isofarm.entity.states.SneakingState;
 import com.isofarm.graphics.*;
 import com.isofarm.input.Keyboard;
 import com.isofarm.item.Backpack;
-import com.isofarm.item.CraftingKit;
+import com.isofarm.item.CraftingBook;
 import com.isofarm.item.Item;
 import com.isofarm.item.Tool;
 import com.isofarm.pathfinding.GridPos;
@@ -270,14 +270,9 @@ public class Player extends Character {
                 .getItems().keySet())) {
             if (i == null) continue;
             switch (i) {
-                case Backpack ignored -> {
-                    continue;
-                }
-                case CraftingKit ignored -> {
-                    continue;
-                }
-                default -> {
-                }
+                case Backpack ignored -> { continue; }
+                case CraftingBook ignored -> { continue; }
+                default ->  {}
             }
 
             int amount = getInventory().getAmount(i);

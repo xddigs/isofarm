@@ -17,11 +17,17 @@ public class ResourceManager {
     private static SpriteSheet toolIcons;
     private static SpriteSheet blockIcons;
     private static SpriteSheet materialIcons;
+    private static SpriteSheet usablesIcons;
+    private static SpriteSheet inventoryIcons;
     private static SpriteSheet playerSpriteSheet;
     private static SpriteSheet backpackSpriteSheet;
     private static Map<CropType, SpriteSheet> cropSpritesheets;
     private static SpriteSheet heartsSpriteSheet;
     private static SpriteSheet destroyTexture;
+    private static SpriteSheet wheat;
+    private static SpriteSheet carrot;
+    private static SpriteSheet potato;
+    private static SpriteSheet beetroot;
     private final Shader defaultShader;
     private final Shader outlineShader;
     private final Shader rainShader;
@@ -37,11 +43,6 @@ public class ResourceManager {
     private final Mesh destroyOverlayMesh;
     private final Texture backgroundGUI;
     private final TextureAtlas blocksAtlas;
-    private static SpriteSheet wheat;
-    private static SpriteSheet carrot;
-    private static SpriteSheet potato;
-    private static SpriteSheet beetroot;
-    private static SpriteSheet inventoryIcons;
 
     public ResourceManager() {
         this.defaultShader = new Shader(K.Paths.DEFAULT_VERT_SHADER, K.Paths.DEFAULT_FRAG_SHADER);
@@ -77,7 +78,7 @@ public class ResourceManager {
         cropIcons = new SpriteSheet(K.Paths.CROP_ICONS, K.UI.ICON_SEED_CROPS_COLS, 1);
         seedIcons = new SpriteSheet(K.Paths.SEED_ICONS, K.UI.ICON_SEED_CROPS_COLS, 1);
         materialIcons = new SpriteSheet(K.Paths.MATERIAL_ICONS, K.UI.ICON_MATERIAL_COLS, K.UI.ICON_MATERIAL_ROWS);
-
+        usablesIcons = new SpriteSheet(K.Paths.USABLES_ICONS, K.UI.ICON_USABLES_COLS, 1);
         inventoryIcons = new SpriteSheet(K.Paths.INVENTORY_ICONS, K.UI.ICON_INV_COLS, 1);
 
         playerSpriteSheet = new SpriteSheet(K.Paths.PLAYER_SPRITESHEET, K.UI.PLAYER_SPRITE_COLS, K.UI.PLAYER_SPRITE_ROWS);
@@ -110,11 +111,8 @@ public class ResourceManager {
         int row = materialID.getRow();
         if (row == 1) {
             int col = switch (materialID) {
-                case STICK -> 0;
                 case PAPER -> 1;
                 case LEATHER -> 2;
-                case BOOK -> 3;
-                case CRAFTING_BOOK -> 4;
                 default -> 0;
             };
             return (row * K.UI.ICON_MATERIAL_COLS) + col;
@@ -122,7 +120,6 @@ public class ResourceManager {
 
         if (material.getTier() != null) {
             int baseCol = switch (material.getTier()) {
-                case COPPER -> 0;
                 case IRON -> 2;
                 case PLATINUM -> 4;
                 case GOLD -> 6;
@@ -159,8 +156,14 @@ public class ResourceManager {
         if (item instanceof Tool tool) {
             int row = tool.getRow();
             int col = tool.getCol();
-            int bucketOffset = (tool instanceof Bucket bucket && bucket.isFull()) ? 1 : 0;
-            return (row * K.UI.ICON_TOOL_COLS) + col + bucketOffset;
+            return (row * K.UI.ICON_TOOL_COLS) + col;
+        }
+
+        if (item instanceof Usable usable) {
+            int row = usable.getUsablesID().getRow();
+            int col = usable.getUsablesID().getCol();
+            int bucketOffset = (usable instanceof Bucket bucket && bucket.isFull()) ? 1 : 0;
+            return (row * K.UI.ICON_USABLES_COLS) + col + bucketOffset;
         }
 
         if (item instanceof Material material) {
@@ -168,6 +171,14 @@ public class ResourceManager {
         }
 
         return 0;
+    }
+
+    public static SpriteSheet getPlayerSpriteSheet() {
+        return playerSpriteSheet;
+    }
+
+    public static SpriteSheet getBackpackSpriteSheet() {
+        return backpackSpriteSheet;
     }
 
     public void dispose() {
@@ -192,6 +203,7 @@ public class ResourceManager {
         toolIcons.dispose();
         blockIcons.dispose();
         materialIcons.dispose();
+        usablesIcons.dispose();
         inventoryIcons.dispose();
 
         playerSpriteSheet.dispose();
@@ -290,17 +302,12 @@ public class ResourceManager {
         return materialIcons;
     }
 
+    public SpriteSheet getUsablesIcons() {
+        return usablesIcons;
+    }
+
     public SpriteSheet getInventoryIcons() {
         return inventoryIcons;
-    }
-
-    public static SpriteSheet getPlayerSpriteSheet() {
-        return playerSpriteSheet;
-    }
-
-
-    public static SpriteSheet getBackpackSpriteSheet() {
-        return backpackSpriteSheet;
     }
 
     public SpriteSheet getHeartsSpriteSheet() {

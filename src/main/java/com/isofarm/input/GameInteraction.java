@@ -213,7 +213,7 @@ public class GameInteraction {
 
     public void dropItem(GameMaster gameMaster, Item selectedItem, boolean dropAll) {
         if (selectedItem == null) return;
-        if (selectedItem instanceof Backpack || selectedItem instanceof CraftingKit) {
+        if (selectedItem instanceof Backpack || selectedItem instanceof CraftingBook) {
             ToastFactory.error("You can't drop your " + selectedItem.getName() + "!");
             return;
         }
@@ -431,9 +431,7 @@ public class GameInteraction {
 
         if (selectedItem instanceof Tool tool) {
             boolean isUsableOn = Arrays.stream(tool.getType().getUsableOn())
-                    .anyMatch(b -> b.getId() == blockId) &&
-                    !(tool instanceof Backpack || tool instanceof CraftingKit ||
-                            tool instanceof Bucket);
+                    .anyMatch(b -> b.getId() == blockId);
 
             tool.setPlayer(gameMaster.getPlayer());
             if (!isUsableOn) {

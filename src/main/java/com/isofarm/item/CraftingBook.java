@@ -2,8 +2,6 @@ package com.isofarm.item;
 
 import com.isofarm.craft.Recipe;
 import com.isofarm.craft.RecipeRegistry;
-import com.isofarm.data.MaterialID;
-import com.isofarm.data.Tier;
 import com.isofarm.entity.Player;
 import com.isofarm.service.CraftingService;
 
@@ -13,8 +11,7 @@ public class CraftingBook extends Book {
     private static final int LINES_PER_PAGE = 16;
 
     public CraftingBook(Player player) {
-        super(Tier.NONE, MaterialID.CRAFTING_BOOK, true);
-
+        super();
         if (!hasContent() || player == null) {
             return;
         }

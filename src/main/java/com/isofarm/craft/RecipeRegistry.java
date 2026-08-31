@@ -16,9 +16,9 @@ public class RecipeRegistry {
 
         create(Tier.LEATHER).result(new Block(BlockData.OAK_WOOD), 4).with(BlockData.OAK_LOG, 1).add();
         create(Tier.LEATHER).result(new Material(Tier.NONE, MaterialID.STICK), 4).with(BlockData.OAK_WOOD, 1).add();
-        create(Tier.LEATHER).result(new Material(Tier.NONE, MaterialID.BOOK), 1).with(MaterialID.LEATHER, 3).with(MaterialID.PAPER, 2).add();
-        create(Tier.LEATHER).result(new Bucket(BlockData.AIR, Tier.WOOD), 1).with(BlockData.OAK_WOOD, 3).add();
-
+        create(Tier.LEATHER).result(new Book(false), 1).with(MaterialID.LEATHER, 3).with(MaterialID.PAPER, 2).add();
+        create(Tier.LEATHER).result(new Backpack(), 1).with(MaterialID.LEATHER, 3).add();
+        create(Tier.LEATHER).result(new Bucket(), 1).with(new Material(Tier.STEEL, MaterialID.INGOT), 3).add();
         registerToolSet(Tier.LEATHER, BlockData.OAK_WOOD);
 
         Map<Tier, Tier> metalProgression = Map.of(
@@ -32,21 +32,6 @@ public class RecipeRegistry {
         metalProgression.forEach((toolTier, requiredStationTier) -> {
             Craftable mainMaterial = new MiningComponent(toolTier, MaterialID.INGOT);
             registerToolSet(requiredStationTier, mainMaterial);
-
-            create(requiredStationTier)
-                    .result(new Backpack(ToolType.BACKPACK, toolTier), 1)
-                    .with(mainMaterial, 3)
-                    .with(MaterialID.LEATHER, 3).add();
-
-            create(requiredStationTier)
-                    .result(new CraftingKit(ToolType.CRAFTING_KIT, toolTier), 1)
-                    .with(mainMaterial, 3)
-                    .with(MaterialID.LEATHER, 2).add();
-
-            create(toolTier)
-                    .result(new Bucket(BlockData.AIR, toolTier), 1)
-                    .with(mainMaterial, 3)
-                    .with(MaterialID.STICK, 2).add();
         });
 
         recipes.sort(Comparator.comparing(recipe -> recipe.result().getName(),
@@ -55,11 +40,11 @@ public class RecipeRegistry {
     }
 
     private void registerToolSet(Tier stationTier, Craftable primaryMat) {
-        registerTool(stationTier, primaryMat, 2, 2, Hoe::new);
-        registerTool(stationTier, primaryMat, 3, 2, Pickaxe::new);
-        registerTool(stationTier, primaryMat, 1, 2, Shovel::new);
-        registerTool(stationTier, primaryMat, 3, 3, Axe::new);
         registerTool(stationTier, primaryMat, 2, 1, Sword::new);
+        registerTool(stationTier, primaryMat, 3, 2, Pickaxe::new);
+        registerTool(stationTier, primaryMat, 3, 3, Axe::new);
+        registerTool(stationTier, primaryMat, 2, 2, Hoe::new);
+        registerTool(stationTier, primaryMat, 1, 2, Shovel::new);
     }
 
     private void registerTool(Tier stationTier, Craftable mat, int matAmount, int stickAmount,

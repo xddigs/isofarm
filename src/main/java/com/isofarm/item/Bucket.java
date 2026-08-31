@@ -6,19 +6,17 @@ import com.isofarm.utils.HoveredCell;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
 
-public class Bucket extends Tool {
-    private final Tier tier;
+public class Bucket extends Usable {
     private BlockData type;
 
-    public Bucket(BlockData blockData, Tier tier) {
-        super((byte) 7, tier.getName() + " " + blockData.getName() + ToolType.BUCKET.getName(),
-                blockData.getValue(), ToolType.BUCKET, tier, tier.getDurability() + ToolType.BUCKET.getBaseDurability());
-        this.type = blockData;
-        this.tier = tier;
+    public Bucket(BlockData type) {
+        super(Usables.BUCKET);
+        this.type = type;
+        setName(type.getName() + getUsablesID().getName());
     }
 
     public Bucket() {
-        this(BlockData.AIR, Tier.WOOD);
+        this(BlockData.AIR);
     }
 
     public BlockData getBlockType() {
@@ -33,42 +31,42 @@ public class Bucket extends Tool {
         this.type = BlockData.AIR;
     }
 
-    public Tier getTier() {
-        return tier;
-    }
-
     @Override
     public Item copy() {
-        return new Bucket(getBlockType(), getTier());
+        return new Bucket(getBlockType());
     }
 
     public boolean isFull() {
         return type.equals(BlockData.WATER);
     }
 
-    public int getFrame() {
-        return type.equals(BlockData.WATER) ? 8 : 7;
-    }
-
-    public void use(GameMaster gameMaster) {
+    public boolean use(GameMaster gameMaster) {
         Player player = gameMaster.getPlayer();
         BlockPos hoveredCell = HoveredCell.get(gameMaster);
         World world = gameMaster.getWorld();
 
-        if (player == null || hoveredCell == null) return;
+        byte waterID = BlockData.WATER.getId();
+        byte airID = BlockData.AIR.getId();
+
+        if (player == null || hoveredCell == null) return false;
         if (isFull()) {
-            if (world.getBlockTypeAt(hoveredCell) == BlockData.AIR.getId()) {
+            if (world.getBlockTypeAt(hoveredCell) == airID) {
                 world.setWaterLevelAt(hoveredCell, (byte) 8);
                 empty();
-                world.setBlockTypeAt(hoveredCell, type.getId());
+                world.setBlockTypeAt(hoveredCell, waterID);
                 gameMaster.rebuildChunkMeshAt(hoveredCell.x(), hoveredCell.z());
             }
         } else {
             world.setWaterLevelAt(hoveredCell, (byte) 0);
+            world.setBlockTypeAt(hoveredCell, airID);
             fill();
             gameMaster.rebuildChunkMeshAt(hoveredCell);
         }
+        return true;
     }
+
+    @Override
+    public void update() {}
 
     @Override
     public boolean enchanting(Enchantment enchantment) {
