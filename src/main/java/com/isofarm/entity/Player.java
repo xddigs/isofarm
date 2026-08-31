@@ -1,11 +1,11 @@
 package com.isofarm.entity;
 
 import com.isofarm.data.*;
-import com.isofarm.entity.states.FallingState;
 import com.isofarm.entity.states.GroundedState;
-import com.isofarm.entity.states.InteractingState;
 import com.isofarm.entity.states.SneakingState;
 import com.isofarm.graphics.*;
+import com.isofarm.graphics.gltf.GLTFModel;
+import com.isofarm.graphics.gltf.GLTFNode;
 import com.isofarm.input.Keyboard;
 import com.isofarm.item.Backpack;
 import com.isofarm.item.CraftingBook;
@@ -14,12 +14,12 @@ import com.isofarm.item.Tool;
 import com.isofarm.pathfinding.GridPos;
 import com.isofarm.service.BookService;
 import com.isofarm.service.TimeService;
-import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import com.isofarm.utils.ToastFactory;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.slf4j.Logger;
@@ -36,24 +36,37 @@ public class Player extends Character {
     private static final Logger log = LoggerFactory.getLogger(Player.class);
     private final Matrix4f modelMatrix;
     private final GameMaster gameMaster;
+    private final GLTFModel playerModel;
     private Direction direction = Direction.S;
     private List<GridPos> path;
-
     private float currentEyeHeight = 1.6f;
     private float targetEyeHeight = 1.6f;
-
     private int pathIndex = 0;
     private int damageSequence = 0;
     private float respawnTimer = -1.0f;
     private boolean isFalling = false;
-
+    private float modelYaw = 0.0f;
+    private float targetModelYaw = 0.0f;
     private PlayerState currentState;
+    private GLTFNode rightArmNode;
+    private GLTFNode leftArmNode;
+    private GLTFNode rightLegNode;
+    private GLTFNode leftLegNode;
+    private float walkAnimTime = 0.0f;
 
     public Player(String name, World world, GameMaster gameMaster) {
         super(name);
         this.gameMaster = gameMaster;
         this.modelMatrix = new Matrix4f();
         this.path = new LinkedList<>();
+
+        this.playerModel = ResourceManager.getPlayerModel();
+        if (this.playerModel != null) {
+            this.rightArmNode = playerModel.findNode("Right Arm");
+            this.leftArmNode = playerModel.findNode("Left Arm");
+            this.rightLegNode = playerModel.findNode("Right Leg");
+            this.leftLegNode = playerModel.findNode("Left Leg");
+        }
 
         float spawnX = 0.5f;
         float spawnZ = 0.5f;
@@ -93,27 +106,57 @@ public class Player extends Character {
 
         currentState.input(this, gameMaster);
         currentState.update(this, delta);
+        updateRotation(delta);
+
+        boolean isMoving = Math.abs(velocity.x) > 0.05f || Math.abs(velocity.z) > 0.05f;
+
+        if (isMoving) {
+            walkAnimTime += delta * 8.0f;
+        } else {
+            walkAnimTime = org.joml.Math.lerp(walkAnimTime, 0.0f, Math.clamp(delta * 10.0f, 0.0f, 1.0f));
+        }
+
+        float swingAngle = (float) Math.sin(walkAnimTime) * 0.45f;
+
+        Quaternionf rightArmRot = new Quaternionf().rotateX(swingAngle);
+        Quaternionf leftArmRot = new Quaternionf().rotateX(-swingAngle);
+        Quaternionf rightLegRot = new Quaternionf().rotateX(-swingAngle);
+        Quaternionf leftLegRot = new Quaternionf().rotateX(swingAngle);
+
+        if (rightArmNode != null) rightArmNode.setRotation(rightArmRot);
+        if (leftArmNode != null) leftArmNode.setRotation(leftArmRot);
+        if (rightLegNode != null) rightLegNode.setRotation(rightLegRot);
+        if (leftLegNode != null) leftLegNode.setRotation(leftLegRot);
+
+        if (playerModel != null) {
+            playerModel.updateTransforms();
+        }
 
         if (Math.abs(velocity.x) > 0.05f || Math.abs(velocity.z) > 0.05f) {
-            float cameraYaw = gameMaster.getActiveCamera().getYaw();
-            float yawRad = (float) Math.toRadians(-cameraYaw);
+            double angleRad = Math.atan2(velocity.x, velocity.z);
+            double degrees = Math.toDegrees(angleRad);
+            degrees = 180.0 - degrees;
 
-            float camRelX = velocity.x * (float) Math.cos(yawRad) - velocity.z * (float) Math.sin(yawRad);
-            float camRelZ = velocity.x * (float) Math.sin(yawRad) + velocity.z * (float) Math.cos(yawRad);
+            if (degrees < 0) {
+                degrees += 360.0;
+            }
+            if (degrees >= 360.0) {
+                degrees -= 360.0;
+            }
 
-            boolean right = camRelX > 0.1f;
-            boolean left  = camRelX < -0.1f;
-            boolean down  = camRelZ > 0.1f;
-            boolean up    = camRelZ < -0.1f;
+            int sector = (int) Math.round(degrees / 45.0) % 8;
 
-            if (up && right)       direction = Direction.NE;
-            else if (up && left)   direction = Direction.NW;
-            else if (down && right) direction = Direction.SE;
-            else if (down && left) direction = Direction.SW;
-            else if (right)        direction = Direction.E;
-            else if (left)         direction = Direction.W;
-            else if (down)         direction = Direction.S;
-            else if (up)           direction = Direction.N;
+            this.direction = switch (sector) {
+                case 0 -> Direction.N;
+                case 1 -> Direction.NE;
+                case 2 -> Direction.E;
+                case 3 -> Direction.SE;
+                case 4 -> Direction.S;
+                case 5 -> Direction.SW;
+                case 6 -> Direction.W;
+                case 7 -> Direction.NW;
+                default -> Direction.N;
+            };
         }
 
         float lerpSpeed = 10.0f;
@@ -130,131 +173,54 @@ public class Player extends Character {
     public void render(GameMaster gameMaster) {
         ResourceManager rm = gameMaster.getResourceManager();
         CameraView camera = gameMaster.getActiveCamera();
-        SpriteSheet sheet = ResourceManager.getPlayerSpriteSheet();
 
-        if (sheet == null || rm.getPlayerMesh() == null) {
+        if (playerModel == null) {
             return;
         }
 
         Shader shader = rm.getDefaultShader();
-        int textureUnit = K.Render.PRIMARY_TEXTURE_UNIT;
-
-        boolean isMoving = (getVelocity().x * getVelocity().x +
-                getVelocity().z * getVelocity().z) > 0.001f;
-
-        boolean isAttacking = currentState instanceof InteractingState;
-        boolean isFalling = currentState instanceof FallingState fallingState
-                        && fallingState.shouldAnimateFall();
-        boolean isSneaking = currentState instanceof SneakingState;
-
-        int rowIndex;
-        int totalFramesInRow;
-        int actionIndex = 16;
-        int sneakIndex = K.UI.PLAYER_SPRITE_ROWS - 1;
-        int fallIndex = sneakIndex - 1;
-
-        if (isFalling) {
-            rowIndex = fallIndex;
-            totalFramesInRow = K.UI.PLAYER_SPRITE_COLS_FALL;
-        } else if (isAttacking) {
-            rowIndex = actionIndex + getActionOffset();
-            totalFramesInRow = K.UI.PLAYER_SPRITE_COLS_ACTION;
-        } else if (isSneaking) {
-            rowIndex = sneakIndex;
-            totalFramesInRow = K.UI.PLAYER_SPRITE_COLS;
-        } else if (isMoving) {
-            rowIndex = getPlayerRow(direction, true);
-            totalFramesInRow = K.UI.PLAYER_SPRITE_COLS_RUN;
-        } else {
-            rowIndex = getPlayerRow(direction, false);
-            totalFramesInRow = K.UI.PLAYER_SPRITE_COLS;
+        if (shader == null) {
+            return;
         }
-
-        int currentFrame;
-
-        if (isSneaking) {
-            currentFrame = switch (direction) {
-                case NW -> 0;
-                case W  -> 1;
-                case SW -> 2;
-                case S  -> 3;
-                case SE -> 4;
-                case E  -> 5;
-                case NE -> 6;
-                case N  -> 7;
-            };
-        } else {
-            currentFrame = (int) (getAnimTimer() / getFrameDuration()) % totalFramesInRow;
-        }
-
-        int spriteIndex = rowIndex * K.UI.PLAYER_SPRITE_COLS + currentFrame;
-        Vector4f uvBounds = sheet.getUVBounds(spriteIndex);
-        shader.bind();
-
-        glActiveTexture(GL_TEXTURE0 + textureUnit);
-
-        shader.setUniform("uTexture", textureUnit);
-        shader.setUniform("uUseTexture", true);
 
         CelestialLighting lighting = gameMaster.getCelestialLighting();
-        float ambient = lighting.getAmbientIntensity();
-        float intensity = lighting.getIntensity();
-        Vector3f lightDirection = lighting.getDirection();
+        shader.bind();
+        shader.setUniform("uProjection", camera.getProjectionMatrix());
+        shader.setUniform("uView", camera.getViewMatrix());
 
-        shader.setUniform("uLightIntensity", intensity);
-        shader.setUniform("uLightDirection", lightDirection);
-        shader.setUniform("uAmbientIntensity", ambient);
+        shader.setUniform("uLightIntensity", lighting.getIntensity());
+        shader.setUniform("uLightDirection", lighting.getDirection());
+        shader.setUniform("uAmbientIntensity", lighting.getAmbientIntensity());
         shader.setUniform("uSkyColor", TimeService.getSkyColor());
         shader.setUniform("uBaseColor", new Vector3f(1.0f));
-        shader.setUniform("uIsSprite", true);
 
+        shader.setUniform("uIsSprite", false);
+        shader.setUniform("uUseTexture", true);
+        shader.setUniform("uUVBounds", new Vector4f(0.0f, 0.0f, 1.0f, 1.0f));
         shader.setUniform("uParticleAlpha", 1.0f);
         shader.setUniform("uIsMaskPass", false);
         shader.setUniform("uEnableShadows", false);
         shader.setUniform("uLightSpaceMatrix", new Matrix4f());
-        shader.setUniform("uProjection", camera.getProjectionMatrix());
-        shader.setUniform("uView", camera.getViewMatrix());
 
-        float baseScaleY = (dimensions == null || dimensions.y <= 0) ? 2.0f : dimensions.y;
-        float baseScaleX = (dimensions == null || dimensions.x <= 0) ? 1.0f : dimensions.x;
-        float baseScaleZ = (dimensions == null || dimensions.z <= 0) ? 1.0f : dimensions.z;
         float globalScale = Settings.getScaledEntity();
 
-        float finalScaleX = baseScaleX * globalScale;
-        float finalScaleY = baseScaleY * globalScale;
-        float finalScaleZ = baseScaleZ * globalScale;
-
-        float yawRad = (float) Math.toRadians(-camera.getYaw());
-        float yOffset = finalScaleY * (currentState instanceof SneakingState ? -0.10f : -0.15f);
-
         modelMatrix.identity()
-                .translate(position.x, position.y + yOffset, position.z)
-                .rotateY(yawRad)
-                .scale(finalScaleX, finalScaleY, finalScaleZ);
+                .translate(position.x, position.y, position.z)
+                .rotateY((float) Math.toRadians(modelYaw))
+                .scale(globalScale);
 
         shader.setUniform("uModel", modelMatrix);
-
-        glDisable(GL_CULL_FACE);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_DEPTH_TEST);
         glDepthMask(true);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        boolean backpackInFront = isBackpackInFront(direction);
-        if (getInventory().hasBackpackEquipped() && !backpackInFront) {
-            renderBackpack(shader, rm, direction, backpackInFront, isMoving);
-        }
+        playerModel.render(shader, modelMatrix);
 
-        sheet.bind();
-        shader.setUniform("uUVBounds", uvBounds);
-        shader.setUniform("uModel", modelMatrix);
-        rm.getPlayerMesh().render();
-
-        if (getInventory().hasBackpackEquipped() && backpackInFront) {
-            renderBackpack(shader, rm, direction, backpackInFront, isMoving);
-        }
-
-        sheet.unbind();
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glDisable(GL_BLEND);
         shader.unbind();
     }
 
@@ -270,9 +236,14 @@ public class Player extends Character {
                 .getItems().keySet())) {
             if (i == null) continue;
             switch (i) {
-                case Backpack ignored -> { continue; }
-                case CraftingBook ignored -> { continue; }
-                default ->  {}
+                case Backpack ignored -> {
+                    continue;
+                }
+                case CraftingBook ignored -> {
+                    continue;
+                }
+                default -> {
+                }
             }
 
             int amount = getInventory().getAmount(i);
@@ -284,17 +255,56 @@ public class Player extends Character {
         }
     }
 
+    private float getDirectionYaw(Direction direction) {
+        return switch (direction) {
+            case N  -> 0.0f;
+            case NE -> 45.0f;
+            case E  -> 90.0f;
+            case SE -> 135.0f;
+            case S  -> 180.0f;
+            case SW -> 225.0f;
+            case W  -> 270.0f;
+            case NW -> 315.0f;
+        };
+    }
+
+    private void updateRotation(float delta) {
+        targetModelYaw = getDirectionYaw(direction);
+        float difference = targetModelYaw - modelYaw;
+
+        while (difference > 180.0f) {
+            difference -= 360.0f;
+        }
+
+        while (difference < -180.0f) {
+            difference += 360.0f;
+        }
+
+        float rotationSpeed = 720.0f;
+        float maxRotation = rotationSpeed * delta;
+        if (Math.abs(difference) <= maxRotation) {
+            modelYaw = targetModelYaw;
+        } else {
+            modelYaw += Math.copySign(maxRotation, difference);
+        }
+
+        modelYaw %= 360.0f;
+        if (modelYaw < 0.0f) {
+            modelYaw += 360.0f;
+        }
+    }
+
     private int getPlayerRow(Direction direction, boolean isMoving) {
         int baseOffset = isMoving ? 8 : 0;
         return baseOffset + switch (direction) {
             case NW -> 0;
-            case W  -> 1;
+            case W -> 1;
             case SW -> 2;
-            case S  -> 3;
+            case S -> 3;
             case SE -> 4;
-            case E  -> 5;
+            case E -> 5;
             case NE -> 6;
-            case N  -> 7;
+            case N -> 7;
         };
     }
 
@@ -308,26 +318,26 @@ public class Player extends Character {
     private int getBackpackFrame(Direction direction, boolean isMoving) {
         return switch (direction) {
             case NW -> 0;
-            case W  -> 1;
+            case W -> 1;
             case SW -> 2;
-            case S  -> 3;
+            case S -> 3;
             case NE -> 4;
-            case E  -> 5;
+            case E -> 5;
             case SE -> 6;
-            case N  -> 7;
+            case N -> 7;
         };
     }
 
     private int getActionOffset() {
         return switch (direction) {
             case NW -> 0;
-            case W  -> 1;
+            case W -> 1;
             case SW -> 2;
-            case S  -> 3;
+            case S -> 3;
             case SE -> 4;
-            case E  -> 5;
+            case E -> 5;
             case NE -> 6;
-            case N  -> 7;
+            case N -> 7;
         };
     }
 
@@ -518,11 +528,11 @@ public class Player extends Character {
 
         if (inputDir.lengthSquared() > 0.0f) {
             inputDir.normalize();
-
             float yawRad = (float) Math.toRadians(cameraYaw);
-            float worldX = inputDir.x * (float) Math.cos(yawRad) - inputDir.z * (float) Math.sin(yawRad);
-            float worldZ = inputDir.x * (float) Math.sin(yawRad) + inputDir.z * (float) Math.cos(yawRad);
-
+            float sin = (float) Math.sin(yawRad);
+            float cos = (float) Math.cos(yawRad);
+            float worldX = inputDir.x * cos - inputDir.z * sin;
+            float worldZ = inputDir.x * sin + inputDir.z * cos;
             Vector3f targetVelocity = new Vector3f(worldX * getSpeed(), getVelocity().y, worldZ * getSpeed());
 
             if (currentState instanceof SneakingState) {
@@ -554,7 +564,8 @@ public class Player extends Character {
                     add(item);
                 }
             }
-            case GODMODE -> {}
+            case GODMODE -> {
+            }
         }
     }
 

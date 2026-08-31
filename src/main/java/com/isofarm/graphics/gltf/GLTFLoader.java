@@ -304,6 +304,7 @@ public final class GLTFLoader {
         var channels = org.lwjgl.system.MemoryStack.stackPush().mallocInt(1);
 
         try {
+            stbi_set_flip_vertically_on_load(false);
             ByteBuffer pixels = stbi_load_from_memory(imageBuffer, width, height, channels, 4);
             if (pixels == null) {
                 throw new RuntimeException("Failed to decode GLTF texture: " + stbi_failure_reason());

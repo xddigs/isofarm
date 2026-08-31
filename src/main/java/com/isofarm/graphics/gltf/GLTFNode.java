@@ -50,8 +50,7 @@ public class GLTFNode {
     }
 
     public void render(GLTFModel model, Matrix4f parentMatrix, Shader shader) {
-        parentMatrix.mul(localMatrix, worldMatrix);
-
+        worldMatrix.set(parentMatrix).mul(localMatrix);
         if (meshIndex >= 0) {
             model.renderMesh(meshIndex, worldMatrix, shader);
         }

@@ -7,10 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL13.*;
-import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
+import static org.lwjgl.opengl.GL15.glDeleteBuffers;
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
 
 public class GLTFModel {
 
@@ -102,7 +103,7 @@ public class GLTFModel {
         private final int indexCount;
         private final int textureId;
 
-        GLTFMesh(int vao, int vbo, int ebo, int indexCount, int textureId) {
+        public GLTFMesh(int vao, int vbo, int ebo, int indexCount, int textureId) {
             this.vao = vao;
             this.vbo = vbo;
             this.ebo = ebo;
@@ -111,12 +112,14 @@ public class GLTFModel {
         }
 
         void render(Shader shader) {
+            glActiveTexture(GL_TEXTURE0);
             if (textureId > 0) {
-                glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_2D, textureId);
-
                 shader.setUniform("uTexture", 0);
                 shader.setUniform("uUseTexture", true);
+            } else {
+                glBindTexture(GL_TEXTURE_2D, 0);
+                shader.setUniform("uUseTexture", false);
             }
 
             glBindVertexArray(vao);
@@ -125,7 +128,7 @@ public class GLTFModel {
             glBindTexture(GL_TEXTURE_2D, 0);
         }
 
-        void dispose() {
+        public void dispose() {
             glDeleteVertexArrays(vao);
             glDeleteBuffers(vbo);
             glDeleteBuffers(ebo);
