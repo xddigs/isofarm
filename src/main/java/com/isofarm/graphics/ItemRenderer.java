@@ -127,10 +127,6 @@ public class ItemRenderer {
 
         int frameIndex = ResourceManager.getItemFrame(item);
 
-        if (item instanceof Bucket bucket) {
-            frameIndex = bucket.getFrame();
-        }
-
         frameIndex = Math.clamp(frameIndex, 0, spriteSheet.getTotalFrames() - 1);
         Vector4f uvBounds = spriteSheet.getUVBounds(frameIndex);
         int textureUnit = K.Render.PRIMARY_TEXTURE_UNIT;

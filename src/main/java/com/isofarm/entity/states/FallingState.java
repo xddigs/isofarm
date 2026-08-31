@@ -7,23 +7,26 @@ import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
 
 public class FallingState implements PlayerState {
+    private static final float FALL_DISTANCE = 4.0f;
+    private static final float FALL_ANIMATION_DELAY = 3.0f;
+
     private float fallStartY;
+    private float fallTime;
 
     @Override
     public void enter(Player player) {
         this.fallStartY = player.getPosition().y;
+        this.fallTime = 0.0f;
         player.setFalling(true);
     }
 
     @Override
-    public void input(Player player, GameMaster gameMaster) {
-
-    }
+    public void input(Player player, GameMaster gameMaster) {}
 
     @Override
     public void update(Player player, float delta) {
         World world = player.getGameMaster().getWorld();
-
+        fallTime += delta;
         if (player.isUnderFluid(world)) {
             player.setFalling(false);
             player.changeState(new SwimmingState());
@@ -36,8 +39,8 @@ public class FallingState implements PlayerState {
         if (player.isOnGround()) {
             float fallDistance = fallStartY - player.getPosition().y;
 
-            if (fallDistance > 3.0f) {
-                float damage = (fallDistance - 3.0f) * 2.0f;
+            if (fallDistance > FALL_DISTANCE) {
+                float damage = (fallDistance - FALL_DISTANCE) * 2.0f;
                 player.fallDamage(damage);
                 player.getSoundService().playBreakSound(SoundGroup.ENTITY, 1.0f, 1.0f);
             }
@@ -50,5 +53,9 @@ public class FallingState implements PlayerState {
     @Override
     public void exit(Player player) {
         player.setFalling(false);
+    }
+
+    public boolean shouldAnimateFall() {
+        return fallTime >= FALL_ANIMATION_DELAY;
     }
 }

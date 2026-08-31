@@ -119,10 +119,6 @@ public class InventorySlotUI extends UIElement {
         float x = Math.round(getAbsoluteX() + (getAbsoluteWidth() - renderWidth) * 0.5f);
         float y = Math.round(getAbsoluteY() + (getAbsoluteHeight() - renderHeight) * 0.5f);
 
-        if (getItem() instanceof Bucket bucket) {
-            spriteFrame = bucket.getFrame();
-        }
-
         GUI.drawSprite(spriteSheet, spriteFrame, x, y, renderWidth, renderHeight,
                 new Vector4f(K.UI.UI_ITEM_TINT.x, K.UI.UI_ITEM_TINT.y, K.UI.UI_ITEM_TINT.z,
                         K.UI.UI_ITEM_TINT.w * getWorldOpacity()));

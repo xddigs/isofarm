@@ -143,7 +143,8 @@ public class Player extends Character {
                 getVelocity().z * getVelocity().z) > 0.001f;
 
         boolean isAttacking = currentState instanceof InteractingState;
-        boolean isFalling = currentState instanceof FallingState;
+        boolean isFalling = currentState instanceof FallingState fallingState
+                        && fallingState.shouldAnimateFall();
         boolean isSneaking = currentState instanceof SneakingState;
 
         int rowIndex;

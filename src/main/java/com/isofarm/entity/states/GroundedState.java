@@ -22,6 +22,10 @@ public class GroundedState implements PlayerState {
         if (Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
             player.changeState(new SneakingState());
         }
+
+        if (Keyboard.isKeyDown(GLFW_KEY_SPACE)) {
+            player.jump();
+        }
     }
 
     @Override
@@ -31,7 +35,7 @@ public class GroundedState implements PlayerState {
             return;
         }
 
-        if (!player.isOnGround()) {
+        if (!player.isOnGround() && !player.isFalling()) {
             player.changeState(new FallingState());
             return;
         }
