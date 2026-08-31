@@ -46,6 +46,7 @@ public class GameMaster {
     private final CommandRegistry commandRegistry;
     private final ItemRegistry itemRegistry;
     private final List<Entity> entities;
+    private final WaterSimulation waterSimulation;
     private List<Recipe> recipes;
     private ShadowMap shadowMap;
     private GameInteraction gameInteraction;
@@ -81,6 +82,7 @@ public class GameMaster {
         this.windowHeight = K.Window.DEFAULT_HEIGHT;
 
         this.world = new World(this);
+        this.waterSimulation = new WaterSimulation(world);
         this.sun = new Sun("Sun");
         this.moon = new Moon("Moon");
         this.celestialLighting = new CelestialLighting(sun, moon);
@@ -182,6 +184,10 @@ public class GameMaster {
         float spawnY = spawn.y() + 1.8f;
         player.setPosition(0.5f, spawnY, 0.5f);
         orthoCamera.setPosition(0.5f, spawnY + 10.0f, 0.5f);
+    }
+
+    public WaterSimulation getWaterSimulation() {
+        return waterSimulation;
     }
 
     public Sun getSun() {
@@ -368,12 +374,12 @@ public class GameMaster {
         this.recipes = recipes;
     }
 
-    public void setDifficulty(Difficulty difficulty) {
-        this.difficulty = difficulty;
-    }
-
     public Difficulty getDifficulty() {
         return difficulty;
+    }
+
+    public void setDifficulty(Difficulty difficulty) {
+        this.difficulty = difficulty;
     }
 
     public CameraView getActiveCamera() {
@@ -454,6 +460,7 @@ public class GameMaster {
         Item selectedInventoryItem = gameUIservice.getInventoryUI().getSelectedItem();
         gameInteraction.update(this, selectedInventoryItem);
 
+        waterSimulation.update(delta);
         if (player != null) {
             chunkManager.update(player.getPosition().x,
                     player.getPosition().z, delta);

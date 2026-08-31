@@ -15,11 +15,20 @@ uniform mat4 uProjection;
 uniform mat4 uView;
 uniform mat4 uModel;
 uniform mat4 uLightSpaceMatrix;
+uniform float uTime;
 
 uniform vec4 uUVBounds;
+uniform bool uIsWater;
 
 void main() {
-    vec4 worldPosition = uModel * vec4(aPos, 1.0);
+    vec3 animatedPos = aPos;
+    if (uIsWater && aNormal.y > 0.5) {
+        float wave = sin((aPos.x + uTime) * 4.0) * 0.015 +
+        cos((aPos.z + uTime * 0.8) * 4.0) * 0.015;
+        animatedPos.y += wave;
+    }
+
+    vec4 worldPosition = uModel * vec4(animatedPos, 1.0);
     gl_Position = uProjection * uView * worldPosition;
 
     vFragPos = worldPosition.xyz;

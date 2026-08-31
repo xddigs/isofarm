@@ -477,6 +477,9 @@ public class GameInteraction {
         }
 
         world.setBlockTypeAt(cell, BlockData.AIR.getId());
+        world.setWaterLevelAt(cell.x(), cell.y(), cell.z(), (byte) 0);
+        gameMaster.getWaterSimulation()
+                .onBlockDestroyed(cell.x(), cell.y(), cell.z());
         gameMaster.rebuildChunkMeshAt(cell);
         particles.spawnBlock(cell, blockData);
 

@@ -34,9 +34,11 @@ public class GameRenderer {
     private float previousCameraPitch;
     private float blurX;
     private float blurY;
+    private float waterTime;
 
     public void render(GameMaster gameMaster, ResourceManager rm,
                        Map<Chunk, ChunkMeshBuilder.ChunkRenderMesh> chunkMeshes) {
+        waterTime += gameMaster.getGenDelta();
         renderShadowPass(gameMaster, rm, chunkMeshes);
         CameraView camera = gameMaster.getActiveCamera();
         float windowWidth = gameMaster.getWindowWidth();
@@ -100,6 +102,7 @@ public class GameRenderer {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+        defaultShader.setUniform("uIsWater", false);
         chunkMeshes.forEach((chunk, chunkMesh) -> {
             if (chunkMesh != null && chunkMesh.solidMesh() != null && chunkMesh.solidMesh().getIndicesCount() > 0) {
                 float minX = chunk.getChunkX() * Chunk.SIZE_X;
@@ -188,6 +191,12 @@ public class GameRenderer {
             defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
         }
 
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDepthMask(false);
+        defaultShader.setUniform("uUVBounds", new Vector4f(0.0f, 0.0f, 1.0f, 1.0f));
+        defaultShader.setUniform("uIsWater", true);
+
         chunkMeshes.forEach((chunk, chunkMesh) -> {
             if (chunkMesh != null && chunkMesh.waterMesh() != null
                     && chunkMesh.waterMesh().getIndicesCount() > 0) {
@@ -197,14 +206,17 @@ public class GameRenderer {
                 float maxX = minX + Chunk.SIZE_X;
                 float maxY = Chunk.SIZE_Y;
                 float maxZ = minZ + Chunk.SIZE_Z;
+
                 if (frustum.testAab(minX, minY, minZ, maxX, maxY, maxZ)) {
                     modelMatrix.identity().translate(minX, 0, minZ);
                     defaultShader.setUniform("uModel", modelMatrix);
+                    defaultShader.setUniform("uTime", waterTime);
                     chunkMesh.waterMesh().render();
                 }
             }
         });
 
+        glDepthMask(true);
         renderDestroyOverlay(gameMaster.getGameInteraction(), defaultShader,
                 rm.getDestroyOverlayMesh(), rm.getDestroyTexture(), camera);
 

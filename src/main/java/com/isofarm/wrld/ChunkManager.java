@@ -6,6 +6,7 @@ import com.isofarm.graphics.ChunkMeshBuilder;
 import com.isofarm.utils.Settings;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,6 +23,7 @@ public class ChunkManager {
     private final ExecutorService meshExecutor;
     private final ConcurrentLinkedQueue<MeshBuildResult> completedMeshes = new ConcurrentLinkedQueue<>();
     private final Set<Long> buildingChunks = ConcurrentHashMap.newKeySet();
+    private final Set<Long> dirtyChunks = new HashSet<>();
 
     private int lastPlayerChunkX = Integer.MAX_VALUE;
     private int lastPlayerChunkZ = Integer.MAX_VALUE;
@@ -159,6 +161,7 @@ public class ChunkManager {
     public void rebuildChunkMeshAt(int worldX, int worldZ) {
         int chunkX = Math.floorDiv(worldX, Chunk.SIZE_X);
         int chunkZ = Math.floorDiv(worldZ, Chunk.SIZE_Z);
+        dirtyChunks.add(world.get2DKey(chunkX, chunkZ));
 
         updateGrass(chunkX, chunkZ);
         rebuildSingleChunk(chunkX, chunkZ);
@@ -276,6 +279,10 @@ public class ChunkManager {
 
     public Map<Chunk, ChunkMeshBuilder.ChunkRenderMesh> getChunkMeshes() {
         return chunkMeshes;
+    }
+
+    public Set<Long> getDirtyChunks() {
+        return dirtyChunks;
     }
 
     public void shutdown() {

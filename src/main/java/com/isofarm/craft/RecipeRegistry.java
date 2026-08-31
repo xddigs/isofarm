@@ -13,12 +13,11 @@ public class RecipeRegistry {
     public List<Recipe> init() {
         recipes.clear();
         registerSmeltingRecipes();
-
         create(Tier.LEATHER).result(new Block(BlockData.OAK_WOOD), 4).with(BlockData.OAK_LOG, 1).add();
         create(Tier.LEATHER).result(new Material(Tier.NONE, MaterialID.STICK), 4).with(BlockData.OAK_WOOD, 1).add();
         create(Tier.LEATHER).result(new Book(false), 1).with(MaterialID.LEATHER, 3).with(MaterialID.PAPER, 2).add();
         create(Tier.LEATHER).result(new Backpack(), 1).with(MaterialID.LEATHER, 3).add();
-        create(Tier.LEATHER).result(new Bucket(), 1).with(new Material(Tier.STEEL, MaterialID.INGOT), 3).add();
+        create(Tier.LEATHER).result(new Bucket(), 1).with(new MiningComponent(Tier.STEEL, MaterialID.INGOT), 3).add();
         registerToolSet(Tier.LEATHER, BlockData.OAK_WOOD);
 
         Map<Tier, Tier> metalProgression = Map.of(

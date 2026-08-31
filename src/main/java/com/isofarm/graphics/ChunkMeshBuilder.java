@@ -67,8 +67,17 @@ public class ChunkMeshBuilder {
                     int worldX = chunkX * Chunk.SIZE_X + x;
                     int worldZ = chunkZ * Chunk.SIZE_Z + z;
                     float bottomY = y;
-                    float topY = (data == BlockData.TILLED_DIRT || data.isFluid()) ? y + TILLED_HEIGHT : y + 1.0f;
                     boolean isWater = data.isFluid();
+                    float topY;
+                    if (data.isFluid()) {
+                        byte level = chunk.getWaterLevel(x, y, z);
+                        int waterLevel = (level <= 0) ? 8 : level;
+                        topY = y + (waterLevel / 8.0f) * 0.9f;
+                    } else if (data == BlockData.TILLED_DIRT) {
+                        topY = y + TILLED_HEIGHT;
+                    } else {
+                        topY = y + 1.0f;
+                    }
 
                     boolean renderTopFace = isWater
                             ? shouldRenderWaterTop(world, worldX, y, worldZ)
