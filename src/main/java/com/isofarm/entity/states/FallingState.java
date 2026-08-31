@@ -8,7 +8,7 @@ import com.isofarm.wrld.World;
 
 public class FallingState implements PlayerState {
     private static final float FALL_DISTANCE = 4.0f;
-    private static final float FALL_ANIMATION_DELAY = 3.0f;
+    private static final float FALL_ANIMATION_DELAY = 1.5f;
 
     private float fallStartY;
     private float fallTime;
