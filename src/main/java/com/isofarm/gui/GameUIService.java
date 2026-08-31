@@ -2,6 +2,7 @@ package com.isofarm.gui;
 
 import com.isofarm.data.*;
 import com.isofarm.entity.Player;
+import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.input.CommandCompletionProvider;
 import com.isofarm.input.Mouse;
@@ -281,9 +282,10 @@ public class GameUIService implements Service<GameMaster> {
             GUI.drawCursor(gameMaster);
         }
 
+        SpriteSheet bookSheet = ResourceManager.getBookAnimationSheet();
         if (BookService.bs.isOpen()) {
             BookUI.render(BookService.bs.getOpenedBook(),
-                    gameMaster.getGenDelta());
+                    gameMaster.getGenDelta(), bookSheet);
         }
 
         GUI.end();
