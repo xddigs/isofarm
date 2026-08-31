@@ -1,7 +1,8 @@
 package com.isofarm.gui;
 
 import com.isofarm.data.BookLine;
-import com.isofarm.graphics.Texture;
+import com.isofarm.graphics.ResourceManager;
+import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.input.Mouse;
 import com.isofarm.item.Book;
 import com.isofarm.item.Page;
@@ -11,14 +12,14 @@ import org.joml.Vector4f;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
 public class BookUI {
-    private static final Texture page = new Texture(K.Paths.DEFAULT_BOOK_UI);
     private static final float ANIMATION_DURATION = 0.35f;
-
+    private static final float PAGE_FLIP_DURATION = 0.075f;
+    private static final int TOTAL_ANIM_FRAMES = 16;
     private static float animationProgress = 0.0f;
-
     private static boolean isOpening = false;
     private static boolean isClosing = false;
-
+    private static boolean isFlippingPage = false;
+    private static float pageFlipTimer = 0.0f;
     private static BookLine hoveredBookLine;
 
     public static void open() {
@@ -53,13 +54,14 @@ public class BookUI {
             return;
         }
 
-        updateBookLine(book);
+        SpriteSheet animSheet = ResourceManager.getBookAnimationSheet();
+        updateBookLine(animSheet ,book);
         if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
             click();
         }
     }
 
-    private static void updateBookLine(Book book) {
+    private static void updateBookLine(SpriteSheet animSheet, Book book) {
         Page currentPage = book.getPage(book.getCurrentPage());
 
         float screenWidth = GUI.getScreenWidth();
@@ -67,8 +69,8 @@ public class BookUI {
 
         float scale = 2.0f;
 
-        float bookWidth = page.getWidth() * scale;
-        float bookHeight = page.getHeight() * scale;
+        float bookWidth = animSheet.getWidth() * scale;
+        float bookHeight = animSheet.getHeight() * scale;
 
         float centerX = (screenWidth - bookWidth) * 0.5f;
         float centerY = (screenHeight - bookHeight) * 0.5f;
@@ -98,28 +100,37 @@ public class BookUI {
         }
     }
 
-    public static void render(Book book, float delta) {
-        if (book == null) {
-            return;
-        }
-
+    public static void render(Book book, float delta,
+                              SpriteSheet animSheet) {
+        if (book == null) return;
         float screenWidth = GUI.getScreenWidth();
         float screenHeight = GUI.getScreenHeight();
-
         float scale = 2.0f;
 
-        float bookWidth = page.getWidth() * scale;
-        float bookHeight = page.getHeight() * scale;
-
+        float bookWidth = animSheet.getFrameWidth() * scale;
+        float bookHeight = animSheet.getFrameHeight() * scale;
         float centerX = (screenWidth - bookWidth) * 0.5f;
         float centerY = (screenHeight - bookHeight) * 0.5f;
 
         updateAnimation(delta);
+
         float easedProgress = easeInOutCubic(animationProgress);
-        float startY = screenHeight;
-        float y = lerp(startY, centerY, easedProgress);
-        GUI.drawTexture(page, centerX, y, bookWidth, bookHeight, new Vector4f(1.0f));
-        renderPage(book, centerX, y);
+        float y = lerp(screenHeight, centerY, easedProgress);
+
+        if (isFlippingPage) {
+            pageFlipTimer += delta;
+            float progress = Math.min(1.0f, pageFlipTimer / PAGE_FLIP_DURATION);
+            int currentFrame = (int) (progress * (TOTAL_ANIM_FRAMES - 1));
+
+            GUI.drawSprite(animSheet, currentFrame, centerX, y, bookWidth, bookHeight, new Vector4f(1.0f));
+            if (progress >= 1.0f) {
+                isFlippingPage = false;
+                book.nextPage();
+            }
+        } else {
+            GUI.drawSprite(animSheet, 0, centerX, y, bookWidth, bookHeight, new Vector4f(1.0f));
+            renderPage(book, centerX, y);
+        }
     }
 
     private static void updateAnimation(float delta) {
@@ -154,6 +165,13 @@ public class BookUI {
 
     private static float lerp(float start, float end, float t) {
         return start + (end - start) * t;
+    }
+
+    public static void nextPage(Book book) {
+        if (!isFlippingPage && book.hasNextPage()) {
+            isFlippingPage = true;
+            pageFlipTimer = 0.0f;
+        }
     }
 
     private static void renderPage(Book book, float x, float y) {
@@ -192,17 +210,12 @@ public class BookUI {
     }
 
     public static boolean isMouseHovering(float x, float y, String text, float lineHeight) {
-
         float mouseX = Mouse.getX();
         float mouseY = Mouse.getY();
-
         String cleanText = text.replace("**", "").replace("-", "").trim();
-
         float width = GUI.getStringWidth(cleanText, GUI.getNormalFont());
-
         float verticalPadding = 4.0f;
         float horizontalPadding = 6.0f;
-
         return mouseX >= x - horizontalPadding &&
                 mouseX <= x + width + horizontalPadding &&
                 mouseY >= y - verticalPadding &&

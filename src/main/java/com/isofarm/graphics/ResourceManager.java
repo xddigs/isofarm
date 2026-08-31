@@ -21,6 +21,7 @@ public class ResourceManager {
     private static SpriteSheet inventoryIcons;
     private static SpriteSheet playerSpriteSheet;
     private static SpriteSheet backpackSpriteSheet;
+    private static SpriteSheet bookAnimationSheet;
     private static Map<CropType, SpriteSheet> cropSpritesheets;
     private static SpriteSheet heartsSpriteSheet;
     private static SpriteSheet destroyTexture;
@@ -83,6 +84,7 @@ public class ResourceManager {
 
         playerSpriteSheet = new SpriteSheet(K.Paths.PLAYER_SPRITESHEET, K.UI.PLAYER_SPRITE_COLS, K.UI.PLAYER_SPRITE_ROWS);
         backpackSpriteSheet = new SpriteSheet(K.Paths.BACKPACK_SPRITESHEET, K.UI.PLAYER_SPRITE_COLS / 3, 2);
+        bookAnimationSheet = new SpriteSheet(K.Paths.BOOK_ANIMATION, 16, 1);
         heartsSpriteSheet = new SpriteSheet(K.Paths.HEARTS_SPRITESHEET, 1, K.UI.ICON_HEARTS_ROWS);
 
         destroyTexture = new SpriteSheet(K.Paths.DESTROY_STAGES, K.UI.DESTROY_FRAMES, 1);
@@ -209,6 +211,7 @@ public class ResourceManager {
 
         playerSpriteSheet.dispose();
         backpackSpriteSheet.dispose();
+        bookAnimationSheet.dispose();
         heartsSpriteSheet.dispose();
 
         defaultShader.dispose();
@@ -279,36 +282,40 @@ public class ResourceManager {
         return blocksAtlas;
     }
 
-    public SpriteSheet getDestroyTexture() {
+    public static SpriteSheet getDestroyTexture() {
         return destroyTexture;
     }
 
-    public SpriteSheet getSeedIcons() {
+    public static SpriteSheet getSeedIcons() {
         return seedIcons;
     }
 
-    public SpriteSheet getCropIcons() {
+    public static SpriteSheet getCropIcons() {
         return cropIcons;
     }
 
-    public SpriteSheet getToolIcons() {
+    public static SpriteSheet getToolIcons() {
         return toolIcons;
     }
 
-    public SpriteSheet getBlockIcons() {
+    public static SpriteSheet getBlockIcons() {
         return blockIcons;
     }
 
-    public SpriteSheet getMaterialIcons() {
+    public static SpriteSheet getMaterialIcons() {
         return materialIcons;
     }
 
-    public SpriteSheet getUsablesIcons() {
+    public static SpriteSheet getUsablesIcons() {
         return usablesIcons;
     }
 
-    public SpriteSheet getInventoryIcons() {
+    public static SpriteSheet getInventoryIcons() {
         return inventoryIcons;
+    }
+
+    public static SpriteSheet getBookAnimationSheet() {
+        return bookAnimationSheet;
     }
 
     public SpriteSheet getHeartsSpriteSheet() {
