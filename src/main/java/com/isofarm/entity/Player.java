@@ -133,19 +133,11 @@ public class Player extends Character {
         }
 
         if (Math.abs(velocity.x) > 0.05f || Math.abs(velocity.z) > 0.05f) {
-            double angleRad = Math.atan2(velocity.x, velocity.z);
-            double degrees = Math.toDegrees(angleRad);
-            degrees = 180.0 - degrees;
+            float rawYaw = (float) Math.toDegrees(Math.atan2(velocity.x, velocity.z));
+            targetModelYaw = (rawYaw + 180.0f) % 360.0f;
+            if (targetModelYaw < 0) targetModelYaw += 360.0f;
 
-            if (degrees < 0) {
-                degrees += 360.0;
-            }
-            if (degrees >= 360.0) {
-                degrees -= 360.0;
-            }
-
-            int sector = (int) Math.round(degrees / 45.0) % 8;
-
+            int sector = (int) Math.round(targetModelYaw / 45.0) % 8;
             this.direction = switch (sector) {
                 case 0 -> Direction.N;
                 case 1 -> Direction.NE;
@@ -269,7 +261,6 @@ public class Player extends Character {
     }
 
     private void updateRotation(float delta) {
-        targetModelYaw = getDirectionYaw(direction);
         float difference = targetModelYaw - modelYaw;
 
         while (difference > 180.0f) {
@@ -280,7 +271,7 @@ public class Player extends Character {
             difference += 360.0f;
         }
 
-        float rotationSpeed = 720.0f;
+        float rotationSpeed = 360.0f;
         float maxRotation = rotationSpeed * delta;
         if (Math.abs(difference) <= maxRotation) {
             modelYaw = targetModelYaw;
