@@ -231,12 +231,6 @@ public abstract class Entity {
         setOnGround(false);
     }
 
-    public void lerp(Vector3f target, float delta) {
-        float speed = 12.0f;
-        float amount = 1.0f - (float) Math.exp(-speed * delta);
-        dimensions.lerp(target, amount);
-    }
-
     public boolean canStandUp(World world) {
         float epsilon = 0.001f;
         float minX = position.x - dimensions.x / 2.0f + epsilon;

@@ -16,6 +16,7 @@ public class InteractingState implements PlayerState {
     public void enter(Player player) {
         this.timer = INTERACTION_DURATION;
         player.setAnimTimer(0.0f);
+        player.interact();
     }
 
     @Override

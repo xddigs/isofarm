@@ -3,7 +3,10 @@ package com.isofarm.entity;
 import com.isofarm.data.*;
 import com.isofarm.entity.states.GroundedState;
 import com.isofarm.entity.states.SneakingState;
-import com.isofarm.graphics.*;
+import com.isofarm.graphics.CameraView;
+import com.isofarm.graphics.CelestialLighting;
+import com.isofarm.graphics.ResourceManager;
+import com.isofarm.graphics.Shader;
 import com.isofarm.graphics.gltf.GLTFModel;
 import com.isofarm.graphics.gltf.GLTFNode;
 import com.isofarm.input.Keyboard;
@@ -28,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.joml.Math.lerp;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL13.*;
 
@@ -52,7 +56,10 @@ public class Player extends Character {
     private GLTFNode leftArmNode;
     private GLTFNode rightLegNode;
     private GLTFNode leftLegNode;
-    private float walkAnimTime = 0.0f;
+    private float walkAnimationTime = 0.0f;
+    private float walkAnimSpeed = 0.0f;
+    private float attackAnimationTime = 0.0f;
+    private boolean isAttacking = false;
 
     public Player(String name, World world, GameMaster gameMaster) {
         super(name);
@@ -109,24 +116,37 @@ public class Player extends Character {
         updateRotation(delta);
 
         boolean isMoving = Math.abs(velocity.x) > 0.05f || Math.abs(velocity.z) > 0.05f;
-
         if (isMoving) {
-            walkAnimTime += delta * 8.0f;
+            walkAnimationTime += delta * 8.0f;
+            walkAnimSpeed = lerp(walkAnimSpeed, 1.0f, Math.clamp(delta * 10.0f, 0.0f, 1.0f));
         } else {
-            walkAnimTime = org.joml.Math.lerp(walkAnimTime, 0.0f, Math.clamp(delta * 10.0f, 0.0f, 1.0f));
+            walkAnimSpeed = lerp(walkAnimSpeed, 0.0f, Math.clamp(delta * 10.0f, 0.0f, 1.0f));
         }
 
-        float swingAngle = (float) Math.sin(walkAnimTime) * 0.45f;
+        float swingAngle = (float) Math.sin(walkAnimationTime) * 0.45f * walkAnimSpeed;
 
-        Quaternionf rightArmRot = new Quaternionf().rotateX(swingAngle);
-        Quaternionf leftArmRot = new Quaternionf().rotateX(-swingAngle);
-        Quaternionf rightLegRot = new Quaternionf().rotateX(-swingAngle);
-        Quaternionf leftLegRot = new Quaternionf().rotateX(swingAngle);
+        Quaternionf leftArmRotation = new Quaternionf().rotateX(-swingAngle);
+        Quaternionf rightLegRotation = new Quaternionf().rotateX(-swingAngle);
+        Quaternionf leftLegRotation = new Quaternionf().rotateX(swingAngle);
+        Quaternionf rightArmRotation = new Quaternionf();
 
-        if (rightArmNode != null) rightArmNode.setRotation(rightArmRot);
-        if (leftArmNode != null) leftArmNode.setRotation(leftArmRot);
-        if (rightLegNode != null) rightLegNode.setRotation(rightLegRot);
-        if (leftLegNode != null) leftLegNode.setRotation(leftLegRot);
+        Quaternionf mainHandRot = Settings.isRightHand() ? rightArmRotation : leftArmRotation;
+        if (isAttacking) {
+            attackAnimationTime += delta * 12.0f;
+            float attackAngle = (float) Math.sin(Math.min(attackAnimationTime, Math.PI)) * 1.2f;
+            mainHandRot.rotateX(attackAngle);
+            if (attackAnimationTime >= Math.PI) {
+                isAttacking = false;
+                attackAnimationTime = 0.0f;
+            }
+        } else {
+            mainHandRot.rotateX(swingAngle);
+        }
+
+        if (rightArmNode != null) rightArmNode.setRotation(rightArmRotation);
+        if (leftArmNode != null) leftArmNode.setRotation(leftArmRotation);
+        if (rightLegNode != null) rightLegNode.setRotation(rightLegRotation);
+        if (leftLegNode != null) leftLegNode.setRotation(leftLegRotation);
 
         if (playerModel != null) {
             playerModel.updateTransforms();
@@ -152,7 +172,7 @@ public class Player extends Character {
         }
 
         float lerpSpeed = 10.0f;
-        currentEyeHeight = org.joml.Math.lerp(currentEyeHeight, targetEyeHeight,
+        currentEyeHeight = lerp(currentEyeHeight, targetEyeHeight,
                 Math.clamp(delta * lerpSpeed, 0.0f, 1.0f));
 
         setAnimTimer(getAnimTimer() + delta);
@@ -258,7 +278,7 @@ public class Player extends Character {
             difference += 360.0f;
         }
 
-        float rotationSpeed = 360.0f;
+        float rotationSpeed = 720.0f;
         float maxRotation = rotationSpeed * delta;
         if (Math.abs(difference) <= maxRotation) {
             modelYaw = targetModelYaw;
@@ -272,16 +292,9 @@ public class Player extends Character {
         }
     }
 
-    public Matrix4f getHandTransform(boolean rightHand) {
-        GLTFNode handNode = rightHand ? rightArmNode : leftArmNode;
-        Matrix4f handMatrix = new Matrix4f();
-
-        if (handNode != null) {
-            handMatrix.set(this.modelMatrix).mul(handNode.getWorldMatrix());
-        } else {
-            handMatrix.set(this.modelMatrix);
-        }
-        return handMatrix;
+    public void interact() {
+        this.isAttacking = true;
+        this.attackAnimationTime = 0.0f;
     }
 
     public void changeState(PlayerState newState) {
