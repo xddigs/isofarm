@@ -21,10 +21,8 @@ import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import static org.joml.Math.lerp;
 import static org.lwjgl.glfw.GLFW.*;
@@ -78,7 +76,6 @@ public class Player extends Character {
     private final Matrix4f modelMatrix;
     private final GameMaster gameMaster;
     private final GLTFModel playerModel;
-    private final Map<String, GLTFNode> equipmentNodes;
     private Direction direction = Direction.S;
     private List<GridPos> path;
     private float currentEyeHeight = INITIAL_EYE_HEIGHT;
@@ -118,7 +115,6 @@ public class Player extends Character {
         this.gameMaster = gameMaster;
         this.modelMatrix = new Matrix4f();
         this.path = new LinkedList<>();
-        this.equipmentNodes = new HashMap<>();
 
         this.playerModel = ResourceManager.getPlayerModel();
 
