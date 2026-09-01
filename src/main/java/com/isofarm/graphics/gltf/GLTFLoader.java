@@ -20,16 +20,16 @@ import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
-import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
+import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.stb.STBImage.*;
 
+@SuppressWarnings("all")
 public final class GLTFLoader {
 
-    private GLTFLoader() {
-    }
+    private GLTFLoader() {}
 
     public static GLTFModel load(String path) {
         try {
@@ -64,7 +64,13 @@ public final class GLTFLoader {
         JsonArray meshesJson = root.getAsJsonArray("meshes");
         JsonArray nodesJson = root.getAsJsonArray("nodes");
         List<ByteBuffer> buffers = loadBuffers(buffersJson);
-        int textureId = loadTexture(root);
+        List<Integer> textureIds = new ArrayList<>();
+        if (root.has("images")) {
+            JsonArray images = root.getAsJsonArray("images");
+            for (int i = 0; i < images.size(); i++) {
+                textureIds.add(0);
+            }
+        }
 
         for (int meshIndex = 0; meshIndex < meshesJson.size(); meshIndex++) {
             JsonObject meshJson = meshesJson.get(meshIndex).getAsJsonObject();
@@ -81,6 +87,7 @@ public final class GLTFLoader {
                 float[] normals = readFloatAccessor(normalAccessor, accessorsJson, bufferViewsJson, buffers);
                 float[] uvs = readFloatAccessor(uvAccessor, accessorsJson, bufferViewsJson, buffers);
                 int[] indices = readIndexAccessor(indexAccessor, accessorsJson, bufferViewsJson, buffers);
+                int textureId = getTextureIdForPrimitive(root, primitive, textureIds);
                 GLTFModel.GLTFMesh glMesh = createMesh(positions, normals, uvs, indices, textureId);
                 model.addMesh(glMesh);
             }
@@ -282,28 +289,38 @@ public final class GLTFLoader {
         return new GLTFModel.GLTFMesh(vao, vbo, ebo, indices.length, textureId);
     }
 
-    private static int loadTexture(JsonObject root) {
+    private static int loadTexture(JsonObject root, int imageIndex) {
         JsonArray images = root.getAsJsonArray("images");
-        if (images == null || images.isEmpty()) {
+
+        if (images == null || imageIndex < 0 || imageIndex >= images.size()) {
             return 0;
         }
 
-        JsonObject image = images.get(0).getAsJsonObject();
+        JsonObject image = images.get(imageIndex).getAsJsonObject();
+
+        if (!image.has("uri")) {
+            throw new IllegalArgumentException("GLTF image without URI is not supported yet: " + imageIndex);
+        }
+
         String uri = image.get("uri").getAsString();
+
         if (!uri.startsWith("data:image")) {
             throw new IllegalArgumentException("Only embedded GLTF images are supported");
         }
 
         int comma = uri.indexOf(',');
         String base64 = uri.substring(comma + 1);
+
         byte[] imageData = Base64.getDecoder().decode(base64);
+
         ByteBuffer imageBuffer = ByteBuffer.allocateDirect(imageData.length);
         imageBuffer.put(imageData).flip();
-        var width = org.lwjgl.system.MemoryStack.stackPush().mallocInt(1);
-        var height = org.lwjgl.system.MemoryStack.stackPush().mallocInt(1);
-        var channels = org.lwjgl.system.MemoryStack.stackPush().mallocInt(1);
 
-        try {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            var width = stack.mallocInt(1);
+            var height = stack.mallocInt(1);
+            var channels = stack.mallocInt(1);
+
             stbi_set_flip_vertically_on_load(false);
             ByteBuffer pixels = stbi_load_from_memory(imageBuffer, width, height, channels, 4);
             if (pixels == null) {
@@ -316,17 +333,63 @@ public final class GLTFLoader {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width.get(0), height.get(0), 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width.get(0), height.get(0), 0,
+                    GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+
             glGenerateMipmap(GL_TEXTURE_2D);
             stbi_image_free(pixels);
             glBindTexture(GL_TEXTURE_2D, 0);
             return texture;
-
-        } finally {
-            MemoryStack.stackPop();
-            MemoryStack.stackPop();
-            MemoryStack.stackPop();
         }
+    }
+
+    private static int getTextureIdForPrimitive(JsonObject root, JsonObject primitive, List<Integer> textureIds) {
+        if (!primitive.has("material")) {
+            return 0;
+        }
+
+        JsonArray materials = root.getAsJsonArray("materials");
+        if (materials == null) {
+            return 0;
+        }
+
+        int materialIndex = primitive.get("material").getAsInt();
+
+        if (materialIndex < 0 || materialIndex >= materials.size()) {
+            return 0;
+        }
+
+        JsonObject material = materials.get(materialIndex).getAsJsonObject();
+        if (!material.has("pbrMetallicRoughness")) {
+            return 0;
+        }
+
+        JsonObject pbr = material.getAsJsonObject("pbrMetallicRoughness");
+        if (!pbr.has("baseColorTexture")) {
+            return 0;
+        }
+
+        JsonObject baseColorTexture = pbr.getAsJsonObject("baseColorTexture");
+        int textureIndex = baseColorTexture.get("index").getAsInt();
+        JsonArray textures = root.getAsJsonArray("textures");
+        if (textures == null || textureIndex < 0 || textureIndex >= textures.size()) {
+            return 0;
+        }
+
+        JsonObject texture = textures.get(textureIndex).getAsJsonObject();
+        int imageIndex = texture.get("source").getAsInt();
+
+        while (textureIds.size() <= imageIndex) {
+            textureIds.add(0);
+        }
+
+        int textureId = textureIds.get(imageIndex);
+        if (textureId == 0) {
+            textureId = loadTexture(root, imageIndex);
+            textureIds.set(imageIndex, textureId);
+        }
+
+        return textureId;
     }
 
     private static Vector3f readVector3(JsonObject object, String property, Vector3f defaultValue) {

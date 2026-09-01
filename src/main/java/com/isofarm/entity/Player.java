@@ -94,6 +94,7 @@ public class Player extends Character {
 
     private GLTFNode headNode;
     private GLTFNode torsoNode;
+    private GLTFNode backpackNode;
     private GLTFNode rightArmNode;
     private GLTFNode leftArmNode;
     private GLTFNode rightLegNode;
@@ -101,6 +102,7 @@ public class Player extends Character {
 
     private Vector3f headTranslation;
     private Vector3f torsoTranslation;
+    private Vector3f backpackTranslation;
     private Vector3f rightArmTranslation;
     private Vector3f leftArmTranslation;
     private Vector3f rightLegTranslation;
@@ -124,6 +126,7 @@ public class Player extends Character {
         if (this.playerModel != null) {
             this.headNode = playerModel.findNode("Head");
             this.torsoNode = playerModel.findNode("Body");
+            this.backpackNode = playerModel.findNode("Backpack");
             this.rightArmNode = playerModel.findNode("Right Arm");
             this.leftArmNode = playerModel.findNode("Left Arm");
             this.rightLegNode = playerModel.findNode("Right Leg");
@@ -136,6 +139,11 @@ public class Player extends Character {
 
         if (torsoNode != null) {
             torsoTranslation = new Vector3f(torsoNode.getTranslation());
+        }
+
+        if (backpackNode != null) {
+            backpackTranslation = new Vector3f(backpackNode.getTranslation());
+            backpackNode.setVisible(false);
         }
 
         if (rightArmNode != null) {
@@ -194,6 +202,12 @@ public class Player extends Character {
         currentState.update(this, delta);
         updateRotation(delta);
 
+        boolean hasBackpack = getInventory().hasBackpackEquipped();
+
+        if (backpackNode != null) {
+            backpackNode.setVisible(hasBackpack);
+        }
+
         boolean isMoving = Math.abs(velocity.x) > MOVEMENT_THRESHOLD || Math.abs(velocity.z) > MOVEMENT_THRESHOLD;
         boolean isSneaking = currentState instanceof SneakingState;
 
@@ -224,6 +238,9 @@ public class Player extends Character {
         Quaternionf torsoRotation = new Quaternionf()
                 .rotateX(-sneakTorsoLean + breathAngle);
 
+        Quaternionf backpackRotation = new Quaternionf()
+                .rotateX(-sneakTorsoLean + breathAngle);
+
         Quaternionf leftArmRotation = new Quaternionf()
                 .rotateX(-swingAngle + breathAngle - sneakArmBend)
                 .rotateZ(-breathSwayZ);
@@ -250,6 +267,12 @@ public class Player extends Character {
             Vector3f translation = new Vector3f(torsoTranslation);
             translation.y -= sneakOffset;
             torsoNode.setTranslation(translation);
+        }
+
+        if (backpackNode != null && backpackTranslation != null) {
+            Vector3f translation = new Vector3f(backpackTranslation);
+            translation.y += sneakOffset;
+            backpackNode.setTranslation(translation);
         }
 
         if (rightArmNode != null && rightArmTranslation != null) {
@@ -290,6 +313,7 @@ public class Player extends Character {
         }
 
         if (torsoNode != null) torsoNode.setRotation(torsoRotation);
+        if (backpackNode != null) backpackNode.setRotation(backpackRotation);
         if (rightArmNode != null) rightArmNode.setRotation(rightArmRotation);
         if (leftArmNode != null) leftArmNode.setRotation(leftArmRotation);
         if (rightLegNode != null) rightLegNode.setRotation(rightLegRotation);

@@ -20,6 +20,7 @@ public class GLTFNode {
     private final Matrix4f worldMatrix;
 
     private final List<GLTFNode> children;
+    private boolean isVisible = true;
 
     public GLTFNode(String name, int meshIndex, Vector3f translation,
                     Quaternionf rotation, Vector3f scale) {
@@ -51,6 +52,7 @@ public class GLTFNode {
 
     public void render(GLTFModel model, Matrix4f parentMatrix, Shader shader) {
         worldMatrix.set(parentMatrix).mul(localMatrix);
+        if (!isVisible) return;
         if (meshIndex >= 0) {
             model.renderMesh(meshIndex, worldMatrix, shader);
         }
@@ -125,5 +127,13 @@ public class GLTFNode {
 
     public List<GLTFNode> getChildren() {
         return children;
+    }
+
+    public boolean isVisible() {
+        return isVisible;
+    }
+
+    public void setVisible(boolean isVisible) {
+        this.isVisible = isVisible;
     }
 }
