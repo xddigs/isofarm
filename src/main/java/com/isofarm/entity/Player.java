@@ -260,12 +260,24 @@ public class Player extends Character {
         float strideAmplitude = lerp(STRIDE_AMPLITUDE, SNEAK_STRIDE_AMPLITUDE, sneakWeight);
         float swingAngle = (float) Math.sin(walkAnimationTime) * strideAmplitude * walkAnimSpeed;
 
-        float breathAngle = (float) Math.sin(idleAnimationTime) * BREATH_AMPLITUDE * idleWeight * (1.0f - sneakWeight * IDLE_SNEAK_FACTOR);
+        float breathAngle = (float) Math.sin(idleAnimationTime) * BREATH_AMPLITUDE * idleWeight *
+                (1.0f - sneakWeight * IDLE_SNEAK_FACTOR);
+
         float breathSwayZ = (float) Math.cos(idleAnimationTime * 0.5f) * BREATH_SWAY_AMPLITUDE * idleWeight;
 
         float sneakOffset = SNEAK_OFFSET * sneakWeight;
         float sneakTorsoLean = (float) Math.toRadians(SNEAK_TORSO_LEAN) * sneakWeight;
         float sneakArmBend = (float) Math.toRadians(SNEAK_ARM_BEND) * sneakWeight;
+
+        float attackAngle = 0.0f;
+        if (isAttacking) {
+            attackAnimationTime += delta * ATTACK_ANIMATION_SPEED;
+            attackAngle = (float) Math.sin(Math.min(attackAnimationTime, Math.PI)) * ATTACK_ANGLE;
+            if (attackAnimationTime >= Math.PI) {
+                isAttacking = false;
+                attackAnimationTime = ZERO_VELOCITY;
+            }
+        }
 
         Quaternionf torsoRotation = new Quaternionf()
                 .rotateX(-sneakTorsoLean + breathAngle);
@@ -278,7 +290,7 @@ public class Player extends Character {
                 .rotateZ(-breathSwayZ);
 
         Quaternionf rightArmRotation = new Quaternionf()
-                .rotateX(swingAngle + breathAngle - sneakArmBend)
+                .rotateX(swingAngle + breathAngle - sneakArmBend + attackAngle)
                 .rotateZ(breathSwayZ);
 
         Quaternionf rightLegRotation = new Quaternionf()
@@ -331,16 +343,6 @@ public class Player extends Character {
             leftLegNode.setTranslation(translation);
         }
 
-        if (isAttacking) {
-            attackAnimationTime += delta * ATTACK_ANIMATION_SPEED;
-            float attackAngle = (float) Math.sin(Math.min(attackAnimationTime, Math.PI)) * ATTACK_ANGLE;
-            rightArmRotation.rotateX(attackAngle);
-            if (attackAnimationTime >= Math.PI) {
-                isAttacking = false;
-                attackAnimationTime = ZERO_VELOCITY;
-            }
-        }
-
         if (torsoNode != null) torsoNode.setRotation(torsoRotation);
         if (backpackNode != null) backpackNode.setRotation(backpackRotation);
         if (rightArmNode != null) rightArmNode.setRotation(rightArmRotation);
@@ -355,9 +357,7 @@ public class Player extends Character {
         if (Math.abs(velocity.x) > MOVEMENT_THRESHOLD || Math.abs(velocity.z) > MOVEMENT_THRESHOLD) {
             float rawYaw = (float) Math.toDegrees(Math.atan2(velocity.x, velocity.z));
             targetModelYaw = (rawYaw + 180.0f) % 360.0f;
-
             if (targetModelYaw < ZERO_VELOCITY) targetModelYaw += 360.0f;
-
             int sector = (int) Math.round(targetModelYaw / 45.0) % 8;
 
             this.direction = switch (sector) {
