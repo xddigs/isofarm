@@ -5,6 +5,8 @@ import com.isofarm.data.Crop;
 import com.isofarm.data.BlockPos;
 import com.isofarm.entity.Player;
 import com.isofarm.input.GameInteraction;
+import com.isofarm.item.Equippable;
+import com.isofarm.item.Item;
 import com.isofarm.service.BookService;
 import com.isofarm.service.TimeService;
 import com.isofarm.service.WeatherService;
@@ -229,7 +231,6 @@ public class GameRenderer {
         defaultShader.setUniform("uIsSprite", false);
         defaultShader.setUniform("uParticleAlpha", 1.0f);
 
-        glEnable(GL_DEPTH_TEST);
         glDepthMask(false);
         gameMaster.getParticles().render(defaultShader, rm.getSpriteMesh(), gameMaster.getActiveCamera());
         glDepthMask(true);

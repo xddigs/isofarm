@@ -8,7 +8,7 @@ import com.isofarm.entity.Player;
 
 @DataClass
 public abstract class Tool implements Item,
-        Enchantable, Equipable {
+        Enchantable, Equippable {
     private final byte id;
     private final String name;
     private final int value;

@@ -69,6 +69,7 @@ public class GameInteraction {
         boolean isShiftHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT);
         isSmartShift = isShiftHeld && !gameMaster.isInventoryOpen();
         boolean isLeftHeld = Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT);
+        boolean isLeftPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
         boolean isRightPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_RIGHT);
         boolean canInteract = player != null
                 && !player.getGamemode().isNoClip()
@@ -125,6 +126,12 @@ public class GameInteraction {
             Settings.toggleMusic();
         }
 
+        if (isLeftPressed && canInteract) {
+            if (!player.isAttacking()) {
+                player.interact();
+            }
+        }
+
         if (selectedItem instanceof Backpack backpack &&
                 isRightPressed && !gameMaster.isInventoryOpen()) {
             if (isCtrlHeld) {
@@ -179,6 +186,9 @@ public class GameInteraction {
         }
 
         if (isRightPressed && !gameMaster.isInventoryOpen()) {
+            if (player != null && !player.isAttacking()) {
+                player.interact();
+            }
             placeAction(gameMaster, hoveredCell, selectedItem);
         }
         return hoveredCell;
@@ -338,6 +348,10 @@ public class GameInteraction {
         if (gameMaster.getPlayer() != null &&
                 !(gameMaster.getPlayer().getCurrentState() instanceof InteractingState)) {
             gameMaster.getPlayer().changeState(new InteractingState());
+
+            if (!gameMaster.getPlayer().isAttacking()) {
+                gameMaster.getPlayer().interact();
+            }
         }
 
         byte blockId = world.getBlockTypeAt(x, y, z);

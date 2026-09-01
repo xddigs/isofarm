@@ -1,7 +1,6 @@
 package com.isofarm.graphics;
 
 import com.isofarm.entity.WorldItem;
-import com.isofarm.item.Bucket;
 import com.isofarm.item.Item;
 import com.isofarm.utils.K;
 import com.isofarm.wrld.GameMaster;
@@ -81,7 +80,7 @@ public class ItemRenderer {
         shader.setUniform("uEnableShadows", false);
         shader.setUniform("uBaseColor", new Vector3f(1.0f));
 
-        setupCommonShaderUniforms(shader, gameMaster, lighting);
+        setupUniforms(shader, gameMaster, lighting);
         glDisable(GL_CULL_FACE);
         for (int i = THICKNESS_LAYERS - 1; i >= 0; i--) {
             float zOffset = (i - THICKNESS_LAYERS / 2.0f) * LAYER_DEPTH;
@@ -94,8 +93,8 @@ public class ItemRenderer {
         shader.unbind();
     }
 
-    private void setupCommonShaderUniforms(Shader shader, GameMaster gameMaster,
-                                           CelestialLighting lighting) {
+    private void setupUniforms(Shader shader, GameMaster gameMaster,
+                               CelestialLighting lighting) {
         shader.setUniform("uUseTexture", true);
         shader.setUniform("uUseFaceAtlas", false);
         shader.setUniform("uParticleAlpha", 1.0f);

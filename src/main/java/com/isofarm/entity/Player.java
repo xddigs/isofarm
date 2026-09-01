@@ -304,7 +304,12 @@ public class Player extends Character {
         if (isAttacking) {
             attackAnimationTime += delta * ATTACK_ANIMATION_SPEED;
             float attackAngle = (float) Math.sin(Math.min(attackAnimationTime, Math.PI)) * ATTACK_ANGLE;
-            mainHandRot.rotateX(attackAngle);
+
+            if (Settings.isRightHand()) {
+                rightArmRotation.rotateX(attackAngle);
+            } else {
+                leftArmRotation.rotateX(attackAngle);
+            }
 
             if (attackAnimationTime >= Math.PI) {
                 isAttacking = false;
@@ -466,6 +471,10 @@ public class Player extends Character {
     public void interact() {
         this.isAttacking = true;
         this.attackAnimationTime = 0.0f;
+    }
+
+    public boolean isAttacking() {
+        return isAttacking;
     }
 
     public void changeState(PlayerState newState) {
