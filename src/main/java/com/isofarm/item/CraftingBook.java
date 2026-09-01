@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CraftingBook extends Book {
+public class CraftingBook extends Book implements Undroppable {
     private static final int LINES_PER_PAGE = 8;
 
     public CraftingBook(Player player) {

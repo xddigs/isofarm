@@ -213,7 +213,7 @@ public class GameInteraction {
 
     public void dropItem(GameMaster gameMaster, Item selectedItem, boolean dropAll) {
         if (selectedItem == null) return;
-        if (selectedItem instanceof Backpack || selectedItem instanceof CraftingBook) {
+        if (selectedItem instanceof Undroppable) {
             ToastFactory.error("You can't drop your " + selectedItem.getName() + "!");
             return;
         }

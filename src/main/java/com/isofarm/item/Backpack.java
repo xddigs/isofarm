@@ -4,7 +4,7 @@ import com.isofarm.data.*;
 import com.isofarm.entity.Player;
 import com.isofarm.wrld.GameMaster;
 
-public class Backpack extends Usable {
+public class Backpack extends Usable implements Undroppable {
 
     public Backpack() {
         super(Usables.BACKPACK, "Backpack");
