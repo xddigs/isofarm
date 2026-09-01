@@ -25,15 +25,15 @@ public class GLTFModel {
         this.rootNodes = new ArrayList<>();
     }
 
-    void addMesh(GLTFMesh mesh) {
+    public void addMesh(GLTFMesh mesh) {
         meshes.add(mesh);
     }
 
-    void addNode(GLTFNode node) {
+    public void addNode(GLTFNode node) {
         nodes.add(node);
     }
 
-    void addRootNode(GLTFNode node) {
+    public void addRootNode(GLTFNode node) {
         rootNodes.add(node);
     }
 

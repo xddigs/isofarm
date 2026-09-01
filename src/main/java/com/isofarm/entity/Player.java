@@ -18,7 +18,6 @@ import com.isofarm.wrld.World;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,6 +72,9 @@ public class Player extends Character {
     private static final float ANIMATION_IDLE_BREATH_SPEED = 2.5f;
     private static final float STRIDE_AMPLITUDE = 0.45f;
     private static final float ANIMATION_SPEED_FACTOR = 10.0f;
+    private static final float FULL_DEGREES = 360.0f;
+    private static final float HALF_DEGREES = 180.0f;
+
     private final Matrix4f modelMatrix;
     private final GameMaster gameMaster;
     private final GLTFModel playerModel;
@@ -119,6 +121,7 @@ public class Player extends Character {
         this.equipmentNodes = new HashMap<>();
 
         this.playerModel = ResourceManager.getPlayerModel();
+
         if (this.playerModel != null) {
             this.headNode = playerModel.findNode("Head");
             this.torsoNode = playerModel.findNode("Body");
@@ -127,12 +130,7 @@ public class Player extends Character {
             this.leftArmNode = playerModel.findNode("Left Arm");
             this.rightLegNode = playerModel.findNode("Right Leg");
             this.leftLegNode = playerModel.findNode("Left Leg");
-
-            registerNode("sword");
-            registerNode("pickaxe");
-            registerNode("axe");
-            registerNode("hoe");
-            registerNode("shovel");
+            EquipmentController.ec.init(this.playerModel);
         }
 
         if (headNode != null) {
@@ -141,11 +139,6 @@ public class Player extends Character {
 
         if (torsoNode != null) {
             torsoTranslation = new Vector3f(torsoNode.getTranslation());
-        }
-
-        String[] equipment = {"sword", "pickaxe", "axe", "hoe", "shovel"};
-        for (String e : equipment) {
-            hideEquipment(e);
         }
 
         if (backpackNode != null) {
@@ -443,35 +436,12 @@ public class Player extends Character {
         }
     }
 
-    private void registerNode(String name) {
-        GLTFNode node = playerModel.findNode(name);
-        if (node != null) {
-            node.setVisible(false);
-            equipmentNodes.put(name, node);
-        }
-    }
-
-    private void hideEquipment(String equipment) {
-        GLTFNode node = equipmentNodes.get(equipment);
-        if (node != null) {
-            node.setVisible(false);
-        }
-    }
-
-    private void updateEquipmentVisual() {
-        for (GLTFNode node : equipmentNodes.values()) {
-            node.setVisible(false);
-            node.clearTextureOverride();
+    private String getEquipmentName(Item item) {
+        if (!(item instanceof Tool tool)) {
+            return null;
         }
 
-        Item item = gameMaster.getGameUIService().getHotbarUI()
-                .getSelectedItem();
-
-        if (item == null) {
-            return;
-        }
-
-        String nodeName = switch (item) {
+        String typeSuffix = switch (item) {
             case Sword ignored -> "sword";
             case Pickaxe ignored -> "pickaxe";
             case Axe ignored -> "axe";
@@ -480,41 +450,33 @@ public class Player extends Character {
             default -> null;
         };
 
-        if (nodeName == null) {
+        return typeSuffix;
+    }
+
+    private void updateEquipmentVisual() {
+        Item item = gameMaster.getGameUIService()
+                .getHotbarUI()
+                .getSelectedItem();
+
+        if (!(item instanceof Tool tool)) {
+            EquipmentController.ec.equip(null, null);
             return;
         }
 
-        GLTFNode node = equipmentNodes.get(nodeName);
-        if (node == null) {
-            return;
-        }
-
-        SpriteSheet toolIcons = ResourceManager.getToolIcons();
-        if (toolIcons == null) {
-            return;
-        }
-
-        int textureId = toolIcons.getTextureId();
-
-        if (textureId <= 0) {
-            return;
-        }
-
-        int frame = ResourceManager.getItemFrame(item);
-        Vector4f uvBounds = toolIcons.getUVBounds(frame);
-        node.setTextureOverride(textureId, uvBounds);
-        node.setVisible(true);
+        String type = getEquipmentName(item);
+        String material = tool.getTier().getName();
+        EquipmentController.ec.equip(material, type);
     }
 
     private void updateRotation(float delta) {
         float difference = targetModelYaw - modelYaw;
 
-        while (difference > 180.0f) {
-            difference -= 360.0f;
+        while (difference > HALF_DEGREES) {
+            difference -= FULL_DEGREES;
         }
 
-        while (difference < -180.0f) {
-            difference += 360.0f;
+        while (difference < -HALF_DEGREES) {
+            difference += FULL_DEGREES;
         }
 
         float maxRotation = ROTATION_SPEED * delta;
@@ -524,9 +486,9 @@ public class Player extends Character {
             modelYaw += Math.copySign(maxRotation, difference);
         }
 
-        modelYaw %= 360.0f;
+        modelYaw %= FULL_DEGREES;
         if (modelYaw < 0.0f) {
-            modelYaw += 360.0f;
+            modelYaw += FULL_DEGREES;
         }
     }
 
@@ -619,10 +581,10 @@ public class Player extends Character {
         setIsOffGroundTimer(0.0f);
         setWasOnGround(false);
 
-        setMaxHitpoints(20);
+        setMaxHitpoints(MAX_HITPOINTS);
         setHitpoints(getMaxHitpoints());
 
-        setMaxStamina(100);
+        setMaxStamina(MAX_STAMINA);
         setStamina(getMaxStamina());
 
         setExperience(0);
@@ -869,10 +831,6 @@ public class Player extends Character {
 
     public boolean hasSeeds() {
         return getInventory().hasItemOfType(Seed.class);
-    }
-
-    public Vector3f getEyePosition() {
-        return new Vector3f(position.x, position.y + getCurrentEyeHeight(), position.z);
     }
 
     @Override
