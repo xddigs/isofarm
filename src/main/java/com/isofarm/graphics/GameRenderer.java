@@ -218,8 +218,9 @@ public class GameRenderer {
 
         glDepthMask(true);
         renderDestroyOverlay(gameMaster.getGameInteraction(), defaultShader,
-                rm.getDestroyOverlayMesh(), rm.getDestroyTexture(), camera);
+                rm.getDestroyOverlayMesh(), ResourceManager.getDestroyTexture(), camera);
 
+        defaultShader.setUniform("uIsWater", false);
         gameMaster.getEntities().removeIf(e -> !e.isAlive());
         gameMaster.getEntities().forEach(entity -> {
             entity.render(gameMaster);

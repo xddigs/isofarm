@@ -37,7 +37,7 @@ public class Settings {
     }
 
     public static float getScaledEntity() {
-        return scale(0.35f);
+        return scale(0.335f);
     }
 
     public static float getScaledIcon() {
