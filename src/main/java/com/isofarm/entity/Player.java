@@ -21,7 +21,6 @@ import com.isofarm.wrld.World;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -387,7 +386,6 @@ public class Player extends Character {
 
         shader.setUniform("uIsSprite", false);
         shader.setUniform("uUseTexture", true);
-        shader.setUniform("uUVBounds", new Vector4f(0.0f, 0.0f, 1.0f, 1.0f));
         shader.setUniform("uParticleAlpha", 1.0f);
         shader.setUniform("uIsMaskPass", false);
         shader.setUniform("uEnableShadows", false);
@@ -402,6 +400,7 @@ public class Player extends Character {
                 .scale(globalScale);
 
         shader.setUniform("uModel", modelMatrix);
+
         glEnable(GL_DEPTH_TEST);
         glDepthMask(true);
         glEnable(GL_CULL_FACE);
@@ -410,7 +409,6 @@ public class Player extends Character {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         playerModel.render(shader, modelMatrix);
-
         glBindTexture(GL_TEXTURE_2D, 0);
         glDisable(GL_BLEND);
         shader.unbind();
@@ -489,13 +487,7 @@ public class Player extends Character {
             default -> null;
         };
 
-        if (nodeName != null) {
-            GLTFNode node = equipmentNodes.get(nodeName);
-
-            if (node != null) {
-                node.setVisible(true);
-            }
-        }
+        showEquipment(nodeName);
     }
 
     private void updateRotation(float delta) {

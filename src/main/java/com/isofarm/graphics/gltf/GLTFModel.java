@@ -2,6 +2,7 @@ package com.isofarm.graphics.gltf;
 
 import com.isofarm.graphics.Shader;
 import org.joml.Matrix4f;
+import org.joml.Vector4f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,6 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
 
 public class GLTFModel {
-
     private final List<GLTFMesh> meshes;
     private final List<GLTFNode> nodes;
     private final List<GLTFNode> rootNodes;
@@ -66,6 +66,15 @@ public class GLTFModel {
         return null;
     }
 
+    public int getTexture() {
+        for (GLTFMesh mesh : meshes) {
+            if (mesh.getTextureId() > 0) {
+                return mesh.getTextureId();
+            }
+        }
+        return 0;
+    }
+
     public List<GLTFNode> getNodes() {
         return nodes;
     }
@@ -102,7 +111,8 @@ public class GLTFModel {
         private final int indexCount;
         private final int textureId;
 
-        public GLTFMesh(int vao, int vbo, int ebo, int indexCount, int textureId) {
+        public GLTFMesh(int vao, int vbo, int ebo,
+                        int indexCount, int textureId) {
             this.vao = vao;
             this.vbo = vbo;
             this.ebo = ebo;
@@ -110,21 +120,24 @@ public class GLTFModel {
             this.textureId = textureId;
         }
 
-        void render(Shader shader) {
+        public int getTextureId() {
+            return textureId;
+        }
+
+        public void render(Shader shader) {
             glActiveTexture(GL_TEXTURE0);
             if (textureId > 0) {
                 glBindTexture(GL_TEXTURE_2D, textureId);
                 shader.setUniform("uTexture", 0);
                 shader.setUniform("uUseTexture", true);
+                shader.setUniform("uUVBounds", new Vector4f(0.0f, 0.0f, 1.0f, 1.0f));
             } else {
-                glBindTexture(GL_TEXTURE_2D, 0);
-                shader.setUniform("uUseTexture", false);
+                shader.setUniform("uUseTexture", true);
             }
 
             glBindVertexArray(vao);
             glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
             glBindVertexArray(0);
-            glBindTexture(GL_TEXTURE_2D, 0);
         }
 
         public void dispose() {
