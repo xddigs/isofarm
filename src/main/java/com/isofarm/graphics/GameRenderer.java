@@ -1,12 +1,10 @@
 package com.isofarm.graphics;
 
 import com.isofarm.data.BlockData;
-import com.isofarm.data.Crop;
 import com.isofarm.data.BlockPos;
+import com.isofarm.data.Crop;
 import com.isofarm.entity.Player;
 import com.isofarm.input.GameInteraction;
-import com.isofarm.item.Equippable;
-import com.isofarm.item.Item;
 import com.isofarm.service.BookService;
 import com.isofarm.service.TimeService;
 import com.isofarm.service.WeatherService;
@@ -228,9 +226,7 @@ public class GameRenderer {
             entity.render(gameMaster);
         });
 
-        defaultShader.setUniform("uIsSprite", false);
         defaultShader.setUniform("uParticleAlpha", 1.0f);
-
         glDepthMask(false);
         gameMaster.getParticles().render(defaultShader, rm.getSpriteMesh(), gameMaster.getActiveCamera());
         glDepthMask(true);

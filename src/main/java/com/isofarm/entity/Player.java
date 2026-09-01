@@ -146,7 +146,7 @@ public class Player extends Character {
             torsoTranslation = new Vector3f(torsoNode.getTranslation());
         }
 
-        String[] equipment = { "sword", "pickaxe", "axe", "hoe", "shovel" };
+        String[] equipment = {"sword", "pickaxe", "axe", "hoe", "shovel"};
         for (String e : equipment) {
             hideEquipment(e);
         }
@@ -188,28 +188,6 @@ public class Player extends Character {
         setUpInventory();
         this.currentState = new GroundedState();
         this.currentState.enter(this);
-    }
-
-    private void registerNode(String name) {
-        GLTFNode node = playerModel.findNode(name);
-        if (node != null) {
-            node.setVisible(false);
-            equipmentNodes.put(name, node);
-        }
-    }
-
-    private void showEquipment(String equipment) {
-        GLTFNode node = equipmentNodes.get(equipment);
-        if (node != null) {
-            node.setVisible(true);
-        }
-    }
-
-    private void hideEquipment(String equipment) {
-        GLTFNode node = equipmentNodes.get(equipment);
-        if (node != null) {
-            node.setVisible(false);
-        }
     }
 
     @Override
@@ -466,6 +444,28 @@ public class Player extends Character {
                     position.y, position.z));
             remove(i, amount);
             gameMaster.addEntity(item);
+        }
+    }
+
+    private void registerNode(String name) {
+        GLTFNode node = playerModel.findNode(name);
+        if (node != null) {
+            node.setVisible(false);
+            equipmentNodes.put(name, node);
+        }
+    }
+
+    private void showEquipment(String equipment) {
+        GLTFNode node = equipmentNodes.get(equipment);
+        if (node != null) {
+            node.setVisible(true);
+        }
+    }
+
+    private void hideEquipment(String equipment) {
+        GLTFNode node = equipmentNodes.get(equipment);
+        if (node != null) {
+            node.setVisible(false);
         }
     }
 

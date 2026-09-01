@@ -51,7 +51,6 @@ public class GLTFModel {
         }
 
         shader.setUniform("uModel", worldMatrix);
-
         meshes.get(meshIndex).render(shader);
     }
 
