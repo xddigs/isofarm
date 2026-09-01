@@ -117,7 +117,7 @@ public class Player extends Character {
 
         boolean isMoving = Math.abs(velocity.x) > 0.05f || Math.abs(velocity.z) > 0.05f;
         if (isMoving) {
-            walkAnimationTime += delta * 8.0f;
+            walkAnimationTime += delta * 10.0f;
             walkAnimSpeed = lerp(walkAnimSpeed, 1.0f, Math.clamp(delta * 10.0f, 0.0f, 1.0f));
         } else {
             walkAnimSpeed = lerp(walkAnimSpeed, 0.0f, Math.clamp(delta * 10.0f, 0.0f, 1.0f));
