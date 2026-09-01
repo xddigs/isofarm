@@ -265,7 +265,6 @@ public class Player extends Character {
 
             int sector = (int) Math.round(targetModelYaw / 45.0) % 8;
             this.direction = switch (sector) {
-                case 0 -> Direction.N;
                 case 1 -> Direction.NE;
                 case 2 -> Direction.E;
                 case 3 -> Direction.SE;
