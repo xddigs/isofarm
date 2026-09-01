@@ -292,7 +292,8 @@ public class GameUIService implements Service<GameMaster> {
         glEnable(GL_DEPTH_TEST);
     }
 
-    public void renderHearts(SpriteSheet heartsSheet, float startX, float startY, Player player) {
+    public void renderHearts(SpriteSheet heartsSheet, float startX,
+                             float startY, Player player) {
         if (player == null || heartsSheet == null) return;
         int currentHp = (int) player.getHitpoints();
         int maxHp = (int) player.getMaxHitpoints();

@@ -52,7 +52,7 @@ public final class K {
 
     public static final class UI {
         public static final int INVENTORY_COLUMNS = 9;
-        public static final int INVENTORY_ROWS = 4;
+        public static final int INVENTORY_ROWS = 6;
         public static final int INVENTORY_SLOTS = INVENTORY_COLUMNS * INVENTORY_ROWS;
 
         public static final float SQUISH_DURATION = 0.25f;
