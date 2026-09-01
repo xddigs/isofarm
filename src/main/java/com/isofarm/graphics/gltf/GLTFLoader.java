@@ -168,26 +168,27 @@ public final class GLTFLoader {
                                              List<ByteBuffer> buffers) {
         JsonObject accessor = accessors.get(accessorIndex).getAsJsonObject();
         int bufferViewIndex = accessor.get("bufferView").getAsInt();
+
         JsonObject bufferView = bufferViews.get(bufferViewIndex).getAsJsonObject();
         int bufferIndex = bufferView.get("buffer").getAsInt();
+
         ByteBuffer buffer = buffers.get(bufferIndex).duplicate().order(ByteOrder.LITTLE_ENDIAN);
         int accessorOffset = accessor.has("byteOffset") ? accessor.get("byteOffset").getAsInt() : 0;
         int viewOffset = bufferView.has("byteOffset") ? bufferView.get("byteOffset").getAsInt() : 0;
-        int stride;
 
-        if (bufferView.has("byteStride")) {
-            stride = bufferView.get("byteStride").getAsInt();
-        } else {
-            stride = 12;
-        }
-
-        int count = accessor.get("count").getAsInt();
         String type = accessor.get("type").getAsString();
         int components = componentCount(type);
+        int count = accessor.get("count").getAsInt();
+
+        int componentSize = 4;
+        int elementSize = components * componentSize;
+
+        int stride = bufferView.has("byteStride") ? bufferView.get("byteStride").getAsInt() : elementSize;
         float[] result = new float[count * components];
         int baseOffset = viewOffset + accessorOffset;
         for (int i = 0; i < count; i++) {
             int elementOffset = baseOffset + i * stride;
+
             for (int component = 0; component < components; component++) {
                 result[i * components + component] = buffer.getFloat(elementOffset + component * 4);
             }

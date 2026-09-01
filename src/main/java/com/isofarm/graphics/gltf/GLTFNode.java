@@ -4,11 +4,13 @@ import com.isofarm.graphics.Shader;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class GLTFNode {
+
     private final String name;
     private final int meshIndex;
 
@@ -20,12 +22,16 @@ public class GLTFNode {
     private final Matrix4f worldMatrix;
 
     private final List<GLTFNode> children;
+
     private boolean isVisible = true;
 
-    public GLTFNode(String name, int meshIndex, Vector3f translation,
-                    Quaternionf rotation, Vector3f scale) {
+    private int textureOverride = 0;
+    private Vector4f uvOverride = null;
+
+    public GLTFNode(String name, int meshIndex, Vector3f translation, Quaternionf rotation, Vector3f scale) {
         this.name = name;
         this.meshIndex = meshIndex;
+
         this.translation = new Vector3f(translation);
         this.rotation = new Quaternionf(rotation);
         this.scale = new Vector3f(scale);
@@ -39,7 +45,10 @@ public class GLTFNode {
     }
 
     private void updateLocalMatrix() {
-        localMatrix.identity().translate(translation).rotate(rotation).scale(scale);
+        localMatrix.identity()
+                .translate(translation)
+                .rotate(rotation)
+                .scale(scale);
     }
 
     public void updateTransform() {
@@ -52,9 +61,16 @@ public class GLTFNode {
 
     public void render(GLTFModel model, Matrix4f parentMatrix, Shader shader) {
         worldMatrix.set(parentMatrix).mul(localMatrix);
-        if (!isVisible) return;
+        if (!isVisible) {
+            return;
+        }
+
         if (meshIndex >= 0) {
-            model.renderMesh(meshIndex, worldMatrix, shader);
+            if (textureOverride != 0 && uvOverride != null) {
+                model.renderMesh(meshIndex, worldMatrix, shader, textureOverride, uvOverride);
+            } else {
+                model.renderMesh(meshIndex, worldMatrix, shader);
+            }
         }
 
         for (GLTFNode child : children) {
@@ -63,11 +79,13 @@ public class GLTFNode {
     }
 
     public GLTFNode find(String nodeName) {
+
         if (name != null && name.equals(nodeName)) {
             return this;
         }
 
         for (GLTFNode child : children) {
+
             GLTFNode result = child.find(nodeName);
 
             if (result != null) {
@@ -133,7 +151,25 @@ public class GLTFNode {
         return isVisible;
     }
 
-    public void setVisible(boolean isVisible) {
-        this.isVisible = isVisible;
+    public void setVisible(boolean visible) {
+        isVisible = visible;
+    }
+
+    public void setTextureOverride(int textureId, Vector4f uvBounds) {
+        this.textureOverride = textureId;
+        this.uvOverride = uvBounds == null ? null : new Vector4f(uvBounds);
+    }
+
+    public void clearTextureOverride() {
+        textureOverride = 0;
+        uvOverride = null;
+    }
+
+    public int getTextureOverride() {
+        return textureOverride;
+    }
+
+    public Vector4f getUvOverride() {
+        return uvOverride;
     }
 }

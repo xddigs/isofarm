@@ -143,13 +143,13 @@ public final class K {
         public static final String POTATO_TEXTURE = "assets/crops/potato_crop.png";
         public static final String BEETROOT_TEXTURE = "assets/crops/beetroot_crop.png";
 
-        public static final String SEED_ICONS = "assets/gui/seeds.png";
-        public static final String CROP_ICONS = "assets/gui/crops.png";
-        public static final String TOOL_ICONS = "assets/gui/tools.png";
-        public static final String BLOCK_ICONS = "assets/gui/blocks.png";
-        public static final String MATERIAL_ICONS = "assets/gui/materials.png";
-        public static final String USABLES_ICONS = "assets/gui/usables.png";
-        public static final String INVENTORY_ICONS = "assets/gui/inventory.png";
+        public static final String SEED_ICONS = "assets/sprites/seeds.png";
+        public static final String CROP_ICONS = "assets/sprites/crops.png";
+        public static final String TOOL_ICONS = "assets/sprites/tools.png";
+        public static final String BLOCK_ICONS = "assets/sprites/blocks.png";
+        public static final String MATERIAL_ICONS = "assets/sprites/materials.png";
+        public static final String USABLES_ICONS = "assets/sprites/usables.png";
+        public static final String INVENTORY_ICONS = "assets/sprites/inventory.png";
 
         public static final String PLAYER_MODEL = "assets/models/player/steve.gltf";
 

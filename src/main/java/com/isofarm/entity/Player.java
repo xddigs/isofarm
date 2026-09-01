@@ -3,10 +3,7 @@ package com.isofarm.entity;
 import com.isofarm.data.*;
 import com.isofarm.entity.states.GroundedState;
 import com.isofarm.entity.states.SneakingState;
-import com.isofarm.graphics.CameraView;
-import com.isofarm.graphics.CelestialLighting;
-import com.isofarm.graphics.ResourceManager;
-import com.isofarm.graphics.Shader;
+import com.isofarm.graphics.*;
 import com.isofarm.graphics.gltf.GLTFModel;
 import com.isofarm.graphics.gltf.GLTFNode;
 import com.isofarm.input.Keyboard;
@@ -21,6 +18,7 @@ import com.isofarm.wrld.World;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -453,13 +451,6 @@ public class Player extends Character {
         }
     }
 
-    private void showEquipment(String equipment) {
-        GLTFNode node = equipmentNodes.get(equipment);
-        if (node != null) {
-            node.setVisible(true);
-        }
-    }
-
     private void hideEquipment(String equipment) {
         GLTFNode node = equipmentNodes.get(equipment);
         if (node != null) {
@@ -470,24 +461,49 @@ public class Player extends Character {
     private void updateEquipmentVisual() {
         for (GLTFNode node : equipmentNodes.values()) {
             node.setVisible(false);
+            node.clearTextureOverride();
         }
 
-        Item item = gameMaster.getGameUIService()
-                .getHotbarUI().getSelectedItem();
+        Item item = gameMaster.getGameUIService().getHotbarUI()
+                .getSelectedItem();
+
         if (item == null) {
             return;
         }
 
         String nodeName = switch (item) {
+            case Sword ignored -> "sword";
             case Pickaxe ignored -> "pickaxe";
             case Axe ignored -> "axe";
             case Hoe ignored -> "hoe";
             case Shovel ignored -> "shovel";
-            case Sword ignored -> "sword";
             default -> null;
         };
 
-        showEquipment(nodeName);
+        if (nodeName == null) {
+            return;
+        }
+
+        GLTFNode node = equipmentNodes.get(nodeName);
+        if (node == null) {
+            return;
+        }
+
+        SpriteSheet toolIcons = ResourceManager.getToolIcons();
+        if (toolIcons == null) {
+            return;
+        }
+
+        int textureId = toolIcons.getTextureId();
+
+        if (textureId <= 0) {
+            return;
+        }
+
+        int frame = ResourceManager.getItemFrame(item);
+        Vector4f uvBounds = toolIcons.getUVBounds(frame);
+        node.setTextureOverride(textureId, uvBounds);
+        node.setVisible(true);
     }
 
     private void updateRotation(float delta) {

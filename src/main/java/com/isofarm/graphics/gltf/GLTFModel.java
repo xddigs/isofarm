@@ -45,13 +45,23 @@ public class GLTFModel {
         }
     }
 
-    void renderMesh(int meshIndex, Matrix4f worldMatrix, Shader shader) {
+    public void renderMesh(int meshIndex, Matrix4f worldMatrix, Shader shader) {
         if (meshIndex < 0 || meshIndex >= meshes.size()) {
             return;
         }
 
         shader.setUniform("uModel", worldMatrix);
         meshes.get(meshIndex).render(shader);
+    }
+
+    public void renderMesh(int meshIndex, Matrix4f worldMatrix, Shader shader, int textureId, Vector4f uvBounds) {
+        if (meshIndex < 0 || meshIndex >= meshes.size()) {
+            return;
+        }
+
+        shader.setUniform("uModel", worldMatrix);
+
+        meshes.get(meshIndex).render(shader, textureId, uvBounds);
     }
 
     public GLTFNode findNode(String name) {
@@ -72,6 +82,7 @@ public class GLTFModel {
                 return mesh.getTextureId();
             }
         }
+
         return 0;
     }
 
@@ -111,8 +122,7 @@ public class GLTFModel {
         private final int indexCount;
         private final int textureId;
 
-        public GLTFMesh(int vao, int vbo, int ebo,
-                        int indexCount, int textureId) {
+        public GLTFMesh(int vao, int vbo, int ebo, int indexCount, int textureId) {
             this.vao = vao;
             this.vbo = vbo;
             this.ebo = ebo;
@@ -125,14 +135,23 @@ public class GLTFModel {
         }
 
         public void render(Shader shader) {
+            render(shader, textureId, new Vector4f(0.0f, 0.0f, 1.0f, 1.0f));
+        }
+
+        public void render(Shader shader, int renderTextureId,
+                           Vector4f uvBounds) {
             glActiveTexture(GL_TEXTURE0);
-            if (textureId > 0) {
-                glBindTexture(GL_TEXTURE_2D, textureId);
+
+            if (renderTextureId > 0) {
+                glBindTexture(GL_TEXTURE_2D, renderTextureId);
+
                 shader.setUniform("uTexture", 0);
                 shader.setUniform("uUseTexture", true);
-                shader.setUniform("uUVBounds", new Vector4f(0.0f, 0.0f, 1.0f, 1.0f));
+                shader.setUniform("uUVBounds", uvBounds);
             } else {
-                shader.setUniform("uUseTexture", true);
+                shader.setUniform("uUseTexture", false);
+                shader.setUniform("uUVBounds",
+                        new Vector4f(0.0f, 0.0f, 1.0f, 1.0f));
             }
 
             glBindVertexArray(vao);
