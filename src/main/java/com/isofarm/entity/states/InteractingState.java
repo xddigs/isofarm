@@ -2,6 +2,7 @@ package com.isofarm.entity.states;
 
 import com.isofarm.data.PlayerState;
 import com.isofarm.entity.Player;
+import com.isofarm.input.Keyboard;
 import com.isofarm.input.Mouse;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
@@ -46,7 +47,11 @@ public class InteractingState implements PlayerState {
 
         timer -= delta;
         if (timer <= 0.0f) {
-            player.changeState(new GroundedState());
+            if (Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
+                player.changeState(new SneakingState());
+            } else {
+                player.changeState(new GroundedState());
+            }
         }
     }
 

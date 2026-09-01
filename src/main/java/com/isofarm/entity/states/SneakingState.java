@@ -25,7 +25,8 @@ public class SneakingState implements PlayerState {
 
         if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT) ||
                 Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
-            player.interact();
+            player.changeState(new InteractingState());
+            return;
         }
 
         if (!Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
