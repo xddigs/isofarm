@@ -28,10 +28,11 @@ import static org.joml.Math.lerp;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL13.*;
 
-@DataClass
+@SuppressWarnings("all")
+@GodObject
 public class Player extends Character {
     private static final Logger log = LoggerFactory.getLogger(Player.class);
-    private static final float PLAYER_WIDTH = 1.0f;
+    private static final float PLAYER_WIDTH = 0.5f;
     private static final float PLAYER_HEIGHT = 2.0f;
     private static final float SPAWN_X = 0.5f;
     private static final float SPAWN_Z = 0.5f;
@@ -59,7 +60,6 @@ public class Player extends Character {
     private static final float ROTATION_SPEED = 720.0f;
     private static final float ATTACK_ANIMATION_SPEED = 10.0f;
     private static final float ATTACK_ANGLE = 1.35f;
-    private static final float ATTACK_SWING_OFFSET = 0.20f;
     private static final float COLLISION_STEP_HEIGHT = 1.05f;
     private static final float SNEAK_GROUND_OFFSET = 0.05f;
     private static final float PATH_REACHED_DISTANCE_SQUARED = 0.01f;
@@ -88,6 +88,7 @@ public class Player extends Character {
     private float modelYaw = 0.0f;
     private float targetModelYaw = 0.0f;
     private PlayerState currentState;
+    private PlayerState previousState;
     private GLTFNode headNode;
     private GLTFNode torsoNode;
     private GLTFNode backpackNode;
@@ -444,11 +445,11 @@ public class Player extends Character {
     }
 
     private String getEquipmentName(Item item) {
-        if (!(item instanceof Tool tool)) {
+        if (!(item instanceof Tool)) {
             return null;
         }
 
-        String typeSuffix = switch (item) {
+        return switch (item) {
             case Sword ignored -> "sword";
             case Pickaxe ignored -> "pickaxe";
             case Axe ignored -> "axe";
@@ -456,8 +457,6 @@ public class Player extends Character {
             case Shovel ignored -> "shovel";
             default -> null;
         };
-
-        return typeSuffix;
     }
 
     private void updateEquipmentVisual() {
@@ -512,6 +511,7 @@ public class Player extends Character {
         if (currentState != null) {
             currentState.exit(this);
         }
+
         currentState = newState;
         currentState.enter(this);
     }
@@ -567,6 +567,14 @@ public class Player extends Character {
         this.currentState = currentState;
     }
 
+    public PlayerState getPreviousState() {
+        return previousState;
+    }
+
+    public void setPreviousState(PlayerState previousState) {
+        this.previousState = previousState;
+    }
+
     public void respawn() {
         if (!Settings.doKeepInventory()) {
             clear();
@@ -614,11 +622,7 @@ public class Player extends Character {
         return damageSequence;
     }
 
-    public void move(World world, Vector3f direction, float delta) {
-        collide(world, direction, delta);
-    }
-
-    public void move(World world, float delta, float cameraYaw) {
+    public void move(World world, float delta) {
         if (!isFollowingPath()) {
             setVelocity(new Vector3f(ZERO_VELOCITY, getVelocity().y, ZERO_VELOCITY));
         } else {
@@ -659,7 +663,7 @@ public class Player extends Character {
                 BookService.bs.isOpen()) return;
 
         if (isFollowingPath()) {
-            move(world, delta, cameraYaw);
+            move(world, delta);
             return;
         }
 

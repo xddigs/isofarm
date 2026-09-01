@@ -129,7 +129,7 @@ public record CameraController(Camera camera) implements Service<Camera> {
 
     private void followPath(Player player, World world, float delta) {
         if (player.isFollowingPath()) {
-            player.move(world, delta, camera.getYaw());
+            player.move(world, delta);
         }
     }
 

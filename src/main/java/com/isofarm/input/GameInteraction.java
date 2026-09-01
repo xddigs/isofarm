@@ -4,7 +4,6 @@ import com.isofarm.data.*;
 import com.isofarm.entity.Entity;
 import com.isofarm.entity.Player;
 import com.isofarm.entity.WorldItem;
-import com.isofarm.entity.states.InteractingState;
 import com.isofarm.graphics.ParticleEngine;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.graphics.TextureAtlas;
@@ -344,11 +343,7 @@ public class GameInteraction {
         int z = cell.z();
 
         Item selectedItem = gameMaster.getGameUIService().getHotbarUI().getSelectedItem();
-
-        if (gameMaster.getPlayer() != null &&
-                !(gameMaster.getPlayer().getCurrentState() instanceof InteractingState)) {
-            gameMaster.getPlayer().changeState(new InteractingState());
-
+        if (gameMaster.getPlayer() != null) {
             if (!gameMaster.getPlayer().isAttacking()) {
                 gameMaster.getPlayer().interact();
             }
@@ -535,9 +530,8 @@ public class GameInteraction {
         if (BookService.bs.isOpen()) return;
         if (gameMaster.getPlayer().checkCollision(world)) return;
 
-        if (gameMaster.getPlayer() != null &&
-                !(gameMaster.getPlayer().getCurrentState() instanceof InteractingState)) {
-            gameMaster.getPlayer().changeState(new InteractingState());
+        if (gameMaster.getPlayer() != null) {
+            gameMaster.getPlayer().interact();
         }
 
         int normalX = gameMaster.getOrthoCamera().getLastHitNormalX();
