@@ -1,5 +1,7 @@
 package com.isofarm.graphics;
 
+import com.isofarm.data.Tier;
+import com.isofarm.data.ToolType;
 import com.isofarm.graphics.gltf.GLTFModel;
 import com.isofarm.graphics.gltf.GLTFNode;
 
@@ -7,23 +9,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class EquipmentController {
-
     public static final EquipmentController ec = new EquipmentController();
-
     private final Map<String, GLTFNode> equipmentNodes = new HashMap<>();
     private GLTFNode currentActiveNode = null;
 
     public void init(GLTFModel playerModel) {
-        String[] materials = {"wooden", "copper", "iron", "steel", "golden", "platinum", "diamond"};
-        String[] types = {"sword", "pickaxe", "axe", "hoe", "shovel"};
+        for (Tier tier : Tier.values()) {
+            if (tier.isInvalidTier()) {
+                continue;
+            }
 
-        for (String type : types) {
-            for (String material : materials) {
-
+            String material = tier.getName().toLowerCase();
+            for (ToolType toolType : ToolType.values()) {
+                String type = toolType.name().toLowerCase();
                 String nodeName = material + "_" + type;
-
                 GLTFNode node = playerModel.findNode(nodeName);
-
                 if (node != null) {
                     node.setVisible(false);
                     equipmentNodes.put(nodeName, node);
