@@ -9,9 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommandCompletionProvider implements CompletionProvider {
-
     private final CommandRegistry commandRegistry;
-
     public CommandCompletionProvider(CommandRegistry commandRegistry) {
         this.commandRegistry = commandRegistry;
     }
@@ -46,31 +44,26 @@ public class CommandCompletionProvider implements CompletionProvider {
     }
 
     private List<String> completeArgument(String text) {
-        String trimmed = text.trim();
-        if (trimmed.isEmpty()) {
+        String trimmedLead = text.stripLeading();
+        if (trimmedLead.isEmpty()) {
             return List.of();
         }
 
-        String commandName = trimmed.split("\\s+", 2)[0];
+        String[] parts = trimmedLead.split("\\s+");
+        String commandName = parts[0];
         Command command = commandRegistry.get(commandName);
         if (command == null) {
             return List.of();
         }
 
-        String argumentPart = text.substring(commandName.length());
-
-        if (argumentPart.startsWith(" ")) {
-            argumentPart = argumentPart.substring(1);
+        int firstSpaceIndex = text.indexOf(' ');
+        if (firstSpaceIndex == -1) {
+            return List.of();
         }
 
-        String[] arguments = argumentPart.isEmpty() ? new String[]{""} : argumentPart.split("\\s+", -1);
-        int argumentIndex = arguments.length - 1;
-        if (text.endsWith(" ")) {
-            argumentIndex = arguments.length - 1;
-            if (arguments.length > 0 && arguments[arguments.length - 1].isEmpty()) {
-                argumentIndex = arguments.length - 1;
-            }
-        }
+        String argsSubstring = text.substring(firstSpaceIndex + 1);
+        String[] args = argsSubstring.split("\\s+", -1);
+        int argumentIndex = args.length - 1;
 
         if (argumentIndex < 0 || argumentIndex >= command.args().length) {
             return List.of();
@@ -81,7 +74,7 @@ public class CommandCompletionProvider implements CompletionProvider {
             return List.of();
         }
 
-        String input = arguments[argumentIndex];
-        return argument.complete(input, argumentIndex);
+        String inputPrefix = args[argumentIndex];
+        return argument.complete(inputPrefix, argumentIndex);
     }
 }

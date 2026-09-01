@@ -1,5 +1,6 @@
 package com.isofarm.gui;
 
+import com.isofarm.data.GodObject;
 import com.isofarm.graphics.*;
 import com.isofarm.input.Mouse;
 import com.isofarm.item.Item;
@@ -18,6 +19,7 @@ import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 
 @Utils
+@GodObject
 public class GUI {
     private static final Shader shader = new Shader(K.Paths.UI_VERTEX_SHADER, K.Paths.UI_FRAG_SHADER);
     private static final Mesh mesh = Mesh.createQuad();

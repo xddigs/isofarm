@@ -1,6 +1,7 @@
 package com.isofarm.gui;
 
 import com.isofarm.data.DataClass;
+import com.isofarm.data.GodObject;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.graphics.Texture;
 import org.joml.Vector2f;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 @SuppressWarnings("unused")
+@GodObject
 @DataClass
 public abstract class UIElement {
     private final List<UIElement> children = new ArrayList<>();
