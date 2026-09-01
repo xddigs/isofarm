@@ -3,9 +3,10 @@ package com.isofarm.entity.states;
 import com.isofarm.data.PlayerState;
 import com.isofarm.entity.Player;
 import com.isofarm.input.Keyboard;
+import com.isofarm.input.Mouse;
 import com.isofarm.wrld.GameMaster;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_CONTROL;
+import static org.lwjgl.glfw.GLFW.*;
 
 public class SneakingState implements PlayerState {
     private static final float SNEAK_EYE_HEIGHT = 1.2f;
@@ -20,6 +21,11 @@ public class SneakingState implements PlayerState {
     public void input(Player player, GameMaster gameMaster) {
         if (gameMaster.isInventoryOpen() || gameMaster.isChatOpen()) {
             return;
+        }
+
+        if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT) ||
+                Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
+            player.interact();
         }
 
         if (!Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {

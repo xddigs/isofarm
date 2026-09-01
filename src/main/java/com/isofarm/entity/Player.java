@@ -60,7 +60,6 @@ public class Player extends Character {
     private static final float ATTACK_ANIMATION_SPEED = 10.0f;
     private static final float ATTACK_ANGLE = 1.35f;
     private static final float ATTACK_SWING_OFFSET = 0.20f;
-    private static final float ATTACK_SINE_FREQUENCY = 2.0f;
     private static final float COLLISION_STEP_HEIGHT = 1.05f;
     private static final float SNEAK_GROUND_OFFSET = 0.05f;
     private static final float PATH_REACHED_DISTANCE_SQUARED = 0.01f;
@@ -235,13 +234,19 @@ public class Player extends Character {
         float sneakTorsoLean = (float) Math.toRadians(SNEAK_TORSO_LEAN) * sneakWeight;
         float sneakArmBend = (float) Math.toRadians(SNEAK_ARM_BEND) * sneakWeight;
 
-        float attackAngle = 0.0f;
+        float attackAngleX = 0.0f;
+        float attackAngleY = 0.0f;
+        float attackAngleZ = 0.0f;
+
         if (isAttacking) {
             attackAnimationTime += delta * ATTACK_ANIMATION_SPEED;
-            float progress = (float) Math.min(attackAnimationTime, Math.PI);
-            float swing = (float) Math.sin(progress) * ATTACK_ANGLE;
-            float sine = (float) Math.sin(progress * 2.0f) * ATTACK_SWING_OFFSET * (float) Math.sin(progress);
-            attackAngle = swing + sine;
+            float progress = (float) Math.min(attackAnimationTime / Math.PI, 1.0f);
+            float swingCurve = (float) Math.sin(Math.sqrt(progress) * Math.PI);
+            float crossCurve = (float) Math.sin(progress * Math.PI);
+            attackAngleX = swingCurve * ATTACK_ANGLE;
+            attackAngleY = swingCurve * (ATTACK_ANGLE * 0.25f);
+            attackAngleZ = crossCurve * -(ATTACK_ANGLE * 0.4f);
+
             if (attackAnimationTime >= Math.PI) {
                 isAttacking = false;
                 attackAnimationTime = ZERO_VELOCITY;
@@ -259,8 +264,9 @@ public class Player extends Character {
                 .rotateZ(-breathSwayZ);
 
         Quaternionf rightArmRotation = new Quaternionf()
-                .rotateX(swingAngle + breathAngle - sneakArmBend + attackAngle)
-                .rotateZ(breathSwayZ);
+                .rotateX(swingAngle + breathAngle - sneakArmBend + attackAngleX)
+                .rotateY(attackAngleY)
+                .rotateZ(breathSwayZ + attackAngleZ);
 
         Quaternionf rightLegRotation = new Quaternionf()
                 .rotateX(-swingAngle);
@@ -677,12 +683,7 @@ public class Player extends Character {
             float worldX = inputDir.x * cos - inputDir.z * sin;
             float worldZ = inputDir.x * sin + inputDir.z * cos;
 
-            Vector3f targetVelocity = new Vector3f(
-                    worldX * getSpeed(),
-                    getVelocity().y,
-                    worldZ * getSpeed()
-            );
-
+            Vector3f targetVelocity = new Vector3f(worldX * getSpeed(), getVelocity().y, worldZ * getSpeed());
             if (currentState instanceof SneakingState) {
                 Vector3f nextPosition = new Vector3f(position).add(targetVelocity.x * delta,
                         ZERO_VELOCITY, targetVelocity.z * delta);
