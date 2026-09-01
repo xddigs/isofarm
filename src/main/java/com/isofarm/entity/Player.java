@@ -38,14 +38,52 @@ import static org.lwjgl.opengl.GL13.*;
 @DataClass
 public class Player extends Character {
     private static final Logger log = LoggerFactory.getLogger(Player.class);
-    private static final float SNEAK_SPEED = 75.0f;
+    private static final float PLAYER_WIDTH = 1.0f;
+    private static final float PLAYER_HEIGHT = 2.0f;
+    private static final float SPAWN_X = 0.5f;
+    private static final float SPAWN_Z = 0.5f;
+    private static final float INITIAL_EYE_HEIGHT = 1.6f;
+    private static final float INITIAL_Y_VELOCITY = 0.0f;
+    private static final float INITIAL_HORIZONTAL_VELOCITY = 0.0f;
+    private static final int MAX_HITPOINTS = 20;
+    private static final int MAX_STAMINA = 100;
+    private static final float PLAYER_SPEED = 6.0f;
+    private static final float MOVEMENT_THRESHOLD = 0.05f;
+    private static final float SNEAK_OFFSET = 0.08f;
+    private static final float SNEAK_TORSO_LEAN = 20.0f;
+    private static final float SNEAK_ARM_BEND = 15.0f;
+    private static final float SNEAK_STRIDE_AMPLITUDE = 0.25f;
+    private static final float SNEAK_LEG_BACK_WEIGHT = 0.18f;
+    private static final float NORMAL_WALK_SPEED = 10.0f;
+    private static final float SNEAK_WALK_SPEED = 7.0f;
+    private static final float BREATH_AMPLITUDE = 0.05f;
+    private static final float BREATH_SWAY_AMPLITUDE = 0.02f;
+    private static final float IDLE_BOBBING_AMPLITUDE = 0.025f;
+    private static final float IDLE_SNEAK_FACTOR = 0.5f;
+    private static final float IDLE_FADE_SPEED = 8.0f;
+    private static final float IDLE_WEIGHT_SPEED = 5.0f;
+    private static final float WALK_WEIGHT_SPEED = 10.0f;
+    private static final float ROTATION_SPEED = 720.0f;
+    private static final float ATTACK_ANIMATION_SPEED = 12.0f;
+    private static final float ATTACK_ANGLE = 1.2f;
+    private static final float COLLISION_STEP_HEIGHT = 1.05f;
+    private static final float SNEAK_GROUND_OFFSET = 0.05f;
+    private static final float PATH_REACHED_DISTANCE_SQUARED = 0.01f;
+    private static final float ZERO_VELOCITY = 0.0f;
+    private static final float DEATH_RESPAWN_TIME = 5.0f;
+    private static final float RESPAWN_Y_OFFSET = 1.0f;
+    private static final float EYE_HEIGHT_LERP_SPEED = 10.0f;
+    private static final float SNEAK_WEIGHT_LERP_SPEED = 75.0f;
+    private static final float ANIMATION_IDLE_BREATH_SPEED = 2.5f;
+    private static final float STRIDE_AMPLITUDE = 0.45f;
+    private static final float ANIMATION_SPEED_FACTOR = 10.0f;
     private final Matrix4f modelMatrix;
     private final GameMaster gameMaster;
     private final GLTFModel playerModel;
     private Direction direction = Direction.S;
     private List<GridPos> path;
-    private float currentEyeHeight = 1.6f;
-    private float targetEyeHeight = 1.6f;
+    private float currentEyeHeight = INITIAL_EYE_HEIGHT;
+    private float targetEyeHeight = INITIAL_EYE_HEIGHT;
     private int pathIndex = 0;
     private int damageSequence = 0;
     private float respawnTimer = -1.0f;
@@ -116,17 +154,17 @@ public class Player extends Character {
             leftLegTranslation = new Vector3f(leftLegNode.getTranslation());
         }
 
-        float spawnX = 0.5f;
-        float spawnZ = 0.5f;
+        float spawnX = SPAWN_X;
+        float spawnZ = SPAWN_Z;
         GridPos highestAltitude = world.getHighestY(spawnX, spawnZ);
         setPosition(new Vector3f(spawnX, highestAltitude.y(), spawnZ));
-        setVelocity(new Vector3f(0.0f, 0.0f, 0.0f));
-        setDimensions(new Vector3f(1.0f, 2.0f, 1.0f));
-        setMaxHitpoints(20);
+        setVelocity(new Vector3f(INITIAL_HORIZONTAL_VELOCITY, INITIAL_Y_VELOCITY, INITIAL_HORIZONTAL_VELOCITY));
+        setDimensions(new Vector3f(PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_WIDTH));
+        setMaxHitpoints(MAX_HITPOINTS);
         setHitpoints(getMaxHitpoints());
-        setMaxStamina(100);
+        setMaxStamina(MAX_STAMINA);
         setStamina(getMaxStamina());
-        setSpeed(6.0f);
+        setSpeed(PLAYER_SPEED);
         setReputation(Reputation.NEUTRAL);
         setGamemode(Gamemode.SURVIVAL);
         setUpInventory();
@@ -137,15 +175,15 @@ public class Player extends Character {
     @Override
     public void update(BlockPos blockPos, float delta) {
         if (!this.isAlive()) {
-            if (respawnTimer <= 0.0f) {
-                respawnTimer = 5.0f;
+            if (respawnTimer <= ZERO_VELOCITY) {
+                respawnTimer = DEATH_RESPAWN_TIME;
                 dropLoot();
                 gameMaster.toggleHUD();
                 setGamemode(Gamemode.NO_CLIP);
             }
 
             respawnTimer -= delta;
-            if (respawnTimer <= 0.0f) {
+            if (respawnTimer <= ZERO_VELOCITY) {
                 respawn();
             }
 
@@ -156,32 +194,32 @@ public class Player extends Character {
         currentState.update(this, delta);
         updateRotation(delta);
 
-        boolean isMoving = Math.abs(velocity.x) > 0.05f || Math.abs(velocity.z) > 0.05f;
+        boolean isMoving = Math.abs(velocity.x) > MOVEMENT_THRESHOLD || Math.abs(velocity.z) > MOVEMENT_THRESHOLD;
         boolean isSneaking = currentState instanceof SneakingState;
 
-        float targetSneakWeight = isSneaking ? 1.0f : 0.0f;
-        sneakWeight = lerp(sneakWeight, targetSneakWeight, Math.clamp(delta * SNEAK_SPEED, 0.0f, 1.0f));
+        float targetSneakWeight = isSneaking ? 1.0f : ZERO_VELOCITY;
+        sneakWeight = lerp(sneakWeight, targetSneakWeight, Math.clamp(delta * SNEAK_WEIGHT_LERP_SPEED, ZERO_VELOCITY, 1.0f));
 
         if (isMoving) {
-            float speedFactor = isSneaking ? 7.0f : 10.0f;
+            float speedFactor = isSneaking ? SNEAK_WALK_SPEED : NORMAL_WALK_SPEED;
             walkAnimationTime += delta * speedFactor;
-            walkAnimSpeed = lerp(walkAnimSpeed, 1.0f, Math.clamp(delta * 10.0f, 0.0f, 1.0f));
-            idleWeight = lerp(idleWeight, 0.0f, Math.clamp(delta * 8.0f, 0.0f, 1.0f));
+            walkAnimSpeed = lerp(walkAnimSpeed, 1.0f, Math.clamp(delta * ANIMATION_SPEED_FACTOR, ZERO_VELOCITY, 1.0f));
+            idleWeight = lerp(idleWeight, ZERO_VELOCITY, Math.clamp(delta * IDLE_FADE_SPEED, ZERO_VELOCITY, 1.0f));
         } else {
-            walkAnimSpeed = lerp(walkAnimSpeed, 0.0f, Math.clamp(delta * 10.0f, 0.0f, 1.0f));
-            idleWeight = lerp(idleWeight, 1.0f, Math.clamp(delta * 5.0f, 0.0f, 1.0f));
-            idleAnimationTime += delta * 2.5f;
+            walkAnimSpeed = lerp(walkAnimSpeed, ZERO_VELOCITY, Math.clamp(delta * WALK_WEIGHT_SPEED, ZERO_VELOCITY, 1.0f));
+            idleWeight = lerp(idleWeight, 1.0f, Math.clamp(delta * IDLE_WEIGHT_SPEED, ZERO_VELOCITY, 1.0f));
+            idleAnimationTime += delta * ANIMATION_IDLE_BREATH_SPEED;
         }
 
-        float strideAmplitude = lerp(0.45f, 0.25f, sneakWeight);
+        float strideAmplitude = lerp(STRIDE_AMPLITUDE, SNEAK_STRIDE_AMPLITUDE, sneakWeight);
         float swingAngle = (float) Math.sin(walkAnimationTime) * strideAmplitude * walkAnimSpeed;
 
-        float breathAngle = (float) Math.sin(idleAnimationTime) * 0.05f * idleWeight * (1.0f - sneakWeight * 0.5f);
-        float breathSwayZ = (float) Math.cos(idleAnimationTime * 0.5f) * 0.02f * idleWeight;
+        float breathAngle = (float) Math.sin(idleAnimationTime) * BREATH_AMPLITUDE * idleWeight * (1.0f - sneakWeight * IDLE_SNEAK_FACTOR);
+        float breathSwayZ = (float) Math.cos(idleAnimationTime * 0.5f) * BREATH_SWAY_AMPLITUDE * idleWeight;
 
-        float sneakOffset = 0.08f * sneakWeight;
-        float sneakTorsoLean = (float) Math.toRadians(20.0f) * sneakWeight;
-        float sneakArmBend   = (float) Math.toRadians(15.0f) * sneakWeight;
+        float sneakOffset = SNEAK_OFFSET * sneakWeight;
+        float sneakTorsoLean = (float) Math.toRadians(SNEAK_TORSO_LEAN) * sneakWeight;
+        float sneakArmBend = (float) Math.toRadians(SNEAK_ARM_BEND) * sneakWeight;
 
         Quaternionf torsoRotation = new Quaternionf()
                 .rotateX(-sneakTorsoLean + breathAngle);
@@ -200,7 +238,8 @@ public class Player extends Character {
         Quaternionf leftLegRotation = new Quaternionf()
                 .rotateX(swingAngle);
 
-        float sneakLegBack = 0.18f * sneakWeight;
+        float sneakLegBack = SNEAK_LEG_BACK_WEIGHT * sneakWeight;
+
         if (headNode != null && headTranslation != null) {
             Vector3f translation = new Vector3f(headTranslation);
             translation.y -= sneakOffset;
@@ -238,13 +277,15 @@ public class Player extends Character {
         }
 
         Quaternionf mainHandRot = Settings.isRightHand() ? rightArmRotation : leftArmRotation;
+
         if (isAttacking) {
-            attackAnimationTime += delta * 12.0f;
-            float attackAngle = (float) Math.sin(Math.min(attackAnimationTime, Math.PI)) * 1.2f;
+            attackAnimationTime += delta * ATTACK_ANIMATION_SPEED;
+            float attackAngle = (float) Math.sin(Math.min(attackAnimationTime, Math.PI)) * ATTACK_ANGLE;
             mainHandRot.rotateX(attackAngle);
+
             if (attackAnimationTime >= Math.PI) {
                 isAttacking = false;
-                attackAnimationTime = 0.0f;
+                attackAnimationTime = ZERO_VELOCITY;
             }
         }
 
@@ -258,12 +299,14 @@ public class Player extends Character {
             playerModel.updateTransforms();
         }
 
-        if (Math.abs(velocity.x) > 0.05f || Math.abs(velocity.z) > 0.05f) {
+        if (Math.abs(velocity.x) > MOVEMENT_THRESHOLD || Math.abs(velocity.z) > MOVEMENT_THRESHOLD) {
             float rawYaw = (float) Math.toDegrees(Math.atan2(velocity.x, velocity.z));
             targetModelYaw = (rawYaw + 180.0f) % 360.0f;
-            if (targetModelYaw < 0) targetModelYaw += 360.0f;
+
+            if (targetModelYaw < ZERO_VELOCITY) targetModelYaw += 360.0f;
 
             int sector = (int) Math.round(targetModelYaw / 45.0) % 8;
+
             this.direction = switch (sector) {
                 case 1 -> Direction.NE;
                 case 2 -> Direction.E;
@@ -276,9 +319,8 @@ public class Player extends Character {
             };
         }
 
-        float lerpSpeed = 10.0f;
         currentEyeHeight = lerp(currentEyeHeight, targetEyeHeight,
-                Math.clamp(delta * lerpSpeed, 0.0f, 1.0f));
+                Math.clamp(delta * EYE_HEIGHT_LERP_SPEED, ZERO_VELOCITY, 1.0f));
 
         setAnimTimer(getAnimTimer() + delta);
         heal(((0.5f + getLevel()) * delta) / getDifficultyRegen());
@@ -320,7 +362,7 @@ public class Player extends Character {
         shader.setUniform("uLightSpaceMatrix", new Matrix4f());
 
         float globalScale = Settings.getScaledEntity();
-        float idleBobbingY = (float) Math.sin(idleAnimationTime) * 0.025f * idleWeight;
+        float idleBobbingY = (float) Math.sin(idleAnimationTime) * IDLE_BOBBING_AMPLITUDE * idleWeight;
 
         modelMatrix.identity()
                 .translate(position.x, position.y + idleBobbingY, position.z)
@@ -384,8 +426,7 @@ public class Player extends Character {
             difference += 360.0f;
         }
 
-        float rotationSpeed = 720.0f;
-        float maxRotation = rotationSpeed * delta;
+        float maxRotation = ROTATION_SPEED * delta;
         if (Math.abs(difference) <= maxRotation) {
             modelYaw = targetModelYaw;
         } else {
@@ -412,7 +453,7 @@ public class Player extends Character {
     }
 
     public void autoJump(World world, Vector3f velocity, float delta) {
-        if (!isOnGround() || (velocity.x == 0.0f && velocity.z == 0.0f)) {
+        if (!isOnGround() || (velocity.x == ZERO_VELOCITY && velocity.z == ZERO_VELOCITY)) {
             return;
         }
 
@@ -423,7 +464,7 @@ public class Player extends Character {
         setPosition(originalPos);
 
         if (isBlockedAtFeet) {
-            getPosition().y += 1.05f;
+            getPosition().y += COLLISION_STEP_HEIGHT;
             getPosition().x += velocity.x * delta;
             getPosition().z += velocity.z * delta;
 
@@ -467,15 +508,15 @@ public class Player extends Character {
             clear();
         }
 
-        float spawnX = 0.5f;
-        float spawnZ = 0.5f;
+        float spawnX = SPAWN_X;
+        float spawnZ = SPAWN_Z;
 
         GridPos highestAltitude = gameMaster.getWorld().getHighestY(spawnX, spawnZ);
         gameMaster.addEntity(this);
-        setPosition(new Vector3f(spawnX, highestAltitude.y() + 1.0f, spawnZ));
-        setVelocity(new Vector3f(0.0f, 0.0f, 0.0f));
-        setDimensions(new Vector3f(1.0f, 2.0f, 1.0f));
-        setSpeed(6.0f);
+        setPosition(new Vector3f(spawnX, highestAltitude.y() + RESPAWN_Y_OFFSET, spawnZ));
+        setVelocity(new Vector3f(INITIAL_HORIZONTAL_VELOCITY, INITIAL_Y_VELOCITY, INITIAL_HORIZONTAL_VELOCITY));
+        setDimensions(new Vector3f(PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_WIDTH));
+        setSpeed(PLAYER_SPEED);
 
         setReputation(Reputation.NEUTRAL);
         setGamemode(Gamemode.SURVIVAL);
@@ -515,11 +556,11 @@ public class Player extends Character {
 
     public void move(World world, float delta, float cameraYaw) {
         if (!isFollowingPath()) {
-            setVelocity(new Vector3f(0.0f, getVelocity().y, 0.0f));
+            setVelocity(new Vector3f(ZERO_VELOCITY, getVelocity().y, ZERO_VELOCITY));
         } else {
             GridPos target = path.get(pathIndex);
-            float targetX = target.x() + 0.5f;
-            float targetZ = target.z() + 0.5f;
+            float targetX = target.x() + SPAWN_X;
+            float targetZ = target.z() + SPAWN_Z;
 
             Vector3f position = getPosition();
             float dx = targetX - position.x;
@@ -527,14 +568,16 @@ public class Player extends Character {
 
             float distanceSquared = dx * dx + dz * dz;
 
-            if (distanceSquared < 0.01f) {
+            if (distanceSquared < PATH_REACHED_DISTANCE_SQUARED) {
                 pathIndex++;
+
                 if (!isFollowingPath()) {
-                    setVelocity(new Vector3f(0.0f, getVelocity().y, 0.0f));
+                    setVelocity(new Vector3f(ZERO_VELOCITY, getVelocity().y, ZERO_VELOCITY));
                 }
             } else {
-                Vector3f direction = new Vector3f(dx, 0.0f, dz);
-                if (direction.lengthSquared() > 0.0f) {
+                Vector3f direction = new Vector3f(dx, ZERO_VELOCITY, dz);
+
+                if (direction.lengthSquared() > ZERO_VELOCITY) {
                     direction.normalize();
                 }
 
@@ -550,47 +593,55 @@ public class Player extends Character {
     public void wasd(World world, float delta, float cameraYaw) {
         if (gameMaster.isChatOpen() || gameMaster.isInventoryOpen() ||
                 BookService.bs.isOpen()) return;
+
         if (isFollowingPath()) {
             move(world, delta, cameraYaw);
             return;
         }
 
-        float moveX = 0.0f;
-        float moveZ = 0.0f;
+        float moveX = ZERO_VELOCITY;
+        float moveZ = ZERO_VELOCITY;
 
         if (Keyboard.isKeyDown(GLFW_KEY_W)) moveZ -= 1.0f;
         if (Keyboard.isKeyDown(GLFW_KEY_S)) moveZ += 1.0f;
         if (Keyboard.isKeyDown(GLFW_KEY_A)) moveX -= 1.0f;
         if (Keyboard.isKeyDown(GLFW_KEY_D)) moveX += 1.0f;
 
-        Vector3f inputDir = new Vector3f(moveX, 0.0f, moveZ);
+        Vector3f inputDir = new Vector3f(moveX, ZERO_VELOCITY, moveZ);
 
-        if (inputDir.lengthSquared() > 0.0f) {
+        if (inputDir.lengthSquared() > ZERO_VELOCITY) {
             inputDir.normalize();
+
             float yawRad = (float) Math.toRadians(cameraYaw);
             float sin = (float) Math.sin(yawRad);
             float cos = (float) Math.cos(yawRad);
+
             float worldX = inputDir.x * cos - inputDir.z * sin;
             float worldZ = inputDir.x * sin + inputDir.z * cos;
-            Vector3f targetVelocity = new Vector3f(worldX * getSpeed(), getVelocity().y, worldZ * getSpeed());
+
+            Vector3f targetVelocity = new Vector3f(
+                    worldX * getSpeed(),
+                    getVelocity().y,
+                    worldZ * getSpeed()
+            );
 
             if (currentState instanceof SneakingState) {
                 Vector3f nextPosition = new Vector3f(position).add(targetVelocity.x * delta,
-                        0.0f, targetVelocity.z * delta);
+                        ZERO_VELOCITY, targetVelocity.z * delta);
 
                 int blockX = (int) Math.floor(nextPosition.x);
                 int blockZ = (int) Math.floor(nextPosition.z);
-                int blockY = (int) Math.floor(position.y - 0.05f);
+                int blockY = (int) Math.floor(position.y - SNEAK_GROUND_OFFSET);
 
                 if (world.getBlockTypeAt(blockX, blockY, blockZ) == BlockData.AIR.getId()) {
-                    targetVelocity.x = 0.0f;
-                    targetVelocity.z = 0.0f;
+                    targetVelocity.x = ZERO_VELOCITY;
+                    targetVelocity.z = ZERO_VELOCITY;
                 }
             }
 
             collide(world, targetVelocity, delta);
         } else {
-            Vector3f targetVelocity = new Vector3f(0.0f, getVelocity().y, 0.0f);
+            Vector3f targetVelocity = new Vector3f(ZERO_VELOCITY, getVelocity().y, ZERO_VELOCITY);
             collide(world, targetVelocity, delta);
         }
     }
