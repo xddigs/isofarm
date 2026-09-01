@@ -10,8 +10,10 @@ environment driven by custom 3D mesh rendering, particle systems, and dynamic da
 ## Featured Controls
 | Action                             | Key / Input              |
 |------------------------------------|--------------------------|
-| **Movement**                       | `Mouse LB`<br>           |
+| **Move**                          | `WASD`<br>               |
 | **Jump**                           | `Space`<br>              |
+| **Interact/Place Blocks**          | `Mouse RB`<br>           |
+| **Attack/Break Blocks**            | `Mouse LB`<br>           |
 | **Zoom Camera**                    | `C`<br>                  |
 | **Break Block / Harvest**          | `Left Mouse Button`<br>  |
 | **Place Block / Use Tool / Plant** | `Right Mouse Button`<br> |
