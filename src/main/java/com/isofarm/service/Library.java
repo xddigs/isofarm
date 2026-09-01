@@ -14,8 +14,6 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("all")
 public class Library implements Service<GameMaster> {
-    public static final String DEFAULT_ID = "isofarm";
-    public static final char SEPARATOR = ':';
     private static final Logger log = LoggerFactory.getLogger(Library.class);
 
     public static void initItems(ItemRegistry itemR, Player player) {
@@ -61,7 +59,7 @@ public class Library implements Service<GameMaster> {
 
     private static void registerDefault(ItemRegistry itemR, Supplier<Item> supplier) {
         Item item = supplier.get();
-        itemR.register(getFormattedName(DEFAULT_ID, String.valueOf(SEPARATOR), item.getName().trim()), supplier);
+        itemR.register(getFormattedName(item.getName().trim()), supplier);
     }
 
     public static void initCommands(float delta, GameMaster gameMaster) {
