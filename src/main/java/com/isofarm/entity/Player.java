@@ -57,8 +57,10 @@ public class Player extends Character {
     private static final float IDLE_WEIGHT_SPEED = 5.0f;
     private static final float WALK_WEIGHT_SPEED = 10.0f;
     private static final float ROTATION_SPEED = 720.0f;
-    private static final float ATTACK_ANIMATION_SPEED = 12.0f;
-    private static final float ATTACK_ANGLE = 1.2f;
+    private static final float ATTACK_ANIMATION_SPEED = 10.0f;
+    private static final float ATTACK_ANGLE = 1.35f;
+    private static final float ATTACK_SWING_OFFSET = 0.20f;
+    private static final float ATTACK_SINE_FREQUENCY = 2.0f;
     private static final float COLLISION_STEP_HEIGHT = 1.05f;
     private static final float SNEAK_GROUND_OFFSET = 0.05f;
     private static final float PATH_REACHED_DISTANCE_SQUARED = 0.01f;
@@ -236,7 +238,10 @@ public class Player extends Character {
         float attackAngle = 0.0f;
         if (isAttacking) {
             attackAnimationTime += delta * ATTACK_ANIMATION_SPEED;
-            attackAngle = (float) Math.sin(Math.min(attackAnimationTime, Math.PI)) * ATTACK_ANGLE;
+            float progress = (float) Math.min(attackAnimationTime, Math.PI);
+            float swing = (float) Math.sin(progress) * ATTACK_ANGLE;
+            float sine = (float) Math.sin(progress * 2.0f) * ATTACK_SWING_OFFSET * (float) Math.sin(progress);
+            attackAngle = swing + sine;
             if (attackAnimationTime >= Math.PI) {
                 isAttacking = false;
                 attackAnimationTime = ZERO_VELOCITY;

@@ -24,8 +24,8 @@ public class RecipeRegistry {
                 Tier.COPPER, Tier.COPPER,
                 Tier.IRON, Tier.COPPER,
                 Tier.STEEL, Tier.IRON,
-                Tier.GOLD, Tier.STEEL,
-                Tier.PLATINUM, Tier.GOLD,
+                Tier.GOLDEN, Tier.STEEL,
+                Tier.PLATINUM, Tier.GOLDEN,
                 Tier.DIAMOND, Tier.PLATINUM);
 
         metalProgression.forEach((toolTier, requiredStationTier) -> {
@@ -57,11 +57,11 @@ public class RecipeRegistry {
     }
 
     private Tier getTierFromMaterial(Craftable mat) {
-        return (mat instanceof MiningComponent mc) ? mc.getTier() : Tier.WOOD;
+        return (mat instanceof MiningComponent mc) ? mc.getTier() : Tier.WOODEN;
     }
 
     private void registerSmeltingRecipes() {
-        Tier[] metalTiers = {Tier.COPPER, Tier.IRON, Tier.STEEL, Tier.GOLD, Tier.PLATINUM, Tier.DIAMOND};
+        Tier[] metalTiers = {Tier.COPPER, Tier.IRON, Tier.STEEL, Tier.GOLDEN, Tier.PLATINUM, Tier.DIAMOND};
         for (Tier tier : metalTiers) {
             create(tier)
                     .result(new MiningComponent(tier, MaterialID.INGOT), 1)

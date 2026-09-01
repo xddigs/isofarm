@@ -125,7 +125,7 @@ public class ResourceManager {
             int baseCol = switch (material.getTier()) {
                 case IRON -> 2;
                 case PLATINUM -> 4;
-                case GOLD -> 6;
+                case GOLDEN -> 6;
                 case STEEL -> 8;
                 case DIAMOND -> 10;
                 default -> 0;

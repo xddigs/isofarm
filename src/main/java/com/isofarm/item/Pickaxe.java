@@ -12,7 +12,7 @@ public class Pickaxe extends Tool {
     }
 
     public Pickaxe() {
-        this(Tier.WOOD);
+        this(Tier.WOODEN);
     }
 
     @Override

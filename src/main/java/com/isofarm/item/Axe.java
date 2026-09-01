@@ -12,7 +12,7 @@ public class Axe extends Tool {
     }
 
     public Axe() {
-        this(Tier.WOOD);
+        this(Tier.WOODEN);
     }
 
     @Override

@@ -12,7 +12,7 @@ public class Sword extends Tool {
     }
 
     public Sword() {
-        this(Tier.WOOD);
+        this(Tier.WOODEN);
     }
     
     @Override

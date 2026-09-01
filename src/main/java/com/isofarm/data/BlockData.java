@@ -7,7 +7,6 @@ import com.isofarm.item.MiningComponent;
 import com.isofarm.utils.K;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @SuppressWarnings("all")
@@ -20,15 +19,15 @@ public enum BlockData implements Craftable {
     TILLED_DIRT((byte) 4, (byte) 4, (byte) 0, "Tilled Dirt", true, false,  110, "assets/textures/blocks/dirt_tilled.png", "assets/textures/blocks/dirt.png", "assets/textures/blocks/dirt.png", SoundGroup.SOIL, 0.9f, false, new Object[]{}, Tier.NONE),
     VOIDSTONE((byte) 5, (byte) 5, (byte) 0, "Voidstone", false, false, 999, "assets/textures/blocks/voidstone.png", SoundGroup.HARD, 999999.0f, false,  new Object[]{}, Tier.NONE),
     GLASS((byte) 6, (byte) 6, (byte) 0, "Glass", false,false,  200, "assets/textures/blocks/glass.png", SoundGroup.GLASS, 1.2f, true, new Object[]{}, Tier.NONE),
-    OAK_LOG((byte) 7, (byte) 7, (byte) 0, "Oak Log", false, false, 100, "assets/textures/blocks/oak_log_top.png", "assets/textures/blocks/oak_log_bottom.png", "assets/textures/blocks/oak_log_side.png", SoundGroup.HARD, 2.2f, false,  new Object[]{}, Tier.WOOD),
-    OAK_WOOD((byte) 8, (byte) 8, (byte) 0, "Oak Wood", false, false, 100, "assets/textures/blocks/oak_plank.png", SoundGroup.HARD, 4.0f, false,  new Object[]{}, Tier.WOOD),
+    OAK_LOG((byte) 7, (byte) 7, (byte) 0, "Oak Log", false, false, 100, "assets/textures/blocks/oak_log_top.png", "assets/textures/blocks/oak_log_bottom.png", "assets/textures/blocks/oak_log_side.png", SoundGroup.HARD, 2.2f, false,  new Object[]{}, Tier.WOODEN),
+    OAK_WOOD((byte) 8, (byte) 8, (byte) 0, "Oak Wood", false, false, 100, "assets/textures/blocks/oak_plank.png", SoundGroup.HARD, 4.0f, false,  new Object[]{}, Tier.WOODEN),
     OAK_LEAVES((byte) 9, (byte) 9, (byte) 0, "Oak Leaves", false, false, 100, "assets/textures/blocks/oak_leaves.png", SoundGroup.SOIL, 1.1f, false,  new Object[]{MaterialID.STICK, "OAK_BONSAI"}, Tier.NONE),
     SNOW((byte) 10, (byte) 10, (byte) 0, "Snow", false, false, 120, "assets/textures/blocks/snow.png", SoundGroup.SNOW, 0.8f, false, new Object[]{}, Tier.NONE),
 
     COPPER_ORE((byte) 11, (byte) 1, (byte) 1, "Copper Ore Block", false, false, 150, "assets/textures/blocks/copper_ore.png", SoundGroup.HARD, 6.0f, false, new MiningComponent[]{new MiningComponent(Tier.COPPER, MaterialID.RAW_ORE)}, Tier.COPPER),
     IRON_ORE((byte) 12, (byte) 2, (byte) 1, "Iron Ore Block", false, false, 150, "assets/textures/blocks/iron_ore.png", SoundGroup.HARD, 8.0f, false, new MiningComponent[]{new MiningComponent(Tier.IRON, MaterialID.RAW_ORE)}, Tier.IRON),
     STEEL_ORE((byte) 13, (byte) 3, (byte) 1, "Steel Ore Block", false, false, 200, "assets/textures/blocks/steel_ore.png", SoundGroup.HARD, 10.0f, false,new MiningComponent[]{new MiningComponent(Tier.STEEL, MaterialID.RAW_ORE)}, Tier.STEEL),
-    GOLD_ORE((byte) 14, (byte) 4, (byte) 1, "Golden Ore Block", false, false, 500, "assets/textures/blocks/gold_ore.png", SoundGroup.HARD, 12.0f, false, new MiningComponent[]{new MiningComponent(Tier.GOLD, MaterialID.RAW_ORE)}, Tier.GOLD),
+    GOLD_ORE((byte) 14, (byte) 4, (byte) 1, "Golden Ore Block", false, false, 500, "assets/textures/blocks/gold_ore.png", SoundGroup.HARD, 12.0f, false, new MiningComponent[]{new MiningComponent(Tier.GOLDEN, MaterialID.RAW_ORE)}, Tier.GOLDEN),
     PLATINUM_ORE((byte) 15, (byte) 5, (byte) 1, "Platinum Ore Block", false, false, 800, "assets/textures/blocks/platinum_ore.png", SoundGroup.HARD, 14.0f, false, new MiningComponent[]{new MiningComponent(Tier.PLATINUM, MaterialID.RAW_ORE)}, Tier.PLATINUM),
     DIAMOND_ORE((byte) 16, (byte) 6, (byte) 1, "Diamond Ore Block", false, false, 1000, "assets/textures/blocks/diamond_ore.png", SoundGroup.HARD, 16.0f, false, new MiningComponent[]{new MiningComponent(Tier.DIAMOND, MaterialID.RAW_ORE)}, Tier.DIAMOND),
     GRAVEL((byte) 17, (byte) 7, (byte) 1, "Gravel", false, false, 100, "assets/textures/blocks/gravel.png", SoundGroup.SOIL, 0.9f, false, new Object[]{}, Tier.NONE),

@@ -12,7 +12,7 @@ public class Shovel extends Tool {
     }
 
     public Shovel() {
-        this(Tier.WOOD);
+        this(Tier.WOODEN);
     }
 
     @Override

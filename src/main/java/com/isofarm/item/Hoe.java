@@ -15,7 +15,7 @@ public class Hoe extends Tool {
     }
 
     public Hoe() {
-        this(Tier.WOOD);
+        this(Tier.WOODEN);
     }
 
     public void use(GameMaster gameMaster, Block block) {
