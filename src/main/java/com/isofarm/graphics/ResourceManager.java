@@ -21,8 +21,6 @@ public class ResourceManager {
     private static SpriteSheet materialIcons;
     private static SpriteSheet usablesIcons;
     private static SpriteSheet inventoryIcons;
-    private static SpriteSheet playerSpriteSheet;
-    private static SpriteSheet backpackSpriteSheet;
     private static SpriteSheet bookAnimationSheet;
     private static Map<CropType, SpriteSheet> cropSpritesheets;
     private static SpriteSheet heartsSpriteSheet;
@@ -85,8 +83,6 @@ public class ResourceManager {
         usablesIcons = new SpriteSheet(K.Paths.USABLES_ICONS, K.UI.ICON_USABLES_COLS, 1);
         inventoryIcons = new SpriteSheet(K.Paths.INVENTORY_ICONS, K.UI.ICON_INV_COLS, 1);
 
-        playerSpriteSheet = new SpriteSheet(K.Paths.PLAYER_SPRITESHEET, K.UI.PLAYER_SPRITE_COLS, K.UI.PLAYER_SPRITE_ROWS);
-        backpackSpriteSheet = new SpriteSheet(K.Paths.BACKPACK_SPRITESHEET, K.UI.PLAYER_SPRITE_COLS / 3, 2);
         bookAnimationSheet = new SpriteSheet(K.Paths.BOOK_ANIMATION, 16, 1);
         heartsSpriteSheet = new SpriteSheet(K.Paths.HEARTS_SPRITESHEET, 1, K.UI.ICON_HEARTS_ROWS);
 
@@ -206,8 +202,6 @@ public class ResourceManager {
         inventoryIcons.dispose();
 
         playerModel.dispose();
-        playerSpriteSheet.dispose();
-        backpackSpriteSheet.dispose();
         bookAnimationSheet.dispose();
         heartsSpriteSheet.dispose();
 
@@ -317,14 +311,6 @@ public class ResourceManager {
 
     public static SpriteSheet getBookAnimationSheet() {
         return bookAnimationSheet;
-    }
-
-    public static SpriteSheet getPlayerSpriteSheet() {
-        return playerSpriteSheet;
-    }
-
-    public static SpriteSheet getBackpackSpriteSheet() {
-        return backpackSpriteSheet;
     }
 
     public SpriteSheet getHeartsSpriteSheet() {

@@ -54,7 +54,6 @@ public final class K {
         public static final int INVENTORY_COLUMNS = 9;
         public static final int INVENTORY_ROWS = 4;
         public static final int INVENTORY_SLOTS = INVENTORY_COLUMNS * INVENTORY_ROWS;
-        public static final float INVENTORY_CHARACTER_OFFSET = 90;
 
         public static final float SQUISH_DURATION = 0.25f;
 
@@ -69,12 +68,6 @@ public final class K {
         public static final int ICON_MATERIAL_COLS = 12;
         public static final int ICON_MATERIAL_ROWS = 2;
         public static final int ICON_INV_COLS = 3;
-
-        public static final int PLAYER_SPRITE_COLS = 12;
-        public static final int PLAYER_SPRITE_ROWS = 26;
-        public static final int PLAYER_SPRITE_COLS_RUN = 8;
-        public static final int PLAYER_SPRITE_COLS_ACTION = 6;
-        public static final int PLAYER_SPRITE_COLS_FALL = 8;
 
         public static final int DESTROY_FRAMES = 9;
 
@@ -160,8 +153,6 @@ public final class K {
 
         public static final String PLAYER_MODEL = "assets/models/player/steve.gltf";
 
-        public static final String PLAYER_SPRITESHEET = "assets/sprites/steve.png";
-        public static final String BACKPACK_SPRITESHEET = "assets/sprites/backpack.png";
         public static final String DESTROY_STAGES = "assets/textures/blocks/destroy.png";
         public static final String HEARTS_SPRITESHEET = "assets/gui/hearts.png";
         public static final String DEFAULT_BACKGROUND_GUI = "assets/gui/background_gui.png";
