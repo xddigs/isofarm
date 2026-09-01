@@ -52,10 +52,14 @@ public class Player extends Character {
     private float modelYaw = 0.0f;
     private float targetModelYaw = 0.0f;
     private PlayerState currentState;
+
     private GLTFNode rightArmNode;
     private GLTFNode leftArmNode;
     private GLTFNode rightLegNode;
     private GLTFNode leftLegNode;
+
+    private float idleAnimationTime = 0.0f;
+    private float idleWeight = 0.0f;
     private float walkAnimationTime = 0.0f;
     private float walkAnimSpeed = 0.0f;
     private float attackAnimationTime = 0.0f;
@@ -116,19 +120,30 @@ public class Player extends Character {
         updateRotation(delta);
 
         boolean isMoving = Math.abs(velocity.x) > 0.05f || Math.abs(velocity.z) > 0.05f;
+
         if (isMoving) {
             walkAnimationTime += delta * 10.0f;
             walkAnimSpeed = lerp(walkAnimSpeed, 1.0f, Math.clamp(delta * 10.0f, 0.0f, 1.0f));
+            idleWeight = lerp(idleWeight, 0.0f, Math.clamp(delta * 8.0f, 0.0f, 1.0f));
         } else {
             walkAnimSpeed = lerp(walkAnimSpeed, 0.0f, Math.clamp(delta * 10.0f, 0.0f, 1.0f));
+            idleWeight = lerp(idleWeight, 1.0f, Math.clamp(delta * 5.0f, 0.0f, 1.0f));
+            idleAnimationTime += delta * 2.5f;
         }
 
         float swingAngle = (float) Math.sin(walkAnimationTime) * 0.45f * walkAnimSpeed;
+        float breathAngle = (float) Math.sin(idleAnimationTime) * 0.05f * idleWeight;
+        float breathSwayZ = (float) Math.cos(idleAnimationTime * 0.5f) * 0.02f * idleWeight;
 
-        Quaternionf leftArmRotation = new Quaternionf().rotateX(-swingAngle);
+        Quaternionf leftArmRotation = new Quaternionf()
+                .rotateX(-swingAngle + breathAngle)
+                .rotateZ(-breathSwayZ);
+
         Quaternionf rightLegRotation = new Quaternionf().rotateX(-swingAngle);
         Quaternionf leftLegRotation = new Quaternionf().rotateX(swingAngle);
-        Quaternionf rightArmRotation = new Quaternionf();
+
+        Quaternionf rightArmRotation = new Quaternionf()
+                .rotateZ(breathSwayZ);
 
         Quaternionf mainHandRot = Settings.isRightHand() ? rightArmRotation : leftArmRotation;
         if (isAttacking) {
@@ -140,7 +155,7 @@ public class Player extends Character {
                 attackAnimationTime = 0.0f;
             }
         } else {
-            mainHandRot.rotateX(swingAngle);
+            mainHandRot.rotateX(Settings.isRightHand() ? (swingAngle + breathAngle) : (-swingAngle + breathAngle));
         }
 
         if (rightArmNode != null) rightArmNode.setRotation(rightArmRotation);
