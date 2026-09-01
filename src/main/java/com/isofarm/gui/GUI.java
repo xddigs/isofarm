@@ -26,8 +26,6 @@ public class GUI {
     private static final Matrix4f projection = new Matrix4f();
     private static final Matrix4f model = new Matrix4f();
 
-    private static final UIFont handwritten = new UIFont(K.Paths.FONT_BOOK, 48.0f);
-
     private static final UIFont small = new UIFont(K.Paths.FONT, 16.0f);
     private static final UIFont normal = new UIFont(K.Paths.FONT, 24.0f);
     private static final UIFont big = new UIFont(K.Paths.FONT, 32.0f);
@@ -272,10 +270,6 @@ public class GUI {
         shader.setUniform("uUseFont", false);
     }
 
-    public static void drawWriting(String text, float x, float y, Vector4f color) {
-        drawString(text, x, y, handwritten, color, 1.0f);
-    }
-
     public static void drawSmallString(String text, float x, float y, Vector4f color) {
         drawString(text, x, y, small, color);
     }
@@ -475,10 +469,6 @@ public class GUI {
 
     public static Shader getShader() {
         return shader;
-    }
-
-    public static UIFont getHandwritten() {
-        return handwritten;
     }
 
     public static UIFont getSmallFont() {

@@ -73,7 +73,7 @@ public class BookUI {
 
         float paddingX = K.UI.UI_BOOK_PADDING_X;
         float paddingTop = K.UI.UI_BOOK_PADDING_TOP;
-        float lineHeight = GUI.getHandwritten().getSize();
+        float lineHeight = GUI.getNormalFont().getSize();
 
         hoveredBookLine = null;
 
@@ -202,7 +202,7 @@ public class BookUI {
 
     private static void renderPage(Page page, float textX, float startY, float alpha) {
         float textY = startY;
-        float lineHeight = GUI.getHandwritten().getSize();
+        float lineHeight = GUI.getNormalFont().getSize();
 
         for (BookLine bookLine : page.getLines()) {
             String renderText = bookLine.getText();
@@ -217,14 +217,14 @@ public class BookUI {
 
             if (isHovered) {
                 float cursorOffset = 24.0f;
-                GUI.drawWriting(">", textX - cursorOffset, textY, finalColor);
+                GUI.drawNormalString(">", textX - cursorOffset, textY, finalColor);
             }
 
             if (renderText.startsWith("**")) {
                 renderText = renderText.replace("**", "");
-                GUI.drawWriting(renderText, textX, textY, finalColor);
+                GUI.drawNormalString(renderText, textX, textY, finalColor);
             } else {
-                GUI.drawWriting(renderText, textX, textY, finalColor);
+                GUI.drawNormalString(renderText, textX, textY, finalColor);
             }
             textY += lineHeight;
         }
