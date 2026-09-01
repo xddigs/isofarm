@@ -96,6 +96,11 @@ public class Player extends Character {
     private GLTFNode torsoNode;
     private GLTFNode backpackNode;
     private GLTFNode rightArmNode;
+    private GLTFNode swordNode;
+    private GLTFNode pickaxeNode;
+    private GLTFNode axeNode;
+    private GLTFNode hoeNode;
+    private GLTFNode shovelNode;
     private GLTFNode leftArmNode;
     private GLTFNode rightLegNode;
     private GLTFNode leftLegNode;
@@ -128,6 +133,11 @@ public class Player extends Character {
             this.torsoNode = playerModel.findNode("Body");
             this.backpackNode = playerModel.findNode("Backpack");
             this.rightArmNode = playerModel.findNode("Right Arm");
+            this.swordNode = playerModel.findNode("sword");
+            this.pickaxeNode = playerModel.findNode("pickaxe");
+            this.axeNode = playerModel.findNode("axe");
+            this.hoeNode = playerModel.findNode("hoe");
+            this.shovelNode = playerModel.findNode("shovel");
             this.leftArmNode = playerModel.findNode("Left Arm");
             this.rightLegNode = playerModel.findNode("Right Leg");
             this.leftLegNode = playerModel.findNode("Left Leg");
@@ -139,6 +149,16 @@ public class Player extends Character {
 
         if (torsoNode != null) {
             torsoTranslation = new Vector3f(torsoNode.getTranslation());
+        }
+
+        if (swordNode != null && pickaxeNode != null &&
+                axeNode != null && hoeNode != null &&
+                shovelNode != null) {
+            swordNode.setVisible(false);
+            pickaxeNode.setVisible(false);
+            axeNode.setVisible(false);
+            hoeNode.setVisible(false);
+            shovelNode.setVisible(false);
         }
 
         if (backpackNode != null) {
@@ -299,18 +319,10 @@ public class Player extends Character {
             leftLegNode.setTranslation(translation);
         }
 
-        Quaternionf mainHandRot = Settings.isRightHand() ? rightArmRotation : leftArmRotation;
-
         if (isAttacking) {
             attackAnimationTime += delta * ATTACK_ANIMATION_SPEED;
             float attackAngle = (float) Math.sin(Math.min(attackAnimationTime, Math.PI)) * ATTACK_ANGLE;
-
-            if (Settings.isRightHand()) {
-                rightArmRotation.rotateX(attackAngle);
-            } else {
-                leftArmRotation.rotateX(attackAngle);
-            }
-
+            rightArmRotation.rotateX(attackAngle);
             if (attackAnimationTime >= Math.PI) {
                 isAttacking = false;
                 attackAnimationTime = ZERO_VELOCITY;
