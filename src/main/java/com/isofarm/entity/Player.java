@@ -38,6 +38,7 @@ import static org.lwjgl.opengl.GL13.*;
 @DataClass
 public class Player extends Character {
     private static final Logger log = LoggerFactory.getLogger(Player.class);
+    private static final float SNEAK_SPEED = 75.0f;
     private final Matrix4f modelMatrix;
     private final GameMaster gameMaster;
     private final GLTFModel playerModel;
@@ -53,13 +54,23 @@ public class Player extends Character {
     private float targetModelYaw = 0.0f;
     private PlayerState currentState;
 
+    private GLTFNode headNode;
+    private GLTFNode torsoNode;
     private GLTFNode rightArmNode;
     private GLTFNode leftArmNode;
     private GLTFNode rightLegNode;
     private GLTFNode leftLegNode;
 
+    private Vector3f headTranslation;
+    private Vector3f torsoTranslation;
+    private Vector3f rightArmTranslation;
+    private Vector3f leftArmTranslation;
+    private Vector3f rightLegTranslation;
+    private Vector3f leftLegTranslation;
+
     private float idleAnimationTime = 0.0f;
     private float idleWeight = 0.0f;
+    private float sneakWeight = 0.0f;
     private float walkAnimationTime = 0.0f;
     private float walkAnimSpeed = 0.0f;
     private float attackAnimationTime = 0.0f;
@@ -73,10 +84,36 @@ public class Player extends Character {
 
         this.playerModel = ResourceManager.getPlayerModel();
         if (this.playerModel != null) {
+            this.headNode = playerModel.findNode("Head");
+            this.torsoNode = playerModel.findNode("Body");
             this.rightArmNode = playerModel.findNode("Right Arm");
             this.leftArmNode = playerModel.findNode("Left Arm");
             this.rightLegNode = playerModel.findNode("Right Leg");
             this.leftLegNode = playerModel.findNode("Left Leg");
+        }
+
+        if (headNode != null) {
+            headTranslation = new Vector3f(headNode.getTranslation());
+        }
+
+        if (torsoNode != null) {
+            torsoTranslation = new Vector3f(torsoNode.getTranslation());
+        }
+
+        if (rightArmNode != null) {
+            rightArmTranslation = new Vector3f(rightArmNode.getTranslation());
+        }
+
+        if (leftArmNode != null) {
+            leftArmTranslation = new Vector3f(leftArmNode.getTranslation());
+        }
+
+        if (rightLegNode != null) {
+            rightLegTranslation = new Vector3f(rightLegNode.getTranslation());
+        }
+
+        if (leftLegNode != null) {
+            leftLegTranslation = new Vector3f(leftLegNode.getTranslation());
         }
 
         float spawnX = 0.5f;
@@ -120,9 +157,14 @@ public class Player extends Character {
         updateRotation(delta);
 
         boolean isMoving = Math.abs(velocity.x) > 0.05f || Math.abs(velocity.z) > 0.05f;
+        boolean isSneaking = currentState instanceof SneakingState;
+
+        float targetSneakWeight = isSneaking ? 1.0f : 0.0f;
+        sneakWeight = lerp(sneakWeight, targetSneakWeight, Math.clamp(delta * SNEAK_SPEED, 0.0f, 1.0f));
 
         if (isMoving) {
-            walkAnimationTime += delta * 10.0f;
+            float speedFactor = isSneaking ? 7.0f : 10.0f;
+            walkAnimationTime += delta * speedFactor;
             walkAnimSpeed = lerp(walkAnimSpeed, 1.0f, Math.clamp(delta * 10.0f, 0.0f, 1.0f));
             idleWeight = lerp(idleWeight, 0.0f, Math.clamp(delta * 8.0f, 0.0f, 1.0f));
         } else {
@@ -131,19 +173,69 @@ public class Player extends Character {
             idleAnimationTime += delta * 2.5f;
         }
 
-        float swingAngle = (float) Math.sin(walkAnimationTime) * 0.45f * walkAnimSpeed;
-        float breathAngle = (float) Math.sin(idleAnimationTime) * 0.05f * idleWeight;
+        float strideAmplitude = lerp(0.45f, 0.25f, sneakWeight);
+        float swingAngle = (float) Math.sin(walkAnimationTime) * strideAmplitude * walkAnimSpeed;
+
+        float breathAngle = (float) Math.sin(idleAnimationTime) * 0.05f * idleWeight * (1.0f - sneakWeight * 0.5f);
         float breathSwayZ = (float) Math.cos(idleAnimationTime * 0.5f) * 0.02f * idleWeight;
 
+        float sneakOffset = 0.08f * sneakWeight;
+        float sneakTorsoLean = (float) Math.toRadians(20.0f) * sneakWeight;
+        float sneakArmBend   = (float) Math.toRadians(15.0f) * sneakWeight;
+
+        Quaternionf torsoRotation = new Quaternionf()
+                .rotateX(-sneakTorsoLean + breathAngle);
+
         Quaternionf leftArmRotation = new Quaternionf()
-                .rotateX(-swingAngle + breathAngle)
+                .rotateX(-swingAngle + breathAngle - sneakArmBend)
                 .rotateZ(-breathSwayZ);
 
-        Quaternionf rightLegRotation = new Quaternionf().rotateX(-swingAngle);
-        Quaternionf leftLegRotation = new Quaternionf().rotateX(swingAngle);
-
         Quaternionf rightArmRotation = new Quaternionf()
+                .rotateX(swingAngle + breathAngle - sneakArmBend)
                 .rotateZ(breathSwayZ);
+
+        Quaternionf rightLegRotation = new Quaternionf()
+                .rotateX(-swingAngle);
+
+        Quaternionf leftLegRotation = new Quaternionf()
+                .rotateX(swingAngle);
+
+        float sneakLegBack = 0.18f * sneakWeight;
+        if (headNode != null && headTranslation != null) {
+            Vector3f translation = new Vector3f(headTranslation);
+            translation.y -= sneakOffset;
+            headNode.setTranslation(translation);
+        }
+
+        if (torsoNode != null && torsoTranslation != null) {
+            Vector3f translation = new Vector3f(torsoTranslation);
+            translation.y -= sneakOffset;
+            torsoNode.setTranslation(translation);
+        }
+
+        if (rightArmNode != null && rightArmTranslation != null) {
+            Vector3f translation = new Vector3f(rightArmTranslation);
+            translation.y -= sneakOffset;
+            rightArmNode.setTranslation(translation);
+        }
+
+        if (leftArmNode != null && leftArmTranslation != null) {
+            Vector3f translation = new Vector3f(leftArmTranslation);
+            translation.y -= sneakOffset;
+            leftArmNode.setTranslation(translation);
+        }
+
+        if (rightLegNode != null && rightLegTranslation != null) {
+            Vector3f translation = new Vector3f(rightLegTranslation);
+            translation.z += sneakLegBack;
+            rightLegNode.setTranslation(translation);
+        }
+
+        if (leftLegNode != null && leftLegTranslation != null) {
+            Vector3f translation = new Vector3f(leftLegTranslation);
+            translation.z += sneakLegBack;
+            leftLegNode.setTranslation(translation);
+        }
 
         Quaternionf mainHandRot = Settings.isRightHand() ? rightArmRotation : leftArmRotation;
         if (isAttacking) {
@@ -154,10 +246,9 @@ public class Player extends Character {
                 isAttacking = false;
                 attackAnimationTime = 0.0f;
             }
-        } else {
-            mainHandRot.rotateX(Settings.isRightHand() ? (swingAngle + breathAngle) : (-swingAngle + breathAngle));
         }
 
+        if (torsoNode != null) torsoNode.setRotation(torsoRotation);
         if (rightArmNode != null) rightArmNode.setRotation(rightArmRotation);
         if (leftArmNode != null) leftArmNode.setRotation(leftArmRotation);
         if (rightLegNode != null) rightLegNode.setRotation(rightLegRotation);
@@ -230,9 +321,10 @@ public class Player extends Character {
         shader.setUniform("uLightSpaceMatrix", new Matrix4f());
 
         float globalScale = Settings.getScaledEntity();
+        float idleBobbingY = (float) Math.sin(idleAnimationTime) * 0.025f * idleWeight;
 
         modelMatrix.identity()
-                .translate(position.x, position.y, position.z)
+                .translate(position.x, position.y + idleBobbingY, position.z)
                 .rotateY((float) Math.toRadians(modelYaw))
                 .scale(globalScale);
 
