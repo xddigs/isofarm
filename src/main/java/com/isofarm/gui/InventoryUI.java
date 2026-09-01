@@ -11,7 +11,6 @@ import com.isofarm.item.Tool;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
-import org.joml.Vector4f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -595,60 +594,6 @@ public class InventoryUI extends UIElement {
         } else {
             backpackButton.hide();
         }
-
-        renderCharacter();
-    }
-
-    private void renderCharacter() {
-        if (player == null) {
-            return;
-        }
-
-        SpriteSheet playerSheet = ResourceManager.getPlayerSpriteSheet();
-        SpriteSheet bpSheet = ResourceManager.getBackpackSpriteSheet();
-        if (playerSheet == null || bpSheet == null) return;
-
-        float scale = Settings.getScaledEntity() * 3.0f;
-        float width = playerSheet.getFrameWidth() * scale;
-        float height = playerSheet.getFrameHeight() * scale;
-
-        float slotSize = Settings.getScaledSlot();
-        float spacing = Settings.getScaledSpacing();
-
-        float slotsTotalHeight = K.UI.INVENTORY_ROWS * slotSize + (K.UI.INVENTORY_ROWS - 1) * spacing;
-        float bottomY = getAbsoluteY() + Settings.getScaledPadding() + slotsTotalHeight;
-        float backgroundWidth = width + 20.0f;
-        float backgroundHeight = height + 20.0f;
-
-        float bgX = getAbsoluteX() - K.UI.INVENTORY_CHARACTER_OFFSET;
-        float bgY = bottomY - backgroundHeight;
-
-        String name = player.getName();
-        if (name != null && !name.isEmpty()) {
-            float nameWidth = GUI.getStringWidth(name, GUI.getNormalFont());
-            float nameX = bgX + (backgroundWidth - nameWidth) / 2.0f;
-            float fontHeight = GUI.getNormalFont().getSize();
-            float nameY = bgY - fontHeight;
-            GUI.drawString(name, nameX, nameY, GUI.getNormalFont(), new Vector4f(1.0f));
-        }
-
-        GUI.drawRect(bgX, bgY, backgroundWidth, backgroundHeight, K.UI.UI_BACKGROUND_COLOR_SLOT);
-        float spriteX = bgX + (backgroundWidth - width) / 2.0f;
-        float spriteY = bgY + (backgroundHeight - height) / 2.0f;
-
-        int frontDirectionOffset = 4;
-        int idleFrameCount = K.UI.PLAYER_SPRITE_COLS;
-        int idleFrame = (int) ((System.currentTimeMillis() / 200) % idleFrameCount);
-        int baseSpriteIndex = (frontDirectionOffset * K.UI.PLAYER_SPRITE_COLS) + idleFrame;
-
-        if (player.getInventory() != null && player.getInventory().hasBackpackEquipped()) {
-            int backpackSpriteIndex = 6 % 8;
-            GUI.drawSprite(bpSheet, backpackSpriteIndex, spriteX, spriteY,
-                    width, height, new Vector4f(1.0f));
-        }
-
-        GUI.drawSprite(playerSheet, baseSpriteIndex, spriteX, spriteY,
-                width, height, new Vector4f(1.0f));
     }
 
     private void renderCarriedItem() {
