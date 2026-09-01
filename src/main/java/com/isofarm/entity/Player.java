@@ -10,10 +10,7 @@ import com.isofarm.graphics.Shader;
 import com.isofarm.graphics.gltf.GLTFModel;
 import com.isofarm.graphics.gltf.GLTFNode;
 import com.isofarm.input.Keyboard;
-import com.isofarm.item.Backpack;
-import com.isofarm.item.CraftingBook;
-import com.isofarm.item.Item;
-import com.isofarm.item.Tool;
+import com.isofarm.item.*;
 import com.isofarm.pathfinding.GridPos;
 import com.isofarm.service.BookService;
 import com.isofarm.service.TimeService;
@@ -28,8 +25,10 @@ import org.joml.Vector4f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import static org.joml.Math.lerp;
 import static org.lwjgl.glfw.GLFW.*;
@@ -80,6 +79,7 @@ public class Player extends Character {
     private final Matrix4f modelMatrix;
     private final GameMaster gameMaster;
     private final GLTFModel playerModel;
+    private final Map<String, GLTFNode> equipmentNodes;
     private Direction direction = Direction.S;
     private List<GridPos> path;
     private float currentEyeHeight = INITIAL_EYE_HEIGHT;
@@ -91,20 +91,13 @@ public class Player extends Character {
     private float modelYaw = 0.0f;
     private float targetModelYaw = 0.0f;
     private PlayerState currentState;
-
     private GLTFNode headNode;
     private GLTFNode torsoNode;
     private GLTFNode backpackNode;
     private GLTFNode rightArmNode;
-    private GLTFNode swordNode;
-    private GLTFNode pickaxeNode;
-    private GLTFNode axeNode;
-    private GLTFNode hoeNode;
-    private GLTFNode shovelNode;
     private GLTFNode leftArmNode;
     private GLTFNode rightLegNode;
     private GLTFNode leftLegNode;
-
     private Vector3f headTranslation;
     private Vector3f torsoTranslation;
     private Vector3f backpackTranslation;
@@ -126,6 +119,7 @@ public class Player extends Character {
         this.gameMaster = gameMaster;
         this.modelMatrix = new Matrix4f();
         this.path = new LinkedList<>();
+        this.equipmentNodes = new HashMap<>();
 
         this.playerModel = ResourceManager.getPlayerModel();
         if (this.playerModel != null) {
@@ -133,14 +127,15 @@ public class Player extends Character {
             this.torsoNode = playerModel.findNode("Body");
             this.backpackNode = playerModel.findNode("Backpack");
             this.rightArmNode = playerModel.findNode("Right Arm");
-            this.swordNode = playerModel.findNode("sword");
-            this.pickaxeNode = playerModel.findNode("pickaxe");
-            this.axeNode = playerModel.findNode("axe");
-            this.hoeNode = playerModel.findNode("hoe");
-            this.shovelNode = playerModel.findNode("shovel");
             this.leftArmNode = playerModel.findNode("Left Arm");
             this.rightLegNode = playerModel.findNode("Right Leg");
             this.leftLegNode = playerModel.findNode("Left Leg");
+
+            registerNode("sword");
+            registerNode("pickaxe");
+            registerNode("axe");
+            registerNode("hoe");
+            registerNode("shovel");
         }
 
         if (headNode != null) {
@@ -151,14 +146,9 @@ public class Player extends Character {
             torsoTranslation = new Vector3f(torsoNode.getTranslation());
         }
 
-        if (swordNode != null && pickaxeNode != null &&
-                axeNode != null && hoeNode != null &&
-                shovelNode != null) {
-            swordNode.setVisible(false);
-            pickaxeNode.setVisible(false);
-            axeNode.setVisible(false);
-            hoeNode.setVisible(false);
-            shovelNode.setVisible(false);
+        String[] equipment = { "sword", "pickaxe", "axe", "hoe", "shovel" };
+        for (String e : equipment) {
+            hideEquipment(e);
         }
 
         if (backpackNode != null) {
@@ -198,6 +188,28 @@ public class Player extends Character {
         setUpInventory();
         this.currentState = new GroundedState();
         this.currentState.enter(this);
+    }
+
+    private void registerNode(String name) {
+        GLTFNode node = playerModel.findNode(name);
+        if (node != null) {
+            node.setVisible(false);
+            equipmentNodes.put(name, node);
+        }
+    }
+
+    private void showEquipment(String equipment) {
+        GLTFNode node = equipmentNodes.get(equipment);
+        if (node != null) {
+            node.setVisible(true);
+        }
+    }
+
+    private void hideEquipment(String equipment) {
+        GLTFNode node = equipmentNodes.get(equipment);
+        if (node != null) {
+            node.setVisible(false);
+        }
     }
 
     @Override
@@ -366,6 +378,7 @@ public class Player extends Character {
         setAnimTimer(getAnimTimer() + delta);
         heal(((0.5f + getLevel()) * delta) / getDifficultyRegen());
         autoJump(gameMaster.getWorld(), getVelocity(), delta);
+        updateEquipmentVisual();
         checkDurability();
     }
 
@@ -453,6 +466,35 @@ public class Player extends Character {
                     position.y, position.z));
             remove(i, amount);
             gameMaster.addEntity(item);
+        }
+    }
+
+    private void updateEquipmentVisual() {
+        for (GLTFNode node : equipmentNodes.values()) {
+            node.setVisible(false);
+        }
+
+        Item item = gameMaster.getGameUIService()
+                .getHotbarUI().getSelectedItem();
+        if (item == null) {
+            return;
+        }
+
+        String nodeName = switch (item) {
+            case Pickaxe ignored -> "pickaxe";
+            case Axe ignored -> "axe";
+            case Hoe ignored -> "hoe";
+            case Shovel ignored -> "shovel";
+            case Sword ignored -> "sword";
+            default -> null;
+        };
+
+        if (nodeName != null) {
+            GLTFNode node = equipmentNodes.get(nodeName);
+
+            if (node != null) {
+                node.setVisible(true);
+            }
         }
     }
 
