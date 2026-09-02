@@ -89,7 +89,6 @@ public class WorldGenerator {
 
     private void generateVegetation(Random random) {
         generateTree(treeX, treeZ, random);
-
         for (int i = 0; i < 16; i++) {
             int fx = random.nextInt(14) - 7;
             int fz = random.nextInt(14) - 7;
@@ -97,11 +96,46 @@ public class WorldGenerator {
             if (!isInsidePool(fx, fz) && (fx != treeX || fz != treeZ)) {
                 BlockData[] plants = BlockData.allPlants();
                 BlockData plant = plants[random.nextInt(plants.length)];
-                if (plant != BlockData.OAK_BONSAI &&
-                        world.getBlockTypeAt(fx, SURFACE_Y, fz) != BlockData.AIR.getId()) {
+
+                if (!plant.equals(BlockData.OAK_BONSAI) &&
+                        world.getBlockTypeAt(fx, SURFACE_Y, fz) != BlockData.AIR.getId() &&
+                        world.getBlockTypeAt(fx, SURFACE_Y + 1, fz) == BlockData.AIR.getId()) {
                     world.setBlockTypeAt(fx, SURFACE_Y + 1, fz, plant.getId());
+                    if (plant.equals(BlockData.TALL_GRASS)) {
+                        generateCluster(fx, fz, plant, random);
+                    }
                 }
             }
+        }
+    }
+
+    public void generateCluster(int centerX, int centerZ, BlockData plant, Random random) {
+        int clusterRadius = 2;
+        int clusterSize = 4 + random.nextInt(5);
+
+        int placed = 0;
+
+        for (int i = 0; i < clusterSize * 3 && placed < clusterSize; i++) {
+            int x = centerX + random.nextInt(clusterRadius * 2 + 1) - clusterRadius;
+            int z = centerZ + random.nextInt(clusterRadius * 2 + 1) - clusterRadius;
+            if (isInsidePool(x, z)) {
+                continue;
+            }
+
+            if (x == treeX && z == treeZ) {
+                continue;
+            }
+
+            if (world.getBlockTypeAt(x, SURFACE_Y, z) == BlockData.AIR.getId()) {
+                continue;
+            }
+
+            if (world.getBlockTypeAt(x, SURFACE_Y + 1, z) != BlockData.AIR.getId()) {
+                continue;
+            }
+
+            world.setBlockTypeAt(x, SURFACE_Y + 1, z, plant.getId());
+            placed++;
         }
     }
 
