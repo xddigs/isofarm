@@ -15,8 +15,10 @@ public class WaterSimulation {
     private static final float STEP_TIME = 0.25f;
 
     private final World world;
+
     private final Queue<FluidPos> queue = new ArrayDeque<>();
     private final Set<FluidPos> queued = new HashSet<>();
+
     private final Set<Long> changedChunks = new HashSet<>();
     private final Set<FluidPos> sources = new HashSet<>();
 
@@ -30,6 +32,7 @@ public class WaterSimulation {
         if (y < 0 || y >= Chunk.SIZE_Y) {
             return false;
         }
+
         FluidPos pos = new FluidPos(x, y, z);
         if (world.getBlockTypeAt(x, y, z) != BlockData.AIR.getId()) {
             return false;
@@ -42,27 +45,25 @@ public class WaterSimulation {
 
     public boolean removeWater(int x, int y, int z) {
         FluidPos pos = new FluidPos(x, y, z);
-        if (!isWater(pos)) {
-            return false;
-        }
-        boolean wasSource = sources.remove(pos);
+        if (!isWater(pos)) return false;
+        sources.remove(pos);
         removeAndRebuildComponent(pos);
         return true;
     }
 
     public void update(float delta) {
         timer += delta;
+
         if (timer < STEP_TIME) {
             return;
         }
-        timer -= STEP_TIME;
 
+        timer -= STEP_TIME;
         int count = queue.size();
+
         while (count-- > 0) {
             FluidPos pos = queue.poll();
-            if (pos == null) {
-                continue;
-            }
+            if (pos == null) continue;
             queued.remove(pos);
             updateCell(pos);
         }
@@ -101,27 +102,46 @@ public class WaterSimulation {
     }
 
     private void spread(FluidPos pos, byte level) {
-        if (level < MIN_LEVEL || !canContainWater(pos)) {
+        if (level < MIN_LEVEL) {
             return;
         }
+
+        if (!canContainWater(pos)) {
+            return;
+        }
+
         byte currentLevel = world.getWaterLevelAt(pos.x(), pos.y(), pos.z());
+
         if (currentLevel >= level) {
             return;
         }
+
         setWater(pos, level);
         enqueue(pos);
     }
 
     private void setWater(FluidPos pos, byte level) {
-        byte currentLevel = world.getWaterLevelAt(pos.x(), pos.y(), pos.z());
-        byte currentBlock = world.getBlockTypeAt(pos.x(), pos.y(), pos.z());
-        if (currentBlock == BlockData.WATER.getId() && currentLevel == level) {
+        if (pos.y() < 0 || pos.y() >= Chunk.SIZE_Y) {
             return;
         }
 
-        BlockData data = BlockData.fromId(currentBlock);
-        if (data != null && data.isPlant()) {
+        byte currentBlock = world.getBlockTypeAt(pos.x(), pos.y(), pos.z());
+        if (!canContainWater(pos)) {
+            return;
+        }
+
+        if (currentBlock != BlockData.AIR.getId() && currentBlock != BlockData.WATER.getId()) {
+            BlockData data = BlockData.fromId(currentBlock);
+            if (data == null || !data.isPlant()) {
+                return;
+            }
+
             world.removeBlockAt(pos.x(), pos.y(), pos.z());
+        }
+
+        byte currentLevel = world.getWaterLevelAt(pos.x(), pos.y(), pos.z());
+        if (currentBlock == BlockData.WATER.getId() && currentLevel == level) {
+            return;
         }
 
         world.setBlockTypeAt(pos.x(), pos.y(), pos.z(), BlockData.WATER.getId());
@@ -133,14 +153,14 @@ public class WaterSimulation {
         if (!isWater(pos)) {
             return;
         }
+
         world.setWaterLevelAt(pos.x(), pos.y(), pos.z(), (byte) 0);
         world.setBlockTypeAt(pos.x(), pos.y(), pos.z(), BlockData.AIR.getId());
         mark(pos);
     }
 
     private void removeAndRebuildComponent(FluidPos removed) {
-        Set<FluidPos> component = collectWaterComponent(removed);
-
+        Set<FluidPos> component = collect(removed);
         for (FluidPos pos : component) {
             if (sources.contains(pos)) {
                 continue;
@@ -152,6 +172,7 @@ public class WaterSimulation {
             if (!sources.contains(pos)) {
                 continue;
             }
+
             setWater(pos, MAX_LEVEL);
             enqueue(pos);
         }
@@ -161,22 +182,19 @@ public class WaterSimulation {
         }
     }
 
-    private Set<FluidPos> collectWaterComponent(FluidPos start) {
+    private Set<FluidPos> collect(FluidPos start) {
         Set<FluidPos> component = new HashSet<>();
         Queue<FluidPos> searchQueue = new ArrayDeque<>();
         Set<FluidPos> visited = new HashSet<>();
 
-        addWaterNeighbour(new FluidPos(start.x() + 1, start.y(), start.z()), searchQueue, visited);
-        addWaterNeighbour(new FluidPos(start.x() - 1, start.y(), start.z()), searchQueue, visited);
-        addWaterNeighbour(new FluidPos(start.x(), start.y() + 1, start.z()), searchQueue, visited);
-        addWaterNeighbour(new FluidPos(start.x(), start.y() - 1, start.z()), searchQueue, visited);
-        addWaterNeighbour(new FluidPos(start.x(), start.y(), start.z() + 1), searchQueue, visited);
-        addWaterNeighbour(new FluidPos(start.x(), start.y(), start.z() - 1), searchQueue, visited);
+        if (isWater(start)) {
+            visited.add(start);
+            searchQueue.add(start);
+        }
 
         while (!searchQueue.isEmpty()) {
             FluidPos pos = searchQueue.poll();
             component.add(pos);
-
             addWaterNeighbour(new FluidPos(pos.x() + 1, pos.y(), pos.z()), searchQueue, visited);
             addWaterNeighbour(new FluidPos(pos.x() - 1, pos.y(), pos.z()), searchQueue, visited);
             addWaterNeighbour(new FluidPos(pos.x(), pos.y() + 1, pos.z()), searchQueue, visited);
@@ -184,14 +202,19 @@ public class WaterSimulation {
             addWaterNeighbour(new FluidPos(pos.x(), pos.y(), pos.z() + 1), searchQueue, visited);
             addWaterNeighbour(new FluidPos(pos.x(), pos.y(), pos.z() - 1), searchQueue, visited);
         }
-
         return component;
     }
 
-    private void addWaterNeighbour(FluidPos pos, Queue<FluidPos> searchQueue, Set<FluidPos> visited) {
-        if (visited.contains(pos) || !isWater(pos)) {
+    private void addWaterNeighbour(FluidPos pos,
+                                   Queue<FluidPos> searchQueue, Set<FluidPos> visited) {
+        if (visited.contains(pos)) {
             return;
         }
+
+        if (!isWater(pos)) {
+            return;
+        }
+
         visited.add(pos);
         searchQueue.add(pos);
     }
@@ -241,10 +264,8 @@ public class WaterSimulation {
     }
 
     private void mark(FluidPos pos) {
-        long key = world.get2DKey(
-                Math.floorDiv(pos.x(), Chunk.SIZE_X),
-                Math.floorDiv(pos.z(), Chunk.SIZE_Z)
-        );
+        long key = world.get2DKey(Math.floorDiv(pos.x(), Chunk.SIZE_X),
+                Math.floorDiv(pos.z(), Chunk.SIZE_Z));
         changedChunks.add(key);
     }
 
@@ -252,14 +273,13 @@ public class WaterSimulation {
         if (changedChunks.isEmpty()) {
             return;
         }
+
         for (long key : changedChunks) {
             int chunkX = (int) (key >> 32);
             int chunkZ = (int) key;
-            world.getGameMaster().rebuildChunkMeshAt(
-                    chunkX * Chunk.SIZE_X,
-                    chunkZ * Chunk.SIZE_Z
-            );
+            world.getGameMaster().rebuildChunkMeshAt(chunkX * Chunk.SIZE_X, chunkZ * Chunk.SIZE_Z);
         }
+
         changedChunks.clear();
     }
 }
