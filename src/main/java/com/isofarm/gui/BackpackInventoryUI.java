@@ -1,6 +1,7 @@
 package com.isofarm.gui;
 
 import com.isofarm.data.Inventory;
+import com.isofarm.data.SlotType;
 import com.isofarm.entity.Player;
 import com.isofarm.utils.Settings;
 
@@ -29,7 +30,7 @@ public class BackpackInventoryUI extends InventoryUI {
             float y = Settings.getScaledPadding() + Settings.getScaledHeader() + row * (Settings.getScaledSlot() + Settings.getScaledSpacing());
 
             InventorySlotUI slotUI = new InventorySlotUI(x, y, Settings.getScaledSlot(), Settings.getScaledSlot(),
-                    InventorySlotUI.SlotType.BACKPACK);
+                    SlotType.BACKPACK);
 
             backpackSlots[i] = slotUI;
             addChild(slotUI);
