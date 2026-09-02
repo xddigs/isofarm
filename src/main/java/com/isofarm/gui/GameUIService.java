@@ -399,8 +399,7 @@ public class GameUIService implements Service<GameMaster> {
             hotbarUI.selectPrevious();
         }
 
-        Item item = hotbarUI.getSelectedItem();
-
+        Item item = Settings.selectedItem;
         if (item != null) {
             showHotbarLabel(item);
         } else {

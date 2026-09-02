@@ -473,10 +473,7 @@ public class Player extends Character {
     }
 
     private void updateEquipmentVisual() {
-        Item item = gameMaster.getGameUIService()
-                .getHotbarUI()
-                .getSelectedItem();
-
+        Item item = Settings.selectedItem;
         if (!(item instanceof Tool tool)) {
             EquipmentController.ec.equip(null, null);
             return;

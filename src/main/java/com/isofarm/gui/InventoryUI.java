@@ -677,14 +677,6 @@ public class InventoryUI extends UIElement {
         this.backpackUI = backpackUI;
     }
 
-    public Item getSelectedItem() {
-        if (hotbarUI != null) {
-            return hotbarUI.getSelectedItem();
-        }
-
-        return null;
-    }
-
     public enum Tab {
         INVENTORY, CRAFTING
     }

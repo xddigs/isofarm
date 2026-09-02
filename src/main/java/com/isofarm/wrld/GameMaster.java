@@ -456,9 +456,7 @@ public class GameMaster {
         orthoCameraController.update(this, delta);
         particles.update(delta);
         stepController.update(this, player, soundService, delta);
-
-        Item selectedInventoryItem = gameUIservice.getInventoryUI().getSelectedItem();
-        gameInteraction.update(this, selectedInventoryItem);
+        gameInteraction.update(this, Settings.selectedItem);
 
         waterSimulation.update(delta);
         if (player != null) {

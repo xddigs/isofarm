@@ -1,10 +1,13 @@
 package com.isofarm.utils;
 
+import com.isofarm.item.Item;
+
 @SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
 public class Settings {
     private static final float BASE_ICON_SIZE = 16.0f;
     private static final float[] GUI_SCALES = {1.0f, 2.0f, 3.0f};
     private static final float SHADOW_MAP_SIZE = 4096.0f;
+    public static Item selectedItem = null;
     private static float fov = 80f;
     private static float ticks = 12000f;
     private static float mouseSensitivity = 0.4f;
@@ -18,8 +21,7 @@ public class Settings {
     private static boolean doEnableDebugInfo = true;
     private static boolean doEnableShadows = false;
 
-    private Settings() {
-    }
+    private Settings() {}
 
     public static float getShadowMapSize() {
         return SHADOW_MAP_SIZE;

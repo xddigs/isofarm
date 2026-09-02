@@ -5,6 +5,7 @@ import com.isofarm.graphics.*;
 import com.isofarm.input.Mouse;
 import com.isofarm.item.Item;
 import com.isofarm.utils.K;
+import com.isofarm.utils.Settings;
 import com.isofarm.utils.Utils;
 import com.isofarm.wrld.GameMaster;
 import org.joml.Matrix4f;
@@ -443,7 +444,7 @@ public class GUI {
         var hotbarUI = gameMaster.getGameUIService().getHotbarUI();
         if (hotbarUI == null) return;
 
-        Item selectedItem = hotbarUI.getSelectedItem();
+        Item selectedItem = Settings.selectedItem;
         if (selectedItem == null) return;
 
         SpriteSheet spriteSheet = ResourceManager.getItemSpriteSheet(selectedItem);

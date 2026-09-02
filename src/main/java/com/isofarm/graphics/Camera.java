@@ -3,6 +3,7 @@ package com.isofarm.graphics;
 import com.isofarm.data.BlockData;
 import com.isofarm.data.BlockPos;
 import com.isofarm.data.Ray;
+import com.isofarm.item.Bucket;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import com.isofarm.wrld.World;
@@ -128,15 +129,18 @@ public class Camera implements CameraView {
     public BlockPos highlight(World world, Vector3f playerPos, float mouseX, float mouseY,
                               float screenWidth, float screenHeight, boolean smartFilter) {
         Ray ray = getMouseRay(mouseX, mouseY, screenWidth, screenHeight);
-        lastHit = raycast(world, playerPos, ray.origin(), ray.direction(), smartFilter);
+        boolean isBucket = Settings.selectedItem instanceof Bucket;
+        lastHit = raycast(world, playerPos, ray.origin(), ray.direction(), smartFilter, isBucket);
         if (lastHit == null) {
             return null;
         }
+
         return lastHit;
     }
 
-    private BlockPos raycast(World world, Vector3f playerPos, Vector3f origin, Vector3f direction,
-                             boolean isSmartFilter) {
+    private BlockPos raycast(World world, Vector3f playerPos,
+                             Vector3f origin, Vector3f direction,
+                             boolean isSmartFilter, boolean isBucket) {
         float tileSize = K.World.TILE_SIZE;
 
         int x = (int) Math.floor(origin.x / tileSize);
@@ -164,20 +168,26 @@ public class Camera implements CameraView {
             BlockData data = BlockData.fromId(block);
             boolean hasBlock = data != BlockData.AIR;
 
-            if (hasBlock && data != BlockData.WATER) {
+            if (hasBlock && (data != BlockData.WATER || isBucket)) {
                 boolean isTransparentObject = data == BlockData.OAK_LEAVES;
 
                 if (!isSmartFilter || !isTransparentObject) {
                     float blockCenterX = x + 0.5f;
                     float blockCenterY = y + 0.5f;
                     float blockCenterZ = z + 0.5f;
-                    float distToPlayer = playerPos.distance(blockCenterX, blockCenterY, blockCenterZ);
+
+                    float distToPlayer = playerPos.distance(
+                            blockCenterX,
+                            blockCenterY,
+                            blockCenterZ
+                    );
 
                     if (distToPlayer <= Settings.getMaxInteractionDistance()) {
                         lastHitNormalX = previousX - x;
                         lastHitNormalY = previousY - y;
                         lastHitNormalZ = previousZ - z;
-                        return new BlockPos(BlockData.fromId(block), x, y, z);
+
+                        return new BlockPos(data, x, y, z);
                     } else {
                         return null;
                     }

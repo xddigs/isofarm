@@ -76,11 +76,13 @@ public class HotbarUI extends UIElement {
                 : K.UI.INVENTORY_COLUMNS;
     }
 
-    public void selectSlot(int slot) {
-        if (slot < 0 || slot >= getMaxSelectableSlots()) {
+    public void selectSlot(int index) {
+        if (index < 0 || index >= getMaxSelectableSlots()) {
             return;
         }
-        selectedSlot = slot;
+        selectedSlot = index;
+        InventorySlot slot = getSelectedInventorySlot();
+        Settings.selectedItem = slot.getItem();
     }
 
     public void selectNext() {
@@ -247,11 +249,6 @@ public class HotbarUI extends UIElement {
         float height = slotUI.getAbsoluteHeight();
         return mouseX >= x && mouseX <= x + width
                 && mouseY >= y && mouseY <= y + height;
-    }
-
-    public Item getSelectedItem() {
-        InventorySlot slot = getSelectedInventorySlot();
-        return (slot == null || slot.isEmpty()) ? null : slot.getItem();
     }
 
     public InventorySlot getSelectedInventorySlot() {

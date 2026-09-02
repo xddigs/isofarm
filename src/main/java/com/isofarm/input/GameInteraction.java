@@ -342,7 +342,7 @@ public class GameInteraction {
         int y = cell.y();
         int z = cell.z();
 
-        Item selectedItem = gameMaster.getGameUIService().getHotbarUI().getSelectedItem();
+        Item selectedItem = Settings.selectedItem;
         if (gameMaster.getPlayer() != null) {
             if (!gameMaster.getPlayer().isAttacking()) {
                 gameMaster.getPlayer().interact();
