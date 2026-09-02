@@ -297,14 +297,22 @@ public class GameRenderer {
         if (hoveredCell != null) {
             Vector3f outlineColor = getOutlineColor(gameMaster);
             glEnable(GL_DEPTH_TEST);
+            glLineWidth(2.0f);
             glDepthMask(false);
             defaultShader.bind();
             defaultShader.setUniform("uUseTexture", false);
             defaultShader.setUniform("uUseFaceAtlas", false);
             defaultShader.setUniform("uBaseColor", outlineColor);
-            modelMatrix.identity().translate(hoveredCell.x(), hoveredCell.y(), hoveredCell.z());
+
+            modelMatrix.identity()
+                    .translate(
+                    hoveredCell.x(),
+                    hoveredCell.y(),
+                    hoveredCell.z());
+
             defaultShader.setUniform("uModel", modelMatrix);
             rm.getSelectionMesh().renderLines();
+
             glDepthMask(true);
             glEnable(GL_DEPTH_TEST);
             defaultShader.bind();
@@ -378,7 +386,7 @@ public class GameRenderer {
     private Vector3f getOutlineColor(GameMaster gameMaster) {
         boolean isSmartShift = gameMaster.getGameInteraction() != null
                 && gameMaster.getGameInteraction().isSmartShiftActive();
-        return isSmartShift ? new Vector3f(1.0f, 0.95f, 0.45f) : K.Colors.OUTLINE_DEFAULT;
+        return isSmartShift ? new Vector3f(1.0f, 0.95f, 0.25f) : K.Colors.OUTLINE_DEFAULT;
     }
 
     private void renderShadowPass(GameMaster gameMaster, ResourceManager rm,
