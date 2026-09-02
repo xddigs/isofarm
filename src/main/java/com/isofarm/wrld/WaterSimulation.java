@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
 
+@SuppressWarnings("all")
 public class WaterSimulation {
     private static final byte MAX_LEVEL = 8;
     private static final byte MIN_LEVEL = 1;
@@ -17,7 +18,8 @@ public class WaterSimulation {
 
     private final Queue<FluidPos> queue = new ArrayDeque<>();
     private final Set<FluidPos> queued = new HashSet<>();
-    private final Set<FluidPos> changed = new HashSet<>();
+    private final Set<Long> changedChunks = new HashSet<>();
+    private final Set<FluidPos> sources = new HashSet<>();
 
     private float timer;
 
@@ -27,19 +29,35 @@ public class WaterSimulation {
 
     public void addSource(int x, int y, int z) {
         FluidPos pos = new FluidPos(x, y, z);
+        long key = world.get2DKey(
+                Math.floorDiv(pos.x(), Chunk.SIZE_X),
+                Math.floorDiv(pos.z(), Chunk.SIZE_Z)
+        );
+        sources.add(pos);
         world.setBlockTypeAt(x, y, z, BlockData.WATER.getId());
         world.setWaterLevelAt(x, y, z, MAX_LEVEL);
-        changed.add(pos);
+        changedChunks.add(key);
         enqueue(pos);
     }
 
-    public void remove(int x, int y, int z) {
-        if (world.getBlockTypeAt(x, y, z) != BlockData.WATER.getId()) return;
+    public boolean removeWater(int x, int y, int z) {
+        FluidPos pos = new FluidPos(x, y, z);
+        if (!isWater(pos)) return false;
+        sources.remove(pos);
         world.setWaterLevelAt(x, y, z, (byte) 0);
         world.setBlockTypeAt(x, y, z, BlockData.AIR.getId());
-        FluidPos pos = new FluidPos(x, y, z);
-        changed.add(pos);
+        check(pos);
         enqueueNeighbours(pos);
+        return true;
+    }
+
+    public void check(FluidPos pos) {
+        long key = world.get2DKey(
+                Math.floorDiv(pos.x(), Chunk.SIZE_X),
+                Math.floorDiv(pos.z(), Chunk.SIZE_Z)
+        );
+
+        changedChunks.add(key);
     }
 
     public void update(float delta) {
@@ -69,43 +87,44 @@ public class WaterSimulation {
         FluidPos below = new FluidPos(pos.x(), pos.y() - 1, pos.z());
         if (canContainWater(below)) {
             byte belowLevel = world.getWaterLevelAt(below.x(), below.y(), below.z());
-            if (belowLevel < MAX_LEVEL) {
-                setWater(below, MAX_LEVEL);
+            if (belowLevel < level) {
+                setWater(below, level);
                 enqueue(below);
-                enqueueNeighbours(below);
-
                 return;
             }
         }
 
-        if (level <= MIN_LEVEL) {
+        if (level == MIN_LEVEL) {
             return;
         }
 
         byte spreadLevel = (byte) (level - 1);
-        spread(pos, new FluidPos(pos.x() + 1, pos.y(), pos.z()), spreadLevel);
-        spread(pos, new FluidPos(pos.x() - 1, pos.y(), pos.z()), spreadLevel);
-        spread(pos, new FluidPos(pos.x(), pos.y(), pos.z() + 1), spreadLevel);
-        spread(pos, new FluidPos(pos.x(), pos.y(), pos.z() - 1), spreadLevel);
+        spread(new FluidPos(pos.x() + 1, pos.y(), pos.z()), spreadLevel);
+        spread(new FluidPos(pos.x() - 1, pos.y(), pos.z()), spreadLevel);
+        spread(new FluidPos(pos.x(), pos.y(), pos.z() + 1), spreadLevel);
+        spread(new FluidPos(pos.x(), pos.y(), pos.z() - 1), spreadLevel);
     }
 
-    private void spread(FluidPos from, FluidPos to, byte level) {
-        if (level < MIN_LEVEL) return;
-        if (!canContainWater(to)) return;
-        byte current = world.getWaterLevelAt(to.x(), to.y(), to.z());
-        if (current >= level) {
+    private void spread(FluidPos to, byte level) {
+        if (level < MIN_LEVEL) {
             return;
         }
 
+        if (!canContainWater(to)) return;
+        byte current = world.getWaterLevelAt(to.x(), to.y(), to.z());
+        if (current >= level) return;
         setWater(to, level);
         enqueue(to);
-        enqueueNeighbours(to);
     }
 
     private void setWater(FluidPos pos, byte level) {
+        byte current = world.getWaterLevelAt(pos.x(), pos.y(), pos.z());
+        if (current == level && world.getBlockTypeAt(pos.x(), pos.y(), pos.z()) == BlockData.WATER.getId()) {
+            return;
+        }
         world.setBlockTypeAt(pos.x(), pos.y(), pos.z(), BlockData.WATER.getId());
         world.setWaterLevelAt(pos.x(), pos.y(), pos.z(), level);
-        changed.add(pos);
+        check(pos);
     }
 
     private boolean canContainWater(FluidPos pos) {
@@ -144,19 +163,24 @@ public class WaterSimulation {
 
     public void onBlockDestroyed(int x, int y, int z) {
         FluidPos pos = new FluidPos(x, y, z);
-        changed.add(pos);
+        long key = world.get2DKey(
+                Math.floorDiv(pos.x(), Chunk.SIZE_X),
+                Math.floorDiv(pos.z(), Chunk.SIZE_Z));
+        changedChunks.add(key);
         enqueueNeighbours(pos);
     }
 
     private void rebuildChangedChunks() {
-        if (changed.isEmpty()) {
+        if (changedChunks.isEmpty()) {
             return;
         }
 
-        for (FluidPos pos : changed) {
-            world.getGameMaster().rebuildChunkMeshAt(pos.x(), pos.z());
+        for (long key : changedChunks) {
+            int chunkX = (int) (key >> 32);
+            int chunkZ = (int) key;
+            world.getGameMaster().rebuildChunkMeshAt(chunkX * Chunk.SIZE_X,
+                    chunkZ * Chunk.SIZE_Z);
         }
-
-        changed.clear();
+        changedChunks.clear();
     }
 }

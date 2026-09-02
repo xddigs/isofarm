@@ -1,9 +1,6 @@
 package com.isofarm.item;
 
-import com.isofarm.data.BlockData;
-import com.isofarm.data.BlockPos;
-import com.isofarm.data.Enchantment;
-import com.isofarm.data.Usables;
+import com.isofarm.data.*;
 import com.isofarm.entity.Player;
 import com.isofarm.utils.HoveredCell;
 import com.isofarm.wrld.GameMaster;
@@ -45,8 +42,12 @@ public class Bucket extends Usable {
                 return false;
             }
 
-            gameMaster.getWaterSimulation().remove(targetBlock.x(), targetBlock.y(), targetBlock.z());
-            gameMaster.rebuildChunkMeshAt(targetBlock.x(), targetBlock.z());
+            if (!gameMaster.getWaterSimulation().removeWater(
+                    targetBlock.x(),
+                    targetBlock.y(),
+                    targetBlock.z())) {
+                return false;
+            }
             fill();
             return true;
         }
