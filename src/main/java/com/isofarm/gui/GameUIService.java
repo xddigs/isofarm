@@ -375,6 +375,18 @@ public class GameUIService implements Service<GameMaster> {
         float hotbarX = windowWidth / 2.0f - hotbarUI.getWidth() / 2.0f;
         float hotbarY = windowHeight - hotbarUI.getHeight() - K.UI.HOTBAR_OFFSET;
         hotbarUI.setPosition(hotbarX, hotbarY);
+        refreshHotbarLabel();
+    }
+
+    public void refreshHotbarLabel() {
+        Item item = hotbarUI.getSelectedItem();
+
+        if (item != null) {
+            showHotbarLabel(item);
+        } else {
+            hotbarLabel = null;
+            hotbarLabelTimer = 0.0f;
+        }
     }
 
     public void renderToasts() {

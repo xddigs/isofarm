@@ -24,6 +24,7 @@ public class HotbarUI extends UIElement {
     private Inventory inventory;
     private InventorySlotUI backpackSlotUI;
     private InventorySlotUI bookSlotUI;
+    private Item lastSelectedItem;
 
     private SpriteSheet seedIcons;
     private SpriteSheet cropIcons;
@@ -54,12 +55,28 @@ public class HotbarUI extends UIElement {
         syncExtraSlots();
         updateSlots();
         interact();
+        updateSelectedItem();
     }
 
     @Override
     public void render() {
         renderChildren();
         renderSelector();
+    }
+
+    public Item getSelectedItem() {
+        InventorySlot slot = getSelectedInventorySlot();
+        return slot != null ? slot.getItem() : null;
+    }
+
+    private void updateSelectedItem() {
+        InventorySlot selected = getSelectedInventorySlot();
+        Item item = selected != null ? selected.getItem() : null;
+
+        if (item != lastSelectedItem) {
+            lastSelectedItem = item;
+            Settings.selectedItem = item;
+        }
     }
 
     private static float getInitialHotbarWidth() {
@@ -212,7 +229,10 @@ public class HotbarUI extends UIElement {
     }
 
     private void syncInventory() {
-        if (player == null) return;
+        if (player == null) {
+            return;
+        }
+
         int hotbarStart = (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
         for (int i = 0; i < K.UI.INVENTORY_COLUMNS; i++) {
             InventorySlotUI slotUI = slotUIs[i];
@@ -220,12 +240,6 @@ public class HotbarUI extends UIElement {
             slotUI.setSlot(inventoryIndex < inventory.getSlots().size() ?
                     inventory.getSlot(inventoryIndex) : null);
             updateItemSprite(slotUI);
-            InventorySlot slot = getSelectedInventorySlot();
-            if (slot != null) {
-                Settings.selectedItem = slot.getItem();
-            } else {
-                Settings.selectedItem = null;
-            }
         }
     }
 
