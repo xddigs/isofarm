@@ -243,26 +243,6 @@ public class GameRenderer {
                 entity.render(gameMaster, RenderPass.NORMAL)
         );
 
-        defaultShader.setUniform("uIsWater", true);
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LESS);
-        glDepthMask(false);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        chunkMeshes.forEach((chunk, chunkMesh) -> {
-            if (chunkMesh == null || chunkMesh.waterMesh() == null ||
-                    chunkMesh.waterMesh().getIndicesCount() <= 0) {
-                return;
-            }
-            float minX = chunk.getChunkX() * Chunk.SIZE_X;
-            float minZ = chunk.getChunkZ() * Chunk.SIZE_Z;
-            modelMatrix.identity().translate(minX, 0.0f, minZ);
-            defaultShader.setUniform("uModel", modelMatrix);
-            defaultShader.setUniform("uTime", waterTime);
-            chunkMesh.waterMesh().render();
-        });
-
         glDepthFunc(GL_LESS);
         glDepthMask(true);
 
@@ -303,6 +283,14 @@ public class GameRenderer {
             defaultShader.setUniform("uUseTexture", false);
             defaultShader.setUniform("uUseFaceAtlas", false);
             defaultShader.setUniform("uBaseColor", outlineColor);
+
+            defaultShader.setUniform("uIsWater", false);
+            defaultShader.setUniform("uIsSprite", false);
+            defaultShader.setUniform("uIsSubmergedEntity", false);
+            defaultShader.setUniform("uEnableShadows", false);
+
+            defaultShader.setUniform("uUseParticleAlpha", false);
+            defaultShader.setUniform("uParticleAlpha", 1.0f);
 
             modelMatrix.identity()
                     .translate(
