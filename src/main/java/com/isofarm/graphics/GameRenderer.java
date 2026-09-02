@@ -383,9 +383,18 @@ public class GameRenderer {
 
         } else {
             glDisable(GL_DEPTH_TEST);
+            Shader motionBlurShader = rm.getMotionBlurShader();
+            motionBlurShader.bind();
+            motionBlurShader.setUniform("uScene", 0);
+            motionBlurShader.setUniform("uVelocity", new Vector2f(blurX, blurY));
+            motionBlurShader.setUniform("uStrength", Settings.doEnableMotions());
+
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, sceneFbo.getTextureId());
+
             rm.getScreenQuadMesh().render();
+
+            motionBlurShader.unbind();
             glEnable(GL_DEPTH_TEST);
         }
 
