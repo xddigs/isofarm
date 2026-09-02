@@ -176,7 +176,7 @@ public abstract class Entity {
         float minX = position.x - dimensions.x / 2.0f + epsilon;
         float maxX = position.x + dimensions.x / 2.0f - epsilon;
 
-        float minY = position.y;
+        float minY = position.y - 0.1f;
         float maxY = position.y + dimensions.y;
 
         float minZ = position.z - dimensions.z / 2.0f + epsilon;
@@ -204,10 +204,10 @@ public abstract class Entity {
 
                     float waterLevel = world.getWaterLevelAt(x, y, z) / 8.0f;
                     float waterTop = y + waterLevel;
-                    float overlapMin = Math.max(minY, y);
+                    float overlapMin = Math.max(position.y, y);
                     float overlapMax = Math.min(maxY, waterTop);
-                    if (overlapMax > overlapMin) {
-                        submergedHeight += overlapMax - overlapMin;
+                    if (overlapMax > overlapMin || (position.y >= y && position.y <= waterTop + 0.1f)) {
+                        submergedHeight += Math.max(0.1f, overlapMax - overlapMin);
                     }
                 }
             }
@@ -241,12 +241,15 @@ public abstract class Entity {
             velocity.x = 0.0f;
         }
 
+        setOnGround(false);
         position.y += velocity.y * delta;
         if (checkCollision(world)) {
             position.y -= velocity.y * delta;
+
             if (velocity.y < 0.0f) {
                 setOnGround(true);
             }
+
             velocity.y = 0.0f;
         }
 

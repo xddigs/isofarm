@@ -36,12 +36,6 @@ public class SwimmingState implements PlayerState {
         float yaw = player.getGameMaster().getActiveCamera().getYaw();
         player.wasd(world, delta, yaw, false);
 
-        if (!Keyboard.isKeyDown(GLFW_KEY_SPACE) && !Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
-            player.getVelocity().y += BUOYANCY * delta;
-        }
-
-        player.getVelocity().y *= WATER_DRAG;
-
         if (player.isOnGround()) {
             if (Keyboard.isKeyDown(GLFW_KEY_SPACE)) {
                 player.jump();

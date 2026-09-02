@@ -722,6 +722,11 @@ public class Player extends Character {
         }
     }
 
+    public void fly(float delta, float yaw, boolean isFlying) {
+        if (isOnGround()) return;
+        wasd(gameMaster.getWorld(), delta, yaw, isFlying);
+    }
+
     private void setUpInventory() {
         switch (getGamemode()) {
             case SURVIVAL -> {
@@ -917,13 +922,5 @@ public class Player extends Character {
 
     public float getDifficultyRegen() {
         return gameMaster.getDifficulty().getMultiplier();
-    }
-
-    public void fly(float delta, float yaw, boolean isFlying) {
-        if (isOnGround()) {
-            return;
-        }
-
-        wasd(gameMaster.getWorld(), delta, yaw, isFlying);
     }
 }
