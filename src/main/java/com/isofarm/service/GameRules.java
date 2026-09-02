@@ -14,12 +14,10 @@ public final class GameRules {
     private static final Logger log = LoggerFactory.getLogger(GameRules.class);
 
     static {
-        RULES.put("doKeepInventory", Settings.doKeepInventory());
-        RULES.put("doEnableMotions", Settings.doEnableMotions());
-        RULES.put("renderDistance", Settings.getRenderDistance());
-        RULES.put("fov", Settings.getFov());
-        RULES.put("unloadMargin", Settings.getUnloadMargin());
         RULES.put("doEnableShadows", Settings.doEnableShadows());
+        RULES.put("doKeepInventory", Settings.doKeepInventory());
+        RULES.put("renderDistance", Settings.getRenderDistance());
+        RULES.put("unloadMargin", Settings.getUnloadMargin());
         RULES.put("maxInteractionDistance", Settings.getMaxInteractionDistance());
     }
 
@@ -94,16 +92,12 @@ public final class GameRules {
     private static void apply(String rule, Object value) {
         try {
             switch (rule) {
+                case "doEnableShadows" -> {
+                    Settings.setDoEnableShadows((Boolean) value);
+                }
+
                 case "doKeepInventory" -> {
                     Settings.setDoKeepInventory((Boolean) value);
-                }
-
-                case "fov" -> {
-                    Settings.setFov((Float) value);
-                }
-
-                case "doEnableMotions" -> {
-                    Settings.setDoEnableMotions((Boolean) value);
                 }
 
                 case "renderDistance" -> {
@@ -112,10 +106,6 @@ public final class GameRules {
 
                 case "unloadMargin" -> {
                     Settings.setUnloadMargin((Integer) value);
-                }
-
-                case "doEnableShadows" -> {
-                    Settings.setDoEnableShadows((Boolean) value);
                 }
 
                 case "maxInteractionDistance" -> {
