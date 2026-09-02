@@ -2,7 +2,6 @@ package com.isofarm.service;
 
 import com.isofarm.data.*;
 import com.isofarm.entity.Player;
-import com.isofarm.graphics.ParticleEngine;
 import com.isofarm.item.Block;
 import com.isofarm.utils.ToastFactory;
 import com.isofarm.wrld.World;
@@ -12,11 +11,9 @@ import org.slf4j.LoggerFactory;
 public class CropService implements Service<Crop> {
     private static final Logger log = LoggerFactory.getLogger(CropService.class);
     private final World world;
-    private final ParticleEngine particles;
 
-    public CropService(World world, ParticleEngine particles) {
+    public CropService(World world) {
         this.world = world;
-        this.particles = particles;
     }
 
     public Crop plant(int x, int y, int z, Player player, Block block,

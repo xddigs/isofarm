@@ -170,11 +170,15 @@ public class GameRenderer {
             defaultShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
             defaultShader.setUniform("uUseTexture", true);
             defaultShader.setUniform("uUseFaceAtlas", false);
-            defaultShader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
-            defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
 
             int frame = crop.getStage().getFrameIndex();
             defaultShader.setUniform("uUVBounds", sheet.getUVBounds(frame));
+            defaultShader.setUniform("uSunColor", lighting.getColor());
+            defaultShader.setUniform("uSkyColor", TimeService.getSkyColor());
+            defaultShader.setUniform("uLightDirection", lighting.getDirection());
+            defaultShader.setUniform("uLightIntensity", lighting.getIntensity());
+            defaultShader.setUniform("uAmbientIntensity", lighting.getAmbientIntensity());
+            defaultShader.setUniform("uLightSpaceMatrix", lightSpaceMatrix);
 
             float renderX = crop.getX() + 0.5f;
             float renderY = crop.getY() + K.World.SHORTER_BLOCK_HEIGHT;
@@ -182,9 +186,7 @@ public class GameRenderer {
 
             modelMatrix.identity().translate(renderX, renderY, renderZ);
             defaultShader.setUniform("uModel", modelMatrix);
-            defaultShader.setUniform("uEnableShadows", false);
             rm.getSpriteMesh().render();
-            defaultShader.setUniform("uEnableShadows", Settings.doEnableShadows());
             sheet.unbind();
         });
 
@@ -209,9 +211,6 @@ public class GameRenderer {
             defaultShader.setUniform("uUVBounds", new Vector4f(
                     region.uvMin().x, region.uvMax().y,
                     region.uvMax().x, region.uvMin().y));
-
-            defaultShader.setUniform("uAtlasScale", region.scale());
-            defaultShader.setUniform("uAtlasOffset", region.offset());
 
             glDisable(GL_CULL_FACE);
             glActiveTexture(GL_TEXTURE0 + K.Render.PRIMARY_TEXTURE_UNIT);

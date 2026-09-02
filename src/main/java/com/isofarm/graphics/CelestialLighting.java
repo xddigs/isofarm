@@ -40,7 +40,7 @@ public class CelestialLighting {
         }
 
         float daylight = Math.clamp(sunIntensity, 0.0f, 1.0f);
-        ambientIntensity = 0.05f + daylight * 0.20f;
+        ambientIntensity = 0.35f + daylight * 0.40f;
     }
 
     public Vector3f getDirection() {

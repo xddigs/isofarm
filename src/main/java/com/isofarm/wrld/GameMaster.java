@@ -89,7 +89,7 @@ public class GameMaster {
 
         this.soundService = new SoundService();
         this.particles = new ParticleEngine();
-        this.cropService = new CropService(world, particles);
+        this.cropService = new CropService(world);
         this.treeService = new TreeService(world);
         this.timeService = new TimeService();
         this.commandRegistry = new CommandRegistry();
