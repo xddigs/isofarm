@@ -3,6 +3,7 @@ package com.isofarm.graphics;
 import com.isofarm.data.BlockData;
 import com.isofarm.data.BlockPos;
 import com.isofarm.data.Crop;
+import com.isofarm.data.RenderPass;
 import com.isofarm.entity.Player;
 import com.isofarm.input.GameInteraction;
 import com.isofarm.service.BookService;
@@ -56,6 +57,8 @@ public class GameRenderer {
         glActiveTexture(GL_TEXTURE0);
         Shader defaultShader = rm.getDefaultShader();
         defaultShader.bind();
+        defaultShader.setUniform("uIsWater", false);
+        defaultShader.setUniform("uIsSubmergedEntity", false);
 
         int textureUnit = K.Render.PRIMARY_TEXTURE_UNIT;
         int shadowUnit = 1;
@@ -103,6 +106,7 @@ public class GameRenderer {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         defaultShader.setUniform("uIsWater", false);
+        defaultShader.setUniform("uIsSubmergedEntity", false);
         chunkMeshes.forEach((chunk, chunkMesh) -> {
             if (chunkMesh != null && chunkMesh.solidMesh() != null && chunkMesh.solidMesh().getIndicesCount() > 0) {
                 float minX = chunk.getChunkX() * Chunk.SIZE_X;
@@ -119,29 +123,31 @@ public class GameRenderer {
             }
         });
 
+        defaultShader.setUniform("uIsWater", true);
         glEnable(GL_DEPTH_TEST);
-        glDepthMask(false);
+        glDepthFunc(GL_LESS);
+        glDepthMask(true);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        defaultShader.setUniform("uIsWater", true);
 
         chunkMeshes.forEach((chunk, chunkMesh) -> {
-            if (chunkMesh != null && chunkMesh.waterMesh() != null &&
-                    chunkMesh.waterMesh().getIndicesCount() > 0) {
+            if (chunkMesh == null || chunkMesh.waterMesh() == null ||
+                    chunkMesh.waterMesh().getIndicesCount() <= 0) {
+                return;
+            }
 
-                float minX = chunk.getChunkX() * Chunk.SIZE_X;
-                float minY = 0;
-                float minZ = chunk.getChunkZ() * Chunk.SIZE_Z;
-                float maxX = minX + Chunk.SIZE_X;
-                float maxY = Chunk.SIZE_Y;
-                float maxZ = minZ + Chunk.SIZE_Z;
+            float minX = chunk.getChunkX() * Chunk.SIZE_X;
+            float minZ = chunk.getChunkZ() * Chunk.SIZE_Z;
 
-                if (frustum.testAab(minX, minY, minZ, maxX, maxY, maxZ)) {
-                    modelMatrix.identity().translate(minX, 0, minZ);
-                    defaultShader.setUniform("uModel", modelMatrix);
-                    defaultShader.setUniform("uTime", waterTime);
-                    chunkMesh.waterMesh().render();
-                }
+            float maxX = minX + Chunk.SIZE_X;
+            float maxY = Chunk.SIZE_Y;
+            float maxZ = minZ + Chunk.SIZE_Z;
+
+            if (frustum.testAab(minX, 0.0f, minZ, maxX, maxY, maxZ)) {
+                modelMatrix.identity().translate(minX, 0.0f, minZ);
+                defaultShader.setUniform("uModel", modelMatrix);
+                defaultShader.setUniform("uTime", waterTime);
+                chunkMesh.waterMesh().render();
             }
         });
 
@@ -150,6 +156,9 @@ public class GameRenderer {
 
         Player player = gameMaster.getPlayer();
         BlockPos hoveredCell = HoveredCell.get(gameMaster);
+
+        defaultShader.setUniform("uIsWater", false);
+        defaultShader.setUniform("uIsSubmergedEntity", false);
 
         gameMaster.getWorld().forEach(block -> {
             if (!(block instanceof Crop crop)) return;
@@ -178,6 +187,9 @@ public class GameRenderer {
             defaultShader.setUniform("uEnableShadows", Settings.doEnableShadows());
             sheet.unbind();
         });
+
+        defaultShader.setUniform("uIsWater", false);
+        defaultShader.setUniform("uIsSubmergedEntity", false);
 
         gameMaster.getWorld().forEachPlant(plant -> {
             BlockData data = plant.data();
@@ -221,24 +233,58 @@ public class GameRenderer {
         }
 
         defaultShader.setUniform("uIsWater", false);
+        defaultShader.setUniform("uIsSubmergedEntity", false);
         gameMaster.getEntities().removeIf(e -> !e.isAlive());
-        gameMaster.getEntities().forEach(entity -> {
-            entity.render(gameMaster);
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
+        glDepthMask(true);
+
+        gameMaster.getEntities().forEach(entity ->
+                entity.render(gameMaster, RenderPass.NORMAL)
+        );
+
+        defaultShader.setUniform("uIsWater", true);
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
+        glDepthMask(false);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        chunkMeshes.forEach((chunk, chunkMesh) -> {
+            if (chunkMesh == null || chunkMesh.waterMesh() == null ||
+                    chunkMesh.waterMesh().getIndicesCount() <= 0) {
+                return;
+            }
+            float minX = chunk.getChunkX() * Chunk.SIZE_X;
+            float minZ = chunk.getChunkZ() * Chunk.SIZE_Z;
+            modelMatrix.identity().translate(minX, 0.0f, minZ);
+            defaultShader.setUniform("uModel", modelMatrix);
+            defaultShader.setUniform("uTime", waterTime);
+            chunkMesh.waterMesh().render();
         });
 
+        glDepthFunc(GL_LESS);
         glDepthMask(true);
-        glEnable(GL_CULL_FACE);
+
+        defaultShader.setUniform("uIsWater", false);
+        defaultShader.setUniform("uIsSubmergedEntity", false);
+        glDepthFunc(GL_LESS);
+        glDepthMask(true);
+        glEnable(GL_DEPTH_TEST);
         renderDestroyOverlay(gameMaster.getGameInteraction(), defaultShader,
                 rm.getDestroyOverlayMesh(), ResourceManager.getDestroyTexture(), camera);
 
         glDepthMask(false);
         defaultShader.setUniform("uParticleAlpha", 1.0f);
-        gameMaster.getParticles().render(defaultShader, rm.getSpriteMesh(), gameMaster.getActiveCamera());
+        gameMaster.getParticles().render(defaultShader, rm.getSpriteMesh(),
+                gameMaster.getActiveCamera());
+
         glDepthMask(true);
 
         if (WeatherService.isRaining()) {
             Vector3f rainTargetPos = (player != null)
-                    ? new Vector3f(player.getPosition().x(), player.getPosition().y() + 10.0f, player.getPosition().z())
+                    ? new Vector3f(player.getPosition().x(), player.getPosition().y() + 10.0f,
+                    player.getPosition().z())
                     : camera.getPosition();
 
             gameMaster.getRainEngine().render(rm.getRainShader(),

@@ -23,9 +23,10 @@ uniform float uAmbientIntensity;
 
 uniform bool uIsMaskPass;
 uniform float uParticleAlpha;
-uniform float uWaterAlpha;
 uniform bool uEnableShadows;
 uniform bool uIsSprite;
+uniform bool uIsSubmergedEntity;
+uniform bool uIsWater;
 
 float calculateShadow(vec4 lightSpacePosition, vec3 normal) {
     vec3 projectionCoordinates = lightSpacePosition.xyz / lightSpacePosition.w;
@@ -58,7 +59,7 @@ void main() {
 
     if (uUseTexture) {
         texColor = texture(uTexture, vTexCoord);
-        if (texColor.a < 0.01 && vIsWater < 0.5) {
+        if (texColor.a < 0.01 && !uIsWater) {
             discard;
         }
     }
@@ -93,8 +94,16 @@ void main() {
     vec3 directLight = uSunColor * diffuse * uLightIntensity * (1.0 - shadow);
     vec3 totalLight = ambient + directLight;
     float alpha = texColor.a * uParticleAlpha;
+    vec3 finalColor = texColor.rgb * totalLight;
+
     if (vIsWater > 0.5) {
         alpha *= 0.50;
     }
-    FragColor = vec4(texColor.rgb * totalLight, alpha);
+
+    if (uIsSubmergedEntity) {
+        finalColor *= vec3(0.65, 0.85, 1.0);
+        alpha = 1.0;
+    }
+
+    FragColor = vec4(finalColor, alpha);
 }

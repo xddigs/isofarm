@@ -359,7 +359,7 @@ public class Player extends Character {
     }
 
     @Override
-    public void render(GameMaster gameMaster) {
+    public void render(GameMaster gameMaster, RenderPass pass) {
         ResourceManager rm = gameMaster.getResourceManager();
         CameraView camera = gameMaster.getActiveCamera();
 
@@ -389,6 +389,7 @@ public class Player extends Character {
         shader.setUniform("uIsMaskPass", false);
         shader.setUniform("uEnableShadows", false);
         shader.setUniform("uLightSpaceMatrix", new Matrix4f());
+        shader.setUniform("uIsSubmergedEntity", pass == RenderPass.SUBMERGED);
 
         float globalScale = Settings.getScaledEntity();
         float idleBobbingY = (float) Math.sin(idleAnimationTime) * IDLE_BOBBING_AMPLITUDE * idleWeight;
@@ -401,13 +402,25 @@ public class Player extends Character {
         shader.setUniform("uModel", modelMatrix);
 
         glEnable(GL_DEPTH_TEST);
-        glDepthMask(true);
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+        if (pass == RenderPass.NORMAL) {
+            glDepthFunc(GL_LESS);
+            glDepthMask(true);
+            shader.setUniform("uIsSubmergedEntity", false);
+
+        } else {
+            glDepthFunc(GL_GREATER);
+            glDepthMask(false);
+            shader.setUniform("uIsSubmergedEntity", true);
+        }
+
         playerModel.render(shader, modelMatrix);
+        glDepthFunc(GL_LESS);
+        glDepthMask(true);
         glBindTexture(GL_TEXTURE_2D, 0);
         glDisable(GL_BLEND);
         shader.unbind();

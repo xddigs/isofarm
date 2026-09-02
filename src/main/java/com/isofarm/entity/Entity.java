@@ -3,6 +3,7 @@ package com.isofarm.entity;
 import com.isofarm.data.BlockData;
 import com.isofarm.data.DataClass;
 import com.isofarm.data.BlockPos;
+import com.isofarm.data.RenderPass;
 import com.isofarm.utils.K;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
@@ -307,7 +308,11 @@ public abstract class Entity {
 
     public abstract void update(BlockPos blockPos, float delta);
 
-    public abstract void render(GameMaster gameMaster);
+    public void render(GameMaster gameMaster) {
+        render(gameMaster, RenderPass.NORMAL);
+    }
+
+    public abstract void render(GameMaster gameMaster, RenderPass pass);
 
     protected void dropLoot() {}
 }

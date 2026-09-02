@@ -2,6 +2,7 @@ package com.isofarm.entity;
 
 import com.isofarm.data.DataClass;
 import com.isofarm.data.BlockPos;
+import com.isofarm.data.RenderPass;
 import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.Shader;
 import com.isofarm.graphics.SpriteSheet;
@@ -102,17 +103,15 @@ public class WorldItem extends Entity {
     }
 
     @Override
-    public void render(GameMaster gameMaster) {
+    public void render(GameMaster gameMaster, RenderPass pass) {
         SpriteSheet spriteSheet = ResourceManager.getItemSpriteSheet(item);
         Shader shader = gameMaster.getResourceManager().getShader("item");
         if (spriteSheet == null || shader == null) {
             return;
         }
-        gameMaster.getItemRenderer().renderWorldItem(
-                gameMaster,
-                this,
-                gameMaster.getCelestialLighting()
-        );
+
+        gameMaster.getItemRenderer().renderWorldItem(gameMaster,
+                this, gameMaster.getCelestialLighting());
     }
 
     public Item getItem() {

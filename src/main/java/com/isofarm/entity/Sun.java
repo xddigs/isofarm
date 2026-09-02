@@ -1,6 +1,7 @@
 package com.isofarm.entity;
 
 import com.isofarm.data.BlockPos;
+import com.isofarm.data.RenderPass;
 import com.isofarm.wrld.GameMaster;
 import org.joml.Vector3f;
 
@@ -49,7 +50,5 @@ public class Sun extends Entity {
     }
 
     @Override
-    public void render(GameMaster gameMaster) {
-
-    }
+    public void render(GameMaster gameMaster, RenderPass pass) {}
 }
