@@ -119,6 +119,12 @@ public final class K {
         public static final String DEFAULT_VERT_SHADER = "shaders/default.vert";
         public static final String DEFAULT_FRAG_SHADER = "shaders/default.frag";
 
+        public static final String MOTION_BLUR_VERT_SHADER = "shaders/motion_blur.vert";
+        public static final String MOTION_BLUR_FRAG_SHADER = "shaders/motion_blur.frag";
+
+        public static final String OUTLINE_VERT_SHADER = "shaders/outline.vert";
+        public static final String OUTLINE_FRAG_SHADER = "shaders/outline.frag";
+
         public static final String UI_VERTEX_SHADER = "shaders/ui.vert";
         public static final String UI_FRAG_SHADER = "shaders/ui.frag";
 
@@ -159,7 +165,7 @@ public final class K {
     }
 
     public static final class Colors {
-        public static final Vector3f OUTLINE_DEFAULT = new Vector3f(0.0f);
+        public static final Vector3f OUTLINE_DEFAULT = new Vector3f(0.0f, 0.0f, 0.0f);
         public static final Vector3f RAIN = new Vector3f(0.35f, 0.55f, 1.0f);
 
     }
