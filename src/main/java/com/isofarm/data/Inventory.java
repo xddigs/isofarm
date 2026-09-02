@@ -1,6 +1,7 @@
 package com.isofarm.data;
 
 import com.isofarm.item.*;
+import com.isofarm.service.SoundService;
 import com.isofarm.utils.K;
 
 import java.util.*;
@@ -9,10 +10,12 @@ import java.util.*;
 public class Inventory {
     private final List<InventorySlot> slots;
     private final InventorySlot backpackSlot;
+    private final InventorySlot bookSlot;
 
     public Inventory() {
         this.slots = new ArrayList<>();
         this.backpackSlot = new InventorySlot();
+        this.bookSlot = new InventorySlot();
 
         for (int i = 0; i < K.UI.INVENTORY_SLOTS; i++) {
             this.slots.add(new InventorySlot());
@@ -35,8 +38,16 @@ public class Inventory {
         return backpackSlot;
     }
 
+    public InventorySlot getBookSlot() {
+        return bookSlot;
+    }
+
     public boolean hasBackpackEquipped() {
         return !backpackSlot.isEmpty() && backpackSlot.getItem() instanceof Backpack;
+    }
+
+    public boolean hasBookEquipped() {
+        return !bookSlot.isEmpty() && bookSlot.getItem() instanceof Book;
     }
 
     public void equipBackpack(Backpack backpack) {
@@ -44,10 +55,23 @@ public class Inventory {
         backpackSlot.setItem(backpack);
     }
 
+    public void equipBook(Book book) {
+        remove(book, 1);
+        bookSlot.setItem(book);
+        SoundService.fx.playUseSound(SoundGroup.ITEMS);
+    }
+
     public void unequipBackpack() {
         Item backpack = backpackSlot.getItem();
         add(backpack, 1);
         backpackSlot.clear();
+    }
+
+    public void unequipBook() {
+        Item book = bookSlot.getItem();
+        add(book, 1);
+        bookSlot.clear();
+        SoundService.fx.playUseSound(SoundGroup.ITEMS);
     }
 
     public int add(Item item, int amount) {
@@ -433,6 +457,4 @@ public class Inventory {
     private boolean isValidIndex(int index) {
         return index >= 0 && index < slots.size();
     }
-
-    private record Stack(Item item, int amount) {}
 }

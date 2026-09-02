@@ -9,10 +9,7 @@ import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.graphics.TextureAtlas;
 import com.isofarm.gui.GameUIService;
 import com.isofarm.item.*;
-import com.isofarm.service.BookService;
-import com.isofarm.service.CropService;
-import com.isofarm.service.TimeService;
-import com.isofarm.service.TreeService;
+import com.isofarm.service.*;
 import com.isofarm.utils.HoveredCell;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
@@ -64,6 +61,7 @@ public class GameInteraction {
 
     public BlockPos update(GameMaster gameMaster, Item selectedItem) {
         Player player = gameMaster.getPlayer();
+        Inventory inventory = player.getInventory();
         boolean isCtrlHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL) || Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
         boolean isShiftHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT);
         isSmartShift = isShiftHeld && !gameMaster.isInventoryOpen();
@@ -133,9 +131,23 @@ public class GameInteraction {
         if (selectedItem instanceof Backpack backpack &&
                 isRightPressed && !gameMaster.isInventoryOpen()) {
             if (isCtrlHeld) {
-                backpack.unequip(gameMaster);
+                backpack.unequip();
             } else {
                 backpack.use(gameMaster);
+            }
+            isRightPressed = false;
+        }
+
+        if (selectedItem instanceof Book book &&
+                isRightPressed && !BookService.bs.isOpen()) {
+            if (isCtrlHeld) {
+                if (!inventory.hasBookEquipped()) {
+                    inventory.equipBook(book);
+                } else {
+                    inventory.unequipBook();
+                }
+            } else {
+                book.use(gameMaster);
             }
             isRightPressed = false;
         }
@@ -214,7 +226,7 @@ public class GameInteraction {
             }
 
             iterator.remove();
-            gameMaster.getSoundService().playEntitySound(SoundGroup.ITEMS);
+            SoundService.fx.playEntitySound(SoundGroup.ITEMS);
             log.info("Added x{} {}", amount, item.getName());
         }
     }
@@ -257,7 +269,7 @@ public class GameInteraction {
 
             player.remove(item, amount);
             gameMaster.addEntity(worldItem);
-            gameMaster.getSoundService().playEntitySound(SoundGroup.ITEMS);
+            SoundService.fx.playEntitySound(SoundGroup.ITEMS);
 
             log.trace("Dropped x{} {} with velocity ({}, {}, {})", amount,
                     item.getName(), velocity.x, velocity.y, velocity.z);
@@ -305,7 +317,7 @@ public class GameInteraction {
                         } else {
                             player.add(item, amount);
                         }
-                        gameMaster.getSoundService().playEntitySound(SoundGroup.ITEMS);
+                        SoundService.fx.playEntitySound(SoundGroup.ITEMS);
                         log.info("Picked up x{} {}", amount, item.getName());
                     }
                     iterator.remove();
@@ -429,7 +441,7 @@ public class GameInteraction {
                             byte blockId, Item selectedItem) {
         World world = gameMaster.getWorld();
         if (blockData.getSoundGroup() != null) {
-            gameMaster.getSoundService().playBreakSound(blockData.getSoundGroup(),
+            SoundService.fx.playBreakSound(blockData.getSoundGroup(),
                     getDistanceToBlock(gameMaster, cell), Settings.getMaxInteractionDistance());
         }
 
@@ -526,11 +538,13 @@ public class GameInteraction {
     private void placeAction(GameMaster gameMaster, BlockPos cell,
                              Item selectedItem) {
         World world = gameMaster.getWorld();
-        if (BookService.bs.isOpen()) return;
-        if (gameMaster.getPlayer().checkCollision(world)) return;
+        Player player = gameMaster.getPlayer();
 
-        if (gameMaster.getPlayer() != null) {
-            gameMaster.getPlayer().interact();
+        if (BookService.bs.isOpen()) return;
+        if (player.checkCollision(world)) return;
+
+        if (player != null) {
+            player.interact();
         }
 
         int normalX = gameMaster.getOrthoCamera().getLastHitNormalX();
@@ -541,7 +555,7 @@ public class GameInteraction {
             int placeX = cell.x() + normalX;
             int placeY = cell.y() + normalY;
             int placeZ = cell.z() + normalZ;
-            if (gameMaster.getPlayer().intersectsBlock(placeX, placeY, placeZ)) return;
+            if (player.intersectsBlock(placeX, placeY, placeZ)) return;
 
             byte targetBlock = world.getBlockTypeAt(placeX, placeY, placeZ);
             BlockData target = BlockData.fromId(targetBlock);
@@ -553,8 +567,8 @@ public class GameInteraction {
                     world.setBlockTypeAt(placeX, placeY, placeZ, block.getType().getId());
                 }
 
-                gameMaster.getPlayer().remove(selectedItem);
-                gameMaster.getSoundService().playBreakSound(newBlock.getType()
+                player.remove(selectedItem);
+                SoundService.fx.playBreakSound(newBlock.getType()
                         .getSoundGroup(), getDistanceToBlock(gameMaster, cell), Settings.getMaxInteractionDistance());
                 gameMaster.rebuildChunkMeshAt(placeX, placeZ);
                 gameUIservice.logAction(new BlockPos(newBlock.getType(), placeX, placeY, placeZ));
@@ -568,7 +582,7 @@ public class GameInteraction {
             Block block = world.getBlockAt(cell.x(), cell.y(), cell.z());
             if (Arrays.stream(hoe.getType().getUsableOn()).noneMatch(
                     b -> b.getId() == block.getType().getId())) {
-                hoe.setPlayer(gameMaster.getPlayer());
+                hoe.setPlayer(player);
                 hoe.misuse();
             } else {
                 hoe.use(gameMaster, block);
@@ -594,17 +608,13 @@ public class GameInteraction {
             if (seed.getType() == null) return;
 
             Block tilledDirt = new Block(BlockData.TILLED_DIRT, x, y, z);
-            Crop planted = cropService.plant(x, y, z, gameMaster.getPlayer(), tilledDirt, seed.getType(),
+            Crop planted = cropService.plant(x, y, z, player, tilledDirt, seed.getType(),
                     timeService.getCurrentSeason());
 
             if (planted != null) {
                 gameUIservice.logAction(cell);
                 log.info("Planted {} at {},{},{}", seed.getType().getName(), x, y, z);
             }
-        }
-
-        if (selectedItem instanceof Book book) {
-            book.use(gameMaster);
         }
     }
 

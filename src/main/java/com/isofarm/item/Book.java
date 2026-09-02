@@ -10,8 +10,7 @@ import com.isofarm.wrld.GameMaster;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
+import static org.lwjgl.glfw.GLFW.*;
 
 public class Book extends Usable {
     private final List<Page> pages;
