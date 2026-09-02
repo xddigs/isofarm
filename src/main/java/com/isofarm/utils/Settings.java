@@ -12,7 +12,7 @@ public class Settings {
     private static int unloadMargin = 4;
     private static int guiScaleIndex = 2;
     private static boolean doKeepInventory = false;
-    private static boolean doEnableMotions = true;
+    private static boolean doEnableMotions = false;
     private static float maxInteractionDistance = 6.0f;
     private static boolean doEnableMusic = true;
     private static boolean doEnableDebugInfo = true;
