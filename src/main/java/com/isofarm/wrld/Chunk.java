@@ -36,9 +36,23 @@ public class Chunk {
     }
 
     public void setBlock(int x, int y, int z, byte blockId) {
-        if (!isOutOfBounds(x, y, z)) {
-            blocks[getIndex(x, y, z)] = blockId;
+        if (isOutOfBounds(x, y, z)) {
+            return;
         }
+
+        int index = getIndex(x, y, z);
+        byte oldBlockId = blocks[index];
+        blocks[index] = blockId;
+        boolean oldWasPlant = isPlant(oldBlockId);
+        boolean newIsPlant = isPlant(blockId);
+        if (oldWasPlant || newIsPlant) {
+            plantCacheDirty = true;
+        }
+    }
+
+    private boolean isPlant(byte blockId) {
+        BlockData data = BlockData.fromId(blockId);
+        return data != null && data.isPlant();
     }
 
     public byte getWaterLevel(int x, int y, int z) {

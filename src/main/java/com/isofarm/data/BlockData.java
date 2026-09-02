@@ -145,7 +145,7 @@ public enum BlockData implements Craftable {
         for (BlockData block : values()) {
             if (block.isPlant) result.add(block);
         }
-        return result.toArray(new BlockData[0]);
+        return result.toArray(new BlockData[result.size()]);
     }
 
     public static BlockData[] all() {
