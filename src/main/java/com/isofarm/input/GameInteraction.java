@@ -62,9 +62,12 @@ public class GameInteraction {
     public BlockPos update(GameMaster gameMaster, Item selectedItem) {
         Player player = gameMaster.getPlayer();
         Inventory inventory = player.getInventory();
-        boolean isCtrlHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL) || Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
+        boolean isCtrlHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL) ||
+                Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
+
         boolean isShiftHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT);
         isSmartShift = isShiftHeld && !gameMaster.isInventoryOpen();
+
         boolean isLeftHeld = Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT);
         boolean isLeftPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
         boolean isRightPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_RIGHT);
