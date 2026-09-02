@@ -46,7 +46,7 @@ public class GroundedState implements PlayerState {
                 .getActiveCamera()
                 .getYaw();
 
-        player.wasd(player.getGameMaster().getWorld(), delta, yaw);
+        player.wasd(player.getGameMaster().getWorld(), delta, yaw, false);
     }
 
     @Override

@@ -54,8 +54,7 @@ public class FallingState implements PlayerState {
                 .getActiveCamera()
                 .getYaw();
 
-        player.wasd(world, delta, yaw);
-
+        player.wasd(world, delta, yaw, false);
         if (player.isOnGround()) {
             float fallDistance = fallStartY - player.getPosition().y;
 

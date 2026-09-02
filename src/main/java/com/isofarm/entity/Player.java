@@ -671,7 +671,8 @@ public class Player extends Character {
         collide(world, getVelocity(), delta);
     }
 
-    public void wasd(World world, float delta, float cameraYaw) {
+    public void wasd(World world, float delta, float cameraYaw,
+                     boolean isFlying) {
         if (gameMaster.isChatOpen() || gameMaster.isInventoryOpen() ||
                 BookService.bs.isOpen()) return;
 
@@ -714,11 +715,10 @@ public class Player extends Character {
                     targetVelocity.z = ZERO_VELOCITY;
                 }
             }
-
-            collide(world, targetVelocity, delta);
+            if (!isFlying) collide(world, targetVelocity, delta);
         } else {
             Vector3f targetVelocity = new Vector3f(ZERO_VELOCITY, getVelocity().y, ZERO_VELOCITY);
-            collide(world, targetVelocity, delta);
+            if (!isFlying) collide(world, targetVelocity, delta);
         }
     }
 
@@ -919,12 +919,11 @@ public class Player extends Character {
         return gameMaster.getDifficulty().getMultiplier();
     }
 
-    public void fly(float delta, float yaw) {
+    public void fly(float delta, float yaw, boolean isFlying) {
         if (isOnGround()) {
-            setVelocity(new Vector3f(ZERO_VELOCITY, INITIAL_Y_VELOCITY, ZERO_VELOCITY));
             return;
         }
 
-        wasd(gameMaster.getWorld(), delta, yaw);
+        wasd(gameMaster.getWorld(), delta, yaw, isFlying);
     }
 }

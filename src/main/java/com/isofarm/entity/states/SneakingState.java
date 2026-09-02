@@ -47,7 +47,7 @@ public class SneakingState implements PlayerState {
         }
 
         float yaw = player.getGameMaster().getActiveCamera().getYaw();
-        player.wasd(player.getGameMaster().getWorld(), delta, yaw);
+        player.wasd(player.getGameMaster().getWorld(), delta, yaw, false);
     }
 
     @Override

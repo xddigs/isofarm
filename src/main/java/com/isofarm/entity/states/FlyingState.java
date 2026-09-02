@@ -41,7 +41,7 @@ public class FlyingState implements PlayerState {
                 .getActiveCamera()
                 .getYaw();
 
-        player.fly(delta, yaw);
+        player.fly(delta, yaw, true);
     }
 
     @Override
