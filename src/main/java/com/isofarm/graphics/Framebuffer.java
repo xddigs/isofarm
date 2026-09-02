@@ -38,6 +38,18 @@ public class Framebuffer {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
+    public int getFboId() {
+        return fboId;
+    }
+
+    public int getTextureId() {
+        return textureId;
+    }
+
+    public int getDepthBufferId() {
+        return depthBufferId;
+    }
+
     public void bind() {
         glBindFramebuffer(GL_FRAMEBUFFER, fboId);
         glViewport(0, 0, width, height);
@@ -46,10 +58,6 @@ public class Framebuffer {
     public void unbind(int windowWidth, int windowHeight) {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, windowWidth, windowHeight);
-    }
-
-    public int getTextureId() {
-        return textureId;
     }
 
     public void dispose() {

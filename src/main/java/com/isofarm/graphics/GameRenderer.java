@@ -232,6 +232,32 @@ public class GameRenderer {
             defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
         }
 
+        if (hoveredCell != null) {
+            sceneFbo.bind();
+            glEnable(GL_DEPTH_TEST);
+            glDepthFunc(GL_LEQUAL);
+            glLineWidth(2.0f);
+            glDepthMask(false);
+            glEnable(GL_POLYGON_OFFSET_LINE);
+            glPolygonOffset(-1.0f, -1.0f);
+
+            defaultShader.bind();
+            defaultShader.setUniform("uIsWater", false);
+            defaultShader.setUniform("uIsSubmergedEntity", false);
+            defaultShader.setUniform("uIsMaskPass", false);
+            defaultShader.setUniform("uProjection", camera.getProjectionMatrix());
+            defaultShader.setUniform("uView", camera.getViewMatrix());
+            modelMatrix.identity().translate(hoveredCell.x(), hoveredCell.y(), hoveredCell.z());
+            defaultShader.setUniform("uModel", modelMatrix);
+            glEnable(GL_CULL_FACE);
+            glCullFace(GL_BACK);
+            rm.getSelectionMesh().renderLines();
+            glDisable(GL_POLYGON_OFFSET_LINE);
+            defaultShader.unbind();
+            glDepthMask(true);
+            glDepthFunc(GL_LESS);
+        }
+
         defaultShader.setUniform("uIsWater", false);
         defaultShader.setUniform("uIsSubmergedEntity", false);
         gameMaster.getEntities().removeIf(e -> !e.isAlive());
@@ -294,55 +320,6 @@ public class GameRenderer {
 
         if (blockAtlas != null) blockAtlas.unbind();
 
-        if (hoveredCell != null) {
-            Vector3f outlineColor = getOutlineColor(gameMaster);
-            glEnable(GL_DEPTH_TEST);
-            glDepthMask(false);
-            defaultShader.bind();
-            defaultShader.setUniform("uUseTexture", false);
-            defaultShader.setUniform("uUseFaceAtlas", false);
-            defaultShader.setUniform("uBaseColor", outlineColor);
-            modelMatrix.identity().translate(hoveredCell.x(), hoveredCell.y(), hoveredCell.z());
-            defaultShader.setUniform("uModel", modelMatrix);
-            rm.getSelectionMesh().renderLines();
-            glDepthMask(true);
-        }
-
-        if (hoveredCell != null) {
-            maskFbo.bind();
-            glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-            defaultShader.bind();
-            defaultShader.setUniform("uIsMaskPass", true);
-            defaultShader.setUniform("uUseTexture", true);
-            defaultShader.setUniform("uUseFaceAtlas", false);
-            defaultShader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
-            defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
-
-            maskFbo.unbind((int) windowWidth, (int) windowHeight);
-            sceneFbo.bind();
-
-            glDisable(GL_DEPTH_TEST);
-
-            Shader outlineShader = rm.getOutlineShader();
-            outlineShader.bind();
-            outlineShader.setUniform("uScreenSize", new Vector2f(windowWidth, windowHeight));
-            outlineShader.setUniform("uOutlineColor", getOutlineColor(gameMaster));
-            outlineShader.setUniform("uMaskTexture", 0);
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, maskFbo.getTextureId());
-
-            rm.getScreenQuadMesh().render();
-
-            glBindTexture(GL_TEXTURE_2D, 0);
-            outlineShader.unbind();
-
-            glEnable(GL_DEPTH_TEST);
-            defaultShader.bind();
-            defaultShader.setUniform("uIsMaskPass", false);
-        }
-
         defaultShader.unbind();
         sceneFbo.unbind((int) windowWidth, (int) windowHeight);
 
@@ -392,10 +369,17 @@ public class GameRenderer {
     }
 
     private Vector3f getOutlineColor(GameMaster gameMaster) {
-        boolean isSmartShift = gameMaster.getGameInteraction() != null
-                && gameMaster.getGameInteraction().isSmartShiftActive();
+        GameInteraction interaction = gameMaster.getGameInteraction();
+        if (interaction == null) return new Vector3f(0.1f, 0.1f, 0.1f);
+        if (interaction.isSmartShiftActive()) {
+            return new Vector3f(0.0f, 0.8f, 1.0f);
+        }
 
-        return isSmartShift ? new Vector3f(1.0f, 0.95f, 0.45f) : K.Colors.OUTLINE_DEFAULT;
+        if (interaction.isBreakingBlock()) {
+            return new Vector3f(1.0f, 0.3f, 0.2f);
+        }
+
+        return new Vector3f(0.1f);
     }
 
     private void renderShadowPass(GameMaster gameMaster, ResourceManager rm,
