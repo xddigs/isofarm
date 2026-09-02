@@ -1,5 +1,6 @@
 package com.isofarm.graphics;
 
+import com.isofarm.utils.K;
 import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,6 +86,7 @@ public class Mesh {
 
     public void renderLines() {
         glBindVertexArray(vaoId);
+        glLineWidth(K.Render.LINE_WIDTH);
         glDrawElements(GL_LINES, vertexCount, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
@@ -173,35 +175,15 @@ public class Mesh {
         float[] positions = getPositions(eps);
         float[] normals = new float[24];
         float[] textCoords = new float[16];
-        int[] indices = new int[]{
-                0, 1, 1, 2, 2, 3, 3, 0,
-                4, 5, 5, 6, 6, 7, 7, 4,
-                0, 1, 1, 5, 5, 4, 4, 0,
-                3, 2, 2, 6, 6, 7, 7, 3,
-                0, 3, 3, 7, 7, 4, 4, 0,
-                1, 2, 2, 6, 6, 5, 5, 1};
+        int[] indices = new int[]{0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7};
         return new Mesh(positions, normals, textCoords, indices);
     }
 
     private static float[] getPositions(float eps) {
-        float minX = -eps;
-        float maxX = 1.0f + eps;
-
-        float minY = -eps;
-        float maxY = 1.0f + eps;
-
-        float minZ = -eps;
-        float maxZ = 1.0f + eps;
-
-        return new float[]{
-                minX, maxY, minZ,
-                maxX, maxY, minZ,
-                maxX, maxY, maxZ,
-                minX, maxY, maxZ,
-                minX, minY, minZ,
-                maxX, minY, minZ,
-                maxX, minY, maxZ,
-                minX, minY, maxZ};
+        float minX = -eps; float maxX = 1.0f + eps;
+        float minY = -eps; float maxY = 1.0f + eps;
+        float minZ = -eps; float maxZ = 1.0f + eps;
+        return new float[]{minX, maxY, minZ, maxX, maxY, minZ, maxX, maxY, maxZ, minX, maxY, maxZ, minX, minY, minZ, maxX, minY, minZ, maxX, minY, maxZ, minX, minY, maxZ};
     }
 
     public static Mesh quadVertical() {

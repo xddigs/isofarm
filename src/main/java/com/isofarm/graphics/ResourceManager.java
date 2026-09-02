@@ -31,7 +31,9 @@ public class ResourceManager {
     private static SpriteSheet beetroot;
     private static GLTFModel playerModel;
     private final Shader defaultShader;
+    private final Shader outlineShader;
     private final Shader rainShader;
+    private final Shader motionBlurShader;
     private final Shader shadowMapShader;
     private final Shader blurShader;
     private final Mesh screenQuadMesh;
@@ -46,7 +48,9 @@ public class ResourceManager {
 
     public ResourceManager() {
         this.defaultShader = new Shader(K.Paths.DEFAULT_VERT_SHADER, K.Paths.DEFAULT_FRAG_SHADER);
+        this.outlineShader = new Shader(K.Paths.OUTLINE_VERT_SHADER, K.Paths.OUTLINE_FRAG_SHADER);
         this.rainShader = new Shader(K.Paths.RAIN_VERT_SHADER, K.Paths.RAIN_FRAG_SHADER);
+        this.motionBlurShader = new Shader(K.Paths.MOTION_BLUR_VERT_SHADER, K.Paths.MOTION_BLUR_FRAG_SHADER);
         this.shadowMapShader = new Shader(K.Paths.SHADOW_VERT_SHADER, K.Paths.SHADOW_FRAG_SHADER);
         this.blurShader = new Shader(K.Paths.BLUR_VERT_SHADER, K.Paths.BLUR_FRAG_SHADER);
 
@@ -202,6 +206,8 @@ public class ResourceManager {
         heartsSpriteSheet.dispose();
 
         defaultShader.dispose();
+        outlineShader.dispose();
+        motionBlurShader.dispose();
         rainShader.dispose();
         shadowMapShader.dispose();
         blurShader.dispose();
@@ -211,8 +217,16 @@ public class ResourceManager {
         return defaultShader;
     }
 
+    public Shader getOutlineShader() {
+        return outlineShader;
+    }
+
     public Shader getRainShader() {
         return rainShader;
+    }
+
+    public Shader getMotionBlurShader() {
+        return motionBlurShader;
     }
 
     public Shader getShadowMapShader() {
@@ -310,7 +324,9 @@ public class ResourceManager {
     public Shader getShader(String name) {
         if (name == null) return defaultShader;
         return switch (name.toLowerCase()) {
+            case "outline" -> outlineShader;
             case "rain" -> rainShader;
+            case "motion_blur" -> motionBlurShader;
             case "blur" -> blurShader;
             case "shadow" -> shadowMapShader;
             case "default", "item" -> defaultShader;
