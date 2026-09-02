@@ -5,12 +5,14 @@ public class Settings {
     private static final float BASE_ICON_SIZE = 16.0f;
     private static final float[] GUI_SCALES = {1.0f, 2.0f, 3.0f};
     private static final float SHADOW_MAP_SIZE = 4096.0f;
+    private static float fov = 80f;
     private static float ticks = 12000f;
     private static float mouseSensitivity = 0.4f;
     private static int renderDistance = 16;
     private static int unloadMargin = 4;
     private static int guiScaleIndex = 2;
     private static boolean doKeepInventory = false;
+    private static boolean doEnableMotions = true;
     private static float maxInteractionDistance = 6.0f;
     private static boolean doEnableMusic = true;
     private static boolean doEnableDebugInfo = true;
@@ -99,6 +101,14 @@ public class Settings {
         Settings.maxInteractionDistance = maxInteractionDistance;
     }
 
+    public static float getFov() {
+        return fov;
+    }
+
+    public static void setFov(float fov) {
+        Settings.fov = fov;
+    }
+
     public static boolean doEnableShadows() {
         return doEnableShadows;
     }
@@ -111,12 +121,32 @@ public class Settings {
         return mouseSensitivity;
     }
 
+    public static float doEnableMotions() {
+        return doEnableMotions ? 0.8f : 0.0f;
+    }
+
     public static boolean doKeepInventory() {
         return doKeepInventory;
     }
 
     public static void setDoKeepInventory(boolean doKeepInventory) {
         Settings.doKeepInventory = doKeepInventory;
+    }
+
+    public static void setDoEnableMotions(boolean doEnableMotions) {
+        Settings.doEnableMotions = doEnableMotions;
+    }
+
+    public static void toggleMotionBlur() {
+        doEnableMotions = !doEnableMotions;
+    }
+
+    public static void toggleKeepInventory() {
+        doKeepInventory = !doKeepInventory;
+    }
+
+    public static void toggleShadows() {
+        doEnableShadows = !doEnableShadows;
     }
 
     public static void toggleMusic() {
