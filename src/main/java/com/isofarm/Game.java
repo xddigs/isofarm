@@ -63,7 +63,6 @@ public class Game {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, OPENGL_MINOR_VERSION);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
-        glfwWindowHint(GLFW_ICONIFIED, GLFW_TRUE);
 
         window = glfwCreateWindow(
                 (int) K.Window.DEFAULT_WIDTH,
