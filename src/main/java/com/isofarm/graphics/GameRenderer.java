@@ -25,12 +25,12 @@ import static org.lwjgl.opengl.GL13.*;
 public class GameRenderer {
     private final Matrix4f modelMatrix = new Matrix4f();
     private final Matrix4f viewProjMatrix = new Matrix4f();
-    private final FrustumIntersection frustum = new FrustumIntersection();
     private final Matrix4f lightProjection = new Matrix4f();
     private final Matrix4f lightView = new Matrix4f();
     private final Matrix4f lightSpaceMatrix = new Matrix4f();
     private final Vector3f lightPosition = new Vector3f();
     private final Vector3f lightTarget = new Vector3f();
+    private final FrustumIntersection frustum = new FrustumIntersection();
     private float previousCameraYaw;
     private float previousCameraPitch;
     private float blurX;
