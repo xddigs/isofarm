@@ -100,13 +100,25 @@ public class GameInteraction {
             dropItem(gameMaster, selectedItem, dropAll);
         }
 
-        if (Keyboard.isKeyPressed(GLFW_KEY_E) && BookService.bs.isOpen()) {
-            BookService.bs.close();
-        }
-
         if (Keyboard.isKeyPressed(GLFW_KEY_E) && !gameMaster.isChatOpen() &&
                 !BookService.bs.isOpen()) {
             gameMaster.toggleInventory();
+        }
+
+        if (inventory.hasBookEquipped() && Keyboard.isKeyPressed(GLFW_KEY_B)
+                && !gameMaster.isChatOpen()) {
+            if (selectedItem instanceof CraftingBook book) {;
+                if (!BookService.bs.isOpen()) {
+                    BookService.bs.open(book);
+                } else {
+                    BookService.bs.close();
+                }
+            }
+        }
+
+        if (Keyboard.isKeyPressed(GLFW_KEY_E) && BookService.bs.isOpen() &&
+            !inventory.hasBookEquipped()) {
+            BookService.bs.close();
         }
 
         if (!gameMaster.getPlayer().getGamemode().isNoClip()) {
@@ -133,30 +145,21 @@ public class GameInteraction {
             if (isCtrlHeld) {
                 backpack.unequip();
             } else {
-                backpack.use(gameMaster);
+                backpack.use(gameMaster, isCtrlHeld);
             }
             isRightPressed = false;
         }
 
-        if (selectedItem instanceof Book book &&
+        if (selectedItem instanceof CraftingBook book &&
                 isRightPressed && !BookService.bs.isOpen()) {
-            if (isCtrlHeld) {
-                if (!inventory.hasBookEquipped()) {
-                    inventory.equipBook(book);
-                } else {
-                    inventory.unequipBook();
-                }
-            } else {
-                book.use(gameMaster);
-            }
+            book.use(gameMaster, isCtrlHeld);
             isRightPressed = false;
         }
 
-        if (selectedItem instanceof Bucket bucket) {
-            if (isRightPressed && !gameMaster.isInventoryOpen()) {
-                bucket.use(gameMaster);
-                isRightPressed = false;
-            }
+        if (selectedItem instanceof Bucket bucket &&
+                isRightPressed && !gameMaster.isInventoryOpen()) {
+            bucket.use(gameMaster, isCtrlHeld);
+            isRightPressed = false;
         }
 
         BlockPos hoveredCell = HoveredCell.get(gameMaster, isShiftHeld);

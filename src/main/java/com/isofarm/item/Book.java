@@ -31,7 +31,7 @@ public class Book extends Usable {
     }
 
     @Override
-    public boolean use(GameMaster gameMaster) {
+    public boolean use(GameMaster gameMaster, boolean isCtrlHeld) {
         if (!hasContent) return false;
         if (isOpen) {
             BookService.bs.close();

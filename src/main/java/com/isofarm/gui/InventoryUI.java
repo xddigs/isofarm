@@ -147,7 +147,7 @@ public class InventoryUI extends UIElement {
             float x = Settings.getScaledPadding() + column * (Settings.getScaledSlot() + Settings.getScaledSpacing());
             float y = Settings.getScaledPadding() + Settings.getScaledHeader() + row * (Settings.getScaledSlot() + Settings.getScaledSpacing());
             InventorySlotUI slotUI = new InventorySlotUI(x, y, Settings.getScaledSlot(), Settings.getScaledSlot(),
-                    InventorySlotUI.SlotType.INVENTORY);
+                    SlotType.INVENTORY);
 
             slotUIs[i] = slotUI;
             addChild(slotUI);

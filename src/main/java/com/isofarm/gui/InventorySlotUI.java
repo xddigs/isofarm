@@ -265,6 +265,4 @@ public class InventorySlotUI extends UIElement {
             this.countFont = countFont;
         }
     }
-
-    public enum SlotType {NONE, INVENTORY, BACKPACK, HOTBAR}
 }

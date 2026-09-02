@@ -24,7 +24,7 @@ public class Bucket extends Usable {
     }
 
     @Override
-    public boolean use(GameMaster gameMaster) {
+    public boolean use(GameMaster gameMaster, boolean isCtrlHeld) {
         Player player = gameMaster.getPlayer();
         World world = gameMaster.getWorld();
 

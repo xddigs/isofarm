@@ -12,10 +12,9 @@ public class Backpack extends Usable implements Undroppable {
     }
 
     @Override
-    public boolean use(GameMaster gameMaster) {
+    public boolean use(GameMaster gameMaster,  boolean isCtrlHeld) {
         Player player = gameMaster.getPlayer();
         if (player == null) return false;
-
         setPlayer(player);
 
         if (!player.getInventory().hasBackpackEquipped()) {

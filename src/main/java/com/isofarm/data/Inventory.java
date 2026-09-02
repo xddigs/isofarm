@@ -47,7 +47,7 @@ public class Inventory {
     }
 
     public boolean hasBookEquipped() {
-        return !bookSlot.isEmpty() && bookSlot.getItem() instanceof Book;
+        return !bookSlot.isEmpty() && bookSlot.getItem() instanceof CraftingBook;
     }
 
     public void equipBackpack(Backpack backpack) {

@@ -53,6 +53,6 @@ public abstract class Usable implements Craftable, Enchantable {
         this.player = player;
     }
 
-    public abstract boolean use(GameMaster gameMaster);
+    public abstract boolean use(GameMaster gameMaster, boolean isCtrlHeld);
     public abstract void update();
 }
