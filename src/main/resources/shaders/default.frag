@@ -77,15 +77,11 @@ void main() {
     vec3 lightDir = normalize(-uLightDirection);
     float diffuse = max(dot(normal, lightDir), 0.0);
 
-    float shadow = 0.0;
-    if (uEnableShadows) {
-        shadow = calculateShadow(vLightSpacePosition, normal);
-    }
-
     if (uIsSprite) {
         diffuse = 0.95;
     }
 
+    float shadow = 0.0;
     if (uEnableShadows && !uIsSprite) {
         shadow = calculateShadow(vLightSpacePosition, normal);
     }
