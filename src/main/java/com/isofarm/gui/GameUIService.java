@@ -372,7 +372,6 @@ public class GameUIService implements Service<GameMaster> {
 
     public void resetHotbarPosition() {
         hotbarUI.refreshSize();
-
         float hotbarX = windowWidth / 2.0f - hotbarUI.getWidth() / 2.0f;
         float hotbarY = windowHeight - hotbarUI.getHeight() - K.UI.HOTBAR_OFFSET;
         hotbarUI.setPosition(hotbarX, hotbarY);

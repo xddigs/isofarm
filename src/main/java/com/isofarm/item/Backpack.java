@@ -18,7 +18,6 @@ public class Backpack extends Usable implements Undroppable {
         setPlayer(player);
 
         if (!player.getInventory().hasBackpackEquipped()) {
-            SoundService.fx.playUseSound(SoundGroup.ITEMS);
             player.getInventory().equipBackpack(this);
             gameMaster.getGameUIService().resetHotbarPosition();
             return true;
@@ -36,7 +35,6 @@ public class Backpack extends Usable implements Undroppable {
 
     public void unequip() {
         if (getPlayer() != null && getPlayer().getInventory().hasBackpackEquipped()) {
-            SoundService.fx.playUseSound(SoundGroup.ITEMS);
             getPlayer().getInventory().unequipBackpack();
             getPlayer().getGameMaster().getGameUIService().resetHotbarPosition();
         }

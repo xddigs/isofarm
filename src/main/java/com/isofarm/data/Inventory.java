@@ -9,6 +9,7 @@ import java.util.*;
 @DataClass
 public class Inventory {
     private final List<InventorySlot> slots;
+    private final List<InventorySlot> equippedExtraItems = new ArrayList<>();
     private final InventorySlot backpackSlot;
     private final InventorySlot bookSlot;
 
@@ -34,6 +35,10 @@ public class Inventory {
         return Collections.unmodifiableMap(result);
     }
 
+    public List<InventorySlot> getEquippedExtraItems() {
+        return equippedExtraItems;
+    }
+
     public InventorySlot getBackpackSlot() {
         return backpackSlot;
     }
@@ -53,22 +58,28 @@ public class Inventory {
     public void equipBackpack(Backpack backpack) {
         remove(backpack, 1);
         backpackSlot.setItem(backpack);
+        equippedExtraItems.add(backpackSlot);
+        SoundService.fx.playUseSound(SoundGroup.ITEMS);
     }
 
     public void equipBook(Book book) {
         remove(book, 1);
         bookSlot.setItem(book);
+        equippedExtraItems.add(bookSlot);
         SoundService.fx.playUseSound(SoundGroup.ITEMS);
     }
 
     public void unequipBackpack() {
         Item backpack = backpackSlot.getItem();
+        equippedExtraItems.remove(backpack);
         add(backpack, 1);
         backpackSlot.clear();
+        SoundService.fx.playUseSound(SoundGroup.ITEMS);
     }
 
     public void unequipBook() {
         Item book = bookSlot.getItem();
+        equippedExtraItems.remove(book);
         add(book, 1);
         bookSlot.clear();
         SoundService.fx.playUseSound(SoundGroup.ITEMS);
