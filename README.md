@@ -15,8 +15,6 @@ environment driven by custom 3D mesh rendering, particle systems, and dynamic da
 | **Interact/Place Blocks**          | `Mouse RB`<br>           |
 | **Attack/Break Blocks**            | `Mouse LB`<br>           |
 | **Zoom Camera**                    | `C`<br>                  |
-| **Break Block / Harvest**          | `Left Mouse Button`<br>  |
-| **Place Block / Use Tool / Plant** | `Right Mouse Button`<br> |
 | **Open / Close Inventory**         | `E`<br>                  |
 | **Toggle Chat / Console**          | `Enter` <br>             |
 | **Toggle HUD (F1 mode)**           | `F1`<br>                 |
