@@ -96,12 +96,10 @@ public class WorldGenerator {
 
             if (!isInsidePool(fx, fz) && (fx != treeX || fz != treeZ)) {
                 BlockData[] plants = BlockData.allPlants();
-                for (BlockData plant : plants) {
-                    byte plantId = plant.getId();
-                    if (plant.equals(BlockData.OAK_BONSAI)) continue;
-                    if (world.getBlockTypeAt(fx, SURFACE_Y, fz) != BlockData.AIR.getId()) {
-                        world.setBlockTypeAt(fx, SURFACE_Y + 1, fz, plantId);
-                    }
+                BlockData plant = plants[random.nextInt(plants.length)];
+                if (plant != BlockData.OAK_BONSAI &&
+                        world.getBlockTypeAt(fx, SURFACE_Y, fz) != BlockData.AIR.getId()) {
+                    world.setBlockTypeAt(fx, SURFACE_Y + 1, fz, plant.getId());
                 }
             }
         }
