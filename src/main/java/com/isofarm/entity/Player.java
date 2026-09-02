@@ -68,8 +68,8 @@ public class Player extends Character {
     private static final float RESPAWN_Y_OFFSET = 1.0f;
     private static final float EYE_HEIGHT_LERP_SPEED = 10.0f;
     private static final float SNEAK_WEIGHT_LERP_SPEED = 75.0f;
-    private static final float ANIMATION_IDLE_BREATH_SPEED = 2.5f;
     private static final float STRIDE_AMPLITUDE = 0.45f;
+    private static final float ANIMATION_IDLE_BREATH_SPEED = 2.5f;
     private static final float ANIMATION_SPEED_FACTOR = 10.0f;
     private static final float FULL_DEGREES = 360.0f;
     private static final float HALF_DEGREES = 180.0f;
@@ -353,7 +353,9 @@ public class Player extends Character {
 
         setAnimTimer(getAnimTimer() + delta);
         heal(((0.5f + getLevel()) * delta) / getDifficultyRegen());
-        autoJump(gameMaster.getWorld(), getVelocity(), delta);
+        if (!(currentState instanceof SneakingState)) {
+            autoJump(gameMaster.getWorld(), getVelocity(), delta);
+        }
         updateEquipmentVisual();
         checkDurability();
     }
@@ -700,16 +702,21 @@ public class Player extends Character {
 
             Vector3f targetVelocity = new Vector3f(worldX * getSpeed(), getVelocity().y, worldZ * getSpeed());
             if (currentState instanceof SneakingState) {
-                Vector3f nextPosition = new Vector3f(position).add(targetVelocity.x * delta,
-                        ZERO_VELOCITY, targetVelocity.z * delta);
+                float nextX = position.x + targetVelocity.x * delta;
+                float nextZ = position.z + targetVelocity.z * delta;
+                boolean nearGround = isOnGround() || hasGroundBelow(world, position.x, position.z);
+                if (nearGround) {
+                    if (!hasGroundBelow(world, nextX, position.z)) {
+                        targetVelocity.x = ZERO_VELOCITY;
+                    }
 
-                int blockX = (int) Math.floor(nextPosition.x);
-                int blockZ = (int) Math.floor(nextPosition.z);
-                int blockY = (int) Math.floor(position.y - SNEAK_GROUND_OFFSET);
+                    if (!hasGroundBelow(world, position.x, nextZ)) {
+                        targetVelocity.z = ZERO_VELOCITY;
+                    }
 
-                if (world.getBlockTypeAt(blockX, blockY, blockZ) == BlockData.AIR.getId()) {
-                    targetVelocity.x = ZERO_VELOCITY;
-                    targetVelocity.z = ZERO_VELOCITY;
+                    if (targetVelocity.y < 0) {
+                        targetVelocity.y = ZERO_VELOCITY;
+                    }
                 }
             }
             if (!isFlying) collide(world, targetVelocity, delta);
@@ -722,6 +729,28 @@ public class Player extends Character {
     public void fly(float delta, float yaw, boolean isFlying) {
         if (isOnGround()) return;
         wasd(gameMaster.getWorld(), delta, yaw, isFlying);
+    }
+
+    public boolean hasGroundBelow(World world, float testX, float testZ) {
+        float epsilon = 0.001f;
+        float halfWidth = dimensions.x / 2.0f - epsilon;
+        float halfDepth = dimensions.z / 2.0f - epsilon;
+        int blockY = (int) Math.floor(position.y - 0.2f);
+
+        float[] minMaxX = { testX - halfWidth, testX + halfWidth };
+        float[] minMaxZ = { testZ - halfDepth, testZ + halfDepth };
+
+        for (float x : minMaxX) {
+            for (float z : minMaxZ) {
+                int bx = (int) Math.floor(x);
+                int bz = (int) Math.floor(z);
+                if (world.isBlockSolid(bx, blockY, bz)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private void setUpInventory() {

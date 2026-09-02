@@ -41,11 +41,6 @@ public class SneakingState implements PlayerState {
             return;
         }
 
-        if (!player.isOnGround()) {
-            player.changeState(new FallingState());
-            return;
-        }
-
         float yaw = player.getGameMaster().getActiveCamera().getYaw();
         player.wasd(player.getGameMaster().getWorld(), delta, yaw, false);
     }

@@ -72,7 +72,6 @@ public class GameInteraction {
         boolean isRightPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_RIGHT);
         boolean canInteract = player != null
                 && !player.getGamemode().isNoClip()
-                && !isCtrlHeld
                 && !gameMaster.isInventoryOpen()
                 && !gameMaster.isChatOpen();
 
