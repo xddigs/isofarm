@@ -49,15 +49,14 @@ public record CameraController(Camera camera) implements Service<Camera> {
             }
         }
 
-//        click(gameMaster, player, gameMaster.getWorld());
-//        followPath(player, gameMaster.getWorld(), delta);
         updateZoom();
         followPlayer(gameMaster, player, delta);
     }
 
     private void updateZoom() {
         boolean isPressingC = Keyboard.isKeyDown(GLFW_KEY_C);
-        float targetZoom = isPressingC ? ZOOMED_ZOOM : NORMAL_ZOOM;
+        boolean isMiddleClickDown = Mouse.isButtonDown(GLFW_MOUSE_BUTTON_MIDDLE);
+        float targetZoom = isPressingC || isMiddleClickDown ? ZOOMED_ZOOM : NORMAL_ZOOM;
         if (camera.getZoom() != targetZoom) {
             camera.setZoom(targetZoom);
         }
