@@ -28,9 +28,9 @@ public class ChunkManager {
     private int lastPlayerChunkX = Integer.MAX_VALUE;
     private int lastPlayerChunkZ = Integer.MAX_VALUE;
 
-    public ChunkManager(World world) {
+    public ChunkManager(World world, WaterSimulation waterSimulation) {
         this.world = world;
-        this.generator = new WorldGenerator(world);
+        this.generator = new WorldGenerator(world, waterSimulation);
         this.chunkMeshes = new HashMap<>();
         this.soilTimers = new HashMap<>();
         int threads = Math.max(1, Runtime.getRuntime().availableProcessors() - 2);

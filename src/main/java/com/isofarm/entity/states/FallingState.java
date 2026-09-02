@@ -44,7 +44,7 @@ public class FallingState implements PlayerState {
         fallTime += delta;
         jumpTime += delta;
 
-        if (player.isUnderFluid(world)) {
+        if (player.isInFluid(world)) {
             player.setFalling(false);
             player.changeState(new SwimmingState());
             return;

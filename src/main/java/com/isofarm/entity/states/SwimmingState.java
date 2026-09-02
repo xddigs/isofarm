@@ -39,7 +39,7 @@ public class SwimmingState implements PlayerState {
 
         player.getVelocity().y *= WATER_DRAG;
 
-        if (!player.isUnderFluid(world)) {
+        if (!player.isInFluid(world)) {
             if (player.isOnGround()) {
                 player.changeState(new GroundedState());
             } else {

@@ -1,8 +1,8 @@
 package com.isofarm.entity;
 
 import com.isofarm.data.BlockData;
-import com.isofarm.data.DataClass;
 import com.isofarm.data.BlockPos;
+import com.isofarm.data.DataClass;
 import com.isofarm.data.RenderPass;
 import com.isofarm.utils.K;
 import com.isofarm.wrld.GameMaster;
@@ -143,7 +143,14 @@ public abstract class Entity {
 
         velocity.x += (targetVelocity.x - velocity.x) * smooth;
         velocity.z += (targetVelocity.z - velocity.z) * smooth;
-        velocity.y += K.World.GRAVITY * delta;
+
+        boolean inFluid = isInFluid(world);
+        if (inFluid) {
+            velocity.y += K.World.GRAVITY * 0.15f * delta;
+        } else {
+            velocity.y += K.World.GRAVITY * delta;
+        }
+
         setOnGround(false);
         position.x += velocity.x * delta;
         if (checkCollision(world)) {
@@ -232,35 +239,6 @@ public abstract class Entity {
         setOnGround(false);
     }
 
-    public boolean canStandUp(World world) {
-        float epsilon = 0.001f;
-        float minX = position.x - dimensions.x / 2.0f + epsilon;
-        float maxX = position.x + dimensions.x / 2.0f - epsilon;
-        float minY = position.y + epsilon;
-        float maxY = position.y + standingHeight - epsilon;
-
-        float minZ = position.z - dimensions.z / 2.0f + epsilon;
-        float maxZ = position.z + dimensions.z / 2.0f - epsilon;
-
-        int blockMinX = (int) Math.floor(minX);
-        int blockMaxX = (int) Math.floor(maxX);
-        int blockMinY = (int) Math.floor(minY);
-        int blockMaxY = (int) Math.floor(maxY);
-        int blockMinZ = (int) Math.floor(minZ);
-        int blockMaxZ = (int) Math.floor(maxZ);
-
-        for (int x = blockMinX; x <= blockMaxX; x++) {
-            for (int y = blockMinY; y <= blockMaxY; y++) {
-                for (int z = blockMinZ; z <= blockMaxZ; z++) {
-                    if (world.isBlockSolid(x, y, z)) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
-    }
-
     public float getSpeed() {
         return speed;
     }
@@ -273,27 +251,36 @@ public abstract class Entity {
         return currentEyeHeight;
     }
 
-    public boolean isUnderFluid(World world) {
+    public boolean isInFluid(World world) {
         float epsilon = 0.001f;
+
         float minX = position.x - dimensions.x / 2.0f + epsilon;
         float maxX = position.x + dimensions.x / 2.0f - epsilon;
+
         float minY = position.y + epsilon;
         float maxY = position.y + dimensions.y - epsilon;
+
         float minZ = position.z - dimensions.z / 2.0f + epsilon;
         float maxZ = position.z + dimensions.z / 2.0f - epsilon;
 
         int blockMinX = (int) Math.floor(minX);
         int blockMaxX = (int) Math.floor(maxX);
+
         int blockMinY = (int) Math.floor(minY);
         int blockMaxY = (int) Math.floor(maxY);
+
         int blockMinZ = (int) Math.floor(minZ);
         int blockMaxZ = (int) Math.floor(maxZ);
 
         for (int x = blockMinX; x <= blockMaxX; x++) {
             for (int y = blockMinY; y <= blockMaxY; y++) {
                 for (int z = blockMinZ; z <= blockMaxZ; z++) {
-                    byte blockId = world.getBlockTypeAt(x, (int) (y + getDimensions().y()), z);
-                    if (BlockData.fromId(blockId).isFluid()) {
+
+                    byte blockId = world.getBlockTypeAt(x, y, z);
+
+                    BlockData data = BlockData.fromId(blockId);
+
+                    if (data != null && data.isFluid()) {
                         return true;
                     }
 
@@ -303,6 +290,7 @@ public abstract class Entity {
                 }
             }
         }
+
         return false;
     }
 

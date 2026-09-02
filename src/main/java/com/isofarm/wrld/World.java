@@ -134,6 +134,10 @@ public class World {
         return getBlockTypeAt(pos.x(), pos.y(), pos.z());
     }
 
+    public void removeBlockAt(int x, int y, int z) {
+        blocks.remove(getBlockKey(x, y, z));
+    }
+
     public void setBlockTypeAt(int x, int y, int z, byte blockId) {
         if (y < 0 || y >= Chunk.SIZE_Y) return;
         int chunkX = Math.floorDiv(x, Chunk.SIZE_X);
@@ -211,7 +215,9 @@ public class World {
     public boolean isBlockSolid(int x, int y, int z) {
         byte blockId = getBlockTypeAt(x, y, z);
         BlockData block = BlockData.fromId(blockId);
-        return block != null && block.isSolid();
+        if (block == null) return false;
+        if (block.isFluid()) return false;
+        return block.isSolid();
     }
 
     public GridPos getHighestY(float spawnX, float spawnZ) {

@@ -65,18 +65,13 @@ public class Bucket extends Usable {
         int placeY = targetBlock.y() + normalY;
         int placeZ = targetBlock.z() + normalZ;
 
-        if (world.getBlockTypeAt(placeX, placeY, placeZ) != BlockData.AIR.getId()) {
-            return false;
-        }
-
         gameMaster.getWaterSimulation().addSource(placeX, placeY, placeZ);
         empty();
         return true;
     }
 
     @Override
-    public void update() {
-    }
+    public void update() {}
 
     @Override
     public boolean enchanting(Enchantment enchantment) {

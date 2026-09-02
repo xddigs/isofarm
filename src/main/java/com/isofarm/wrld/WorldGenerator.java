@@ -12,18 +12,20 @@ public class WorldGenerator {
     private static final int MAX_DEPTH = 24;
 
     private static World world;
+    private static WaterSimulation waterSimulation;
     private final long seed;
 
     private final int poolMinX;
     private final int poolMinZ;
     private int treeX, treeZ;
 
-    public WorldGenerator(World world) {
-        this(world, new Random().nextLong());
+    public WorldGenerator(World world, WaterSimulation waterSimulation) {
+        this(world, waterSimulation, new Random().nextLong());
     }
 
-    public WorldGenerator(World world, long seed) {
+    public WorldGenerator(World world, WaterSimulation waterSimulation, long seed) {
         WorldGenerator.world = world;
+        WorldGenerator.waterSimulation = waterSimulation;
         this.seed = seed;
 
         Random islandRandom = new Random(seed);
@@ -63,7 +65,12 @@ public class WorldGenerator {
                     if (distToCenter <= currentAllowedRadius) {
                         byte blockId;
                         if (y == SURFACE_Y) {
-                            blockId = isWaterBlock ? BlockData.WATER.getId() : BlockData.GRASS.getId();
+                            if (isWaterBlock) {
+                                blockId = BlockData.WATER.getId();
+                                chunk.setWaterLevel(x, y, z, (byte) 8);
+                            } else {
+                                blockId = BlockData.GRASS.getId();
+                            }
                         } else if (y >= SURFACE_Y - 3) {
                             blockId = BlockData.DIRT.getId();
                         } else {
@@ -78,6 +85,16 @@ public class WorldGenerator {
                             chunk.setBlock(x, y, z, blockId);
                         }
                     }
+                }
+            }
+        }
+
+        for (int x = 0; x < Chunk.SIZE_X; x++) {
+            for (int z = 0; z < Chunk.SIZE_Z; z++) {
+                int worldX = chunkX * Chunk.SIZE_X + x;
+                int worldZ = chunkZ * Chunk.SIZE_Z + z;
+                if (chunk.getBlock(x, SURFACE_Y, z) == BlockData.WATER.getId()) {
+                    waterSimulation.addSource(worldX, SURFACE_Y, worldZ);
                 }
             }
         }

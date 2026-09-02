@@ -72,9 +72,10 @@ public class ChunkMeshBuilder {
                     if (data.isFluid()) {
                         byte level = chunk.getWaterLevel(x, y, z);
                         int waterLevel = (level <= 0) ? 8 : level;
-                        topY = y + (waterLevel / 8.0f) * 0.9f;
-                    } else if (data == BlockData.TILLED_DIRT) {
-                        topY = y + TILLED_HEIGHT;
+                        boolean hasWaterAbove = (y < Chunk.SIZE_Y - 1) &&
+                                BLOCK_LUT[chunk.getBlock(x, y + 1, z) & 0xFF] != null &&
+                                BLOCK_LUT[chunk.getBlock(x, y + 1, z) & 0xFF].isFluid();
+                        topY = hasWaterAbove ? (y + 1.0f) : (y + (waterLevel / 8.0f) * 0.9f);
                     } else {
                         topY = y + 1.0f;
                     }
@@ -87,7 +88,13 @@ public class ChunkMeshBuilder {
                         TextureAtlas.TextureRegion region = data.getTopRegion();
                         if (region != null) {
                             if (isWater) {
-                                wPosIdx = addQuadPos(wPosBuf, wPosIdx, x, topY, z + 1, x + 1, topY, z + 1, x + 1, topY, z, x, topY, z);
+                                float y00 = getWaterCornerHeight(world, worldX, y, worldZ);
+                                float y10 = getWaterCornerHeight(world, worldX + 1, y, worldZ);
+                                float y11 = getWaterCornerHeight(world, worldX + 1, y, worldZ + 1);
+                                float y01 = getWaterCornerHeight(world, worldX, y, worldZ + 1);
+
+                                wPosIdx = addQuadPos(wPosBuf, wPosIdx, x, y01, z + 1, x + 1, y11, z + 1, x + 1, y10, z, x, y00, z);
+
                                 wUvIdx = addQuadUV(wUvBuf, wUvIdx, region.uvMin().x, region.uvMax().y, region.uvMax().x, region.uvMax().y, region.uvMax().x, region.uvMin().y, region.uvMin().x, region.uvMin().y);
                                 wNormIdx = addQuadNorm(wNormBuf, wNormIdx, 0, 1, 0);
                                 wElemIdx = addQuadIndices(wIdxBuf, wElemIdx, wVertexCount);
@@ -232,6 +239,31 @@ public class ChunkMeshBuilder {
         if (above == null) return true;
         if (above.isFluid()) return false;
         return !above.isSolid();
+    }
+
+    private static float getWaterCornerHeight(World world, int wx, int wy, int wz) {
+        float totalHeight = 0;
+        int count = 0;
+        for (int dx = -1; dx <= 0; dx++) {
+            for (int dz = -1; dz <= 0; dz++) {
+                int nx = wx + dx;
+                int nz = wz + dz;
+                if (world.isChunkLoadedAt(nx, nz)) {
+                    byte blockId = world.getBlockTypeAt(nx, wy, nz);
+                    BlockData bData = BLOCK_LUT[blockId & 0xFF];
+                    if (bData != null && bData.isFluid()) {
+                        byte lvl = world.getWaterLevelAt(nx, wy, nz);
+                        float level = (lvl <= 0) ? 8 : lvl;
+                        totalHeight += wy + (level / 8.0f) * 0.88f;
+                        count++;
+                    } else if (bData != null && bData.isSolid()) {
+                        totalHeight += wy + 1.0f;
+                        count++;
+                    }
+                }
+            }
+        }
+        return count > 0 ? (totalHeight / count) : (wy + 0.88f);
     }
 
     private static boolean isPartialSideExposure(World world, int worldX, int worldY, int worldZ, BlockData currentBlock) {

@@ -32,7 +32,7 @@ public class GroundedState implements PlayerState {
 
     @Override
     public void update(Player player, float delta) {
-        if (player.isUnderFluid(player.getGameMaster().getWorld())) {
+        if (player.isInFluid(player.getGameMaster().getWorld())) {
             player.changeState(new SwimmingState());
             return;
         }

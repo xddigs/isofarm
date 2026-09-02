@@ -123,7 +123,7 @@ public class GameMaster {
         this.resourceManager = new ResourceManager();
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
-        this.chunkManager = new ChunkManager(world);
+        this.chunkManager = new ChunkManager(world, waterSimulation);
         this.gameRenderer = new GameRenderer();
         this.itemRenderer = new ItemRenderer();
         this.shop = new Shop();
