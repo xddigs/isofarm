@@ -2,6 +2,7 @@ package com.isofarm.item;
 
 import com.isofarm.data.*;
 import com.isofarm.input.GameInteraction;
+import com.isofarm.service.SoundService;
 import com.isofarm.utils.HoveredCell;
 import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
@@ -33,7 +34,7 @@ public class Hoe extends Tool {
                 target.getZ(), BlockData.TILLED_DIRT.getId());
 
         gameMaster.rebuildChunkMeshAt(target.getX(), target.getZ());
-        gameMaster.getSoundService().playPlaceSound(block.getType().getSoundGroup(),
+        SoundService.fx.playPlaceSound(block.getType().getSoundGroup(),
                 interaction.getDistanceToBlock(gameMaster, HoveredCell.get(gameMaster)),
                 Settings.getMaxInteractionDistance());
     }

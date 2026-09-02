@@ -250,10 +250,6 @@ public class GameMaster {
         return player;
     }
 
-    public SoundService getSoundService() {
-        return soundService;
-    }
-
     public CropService getCropService() {
         return cropService;
     }

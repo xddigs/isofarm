@@ -2,6 +2,7 @@ package com.isofarm.item;
 
 import com.isofarm.data.*;
 import com.isofarm.entity.Player;
+import com.isofarm.service.SoundService;
 import com.isofarm.wrld.GameMaster;
 
 public class Backpack extends Usable implements Undroppable {
@@ -18,7 +19,7 @@ public class Backpack extends Usable implements Undroppable {
         setPlayer(player);
 
         if (!player.getInventory().hasBackpackEquipped()) {
-            gameMaster.getSoundService().playUseSound(SoundGroup.ITEMS);
+            SoundService.fx.playUseSound(SoundGroup.ITEMS);
             player.getInventory().equipBackpack(this);
             gameMaster.getGameUIService().resetHotbarPosition();
             return true;
@@ -34,9 +35,9 @@ public class Backpack extends Usable implements Undroppable {
     @Override
     public void update() {}
 
-    public void unequip(GameMaster gameMaster) {
+    public void unequip() {
         if (getPlayer() != null && getPlayer().getInventory().hasBackpackEquipped()) {
-            gameMaster.getSoundService().playUseSound(SoundGroup.ITEMS);
+            SoundService.fx.playUseSound(SoundGroup.ITEMS);
             getPlayer().getInventory().unequipBackpack();
             getPlayer().getGameMaster().getGameUIService().resetHotbarPosition();
         }

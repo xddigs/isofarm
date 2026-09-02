@@ -83,8 +83,8 @@ public class TreeService {
 
         if (blocksBroken > 0) {
             gamemaster.getGameUIService().logAction(cell);
-            gamemaster.getSoundService().playBreakSound(
-                    startBlock.getSoundGroup(), 1.0f, Settings.getMaxInteractionDistance()
+            SoundService.fx.playBreakSound(startBlock.getSoundGroup(),
+                    1.0f, Settings.getMaxInteractionDistance()
             );
 
             for (ChunkPos chunk : affectedChunks) {
