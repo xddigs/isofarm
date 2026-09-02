@@ -136,7 +136,7 @@ public class Camera implements CameraView {
     }
 
     private BlockPos raycast(World world, Vector3f playerPos, Vector3f origin, Vector3f direction,
-                             boolean smartFilter) {
+                             boolean isSmartFilter) {
         float tileSize = K.World.TILE_SIZE;
 
         int x = (int) Math.floor(origin.x / tileSize);
@@ -161,14 +161,13 @@ public class Camera implements CameraView {
 
         do {
             byte block = world.getBlockTypeAt(x, y, z);
-            byte waterLevel = world.getWaterLevelAt(x, y, z);
+            BlockData data = BlockData.fromId(block);
+            boolean hasBlock = data != BlockData.AIR;
 
-            boolean hasBlock = block != BlockData.AIR.getId();
-            boolean hasWater = waterLevel > 0;
+            if (hasBlock && data != BlockData.WATER) {
+                boolean isTransparentObject = data == BlockData.OAK_LEAVES;
 
-            if (hasBlock || hasWater) {
-                boolean isTransparentObject = block == BlockData.OAK_LEAVES.getId();
-                if (!smartFilter || !isTransparentObject) {
+                if (!isSmartFilter || !isTransparentObject) {
                     float blockCenterX = x + 0.5f;
                     float blockCenterY = y + 0.5f;
                     float blockCenterZ = z + 0.5f;

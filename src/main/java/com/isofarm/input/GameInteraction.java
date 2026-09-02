@@ -545,7 +545,8 @@ public class GameInteraction {
             if (gameMaster.getPlayer().intersectsBlock(placeX, placeY, placeZ)) return;
 
             byte targetBlock = world.getBlockTypeAt(placeX, placeY, placeZ);
-            if (targetBlock == 0) {
+            BlockData target = BlockData.fromId(targetBlock);
+            if (target.equals(BlockData.AIR) || target.equals(BlockData.WATER)) {
                 Block newBlock = new Block(block.getType(), placeX, placeY, placeZ);
                 if (block.getType().equals(BlockData.OAK_BONSAI)) {
                     gameMaster.getTreeService().plant(placeX, placeY, placeZ, BlockData.OAK_BONSAI);
