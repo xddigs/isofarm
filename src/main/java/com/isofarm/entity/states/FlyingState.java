@@ -7,11 +7,12 @@ import com.isofarm.wrld.GameMaster;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-public class GroundedState implements PlayerState {
+public class FlyingState implements PlayerState {
+    private static final float FLY_SPEED = 8.0f;
 
     @Override
     public void enter(Player player) {
-        player.setTargetEyeHeight(1.6f);
+        player.getVelocity().set(0.0f, 0.0f, 0.0f);
     }
 
     @Override
@@ -20,36 +21,29 @@ public class GroundedState implements PlayerState {
             return;
         }
 
-        if (Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
-            player.changeState(new SneakingState());
+        if (!player.getGamemode().isGodmode()) {
+            player.changeState(new FallingState());
             return;
         }
 
-        if (Keyboard.isKeyPressed(GLFW_KEY_SPACE)) {
-            player.jump();
+        if (Keyboard.isKeyDown(GLFW_KEY_SPACE)) {
+            player.getVelocity().y = FLY_SPEED;
+        } else if (Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
+            player.getVelocity().y = -FLY_SPEED;
+        } else {
+            player.getVelocity().y = 0.0f;
         }
     }
 
     @Override
     public void update(Player player, float delta) {
-        if (player.isUnderFluid(player.getGameMaster().getWorld())) {
-            player.changeState(new SwimmingState());
-            return;
-        }
-
-        if (!player.isOnGround() && !player.isFalling()) {
-            player.changeState(new FallingState());
-            return;
-        }
-
         float yaw = player.getGameMaster()
                 .getActiveCamera()
                 .getYaw();
 
-        player.wasd(player.getGameMaster().getWorld(), delta, yaw);
+        player.fly(delta, yaw);
     }
 
     @Override
-    public void exit(Player player) {
-    }
+    public void exit(Player player) {}
 }

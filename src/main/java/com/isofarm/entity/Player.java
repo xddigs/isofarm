@@ -918,4 +918,13 @@ public class Player extends Character {
     public float getDifficultyRegen() {
         return gameMaster.getDifficulty().getMultiplier();
     }
+
+    public void fly(float delta, float yaw) {
+        if (isOnGround()) {
+            setVelocity(new Vector3f(ZERO_VELOCITY, INITIAL_Y_VELOCITY, ZERO_VELOCITY));
+            return;
+        }
+
+        wasd(gameMaster.getWorld(), delta, yaw);
+    }
 }
