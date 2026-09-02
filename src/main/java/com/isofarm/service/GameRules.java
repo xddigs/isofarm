@@ -15,9 +15,7 @@ public final class GameRules {
 
     static {
         RULES.put("doKeepInventory", Settings.doKeepInventory());
-        RULES.put("doEnableMotions", Settings.doEnableMotions());
         RULES.put("renderDistance", Settings.getRenderDistance());
-        RULES.put("fov", Settings.getFov());
         RULES.put("unloadMargin", Settings.getUnloadMargin());
         RULES.put("doEnableShadows", Settings.doEnableShadows());
         RULES.put("maxInteractionDistance", Settings.getMaxInteractionDistance());
@@ -96,14 +94,6 @@ public final class GameRules {
             switch (rule) {
                 case "doKeepInventory" -> {
                     Settings.setDoKeepInventory((Boolean) value);
-                }
-
-                case "fov" -> {
-                    Settings.setFov((Float) value);
-                }
-
-                case "doEnableMotions" -> {
-                    Settings.setDoEnableMotions((Boolean) value);
                 }
 
                 case "renderDistance" -> {
