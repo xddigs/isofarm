@@ -9,17 +9,17 @@ public class ChunkMeshBuilder {
     private static final float PIXEL = 1.0f / K.World.DEFAULT_TEXTURE_SCALE;
     private static final float TILLED_HEIGHT = 1.0f - PIXEL;
     private static final BlockData[] BLOCK_LUT = new BlockData[256];
-    private static final int MAX_FLOATS = Chunk.SIZE_X * Chunk.SIZE_Y * Chunk.SIZE_Z * 24;
+    private static final int MAX_POSITION_FLOATS = Chunk.SIZE_X * Chunk.SIZE_Y * Chunk.SIZE_Z * 72;
+    private static final int MAX_NORMAL_FLOATS = Chunk.SIZE_X * Chunk.SIZE_Y * Chunk.SIZE_Z * 72;
+    private static final int MAX_UV_FLOATS = Chunk.SIZE_X * Chunk.SIZE_Y * Chunk.SIZE_Z * 48;
     private static final int MAX_INDICES = Chunk.SIZE_X * Chunk.SIZE_Y * Chunk.SIZE_Z * 36;
-
-    private static final ThreadLocal<float[]> POS_BUFFER = ThreadLocal.withInitial(() -> new float[MAX_FLOATS]);
-    private static final ThreadLocal<float[]> NORM_BUFFER = ThreadLocal.withInitial(() -> new float[MAX_FLOATS]);
-    private static final ThreadLocal<float[]> UV_BUFFER = ThreadLocal.withInitial(() -> new float[MAX_FLOATS]);
+    private static final ThreadLocal<float[]> POS_BUFFER = ThreadLocal.withInitial(() -> new float[MAX_POSITION_FLOATS]);
+    private static final ThreadLocal<float[]> NORMAL_BUFFER = ThreadLocal.withInitial(() -> new float[MAX_NORMAL_FLOATS]);
+    private static final ThreadLocal<float[]> UV_BUFFER = ThreadLocal.withInitial(() -> new float[MAX_UV_FLOATS]);
     private static final ThreadLocal<int[]> INDEX_BUFFER = ThreadLocal.withInitial(() -> new int[MAX_INDICES]);
-
-    private static final ThreadLocal<float[]> WATER_POS_BUFFER = ThreadLocal.withInitial(() -> new float[MAX_FLOATS]);
-    private static final ThreadLocal<float[]> WATER_NORM_BUFFER = ThreadLocal.withInitial(() -> new float[MAX_FLOATS]);
-    private static final ThreadLocal<float[]> WATER_UV_BUFFER = ThreadLocal.withInitial(() -> new float[MAX_FLOATS]);
+    private static final ThreadLocal<float[]> WATER_POS_BUFFER = ThreadLocal.withInitial(() -> new float[MAX_POSITION_FLOATS]);
+    private static final ThreadLocal<float[]> WATER_NORMAL_BUFFER = ThreadLocal.withInitial(() -> new float[MAX_NORMAL_FLOATS]);
+    private static final ThreadLocal<float[]> WATER_UV_BUFFER = ThreadLocal.withInitial(() -> new float[MAX_UV_FLOATS]);
     private static final ThreadLocal<int[]> WATER_INDEX_BUFFER = ThreadLocal.withInitial(() -> new int[MAX_INDICES]);
 
     static {
@@ -46,12 +46,12 @@ public class ChunkMeshBuilder {
         int chunkZ = chunk.getChunkZ();
 
         float[] posBuf = POS_BUFFER.get();
-        float[] normBuf = NORM_BUFFER.get();
+        float[] normBuf = NORMAL_BUFFER.get();
         float[] uvBuf = UV_BUFFER.get();
         int[] idxBuf = INDEX_BUFFER.get();
 
         float[] wPosBuf = WATER_POS_BUFFER.get();
-        float[] wNormBuf = WATER_NORM_BUFFER.get();
+        float[] wNormBuf = WATER_NORMAL_BUFFER.get();
         float[] wUvBuf = WATER_UV_BUFFER.get();
         int[] wIdxBuf = WATER_INDEX_BUFFER.get();
 
@@ -209,19 +209,24 @@ public class ChunkMeshBuilder {
         if (worldY < 0) return false;
         if (worldY >= Chunk.SIZE_Y) return true;
         if (!world.isChunkLoadedAt(worldX, worldZ)) return false;
+
         byte neighborId = world.getBlockTypeAt(worldX, worldY, worldZ);
         if (neighborId == 0) return true;
+
         BlockData neighborData = BLOCK_LUT[neighborId & 0xFF];
         if (neighborData == null) return true;
-        if (currentBlock.isFluid() && neighborData.isFluid()) return false;
-        if (currentBlock.isFluid()) return neighborData.isTransparent() && !neighborData.isSolid();
+
+        if (currentBlock.isFluid()) {
+            return !neighborData.isSolid() && !neighborData.isFluid();
+        }
+
         if (neighborData.isFluid()) return true;
         return neighborData.isTransparent() && neighborData != currentBlock;
     }
 
-    private static boolean shouldRenderWaterTop(World world, int x, int y, int z) {
+    private static boolean shouldRenderWaterTop(World world, int worldX, int y, int worldZ) {
         if (y >= Chunk.SIZE_Y - 1) return true;
-        byte aboveId = world.getBlockTypeAt(x, y + 1, z);
+        byte aboveId = world.getBlockTypeAt(worldX, y + 1, worldZ);
         if (aboveId == 0) return true;
         BlockData above = BLOCK_LUT[aboveId & 0xFF];
         if (above == null) return true;
@@ -281,7 +286,10 @@ public class ChunkMeshBuilder {
         return idx + 6;
     }
 
-    private static int addSideQuadDirect(float[] pos, float[] norm, float[] uv, int[] idx, int posI, int normI, int uvI, int elemI, int vertexCount, float x1, float x2, float y1, float y2, float z1, float z2, float nx, float ny, float nz, BlockData data, float uvB, float uvT) {
+    private static int addSideQuadDirect(float[] pos, float[] norm, float[] uv, int[] idx,
+                                         int posI, int normI, int uvI, int elemI, int vertexCount, float x1,
+                                         float x2, float y1, float y2, float z1, float z2, float nx, float ny,
+                                         float nz, BlockData data, float uvB, float uvT) {
         TextureAtlas.TextureRegion region = data.getSideRegion();
         if (region == null) return vertexCount;
         addQuadPos(pos, posI, x1, y1, z1, x2, y1, z2, x2, y2, z2, x1, y2, z1);

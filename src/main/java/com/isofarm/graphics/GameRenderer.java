@@ -119,6 +119,35 @@ public class GameRenderer {
             }
         });
 
+        glEnable(GL_DEPTH_TEST);
+        glDepthMask(false);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        defaultShader.setUniform("uIsWater", true);
+
+        chunkMeshes.forEach((chunk, chunkMesh) -> {
+            if (chunkMesh != null && chunkMesh.waterMesh() != null &&
+                    chunkMesh.waterMesh().getIndicesCount() > 0) {
+
+                float minX = chunk.getChunkX() * Chunk.SIZE_X;
+                float minY = 0;
+                float minZ = chunk.getChunkZ() * Chunk.SIZE_Z;
+                float maxX = minX + Chunk.SIZE_X;
+                float maxY = Chunk.SIZE_Y;
+                float maxZ = minZ + Chunk.SIZE_Z;
+
+                if (frustum.testAab(minX, minY, minZ, maxX, maxY, maxZ)) {
+                    modelMatrix.identity().translate(minX, 0, minZ);
+                    defaultShader.setUniform("uModel", modelMatrix);
+                    defaultShader.setUniform("uTime", waterTime);
+                    chunkMesh.waterMesh().render();
+                }
+            }
+        });
+
+        glDepthMask(true);
+        glEnable(GL_DEPTH_TEST);
+
         Player player = gameMaster.getPlayer();
         BlockPos hoveredCell = HoveredCell.get(gameMaster);
 
@@ -181,11 +210,6 @@ public class GameRenderer {
             glEnable(GL_CULL_FACE);
         });
 
-        gameMaster.getEntities().removeIf(e -> !e.isAlive());
-        gameMaster.getEntities().forEach(entity -> {
-            entity.render(gameMaster);
-        });
-
         if (blockAtlas != null) {
             glActiveTexture(GL_TEXTURE0 + textureUnit);
             blockAtlas.bind();
@@ -196,43 +220,19 @@ public class GameRenderer {
             defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
         }
 
-        glDisable(GL_CULL_FACE);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glDepthMask(false);
-        glEnable(GL_POLYGON_OFFSET_FILL);
-        glPolygonOffset(-1.0f, -1.0f);
-        defaultShader.setUniform("uUVBounds", new Vector4f(0.0f, 0.0f, 1.0f, 1.0f));
-        defaultShader.setUniform("uIsWater", true);
-
-        chunkMeshes.forEach((chunk, chunkMesh) -> {
-            if (chunkMesh != null && chunkMesh.waterMesh() != null &&
-                    chunkMesh.waterMesh().getIndicesCount() > 0) {
-                float minX = chunk.getChunkX() * Chunk.SIZE_X;
-                float minY = 0;
-                float minZ = chunk.getChunkZ() * Chunk.SIZE_Z;
-                float maxX = minX + Chunk.SIZE_X;
-                float maxY = Chunk.SIZE_Y;
-                float maxZ = minZ + Chunk.SIZE_Z;
-
-                if (frustum.testAab(minX, minY, minZ, maxX, maxY, maxZ)) {
-                    modelMatrix.identity().translate(minX, 0, minZ);
-                    defaultShader.setUniform("uModel", modelMatrix);
-                    defaultShader.setUniform("uTime", waterTime);
-                    chunkMesh.waterMesh().render();
-                }
-            }
+        defaultShader.setUniform("uIsWater", false);
+        gameMaster.getEntities().removeIf(e -> !e.isAlive());
+        gameMaster.getEntities().forEach(entity -> {
+            entity.render(gameMaster);
         });
 
-        glEnable(GL_CULL_FACE);
-        glDisable(GL_POLYGON_OFFSET_FILL);
         glDepthMask(true);
-
+        glEnable(GL_CULL_FACE);
         renderDestroyOverlay(gameMaster.getGameInteraction(), defaultShader,
                 rm.getDestroyOverlayMesh(), ResourceManager.getDestroyTexture(), camera);
 
-        defaultShader.setUniform("uParticleAlpha", 1.0f);
         glDepthMask(false);
+        defaultShader.setUniform("uParticleAlpha", 1.0f);
         gameMaster.getParticles().render(defaultShader, rm.getSpriteMesh(), gameMaster.getActiveCamera());
         glDepthMask(true);
 
