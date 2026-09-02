@@ -306,20 +306,6 @@ public class GameRenderer {
             defaultShader.setUniform("uModel", modelMatrix);
             rm.getSelectionMesh().renderLines();
             glDepthMask(true);
-
-            sceneFbo.bind();
-            glDisable(GL_DEPTH_TEST);
-            Shader outlineShader = rm.getOutlineShader();
-            outlineShader.bind();
-            outlineShader.setUniform("uScreenSize", new Vector2f(windowWidth, windowHeight));
-            outlineShader.setUniform("uOutlineColor", getOutlineColor(gameMaster));
-            outlineShader.setUniform("uMaskTexture", 0);
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, maskFbo.getTextureId());
-
-            glBindTexture(GL_TEXTURE_2D, 0);
-            outlineShader.unbind();
-
             glEnable(GL_DEPTH_TEST);
             defaultShader.bind();
             defaultShader.setUniform("uIsMaskPass", false);
