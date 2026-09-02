@@ -307,22 +307,8 @@ public class GameRenderer {
             rm.getSelectionMesh().renderLines();
             glDepthMask(true);
 
-            maskFbo.bind();
-            glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-            defaultShader.bind();
-            defaultShader.setUniform("uIsMaskPass", true);
-            defaultShader.setUniform("uUseTexture", true);
-            defaultShader.setUniform("uUseFaceAtlas", false);
-            defaultShader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
-            defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
-
-            maskFbo.unbind((int) windowWidth, (int) windowHeight);
             sceneFbo.bind();
-
             glDisable(GL_DEPTH_TEST);
-
             Shader outlineShader = rm.getOutlineShader();
             outlineShader.bind();
             outlineShader.setUniform("uScreenSize", new Vector2f(windowWidth, windowHeight));
@@ -330,8 +316,6 @@ public class GameRenderer {
             outlineShader.setUniform("uMaskTexture", 0);
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, maskFbo.getTextureId());
-
-            rm.getScreenQuadMesh().render();
 
             glBindTexture(GL_TEXTURE_2D, 0);
             outlineShader.unbind();
@@ -408,7 +392,6 @@ public class GameRenderer {
     private Vector3f getOutlineColor(GameMaster gameMaster) {
         boolean isSmartShift = gameMaster.getGameInteraction() != null
                 && gameMaster.getGameInteraction().isSmartShiftActive();
-
         return isSmartShift ? new Vector3f(1.0f, 0.95f, 0.45f) : K.Colors.OUTLINE_DEFAULT;
     }
 

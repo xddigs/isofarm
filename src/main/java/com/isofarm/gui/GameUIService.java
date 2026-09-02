@@ -151,6 +151,9 @@ public class GameUIService implements Service<GameMaster> {
                 DEBUG_LABEL_WIDTH, 25f, null);
         this.memory.show();
         uiManager.getRoot().addChild(memory);
+    }
+
+    private void debugPrint() {
         uiManager.getRoot().getChildren().forEach(uiElement ->
                 log.debug(String.valueOf(uiElement)));
     }
