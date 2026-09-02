@@ -33,6 +33,8 @@ public class GameRenderer {
     private final Vector3f lightTarget = new Vector3f();
     private float previousCameraYaw;
     private float previousCameraPitch;
+    private float blurX;
+    private float blurY;
     private float waterTime;
 
     public void render(GameMaster gameMaster, ResourceManager rm,
@@ -97,6 +99,8 @@ public class GameRenderer {
 
         viewProjMatrix.set(camera.getProjectionMatrix()).mul(camera.getViewMatrix());
         frustum.set(viewProjMatrix);
+
+        updateBlur(camera);
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -524,6 +528,18 @@ public class GameRenderer {
         glEnable(GL_CULL_FACE);
         glDisable(GL_BLEND);
         glActiveTexture(GL_TEXTURE0);
+    }
+
+    private void updateBlur(CameraView camera) {
+        float yawDelta = camera.getYaw() - previousCameraYaw;
+        if (yawDelta > K.Camera.HALF_DEGREES) yawDelta -= K.Camera.FULL_DEGREES;
+        else if (yawDelta < -K.Camera.HALF_DEGREES) yawDelta += K.Camera.FULL_DEGREES;
+
+        float pitchDelta = camera.getPitch() - previousCameraPitch;
+        previousCameraYaw = camera.getYaw();
+        previousCameraPitch = camera.getPitch();
+        blurX = yawDelta / K.Camera.FULL_DEGREES;
+        blurY = pitchDelta / K.Camera.HALF_DEGREES;
     }
 
     public void initCamera(CameraView camera) {
