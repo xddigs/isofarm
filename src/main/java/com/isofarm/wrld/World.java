@@ -54,7 +54,7 @@ public class World {
             return null;
         }
 
-        BlockData data = getBlockData(blockId);
+        BlockData data = BlockData.fromId(blockId);
         if (data == null) {
             return null;
         }
@@ -139,14 +139,21 @@ public class World {
     }
 
     public void setBlockTypeAt(int x, int y, int z, byte blockId) {
-        if (y < 0 || y >= Chunk.SIZE_Y) return;
+        if (y < 0 || y >= Chunk.SIZE_Y) {
+            return;
+        }
+
         int chunkX = Math.floorDiv(x, Chunk.SIZE_X);
         int chunkZ = Math.floorDiv(z, Chunk.SIZE_Z);
         Chunk chunk = getOrCreateChunk(chunkX, chunkZ);
-
         int localX = Math.floorMod(x, Chunk.SIZE_X);
         int localZ = Math.floorMod(z, Chunk.SIZE_Z);
+
         chunk.setBlock(localX, y, localZ, blockId);
+
+        if (blockId == BlockData.AIR.getId()) {
+            removeBlockAt(x, y, z);
+        }
     }
 
     public void setBlockTypeAt(BlockPos pos, byte blockId) {
@@ -198,8 +205,9 @@ public class World {
     }
 
     public long getBlockKey(int x, int y, int z) {
-        long keyXZ = get2DKey(x, z);
-        return keyXZ ^ ((long) y * 0x9E3779B97F4A7C15L);
+        return (((long) x & 0x3FFFFFFL) << 38) |
+                (((long) z & 0x3FFFFFFL) << 12) |
+                ((long) y & 0xFFFL);
     }
 
     private BlockData getBlockData(byte blockId) {
