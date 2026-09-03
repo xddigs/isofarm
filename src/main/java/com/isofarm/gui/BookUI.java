@@ -9,6 +9,7 @@ import com.isofarm.item.Page;
 import com.isofarm.utils.K;
 import com.isofarm.wrld.GameMaster;
 import org.joml.Vector4f;
+import org.lwjgl.stb.STBTTBakedChar;
 
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
@@ -138,7 +139,7 @@ public class BookUI extends UIElement {
     private void checkHover(Page page, float textX, float startY, float lineHeight) {
         float textY = startY;
         for (BookLine bookLine : page.getLines()) {
-            if (bookLine.isInteractive() && isMouseHovering(textX, textY, bookLine.getText(), lineHeight)) {
+            if (bookLine.isInteractive() && isMouseHovering(textX, textY, bookLine.getText())) {
                 hoveredBookLine = bookLine;
                 GameMaster.game.getGameUIService().getUIManager().showTooltip(bookLine.getTooltipText(),
                         Mouse.getX(), Mouse.getY());
@@ -262,15 +263,44 @@ public class BookUI extends UIElement {
         }
     }
 
-    public boolean isMouseHovering(float x, float y, String text, float lineHeight) {
+    public boolean isMouseHovering(float x, float y, String text) {
+        if (text == null || text.isEmpty()) {
+            return false;
+        }
+
         float mouseX = Mouse.getX();
         float mouseY = Mouse.getY();
         String cleanText = text.replace("**", "").replace("-", "").trim();
-        float width = GUI.getStringWidth(cleanText, GUI.getNormalFont());
-        float verticalPadding = 4.0f;
+
+        if (cleanText.isEmpty()) {
+            return false;
+        }
+
+        UIFont font = GUI.getNormalFont();
+        float width = GUI.getStringWidth(cleanText, font);
+        float minY = Float.MAX_VALUE;
+        float maxY = -Float.MAX_VALUE;
+
+        for (int i = 0; i < cleanText.length(); ) {
+            int codePoint = cleanText.codePointAt(i);
+            STBTTBakedChar glyph = font.getGlyph(codePoint);
+            if (glyph != null) {
+                float glyphTop = y + glyph.yoff();
+                float glyphBottom = glyphTop + (glyph.y1() - glyph.y0());
+                minY = Math.min(minY, glyphTop);
+                maxY = Math.max(maxY, glyphBottom);
+            }
+            i += Character.charCount(codePoint);
+        }
+
+        if (minY == Float.MAX_VALUE) {
+            return false;
+        }
+
         float horizontalPadding = 6.0f;
+        float verticalPadding = 2.0f;
         return mouseX >= x - horizontalPadding && mouseX <= x + width + horizontalPadding
-                && mouseY >= y - verticalPadding && mouseY <= y + lineHeight + verticalPadding;
+                && mouseY >= minY - verticalPadding && mouseY <= maxY + verticalPadding;
     }
 
     private void click() {

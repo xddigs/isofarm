@@ -65,7 +65,7 @@ public class CraftingBook extends Book implements Undroppable {
                     .stream()
                     .map(ingredient -> ingredient.craftable()
                             .getDisplayName() + " x " + ingredient.amount())
-                    .collect(Collectors.joining(", "));
+                    .collect(Collectors.joining("\n"));
 
             page.addLine(lines.getFirst(),
                     line -> CraftingService.cs.craft(player, recipe),

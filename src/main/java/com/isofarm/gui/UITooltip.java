@@ -6,11 +6,11 @@ import com.isofarm.utils.Settings;
 
 @SuppressWarnings("unused")
 public class UITooltip extends UIElement {
+    private static final float OFFSET_PADDING = 2.2f;
     private String text = "";
     private float padding = Settings.getScaledPadding();
     private float offsetX = Settings.getScaledSpacing();
     private float offsetY = Settings.getScaledSpacing();
-    private static final float OFFSET_PADDING = 2.2f;
 
     public UITooltip() {
         super(0.0f, 0.0f, 0.0f, 0.0f);
@@ -21,17 +21,19 @@ public class UITooltip extends UIElement {
 
     @Override
     public void render() {
-        if (!isActuallyVisible() || text == null || text.isBlank()) {
-            return;
-        }
-
+        if (!isActuallyVisible() || text == null || text.isBlank()) return;
         GUI.drawRect(getAbsoluteX(), getAbsoluteY(), getAbsoluteWidth(), getAbsoluteHeight(),
                 K.UI.UI_BACKGROUND_COLOR, Settings.getScaledCornerRadius(),
                 K.UI.UI_BORDER_COLOR, Settings.getScaledThickness());
 
-        GUI.drawString(text, getAbsoluteX() + padding,
-                getAbsoluteY() + padding * OFFSET_PADDING, GUI.getNormalFont(),
-                K.UI.UI_TEXT_COLOR);
+        UIFont font = GUI.getNormalFont();
+        float lineHeight = font.getSize();
+        String[] lines = text.split("\n", -1);
+        float textY = getAbsoluteY() + padding * 2.2f;
+        for (String line : lines) {
+            GUI.drawString(line, getAbsoluteX() + padding, textY, font, K.UI.UI_TEXT_COLOR);
+            textY += lineHeight;
+        }
 
         renderChildren();
     }
@@ -47,10 +49,18 @@ public class UITooltip extends UIElement {
     public UITooltip text(String text) {
         setText(text);
         UIFont font = GUI.getNormalFont();
-        float textWidth = GUI.getStringWidth(this.text, font);
-        float textHeight = font.getSize();
-        float totalWidth = textWidth + (padding * 2.0f);
-        float totalHeight = textHeight + (padding * 2.0f);
+        String[] lines = this.text.split("\n", -1);
+        float maxWidth = 0.0f;
+        for (String line : lines) {
+            maxWidth = Math.max(
+                    maxWidth,
+                    GUI.getStringWidth(line, font)
+            );
+        }
+
+        float lineHeight = font.getSize();
+        float totalWidth = maxWidth + padding * 2.0f;
+        float totalHeight = (lineHeight * lines.length) + padding * 2.0f;
         setSize(totalWidth, totalHeight);
         return this;
     }
