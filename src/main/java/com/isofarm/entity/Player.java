@@ -556,14 +556,13 @@ public class Player extends Character {
     private void checkDurability() {
         for (InventorySlot slot : getInventory().getSlots()) {
             if (slot.getItem() instanceof Tool tool) {
-                if (tool.getDurability() == 10) {
+                if (tool.getDurability() == tool.getDurability() % 25) {
                     ToastFactory.warning("Your " + tool.getName() + " is about to break!");
                     return;
                 }
 
                 if (tool.getDurability() <= 0) {
                     remove(tool);
-                    ToastFactory.error("Your " + tool.getName() + " broke!");
                     getSoundService().playBreakSound(SoundGroup.ITEMS, 1.0f,
                             Settings.getMaxInteractionDistance());
                 }
