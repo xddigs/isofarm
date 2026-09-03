@@ -3,15 +3,13 @@ package com.isofarm.item;
 import com.isofarm.data.*;
 import com.isofarm.input.GameInteraction;
 import com.isofarm.service.SoundService;
-import com.isofarm.utils.HoveredCell;
-import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
 
 public class Hoe extends Tool {
 
     public Hoe(Tier tier) {
-        super((byte) 3, tier.getName() + ToolType.HOE.getName(), 150, ToolType.HOE,
+        super((byte) 3, tier.getDisplayName() + ToolType.HOE.getDisplayName(), 150, ToolType.HOE,
                 tier, tier.getDurability() + ToolType.HOE.getBaseDurability());
     }
 

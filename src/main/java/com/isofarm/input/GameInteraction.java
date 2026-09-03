@@ -244,7 +244,7 @@ public class GameInteraction {
     public void dropItem(GameMaster gameMaster, Item selectedItem, boolean dropAll) {
         if (selectedItem == null) return;
         if (selectedItem instanceof Undroppable) {
-            ToastFactory.error("You can't drop your " + selectedItem.getName() + "!");
+            ToastFactory.error("toast.item_undroppable");
             return;
         }
         Player player = gameMaster.getPlayer();
@@ -529,7 +529,7 @@ public class GameInteraction {
         gameMaster.addEntity(dropEntity);
 
         gameUIservice.logAction(cell);
-        log.trace("Block removed: {} at {},{},{}", blockData.getName(), cell.x(), cell.y(), cell.z());
+        log.trace("Block removed: {} at {},{},{}", blockData.getDisplayName(), cell.x(), cell.y(), cell.z());
         this.breakTimeout = TIMEOUT;
     }
 
@@ -583,7 +583,7 @@ public class GameInteraction {
                 SoundService.fx.playBreakSound(newBlock.getType().getSoundGroup());
                 gameMaster.rebuildChunkMeshAt(placeX, placeZ);
                 gameUIservice.logAction(new BlockPos(newBlock.getType(), placeX, placeY, placeZ));
-                log.trace("Block placed: {} at {},{},{}", newBlock.getType().getName(), placeX, placeY, placeZ);
+                log.trace("Block placed: {} at {},{},{}", newBlock.getType().getDisplayName(), placeX, placeY, placeZ);
             }
             return;
         }

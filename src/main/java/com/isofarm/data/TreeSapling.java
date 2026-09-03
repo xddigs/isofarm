@@ -1,7 +1,5 @@
 package com.isofarm.data;
 
-import com.isofarm.data.BlockData;
-
 public class TreeSapling {
     private final int x, y, z;
     private final BlockData treeType;

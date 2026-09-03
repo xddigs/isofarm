@@ -1,6 +1,7 @@
 package com.isofarm.data;
 
 import com.isofarm.item.Item;
+import com.isofarm.utils.Local;
 
 import java.util.Objects;
 
@@ -8,16 +9,16 @@ import java.util.Objects;
 public class Seed implements Item {
     private final CropType type;
     private final byte id;
+    private final String displayName;
     private final String name;
     private final int value;
-    private final String description;
 
     public Seed(CropType type) {
         this.type = type;
         this.id = type.getId();
-        this.name = type.getName() + " Seed";
+        this.displayName = getDisplayName(type.getName());
+        this.name = type.getName() + "_seed";
         this.value = type.getValue();
-        this.description = type.getDescription();
     }
 
     public Seed() {
@@ -34,6 +35,10 @@ public class Seed implements Item {
         return name;
     }
 
+    public String getDisplayName() {
+        return displayName;
+    }
+
     @Override
     public int getValue() {
         return value;
@@ -43,8 +48,8 @@ public class Seed implements Item {
         return type;
     }
 
-    public String getDescription() {
-        return description;
+    private String getDisplayName(String name) {
+        return Local.lang.t("crop." + name + ".seed");
     }
 
     @Override

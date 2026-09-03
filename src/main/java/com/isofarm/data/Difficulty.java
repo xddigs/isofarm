@@ -1,10 +1,12 @@
 package com.isofarm.data;
 
+import com.isofarm.utils.Local;
+
 public enum Difficulty {
-    EASY((byte) 0, "Easy", 0.5f),
-    NORMAL((byte) 1, "Normal", 1.0f),
-    HARD((byte) 2, "Hard", 2.0f),
-    NIGHTMARE((byte) 3, "Nightmare", 5.0f),;
+    EASY((byte) 0, "difficulty.easy", 0.5f),
+    NORMAL((byte) 1, "difficulty.normal", 1.0f),
+    HARD((byte) 2, "difficulty.hard", 2.0f),
+    NIGHTMARE((byte) 3, "difficulty.nightmare", 5.0f),;
 
     private final byte id;
     private final String name;
@@ -21,7 +23,7 @@ public enum Difficulty {
     }
 
     public String getName() {
-        return name;
+        return Local.lang.t(name);
     }
 
     public float getMultiplier() {

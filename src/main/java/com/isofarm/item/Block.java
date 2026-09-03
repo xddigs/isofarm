@@ -17,7 +17,7 @@ public class Block implements Craftable {
 
     public Block(BlockData type, int x, int y, int z) {
         this.id = type.getId();
-        this.name = type.getName();
+        this.name = type.getDisplayName();
         this.value = type.getValue();
         this.type = type;
         this.x = x;
@@ -31,7 +31,7 @@ public class Block implements Craftable {
 
     public Block(BlockData type) {
         this.id = type.getId();
-        this.name = type.getName();
+        this.name = type.getDisplayName();
         this.value = type.getValue();
         this.type = type;
     }
@@ -48,6 +48,11 @@ public class Block implements Craftable {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return type.getDisplayName();
     }
 
     @Override

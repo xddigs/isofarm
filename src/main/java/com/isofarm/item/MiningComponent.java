@@ -3,6 +3,7 @@ package com.isofarm.item;
 import com.isofarm.data.DataClass;
 import com.isofarm.data.MaterialID;
 import com.isofarm.data.Tier;
+import com.isofarm.utils.Local;
 
 @DataClass
 public class MiningComponent extends Material implements Craftable {
@@ -17,7 +18,8 @@ public class MiningComponent extends Material implements Craftable {
         this.tier = tier;
         this.materialID = materialID;
         this.id = materialID.getId();
-        this.name = tier.getName() + materialID.getName();
+        // TODO Localization order for languages other than English
+        this.name = Local.lang.f(tier.getDisplayName(), materialID.getDisplayName());
         this.value = materialID.getValue();
     }
 
@@ -27,7 +29,7 @@ public class MiningComponent extends Material implements Craftable {
     }
 
     @Override
-    public String getName() {
+    public String getDisplayName() {
         return name;
     }
 

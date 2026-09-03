@@ -21,8 +21,14 @@ public class Material implements Craftable {
 
     @Override
     public String getName() {
-        String name = materialID.getName();
-        name += tier.equals(Tier.NONE) ? "" : tier.getName();
+        return materialID.getName();
+    }
+
+    @Override
+    public String getDisplayName() {
+        String name = materialID.getDisplayName();
+        // TODO localization order for languaages other than English #2
+        name = tier.equals(Tier.NONE) ? name : tier.getName() + name;
         return name;
     }
 

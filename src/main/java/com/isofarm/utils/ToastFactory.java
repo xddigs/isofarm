@@ -113,7 +113,7 @@ public class ToastFactory implements Service<Toast> {
         float targetY = K.UI.TOAST_MARGIN_TOP;
 
         Toast toast = new Toast(startX, targetY, targetX, targetY,
-                type, message, K.UI.TOAST_DURATION);
+                type, Local.lang.t(message), K.UI.TOAST_DURATION);
 
         toast.setWindowWidth(windowWidth);
         add(toast);

@@ -1,6 +1,7 @@
 package com.isofarm.gui;
 
 import com.isofarm.utils.K;
+import com.isofarm.utils.Local;
 import com.isofarm.utils.Settings;
 
 @SuppressWarnings("unused")
@@ -40,7 +41,7 @@ public class UITooltip extends UIElement {
     }
 
     public void setText(String text) {
-        this.text = text == null ? "" : text;
+        this.text = text == null ? "" : Local.lang.t(text);
     }
 
     public UITooltip text(String text) {

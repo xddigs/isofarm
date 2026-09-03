@@ -12,10 +12,7 @@ import com.isofarm.input.*;
 import com.isofarm.item.Item;
 import com.isofarm.pathfinding.GridPos;
 import com.isofarm.service.*;
-import com.isofarm.utils.HoveredCell;
-import com.isofarm.utils.K;
-import com.isofarm.utils.Settings;
-import com.isofarm.utils.ToastFactory;
+import com.isofarm.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +47,6 @@ public class GameMaster {
     private List<Recipe> recipes;
     private ShadowMap shadowMap;
     private GameInteraction gameInteraction;
-    private WeatherService weatherService;
     private ChunkManager chunkManager;
     private GameRenderer gameRenderer;
     private ItemRenderer itemRenderer;
@@ -104,7 +100,6 @@ public class GameMaster {
 
         this.orthoCameraController = new CameraController(orthoCamera);
         this.stepController = new StepController();
-        this.weatherService = new WeatherService(rainEngine);
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
         this.recenter();
@@ -148,7 +143,7 @@ public class GameMaster {
                 "Kai", "Kendall", "Logan", "Morgan", "Parker", "Quinn", "Reese", "Riley", "River",
                 "Robin", "Rowan", "Sam", "Shawn", "Skyler", "Taylor", "Terry", "Tristan", "Wren"};
         player.setName(defaultNames[(int) (Math.random() * defaultNames.length)]);
-        ToastFactory.info("Press E to open inventory");
+        ToastFactory.info(Local.lang.f("toast.open_inventory", player.getName()));
     }
 
     public void spawn() {
@@ -225,10 +220,6 @@ public class GameMaster {
 
     public GameUIService getGameUIService() {
         return gameUIservice;
-    }
-
-    public WeatherService getWeatherService() {
-        return weatherService;
     }
 
     public CommandService getCommandService() {
@@ -394,11 +385,11 @@ public class GameMaster {
         }
 
         genDelta = delta;
-        TimeService.ts.update(delta, weatherService);
+        TimeService.ts.update(delta, WeatherService.wes);
         float timeOfDay = TimeService.ts.getHour() + (TimeService.ts.getMinute() / 60.0f);
         celestialLighting.update(HoveredCell.get(this), timeOfDay);
         shop.update(TimeService.ts);
-        cropService.update(delta, weatherService.getWeather());
+        cropService.update(delta, WeatherService.wes.getWeather());
         treeService.update(this);
         updateEntities(delta);
         BookService.bs.update();

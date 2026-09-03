@@ -1,5 +1,6 @@
 package com.isofarm.gui;
 
+import com.isofarm.utils.Local;
 import org.joml.Vector4f;
 
 @SuppressWarnings("unused")
@@ -12,7 +13,7 @@ public class UILabel extends UIElement {
 
     public UILabel(float x, float y, float width, float height, String text) {
         super(x, y, width, height);
-        this.text = text;
+        this.text = Local.lang.t(text);
         this.font = GUI.getNormalFont();
     }
 
@@ -47,7 +48,7 @@ public class UILabel extends UIElement {
     }
 
     public UILabel setText(String text) {
-        this.text = text;
+        this.text = Local.lang.t(text);
         return this;
     }
 

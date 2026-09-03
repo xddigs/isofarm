@@ -2,9 +2,11 @@ package com.isofarm.item;
 
 import com.isofarm.data.Usables;
 import com.isofarm.entity.Player;
+import com.isofarm.utils.Local;
 import com.isofarm.wrld.GameMaster;
 
-public abstract class Usable implements Craftable, Enchantable {
+public abstract class Usable implements Craftable,
+        Enchantable {
     private final Usables usablesID;
     private final byte id;
     private final int value;
@@ -35,6 +37,10 @@ public abstract class Usable implements Craftable, Enchantable {
     @Override
     public String getName() {
         return name;
+    }
+
+    public String getDisplayName() {
+        return Local.lang.t("item.usable." + usablesID.name().toLowerCase());
     }
 
     public Usables getUsablesID() {

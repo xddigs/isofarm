@@ -1,17 +1,16 @@
 package com.isofarm.data;
 
 import com.isofarm.graphics.TextureAtlas;
-import com.isofarm.item.Craftable;
-import com.isofarm.item.Item;
+import com.isofarm.item.Block;
 import com.isofarm.item.MiningComponent;
 import com.isofarm.utils.K;
+import com.isofarm.utils.Local;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("all")
 @DataClass
-public enum BlockData implements Craftable {
+public enum BlockData {
     AIR((byte) 0, (byte) 0, (byte) 0, "Empty", false, false, 0, null, SoundGroup.SILENT, 0f, true, new Object[]{}, Tier.NONE),
     DIRT((byte) 1, (byte) 1, (byte) 0, "Dirt", true, false, 100, "assets/textures/blocks/dirt.png", SoundGroup.SOIL, 0.9f, false, new Object[]{}, Tier.NONE),
     GRASS((byte) 2, (byte) 2, (byte) 0, "Grass", true, false, 120, "assets/textures/blocks/grass_top.png", "assets/textures/blocks/grass_bottom.png","assets/textures/blocks/grass.png",SoundGroup.SOIL, 1.0f, false, new Seed[]{new Seed()}, Tier.NONE),
@@ -47,7 +46,6 @@ public enum BlockData implements Craftable {
     TULIP((byte) 30, (byte) 10, (byte) (K.UI.ICON_BLOCK_ROWS - 1), "Tulip", false, true, 10, "assets/textures/blocks/tulip.png", SoundGroup.SOIL, 0.01f, true, new Object[]{}, Tier.NONE),
 
     OAK_BONSAI((byte) 31, (byte) 1, (byte) 2, "Oak Bonsai", false, true, 100, "assets/textures/blocks/oak_bonsai.png", SoundGroup.SOIL, 0.01f, true, new Object[]{}, Tier.NONE),
-
     WATER((byte) 127, (byte) -1, (byte) -1, "Water", false, false, 80, "assets/textures/blocks/water.png", SoundGroup.WATER, 0.0f, true, new Object[]{}, Tier.NONE);
 
     public static final BlockData[] ORES = {COPPER_ORE, IRON_ORE, STEEL_ORE, GOLD_ORE, PLATINUM_ORE, DIAMOND_ORE};
@@ -93,8 +91,8 @@ public enum BlockData implements Craftable {
         this.tier = tier;
     }
 
-    BlockData(byte id, byte col, byte row, String name, boolean isTillable, boolean isPlant, int value, String texturePath,
-              SoundGroup soundGroup, float destroyTime,
+    BlockData(byte id, byte col, byte row, String name, boolean isTillable, boolean isPlant,
+              int value, String texturePath, SoundGroup soundGroup, float destroyTime,
               boolean isTransparent, Object[] drops, Tier tier) {
         this(id, col, row, name, isTillable, isPlant, value, texturePath, texturePath, texturePath, soundGroup, destroyTime, isTransparent, drops, tier);
     }
@@ -133,6 +131,10 @@ public enum BlockData implements Craftable {
         return BY_ID[index];
     }
 
+    public static Block fromIdTo(byte id) {
+        return new Block(fromId(id));
+    }
+
     public static BlockData fromName(String name) {
         for (BlockData block : all()) {
             if (block.name.equals(name)) return block;
@@ -145,7 +147,7 @@ public enum BlockData implements Craftable {
         for (BlockData block : values()) {
             if (block.isPlant) result.add(block);
         }
-        return result.toArray(new BlockData[result.size()]);
+        return result.toArray(new BlockData[0]);
     }
 
     public static BlockData[] all() {
@@ -190,17 +192,16 @@ public enum BlockData implements Craftable {
         return name;
     }
 
+    public String getDisplayName() {
+        return Local.lang.t("block." + name());
+    }
+
     public int getValue() {
         return value;
     }
 
     public Tier getTier() {
         return tier;
-    }
-
-    @Override
-    public Item copy() {
-        return this;
     }
 
     public boolean isPlant() {

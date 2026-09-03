@@ -5,6 +5,7 @@ import com.isofarm.data.Enchantment;
 import com.isofarm.data.Tier;
 import com.isofarm.data.ToolType;
 import com.isofarm.entity.Player;
+import com.isofarm.utils.Local;
 
 @DataClass
 public abstract class Tool implements Item,
@@ -40,6 +41,10 @@ public abstract class Tool implements Item,
     @Override
     public String getName() {
         return name;
+    }
+
+    public String getDisplayName() {
+        return type.getDisplayName();
     }
 
     @Override

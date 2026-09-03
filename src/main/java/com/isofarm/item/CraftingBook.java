@@ -5,16 +5,12 @@ import com.isofarm.craft.Recipe;
 import com.isofarm.craft.RecipeRegistry;
 import com.isofarm.data.Inventory;
 import com.isofarm.entity.Player;
-import com.isofarm.input.Keyboard;
 import com.isofarm.service.CraftingService;
 import com.isofarm.wrld.GameMaster;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_CONTROL;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT_CONTROL;
 
 public class CraftingBook extends Book implements Undroppable {
     private static final int LINES_PER_PAGE = 16;
@@ -52,7 +48,6 @@ public class CraftingBook extends Book implements Undroppable {
         addPage(page);
 
         int lineCount = 0;
-        int currentPageIndex = 0;
 
         for (Recipe recipe : recipes) {
             List<String> lines = recipe.toBookLines();
@@ -61,7 +56,6 @@ public class CraftingBook extends Book implements Undroppable {
             if (lineCount + lines.size() > LINES_PER_PAGE) {
                 page = new Page();
                 addPage(page);
-                currentPageIndex++;
                 lineCount = 0;
             }
 
@@ -73,7 +67,7 @@ public class CraftingBook extends Book implements Undroppable {
                 String lineText = lines.get(i);
                 Ingredient targetIngredient = null;
                 for (Ingredient ingredient : recipe.ingredients()) {
-                    if (ingredient != null && lineText.contains(ingredient.craftable().getName())) {
+                    if (ingredient != null && lineText.contains(ingredient.craftable().getDisplayName())) {
                         if (recipePageMap.containsKey(ingredient)) {
                             targetIngredient = ingredient;
                             break;

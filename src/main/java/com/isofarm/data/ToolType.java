@@ -1,6 +1,7 @@
 package com.isofarm.data;
 
 import com.isofarm.item.Item;
+import com.isofarm.utils.Local;
 
 public enum ToolType implements Item {
     SWORD((byte) 0, " Sword", 7, BlockData.all(), 10, new float[]{}),
@@ -33,6 +34,11 @@ public enum ToolType implements Item {
     @Override
     public String getName() {
         return name;
+    }
+
+
+    public String getDisplayName() {
+        return Local.lang.t("item." + name().toLowerCase());
     }
 
     @Override

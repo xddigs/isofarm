@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 public class CommandRegistry implements Service<Command> {
-
     private final Map<String, Command> commands = new HashMap<>();
 
     public CommandRegistry() {

@@ -1,5 +1,7 @@
 package com.isofarm.data;
 
+import com.isofarm.utils.Local;
+
 public enum Season {
     WINTER((byte) 0, "Winter", 0.5),
     SPRING((byte) 1, "Spring", 2.0),
@@ -10,7 +12,7 @@ public enum Season {
     private final String name;
     private final double valueMultiplier;
 
-    private Season(byte id, String name, double valueMultiplier) {
+    Season(byte id, String name, double valueMultiplier) {
         this.id = id;
         this.name = name;
         this.valueMultiplier = valueMultiplier;
@@ -22,6 +24,10 @@ public enum Season {
 
     public String getName() {
         return name;
+    }
+
+    public String getDisplayName() {
+        return Local.lang.t("season." + name().toLowerCase());
     }
 
     public double getValueMultiplier() {

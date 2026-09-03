@@ -1,14 +1,15 @@
 package com.isofarm.item;
 
-import com.isofarm.data.*;
+import com.isofarm.data.Enchantment;
+import com.isofarm.data.Usables;
 import com.isofarm.entity.Player;
-import com.isofarm.service.SoundService;
+import com.isofarm.utils.Local;
 import com.isofarm.wrld.GameMaster;
 
 public class Backpack extends Usable implements Undroppable {
 
     public Backpack() {
-        super(Usables.BACKPACK, "Backpack");
+        super(Usables.BACKPACK, Local.lang.t("item.usable.backpack"));
     }
 
     @Override

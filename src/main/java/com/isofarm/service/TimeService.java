@@ -2,6 +2,7 @@ package com.isofarm.service;
 
 import com.isofarm.data.Season;
 import com.isofarm.data.Singleton;
+import com.isofarm.utils.Local;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,8 +56,7 @@ public class TimeService {
     }
 
     public String getFormattedTime() {
-        return String.format("Year %d %s, Day %02d | %02d:%02d",
-                year, currentSeason, day, hour, minute);
+        return Local.lang.f("time.formatted", year, currentSeason.getDisplayName(), day, hour, minute);
     }
 
     public void setTimeScale(float timeScale) {

@@ -58,7 +58,6 @@ public record Recipe(Tier tier, Item result, int resultAmount, List<Ingredient> 
         if (a == null || b == null) return false;
 
         return switch (a) {
-            case BlockData bd1 when b instanceof BlockData bd2 -> bd1 == bd2;
             case MaterialID mid1 when b instanceof MaterialID mid2 -> mid1 == mid2;
             case MiningComponent mc1 when b instanceof MiningComponent mc2 -> mc1.getTier() == mc2.getTier()
                     && mc1.getId() == mc2.getId();

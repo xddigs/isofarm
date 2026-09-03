@@ -1,27 +1,30 @@
 package com.isofarm.service;
 
+import com.isofarm.data.Singleton;
 import com.isofarm.data.WeatherType;
-import com.isofarm.graphics.RainEngine;
 import com.isofarm.utils.K;
 
 import java.util.Random;
 
+@Singleton
 public class WeatherService implements Service<WeatherType> {
+    public static final WeatherService wes = new WeatherService();
     private final static Random random = new Random();
-    private final RainEngine rainEngine;
-    private static WeatherType weather;
+    private static WeatherType weather = WeatherType.CLEAR;
 
-    public WeatherService(RainEngine rainEngine) {
-        this.rainEngine = rainEngine;
-        weather = WeatherType.CLEAR;
-    }
+    private WeatherService() {}
 
-    public void setWeather(WeatherType weather) {
-        this.weather = weather;
+    public static boolean isRaining() {
+        return weather == WeatherType.RAIN ||
+                weather == WeatherType.THUNDERSTORM;
     }
 
     public WeatherType getWeather() {
         return weather;
+    }
+
+    public void setWeather(WeatherType weather) {
+        WeatherService.weather = weather;
     }
 
     public WeatherType nextWeather() {
@@ -30,10 +33,5 @@ public class WeatherService implements Service<WeatherType> {
                     (int) (Math.random() * WeatherType.values().length)];
         }
         return weather;
-    }
-
-    public static boolean isRaining() {
-        return weather == WeatherType.RAIN ||
-                weather == WeatherType.HEAVY_STORM;
     }
 }

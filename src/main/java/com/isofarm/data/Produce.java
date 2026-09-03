@@ -8,6 +8,7 @@ import java.util.Objects;
 public class Produce implements Item {
     private final byte id;
     private final String name;
+    private final String displayName;
     private final int value;
     private final CropType type;
 
@@ -15,6 +16,7 @@ public class Produce implements Item {
         this.type = type;
         this.id = type.getId();
         this.name = type.getName();
+        this.displayName = type.getDisplayName();
         this.value = type.getValue();
     }
 
@@ -26,6 +28,11 @@ public class Produce implements Item {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return displayName;
     }
 
     @Override

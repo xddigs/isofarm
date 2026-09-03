@@ -5,6 +5,7 @@ import com.isofarm.craft.Recipe;
 import com.isofarm.data.*;
 import com.isofarm.entity.Player;
 import com.isofarm.item.*;
+import com.isofarm.utils.Local;
 import com.isofarm.utils.ToastFactory;
 
 public class CraftingService {
@@ -27,7 +28,7 @@ public class CraftingService {
         if (player == null || recipe == null) return false;
 
         if (!canCraft(player, recipe)) {
-            ToastFactory.error("You don't have enough ingredients");
+            ToastFactory.error("toast.no_ingredients");
             return false;
         }
 
@@ -35,7 +36,7 @@ public class CraftingService {
         consume(inventory, recipe);
         give(player, recipe);
         SoundService.fx.playEntitySound(SoundGroup.ITEMS);
-        ToastFactory.success("Crafted " + recipe.result().getName());
+        ToastFactory.success(Local.lang.f("toast.crafted", recipe.result().getDisplayName()));
         return true;
     }
 
@@ -126,7 +127,7 @@ public class CraftingService {
         }
 
         if (!player.hasSpace()) {
-            ToastFactory.error("Not enough inventory space");
+            ToastFactory.error("toast.no_space");
         }
     }
 

@@ -8,6 +8,7 @@ import java.util.Objects;
 public interface Item {
     byte getId();
     String getName();
+    String getDisplayName();
     int getValue();
     Item copy();
 }

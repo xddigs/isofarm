@@ -3,6 +3,7 @@ package com.isofarm.service;
 import com.isofarm.data.*;
 import com.isofarm.entity.Player;
 import com.isofarm.item.*;
+import com.isofarm.utils.Local;
 import com.isofarm.utils.ToastFactory;
 import com.isofarm.wrld.GameMaster;
 import org.slf4j.Logger;
@@ -59,14 +60,14 @@ public class Library implements Service<GameMaster> {
 
     private static void registerDefault(ItemRegistry itemR, Supplier<Item> supplier) {
         Item item = supplier.get();
-        itemR.register(getFormattedName(item.getName().trim()), supplier);
+        itemR.register(getFormattedName(item.getName()), supplier);
     }
 
     public static void initCommands(float delta, GameMaster gameMaster) {
         Player player = gameMaster.getPlayer();
         CommandRegistry cr = gameMaster.getCommandRegistry();
         ItemRegistry ir = gameMaster.getItemRegistry();
-        WeatherService weatherService = gameMaster.getWeatherService();
+        WeatherService weatherService = WeatherService.wes;
 
         cr.register(new Command("/give", new CommandArgument[]{dynamic("item", ir::getIds),
                 new CommandArgument("amount")}, args -> {
@@ -104,7 +105,7 @@ public class Library implements Service<GameMaster> {
                 player.add(item, amount);
             }
             log.info("Command add executed: {} x{}", itemId, amount);
-            ToastFactory.success("You added " + amount + " " + item.getName() + " to your inventory!");
+            ToastFactory.success(Local.lang.f("toast.item_added", amount, item.getDisplayName()));
         }));
 
         cr.register(new Command("/rain", new CommandArgument[]{literal("action", "start", "stop")}, args -> {
@@ -120,12 +121,12 @@ public class Library implements Service<GameMaster> {
                 case "start" -> {
                     weatherService.setWeather(WeatherType.RAIN);
                     log.info("Command rain executed");
-                    ToastFactory.success("You started the rain.");
+                    ToastFactory.success(Local.lang.t("toast.started_rain"));
                 }
                 case "stop" -> {
                     weatherService.setWeather(WeatherType.CLEAR);
                     log.info("Command rain executed");
-                    ToastFactory.success("You stopped the rain.");
+                    ToastFactory.success(Local.lang.t("toast.stopped_rain"));
                 }
                 default -> log.warn("Unknown rain action: {}", args[0]);
             }
@@ -173,7 +174,7 @@ public class Library implements Service<GameMaster> {
             player.setGamemode(targetMode);
             if (targetMode.isNoClip()) gameMaster.toggleHUD();
             log.info("Command gamemode executed: {}", targetMode);
-            ToastFactory.success("You changed gamemode to " + targetMode.name().toLowerCase());
+            ToastFactory.success(Local.lang.f("toast.gamemode_changed", targetMode.name().toLowerCase()));
         }));
 
         cr.register(new Command("/gamerule", new CommandArgument[]{dynamic("rule", () ->
@@ -183,20 +184,20 @@ public class Library implements Service<GameMaster> {
                 return;
             }
             if (args.length == 0) {
-                ToastFactory.info("Available gamerules:");
-                GameRules.getRules().forEach((rule, value) -> ToastFactory.info(rule + " = " + value));
+                ToastFactory.info(Local.lang.t("toast.available_gamerules"));
+                GameRules.getRules().forEach((rule, value) -> ToastFactory.info(Local.lang.f("toast.gamerule_value", rule, value)));
                 return;
             }
             String rule = args[0];
             if (!GameRules.exists(rule)) {
                 log.warn("Unknown gamerule: {}", rule);
-                ToastFactory.error("Unknown gamerule: " + rule);
+                ToastFactory.error(Local.lang.f("toast.unknown_gamerule", rule));
                 return;
             }
             if (args.length == 1) {
                 Object value = GameRules.get(rule);
                 log.info("Gamerule {} = {}", rule, value);
-                ToastFactory.info(rule + " = " + value);
+                ToastFactory.info(Local.lang.f("toast.gamerule_value", rule, value));
                 return;
             }
             String valueString = args[1];
@@ -217,13 +218,13 @@ public class Library implements Service<GameMaster> {
                 }
             } catch (IllegalArgumentException e) {
                 log.warn("Invalid value for gamerule {}: {}", rule, valueString);
-                ToastFactory.error("Invalid value for " + rule);
+                ToastFactory.error(Local.lang.f("toast.invalid_gamerule_value", rule));
                 return;
             }
             try {
                 GameRules.set(rule, newValue);
                 log.info("Gamerule changed: {} = {}", rule, newValue);
-                ToastFactory.success("Gamerule " + rule + " was set to " + newValue);
+                ToastFactory.success(Local.lang.f("toast.gamerule_changed", rule, newValue));
             } catch (IllegalArgumentException e) {
                 log.warn("Could not set gamerule {}: {}", rule, e.getMessage());
                 ToastFactory.error(e.getMessage());
@@ -237,7 +238,7 @@ public class Library implements Service<GameMaster> {
             }
             player.setHitpoints(-player.getHitpoints());
             log.info("Command kill executed");
-            ToastFactory.success("You killed yourself!");
+            ToastFactory.success(Local.lang.t("toast.self_kill"));
         }));
     }
 
@@ -257,7 +258,7 @@ public class Library implements Service<GameMaster> {
                 return java.util.List.of();
             }
             return values.stream().filter(value -> value != null).filter(
-                    value -> value.regionMatches(true, 0, prefix, 0, prefix.length()))
+                            value -> value.regionMatches(true, 0, prefix, 0, prefix.length()))
                     .sorted(String.CASE_INSENSITIVE_ORDER).toList();
         });
     }

@@ -12,6 +12,7 @@ import com.isofarm.pathfinding.GridPos;
 import com.isofarm.service.BookService;
 import com.isofarm.service.SoundService;
 import com.isofarm.service.TimeService;
+import com.isofarm.utils.Local;
 import com.isofarm.utils.Settings;
 import com.isofarm.utils.ToastFactory;
 import com.isofarm.wrld.GameMaster;
@@ -567,7 +568,7 @@ public class Player extends Character {
         for (InventorySlot slot : getInventory().getSlots()) {
             if (slot.getItem() instanceof Tool tool) {
                 if (tool.getDurability() == tool.getDurability() % 25) {
-                    ToastFactory.warning("Your " + tool.getName() + " is about to break!");
+                    ToastFactory.warning(Local.lang.f("toast.item_warning", tool.getDisplayName()));
                     return;
                 }
 
@@ -787,7 +788,7 @@ public class Player extends Character {
         int toSell = Math.min(current, amount);
         getInventory().remove(item, toSell);
         int earnings = toSell * item.getValue();
-        ToastFactory.sell("You successfully sold " + item.getName() + " for " + earnings + " coins");
+        ToastFactory.sell(Local.lang.f("toast.item_sold", amount, item.getDisplayName(), earnings));
         earn(earnings);
     }
 

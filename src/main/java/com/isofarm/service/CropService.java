@@ -3,6 +3,7 @@ package com.isofarm.service;
 import com.isofarm.data.*;
 import com.isofarm.entity.Player;
 import com.isofarm.item.Block;
+import com.isofarm.utils.Local;
 import com.isofarm.utils.ToastFactory;
 import com.isofarm.wrld.World;
 import org.slf4j.Logger;
@@ -22,7 +23,7 @@ public class CropService implements Service<Crop> {
         if (block == null || block.getType() != BlockData.TILLED_DIRT) {
             log.warn("Attempted to plant {} at ({}, {}) but block is not tilled!",
                     type.getName(), x, z);
-            ToastFactory.warning("You can only plant crops on tilled dirt");
+            ToastFactory.warning("toast.tilled_dirt_warn");
             return null;
         }
 
@@ -34,7 +35,7 @@ public class CropService implements Service<Crop> {
         if (existingCrop != null) {
             log.warn("Attempted to plant {} at ({}, {}) but a crop already exists!",
                     type.getName(), x, z);
-            ToastFactory.warning("A crop is already growing here!");
+            ToastFactory.warning("toast.crop_already_exists");
             return null;
         }
 
@@ -44,7 +45,7 @@ public class CropService implements Service<Crop> {
 
         if (seedOpt.isEmpty()) {
             log.warn("You don't have seeds of {}", type.getName());
-            ToastFactory.error("You don't have seeds of " + type.getName());
+            ToastFactory.error(Local.lang.f("toast.not_enough_seeds", type.getDisplayName()));
             return null;
         }
 
@@ -88,7 +89,8 @@ public class CropService implements Service<Crop> {
         world.removeCrop(crop);
         log.info("Successfully harvested {}" +
                 " giving {} items.", crop.getCropType().getName(), yield);
-        ToastFactory.success("You harvested " + yield + " " + crop.getCropType().getName());
+        ToastFactory.success(Local.lang.f("toast.harvest", yield,
+                crop.getCropType().getDisplayName()));
         return yield;
     }
 

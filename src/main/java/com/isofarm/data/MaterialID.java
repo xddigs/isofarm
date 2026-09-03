@@ -2,6 +2,7 @@ package com.isofarm.data;
 
 import com.isofarm.item.Craftable;
 import com.isofarm.item.Item;
+import com.isofarm.utils.Local;
 
 @DataClass
 public enum MaterialID implements Craftable {
@@ -25,7 +26,18 @@ public enum MaterialID implements Craftable {
 
     public byte getId() { return id; }
     public byte getRow() { return row; }
-    public String getName() { return name; }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return Local.lang.t("item.material." + name().toLowerCase());
+    }
+
+    @Override
     public int getValue() { return value; }
 
     @Override

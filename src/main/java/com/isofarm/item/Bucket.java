@@ -6,6 +6,7 @@ import com.isofarm.data.Enchantment;
 import com.isofarm.data.Usables;
 import com.isofarm.entity.Player;
 import com.isofarm.utils.HoveredCell;
+import com.isofarm.utils.Local;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.WaterSimulation;
 import com.isofarm.wrld.World;
@@ -14,7 +15,7 @@ public class Bucket extends Usable {
     private BlockData type;
 
     public Bucket(BlockData type) {
-        super(Usables.BUCKET, (type.equals(BlockData.AIR)) ? "Bucket" : type.getName() + " Bucket");
+        super(Usables.BUCKET, Local.lang.t("item.usable.bucket"));
         this.type = type;
     }
 
@@ -91,13 +92,13 @@ public class Bucket extends Usable {
     }
 
     public void fill() {
-        this.type = BlockData.WATER;
-        setName(type.getName() + " Bucket");
+        setBlockType(BlockData.WATER);
+        setName(Local.lang.t("item.usable.water_bucket"));
     }
 
     public void empty() {
-        this.type = BlockData.AIR;
-        setName("Bucket");
+        setBlockType(BlockData.AIR);
+        setName(Local.lang.t("item.usable.bucket"));
     }
 
     public boolean isFull() {

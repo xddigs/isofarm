@@ -29,7 +29,7 @@ public enum Gamemode {
     public static Gamemode fromString(String text) {
         if (text == null) return null;
         for (Gamemode mode : values()) {
-            if (mode.name().replace("_", "")
+            if (mode.name().toLowerCase().replace("_", "")
                     .equalsIgnoreCase(text.replace("_", ""))) {
                 return mode;
             }
