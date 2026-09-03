@@ -14,16 +14,15 @@ import org.joml.Vector3f;
 
 import java.util.*;
 
+@Singleton
 public class TreeService {
+    public static final TreeService ts = new TreeService();
     private static final int LEAF_DECAY_CHECK_DISTANCE = 4;
     private static final int RANDOM_TICKS_PER_CHUNK = 3;
-    private final World world;
     private final List<TreeSapling> saplings = new ArrayList<>();
     private final Random random = new Random();
 
-    public TreeService(World world) {
-        this.world = world;
-    }
+    private TreeService() {}
 
     public static List<BlockPos> chop(GameMaster gamemaster, Axe axe) {
         List<BlockPos> choppedBlocks = new ArrayList<>();
@@ -51,12 +50,12 @@ public class TreeService {
 
         while (!toProcess.isEmpty() && blocksBroken < maxBlocks) {
             BlockPos current = toProcess.poll();
-            byte currentId = world.getBlockTypeAt(current.x(), current.y(), current.z());
+            byte currentId = World.wrld.getBlockTypeAt(current.x(), current.y(), current.z());
             BlockData currentBlock = BlockData.fromId(currentId);
             boolean isLog = BlockData.OAK_LOG.equals(currentBlock);
 
             if (isLog) {
-                world.setBlockTypeAt(current.x(), current.y(), current.z(), BlockData.AIR.getId());
+                World.wrld.setBlockTypeAt(current.x(), current.y(), current.z(), BlockData.AIR.getId());
                 choppedBlocks.add(current);
                 blocksBroken++;
                 axe.use();
@@ -95,7 +94,7 @@ public class TreeService {
     }
 
     public void plant(int x, int y, int z, BlockData saplingBlock) {
-        world.setBlockTypeAt(x, y, z, saplingBlock.getId());
+        World.wrld.setBlockTypeAt(x, y, z, saplingBlock.getId());
         saplings.add(new TreeSapling(x, y, z, saplingBlock, (int) Settings.getTicks()));
     }
 
@@ -108,7 +107,7 @@ public class TreeService {
             }
         }
 
-        saplings.removeIf(t -> world.getBlockTypeAt(
+        saplings.removeIf(t -> World.wrld.getBlockTypeAt(
                 t.getX(), t.getY(), t.getZ()) == BlockData.AIR.getId());
         updateLeaves(gameMaster);
     }
@@ -118,13 +117,13 @@ public class TreeService {
         int y = sapling.getY();
         int z = sapling.getZ();
 
-        world.setBlockTypeAt(x, y, z, BlockData.AIR.getId());
+        World.wrld.setBlockTypeAt(x, y, z, BlockData.AIR.getId());
         WorldGenerator.generateTree(x, z, random);
         GameMaster.game.rebuildChunkMeshAt(x, z);
     }
 
     private void updateLeaves(GameMaster gameMaster) {
-        for (Chunk chunk : world.getChunks().values()) {
+        for (Chunk chunk : World.wrld.getChunks().values()) {
             int chunkStartX = chunk.getChunkX() * Chunk.SIZE_X;
             int chunkStartZ = chunk.getChunkZ() * Chunk.SIZE_Z;
 
@@ -141,7 +140,7 @@ public class TreeService {
 
                     Item item = BlockData.fromIdTo(blockId);
                     if (!isConnectedToLog(worldX, localY, worldZ)) {
-                        world.setBlockTypeAt(worldX, localY, worldZ, BlockData.AIR.getId());
+                        World.wrld.setBlockTypeAt(worldX, localY, worldZ, BlockData.AIR.getId());
                         WorldItem worldItem = new WorldItem(item, 1, new Vector3f(worldX, localY, worldZ));
                         gameMaster.addEntity(worldItem);
                         gameMaster.rebuildChunkMeshAt(worldX, worldZ);
@@ -156,7 +155,7 @@ public class TreeService {
         Set<Long> visited = new HashSet<>();
 
         queue.add(new BlockNode(startX, startY, startZ, 0));
-        visited.add(world.getBlockKey(startX, startY, startZ));
+        visited.add(World.wrld.getBlockKey(startX, startY, startZ));
 
         while (!queue.isEmpty()) {
             BlockNode current = queue.poll();
@@ -164,7 +163,7 @@ public class TreeService {
                 continue;
             }
 
-            byte currentId = world.getBlockTypeAt(current.x(), current.y(), current.z());
+            byte currentId = World.wrld.getBlockTypeAt(current.x(), current.y(), current.z());
             if (currentId == BlockData.OAK_LOG.getId()) {
                 return true;
             }
@@ -179,7 +178,7 @@ public class TreeService {
                             int ny = current.y() + dy;
                             int nz = current.z() + dz;
 
-                            long key = world.getBlockKey(nx, ny, nz);
+                            long key = World.wrld.getBlockKey(nx, ny, nz);
                             if (!visited.contains(key)) {
                                 visited.add(key);
                                 queue.add(new BlockNode(nx, ny, nz, current.distance() + 1));
