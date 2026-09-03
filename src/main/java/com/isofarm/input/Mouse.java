@@ -6,8 +6,21 @@ import static org.lwjgl.glfw.GLFW.*;
  * Provides mouse behavior.
  */
 public final class Mouse {
-    private static final boolean[] buttons = new boolean[GLFW_MOUSE_BUTTON_LAST + 1];
-    private static final boolean[] lastButtons = new boolean[GLFW_MOUSE_BUTTON_LAST + 1];
+    public static final int BUTTON_1 = GLFW_MOUSE_BUTTON_1;
+    public static final int BUTTON_2 = GLFW_MOUSE_BUTTON_2;
+    public static final int BUTTON_3 = GLFW_MOUSE_BUTTON_3;
+    public static final int BUTTON_4 = GLFW_MOUSE_BUTTON_4;
+    public static final int BUTTON_5 = GLFW_MOUSE_BUTTON_5;
+    public static final int BUTTON_6 = GLFW_MOUSE_BUTTON_6;
+    public static final int BUTTON_7 = GLFW_MOUSE_BUTTON_7;
+    public static final int BUTTON_8 = GLFW_MOUSE_BUTTON_8;
+    public static final int BUTTON_LEFT = GLFW_MOUSE_BUTTON_LEFT;
+    public static final int BUTTON_RIGHT = GLFW_MOUSE_BUTTON_RIGHT;
+    public static final int BUTTON_MIDDLE = GLFW_MOUSE_BUTTON_MIDDLE;
+    public static final int BUTTON_LAST = GLFW_MOUSE_BUTTON_LAST;
+
+    private static final boolean[] buttons = new boolean[BUTTON_LAST + 1];
+    private static final boolean[] lastButtons = new boolean[BUTTON_LAST + 1];
 
     private static float x = 0, y = 0;
     private static float lastX = 0, lastY = 0;
@@ -45,7 +58,7 @@ public final class Mouse {
         });
 
         glfwSetMouseButtonCallback(windowId, (window, button, action, scanner) -> {
-            if (button >= 0 && button <= GLFW_MOUSE_BUTTON_LAST) {
+            if (button >= 0 && button <= BUTTON_LAST) {
                 buttons[button] = (action != GLFW_RELEASE);
             }
         });
@@ -71,7 +84,7 @@ public final class Mouse {
      * @return {@code true} if button down; otherwise {@code false}
      */
     public static boolean isButtonDown(int button) {
-        return button >= 0 && button <= GLFW_MOUSE_BUTTON_LAST && buttons[button];
+        return button >= 0 && button <= BUTTON_LAST && buttons[button];
     }
 
     /**
@@ -80,7 +93,7 @@ public final class Mouse {
      * @return {@code true} if button pressed; otherwise {@code false}
      */
     public static boolean isButtonPressed(int button) {
-        return button >= 0 && button <= GLFW_MOUSE_BUTTON_LAST
+        return button >= 0 && button <= BUTTON_LAST
                 && buttons[button] && !lastButtons[button];
     }
 
@@ -91,7 +104,7 @@ public final class Mouse {
      */
     public static boolean isButtonReleased(int button) {
         return button >= 0 &&
-                button <= GLFW_MOUSE_BUTTON_LAST &&
+                button <= BUTTON_LAST &&
                 !buttons[button] &&
                 lastButtons[button];
     }

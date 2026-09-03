@@ -250,13 +250,13 @@ public class Intro {
 
             glfwPollEvents();
 
-            if (Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT) &&
-                    Keyboard.isKeyPressed(GLFW_KEY_ESCAPE)) {
+            if (Keyboard.isKeyDown(Keyboard.KEY_LEFT_SHIFT) &&
+                    Keyboard.isKeyPressed(Keyboard.KEY_ESCAPE)) {
                 GameMaster.game.getChunkManager().shutdown();
                 glfwSetWindowShouldClose(window, true);
             }
 
-            if (Keyboard.isKeyPressed(GLFW_KEY_F5)) {
+            if (Keyboard.isKeyPressed(Keyboard.KEY_F5)) {
                 Local.lang.nextLanguage();
                 if (BookService.bs.isOpen() && BookService.bs.getOpenedBook() != null) {
                     BookUI.bui.reload(BookService.bs.getOpenedBook());
@@ -266,12 +266,12 @@ public class Intro {
                         Local.lang.getCurrentLanguage().getName()));
             }
 
-            if (Keyboard.isKeyPressed(GLFW_KEY_F6)) {
+            if (Keyboard.isKeyPressed(Keyboard.KEY_F6)) {
                 ToastFactory.info(Local.lang.f("engine.current_language",
                         Local.lang.getCurrentLanguage().getName()));
             }
 
-            if (Keyboard.isKeyPressed(GLFW_KEY_F11)) {
+            if (Keyboard.isKeyPressed(Keyboard.KEY_F11)) {
                 toggleFullscreen();
             }
 

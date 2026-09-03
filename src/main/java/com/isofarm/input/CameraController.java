@@ -44,15 +44,15 @@ public record CameraController(Camera camera) implements Service<Camera> {
         Player player = gameMaster.getPlayer();
         if (player == null) return;
 
-        if (Keyboard.isKeyDown(GLFW_KEY_W) || Keyboard.isKeyDown(GLFW_KEY_A) ||
-                Keyboard.isKeyDown(GLFW_KEY_S) || Keyboard.isKeyDown(GLFW_KEY_D)) {
+        if (Keyboard.isKeyDown(Keyboard.KEY_W) || Keyboard.isKeyDown(Keyboard.KEY_A) ||
+                Keyboard.isKeyDown(Keyboard.KEY_S) || Keyboard.isKeyDown(Keyboard.KEY_D)) {
             player.clearPath();
         }
 
         if (player.getCurrentState() instanceof SwimmingState) {
-            if (Keyboard.isKeyDown(GLFW_KEY_SPACE)) {
+            if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
                 player.getVelocity().y = 4.0f;
-            } else if (Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
+            } else if (Keyboard.isKeyDown(Keyboard.KEY_LEFT_CONTROL)) {
                 player.getVelocity().y = -3.0f;
             }
         }
@@ -65,8 +65,8 @@ public record CameraController(Camera camera) implements Service<Camera> {
      * Updates the zoom.
      */
     private void updateZoom() {
-        boolean isPressingC = Keyboard.isKeyDown(GLFW_KEY_C);
-        boolean isMiddleClickDown = Mouse.isButtonDown(GLFW_MOUSE_BUTTON_MIDDLE);
+        boolean isPressingC = Keyboard.isKeyDown(Keyboard.KEY_C);
+        boolean isMiddleClickDown = Mouse.isButtonDown(Mouse.BUTTON_MIDDLE);
         float targetZoom = isPressingC || isMiddleClickDown ? ZOOMED_ZOOM : NORMAL_ZOOM;
         if (camera.getZoom() != targetZoom) {
             camera.setZoom(targetZoom);
@@ -93,7 +93,7 @@ public record CameraController(Camera camera) implements Service<Camera> {
         Vector3f directionToMouse = new Vector3f(mouseWorldPos).sub(playerPos);
         directionToMouse.y = 0.0f;
 
-        boolean isZoomed = Keyboard.isKeyDown(GLFW_KEY_C);
+        boolean isZoomed = Keyboard.isKeyDown(Keyboard.KEY_C);
         float cursorWeight = isZoomed ? ZOOMED_CURSOR_WEIGHT : NORMAL_CURSOR_WEIGHT;
 
         Vector3f targetOffset = new Vector3f(directionToMouse).mul(cursorWeight);
@@ -123,7 +123,7 @@ public record CameraController(Camera camera) implements Service<Camera> {
      * @param world the world value
      */
     private void click(GameMaster gameMaster, Player player, World world) {
-        boolean isRightClickDown = Mouse.isButtonDown(GLFW_MOUSE_BUTTON_RIGHT);
+        boolean isRightClickDown = Mouse.isButtonDown(Mouse.BUTTON_RIGHT);
         if (!isRightClickDown) {
             lastGoal = null;
             return;

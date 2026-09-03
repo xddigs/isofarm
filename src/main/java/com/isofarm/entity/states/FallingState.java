@@ -8,8 +8,6 @@ import com.isofarm.service.SoundService;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
-
 /**
  * Provides falling state behavior.
  */
@@ -46,7 +44,7 @@ public class FallingState implements PlayerState {
         }
 
         if (player.getGamemode().isGodmode() && jumpTime <= DOUBLE_JUMP_WINDOW
-                && Keyboard.isKeyPressed(GLFW_KEY_SPACE)) {
+                && Keyboard.isKeyPressed(Keyboard.KEY_SPACE)) {
             player.changeState(new FlyingState());
         }
     }

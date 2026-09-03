@@ -66,21 +66,21 @@ public class GameInteraction {
     public BlockPos update(GameMaster gameMaster, Item selectedItem) {
         Player player = GameMaster.game.getPlayer();
         Inventory inventory = player.getInventory();
-        boolean isCtrlHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL) ||
-                Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
+        boolean isCtrlHeld = Keyboard.isKeyDown(Keyboard.KEY_LEFT_CONTROL) ||
+                Keyboard.isKeyDown(Keyboard.KEY_RIGHT_CONTROL);
 
-        boolean isShiftHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT);
+        boolean isShiftHeld = Keyboard.isKeyDown(Keyboard.KEY_LEFT_SHIFT);
         isSmartShift = isShiftHeld && !GameMaster.game.isInventoryOpen();
 
-        boolean isLeftHeld = Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT);
-        boolean isLeftPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
-        boolean isRightPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_RIGHT);
+        boolean isLeftHeld = Mouse.isButtonDown(Mouse.BUTTON_LEFT);
+        boolean isLeftPressed = Mouse.isButtonPressed(Mouse.BUTTON_LEFT);
+        boolean isRightPressed = Mouse.isButtonPressed(Mouse.BUTTON_RIGHT);
         boolean canInteract = player != null
                 && !player.getGamemode().isNoClip()
                 && !GameMaster.game.isInventoryOpen()
                 && !GameMaster.game.isChatOpen();
 
-        if (Keyboard.isKeyPressed(GLFW_KEY_ENTER)) {
+        if (Keyboard.isKeyPressed(Keyboard.KEY_ENTER)) {
             if (!GameMaster.game.isChatOpen()) {
                 GameMaster.game.setChatOpen(true);
                 GameMaster.game.getGameUIService().openChat();
@@ -94,25 +94,25 @@ public class GameInteraction {
             }
         }
 
-        if (Keyboard.isKeyPressed(GLFW_KEY_F1)) {
+        if (Keyboard.isKeyPressed(Keyboard.KEY_F1)) {
             GameMaster.game.toggleHUD();
         }
 
-        if (Keyboard.isKeyPressed(GLFW_KEY_F3)) {
+        if (Keyboard.isKeyPressed(Keyboard.KEY_F3)) {
             Settings.toggleDebugInfo();
         }
 
-        if (Keyboard.isKeyPressed(GLFW_KEY_Q) && canInteract) {
-            boolean dropAll = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL);
+        if (Keyboard.isKeyPressed(Keyboard.KEY_Q) && canInteract) {
+            boolean dropAll = Keyboard.isKeyDown(Keyboard.KEY_LEFT_CONTROL);
             dropItem(selectedItem, dropAll);
         }
 
-        if (Keyboard.isKeyPressed(GLFW_KEY_E) && !GameMaster.game.isChatOpen() &&
+        if (Keyboard.isKeyPressed(Keyboard.KEY_E) && !GameMaster.game.isChatOpen() &&
                 !BookService.bs.isOpen()) {
             GameMaster.game.toggleInventory();
         }
 
-        if (inventory.hasBookEquipped() && Keyboard.isKeyPressed(GLFW_KEY_TAB)
+        if (inventory.hasBookEquipped() && Keyboard.isKeyPressed(Keyboard.KEY_TAB)
                 && !GameMaster.game.isChatOpen()) {
             CraftingBook book = inventory.getBook();
             if (book != null) {
@@ -122,7 +122,7 @@ public class GameInteraction {
                     BookService.bs.close();
                 }
             }
-        } else if (Keyboard.isKeyPressed(GLFW_KEY_E) && BookService.bs.isOpen() &&
+        } else if (Keyboard.isKeyPressed(Keyboard.KEY_E) && BookService.bs.isOpen() &&
                 !inventory.hasBookEquipped()) {
             BookService.bs.close();
         }
@@ -136,7 +136,7 @@ public class GameInteraction {
             }
         }
 
-        if (Keyboard.isKeyPressed(GLFW_KEY_M) && !GameMaster.game.isChatOpen()) {
+        if (Keyboard.isKeyPressed(Keyboard.KEY_M) && !GameMaster.game.isChatOpen()) {
             Settings.toggleMusic();
         }
 

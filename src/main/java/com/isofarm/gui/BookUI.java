@@ -11,8 +11,6 @@ import com.isofarm.wrld.GameMaster;
 import org.joml.Vector4f;
 import org.lwjgl.stb.STBTTBakedChar;
 
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
-
 /**
  * Provides book ui behavior.
  */
@@ -147,7 +145,7 @@ public class BookUI extends UIElement {
         }
 
         updateBookLine(animSheet, book);
-        if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
+        if (Mouse.isButtonPressed(Mouse.BUTTON_LEFT)) {
             click();
         }
     }

@@ -38,9 +38,9 @@ public class FlyingState implements PlayerState {
             return;
         }
 
-        if (Keyboard.isKeyDown(GLFW_KEY_SPACE)) {
+        if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
             player.getVelocity().y = FLY_SPEED;
-        } else if (Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
+        } else if (Keyboard.isKeyDown(Keyboard.KEY_LEFT_CONTROL)) {
             player.getVelocity().y = -FLY_SPEED;
         } else {
             player.getVelocity().y = 0.0f;

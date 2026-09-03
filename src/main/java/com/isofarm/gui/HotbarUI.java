@@ -427,9 +427,9 @@ public class HotbarUI extends UIElement {
      * Performs the interact operation.
      */
     private void interact() {
-        boolean isLeftClick = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
-        boolean isCtrlHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL) ||
-                Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
+        boolean isLeftClick = Mouse.isButtonPressed(Mouse.BUTTON_LEFT);
+        boolean isCtrlHeld = Keyboard.isKeyDown(Keyboard.KEY_LEFT_CONTROL) ||
+                Keyboard.isKeyDown(Keyboard.KEY_RIGHT_CONTROL);
 
         if (isLeftClick) {
             if (backpackSlotUI.isVisible() && isSlotHovered(backpackSlotUI)) {

@@ -2,7 +2,6 @@ package com.isofarm.gui;
 
 import com.isofarm.input.Keyboard;
 import com.isofarm.input.Mouse;
-import org.lwjgl.glfw.GLFW;
 
 /**
  * Provides uimanager behavior.
@@ -50,8 +49,8 @@ public class UIManager {
             tooltip.hide();
         }
 
-        for (int button = GLFW.GLFW_MOUSE_BUTTON_1;
-             button <= GLFW.GLFW_MOUSE_BUTTON_LAST;
+        for (int button = Mouse.BUTTON_1;
+             button <= Mouse.BUTTON_LAST;
              button++) {
 
             if (Mouse.isButtonPressed(button)) {
@@ -81,8 +80,8 @@ public class UIManager {
         }
 
         if (focusedElement != null) {
-            for (int key = GLFW.GLFW_KEY_SPACE;
-                 key <= GLFW.GLFW_KEY_LAST;
+            for (int key = Keyboard.KEY_SPACE;
+                 key <= Keyboard.KEY_LAST;
                  key++) {
 
                 if (Keyboard.isKeyPressed(key)) {

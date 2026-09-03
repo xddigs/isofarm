@@ -32,7 +32,7 @@ public class GroundedState implements PlayerState {
             return;
         }
 
-        if (Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
+        if (Keyboard.isKeyDown(Keyboard.KEY_LEFT_CONTROL)) {
             player.changeState(new SneakingState());
             return;
         }

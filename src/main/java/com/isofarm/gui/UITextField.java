@@ -2,6 +2,7 @@ package com.isofarm.gui;
 
 import com.isofarm.data.CompletionProvider;
 import com.isofarm.data.GodObject;
+import com.isofarm.input.Keyboard;
 import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
 
@@ -129,7 +130,7 @@ public class UITextField extends UIElement {
         boolean shift = (modifiers & GLFW.GLFW_MOD_SHIFT) != 0;
         boolean control = (modifiers & GLFW.GLFW_MOD_CONTROL) != 0;
 
-        if (key == GLFW.GLFW_KEY_TAB) {
+        if (key == Keyboard.KEY_TAB) {
             if (!shift) {
                 completeForward();
             } else {
@@ -139,7 +140,7 @@ public class UITextField extends UIElement {
         }
 
         switch (key) {
-            case GLFW.GLFW_KEY_BACKSPACE -> {
+            case Keyboard.KEY_BACKSPACE -> {
                 if (hasSelection()) {
                     deleteSelection();
                 } else if (cursorPosition > 0) {
@@ -154,7 +155,7 @@ public class UITextField extends UIElement {
                 return true;
             }
 
-            case GLFW.GLFW_KEY_DELETE -> {
+            case Keyboard.KEY_DELETE -> {
                 if (hasSelection()) {
                     deleteSelection();
                 } else if (cursorPosition < text.length()) {
@@ -167,7 +168,7 @@ public class UITextField extends UIElement {
                 return true;
             }
 
-            case GLFW.GLFW_KEY_LEFT -> {
+            case Keyboard.KEY_LEFT -> {
                 if (control) {
                     moveCursorWordLeft(shift);
                 } else {
@@ -178,7 +179,7 @@ public class UITextField extends UIElement {
                 return true;
             }
 
-            case GLFW.GLFW_KEY_RIGHT -> {
+            case Keyboard.KEY_RIGHT -> {
                 if (control) {
                     moveCursorWordRight(shift);
                 } else {
@@ -189,7 +190,7 @@ public class UITextField extends UIElement {
                 return true;
             }
 
-            case GLFW.GLFW_KEY_HOME -> {
+            case Keyboard.KEY_HOME -> {
                 cursorPosition = 0;
                 if (!shift) {
                     selectionAnchor = cursorPosition;
@@ -199,7 +200,7 @@ public class UITextField extends UIElement {
                 return true;
             }
 
-            case GLFW.GLFW_KEY_END -> {
+            case Keyboard.KEY_END -> {
                 cursorPosition = text.length();
                 if (!shift) {
                     selectionAnchor = cursorPosition;
@@ -209,7 +210,7 @@ public class UITextField extends UIElement {
                 return true;
             }
 
-            case GLFW.GLFW_KEY_A -> {
+            case Keyboard.KEY_A -> {
                 if (control) {
                     selectionAnchor = 0;
                     cursorPosition = text.length();
@@ -218,14 +219,14 @@ public class UITextField extends UIElement {
                 }
             }
 
-            case GLFW.GLFW_KEY_C -> {
+            case Keyboard.KEY_C -> {
                 if (control && hasSelection()) {
                     copySelection();
                     return true;
                 }
             }
 
-            case GLFW.GLFW_KEY_X -> {
+            case Keyboard.KEY_X -> {
                 if (control && hasSelection()) {
                     copySelection();
                     deleteSelection();
@@ -234,7 +235,7 @@ public class UITextField extends UIElement {
                 }
             }
 
-            case GLFW.GLFW_KEY_V -> {
+            case Keyboard.KEY_V -> {
                 if (control) {
                     pasteClipboard();
                     resetCursorBlink();
@@ -242,7 +243,7 @@ public class UITextField extends UIElement {
                 }
             }
 
-            case GLFW.GLFW_KEY_ENTER -> {
+            case Keyboard.KEY_ENTER -> {
                 return true;
             }
         }

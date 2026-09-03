@@ -17,9 +17,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_RIGHT;
-
 /**
  * Provides inventory ui behavior.
  */
@@ -517,12 +514,12 @@ public class InventoryUI extends UIElement {
             InventorySlot slot = slotUI.getSlotType();
             if (slot == null) continue;
 
-            if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
+            if (Mouse.isButtonPressed(Mouse.BUTTON_LEFT)) {
                 leftClick(slot);
                 break;
             }
 
-            if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
+            if (Mouse.isButtonPressed(Mouse.BUTTON_RIGHT)) {
                 rightClick(slot);
                 break;
             }

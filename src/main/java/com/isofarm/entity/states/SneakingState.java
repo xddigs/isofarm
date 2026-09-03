@@ -35,13 +35,13 @@ public class SneakingState implements PlayerState {
             return;
         }
 
-        if (Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT) ||
-                Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
+        if (Mouse.isButtonPressed(Mouse.BUTTON_LEFT) ||
+                Mouse.isButtonPressed(Mouse.BUTTON_RIGHT)) {
             player.interact();
             return;
         }
 
-        if (!Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
+        if (!Keyboard.isKeyDown(Keyboard.KEY_LEFT_CONTROL)) {
             player.changeState(new GroundedState());
         }
     }

@@ -34,9 +34,9 @@ public class SwimmingState implements PlayerState {
      */
     @Override
     public void input(Player player, GameMaster gameMaster) {
-        if (Keyboard.isKeyDown(GLFW_KEY_SPACE)) {
+        if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
             player.getVelocity().y = SWIM_UP_SPEED;
-        } else if (Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
+        } else if (Keyboard.isKeyDown(Keyboard.KEY_LEFT_CONTROL)) {
             player.getVelocity().y = SWIM_DOWN_SPEED;
         }
     }
@@ -52,7 +52,7 @@ public class SwimmingState implements PlayerState {
         player.wasd(World.wrld, delta, yaw, false);
 
         if (player.isOnGround()) {
-            if (Keyboard.isKeyDown(GLFW_KEY_SPACE)) {
+            if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
                 player.changeState(new GroundedState());
                 return;
             }

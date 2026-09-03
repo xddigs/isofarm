@@ -63,8 +63,8 @@ public class Book extends Usable {
      */
     @Override
     public void update() {
-        if (Keyboard.isKeyPressed(GLFW_KEY_LEFT)) previousPage();
-        if (Keyboard.isKeyPressed(GLFW_KEY_RIGHT)) nextPage();
+        if (Keyboard.isKeyPressed(Keyboard.KEY_LEFT)) previousPage();
+        if (Keyboard.isKeyPressed(Keyboard.KEY_RIGHT)) nextPage();
     }
 
 

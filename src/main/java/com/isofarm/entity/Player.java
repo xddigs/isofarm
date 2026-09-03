@@ -828,10 +828,10 @@ public class Player extends Character {
         float moveX = ZERO_VELOCITY;
         float moveZ = ZERO_VELOCITY;
 
-        if (Keyboard.isKeyDown(GLFW_KEY_W)) moveZ -= 1.0f;
-        if (Keyboard.isKeyDown(GLFW_KEY_S)) moveZ += 1.0f;
-        if (Keyboard.isKeyDown(GLFW_KEY_A)) moveX -= 1.0f;
-        if (Keyboard.isKeyDown(GLFW_KEY_D)) moveX += 1.0f;
+        if (Keyboard.isKeyDown(Keyboard.KEY_W)) moveZ -= 1.0f;
+        if (Keyboard.isKeyDown(Keyboard.KEY_S)) moveZ += 1.0f;
+        if (Keyboard.isKeyDown(Keyboard.KEY_A)) moveX -= 1.0f;
+        if (Keyboard.isKeyDown(Keyboard.KEY_D)) moveX += 1.0f;
 
         Vector3f inputDir = new Vector3f(moveX, ZERO_VELOCITY, moveZ);
 
