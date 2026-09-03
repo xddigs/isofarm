@@ -5,11 +5,17 @@ import static org.lwjgl.glfw.GLFW.*;
 /**
  * Provides keyboard behavior.
  */
-public class Keyboard {
+public final class Keyboard {
     private static final boolean[] keys = new boolean[GLFW_KEY_LAST + 1];
     private static final boolean[] lastKeys = new boolean[GLFW_KEY_LAST + 1];
     private static final StringBuilder typedCharacters = new StringBuilder();
     private static int modifiers;
+
+    /**
+     * Creates a new {@code Keyboard} instance. In private because
+     * this is a static class.
+     */
+    private Keyboard() {}
 
     /**
      * Initializes the component.

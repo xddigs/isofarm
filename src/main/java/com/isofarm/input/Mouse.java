@@ -5,7 +5,7 @@ import static org.lwjgl.glfw.GLFW.*;
 /**
  * Provides mouse behavior.
  */
-public class Mouse {
+public final class Mouse {
     private static final boolean[] buttons = new boolean[GLFW_MOUSE_BUTTON_LAST + 1];
     private static final boolean[] lastButtons = new boolean[GLFW_MOUSE_BUTTON_LAST + 1];
 
@@ -14,6 +14,11 @@ public class Mouse {
     private static float deltaX = 0, deltaY = 0;
     private static boolean firstMouse = true;
     private static float scrollY = 0.0f;
+
+    /**
+     * Creates a new private* {@code Mouse} instance.
+     */
+    private Mouse() {}
 
     /**
      * Initializes the component.

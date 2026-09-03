@@ -46,7 +46,7 @@ public final class Joystick {
     private static int activeJoystick = -1;
 
     /**
-     * Creates a new {@code Joystick} instance.
+     * Creates a new private {@code Joystick} instance.
      */
     private Joystick() {}
 
