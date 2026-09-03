@@ -4,6 +4,7 @@ import com.isofarm.data.PlayerState;
 import com.isofarm.data.SoundGroup;
 import com.isofarm.entity.Player;
 import com.isofarm.input.Keyboard;
+import com.isofarm.service.SoundService;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
 
@@ -62,8 +63,7 @@ public class FallingState implements PlayerState {
                 float damage = (fallDistance - FALL_DISTANCE) * 2.0f;
 
                 player.fallDamage(damage);
-                player.getSoundService()
-                        .playBreakSound(SoundGroup.ENTITY, 1.0f, 1.0f);
+               SoundService.fx.playBreakSound(SoundGroup.ENTITY, 1.0f, 1.0f);
             }
 
             player.setFalling(false);

@@ -143,7 +143,6 @@ public class GameMaster {
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
         this.player = new Player(null, world, this);
-        player.setSoundService(soundService);
         addEntity(player);
         shop.setPlayer(player);
         notifyProgress(progressCallback, ++currentStep / totalSteps);
