@@ -4,6 +4,7 @@ import com.isofarm.data.*;
 import com.isofarm.entity.Entity;
 import com.isofarm.entity.Player;
 import com.isofarm.entity.WorldItem;
+import com.isofarm.graphics.ParticleEngine;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.item.*;
 import com.isofarm.service.BookService;
@@ -382,7 +383,7 @@ public class GameInteraction {
             }
 
             SoundService.fx.playBreakSound(SoundGroup.SOIL);
-            if (sheet != null) GameMaster.game.getParticles().spawnCrop(x, y + K.World.SHORTER_BLOCK_HEIGHT,
+            if (sheet != null) ParticleEngine.peng.spawnCrop(x, y + K.World.SHORTER_BLOCK_HEIGHT,
                     z, sheet, frameIndex);
             GameMaster.game.getGameUIService().logAction(cell);
             return;
@@ -488,7 +489,7 @@ public class GameInteraction {
                         itemToDrop = brokenBlock;
                     }
 
-                    GameMaster.game.getParticles().spawnBlock(pos, bData);
+                    ParticleEngine.peng.spawnBlock(pos, bData);
                     Vector3f dropPos = new Vector3f(pos.x() + 0.5f, pos.y() + 0.5f, pos.z() + 0.5f);
 
                     int count = (int) (Math.random() * 2) + 1;
@@ -505,7 +506,7 @@ public class GameInteraction {
         world.setWaterLevelAt(cell.x(), cell.y(), cell.z(), (byte) 0);
         WaterSimulation.ws.onBlockDestroyed(cell.x(), cell.y(), cell.z());
         gameMaster.rebuildChunkMeshAt(cell);
-        GameMaster.game.getParticles().spawnBlock(cell, blockData);
+        ParticleEngine.peng.spawnBlock(cell, blockData);
 
         if (removedBlock.getType().hasDrops()) {
             Object dropObj = removedBlock.getType().getRandomDrop();
@@ -567,7 +568,7 @@ public class GameInteraction {
                     (target.isPlant() && !block.getType().isPlant())) {
                 Block newBlock = new Block(block.getType(), placeX, placeY, placeZ);
                 if (block.getType().equals(BlockData.OAK_BONSAI)) {
-                    gameMaster.getTreeService().plant(placeX, placeY, placeZ, BlockData.OAK_BONSAI);
+                    TreeService.ts.plant(placeX, placeY, placeZ, BlockData.OAK_BONSAI);
                 } else {
                     if (target.isPlant()) {
                         breakBlock(gameMaster, new BlockPos(target, placeX, placeY, placeZ),
