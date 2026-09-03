@@ -29,31 +29,27 @@ public class GameMaster {
 
     private static final Logger log = LoggerFactory.getLogger(GameMaster.class);
     private final long windowHandle = Intro.getWindow();
-    private final World world = World.wd;
+    private final World world = World.wrld;
     private final Sun sun = new Sun("Sun");
     private final Moon moon = new Moon("Moon");
     private final CelestialLighting celestialLighting = new CelestialLighting(sun, moon);
     private final UIManager uiManager = Intro.getUiManager();
     private final CropService cropService = new CropService(world);
-    private final TreeService treeService = new TreeService(world);
     private final CommandRegistry commandRegistry = new CommandRegistry();
     private final CommandService commandService = new CommandService(commandRegistry);
     private final ItemRegistry itemRegistry = new ItemRegistry();
-    private final ParticleEngine particles = new ParticleEngine();
     private final RainEngine rainEngine = new RainEngine();
     private final List<Entity> entities = new LinkedList<>();
 
     private List<Recipe> recipes;
     private ShadowMap shadowMap;
     private ChunkManager chunkManager;
-    private GameRenderer gameRenderer;
     private ItemRenderer itemRenderer;
     private GameUIService gameUIservice;
     private Framebuffer sceneFbo;
     private Framebuffer blurFbo;
     private Camera orthoCamera;
     private CameraController orthoCameraController;
-    private StepController stepController;
     private float windowWidth = K.Window.DEFAULT_WIDTH;
     private float windowHeight = K.Window.DEFAULT_HEIGHT;
     private Player player;
@@ -89,7 +85,6 @@ public class GameMaster {
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
         this.chunkManager = new ChunkManager(world, WaterSimulation.ws);
-        this.gameRenderer = new GameRenderer();
         this.itemRenderer = new ItemRenderer();
         this.shop = new Shop();
         notifyProgress(progressCallback, ++currentStep / totalSteps);
@@ -97,7 +92,6 @@ public class GameMaster {
         this.orthoCamera = new Camera(windowWidth, windowHeight, Settings.getRenderDistance());
 
         this.orthoCameraController = new CameraController(orthoCamera);
-        this.stepController = new StepController();
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
         this.recenter();
@@ -175,10 +169,6 @@ public class GameMaster {
         return itemRenderer;
     }
 
-    public ParticleEngine getParticles() {
-        return particles;
-    }
-
     public Framebuffer getSceneFbo() {
         return sceneFbo;
     }
@@ -201,10 +191,6 @@ public class GameMaster {
 
     public CropService getCropService() {
         return cropService;
-    }
-
-    public TreeService getTreeService() {
-        return treeService;
     }
 
     public CommandRegistry getCommandRegistry() {
@@ -235,28 +221,8 @@ public class GameMaster {
         return orthoCamera;
     }
 
-    public CameraController getOrthoCameraController() {
-        return orthoCameraController;
-    }
-
     public Framebuffer getBlurFbo() {
         return blurFbo;
-    }
-
-    public int getLastPlayerChunkX() {
-        return chunkManager.getLastPlayerChunkX();
-    }
-
-    public void setLastPlayerChunkX(int lastPlayerChunkX) {
-        chunkManager.setLastPlayerChunkX(lastPlayerChunkX);
-    }
-
-    public int getLastPlayerChunkZ() {
-        return chunkManager.getLastPlayerChunkZ();
-    }
-
-    public void setLastPlayerChunkZ(int lastPlayerChunkZ) {
-        chunkManager.setLastPlayerChunkZ(lastPlayerChunkZ);
     }
 
     public boolean isChatOpen() {
@@ -301,10 +267,6 @@ public class GameMaster {
 
     public List<Recipe> getRecipes() {
         return recipes;
-    }
-
-    public void setRecipes(List<Recipe> recipes) {
-        this.recipes = recipes;
     }
 
     public Difficulty getDifficulty() {
@@ -385,11 +347,11 @@ public class GameMaster {
         celestialLighting.update(HoveredCell.get(this), timeOfDay);
         shop.update(TimeService.ts);
         cropService.update(delta, WeatherService.wes.getWeather());
-        treeService.update(this);
+        TreeService.ts.update(this);
         updateEntities(delta);
         orthoCameraController.update(this, delta);
-        particles.update(delta);
-        stepController.update(this, player, SoundService.fx, delta);
+        ParticleEngine.peng.update(delta);
+        StepController.step.update(this, player, SoundService.fx, delta);
         GameInteraction.gami.update(this, Settings.selectedItem);
 
         WaterSimulation.ws.update(delta);
@@ -403,7 +365,7 @@ public class GameMaster {
     }
 
     public void render() {
-        gameRenderer.render(this, chunkManager.getChunkMeshes());
+        GameRenderer.gamr.render(this, chunkManager.getChunkMeshes());
         gameUIservice.render(isHUDShown(), this);
     }
 
