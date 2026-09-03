@@ -573,8 +573,8 @@ public class Player extends Character {
 
                 if (tool.getDurability() <= 0) {
                     remove(tool);
-                    SoundService.fx.playBreakSound(SoundGroup.ITEMS, 1.0f,
-                            Settings.getMaxInteractionDistance());
+                    SoundService.fx.playBreakSound(SoundGroup.ITEMS
+                    );
                 }
             }
         }

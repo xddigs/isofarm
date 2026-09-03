@@ -61,7 +61,7 @@ public class FallingState implements PlayerState {
                 float damage = (fallDistance - FALL_DISTANCE) * 2.0f;
 
                 player.fallDamage(damage);
-               SoundService.fx.playBreakSound(SoundGroup.ENTITY, 1.0f, 1.0f);
+               SoundService.fx.playBreakSound(SoundGroup.ENTITY);
             }
 
             player.setFalling(false);

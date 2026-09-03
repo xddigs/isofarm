@@ -97,22 +97,19 @@ public class SoundService implements Service<SoundGroup> {
         alSourcef(useSource, AL_GAIN, 1.0f);
     }
 
-    public void playStepSound(SoundGroup group, float distance, float maxDistance) {
-        float volume = calc(distance, maxDistance);
+    public void playStepSound(SoundGroup group) {
         playSound(stepSource, group != null ? group.getStepSounds() : null,
-                0.95f, 0.1f, volume);
+                0.95f, 0.1f, 1.0f);
     }
 
-    public void playBreakSound(SoundGroup group, float distance, float maxDistance) {
-        float volume = calc(distance, maxDistance);
+    public void playBreakSound(SoundGroup group) {
         playSound(breakSource, group != null ? group.getBreakSounds() : null,
-                0.8f, 0.2f, volume);
+                0.8f, 0.2f, 1.0f);
     }
 
-    public void playPlaceSound(SoundGroup group, float distance, float maxDistance) {
-        float volume = calc(distance, maxDistance);
+    public void playPlaceSound(SoundGroup group) {
         playSound(breakSource, group != null ? group.getPlaceSounds() : null,
-                0.75f, 0.2f, volume);
+                0.75f, 0.2f, 1.0f);
     }
 
     public void playEntitySound(SoundGroup group) {
@@ -170,16 +167,6 @@ public class SoundService implements Service<SoundGroup> {
         currentBackgroundSound = soundPath;
 
         alSourcePlay(backgroundSource);
-    }
-
-    private float calc(float distance, float maxDistance) {
-        if (maxDistance <= 0.0f) {
-            return 1.0f;
-        }
-
-        float normalizedDistance = Math.min(distance / maxDistance, 1.0f);
-        float volume = 1.1f - (normalizedDistance * normalizedDistance) * 0.95f;
-        return Math.clamp(volume, 0.05f, 1.1f);
     }
 
     private void playSound(int source, String[] sounds, float basePitch,

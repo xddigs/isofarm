@@ -40,8 +40,7 @@ public class StepController {
             Block block = world.getBlockAt(blockX, blockY, blockZ);
             if (block != null && block.getType() != null) {
                 SoundGroup soundGroup = block.getType().getSoundGroup();
-                soundService.playStepSound(soundGroup, gameMaster.getGameInteraction().getDistanceToBlock(gameMaster,
-                        HoveredCell.get(gameMaster)), Settings.getMaxInteractionDistance());
+                soundService.playStepSound(soundGroup);
             }
         }
     }

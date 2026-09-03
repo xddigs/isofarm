@@ -378,10 +378,9 @@ public class GameInteraction {
                 cropService.rip(crop);
             }
 
-            if (sheet != null) {
-                particles.spawnCrop(x, y + K.World.SHORTER_BLOCK_HEIGHT, z, sheet, frameIndex);
-            }
-
+            SoundService.fx.playBreakSound(SoundGroup.SOIL);
+            if (sheet != null) particles.spawnCrop(x, y + K.World.SHORTER_BLOCK_HEIGHT,
+                    z, sheet, frameIndex);
             gameUIservice.logAction(cell);
             return;
         }
@@ -445,8 +444,7 @@ public class GameInteraction {
                             byte blockId, Item selectedItem) {
         World world = gameMaster.getWorld();
         if (blockData.getSoundGroup() != null) {
-            SoundService.fx.playBreakSound(blockData.getSoundGroup(),
-                    getDistanceToBlock(gameMaster, cell), Settings.getMaxInteractionDistance());
+            SoundService.fx.playBreakSound(blockData.getSoundGroup());
         }
 
         Vector3f position = new Vector3f(cell.x() + 0.5f, cell.y() + 0.5f, cell.z() + 0.5f);
@@ -575,8 +573,7 @@ public class GameInteraction {
                 }
 
                 player.remove(selectedItem);
-                SoundService.fx.playBreakSound(newBlock.getType()
-                        .getSoundGroup(), getDistanceToBlock(gameMaster, cell), Settings.getMaxInteractionDistance());
+                SoundService.fx.playBreakSound(newBlock.getType().getSoundGroup());
                 gameMaster.rebuildChunkMeshAt(placeX, placeZ);
                 gameUIservice.logAction(new BlockPos(newBlock.getType(), placeX, placeY, placeZ));
                 log.info("Block placed: {} at {},{},{}", newBlock.getType().getName(), placeX, placeY, placeZ);
