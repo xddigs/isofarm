@@ -15,6 +15,9 @@ import org.joml.Vector3f;
 import static org.joml.Math.lerp;
 import static org.lwjgl.glfw.GLFW.*;
 
+/**
+ * Stores camera controller data.
+ */
 public record CameraController(Camera camera) implements Service<Camera> {
     private static final float NORMAL_ZOOM = 18.0f;
     private static final float ZOOMED_ZOOM = NORMAL_ZOOM / 2.5f;
@@ -27,6 +30,11 @@ public record CameraController(Camera camera) implements Service<Camera> {
     private static boolean mouseCaptured = false;
     private static GridPos lastGoal = null;
 
+    /**
+     * Updates the current state.
+     * @param gameMaster the game master value
+     * @param delta the delta value
+     */
     public void update(GameMaster gameMaster, float delta) {
         if (gameMaster.isInventoryOpen() || gameMaster.isChatOpen()) {
             lastGoal = null;
@@ -53,6 +61,9 @@ public record CameraController(Camera camera) implements Service<Camera> {
         followPlayer(gameMaster, player, delta);
     }
 
+    /**
+     * Updates the zoom.
+     */
     private void updateZoom() {
         boolean isPressingC = Keyboard.isKeyDown(GLFW_KEY_C);
         boolean isMiddleClickDown = Mouse.isButtonDown(GLFW_MOUSE_BUTTON_MIDDLE);
@@ -62,6 +73,12 @@ public record CameraController(Camera camera) implements Service<Camera> {
         }
     }
 
+    /**
+     * Performs the follow player operation.
+     * @param gameMaster the game master value
+     * @param player the player value
+     * @param delta the delta value
+     */
     private void followPlayer(GameMaster gameMaster, Player player, float delta) {
         Vector3f playerPos = player.getPosition();
 
@@ -99,6 +116,12 @@ public record CameraController(Camera camera) implements Service<Camera> {
         camera.getPosition().set(cameraPos);
     }
 
+    /**
+     * Performs the click operation.
+     * @param gameMaster the game master value
+     * @param player the player value
+     * @param world the world value
+     */
     private void click(GameMaster gameMaster, Player player, World world) {
         boolean isRightClickDown = Mouse.isButtonDown(GLFW_MOUSE_BUTTON_RIGHT);
         if (!isRightClickDown) {
@@ -126,12 +149,24 @@ public record CameraController(Camera camera) implements Service<Camera> {
         lastGoal = goal;
     }
 
+    /**
+     * Performs the follow path operation.
+     * @param player the player value
+     * @param world the world value
+     * @param delta the delta value
+     */
     private void followPath(Player player, World world, float delta) {
         if (player.isFollowingPath()) {
             player.move(world, delta);
         }
     }
 
+    /**
+     * Returns the goal position.
+     * @param world the world value
+     * @param blockPos the block pos value
+     * @return the goal position
+     */
     private GridPos getGoalPosition(World world, BlockPos blockPos) {
         int x = blockPos.x();
         int z = blockPos.z();
@@ -142,6 +177,15 @@ public record CameraController(Camera camera) implements Service<Camera> {
         return new GridPos(x, walkY, z);
     }
 
+    /**
+     * Returns the mouse world position.
+     * @param mouseX the mouse x value
+     * @param mouseY the mouse y value
+     * @param screenWidth the screen width value
+     * @param screenHeight the screen height value
+     * @param planeY the plane y value
+     * @return the mouse world position
+     */
     public Vector3f getMouseWorldPosition(float mouseX, float mouseY, float screenWidth,
                                           float screenHeight, float planeY) {
         Ray ray = camera.getMouseRay(mouseX, mouseY, screenWidth, screenHeight);
@@ -153,12 +197,20 @@ public record CameraController(Camera camera) implements Service<Camera> {
         return new Vector3f(ray.origin()).add(new Vector3f(ray.direction()).mul(t));
     }
 
+    /**
+     * Performs the release mouse operation.
+     * @param gameMaster the game master value
+     */
     private void releaseMouse(GameMaster gameMaster) {
         if (!mouseCaptured) return;
         glfwSetInputMode(gameMaster.getWindowHandle(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         mouseCaptured = false;
     }
 
+    /**
+     * Performs the release operation.
+     * @param gameMaster the game master value
+     */
     public void release(GameMaster gameMaster) {
         releaseMouse(gameMaster);
     }

@@ -8,17 +8,32 @@ import com.isofarm.service.SoundService;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
 
+/**
+ * Provides hoe behavior.
+ */
 public class Hoe extends Tool {
 
+    /**
+     * Creates a new {@code Hoe} instance.
+     * @param tier the tier value
+     */
     public Hoe(Tier tier) {
         super((byte) 3, ToolType.HOE.getName(), 150, ToolType.HOE,
                 tier, tier.getDurability() + ToolType.HOE.getBaseDurability());
     }
 
+    /**
+     * Creates a new {@code Hoe} instance.
+     */
     public Hoe() {
         this(Tier.WOODEN);
     }
 
+    /**
+     * Performs the use operation.
+     * @param gameMaster the game master value
+     * @param block the block value
+     */
     public void use(GameMaster gameMaster, Block block) {
         setPlayer(gameMaster.getPlayer());
         super.use();
@@ -36,11 +51,20 @@ public class Hoe extends Tool {
         SoundService.fx.playPlaceSound(block.getType().getSoundGroup());
     }
 
+    /**
+     * Performs the copy operation.
+     * @return the copy result
+     */
     @Override
     public Item copy() {
         return new Hoe(getTier());
     }
 
+    /**
+     * Performs the enchanting operation.
+     * @param enchantment the enchantment value
+     * @return the enchanting result
+     */
     @Override
     public boolean enchanting(Enchantment enchantment) {
         return false;

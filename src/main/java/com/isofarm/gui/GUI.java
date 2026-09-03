@@ -19,6 +19,9 @@ import static org.lwjgl.opengl.GL11C.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 
+/**
+ * Provides gui behavior.
+ */
 @Utils
 @GodObject
 public class GUI {
@@ -42,9 +45,17 @@ public class GUI {
     private static int screenWidth;
     private static int screenHeight;
 
+    /**
+     * Creates a new {@code GUI} instance.
+     */
     private GUI() {
     }
 
+    /**
+     * Performs the begin operation.
+     * @param screenWidth the screen width value
+     * @param screenHeight the screen height value
+     */
     public static void begin(float screenWidth, float screenHeight) {
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
@@ -61,6 +72,9 @@ public class GUI {
         shader.setUniform("uUseFont", false);
     }
 
+    /**
+     * Performs the end operation.
+     */
     public static void end() {
         shader.unbind();
         glDepthMask(true);
@@ -69,6 +83,15 @@ public class GUI {
         glEnable(GL_CULL_FACE);
     }
 
+    /**
+     * Draws the line.
+     * @param x1 the x1 value
+     * @param y1 the y1 value
+     * @param x2 the x2 value
+     * @param y2 the y2 value
+     * @param thickness the thickness value
+     * @param color the color value
+     */
     public static void drawLine(float x1, float y1, float x2, float y2,
                                 float thickness, Vector4f color) {
         float dx = x2 - x1;
@@ -94,11 +117,30 @@ public class GUI {
         mesh.render();
     }
 
+    /**
+     * Draws the border.
+     * @param x the x value
+     * @param y the y value
+     * @param width the width value
+     * @param height the height value
+     * @param color the color value
+     * @param borderWidth the border width value
+     */
     public static void drawBorder(float x, float y, float width, float height,
                                   Vector4f color, float borderWidth) {
         drawBorder(x, y, width, height, color, borderWidth, 0.0f);
     }
 
+    /**
+     * Draws the border.
+     * @param x the x value
+     * @param y the y value
+     * @param width the width value
+     * @param height the height value
+     * @param color the color value
+     * @param borderWidth the border width value
+     * @param arc the arc value
+     */
     public static void drawBorder(float x, float y, float width, float height,
                                   Vector4f color, float borderWidth, float arc) {
         if (width <= 0.0f || height <= 0.0f || borderWidth <= 0.0f) {
@@ -122,21 +164,59 @@ public class GUI {
         shader.setUniform("uBorderOnly", false);
     }
 
+    /**
+     * Draws the rect.
+     * @param x the x value
+     * @param y the y value
+     * @param width the width value
+     * @param height the height value
+     * @param color the color value
+     */
     public static void drawRect(float x, float y, float width, float height,
                                 Vector4f color) {
         drawRect(x, y, width, height, color, 0.0f, null, 0.0f);
     }
 
+    /**
+     * Draws the rect.
+     * @param x the x value
+     * @param y the y value
+     * @param width the width value
+     * @param height the height value
+     * @param color the color value
+     * @param borderColor the border color value
+     * @param borderWidth the border width value
+     */
     public static void drawRect(float x, float y, float width, float height,
                                 Vector4f color, Vector4f borderColor, float borderWidth) {
         drawRect(x, y, width, height, color, 0.0f, borderColor, borderWidth);
     }
 
+    /**
+     * Draws the rect.
+     * @param x the x value
+     * @param y the y value
+     * @param width the width value
+     * @param height the height value
+     * @param color the color value
+     * @param arc the arc value
+     */
     public static void drawRect(float x, float y, float width, float height,
                                 Vector4f color, float arc) {
         drawRect(x, y, width, height, color, arc, null, 0.0f);
     }
 
+    /**
+     * Draws the rect.
+     * @param x the x value
+     * @param y the y value
+     * @param width the width value
+     * @param height the height value
+     * @param color the color value
+     * @param arc the arc value
+     * @param borderColor the border color value
+     * @param borderWidth the border width value
+     */
     public static void drawRect(float x, float y, float width, float height,
                                 Vector4f color, float arc,
                                 Vector4f borderColor, float borderWidth) {
@@ -163,6 +243,15 @@ public class GUI {
         shader.setUniform("uUseRoundedRect", false);
     }
 
+    /**
+     * Draws the texture.
+     * @param texture the texture value
+     * @param x the x value
+     * @param y the y value
+     * @param width the width value
+     * @param height the height value
+     * @param tint the tint value
+     */
     public static void drawTexture(Texture texture, float x, float y,
                                    float width, float height, Vector4f tint) {
         if (texture == null) return;
@@ -182,6 +271,17 @@ public class GUI {
         texture.unbind();
     }
 
+    /**
+     * Draws the sprite.
+     * @param spriteSheet the sprite sheet value
+     * @param column the column value
+     * @param row the row value
+     * @param x the x value
+     * @param y the y value
+     * @param width the width value
+     * @param height the height value
+     * @param tint the tint value
+     */
     public static void drawSprite(SpriteSheet spriteSheet, int column, int row,
                                   float x, float y, float width, float height,
                                   Vector4f tint) {
@@ -209,17 +309,44 @@ public class GUI {
         spriteSheet.unbind();
     }
 
+    /**
+     * Draws the sprite.
+     * @param spriteSheet the sprite sheet value
+     * @param frame the frame value
+     * @param x the x value
+     * @param y the y value
+     * @param width the width value
+     * @param height the height value
+     * @param tint the tint value
+     */
     public static void drawSprite(SpriteSheet spriteSheet, int frame,
                                   float x, float y, float width, float height, Vector4f tint) {
         drawSprite(spriteSheet, frame % spriteSheet.getCols(),
                 frame / spriteSheet.getCols(), x, y, width, height, tint);
     }
 
+    /**
+     * Draws the string.
+     * @param text the text value
+     * @param x the x value
+     * @param y the y value
+     * @param font the font value
+     * @param color the color value
+     */
     public static void drawString(String text, float x, float y,
                                   UIFont font, Vector4f color) {
         drawString(text, x, y, font, color, 1.0f);
     }
 
+    /**
+     * Draws the string.
+     * @param text the text value
+     * @param x the x value
+     * @param y the y value
+     * @param font the font value
+     * @param color the color value
+     * @param textScale the text scale value
+     */
     public static void drawString(String text, float x, float y,
                                   UIFont font, Vector4f color, float textScale) {
         if (text == null || text.isEmpty() || font == null) {
@@ -273,26 +400,67 @@ public class GUI {
         shader.setUniform("uUseFont", false);
     }
 
+    /**
+     * Draws the small string.
+     * @param text the text value
+     * @param x the x value
+     * @param y the y value
+     * @param color the color value
+     */
     public static void drawSmallString(String text, float x, float y, Vector4f color) {
         drawString(text, x, y, small, color);
     }
 
+    /**
+     * Draws the normal string.
+     * @param text the text value
+     * @param x the x value
+     * @param y the y value
+     * @param color the color value
+     */
     public static void drawNormalString(String text, float x, float y, Vector4f color) {
         drawString(text, x, y, normal, color);
     }
 
+    /**
+     * Draws the bold string.
+     * @param line the line value
+     * @param textX the text x value
+     * @param textY the text y value
+     * @param uiBookTextColor the ui book text color value
+     */
     public static void drawBoldString(String line, float textX, float textY, Vector4f uiBookTextColor) {
         drawString(line, textX, textY, normalBold, uiBookTextColor);
     }
 
+    /**
+     * Draws the big string.
+     * @param text the text value
+     * @param x the x value
+     * @param y the y value
+     * @param color the color value
+     */
     public static void drawBigString(String text, float x, float y, Vector4f color) {
         drawString(text, x, y, big, color);
     }
 
+    /**
+     * Returns the string width.
+     * @param text the text value
+     * @param font the font value
+     * @return the string width
+     */
     public static float getStringWidth(String text, UIFont font) {
         return getStringWidth(text, font, 1.0f);
     }
 
+    /**
+     * Returns the string width.
+     * @param text the text value
+     * @param font the font value
+     * @param textScale the text scale value
+     * @return the string width
+     */
     public static float getStringWidth(String text, UIFont font, float textScale) {
         if (text == null || text.isEmpty() || font == null) {
             return 0.0f;
@@ -311,10 +479,24 @@ public class GUI {
         return width;
     }
 
+    /**
+     * Returns the string height.
+     * @param text the text value
+     * @param normalFont the normal font value
+     * @return the string height
+     */
     public static float getStringHeight(String text, UIFont normalFont) {
         return normalFont.getSize() * text.length();
     }
 
+    /**
+     * Returns the centered text y.
+     * @param text the text value
+     * @param font the font value
+     * @param boxY the box y value
+     * @param boxHeight the box height value
+     * @return the centered text y
+     */
     public static float getCenteredTextY(String text, UIFont font,
                                          float boxY, float boxHeight) {
         if (text == null || text.isEmpty() || font == null) {
@@ -348,6 +530,13 @@ public class GUI {
         return centeredTop - minY;
     }
 
+    /**
+     * Performs the wrap text operation.
+     * @param text the text value
+     * @param maxWidth the max width value
+     * @param font the font value
+     * @return the wrap text result
+     */
     public static String[] wrapText(String text, float maxWidth, UIFont font) {
         if (text == null || text.isEmpty() || maxWidth <= 0.0f) {
             return new String[0];
@@ -381,6 +570,13 @@ public class GUI {
         return lines.toArray(new String[0]);
     }
 
+    /**
+     * Performs the push scissor operation.
+     * @param x the x value
+     * @param y the y value
+     * @param width the width value
+     * @param height the height value
+     */
     public static void pushScissor(float x, float y, float width, float height) {
         int windowHeight = (int) getScreenHeight();
         glEnable(GL_SCISSOR_TEST);
@@ -388,10 +584,17 @@ public class GUI {
                 (int) width, (int) height);
     }
 
+    /**
+     * Performs the pop scissor operation.
+     */
     public static void popScissor() {
         glDisable(GL_SCISSOR_TEST);
     }
 
+    /**
+     * Renders render.
+     * @param element the element value
+     */
     public static void render(UIElement element) {
         if (element == null || !element.isActuallyVisible()) {
             return;
@@ -425,12 +628,20 @@ public class GUI {
         element.renderChildren();
     }
 
+    /**
+     * Performs the resize operation.
+     * @param width the width value
+     * @param height the height value
+     */
     public static void resize(int width, int height) {
         screenWidth = width;
         screenHeight = height;
         updateProjection();
     }
 
+    /**
+     * Updates the projection.
+     */
     private static void updateProjection() {
         projection.identity().ortho2D(
                 0.0f,
@@ -440,6 +651,10 @@ public class GUI {
         );
     }
 
+    /**
+     * Draws the cursor.
+     * @param gameMaster the game master value
+     */
     public static void drawCursor(GameMaster gameMaster) {
         if (gameMaster == null) return;
 
@@ -462,42 +677,81 @@ public class GUI {
         drawSprite(spriteSheet, frameIndex, renderX, renderY, iconSize, iconSize, new Vector4f(1.0f));
     }
 
+    /**
+     * Returns the screen width.
+     * @return the screen width
+     */
     public static int getScreenWidth() {
         return screenWidth;
     }
 
+    /**
+     * Returns the screen height.
+     * @return the screen height
+     */
     public static int getScreenHeight() {
         return screenHeight;
     }
 
+    /**
+     * Returns the shader.
+     * @return the shader
+     */
     public static Shader getShader() {
         return shader;
     }
 
+    /**
+     * Returns the small font.
+     * @return the small font
+     */
     public static UIFont getSmallFont() {
         return small;
     }
 
+    /**
+     * Returns the normal font.
+     * @return the normal font
+     */
     public static UIFont getNormalFont() {
         return normal;
     }
 
+    /**
+     * Returns the big font.
+     * @return the big font
+     */
     public static UIFont getBigFont() {
         return big;
     }
 
+    /**
+     * Returns the small bold font.
+     * @return the small bold font
+     */
     public static UIFont getSmallBoldFont() {
         return smallBold;
     }
 
+    /**
+     * Returns the normal bold font.
+     * @return the normal bold font
+     */
     public static UIFont getNormalBoldFont() {
         return normalBold;
     }
 
+    /**
+     * Returns the big bold font.
+     * @return the big bold font
+     */
     public static UIFont getBigBoldFont() {
         return bigBold;
     }
 
+    /**
+     * Performs the dispose operation.
+     */
     public static void dispose() {
         mesh.dispose();
         shader.dispose();

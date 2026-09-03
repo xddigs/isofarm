@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Enumerates the supported block data values.
+ */
 @DataClass
 public enum BlockData {
     AIR((byte) 0, (byte) 0, (byte) 0, "Empty", false, false, 0, null, SoundGroup.SILENT, 0f, true, new Object[]{}, Tier.NONE),
@@ -72,6 +75,24 @@ public enum BlockData {
     private TextureAtlas.TextureRegion bottomRegion;
     private TextureAtlas.TextureRegion sideRegion;
 
+    /**
+     * Creates a new {@code BlockData} instance.
+     * @param id the id value
+     * @param col the col value
+     * @param row the row value
+     * @param name the name value
+     * @param isTillable the is tillable value
+     * @param isPlant the is plant value
+     * @param value the value value
+     * @param topPath the top path value
+     * @param bottomPath the bottom path value
+     * @param sidePath the side path value
+     * @param soundGroup the sound group value
+     * @param destroyTime the destroy time value
+     * @param isTransparent the is transparent value
+     * @param drops the drops value
+     * @param tier the tier value
+     */
     BlockData(byte id, byte col, byte row, String name, boolean isTillable, boolean isPlant, int value,
               String topPath, String bottomPath, String sidePath, SoundGroup soundGroup,
               float destroyTime, boolean isTransparent, Object[] drops, Tier tier) {
@@ -92,12 +113,32 @@ public enum BlockData {
         this.tier = tier;
     }
 
+    /**
+     * Creates a new {@code BlockData} instance.
+     * @param id the id value
+     * @param col the col value
+     * @param row the row value
+     * @param name the name value
+     * @param isTillable the is tillable value
+     * @param isPlant the is plant value
+     * @param value the value value
+     * @param texturePath the texture path value
+     * @param soundGroup the sound group value
+     * @param destroyTime the destroy time value
+     * @param isTransparent the is transparent value
+     * @param drops the drops value
+     * @param tier the tier value
+     */
     BlockData(byte id, byte col, byte row, String name, boolean isTillable, boolean isPlant,
               int value, String texturePath, SoundGroup soundGroup, float destroyTime,
               boolean isTransparent, Object[] drops, Tier tier) {
         this(id, col, row, name, isTillable, isPlant, value, texturePath, texturePath, texturePath, soundGroup, destroyTime, isTransparent, drops, tier);
     }
 
+    /**
+     * Returns the all texture paths.
+     * @return the all texture paths
+     */
     public static List<String> getAllTexturePaths() {
         List<String> paths = new ArrayList<>();
         for (BlockData block : values()) {
@@ -108,6 +149,10 @@ public enum BlockData {
         return paths;
     }
 
+    /**
+     * Creates and returns the by id.
+     * @return the created by id
+     */
     private static BlockData[] createById() {
         byte maxId = 0;
         for (BlockData block : values()) {
@@ -124,6 +169,11 @@ public enum BlockData {
         return result;
     }
 
+    /**
+     * Performs the from id operation.
+     * @param id the id value
+     * @return the from id result
+     */
     public static BlockData fromId(byte id) {
         int index = Byte.toUnsignedInt(id);
         if (index < 0 || index >= BY_ID.length) {
@@ -132,10 +182,20 @@ public enum BlockData {
         return BY_ID[index];
     }
 
+    /**
+     * Performs the from id to operation.
+     * @param id the id value
+     * @return the from id to result
+     */
     public static Block fromIdTo(byte id) {
         return new Block(fromId(id));
     }
 
+    /**
+     * Performs the from name operation.
+     * @param name the name value
+     * @return the from name result
+     */
     public static BlockData fromName(String name) {
         for (BlockData block : all()) {
             if (block.name.equals(name)) return block;
@@ -143,6 +203,10 @@ public enum BlockData {
         return null;
     }
 
+    /**
+     * Performs the all plants operation.
+     * @return the all plants result
+     */
     public static BlockData[] allPlants() {
         List<BlockData> result = new ArrayList<>();
         for (BlockData block : values()) {
@@ -151,14 +215,27 @@ public enum BlockData {
         return result.toArray(new BlockData[0]);
     }
 
+    /**
+     * Performs the all operation.
+     * @return the all result
+     */
     public static BlockData[] all() {
         return values();
     }
 
+    /**
+     * Returns the ores.
+     * @return the ores
+     */
     public static BlockData[] getOres() {
         return ORES;
     }
 
+    /**
+     * Returns the ore.
+     * @param tier the tier value
+     * @return the ore
+     */
     public static BlockData getOre(Tier tier) {
         for (BlockData block : ORES) {
             if (block.getTier() == tier) return block;
@@ -166,10 +243,18 @@ public enum BlockData {
         return null;
     }
 
+    /**
+     * Returns the random ore.
+     * @return the random ore
+     */
     public static BlockData getRandomOre() {
         return ORES[(int) (Math.random() * ORES.length)];
     }
 
+    /**
+     * Initializes the regions.
+     * @param atlas the atlas value
+     */
     public void initRegions(TextureAtlas atlas) {
         if (atlas == null) return;
         if (topPath != null) this.topRegion = atlas.getRegion(topPath);
@@ -177,94 +262,186 @@ public enum BlockData {
         if (sidePath != null) this.sideRegion = atlas.getRegion(sidePath);
     }
 
+    /**
+     * Returns the id.
+     * @return the id
+     */
     public byte getId() {
         return id;
     }
 
+    /**
+     * Returns the col.
+     * @return the col
+     */
     public byte getCol() {
         return col;
     }
 
+    /**
+     * Returns the row.
+     * @return the row
+     */
     public byte getRow() {
         return row;
     }
 
+    /**
+     * Returns the name.
+     * @return the name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns the display name.
+     * @return the display name
+     */
     public String getDisplayName() {
         return Local.lang.t("block." + name().toLowerCase(Locale.ROOT));
     }
 
+    /**
+     * Returns the value.
+     * @return the value
+     */
     public int getValue() {
         return value;
     }
 
+    /**
+     * Returns the tier.
+     * @return the tier
+     */
     public Tier getTier() {
         return tier;
     }
 
+    /**
+     * Checks whether the plant condition is met.
+     * @return {@code true} if plant; otherwise {@code false}
+     */
     public boolean isPlant() {
         return isPlant;
     }
 
+    /**
+     * Checks whether the tillable condition is met.
+     * @return {@code true} if tillable; otherwise {@code false}
+     */
     public boolean isTillable() {
         return isTillable;
     }
 
+    /**
+     * Checks whether the transparent condition is met.
+     * @return {@code true} if transparent; otherwise {@code false}
+     */
     public boolean isTransparent() {
         return isTransparent;
     }
 
+    /**
+     * Checks whether the solid condition is met.
+     * @return {@code true} if solid; otherwise {@code false}
+     */
     public boolean isSolid() {
         return this != AIR && !isPlant && !isFluid();
     }
 
+    /**
+     * Checks whether the fluid condition is met.
+     * @return {@code true} if fluid; otherwise {@code false}
+     */
     public boolean isFluid() {
         return this == WATER;
     }
 
+    /**
+     * Returns the top path.
+     * @return the top path
+     */
     public String getTopPath() {
         return topPath;
     }
 
+    /**
+     * Returns the bottom path.
+     * @return the bottom path
+     */
     public String getBottomPath() {
         return bottomPath;
     }
 
+    /**
+     * Returns the side path.
+     * @return the side path
+     */
     public String getSidePath() {
         return sidePath;
     }
 
+    /**
+     * Returns the top region.
+     * @return the top region
+     */
     public TextureAtlas.TextureRegion getTopRegion() {
         return topRegion;
     }
 
+    /**
+     * Returns the bottom region.
+     * @return the bottom region
+     */
     public TextureAtlas.TextureRegion getBottomRegion() {
         return bottomRegion;
     }
 
+    /**
+     * Returns the side region.
+     * @return the side region
+     */
     public TextureAtlas.TextureRegion getSideRegion() {
         return sideRegion;
     }
 
+    /**
+     * Returns the sound group.
+     * @return the sound group
+     */
     public SoundGroup getSoundGroup() {
         return soundGroup;
     }
 
+    /**
+     * Returns the destroy time.
+     * @return the destroy time
+     */
     public float getDestroyTime() {
         return destroyTime;
     }
 
+    /**
+     * Returns the drops.
+     * @return the drops
+     */
     public Object[] getDrops() {
         return drops;
     }
 
+    /**
+     * Checks whether the drops condition is met.
+     * @return {@code true} if drops; otherwise {@code false}
+     */
     public boolean hasDrops() {
         return drops != null && drops.length > 0;
     }
 
+    /**
+     * Returns the random drop.
+     * @return the random drop
+     */
     public Object getRandomDrop() {
         if (!hasDrops()) return null;
         if (Math.random() < 0.50f) {

@@ -9,6 +9,9 @@ import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
 import org.joml.Vector3f;
 
+/**
+ * Provides entity behavior.
+ */
 @DataClass
 public abstract class Entity {
     private final byte id;
@@ -28,6 +31,10 @@ public abstract class Entity {
 
     private float speed;
 
+    /**
+     * Creates a new {@code Entity} instance.
+     * @param name the name value
+     */
     public Entity(String name) {
         this.id = (byte) (Math.floor((Math.random() * Math.random()) * 100));
         this.name = name;
@@ -44,59 +51,121 @@ public abstract class Entity {
         this.speed = 1.0f;
     }
 
+    /**
+     * Checks whether the alive condition is met.
+     * @return {@code true} if alive; otherwise {@code false}
+     */
     public boolean isAlive() {
         return hitpoints > 0;
     }
 
+    /**
+     * Returns the id.
+     * @return the id
+     */
     public byte getId() {
         return id;
     }
 
+    /**
+     * Returns the name.
+     * @return the name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Sets the name.
+     * @param name the name value
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Returns the position.
+     * @return the position
+     */
     public Vector3f getPosition() {
         return position;
     }
 
+    /**
+     * Returns the position string.
+     * @return the position string
+     */
     public String getPositionString() {
         return String.format("X:%.2f // Y:%.2f // Z:%.2f",
                 position.x, position.y, position.z);
     }
 
+    /**
+     * Sets the position.
+     * @param position the position value
+     */
     public void setPosition(Vector3f position) {
         this.position.set(position);
     }
 
+    /**
+     * Sets the position.
+     * @param x the x value
+     * @param y the y value
+     * @param z the z value
+     */
     public void setPosition(float x, float y, float z) {
         this.position.set(x, y, z);
     }
 
+    /**
+     * Returns the velocity.
+     * @return the velocity
+     */
     public Vector3f getVelocity() {
         return velocity;
     }
 
+    /**
+     * Sets the velocity.
+     * @param velocity the velocity value
+     */
     public void setVelocity(Vector3f velocity) {
         this.velocity.set(velocity);
     }
 
+    /**
+     * Sets the velocity.
+     * @param x the x value
+     * @param y the y value
+     * @param z the z value
+     */
     public void setVelocity(float x, float y, float z) {
         this.velocity.set(x, y, z);
     }
 
+    /**
+     * Returns the dimensions.
+     * @return the dimensions
+     */
     public Vector3f getDimensions() {
         return dimensions;
     }
 
+    /**
+     * Sets the dimensions.
+     * @param dimensions the dimensions value
+     */
     public void setDimensions(Vector3f dimensions) {
         this.dimensions.set(dimensions);
     }
 
+    /**
+     * Sets the dimensions.
+     * @param width the width value
+     * @param height the height value
+     * @param depth the depth value
+     */
     public void setDimensions(float width, float height, float depth) {
         this.dimensions.set(width, height, depth);
 
@@ -105,38 +174,75 @@ public abstract class Entity {
         }
     }
 
+    /**
+     * Returns the standing height.
+     * @return the standing height
+     */
     public float getStandingHeight() {
         return standingHeight;
     }
 
+    /**
+     * Sets the standing height.
+     * @param standingHeight the standing height value
+     */
     public void setStandingHeight(float standingHeight) {
         this.standingHeight = standingHeight;
     }
 
+    /**
+     * Returns the crouching height.
+     * @return the crouching height
+     */
     public float getCrouchingHeight() {
         return crouchingHeight;
     }
 
+    /**
+     * Sets the crouching height.
+     * @param crouchingHeight the crouching height value
+     */
     public void setCrouchingHeight(float crouchingHeight) {
         this.crouchingHeight = crouchingHeight;
     }
 
+    /**
+     * Checks whether the on ground condition is met.
+     * @return {@code true} if on ground; otherwise {@code false}
+     */
     public boolean isOnGround() {
         return onGround;
     }
 
+    /**
+     * Performs the was on ground operation.
+     * @return the was on ground result
+     */
     public boolean wasOnGround() {
         return wasOnGround;
     }
 
+    /**
+     * Sets the on ground.
+     * @param onGround the on ground value
+     */
     public void setOnGround(boolean onGround) {
         this.onGround = onGround;
     }
 
+    /**
+     * Sets the was on ground.
+     * @param wasOnGround the was on ground value
+     */
     public void setWasOnGround(boolean wasOnGround) {
         this.wasOnGround = wasOnGround;
     }
 
+    /**
+     * Checks whether the in fluid condition is met.
+     * @param world the world value
+     * @return {@code true} if in fluid; otherwise {@code false}
+     */
     public boolean isInFluid(World world) {
         float epsilon = 0.001f;
         float minX = position.x - dimensions.x / 2.0f + epsilon;
@@ -169,6 +275,11 @@ public abstract class Entity {
         return false;
     }
 
+    /**
+     * Returns the fluid submersion.
+     * @param world the world value
+     * @return the fluid submersion
+     */
     private float getFluidSubmersion(World world) {
         float epsilon = 0.001f;
 
@@ -215,6 +326,12 @@ public abstract class Entity {
         return submergedHeight;
     }
 
+    /**
+     * Performs the collide operation.
+     * @param world the world value
+     * @param targetVelocity the target velocity value
+     * @param delta the delta value
+     */
     public void collide(World world, Vector3f targetVelocity, float delta) {
         float smooth = 1.0f - (float) Math.exp(-12.0f * delta);
 
@@ -260,8 +377,18 @@ public abstract class Entity {
         }
     }
 
+    /**
+     * Performs the adjust velocity operation.
+     * @param world the world value
+     * @param delta the delta value
+     */
     protected void adjustVelocity(World world, float delta) {}
 
+    /**
+     * Performs the check collision operation.
+     * @param world the world value
+     * @return the check collision result
+     */
     public boolean checkCollision(World world) {
         float epsilon = 0.001f;
 
@@ -296,6 +423,13 @@ public abstract class Entity {
         return false;
     }
 
+    /**
+     * Performs the intersects block operation.
+     * @param blockX the block x value
+     * @param blockY the block y value
+     * @param blockZ the block z value
+     * @return the intersects block result
+     */
     public boolean intersectsBlock(int blockX, int blockY, int blockZ) {
         float epsilon = 0.001f;
 
@@ -320,27 +454,55 @@ public abstract class Entity {
                 maxZ > blockZ;
     }
 
+    /**
+     * Performs the jump operation.
+     */
     public void jump() {
         if (!isOnGround()) return;
         velocity.y = K.World.JUMP_FORCE;
         setOnGround(false);
     }
 
+    /**
+     * Returns the speed.
+     * @return the speed
+     */
     public float getSpeed() {
         return speed;
     }
 
+    /**
+     * Sets the speed.
+     * @param speed the speed value
+     */
     public void setSpeed(float speed) {
         this.speed = speed;
     }
 
+    /**
+     * Updates the current state.
+     * @param blockPos the block pos value
+     * @param delta the delta value
+     */
     public abstract void update(BlockPos blockPos, float delta);
 
+    /**
+     * Renders render.
+     * @param gameMaster the game master value
+     */
     public void render(GameMaster gameMaster) {
         render(gameMaster, RenderPass.NORMAL);
     }
 
+    /**
+     * Renders render.
+     * @param gameMaster the game master value
+     * @param pass the pass value
+     */
     public abstract void render(GameMaster gameMaster, RenderPass pass);
 
+    /**
+     * Performs the drop loot operation.
+     */
     protected void dropLoot() {}
 }

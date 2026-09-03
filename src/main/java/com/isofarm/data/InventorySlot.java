@@ -2,20 +2,35 @@ package com.isofarm.data;
 
 import com.isofarm.item.Item;
 
+/**
+ * Provides inventory slot behavior.
+ */
 @DataClass
 public class InventorySlot {
     private Item item;
     private int amount;
 
+    /**
+     * Creates a new {@code InventorySlot} instance.
+     */
     public InventorySlot() {
         this.item = null;
         this.amount = 0;
     }
 
+    /**
+     * Creates a new {@code InventorySlot} instance.
+     * @param item the item value
+     */
     public InventorySlot(Item item) {
         this(item, 1);
     }
 
+    /**
+     * Creates a new {@code InventorySlot} instance.
+     * @param item the item value
+     * @param amount the amount value
+     */
     public InventorySlot(Item item, int amount) {
         if (item == null || amount <= 0) {
             this.item = null;
@@ -27,10 +42,18 @@ public class InventorySlot {
         this.amount = amount;
     }
 
+    /**
+     * Returns the item.
+     * @return the item
+     */
     public Item getItem() {
         return item;
     }
 
+    /**
+     * Sets the item.
+     * @param item the item value
+     */
     public void setItem(Item item) {
         this.item = item;
 
@@ -41,10 +64,18 @@ public class InventorySlot {
         }
     }
 
+    /**
+     * Returns the amount.
+     * @return the amount
+     */
     public int getAmount() {
         return amount;
     }
 
+    /**
+     * Sets the amount.
+     * @param amount the amount value
+     */
     public void setAmount(int amount) {
         if (item == null || amount <= 0) {
             clear();
@@ -54,14 +85,25 @@ public class InventorySlot {
         this.amount = amount;
     }
 
+    /**
+     * Adds the amount.
+     * @param amount the amount value
+     */
     public void addAmount(int amount) {
         setAmount(this.amount + amount);
     }
 
+    /**
+     * Checks whether the empty condition is met.
+     * @return {@code true} if empty; otherwise {@code false}
+     */
     public boolean isEmpty() {
         return item == null || amount <= 0;
     }
 
+    /**
+     * Removes clear.
+     */
     public void clear() {
         item = null;
         amount = 0;

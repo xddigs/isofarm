@@ -12,9 +12,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Provides crafting book behavior.
+ */
 public class CraftingBook extends Book implements Undroppable {
     private static final int LINES_PER_PAGE = 16;
 
+    /**
+     * Creates a new {@code CraftingBook} instance.
+     * @param player the player value
+     */
     public CraftingBook(Player player) {
         super();
         if (!hasContent() || player == null) {
@@ -24,6 +31,10 @@ public class CraftingBook extends Book implements Undroppable {
         reload(player);
     }
 
+    /**
+     * Performs the reload operation.
+     * @param player the player value
+     */
     @Override
     public void reload(Player player) {
         clearPages();
@@ -73,6 +84,12 @@ public class CraftingBook extends Book implements Undroppable {
         }
     }
 
+    /**
+     * Performs the use operation.
+     * @param gameMaster the game master value
+     * @param isCtrlHeld the is ctrl held value
+     * @return the use result
+     */
     @Override
     public boolean use(GameMaster gameMaster, boolean isCtrlHeld) {
         Inventory inventory = gameMaster.getPlayer().getInventory();

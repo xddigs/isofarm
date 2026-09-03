@@ -8,6 +8,9 @@ import org.slf4j.LoggerFactory;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Provides game rules behavior.
+ */
 @SuppressWarnings("all")
 public final class GameRules {
     private static final Map<String, Object> RULES = new LinkedHashMap<>();
@@ -23,20 +26,42 @@ public final class GameRules {
         RULES.put("maxInteractionDistance", Settings.getMaxInteractionDistance());
     }
 
+    /**
+     * Creates a new {@code GameRules} instance.
+     */
     private GameRules() {}
 
+    /**
+     * Performs the exists operation.
+     * @param rule the rule value
+     * @return the exists result
+     */
     public static boolean exists(String rule) {
         return RULES.containsKey(rule);
     }
 
+    /**
+     * Returns get.
+     * @param rule the rule value
+     * @return the get result
+     */
     public static Object get(String rule) {
         return RULES.get(rule);
     }
 
+    /**
+     * Returns the rules.
+     * @return the rules
+     */
     public static Map<String, Object> getRules() {
         return Map.copyOf(RULES);
     }
 
+    /**
+     * Returns the boolean.
+     * @param rule the rule value
+     * @return the boolean
+     */
     public static boolean getBoolean(String rule) {
         Object value = RULES.get(rule);
 
@@ -49,6 +74,11 @@ public final class GameRules {
         return booleanValue;
     }
 
+    /**
+     * Returns the int.
+     * @param rule the rule value
+     * @return the int
+     */
     public static int getInt(String rule) {
         Object value = RULES.get(rule);
 
@@ -61,6 +91,11 @@ public final class GameRules {
         return intValue;
     }
 
+    /**
+     * Returns the float.
+     * @param rule the rule value
+     * @return the float
+     */
     public static float getFloat(String rule) {
         Object value = RULES.get(rule);
 
@@ -73,6 +108,11 @@ public final class GameRules {
         return floatValue;
     }
 
+    /**
+     * Sets set.
+     * @param rule the rule value
+     * @param value the value value
+     */
     public static void set(String rule, Object value) {
         if (!RULES.containsKey(rule)) {
             throw new IllegalArgumentException(
@@ -91,6 +131,11 @@ public final class GameRules {
         apply(rule, value);
     }
 
+    /**
+     * Performs the apply operation.
+     * @param rule the rule value
+     * @param value the value value
+     */
     private static void apply(String rule, Object value) {
         try {
             switch (rule) {

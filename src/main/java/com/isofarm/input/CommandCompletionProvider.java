@@ -8,12 +8,25 @@ import com.isofarm.service.CommandRegistry;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Provides command completion provider behavior.
+ */
 public class CommandCompletionProvider implements CompletionProvider {
     private final CommandRegistry commandRegistry;
+    /**
+     * Creates a new {@code CommandCompletionProvider} instance.
+     * @param commandRegistry the command registry value
+     */
     public CommandCompletionProvider(CommandRegistry commandRegistry) {
         this.commandRegistry = commandRegistry;
     }
 
+    /**
+     * Performs the complete operation.
+     * @param text the text value
+     * @param cursorPosition the cursor position value
+     * @return the complete result
+     */
     @Override
     public List<String> complete(String text, int cursorPosition) {
         if (text == null || cursorPosition <= 0) {
@@ -26,6 +39,11 @@ public class CommandCompletionProvider implements CompletionProvider {
         return completeArgument(beforeCursor);
     }
 
+    /**
+     * Performs the complete command operation.
+     * @param text the text value
+     * @return the complete command result
+     */
     private List<String> completeCommand(String text) {
         if (!text.startsWith("/")) {
             return List.of();
@@ -43,6 +61,11 @@ public class CommandCompletionProvider implements CompletionProvider {
         return result;
     }
 
+    /**
+     * Performs the complete argument operation.
+     * @param text the text value
+     * @return the complete argument result
+     */
     private List<String> completeArgument(String text) {
         String trimmedLead = text.stripLeading();
         if (trimmedLead.isEmpty()) {

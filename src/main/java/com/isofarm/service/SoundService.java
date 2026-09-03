@@ -22,6 +22,9 @@ import static org.lwjgl.openal.AL10.*;
 import static org.lwjgl.openal.ALC10.*;
 import static org.lwjgl.stb.STBVorbis.stb_vorbis_decode_memory;
 
+/**
+ * Provides sound service behavior.
+ */
 @Singleton
 public class SoundService implements Service<SoundGroup> {
     public static final SoundService fx = new SoundService();
@@ -41,6 +44,9 @@ public class SoundService implements Service<SoundGroup> {
     private String currentBackgroundSound;
     private boolean hasLoaded = false;
 
+    /**
+     * Creates a new {@code SoundService} instance.
+     */
     public SoundService() {
         soundBuffers.clear();
         if (!hasLoaded) {
@@ -59,6 +65,10 @@ public class SoundService implements Service<SoundGroup> {
         }
     }
 
+    /**
+     * Loads the sound array.
+     * @param paths the paths value
+     */
     private void loadSoundArray(String[] paths) {
         if (paths == null) return;
         for (String path : paths) {
@@ -69,6 +79,9 @@ public class SoundService implements Service<SoundGroup> {
         }
     }
 
+    /**
+     * Initializes the component.
+     */
     public void init() {
         device = alcOpenDevice((CharSequence) null);
         if (device == MemoryUtil.NULL) {
@@ -97,26 +110,46 @@ public class SoundService implements Service<SoundGroup> {
         alSourcef(useSource, AL_GAIN, 1.0f);
     }
 
+    /**
+     * Performs the play step sound operation.
+     * @param group the group value
+     */
     public void playStepSound(SoundGroup group) {
         playSound(stepSource, group != null ? group.getStepSounds() : null,
                 0.95f, 0.1f, 1.0f);
     }
 
+    /**
+     * Performs the play break sound operation.
+     * @param group the group value
+     */
     public void playBreakSound(SoundGroup group) {
         playSound(breakSource, group != null ? group.getBreakSounds() : null,
                 0.8f, 0.2f, 1.0f);
     }
 
+    /**
+     * Performs the play place sound operation.
+     * @param group the group value
+     */
     public void playPlaceSound(SoundGroup group) {
         playSound(breakSource, group != null ? group.getPlaceSounds() : null,
                 0.75f, 0.2f, 1.0f);
     }
 
+    /**
+     * Performs the play entity sound operation.
+     * @param group the group value
+     */
     public void playEntitySound(SoundGroup group) {
         playSound(entitySource, group != null ? group.getEntitySounds() : null,
                 1.0f, 0.2f, 1.2f);
     }
 
+    /**
+     * Performs the play looping sound operation.
+     * @param group the group value
+     */
     public void playLoopingSound(SoundGroup group) {
         if (group == null) return;
         String[] sounds = group.getLoopingSounds();
@@ -124,6 +157,10 @@ public class SoundService implements Service<SoundGroup> {
         playSound(loopingSource, sounds, 1.0f, 0.0f, 1.0f);
     }
 
+    /**
+     * Performs the play use sound operation.
+     * @param group the group value
+     */
     public void playUseSound(SoundGroup group) {
         if (group == null) return;
         String[] sounds = group.getUseSounds();
@@ -131,6 +168,10 @@ public class SoundService implements Service<SoundGroup> {
         playSound(useSource, sounds, 1.0f, 0.0f, 1.0f);
     }
 
+    /**
+     * Sets the background sound.
+     * @param group the group value
+     */
     public void setBackgroundSound(SoundGroup group) {
         if (group == null) {
             stopBackgroundSound();
@@ -169,6 +210,14 @@ public class SoundService implements Service<SoundGroup> {
         alSourcePlay(backgroundSource);
     }
 
+    /**
+     * Performs the play sound operation.
+     * @param source the source value
+     * @param sounds the sounds value
+     * @param basePitch the base pitch value
+     * @param pitchVariation the pitch variation value
+     * @param volume the volume value
+     */
     private void playSound(int source, String[] sounds, float basePitch,
                            float pitchVariation, float volume) {
         if (sounds == null || sounds.length == 0) return;
@@ -184,6 +233,9 @@ public class SoundService implements Service<SoundGroup> {
         }
     }
 
+    /**
+     * Performs the stop background sound operation.
+     */
     public void stopBackgroundSound() {
         if (alGetSourcei(backgroundSource, AL_SOURCE_STATE) == AL_PLAYING) {
             alSourceStop(backgroundSource);
@@ -193,6 +245,11 @@ public class SoundService implements Service<SoundGroup> {
         currentBackgroundSound = null;
     }
 
+    /**
+     * Loads the ogg.
+     * @param resourcePath the resource path value
+     * @return the load ogg result
+     */
     public int loadOgg(String resourcePath) {
         if (resourcePath == null) return -1;
         try (InputStream in = getClass().getClassLoader().getResourceAsStream(resourcePath)) {
@@ -235,6 +292,9 @@ public class SoundService implements Service<SoundGroup> {
         }
     }
 
+    /**
+     * Performs the cleanup operation.
+     */
     public void cleanup() {
         alDeleteSources(stepSource);
         alDeleteSources(breakSource);

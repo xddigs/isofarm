@@ -2,6 +2,9 @@ package com.isofarm.data;
 
 import com.isofarm.utils.Local;
 
+/**
+ * Enumerates the supported usables values.
+ */
 @DataClass
 public enum Usables {
     BACKPACK((byte) 0, (byte) 0, (byte) 0, "Backpack", "item.usable.backpack", 500),
@@ -16,6 +19,15 @@ public enum Usables {
     private final String displayName;
     private final int value;
 
+    /**
+     * Creates a new {@code Usables} instance.
+     * @param id the id value
+     * @param col the col value
+     * @param row the row value
+     * @param name the name value
+     * @param displayName the display name value
+     * @param value the value value
+     */
     Usables(byte id, byte col, byte row, String name, String displayName, int value) {
         this.id = id;
         this.col = col;
@@ -25,26 +37,50 @@ public enum Usables {
         this.value = value;
     }
 
+    /**
+     * Returns the id.
+     * @return the id
+     */
     public byte getId() {
         return id;
     }
 
+    /**
+     * Returns the col.
+     * @return the col
+     */
     public byte getCol() {
         return col;
     }
 
+    /**
+     * Returns the row.
+     * @return the row
+     */
     public byte getRow() {
         return row;
     }
 
+    /**
+     * Returns the name.
+     * @return the name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns the display name.
+     * @return the display name
+     */
     public String getDisplayName() {
         return Local.lang.t(displayName);
     }
 
+    /**
+     * Returns the value.
+     * @return the value
+     */
     public int getValue() {
         return value;
     }

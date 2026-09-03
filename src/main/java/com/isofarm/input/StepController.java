@@ -11,6 +11,9 @@ import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
 import org.joml.Vector3f;
 
+/**
+ * Provides step controller behavior.
+ */
 @Singleton
 public class StepController {
     public static final StepController step = new StepController();
@@ -18,6 +21,13 @@ public class StepController {
     private static final float STEP_DISTANCE_THRESHOLD = 1.6f;
     private final Vector3f lastPosition = new Vector3f();
 
+    /**
+     * Updates the current state.
+     * @param gameMaster the game master value
+     * @param player the player value
+     * @param soundService the sound service value
+     * @param delta the delta value
+     */
     public void update(GameMaster gameMaster, Player player, SoundService soundService, float delta) {
         if (player == null) return;
         Vector3f currentPos = player.getPosition();

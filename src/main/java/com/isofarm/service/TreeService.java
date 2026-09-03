@@ -14,6 +14,9 @@ import org.joml.Vector3f;
 
 import java.util.*;
 
+/**
+ * Provides tree service behavior.
+ */
 @Singleton
 public class TreeService {
     public static final TreeService ts = new TreeService();
@@ -22,8 +25,17 @@ public class TreeService {
     private final List<TreeSapling> saplings = new ArrayList<>();
     private final Random random = new Random();
 
+    /**
+     * Creates a new {@code TreeService} instance.
+     */
     private TreeService() {}
 
+    /**
+     * Performs the chop operation.
+     * @param gamemaster the gamemaster value
+     * @param axe the axe value
+     * @return the chop result
+     */
     public static List<BlockPos> chop(GameMaster gamemaster, Axe axe) {
         List<BlockPos> choppedBlocks = new ArrayList<>();
         BlockPos cell = HoveredCell.get(gamemaster);
@@ -93,11 +105,22 @@ public class TreeService {
         return choppedBlocks;
     }
 
+    /**
+     * Performs the plant operation.
+     * @param x the x value
+     * @param y the y value
+     * @param z the z value
+     * @param saplingBlock the sapling block value
+     */
     public void plant(int x, int y, int z, BlockData saplingBlock) {
         World.wrld.setBlockTypeAt(x, y, z, saplingBlock.getId());
         saplings.add(new TreeSapling(x, y, z, saplingBlock, (int) Settings.getTicks()));
     }
 
+    /**
+     * Updates the current state.
+     * @param gameMaster the game master value
+     */
     public void update(GameMaster gameMaster) {
         for (int i = saplings.size() - 1; i >= 0; i--) {
             TreeSapling sapling = saplings.get(i);
@@ -112,6 +135,10 @@ public class TreeService {
         updateLeaves(gameMaster);
     }
 
+    /**
+     * Performs the grow tree operation.
+     * @param sapling the sapling value
+     */
     private void growTree(TreeSapling sapling) {
         int x = sapling.getX();
         int y = sapling.getY();
@@ -122,6 +149,10 @@ public class TreeService {
         GameMaster.game.rebuildChunkMeshAt(x, z);
     }
 
+    /**
+     * Updates the leaves.
+     * @param gameMaster the game master value
+     */
     private void updateLeaves(GameMaster gameMaster) {
         for (Chunk chunk : World.wrld.getChunks().values()) {
             int chunkStartX = chunk.getChunkX() * Chunk.SIZE_X;
@@ -150,6 +181,13 @@ public class TreeService {
         }
     }
 
+    /**
+     * Checks whether the connected to log condition is met.
+     * @param startX the start x value
+     * @param startY the start y value
+     * @param startZ the start z value
+     * @return {@code true} if connected to log; otherwise {@code false}
+     */
     private boolean isConnectedToLog(int startX, int startY, int startZ) {
         Queue<BlockNode> queue = new ArrayDeque<>();
         Set<Long> visited = new HashSet<>();

@@ -14,12 +14,19 @@ import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.stb.STBImage.*;
 
+/**
+ * Provides texture behavior.
+ */
 public class Texture {
     private static final Logger log = LoggerFactory.getLogger(Texture.class);
     private final int id;
     private final int width;
     private final int height;
 
+    /**
+     * Creates a new {@code Texture} instance.
+     * @param resourcePath the resource path value
+     */
     public Texture(String resourcePath) {
         stbi_set_flip_vertically_on_load(true);
         try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -80,28 +87,49 @@ public class Texture {
                 resourcePath, width, height, id);
     }
 
+    /**
+     * Performs the bind operation.
+     */
     public void bind() {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, id);
     }
 
+    /**
+     * Performs the unbind operation.
+     */
     public void unbind() {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
+    /**
+     * Performs the dispose operation.
+     */
     public void dispose() {
         glDeleteTextures(id);
         log.info("Texture resource deleted (ID: {})", id);
     }
 
+    /**
+     * Returns the id.
+     * @return the id
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     * Returns the width.
+     * @return the width
+     */
     public int getWidth() {
         return width;
     }
 
+    /**
+     * Returns the height.
+     * @return the height
+     */
     public int getHeight() {
         return height;
     }

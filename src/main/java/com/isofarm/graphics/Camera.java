@@ -12,6 +12,9 @@ import org.joml.Vector3f;
 
 import static org.joml.Math.lerp;
 
+/**
+ * Provides camera behavior.
+ */
 public class Camera implements CameraView {
     private static final float MIN_ZOOM = 1.0f;
     private static final float MAX_ZOOM = 80.0f;
@@ -34,12 +37,24 @@ public class Camera implements CameraView {
     private int lastHitNormalY;
     private int lastHitNormalZ;
 
+    /**
+     * Creates a new {@code Camera} instance.
+     * @param width the width value
+     * @param height the height value
+     * @param renderDistanceChunks the render distance chunks value
+     */
     public Camera(float width, float height, int renderDistanceChunks) {
         this.position = new Vector3f();
         this.projectionMatrix = new Matrix4f();
         updateProjection(width, height, renderDistanceChunks);
     }
 
+    /**
+     * Updates the projection.
+     * @param width the width value
+     * @param height the height value
+     * @param renderDistanceChunks the render distance chunks value
+     */
     public void updateProjection(float width, float height, int renderDistanceChunks) {
         this.aspectRatio = width / Math.max(height, 1.0f);
         float farPlane = (renderDistanceChunks + 2) * 16.0f;
@@ -47,11 +62,19 @@ public class Camera implements CameraView {
                 zoom * aspectRatio, -zoom, zoom, NEAR_PLANE, Math.max(farPlane, FAR_PLANE));
     }
 
+    /**
+     * Returns the projection matrix.
+     * @return the projection matrix
+     */
     @Override
     public Matrix4f getProjectionMatrix() {
         return projectionMatrix;
     }
 
+    /**
+     * Returns the view matrix.
+     * @return the view matrix
+     */
     @Override
     public Matrix4f getViewMatrix() {
         return new Matrix4f()
@@ -61,25 +84,47 @@ public class Camera implements CameraView {
                 .translate(-position.x, -position.y, -position.z);
     }
 
+    /**
+     * Returns the position.
+     * @return the position
+     */
     @Override
     public Vector3f getPosition() {
         return position;
     }
 
+    /**
+     * Returns the pitch.
+     * @return the pitch
+     */
     @Override
     public float getPitch() {
         return PITCH;
     }
 
+    /**
+     * Returns the yaw.
+     * @return the yaw
+     */
     @Override
     public float getYaw() {
         return yaw;
     }
 
+    /**
+     * Sets the position.
+     * @param x the x value
+     * @param y the y value
+     * @param z the z value
+     */
     public void setPosition(float x, float y, float z) {
         position.set(x, y, z);
     }
 
+    /**
+     * Returns the forward vector.
+     * @return the forward vector
+     */
     public Vector3f getForwardVector() {
         float yawRad = (float) Math.toRadians(yaw);
         float pitchRad = (float) Math.toRadians(PITCH);
@@ -90,6 +135,10 @@ public class Camera implements CameraView {
         return direction.normalize();
     }
 
+    /**
+     * Returns the right vector.
+     * @return the right vector
+     */
     public Vector3f getRightVector() {
         Vector3f forward = getForwardVector();
         Vector3f right = new Vector3f();
@@ -97,15 +146,27 @@ public class Camera implements CameraView {
         return right.normalize();
     }
 
+    /**
+     * Returns the zoom.
+     * @return the zoom
+     */
     public float getZoom() {
         return zoom;
     }
 
+    /**
+     * Sets the zoom.
+     * @param zoom the zoom value
+     */
     public void setZoom(float zoom) {
         this.zoom = lerp(this.zoom, Math.clamp(zoom, MIN_ZOOM, MAX_ZOOM), .01f);
         updateProjection(aspectRatio, 1.0f, Settings.getRenderDistance());
     }
 
+    /**
+     * Returns the up vector.
+     * @return the up vector
+     */
     public Vector3f getUpVector() {
         Vector3f forward = getForwardVector();
         Vector3f right = getRightVector();
@@ -114,6 +175,14 @@ public class Camera implements CameraView {
         return up.normalize();
     }
 
+    /**
+     * Returns the mouse ray.
+     * @param mouseX the mouse x value
+     * @param mouseY the mouse y value
+     * @param screenWidth the screen width value
+     * @param screenHeight the screen height value
+     * @return the mouse ray
+     */
     public Ray getMouseRay(float mouseX, float mouseY, float screenWidth, float screenHeight) {
         float ndcX = (2.0f * mouseX / screenWidth) - 1.0f;
         float ndcY = 1.0f - (2.0f * mouseY / screenHeight);
@@ -126,6 +195,17 @@ public class Camera implements CameraView {
         return new Ray(rayOrigin, getForwardVector());
     }
 
+    /**
+     * Performs the highlight operation.
+     * @param world the world value
+     * @param playerPos the player pos value
+     * @param mouseX the mouse x value
+     * @param mouseY the mouse y value
+     * @param screenWidth the screen width value
+     * @param screenHeight the screen height value
+     * @param smartFilter the smart filter value
+     * @return the highlight result
+     */
     public BlockPos highlight(World world, Vector3f playerPos, float mouseX, float mouseY,
                               float screenWidth, float screenHeight, boolean smartFilter) {
         Ray ray = getMouseRay(mouseX, mouseY, screenWidth, screenHeight);
@@ -138,6 +218,16 @@ public class Camera implements CameraView {
         return lastHit;
     }
 
+    /**
+     * Performs the raycast operation.
+     * @param world the world value
+     * @param playerPos the player pos value
+     * @param origin the origin value
+     * @param direction the direction value
+     * @param isSmartFilter the is smart filter value
+     * @param isBucket the is bucket value
+     * @return the raycast result
+     */
     private BlockPos raycast(World world, Vector3f playerPos,
                              Vector3f origin, Vector3f direction,
                              boolean isSmartFilter, boolean isBucket) {
@@ -220,14 +310,26 @@ public class Camera implements CameraView {
         return null;
     }
 
+    /**
+     * Returns the last hit normal x.
+     * @return the last hit normal x
+     */
     public int getLastHitNormalX() {
         return lastHitNormalX;
     }
 
+    /**
+     * Returns the last hit normal y.
+     * @return the last hit normal y
+     */
     public int getLastHitNormalY() {
         return lastHitNormalY;
     }
 
+    /**
+     * Returns the last hit normal z.
+     * @return the last hit normal z
+     */
     public int getLastHitNormalZ() {
         return lastHitNormalZ;
     }

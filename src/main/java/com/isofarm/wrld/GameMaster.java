@@ -23,6 +23,9 @@ import java.util.function.Consumer;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 
+/**
+ * Provides game master behavior.
+ */
 @Singleton
 public class GameMaster {
     public static final GameMaster game = new GameMaster();
@@ -59,8 +62,15 @@ public class GameMaster {
 
     private float genDelta;
 
+    /**
+     * Creates a new {@code GameMaster} instance.
+     */
     private GameMaster() {}
 
+    /**
+     * Loads the resources.
+     * @param progressCallback the progress callback value
+     */
     public void loadResources(Consumer<Float> progressCallback) {
         float totalSteps = 10.0f;
         int currentStep = 0;
@@ -109,12 +119,20 @@ public class GameMaster {
         notifyProgress(progressCallback, ++currentStep / totalSteps);
     }
 
+    /**
+     * Performs the notify progress operation.
+     * @param callback the callback value
+     * @param progress the progress value
+     */
     private void notifyProgress(Consumer<Float> callback, float progress) {
         if (callback != null) {
             callback.accept(progress);
         }
     }
 
+    /**
+     * Initializes the ui.
+     */
     public void initUI() {
         gameUIservice = new GameUIService(windowHandle, this,
                 uiManager, ResourceManager.rem.getSeedIcons(), ResourceManager.rem.getCropIcons(),
@@ -134,6 +152,9 @@ public class GameMaster {
         ToastFactory.info(Local.lang.f("toast.open_inventory", player.getName()));
     }
 
+    /**
+     * Performs the spawn operation.
+     */
     public void spawn() {
         chunkManager.updateLoadedChunks(0, 0);
         GridPos spawn = world.getHighestY(0.5f, 0.5f);
@@ -142,138 +163,274 @@ public class GameMaster {
         orthoCamera.setPosition(0.5f, spawnY + 10.0f, 0.5f);
     }
 
+    /**
+     * Returns the sun.
+     * @return the sun
+     */
     public Sun getSun() {
         return sun;
     }
 
+    /**
+     * Returns the moon.
+     * @return the moon
+     */
     public Moon getMoon() {
         return moon;
     }
 
+    /**
+     * Returns the celestial lighting.
+     * @return the celestial lighting
+     */
     public CelestialLighting getCelestialLighting() {
         return celestialLighting;
     }
 
+    /**
+     * Returns the shadow map.
+     * @return the shadow map
+     */
     public ShadowMap getShadowMap() {
         return shadowMap;
     }
 
+    /**
+     * Returns the chunk manager.
+     * @return the chunk manager
+     */
     public ChunkManager getChunkManager() {
         return chunkManager;
     }
 
+    /**
+     * Returns the item renderer.
+     * @return the item renderer
+     */
     public ItemRenderer getItemRenderer() {
         return itemRenderer;
     }
 
+    /**
+     * Returns the scene fbo.
+     * @return the scene fbo
+     */
     public Framebuffer getSceneFbo() {
         return sceneFbo;
     }
 
+    /**
+     * Returns the rain engine.
+     * @return the rain engine
+     */
     public RainEngine getRainEngine() {
         return rainEngine;
     }
 
+    /**
+     * Returns the window handle.
+     * @return the window handle
+     */
     public long getWindowHandle() {
         return windowHandle;
     }
 
+    /**
+     * Returns the world.
+     * @return the world
+     */
     public World getWorld() {
         return world;
     }
 
+    /**
+     * Returns the player.
+     * @return the player
+     */
     public Player getPlayer() {
         return player;
     }
 
+    /**
+     * Returns the command registry.
+     * @return the command registry
+     */
     public CommandRegistry getCommandRegistry() {
         return commandRegistry;
     }
 
+    /**
+     * Returns the item registry.
+     * @return the item registry
+     */
     public ItemRegistry getItemRegistry() {
         return itemRegistry;
     }
 
+    /**
+     * Returns the game uiservice.
+     * @return the game uiservice
+     */
     public GameUIService getGameUIService() {
         return gameUIservice;
     }
 
+    /**
+     * Returns the command service.
+     * @return the command service
+     */
     public CommandService getCommandService() {
         return commandService;
     }
 
+    /**
+     * Returns the window width.
+     * @return the window width
+     */
     public float getWindowWidth() {
         return windowWidth;
     }
 
+    /**
+     * Returns the window height.
+     * @return the window height
+     */
     public float getWindowHeight() {
         return windowHeight;
     }
 
+    /**
+     * Returns the ortho camera.
+     * @return the ortho camera
+     */
     public Camera getOrthoCamera() {
         return orthoCamera;
     }
 
+    /**
+     * Returns the blur fbo.
+     * @return the blur fbo
+     */
     public Framebuffer getBlurFbo() {
         return blurFbo;
     }
 
+    /**
+     * Checks whether the chat open condition is met.
+     * @return {@code true} if chat open; otherwise {@code false}
+     */
     public boolean isChatOpen() {
         return isChatOpen;
     }
 
+    /**
+     * Sets the chat open.
+     * @param isChatOpen the is chat open value
+     */
     public void setChatOpen(boolean isChatOpen) {
         this.isChatOpen = isChatOpen;
     }
 
+    /**
+     * Checks whether the inventory open condition is met.
+     * @return {@code true} if inventory open; otherwise {@code false}
+     */
     public boolean isInventoryOpen() {
         return isInventoryOpen;
     }
 
+    /**
+     * Sets the inventory open.
+     * @param isInventoryOpen the is inventory open value
+     */
     public void setInventoryOpen(boolean isInventoryOpen) {
         this.isInventoryOpen = isInventoryOpen;
     }
 
+    /**
+     * Checks whether the hudshown condition is met.
+     * @return {@code true} if hudshown; otherwise {@code false}
+     */
     public boolean isHUDShown() {
         return isHUDShown;
     }
 
+    /**
+     * Performs the toggle hud operation.
+     */
     public void toggleHUD() {
         this.isHUDShown = !isHUDShown;
     }
 
+    /**
+     * Returns the crop sprite sheet.
+     * @param type the type value
+     * @return the crop sprite sheet
+     */
     public SpriteSheet getCropSpriteSheet(CropType type) {
         return ResourceManager.rem.getCropSpritesheets().get(type);
     }
 
+    /**
+     * Returns the season.
+     * @return the season
+     */
     public Season getSeason() {
         return TimeService.ts.getCurrentSeason();
     }
 
+    /**
+     * Returns the entities immutable.
+     * @return the entities immutable
+     */
     public List<Entity> getEntitiesImmutable() {
         return List.copyOf(entities);
     }
 
+    /**
+     * Returns the entities.
+     * @return the entities
+     */
     public List<Entity> getEntities() {
         return entities;
     }
 
+    /**
+     * Returns the recipes.
+     * @return the recipes
+     */
     public List<Recipe> getRecipes() {
         return recipes;
     }
 
+    /**
+     * Returns the difficulty.
+     * @return the difficulty
+     */
     public Difficulty getDifficulty() {
         return difficulty;
     }
 
+    /**
+     * Sets the difficulty.
+     * @param difficulty the difficulty value
+     */
     public void setDifficulty(Difficulty difficulty) {
         this.difficulty = difficulty;
     }
 
+    /**
+     * Returns the active camera.
+     * @return the active camera
+     */
     public CameraView getActiveCamera() {
         return orthoCamera;
     }
 
+    /**
+     * Adds the entity.
+     * @param entity the entity value
+     */
     public void addEntity(Entity entity) {
         if (entity == null) {
             return;
@@ -286,11 +443,19 @@ public class GameMaster {
         entities.add(entity);
     }
 
+    /**
+     * Removes the entity.
+     * @param entity the entity value
+     */
     public void removeEntity(Entity entity) {
         if (entity == null) return;
         entities.remove(entity);
     }
 
+    /**
+     * Updates the entities.
+     * @param delta the delta value
+     */
     private void updateEntities(float delta) {
         if (player != null) {
             player.update(HoveredCell.get(this), delta);
@@ -303,14 +468,26 @@ public class GameMaster {
         entities.removeIf(e -> e != player && !e.isAlive());
     }
 
+    /**
+     * Returns the gen delta.
+     * @return the gen delta
+     */
     public float getGenDelta() {
         return genDelta;
     }
 
+    /**
+     * Returns the fps.
+     * @return the fps
+     */
     public String getFps() {
         return String.format("%.0f", 1.0f / genDelta) + " FPS";
     }
 
+    /**
+     * Updates the current state.
+     * @param delta the delta value
+     */
     public void update(float delta) {
         if (WeatherService.isRaining()) {
             rainEngine.update(delta);
@@ -358,11 +535,17 @@ public class GameMaster {
         Joystick.update();
     }
 
+    /**
+     * Renders render.
+     */
     public void render() {
         GameRenderer.gamr.render(this, chunkManager.getChunkMeshes());
         gameUIservice.render(isHUDShown(), this);
     }
 
+    /**
+     * Performs the dispose operation.
+     */
     public void dispose() {
         chunkManager.dispose();
         ResourceManager.rem.dispose();
@@ -380,11 +563,19 @@ public class GameMaster {
         log.info("GameMaster resources successfully cleaned up");
     }
 
+    /**
+     * Performs the recenter operation.
+     */
     public void recenter() {
         float center = (K.World.MAP_WORLD_SIZE - 1) / 2.0f;
         float worldCenter = center * K.World.TILE_SIZE;
     }
 
+    /**
+     * Returns the world item.
+     * @param item the item value
+     * @return the world item
+     */
     public WorldItem getWorldItem(Item item) {
         return entities.stream()
                 .filter(WorldItem.class::isInstance)
@@ -394,10 +585,18 @@ public class GameMaster {
                 .orElse(null);
     }
 
+    /**
+     * Performs the toggle inventory operation.
+     */
     public void toggleInventory() {
         setInventoryOpen(!isInventoryOpen());
     }
 
+    /**
+     * Performs the on resize operation.
+     * @param newWidth the new width value
+     * @param newHeight the new height value
+     */
     public void onResize(int newWidth, int newHeight) {
         this.windowWidth = newWidth;
         this.windowHeight = newHeight;
@@ -423,6 +622,11 @@ public class GameMaster {
         ToastFactory.onResize(newWidth);
     }
 
+    /**
+     * Performs the rebuild chunk mesh at operation.
+     * @param worldX the world x value
+     * @param worldZ the world z value
+     */
     public void rebuildChunkMeshAt(int worldX, int worldZ) {
         chunkManager.rebuildChunkMeshAt(worldX, worldZ);
         int localX = Math.floorMod(worldX, Chunk.SIZE_X);
@@ -445,6 +649,10 @@ public class GameMaster {
         }
     }
 
+    /**
+     * Performs the rebuild chunk mesh at operation.
+     * @param pos the pos value
+     */
     public void rebuildChunkMeshAt(BlockPos pos) {
         rebuildChunkMeshAt(pos.x(), pos.z());
     }

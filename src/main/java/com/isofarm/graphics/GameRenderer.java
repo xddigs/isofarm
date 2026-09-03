@@ -22,6 +22,9 @@ import java.util.Map;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;
 
+/**
+ * Provides game renderer behavior.
+ */
 public class GameRenderer {
     public static final GameRenderer gamr = new GameRenderer();
     private final Matrix4f modelMatrix = new Matrix4f();
@@ -33,6 +36,11 @@ public class GameRenderer {
     private float blurY;
     private float waterTime;
 
+    /**
+     * Renders render.
+     * @param gameMaster the game master value
+     * @param chunkMeshes the chunk meshes value
+     */
     public void render(GameMaster gameMaster, Map<Chunk, ChunkMeshBuilder.ChunkRenderMesh> chunkMeshes) {
         ShadowSystem.sys.render(gameMaster, chunkMeshes);
         waterTime += gameMaster.getGenDelta();
@@ -365,12 +373,25 @@ public class GameRenderer {
         }
     }
 
+    /**
+     * Returns the outline color.
+     * @param gameMaster the game master value
+     * @return the outline color
+     */
     private Vector3f getOutlineColor(GameMaster gameMaster) {
         boolean isSmartShift = GameInteraction.gami != null
                 && GameInteraction.gami.isSmartShiftActive();
         return isSmartShift ? new Vector3f(1.0f, 1.0f, 0.2f) : K.Colors.OUTLINE_DEFAULT;
     }
 
+    /**
+     * Renders the destroy overlay.
+     * @param interaction the interaction value
+     * @param shader the shader value
+     * @param blockMesh the block mesh value
+     * @param destroyTexture the destroy texture value
+     * @param camera the camera value
+     */
     public void renderDestroyOverlay(GameInteraction interaction, Shader shader, Mesh blockMesh,
                                      SpriteSheet destroyTexture, CameraView camera) {
         if (!interaction.isBreakingBlock() || destroyTexture == null) return;
@@ -420,6 +441,10 @@ public class GameRenderer {
         glActiveTexture(GL_TEXTURE0);
     }
 
+    /**
+     * Updates the blur.
+     * @param camera the camera value
+     */
     private void updateBlur(CameraView camera) {
         float yawDelta = camera.getYaw() - previousCameraYaw;
         if (yawDelta > K.Camera.HALF_DEGREES) yawDelta -= K.Camera.FULL_DEGREES;

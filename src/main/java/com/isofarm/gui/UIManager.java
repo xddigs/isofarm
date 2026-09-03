@@ -4,11 +4,19 @@ import com.isofarm.input.Keyboard;
 import com.isofarm.input.Mouse;
 import org.lwjgl.glfw.GLFW;
 
+/**
+ * Provides uimanager behavior.
+ */
 public class UIManager {
     private final UIPanel root;
     private final UITooltip tooltip;
     private UIElement focusedElement;
 
+    /**
+     * Creates a new {@code UIManager} instance.
+     * @param width the width value
+     * @param height the height value
+     */
     public UIManager(float width, float height) {
         root = new UIPanel(0.0f, 0.0f, width, height);
         tooltip = new UITooltip();
@@ -17,6 +25,10 @@ public class UIManager {
         root.addChild(tooltip);
     }
 
+    /**
+     * Updates the current state.
+     * @param delta the delta value
+     */
     public void update(float delta) {
         root.update(delta);
         root.mouseMoved(Mouse.getX(), Mouse.getY());
@@ -102,18 +114,35 @@ public class UIManager {
         }
     }
 
+    /**
+     * Renders render.
+     */
     public void render() {
         GUI.render(root);
     }
 
+    /**
+     * Returns the root.
+     * @return the root
+     */
     public UIPanel getRoot() {
         return root;
     }
 
+    /**
+     * Returns the tooltip.
+     * @return the tooltip
+     */
     public UITooltip getTooltip() {
         return tooltip;
     }
 
+    /**
+     * Performs the show tooltip operation.
+     * @param text the text value
+     * @param mouseX the mouse x value
+     * @param mouseY the mouse y value
+     */
     public void showTooltip(String text, float mouseX, float mouseY) {
         if (text == null || text.isBlank()) {
             tooltip.hide();
@@ -125,14 +154,25 @@ public class UIManager {
         tooltip.show();
     }
 
+    /**
+     * Performs the hide tooltip operation.
+     */
     public void hideTooltip() {
         tooltip.hide();
     }
 
+    /**
+     * Returns the focused element.
+     * @return the focused element
+     */
     public UIElement getFocusedElement() {
         return focusedElement;
     }
 
+    /**
+     * Sets the focused element.
+     * @param element the element value
+     */
     public void setFocusedElement(UIElement element) {
         if (focusedElement == element) {
             return;
@@ -154,10 +194,18 @@ public class UIManager {
         }
     }
 
+    /**
+     * Clears the focus.
+     */
     public void clearFocus() {
         setFocusedElement(null);
     }
 
+    /**
+     * Performs the resize operation.
+     * @param width the width value
+     * @param height the height value
+     */
     public void resize(float width, float height) {
         root.setSize(width, height);
         GUI.resize((int) width, (int) height);

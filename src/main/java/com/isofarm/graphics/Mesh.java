@@ -13,6 +13,9 @@ import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 
+/**
+ * Provides mesh behavior.
+ */
 public class Mesh {
     private static final Logger log = LoggerFactory.getLogger(Mesh.class);
     private final int vaoId;
@@ -22,6 +25,13 @@ public class Mesh {
     private final int eboId;
     private final int vertexCount;
 
+    /**
+     * Creates a new {@code Mesh} instance.
+     * @param positions the positions value
+     * @param normals the normals value
+     * @param textCoords the text coords value
+     * @param indices the indices value
+     */
     public Mesh(float[] positions, float[] normals, float[] textCoords, int[] indices) {
         this.vertexCount = indices.length;
 
@@ -76,14 +86,24 @@ public class Mesh {
         log.trace("Mesh created successfully [VAO ID: {}, Vertices: {}]", vaoId, vertexCount);
     }
 
+    /**
+     * Returns the indices count.
+     * @return the indices count
+     */
     public int getIndicesCount() { return vertexCount; }
 
+    /**
+     * Renders render.
+     */
     public void render() {
         glBindVertexArray(vaoId);
         glDrawElements(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
 
+    /**
+     * Renders the lines.
+     */
     public void renderLines() {
         glBindVertexArray(vaoId);
         glLineWidth(K.Render.LINE_WIDTH);
@@ -91,6 +111,9 @@ public class Mesh {
         glBindVertexArray(0);
     }
 
+    /**
+     * Performs the dispose operation.
+     */
     public void dispose() {
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
@@ -108,6 +131,11 @@ public class Mesh {
         log.trace("Mesh resources cleaned up [VAO ID: {}]", vaoId);
     }
 
+    /**
+     * Creates and returns the mesh.
+     * @param depth the depth value
+     * @return the created mesh
+     */
     public static Mesh createMesh(float depth) {
         float[] positions = getFloats(depth);
         float[] normals = new float[]{0,1,0, 0,1,0, 0,1,0, 0,1,0, 0,0,1, 0,0,1, 0,0,1, 0,0,1, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 0,0,-1, 0,0,-1, 0,0,-1, 0,0,-1, -1,0,0, -1,0,0, -1,0,0, -1,0,0, 0,-1,0, 0,-1,0, 0,-1,0, 0,-1,0};
@@ -117,6 +145,10 @@ public class Mesh {
         return new Mesh(positions, normals, textCoords, indices);
     }
 
+    /**
+     * Creates and returns the cross mesh.
+     * @return the created cross mesh
+     */
     public static Mesh createCrossMesh() {
         float[] positions = new float[]{-0.5f, 0.0f, -0.5f, 0.5f, 0.0f, 0.5f, 0.5f, 1.0f, 0.5f, -0.5f, 1.0f, -0.5f, 0.5f, 0.0f, -0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 1.0f, 0.5f, 0.5f, 1.0f, -0.5f};
         float[] normals = new float[]{-0.707f, 0.0f, 0.707f, -0.707f, 0.0f, 0.707f, -0.707f, 0.0f, 0.707f, -0.707f, 0.0f, 0.707f, 0.707f, 0.0f, 0.707f, 0.707f, 0.0f, 0.707f, 0.707f, 0.0f, 0.707f, 0.707f, 0.0f, 0.707f};
@@ -125,6 +157,10 @@ public class Mesh {
         return new Mesh(positions, normals, texCoords, indices);
     }
 
+    /**
+     * Creates and returns the destroy overlay mesh.
+     * @return the created destroy overlay mesh
+     */
     public static Mesh createDestroyOverlayMesh() {
         float[] positions = new float[]{0,1,0, 0,1,1, 1,1,1, 1,1,0, 0,0,1, 0,1,1, 1,1,1, 1,0,1, 1,0,1, 1,1,1, 1,1,0, 1,0,0, 1,0,0, 1,1,0, 0,1,0, 0,0,0, 0,0,0, 0,1,0, 0,1,1, 0,0,1, 0,0,1, 0,0,0, 1,0,0, 1,0,1};
         float[] normals = new float[]{0,1,0, 0,1,0, 0,1,0, 0,1,0, 0,0,1, 0,0,1, 0,0,1, 0,0,1, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 0,0,-1, 0,0,-1, 0,0,-1, 0,0,-1, -1,0,0, -1,0,0, -1,0,0, -1,0,0, 0,-1,0, 0,-1,0, 0,-1,0, 0,-1,0};
@@ -134,6 +170,10 @@ public class Mesh {
         return new Mesh(positions, normals, texCoords, indices);
     }
 
+    /**
+     * Creates and returns the centered quad.
+     * @return the created centered quad
+     */
     public static Mesh createCenteredQuad() {
         float[] positions = new float[]{-0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.5f, 0.5f, 0.0f, -0.5f, 0.5f, 0.0f};
         float[] normals = new float[]{0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f};
@@ -142,6 +182,10 @@ public class Mesh {
         return new Mesh(positions, normals, texCoords, indices);
     }
 
+    /**
+     * Creates and returns the quad.
+     * @return the created quad
+     */
     public static Mesh createQuad() {
         float[] positions = new float[]{0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f};
         float[] normals = new float[]{0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f};
@@ -150,6 +194,10 @@ public class Mesh {
         return new Mesh(positions, normals, textCoords, indices);
     }
 
+    /**
+     * Performs the screen quad operation.
+     * @return the screen quad result
+     */
     public static Mesh screenQuad() {
         float[] positions = new float[]{-1.0f, 1.0f, 0.0f, -1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f};
         float[] normals = new float[12];
@@ -158,6 +206,11 @@ public class Mesh {
         return new Mesh(positions, normals, texCoords, indices);
     }
 
+    /**
+     * Returns the floats.
+     * @param depth the depth value
+     * @return the floats
+     */
     private static float[] getFloats(float depth) {
         float height = 1.0f;
         return new float[]{
@@ -170,6 +223,10 @@ public class Mesh {
         };
     }
 
+    /**
+     * Performs the selection operation.
+     * @return the selection result
+     */
     public static Mesh selection() {
         float eps = 0.002f;
         float[] positions = getPositions(eps);
@@ -179,6 +236,11 @@ public class Mesh {
         return new Mesh(positions, normals, textCoords, indices);
     }
 
+    /**
+     * Returns the positions.
+     * @param eps the eps value
+     * @return the positions
+     */
     private static float[] getPositions(float eps) {
         float minX = -eps; float maxX = 1.0f + eps;
         float minY = -eps; float maxY = 1.0f + eps;
@@ -186,6 +248,10 @@ public class Mesh {
         return new float[]{minX, maxY, minZ, maxX, maxY, minZ, maxX, maxY, maxZ, minX, maxY, maxZ, minX, minY, minZ, maxX, minY, minZ, maxX, minY, maxZ, minX, minY, maxZ};
     }
 
+    /**
+     * Performs the quad vertical operation.
+     * @return the quad vertical result
+     */
     public static Mesh quadVertical() {
         float[] positions = new float[]{-0.5f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.5f, 1.0f, 0.0f, -0.5f, 1.0f, 0.0f};
         float[] normals = new float[]{0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f};
@@ -194,6 +260,10 @@ public class Mesh {
         return new Mesh(positions, normals, texCoords, indices);
     }
 
+    /**
+     * Creates and returns the crop.
+     * @return the created crop
+     */
     public static Mesh createCrop() {
         float[] positions = new float[]{-0.4f, 0.0f, -0.25f, 0.4f, 0.0f, -0.25f, 0.4f, 0.8f, -0.25f, -0.4f, 0.8f, -0.25f, -0.4f, 0.0f, 0.25f, 0.4f, 0.0f, 0.25f, 0.4f, 0.8f, 0.25f, -0.4f, 0.8f, 0.25f, -0.25f, 0.0f, -0.4f, -0.25f, 0.0f, 0.4f, -0.25f, 0.8f, 0.4f, -0.25f, 0.8f, -0.4f, 0.25f, 0.0f, -0.4f, 0.25f, 0.0f, 0.4f, 0.25f, 0.8f, 0.4f, 0.25f, 0.8f, -0.4f};
         float[] normals = new float[]{0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f};
@@ -202,6 +272,10 @@ public class Mesh {
         return new Mesh(positions, normals, texCoords, indices);
     }
 
+    /**
+     * Creates and returns the cube.
+     * @return the created cube
+     */
     public static Mesh createCube() {
         float[] positions = new float[]{-0.5f, 0.5f, -0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f};
         float[] normals = new float[]{0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f};

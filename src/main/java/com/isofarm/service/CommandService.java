@@ -4,18 +4,33 @@ import com.isofarm.data.Command;
 import com.isofarm.gui.GameUIService;
 import com.isofarm.utils.ToastFactory;
 
+/**
+ * Provides command service behavior.
+ */
 public class CommandService implements Service<Command> {
     private final CommandRegistry registry;
     private GameUIService gameUIService;
 
+    /**
+     * Creates a new {@code CommandService} instance.
+     * @param registry the registry value
+     */
     public CommandService(CommandRegistry registry) {
         this.registry = registry;
     }
 
+    /**
+     * Sets the game uiservice.
+     * @param gameUIService the game uiservice value
+     */
     public void setGameUIService(GameUIService gameUIService) {
         this.gameUIService = gameUIService;
     }
 
+    /**
+     * Performs the execute operation.
+     * @param input the input value
+     */
     public void execute(String input) {
         if (input == null || input.isBlank()) return;
         if (!input.startsWith("/")) return;

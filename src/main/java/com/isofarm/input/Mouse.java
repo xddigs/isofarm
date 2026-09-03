@@ -2,6 +2,9 @@ package com.isofarm.input;
 
 import static org.lwjgl.glfw.GLFW.*;
 
+/**
+ * Provides mouse behavior.
+ */
 public class Mouse {
     private static final boolean[] buttons = new boolean[GLFW_MOUSE_BUTTON_LAST + 1];
     private static final boolean[] lastButtons = new boolean[GLFW_MOUSE_BUTTON_LAST + 1];
@@ -12,6 +15,10 @@ public class Mouse {
     private static boolean firstMouse = true;
     private static float scrollY = 0.0f;
 
+    /**
+     * Initializes the component.
+     * @param windowId the window id value
+     */
     public static void init(long windowId) {
         glfwSetCursorPosCallback(windowId, (window, xpos, ypos) -> {
             float currentX = (float) xpos;
@@ -43,6 +50,9 @@ public class Mouse {
         });
     }
 
+    /**
+     * Updates the current state.
+     */
     public static void update() {
         System.arraycopy(buttons, 0, lastButtons, 0, buttons.length);
         deltaX = 0;
@@ -50,15 +60,30 @@ public class Mouse {
         scrollY = 0.0f;
     }
 
+    /**
+     * Checks whether the button down condition is met.
+     * @param button the button value
+     * @return {@code true} if button down; otherwise {@code false}
+     */
     public static boolean isButtonDown(int button) {
         return button >= 0 && button <= GLFW_MOUSE_BUTTON_LAST && buttons[button];
     }
 
+    /**
+     * Checks whether the button pressed condition is met.
+     * @param button the button value
+     * @return {@code true} if button pressed; otherwise {@code false}
+     */
     public static boolean isButtonPressed(int button) {
         return button >= 0 && button <= GLFW_MOUSE_BUTTON_LAST
                 && buttons[button] && !lastButtons[button];
     }
 
+    /**
+     * Checks whether the button released condition is met.
+     * @param button the button value
+     * @return {@code true} if button released; otherwise {@code false}
+     */
     public static boolean isButtonReleased(int button) {
         return button >= 0 &&
                 button <= GLFW_MOUSE_BUTTON_LAST &&
@@ -66,15 +91,39 @@ public class Mouse {
                 lastButtons[button];
     }
 
+    /**
+     * Returns the delta x.
+     * @return the delta x
+     */
     public static float getDeltaX() { return deltaX; }
+    /**
+     * Returns the delta y.
+     * @return the delta y
+     */
     public static float getDeltaY() { return deltaY; }
+    /**
+     * Returns the x.
+     * @return the x
+     */
     public static float getX() { return x; }
+    /**
+     * Returns the y.
+     * @return the y
+     */
     public static float getY() { return y; }
 
+    /**
+     * Returns the scroll y.
+     * @return the scroll y
+     */
     public static float getScrollY() {
         return scrollY;
     }
 
+    /**
+     * Sets the scroll y.
+     * @param scrollY the scroll y value
+     */
     public static void setScrollY(float scrollY) {
         Mouse.scrollY = scrollY;
     }

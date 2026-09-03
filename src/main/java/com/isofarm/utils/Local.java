@@ -12,6 +12,9 @@ import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Properties;
 
+/**
+ * Provides local behavior.
+ */
 @Utils
 @Singleton
 public class Local {
@@ -20,6 +23,9 @@ public class Local {
     private final Properties properties = new Properties();
     private Languages currentLanguage;
 
+    /**
+     * Creates a new {@code Local} instance.
+     */
     private Local() {
         String sysLang = Locale.getDefault().getLanguage();
         Languages initialLang = Languages.EN;
@@ -32,6 +38,10 @@ public class Local {
         setLanguage(initialLang);
     }
 
+    /**
+     * Sets the language.
+     * @param language the language value
+     */
     public void setLanguage(Languages language) {
         if (language == null) return;
         String file = "/lang/lang_" + language.getCode() + ".properties";
@@ -48,6 +58,10 @@ public class Local {
         }
     }
 
+    /**
+     * Performs the next language operation.
+     * @return the next language result
+     */
     public Languages nextLanguage() {
         int nextIndex = (currentLanguage.ordinal() + 1) % LANGS.length;
         Languages nextLang = LANGS[nextIndex];
@@ -55,18 +69,39 @@ public class Local {
         return nextLang;
     }
 
+    /**
+     * Returns the current language.
+     * @return the current language
+     */
     public Languages getCurrentLanguage() {
         return currentLanguage;
     }
 
+    /**
+     * Performs the t operation.
+     * @param key the key value
+     * @return the t result
+     */
     public String t(String key) {
         return properties.getProperty(key, key);
     }
 
+    /**
+     * Performs the f operation.
+     * @param s the s value
+     * @param args the args value
+     * @return the f result
+     */
     public String f(String s, Object... args) {
         return MessageFormat.format(t(s), args);
     }
 
+    /**
+     * Performs the item operation.
+     * @param itemKey the item key value
+     * @param tierKey the tier key value
+     * @return the item result
+     */
     public String item(String itemKey, String tierKey) {
         String itemName = t(itemKey);
         if (tierKey == null || tierKey.isBlank()) {

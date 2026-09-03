@@ -1,5 +1,8 @@
 package com.isofarm.data;
 
+/**
+ * Enumerates the supported sound group values.
+ */
 public enum SoundGroup {
     SOIL(
         new String[]{"fx/steps/steps_grass_01.ogg", "fx/steps/steps_grass_02.ogg", "fx/steps/steps_grass_03.ogg", "fx/steps/steps_grass_04.ogg"},
@@ -32,6 +35,16 @@ public enum SoundGroup {
     private final String[] loopingSounds;
     private final String[] useSounds;
 
+    /**
+     * Creates a new {@code SoundGroup} instance.
+     * @param stepSounds the step sounds value
+     * @param breakSounds the break sounds value
+     * @param placeSounds the place sounds value
+     * @param entitySounds the entity sounds value
+     * @param backgroundSounds the background sounds value
+     * @param loopingSounds the looping sounds value
+     * @param useSounds the use sounds value
+     */
     SoundGroup(String[] stepSounds, String[] breakSounds, String[] placeSounds,
                String[] entitySounds, String[] backgroundSounds, String[] loopingSounds, String[] useSounds) {
         this.stepSounds = stepSounds;
@@ -43,11 +56,39 @@ public enum SoundGroup {
         this.useSounds = useSounds;
     }
 
+    /**
+     * Returns the step sounds.
+     * @return the step sounds
+     */
     public String[] getStepSounds() { return stepSounds; }
+    /**
+     * Returns the break sounds.
+     * @return the break sounds
+     */
     public String[] getBreakSounds() { return breakSounds; }
+    /**
+     * Returns the place sounds.
+     * @return the place sounds
+     */
     public String[] getPlaceSounds() { return placeSounds; }
+    /**
+     * Returns the entity sounds.
+     * @return the entity sounds
+     */
     public String[] getEntitySounds() { return entitySounds; }
+    /**
+     * Returns the background sounds.
+     * @return the background sounds
+     */
     public String[] getBackgroundSounds() { return backgroundSounds; }
+    /**
+     * Returns the looping sounds.
+     * @return the looping sounds
+     */
     public String[] getLoopingSounds() { return loopingSounds; }
+    /**
+     * Returns the use sounds.
+     * @return the use sounds
+     */
     public String[] getUseSounds() { return useSounds; }
 }

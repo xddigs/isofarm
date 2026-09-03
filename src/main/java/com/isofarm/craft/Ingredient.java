@@ -4,5 +4,8 @@ import com.isofarm.data.DataClass;
 import com.isofarm.item.Craftable;
 import com.isofarm.item.Item;
 
+/**
+ * Stores ingredient data.
+ */
 @DataClass
 public record Ingredient(Craftable craftable, int amount) {}

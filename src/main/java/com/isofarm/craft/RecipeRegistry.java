@@ -6,10 +6,17 @@ import com.isofarm.item.*;
 import java.util.*;
 import java.util.function.Function;
 
+/**
+ * Provides recipe registry behavior.
+ */
 public class RecipeRegistry {
     public static final RecipeRegistry reg = new RecipeRegistry();
     private static final List<Recipe> recipes = new LinkedList<>();
 
+    /**
+     * Initializes the component.
+     * @return the init result
+     */
     public List<Recipe> init() {
         recipes.clear();
         registerSmeltingRecipes();
@@ -36,6 +43,11 @@ public class RecipeRegistry {
         return recipes;
     }
 
+    /**
+     * Performs the register tool set operation.
+     * @param stationTier the station tier value
+     * @param primaryMat the primary mat value
+     */
     private void registerToolSet(Tier stationTier, Craftable primaryMat) {
         if (stationTier.equals(Tier.NONE)) return;
         registerTool(stationTier, primaryMat, 2, 1, Sword::new);
@@ -45,6 +57,14 @@ public class RecipeRegistry {
         registerTool(stationTier, primaryMat, 1, 2, Shovel::new);
     }
 
+    /**
+     * Performs the register tool operation.
+     * @param stationTier the station tier value
+     * @param mat the mat value
+     * @param matAmount the mat amount value
+     * @param stickAmount the stick amount value
+     * @param constructor the constructor value
+     */
     private void registerTool(Tier stationTier, Craftable mat, int matAmount, int stickAmount,
                                      Function<Tier, Item> constructor) {
         create(stationTier)
@@ -54,10 +74,18 @@ public class RecipeRegistry {
                 .add();
     }
 
+    /**
+     * Returns the tier from material.
+     * @param mat the mat value
+     * @return the tier from material
+     */
     private Tier getTierFromMaterial(Craftable mat) {
         return (mat instanceof MiningComponent mc) ? mc.getTier() : Tier.WOODEN;
     }
 
+    /**
+     * Performs the register smelting recipes operation.
+     */
     private void registerSmeltingRecipes() {
         Tier[] metalTiers = {Tier.COPPER, Tier.IRON, Tier.STEEL, Tier.GOLDEN, Tier.PLATINUM, Tier.DIAMOND};
         for (Tier tier : metalTiers) {
@@ -67,6 +95,10 @@ public class RecipeRegistry {
         }
     }
 
+    /**
+     * Returns the recipes.
+     * @return the recipes
+     */
     public List<Recipe> getRecipes() {
         List<Recipe> sortedRecipes = new ArrayList<>(recipes);
         sortedRecipes.sort(Comparator.comparing(
@@ -76,31 +108,59 @@ public class RecipeRegistry {
         return sortedRecipes;
     }
 
+    /**
+     * Returns create.
+     * @param tier the tier value
+     * @return the create result
+     */
     public RecipeBuilder create(Tier tier) {
         return new RecipeBuilder(tier);
     }
 
+    /**
+     * Provides recipe builder behavior.
+     */
     public static class RecipeBuilder {
         private final Tier tier;
         private final List<Ingredient> ingredients = new ArrayList<>();
         private Item result;
         private int amount = 1;
 
+        /**
+         * Creates a new {@code RecipeBuilder} instance.
+         * @param tier the tier value
+         */
         public RecipeBuilder(Tier tier) {
             this.tier = tier;
         }
 
+        /**
+         * Performs the result operation.
+         * @param result the result value
+         * @param amount the amount value
+         * @return the result result
+         */
         public RecipeBuilder result(Item result, int amount) {
             this.result = result;
             this.amount = amount;
             return this;
         }
 
+        /**
+         * Performs the with operation.
+         * @param craftable the craftable value
+         * @param count the count value
+         * @return the with result
+         */
         public RecipeBuilder with(Craftable craftable, int count) {
             this.ingredients.add(new Ingredient(craftable, count));
             return this;
         }
 
+        /**
+         * Adds add.
+         * @return the add result
+         */
         public Recipe add() {
             Recipe recipe = new Recipe(tier, result, amount, List.copyOf(ingredients));
             recipes.add(recipe);

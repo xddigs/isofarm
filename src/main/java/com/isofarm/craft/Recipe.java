@@ -8,12 +8,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Stores recipe data.
+ */
 public record Recipe(Tier tier, Item result, int resultAmount, List<Ingredient> ingredients) {
 
+    /**
+     * Performs the of operation.
+     * @param tier the tier value
+     * @param result the result value
+     * @param resultAmount the result amount value
+     * @param ingredients the ingredients value
+     * @return the of result
+     */
     public static Recipe of(Tier tier, Item result, int resultAmount, Ingredient... ingredients) {
         return new Recipe(tier, result, resultAmount, List.of(ingredients));
     }
 
+    /**
+     * Performs the match operation.
+     * @param inputIngredients the input ingredients value
+     * @return the match result
+     */
     public boolean match(Map<Craftable, Integer> inputIngredients) {
         if (inputIngredients.size() != ingredients.size()) {
             return false;
@@ -36,6 +52,11 @@ public record Recipe(Tier tier, Item result, int resultAmount, List<Ingredient> 
         return true;
     }
 
+    /**
+     * Checks whether the craft with condition is met.
+     * @param availableMaterials the available materials value
+     * @return {@code true} if craft with; otherwise {@code false}
+     */
     public boolean canCraftWith(Map<Craftable, Integer> availableMaterials) {
         for (Ingredient req : ingredients) {
             Craftable reqKey = req.craftable();
@@ -52,6 +73,12 @@ public record Recipe(Tier tier, Item result, int resultAmount, List<Ingredient> 
         return true;
     }
 
+    /**
+     * Checks whether the same craftable condition is met.
+     * @param a the a value
+     * @param b the b value
+     * @return {@code true} if same craftable; otherwise {@code false}
+     */
     public static boolean isSameCraftable(Craftable a, Craftable b) {
         if (a == b) return true;
         if (a == null || b == null) return false;
@@ -67,6 +94,10 @@ public record Recipe(Tier tier, Item result, int resultAmount, List<Ingredient> 
 
     }
 
+    /**
+     * Performs the to book lines operation.
+     * @return the to book lines result
+     */
     public List<String> toBookLines() {
         List<String> lines = new ArrayList<>();
         lines.add("**" + result.getDisplayName());
@@ -77,6 +108,10 @@ public record Recipe(Tier tier, Item result, int resultAmount, List<Ingredient> 
         return lines;
     }
 
+    /**
+     * Performs the to string operation.
+     * @return the to string result
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

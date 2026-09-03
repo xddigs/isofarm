@@ -12,6 +12,9 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Provides resource manager behavior.
+ */
 @Singleton
 public class ResourceManager {
     public static final ResourceManager rem = new ResourceManager();
@@ -67,9 +70,17 @@ public class ResourceManager {
         cropSpritesheets.put(CropType.BEETROOT, beetroot);
     }
 
+    /**
+     * Creates a new {@code ResourceManager} instance.
+     */
     private ResourceManager() {
     }
 
+    /**
+     * Returns the item sprite sheet.
+     * @param item the item value
+     * @return the item sprite sheet
+     */
     public static SpriteSheet getItemSpriteSheet(Item item) {
         return switch (item) {
             case Crop crop -> cropSpritesheets.get(crop.getCropType());
@@ -83,6 +94,11 @@ public class ResourceManager {
         };
     }
 
+    /**
+     * Returns the material frame.
+     * @param material the material value
+     * @return the material frame
+     */
     private static int getMaterialFrame(Material material) {
         MaterialID materialID = material.getMaterialID();
         int row = materialID.getRow();
@@ -113,6 +129,11 @@ public class ResourceManager {
         return 0;
     }
 
+    /**
+     * Returns the item frame.
+     * @param item the item value
+     * @return the item frame
+     */
     public static int getItemFrame(Item item) {
         if (item instanceof Block block && block.getType() != null) {
             int col = block.getType().getCol() - 1;
@@ -150,6 +171,9 @@ public class ResourceManager {
         return 0;
     }
 
+    /**
+     * Performs the dispose operation.
+     */
     public void dispose() {
         blockMesh.dispose();
         flowerMesh.dispose();
@@ -186,110 +210,219 @@ public class ResourceManager {
         blurShader.dispose();
     }
 
+    /**
+     * Returns the default shader.
+     * @return the default shader
+     */
     public Shader getDefaultShader() {
         return defaultShader;
     }
 
+    /**
+     * Returns the rain shader.
+     * @return the rain shader
+     */
     public Shader getRainShader() {
         return rainShader;
     }
 
+    /**
+     * Returns the motion blur shader.
+     * @return the motion blur shader
+     */
     public Shader getMotionBlurShader() {
         return motionBlurShader;
     }
 
+    /**
+     * Returns the shadow map shader.
+     * @return the shadow map shader
+     */
     public Shader getShadowMapShader() {
         return shadowMapShader;
     }
 
+    /**
+     * Returns the blur shader.
+     * @return the blur shader
+     */
     public Shader getBlurShader() {
         return blurShader;
     }
 
+    /**
+     * Returns the screen quad mesh.
+     * @return the screen quad mesh
+     */
     public Mesh getScreenQuadMesh() {
         return screenQuadMesh;
     }
 
+    /**
+     * Returns the block mesh.
+     * @return the block mesh
+     */
     public Mesh getBlockMesh() {
         return blockMesh;
     }
 
+    /**
+     * Returns the flower mesh.
+     * @return the flower mesh
+     */
     public Mesh getFlowerMesh() {
         return flowerMesh;
     }
 
+    /**
+     * Returns the destroy overlay mesh.
+     * @return the destroy overlay mesh
+     */
     public Mesh getDestroyOverlayMesh() {
         return destroyOverlayMesh;
     }
 
+    /**
+     * Returns the selection mesh.
+     * @return the selection mesh
+     */
     public Mesh getSelectionMesh() {
         return selectionMesh;
     }
 
+    /**
+     * Returns the sprite mesh.
+     * @return the sprite mesh
+     */
     public Mesh getSpriteMesh() {
         return spriteMesh;
     }
 
+    /**
+     * Returns the player mesh.
+     * @return the player mesh
+     */
     public Mesh getPlayerMesh() {
         return playerMesh;
     }
 
+    /**
+     * Returns the background gui.
+     * @return the background gui
+     */
     public Texture getBackgroundGUI() {
         return backgroundGUI;
     }
 
+    /**
+     * Returns the blocks atlas.
+     * @return the blocks atlas
+     */
     public TextureAtlas getBlocksAtlas() {
         return blocksAtlas;
     }
 
+    /**
+     * Returns the destroy texture.
+     * @return the destroy texture
+     */
     public SpriteSheet getDestroyTexture() {
         return destroyTexture;
     }
 
+    /**
+     * Returns the player model.
+     * @return the player model
+     */
     public GLTFModel getPlayerModel() {
         return playerModel;
     }
 
+    /**
+     * Returns the seed icons.
+     * @return the seed icons
+     */
     public SpriteSheet getSeedIcons() {
         return seedIcons;
     }
 
+    /**
+     * Returns the crop icons.
+     * @return the crop icons
+     */
     public SpriteSheet getCropIcons() {
         return cropIcons;
     }
 
+    /**
+     * Returns the tool icons.
+     * @return the tool icons
+     */
     public SpriteSheet getToolIcons() {
         return toolIcons;
     }
 
+    /**
+     * Returns the block icons.
+     * @return the block icons
+     */
     public SpriteSheet getBlockIcons() {
         return blockIcons;
     }
 
+    /**
+     * Returns the material icons.
+     * @return the material icons
+     */
     public SpriteSheet getMaterialIcons() {
         return materialIcons;
     }
 
+    /**
+     * Returns the usables icons.
+     * @return the usables icons
+     */
     public SpriteSheet getUsablesIcons() {
         return usablesIcons;
     }
 
+    /**
+     * Returns the inventory icons.
+     * @return the inventory icons
+     */
     public SpriteSheet getInventoryIcons() {
         return inventoryIcons;
     }
 
+    /**
+     * Returns the book animation sheet.
+     * @return the book animation sheet
+     */
     public SpriteSheet getBookAnimationSheet() {
         return bookAnimationSheet;
     }
 
+    /**
+     * Returns the hearts sprite sheet.
+     * @return the hearts sprite sheet
+     */
     public SpriteSheet getHeartsSpriteSheet() {
         return heartsSpriteSheet;
     }
 
+    /**
+     * Returns the crop spritesheets.
+     * @return the crop spritesheets
+     */
     public Map<CropType, SpriteSheet> getCropSpritesheets() {
         return cropSpritesheets;
     }
 
+    /**
+     * Returns the shader.
+     * @param name the name value
+     * @return the shader
+     */
     public Shader getShader(String name) {
         if (name == null) return defaultShader;
 

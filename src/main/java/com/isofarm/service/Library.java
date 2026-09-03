@@ -13,10 +13,18 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Supplier;
 
+/**
+ * Provides library behavior.
+ */
 @SuppressWarnings("all")
 public class Library implements Service<GameMaster> {
     private static final Logger log = LoggerFactory.getLogger(Library.class);
 
+    /**
+     * Initializes the items.
+     * @param itemR the item r value
+     * @param player the player value
+     */
     public static void initItems(ItemRegistry itemR, Player player) {
         registerDefault(itemR, Backpack::new);
         registerDefault(itemR, () -> new Book(false));
@@ -57,6 +65,11 @@ public class Library implements Service<GameMaster> {
         }
     }
 
+    /**
+     * Performs the register default operation.
+     * @param itemR the item r value
+     * @param supplier the supplier value
+     */
     private static void registerDefault(ItemRegistry itemR, Supplier<Item> supplier) {
         Item item = supplier.get();
         String rawName = item.getName();
@@ -66,6 +79,11 @@ public class Library implements Service<GameMaster> {
         itemR.register(getFormattedName(rawName), supplier);
     }
 
+    /**
+     * Initializes the commands.
+     * @param delta the delta value
+     * @param gameMaster the game master value
+     */
     public static void initCommands(float delta, GameMaster gameMaster) {
         Player player = gameMaster.getPlayer();
         CommandRegistry cr = gameMaster.getCommandRegistry();
@@ -251,6 +269,12 @@ public class Library implements Service<GameMaster> {
         }));
     }
 
+    /**
+     * Performs the literal operation.
+     * @param name the name value
+     * @param values the values value
+     * @return the literal result
+     */
     private static CommandArgument literal(String name, String... values) {
         return CommandArgument.of(name, (text, cursorPosition) -> {
             String prefix = text == null ? "" : text.substring(0, Math.min(cursorPosition, text.length()));
@@ -259,6 +283,12 @@ public class Library implements Service<GameMaster> {
         });
     }
 
+    /**
+     * Performs the dynamic operation.
+     * @param name the name value
+     * @param supplier the supplier value
+     * @return the dynamic result
+     */
     private static CommandArgument dynamic(String name, Supplier<Collection<String>> supplier) {
         return CommandArgument.of(name, (text, cursorPosition) -> {
             String prefix = text == null ? "" : text.substring(0, Math.min(cursorPosition, text.length()));
@@ -272,6 +302,11 @@ public class Library implements Service<GameMaster> {
         });
     }
 
+    /**
+     * Returns the formatted name.
+     * @param name the name value
+     * @return the formatted name
+     */
     public static String getFormattedName(String... name) {
         StringBuilder builder = new StringBuilder();
         for (String s : name) {

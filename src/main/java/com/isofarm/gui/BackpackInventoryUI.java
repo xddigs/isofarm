@@ -5,11 +5,19 @@ import com.isofarm.data.SlotType;
 import com.isofarm.entity.Player;
 import com.isofarm.utils.Settings;
 
+/**
+ * Provides backpack inventory ui behavior.
+ */
 public class BackpackInventoryUI extends InventoryUI {
     private static final int BACKPACK_SLOTS = 16;
     private final InventorySlotUI[] backpackSlots = new InventorySlotUI[BACKPACK_SLOTS];
     private Inventory backpack;
 
+    /**
+     * Creates a new {@code BackpackInventoryUI} instance.
+     * @param x the x value
+     * @param y the y value
+     */
     public BackpackInventoryUI(float x, float y) {
         super(x, y);
         setBackpackUI(this);
@@ -22,6 +30,9 @@ public class BackpackInventoryUI extends InventoryUI {
         createBackpackSlots();
     }
 
+    /**
+     * Creates and returns the backpack slots.
+     */
     private void createBackpackSlots() {
         for (int i = 0; i < BACKPACK_SLOTS; i++) {
             int column = i % 4;
@@ -37,11 +48,19 @@ public class BackpackInventoryUI extends InventoryUI {
         }
     }
 
+    /**
+     * Returns the slot uis.
+     * @return the slot uis
+     */
     @Override
     public InventorySlotUI[] getSlotUIs() {
         return backpackSlots;
     }
 
+    /**
+     * Sets the player.
+     * @param player the player value
+     */
     @Override
     public void setPlayer(Player player) {
         super.setPlayer(player);
@@ -55,10 +74,18 @@ public class BackpackInventoryUI extends InventoryUI {
         }
     }
 
+    /**
+     * Returns the backpack.
+     * @return the backpack
+     */
     public Inventory getBackpack() {
         return backpack;
     }
 
+    /**
+     * Updates the current state.
+     * @param delta the delta value
+     */
     @Override
     public void update(float delta) {
         if (getBackpack() == null) return;
@@ -66,6 +93,9 @@ public class BackpackInventoryUI extends InventoryUI {
         getChildren().forEach(child -> child.update(delta));
     }
 
+    /**
+     * Renders render.
+     */
     @Override
     public void render() {
         if (!isVisible()) return;

@@ -9,6 +9,9 @@ import oshi.hardware.Sensors;
 
 import java.util.List;
 
+/**
+ * Provides components behavior.
+ */
 @Utils
 public final class Components {
     private static final SystemInfo SYSTEM_INFO = new SystemInfo();
@@ -20,6 +23,10 @@ public final class Components {
     private static final String CPU_NAME = CPU.getProcessorIdentifier().getName();
     private static final String GPU_NAME = loadGpuName();
 
+    /**
+     * Loads the gpu name.
+     * @return the load gpu name result
+     */
     private static String loadGpuName() {
         List<GraphicsCard> graphicsCards = HARDWARE.getGraphicsCards();
         if (graphicsCards.isEmpty()) {
@@ -28,16 +35,31 @@ public final class Components {
         return graphicsCards.getFirst().getName();
     }
 
+    /**
+     * Creates a new {@code Components} instance.
+     */
     private Components() {}
 
+    /**
+     * Returns the cpu.
+     * @return the cpu
+     */
     public static String getCpu() {
         return CPU_NAME;
     }
 
+    /**
+     * Returns the gpu.
+     * @return the gpu
+     */
     public static String getGpu() {
         return GPU_NAME;
     }
 
+    /**
+     * Returns the cpu temperature.
+     * @return the cpu temperature
+     */
     public static String getCpuTemperature() {
         double temperature = SENSORS.getCpuTemperature();
         if (temperature <= 0 || Double.isNaN(temperature)) {
@@ -47,6 +69,10 @@ public final class Components {
         return String.format("%.1f °C", temperature);
     }
 
+    /**
+     * Returns the physical memory.
+     * @return the physical memory
+     */
     public static String getPhysicalMemory() {
         long total = MEMORY.getTotal();
         long available = MEMORY.getAvailable();
@@ -61,6 +87,11 @@ public final class Components {
         );
     }
 
+    /**
+     * Performs the format bytes operation.
+     * @param bytes the bytes value
+     * @return the format bytes result
+     */
     private static String formatBytes(long bytes) {
         double gb = bytes / (1024.0 * 1024.0 * 1024.0);
 

@@ -3,6 +3,9 @@ package com.isofarm.gui;
 import com.isofarm.graphics.SpriteSheet;
 import org.joml.Vector4f;
 
+/**
+ * Provides uibutton behavior.
+ */
 @SuppressWarnings("all")
 public class UIButton extends UIElement {
     private SpriteSheet spriteSheet;
@@ -13,12 +16,26 @@ public class UIButton extends UIElement {
     private Vector4f hoverColor = new Vector4f(0.25f, 0.25f, 0.25f, 1.0f);
     private Vector4f pressedColor = new Vector4f(0.1f, 0.1f, 0.1f, 1.0f);
 
+    /**
+     * Creates a new {@code UIButton} instance.
+     * @param x the x value
+     * @param y the y value
+     * @param width the width value
+     * @param height the height value
+     */
     public UIButton(float x, float y, float width, float height) {
         super(x, y, width, height);
         setInteractable(true);
         setFocusable(true);
     }
 
+    /**
+     * Performs the mouse released operation.
+     * @param mouseX the mouse x value
+     * @param mouseY the mouse y value
+     * @param button the button value
+     * @return the mouse released result
+     */
     @Override
     public boolean mouseReleased(float mouseX, float mouseY, int button) {
         super.mouseReleased(mouseX, mouseY, button);
@@ -34,6 +51,9 @@ public class UIButton extends UIElement {
         return false;
     }
 
+    /**
+     * Renders render.
+     */
     @Override
     public void render() {
         Vector4f color = normalColor;
@@ -59,53 +79,114 @@ public class UIButton extends UIElement {
         renderChildren();
     }
 
+    /**
+     * Returns the sprite sheet.
+     * @return the sprite sheet
+     */
     public SpriteSheet getSpriteSheet() {
         return spriteSheet;
     }
 
+    /**
+     * Sets the sprite sheet.
+     * @param spriteSheet the sprite sheet value
+     */
     public void setSpriteSheet(SpriteSheet spriteSheet) {
         this.spriteSheet = spriteSheet;
     }
 
+    /**
+     * Returns the sprite col.
+     * @return the sprite col
+     */
     public int getSpriteCol() {
         return spriteFrame;
     }
 
+    /**
+     * Sets the sprite column.
+     * @param spriteFrame the sprite frame value
+     */
     public void setSpriteColumn(int spriteFrame) {
         this.spriteFrame = Math.max(0, spriteFrame);
     }
 
+    /**
+     * Returns the on click.
+     * @return the on click
+     */
     public Runnable getOnClick() {
         return onClick;
     }
 
+    /**
+     * Sets the on click.
+     * @param onClick the on click value
+     * @return the set on click result
+     */
     public UIButton setOnClick(Runnable onClick) {
         this.onClick = onClick;
         return this;
     }
 
+    /**
+     * Returns the normal color.
+     * @return the normal color
+     */
     public Vector4f getNormalColor() {
         return new Vector4f(normalColor);
     }
 
+    /**
+     * Sets the normal color.
+     * @param r the r value
+     * @param g the g value
+     * @param b the b value
+     * @param a the a value
+     * @return the set normal color result
+     */
     public UIButton setNormalColor(float r, float g, float b, float a) {
         normalColor.set(r, g, b, a);
         return this;
     }
 
+    /**
+     * Returns the hover color.
+     * @return the hover color
+     */
     public Vector4f getHoverColor() {
         return new Vector4f(hoverColor);
     }
 
+    /**
+     * Sets the hover color.
+     * @param r the r value
+     * @param g the g value
+     * @param b the b value
+     * @param a the a value
+     * @return the set hover color result
+     */
     public UIButton setHoverColor(float r, float g, float b, float a) {
         hoverColor.set(r, g, b, a);
         return this;
     }
 
+    /**
+     * Returns the pressed color.
+     * @return the pressed color
+     */
     public Vector4f getPressedColor() {
         return new Vector4f(pressedColor);
     }
 
+    /**
+     * Sets the pressed color.
+     * @param r the r value
+     * @param g the g value
+     * @param b the b value
+     * @param a the a value
+     * @return the set pressed color result
+     */
     public UIButton setPressedColor(float r, float g, float b, float a) {
         pressedColor.set(r, g, b, a);
         return this;

@@ -3,6 +3,9 @@ package com.isofarm.graphics;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL30.*;
 
+/**
+ * Provides framebuffer behavior.
+ */
 public class Framebuffer {
     private final int fboId;
     private final int textureId;
@@ -10,6 +13,11 @@ public class Framebuffer {
     private final int height;
     private final int depthBufferId;
 
+    /**
+     * Creates a new {@code Framebuffer} instance.
+     * @param width the width value
+     * @param height the height value
+     */
     public Framebuffer(int width, int height) {
         this.width = width;
         this.height = height;
@@ -38,20 +46,35 @@ public class Framebuffer {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
+    /**
+     * Performs the bind operation.
+     */
     public void bind() {
         glBindFramebuffer(GL_FRAMEBUFFER, fboId);
         glViewport(0, 0, width, height);
     }
 
+    /**
+     * Performs the unbind operation.
+     * @param windowWidth the window width value
+     * @param windowHeight the window height value
+     */
     public void unbind(int windowWidth, int windowHeight) {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, windowWidth, windowHeight);
     }
 
+    /**
+     * Returns the texture id.
+     * @return the texture id
+     */
     public int getTextureId() {
         return textureId;
     }
 
+    /**
+     * Performs the dispose operation.
+     */
     public void dispose() {
         glDeleteTextures(textureId);
         glDeleteRenderbuffers(depthBufferId);

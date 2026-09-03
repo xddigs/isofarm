@@ -3,12 +3,20 @@ package com.isofarm.graphics;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL30.*;
 
+/**
+ * Provides shadow map behavior.
+ */
 public class ShadowMap {
     private final int width;
     private final int height;
     private final int framebuffer;
     private final int depthTexture;
 
+    /**
+     * Creates a new {@code ShadowMap} instance.
+     * @param width the width value
+     * @param height the height value
+     */
     public ShadowMap(int width, int height) {
         this.width = width;
         this.height = height;
@@ -41,33 +49,60 @@ public class ShadowMap {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
+    /**
+     * Performs the bind operation.
+     */
     public void bind() {
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         glViewport(0, 0, width, height);
         glClear(GL_DEPTH_BUFFER_BIT);
     }
 
+    /**
+     * Performs the unbind operation.
+     * @param windowWidth the window width value
+     * @param windowHeight the window height value
+     */
     public void unbind(int windowWidth, int windowHeight) {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, windowWidth, windowHeight);
     }
 
+    /**
+     * Returns the depth texture.
+     * @return the depth texture
+     */
     public int getDepthTexture() {
         return depthTexture;
     }
 
+    /**
+     * Returns the framebuffer.
+     * @return the framebuffer
+     */
     public int getFramebuffer() {
         return framebuffer;
     }
 
+    /**
+     * Returns the width.
+     * @return the width
+     */
     public int getWidth() {
         return width;
     }
 
+    /**
+     * Returns the height.
+     * @return the height
+     */
     public int getHeight() {
         return height;
     }
 
+    /**
+     * Performs the dispose operation.
+     */
     public void dispose() {
         glDeleteFramebuffers(framebuffer);
         glDeleteTextures(depthTexture);

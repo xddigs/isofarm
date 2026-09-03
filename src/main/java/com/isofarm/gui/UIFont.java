@@ -14,6 +14,9 @@ import static org.lwjgl.opengl.GL13C.glActiveTexture;
 import static org.lwjgl.system.MemoryUtil.memAlloc;
 import static org.lwjgl.system.MemoryUtil.memFree;
 
+/**
+ * Provides uifont behavior.
+ */
 @SuppressWarnings("all")
 public class UIFont {
     private static final int FIRST_CHAR = 32;
@@ -27,10 +30,22 @@ public class UIFont {
     private final int textureId;
     private final STBTTBakedChar.Buffer glyphs;
 
+    /**
+     * Creates a new {@code UIFont} instance.
+     * @param path the path value
+     * @param size the size value
+     */
     public UIFont(String path, float size) {
         this(path, size, 1024, 1024);
     }
 
+    /**
+     * Creates a new {@code UIFont} instance.
+     * @param path the path value
+     * @param size the size value
+     * @param atlasWidth the atlas width value
+     * @param atlasHeight the atlas height value
+     */
     public UIFont(String path, float size, int atlasWidth, int atlasHeight) {
         this.path = path;
         this.size = size;
@@ -61,6 +76,11 @@ public class UIFont {
         memFree(fontData);
     }
 
+    /**
+     * Loads the font.
+     * @param path the path value
+     * @return the load font result
+     */
     private ByteBuffer loadFont(String path) {
         try (InputStream input = getClass().getClassLoader().getResourceAsStream(path)) {
             if (input == null) {
@@ -79,31 +99,58 @@ public class UIFont {
         }
     }
 
+    /**
+     * Performs the bind operation.
+     */
     public void bind() {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, textureId);
     }
 
+    /**
+     * Performs the unbind operation.
+     */
     public void unbind() {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
+    /**
+     * Returns the texture id.
+     * @return the texture id
+     */
     public int getTextureId() {
         return textureId;
     }
 
+    /**
+     * Returns the size.
+     * @return the size
+     */
     public float getSize() {
         return size;
     }
 
+    /**
+     * Returns the atlas width.
+     * @return the atlas width
+     */
     public int getAtlasWidth() {
         return atlasWidth;
     }
 
+    /**
+     * Returns the atlas height.
+     * @return the atlas height
+     */
     public int getAtlasHeight() {
         return atlasHeight;
     }
 
+    /**
+     * Returns the glyph.
+     * @param character the character value
+     * @return the glyph
+     */
     public STBTTBakedChar getGlyph(int character) {
         if (character < FIRST_CHAR || character > LAST_CHAR) {
             return null;
@@ -112,14 +159,25 @@ public class UIFont {
         return glyphs.get(character - FIRST_CHAR);
     }
 
+    /**
+     * Returns the first char.
+     * @return the first char
+     */
     public int getFirstChar() {
         return FIRST_CHAR;
     }
 
+    /**
+     * Returns the last char.
+     * @return the last char
+     */
     public int getLastChar() {
         return LAST_CHAR;
     }
 
+    /**
+     * Performs the dispose operation.
+     */
     public void dispose() {
         glDeleteTextures(textureId);
         glyphs.free();

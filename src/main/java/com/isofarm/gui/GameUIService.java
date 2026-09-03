@@ -25,6 +25,9 @@ import java.util.Map;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.glEnable;
 
+/**
+ * Provides game uiservice behavior.
+ */
 @SuppressWarnings("all")
 @GodObject
 public class GameUIService implements Service<GameMaster> {
@@ -64,6 +67,18 @@ public class GameUIService implements Service<GameMaster> {
     private int lastRenderedDamageSequence = -1;
     private float flashTimer = 0.0f;
 
+    /**
+     * Creates a new {@code GameUIService} instance.
+     * @param windowHandle the window handle value
+     * @param gameMaster the game master value
+     * @param uiManager the ui manager value
+     * @param seedIcons the seed icons value
+     * @param cropIcons the crop icons value
+     * @param blockIcons the block icons value
+     * @param toolIcons the tool icons value
+     * @param materialIcons the material icons value
+     * @param inventoryIcons the inventory icons value
+     */
     public GameUIService(
             long windowHandle,
             GameMaster gameMaster,
@@ -160,23 +175,42 @@ public class GameUIService implements Service<GameMaster> {
         uiManager.getRoot().addChild(memory);
     }
 
+    /**
+     * Performs the debug print operation.
+     */
     private void debugPrint() {
         uiManager.getRoot().getChildren().forEach(uiElement ->
                 log.debug(String.valueOf(uiElement)));
     }
 
+    /**
+     * Returns the inventory ui.
+     * @return the inventory ui
+     */
     public InventoryUI getInventoryUI() {
         return inventoryUI;
     }
 
+    /**
+     * Returns the hotbar ui.
+     * @return the hotbar ui
+     */
     public HotbarUI getHotbarUI() {
         return hotbarUI;
     }
 
+    /**
+     * Returns the backpack inventory ui.
+     * @return the backpack inventory ui
+     */
     public BackpackInventoryUI getBackpackInventoryUI() {
         return backpackUI;
     }
 
+    /**
+     * Sets the player.
+     * @param player the player value
+     */
     public void setPlayer(Player player) {
         if (player == null) {
             return;
@@ -192,10 +226,18 @@ public class GameUIService implements Service<GameMaster> {
         backpackUI.setInventory(player.getBackpack());
     }
 
+    /**
+     * Sets the shop.
+     * @param shop the shop value
+     */
     public void setShop(Shop shop) {
         this.shop = shop;
     }
 
+    /**
+     * Updates the current state.
+     * @param delta the delta value
+     */
     public void update(float delta) {
         if (Settings.doEnableDebugInfo()) {
             hardwareUpdateTimer -= delta;
@@ -274,6 +316,9 @@ public class GameUIService implements Service<GameMaster> {
         }
     }
 
+    /**
+     * Updates the hardware info.
+     */
     private void updateHardwareInfo() {
         cpu.setText("CPU: " + Components.getCpu());
         gpu.setText("GPU: " + Components.getGpu());
@@ -281,6 +326,11 @@ public class GameUIService implements Service<GameMaster> {
         memory.setText("RAM: " + Components.getPhysicalMemory());
     }
 
+    /**
+     * Renders render.
+     * @param isHUDShown the is hudshown value
+     * @param gameMaster the game master value
+     */
     public void render(boolean isHUDShown, GameMaster gameMaster) {
         if (!gameMaster.getPlayer().isAlive()) return;
         GUI.begin(windowWidth, windowHeight);
@@ -310,6 +360,13 @@ public class GameUIService implements Service<GameMaster> {
         glEnable(GL_DEPTH_TEST);
     }
 
+    /**
+     * Renders the hearts.
+     * @param heartsSheet the hearts sheet value
+     * @param startX the start x value
+     * @param startY the start y value
+     * @param player the player value
+     */
     public void renderHearts(SpriteSheet heartsSheet, float startX,
                              float startY, Player player) {
         if (player == null || heartsSheet == null) return;
@@ -342,10 +399,17 @@ public class GameUIService implements Service<GameMaster> {
         }
     }
 
+    /**
+     * Returns the uimanager.
+     * @return the uimanager
+     */
     public UIManager getUIManager() {
         return uiManager;
     }
 
+    /**
+     * Renders the chat history.
+     */
     private void renderChatHistory() {
         if (chatHistoryTimer <= 0.0f || chatHistory.isEmpty()) {
             return;
@@ -367,6 +431,10 @@ public class GameUIService implements Service<GameMaster> {
         }
     }
 
+    /**
+     * Adds the chat message.
+     * @param message the message value
+     */
     public void addChatMessage(String message) {
         if (message == null || message.isBlank()) return;
         chatHistory.add(message);
@@ -377,6 +445,9 @@ public class GameUIService implements Service<GameMaster> {
         chatHistoryTimer = CHAT_HISTORY_DURATION;
     }
 
+    /**
+     * Renders the hotbar label.
+     */
     private void renderHotbarLabel() {
         if (hotbarLabel == null || hotbarLabelTimer <= 0.0f) {
             return;
@@ -389,6 +460,9 @@ public class GameUIService implements Service<GameMaster> {
         GUI.drawNormalString(hotbarLabel, x, y, color);
     }
 
+    /**
+     * Performs the reset hotbar position operation.
+     */
     public void resetHotbarPosition() {
         hotbarUI.refreshSize();
         float hotbarX = windowWidth / 2.0f - hotbarUI.getWidth() / 2.0f;
@@ -397,6 +471,9 @@ public class GameUIService implements Service<GameMaster> {
         refreshHotbarLabel();
     }
 
+    /**
+     * Performs the refresh hotbar label operation.
+     */
     public void refreshHotbarLabel() {
         Item item = hotbarUI.getSelectedItem();
 
@@ -408,6 +485,9 @@ public class GameUIService implements Service<GameMaster> {
         }
     }
 
+    /**
+     * Renders the toasts.
+     */
     public void renderToasts() {
         if (ToastFactory.isEmpty()) {
             return;
@@ -418,6 +498,10 @@ public class GameUIService implements Service<GameMaster> {
         }
     }
 
+    /**
+     * Performs the select item operation.
+     * @param direction the direction value
+     */
     public void selectItem(int direction) {
         if (player == null) {
             return;
@@ -438,6 +522,10 @@ public class GameUIService implements Service<GameMaster> {
         }
     }
 
+    /**
+     * Performs the show hotbar label operation.
+     * @param item the item value
+     */
     private void showHotbarLabel(Item item) {
         if (item == null) {
             hotbarLabel = null;
@@ -449,6 +537,10 @@ public class GameUIService implements Service<GameMaster> {
         hotbarLabelTimer = K.UI.HOTBAR_LABEL_DURATION;
     }
 
+    /**
+     * Renders the toast.
+     * @param toast the toast value
+     */
     private void renderToast(Toast toast) {
         UIFont prefixFont = GUI.getNormalBoldFont();
         UIFont messageFont = GUI.getNormalFont();
@@ -507,6 +599,11 @@ public class GameUIService implements Service<GameMaster> {
         }
     }
 
+    /**
+     * Returns the toast accent.
+     * @param type the type value
+     * @return the toast accent
+     */
     private float[] getToastAccent(ToastData type) {
         return switch (type) {
             case SUCCESS -> K.Style.COLOR_TOAST_SUCCESS;
@@ -519,6 +616,11 @@ public class GameUIService implements Service<GameMaster> {
         };
     }
 
+    /**
+     * Returns the toast background.
+     * @param type the type value
+     * @return the toast background
+     */
     private float[] getToastBackground(ToastData type) {
         return switch (type) {
             case SUCCESS -> K.Style.COLOR_TOAST_SUCCESS_BG;
@@ -531,6 +633,11 @@ public class GameUIService implements Service<GameMaster> {
         };
     }
 
+    /**
+     * Returns the toast prefix.
+     * @param type the type value
+     * @return the toast prefix
+     */
     private String getToastPrefix(ToastData type) {
         return switch (type) {
             case PURCHASE, SUCCESS -> "+";
@@ -542,10 +649,19 @@ public class GameUIService implements Service<GameMaster> {
         };
     }
 
+    /**
+     * Performs the log action operation.
+     * @param cell the cell value
+     */
     public void logAction(BlockPos cell) {
         this.lastActionCell = new Vector2i(cell.x(), cell.y());
     }
 
+    /**
+     * Performs the on resize operation.
+     * @param width the width value
+     * @param height the height value
+     */
     public void onResize(int width, int height) {
         this.windowWidth = width;
         this.windowHeight = height;
@@ -565,21 +681,36 @@ public class GameUIService implements Service<GameMaster> {
         }
     }
 
+    /**
+     * Performs the open chat operation.
+     */
     public void openChat() {
         chatField.clear();
         chatField.show();
         uiManager.setFocusedElement(chatField);
     }
 
+    /**
+     * Performs the close chat operation.
+     */
     public void closeChat() {
         chatField.hide();
         uiManager.clearFocus();
     }
 
+    /**
+     * Returns the chat text.
+     * @return the chat text
+     */
     public String getChatText() {
         return chatField.getText();
     }
 
+    /**
+     * Performs the sell item operation.
+     * @param inv the inv value
+     * @param item the item value
+     */
     private void sellItem(Inventory inv, Item item) {
         Item targetItem = null;
         int cumulativeAmount = 0;
@@ -598,6 +729,12 @@ public class GameUIService implements Service<GameMaster> {
         }
     }
 
+    /**
+     * Performs the buy item operation.
+     * @param stock the stock value
+     * @param item the item value
+     * @param amount the amount value
+     */
     private void buyItem(Inventory stock, Item item, int amount) {
         if (amount <= 0) return;
 

@@ -6,6 +6,9 @@ import com.isofarm.utils.K;
 
 import java.util.*;
 
+/**
+ * Provides inventory behavior.
+ */
 @DataClass
 public class Inventory {
     private final List<InventorySlot> slots;
@@ -13,6 +16,9 @@ public class Inventory {
     private final InventorySlot backpackSlot;
     private final InventorySlot bookSlot;
 
+    /**
+     * Creates a new {@code Inventory} instance.
+     */
     public Inventory() {
         this.slots = new ArrayList<>();
         this.backpackSlot = new InventorySlot();
@@ -23,6 +29,10 @@ public class Inventory {
         }
     }
 
+    /**
+     * Returns the items.
+     * @return the items
+     */
     public Map<Item, Integer> getItems() {
         Map<Item, Integer> result = new LinkedHashMap<>();
 
@@ -35,34 +45,66 @@ public class Inventory {
         return Collections.unmodifiableMap(result);
     }
 
+    /**
+     * Returns the equipped extra items.
+     * @return the equipped extra items
+     */
     public List<InventorySlot> getEquippedExtraItems() {
         return equippedExtraItems;
     }
 
+    /**
+     * Returns the backpack slot.
+     * @return the backpack slot
+     */
     public InventorySlot getBackpackSlot() {
         return backpackSlot;
     }
 
+    /**
+     * Returns the book slot.
+     * @return the book slot
+     */
     public InventorySlot getBookSlot() {
         return bookSlot;
     }
 
+    /**
+     * Checks whether the backpack equipped condition is met.
+     * @return {@code true} if backpack equipped; otherwise {@code false}
+     */
     public boolean hasBackpackEquipped() {
         return !backpackSlot.isEmpty() && backpackSlot.getItem() instanceof Backpack;
     }
 
+    /**
+     * Checks whether the book equipped condition is met.
+     * @return {@code true} if book equipped; otherwise {@code false}
+     */
     public boolean hasBookEquipped() {
         return !bookSlot.isEmpty() && bookSlot.getItem() instanceof CraftingBook;
     }
 
+    /**
+     * Returns the backpack.
+     * @return the backpack
+     */
     public Backpack getBackpack() {
         return backpackSlot.getItem() instanceof Backpack backpack ? backpack : null;
     }
 
+    /**
+     * Returns the book.
+     * @return the book
+     */
     public CraftingBook getBook() {
         return bookSlot.getItem() instanceof CraftingBook book ? book : null;
     }
 
+    /**
+     * Performs the equip backpack operation.
+     * @param backpack the backpack value
+     */
     public void equipBackpack(Backpack backpack) {
         remove(backpack, 1);
         backpackSlot.setItem(backpack);
@@ -70,6 +112,10 @@ public class Inventory {
         SoundService.fx.playUseSound(SoundGroup.ITEMS);
     }
 
+    /**
+     * Performs the equip book operation.
+     * @param book the book value
+     */
     public void equipBook(Book book) {
         remove(book, 1);
         bookSlot.setItem(book);
@@ -77,6 +123,9 @@ public class Inventory {
         SoundService.fx.playUseSound(SoundGroup.ITEMS);
     }
 
+    /**
+     * Performs the unequip backpack operation.
+     */
     public void unequipBackpack() {
         Item backpack = backpackSlot.getItem();
         equippedExtraItems.remove(backpack);
@@ -85,6 +134,9 @@ public class Inventory {
         SoundService.fx.playUseSound(SoundGroup.ITEMS);
     }
 
+    /**
+     * Performs the unequip book operation.
+     */
     public void unequipBook() {
         Item book = bookSlot.getItem();
         equippedExtraItems.remove(book);
@@ -93,6 +145,12 @@ public class Inventory {
         SoundService.fx.playUseSound(SoundGroup.ITEMS);
     }
 
+    /**
+     * Adds add.
+     * @param item the item value
+     * @param amount the amount value
+     * @return the add result
+     */
     public int add(Item item, int amount) {
         if (item == null || amount <= 0) {
             return amount;
@@ -112,6 +170,14 @@ public class Inventory {
         return remaining;
     }
 
+    /**
+     * Adds the to existing stacks.
+     * @param item the item value
+     * @param amount the amount value
+     * @param start the start value
+     * @param end the end value
+     * @return the add to existing stacks result
+     */
     private int addToExistingStacks(Item item, int amount, int start, int end) {
         int remaining = amount;
 
@@ -141,6 +207,14 @@ public class Inventory {
         return remaining;
     }
 
+    /**
+     * Adds the to empty slots.
+     * @param item the item value
+     * @param amount the amount value
+     * @param start the start value
+     * @param end the end value
+     * @return the add to empty slots result
+     */
     private int addToEmptySlots(Item item, int amount, int start, int end) {
         int remaining = amount;
 
@@ -162,6 +236,11 @@ public class Inventory {
         return remaining;
     }
 
+    /**
+     * Removes remove.
+     * @param item the item value
+     * @param amount the amount value
+     */
     public void remove(Item item, int amount) {
         if (item == null || amount <= 0) {
             return;
@@ -188,6 +267,9 @@ public class Inventory {
         }
     }
 
+    /**
+     * Performs the sort operation.
+     */
     public void sort() {
         group();
         List<Stack> stacks = new ArrayList<>();
@@ -218,6 +300,9 @@ public class Inventory {
         }
     }
 
+    /**
+     * Performs the group operation.
+     */
     public void group() {
         for (int i = 0; i < slots.size(); i++) {
             InventorySlot currentSlot = slots.get(i);
@@ -254,6 +339,12 @@ public class Inventory {
         }
     }
 
+    /**
+     * Performs the take operation.
+     * @param index the index value
+     * @param amount the amount value
+     * @return the take result
+     */
     public int take(int index, int amount) {
         if (!isValidIndex(index) || amount <= 0) {
             return 0;
@@ -272,6 +363,13 @@ public class Inventory {
         return taken;
     }
 
+    /**
+     * Adds the to stack.
+     * @param targetIndex the target index value
+     * @param item the item value
+     * @param amount the amount value
+     * @return the add to stack result
+     */
     public int addToStack(int targetIndex, Item item, int amount) {
         if (!isValidIndex(targetIndex) || item == null || amount <= 0) {
             return 0;
@@ -304,10 +402,20 @@ public class Inventory {
         return added;
     }
 
+    /**
+     * Adds the one.
+     * @param targetIndex the target index value
+     * @param item the item value
+     * @return the add one result
+     */
     public int addOne(int targetIndex, Item item) {
         return addToStack(targetIndex, item, 1);
     }
 
+    /**
+     * Returns the hotbar items.
+     * @return the hotbar items
+     */
     public List<Item> getHotbarItems() {
         List<Item> hotbar = new ArrayList<>();
 
@@ -330,25 +438,45 @@ public class Inventory {
         return hotbar;
     }
 
+    /**
+     * Removes clear.
+     */
     public void clear() {
         for (InventorySlot slot : slots) {
             slot.clear();
         }
     }
 
+    /**
+     * Checks whether the full condition is met.
+     * @return {@code true} if full; otherwise {@code false}
+     */
     public boolean isFull() {
         return slots.stream().noneMatch(InventorySlot::isEmpty);
     }
 
+    /**
+     * Checks whether the empty condition is met.
+     * @return {@code true} if empty; otherwise {@code false}
+     */
     public boolean isEmpty() {
         return slots.stream().allMatch(
                 slot -> slot.isEmpty() || slot.getAmount() <= 0);
     }
 
+    /**
+     * Performs the size operation.
+     * @return the size result
+     */
     public int size() {
         return (int) slots.stream().filter(slot -> !slot.isEmpty()).count();
     }
 
+    /**
+     * Returns get.
+     * @param index the index value
+     * @return the get result
+     */
     public Item get(int index) {
         InventorySlot slot = getSlot(index);
 
@@ -359,6 +487,11 @@ public class Inventory {
         return slot.getItem();
     }
 
+    /**
+     * Returns get.
+     * @param item the item value
+     * @return the get result
+     */
     public Item get(Item item) {
         if (item == null) {
             return null;
@@ -373,6 +506,11 @@ public class Inventory {
         return null;
     }
 
+    /**
+     * Returns the amount.
+     * @param item the item value
+     * @return the amount
+     */
     public int getAmount(Item item) {
         if (item == null) {
             return 0;
@@ -389,29 +527,59 @@ public class Inventory {
         return amount;
     }
 
+    /**
+     * Checks whether the item of type condition is met.
+     * @param <T> the generic type
+     * @param type the type value
+     * @return {@code true} if item of type; otherwise {@code false}
+     */
     public <T extends Item> boolean hasItemOfType(Class<T> type) {
         return slots.stream().filter(slot -> !slot.isEmpty()).anyMatch(
                 slot -> type.isInstance(slot.getItem()) && slot.getAmount() > 0);
     }
 
+    /**
+     * Returns the item of type.
+     * @param <T> the generic type
+     * @param type the type value
+     * @return the item of type
+     */
     public <T extends Item> Optional<T> getItemOfType(Class<T> type) {
         return slots.stream().filter(slot -> !slot.isEmpty()).filter(
                 slot -> type.isInstance(slot.getItem()) && slot.getAmount() > 0).map(
                         slot -> type.cast(slot.getItem())).findFirst();
     }
 
+    /**
+     * Returns the first item id of type.
+     * @param <T> the generic type
+     * @param type the type value
+     * @return the first item id of type
+     */
     public <T extends Item> Optional<Byte> getFirstItemIdOfType(Class<T> type) {
         return slots.stream().filter(slot -> !slot.isEmpty()).filter(
                 slot -> type.isInstance(slot.getItem()) && slot.getAmount() > 0).map(
                         slot -> slot.getItem().getId()).findFirst();
     }
 
+    /**
+     * Checks whether the item with id condition is met.
+     * @param <T> the generic type
+     * @param type the type value
+     * @param id the id value
+     * @return {@code true} if item with id; otherwise {@code false}
+     */
     public <T extends Item> boolean hasItemWithId(Class<T> type, byte id) {
         return slots.stream().filter(slot -> !slot.isEmpty()).anyMatch(
                 slot -> type.isInstance(slot.getItem())
                         && slot.getItem().getId() == id && slot.getAmount() > 0);
     }
 
+    /**
+     * Returns the amount of material.
+     * @param id the id value
+     * @return the amount of material
+     */
     public int getAmountOfMaterial(MaterialID id) {
         return slots.stream()
                 .filter(slot -> !slot.isEmpty())
@@ -421,10 +589,19 @@ public class Inventory {
                 .sum();
     }
 
+    /**
+     * Returns the slots.
+     * @return the slots
+     */
     public List<InventorySlot> getSlots() {
         return Collections.unmodifiableList(slots);
     }
 
+    /**
+     * Returns the slot.
+     * @param index the index value
+     * @return the slot
+     */
     public InventorySlot getSlot(int index) {
         if (!isValidIndex(index)) {
             throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + slots.size());
@@ -433,14 +610,28 @@ public class Inventory {
         return slots.get(index);
     }
 
+    /**
+     * Returns the slot amount.
+     * @param index the index value
+     * @return the slot amount
+     */
     public int getSlotAmount(int index) {
         return getSlot(index).getAmount();
     }
 
+    /**
+     * Returns the hotbar start.
+     * @return the hotbar start
+     */
     public int getHotbarStart() {
         return (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
     }
 
+    /**
+     * Returns the max stack.
+     * @param item the item value
+     * @return the max stack
+     */
     public int getMaxStack(Item item) {
         if (item == null) {
             return 0;
@@ -454,6 +645,12 @@ public class Inventory {
         };
     }
 
+    /**
+     * Checks whether the same type condition is met.
+     * @param a the a value
+     * @param b the b value
+     * @return {@code true} if same type; otherwise {@code false}
+     */
     private boolean isSameType(Item a, Item b) {
         if (a == null || b == null) {
             return false;
@@ -473,6 +670,11 @@ public class Inventory {
 
     }
 
+    /**
+     * Checks whether the valid index condition is met.
+     * @param index the index value
+     * @return {@code true} if valid index; otherwise {@code false}
+     */
     private boolean isValidIndex(int index) {
         return index >= 0 && index < slots.size();
     }

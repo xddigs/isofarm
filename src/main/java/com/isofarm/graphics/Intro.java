@@ -19,6 +19,9 @@ import java.nio.IntBuffer;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
+/**
+ * Provides intro behavior.
+ */
 public class Intro {
     private static final float CLEAR_COLOR_ALPHA = 1.0f;
     private static long window;
@@ -34,18 +37,33 @@ public class Intro {
     private int windowedWidth;
     private int windowedHeight;
 
+    /**
+     * Creates a new {@code Intro} instance.
+     * @param window the window value
+     */
     public Intro(long window) {
         Intro.window = window;
     }
 
+    /**
+     * Returns the window.
+     * @return the window
+     */
     public static long getWindow() {
         return window;
     }
 
+    /**
+     * Returns the ui manager.
+     * @return the ui manager
+     */
     public static UIManager getUiManager() {
         return uiManager;
     }
 
+    /**
+     * Sets setup ui.
+     */
     public void setupUI() {
         updateFramebufferSize();
         float barWidth = 500f;
@@ -65,6 +83,9 @@ public class Intro {
         uiManager.resize(framebufferWidth, framebufferHeight);
     }
 
+    /**
+     * Performs the show operation.
+     */
     public void show() {
         setupUI();
         toggleFullscreen();
@@ -147,6 +168,10 @@ public class Intro {
         loop();
     }
 
+    /**
+     * Renders the loading frame.
+     * @param statusText the status text value
+     */
     private void renderLoadingFrame(String statusText) {
         updateFramebufferSize();
         glViewport(0, 0, framebufferWidth, framebufferHeight);
@@ -171,6 +196,9 @@ public class Intro {
         glFlush();
     }
 
+    /**
+     * Sets setup callbacks.
+     */
     public void setupCallbacks() {
         glfwSetFramebufferSizeCallback(window, (windowHandle, width, height) -> {
             if (width <= 0 || height <= 0) {
@@ -195,6 +223,9 @@ public class Intro {
         });
     }
 
+    /**
+     * Performs the reposition progress bar operation.
+     */
     private void repositionProgressBar() {
         if (progressBar == null) return;
 
@@ -207,6 +238,9 @@ public class Intro {
         progressBar.setPosition(x, y);
     }
 
+    /**
+     * Performs the loop operation.
+     */
     private void loop() {
         double lastTime = glfwGetTime();
         while (!glfwWindowShouldClose(window)) {
@@ -251,6 +285,9 @@ public class Intro {
         }
     }
 
+    /**
+     * Performs the toggle fullscreen operation.
+     */
     private void toggleFullscreen() {
         fullscreen = !fullscreen;
         if (fullscreen) {
@@ -306,6 +343,9 @@ public class Intro {
         repositionProgressBar();
     }
 
+    /**
+     * Updates the framebuffer size.
+     */
     private void updateFramebufferSize() {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer width = stack.mallocInt(1);

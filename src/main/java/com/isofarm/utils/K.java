@@ -3,17 +3,29 @@ package com.isofarm.utils;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
+/**
+ * Provides k behavior.
+ */
 @Utils
 public final class K {
 
+    /**
+     * Creates a new {@code K} instance.
+     */
     private K() {
     }
 
+    /**
+     * Provides camera behavior.
+     */
     public static final class Camera {
         public static final float FULL_DEGREES = 360.0f;
         public static final float HALF_DEGREES = 180.0f;
     }
 
+    /**
+     * Provides world behavior.
+     */
     public static final class World {
         public static final float GRAVITY = -25.0f;
         public static final float JUMP_FORCE = 9.0f;
@@ -32,11 +44,17 @@ public final class K {
         public static final float SHORTER_BLOCK_HEIGHT = 0.9375f;
     }
 
+    /**
+     * Provides window behavior.
+     */
     public static final class Window {
         public static final float DEFAULT_WIDTH = 1280.0f;
         public static final float DEFAULT_HEIGHT = 720.0f;
     }
 
+    /**
+     * Provides style behavior.
+     */
     public static final class Style {
         public static final float[] COLOR_TOAST_SUCCESS = {0.30f, 0.85f, 0.40f, 1.0f};
         public static final float[] COLOR_TOAST_SUCCESS_BG = {0.08f, 0.16f, 0.10f, 0.95f};
@@ -50,6 +68,9 @@ public final class K {
         public static final float[] COLOR_TOAST_REWARD_BG = {0.18f, 0.15f, 0.05f, 0.95f};
     }
 
+    /**
+     * Provides ui behavior.
+     */
     public static final class UI {
         public static final int INVENTORY_COLUMNS = 9;
         public static final int INVENTORY_ROWS = 6;
@@ -112,6 +133,9 @@ public final class K {
         public static final Vector4f UI_HOTBAR_SELECTED_COLOR = new Vector4f(0.35f, 0.9f, 0.35f, 1.0f);
     }
 
+    /**
+     * Provides paths behavior.
+     */
     public static final class Paths {
         public static final String FONT = "font/LeagueSpartan-Regular.ttf";
         public static final String FONT_BOLD = "font/LeagueSpartan-SemiBold.ttf";
@@ -155,12 +179,18 @@ public final class K {
         public static final String BOOK_ANIMATION = "assets/gui/book.png";
     }
 
+    /**
+     * Provides render behavior.
+     */
     public static final class Render {
         public static final float LINE_WIDTH = 2.0f;
         public static final int CROP_TOTAL_FRAMES = 5;
         public static final int PRIMARY_TEXTURE_UNIT = 0;
     }
 
+    /**
+     * Provides colors behavior.
+     */
     public static final class Colors {
         public static final Vector3f OUTLINE_DEFAULT = new Vector3f(0.0f, 0.0f, 0.0f);
         public static final Vector3f RAIN = new Vector3f(0.35f, 0.55f, 1.0f);

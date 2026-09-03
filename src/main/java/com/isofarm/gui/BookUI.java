@@ -13,6 +13,9 @@ import org.lwjgl.stb.STBTTBakedChar;
 
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
+/**
+ * Provides book ui behavior.
+ */
 @Singleton
 public class BookUI extends UIElement {
     private static final float ANIMATION_DURATION = 0.35f;
@@ -32,16 +35,35 @@ public class BookUI extends UIElement {
 
     private BookLine hoveredBookLine;
 
+    /**
+     * Creates a new {@code BookUI} instance.
+     * @param x the x value
+     * @param y the y value
+     * @param width the width value
+     * @param height the height value
+     */
     public BookUI(float x, float y, float width, float height) {
         super(x, y, width, height);
         hide();
     }
 
+    /**
+     * Initializes the component.
+     * @param x the x value
+     * @param y the y value
+     * @param width the width value
+     * @param height the height value
+     */
     public static void init(float x, float y, float width, float height) {
         if (bui != null) return;
         bui = new BookUI(x, y, width, height);
     }
 
+    /**
+     * Performs the ease in out cubic operation.
+     * @param t the t value
+     * @return the ease in out cubic result
+     */
     private static float easeInOutCubic(float t) {
         if (t < 0.5f) {
             return 4.0f * t * t * t;
@@ -50,19 +72,35 @@ public class BookUI extends UIElement {
         return 1.0f - (float) Math.pow(-2.0f * t + 2.0f, 3.0f) / 2.0f;
     }
 
+    /**
+     * Performs the lerp operation.
+     * @param start the start value
+     * @param end the end value
+     * @param t the t value
+     * @return the lerp result
+     */
     private static float lerp(float start, float end, float t) {
         return start + (end - start) * t;
     }
 
+    /**
+     * Renders render.
+     */
     @Override
     public void render() {
     }
 
+    /**
+     * Performs the open operation.
+     */
     public void open() {
         isClosing = false;
         isOpening = true;
     }
 
+    /**
+     * Performs the close operation.
+     */
     public void close() {
         if (isClosing) return;
 
@@ -70,18 +108,35 @@ public class BookUI extends UIElement {
         isOpening = false;
     }
 
+    /**
+     * Checks whether the closed condition is met.
+     * @return {@code true} if closed; otherwise {@code false}
+     */
     public boolean isClosed() {
         return !isOpening && !isClosing && animationProgress <= 0.0f;
     }
 
+    /**
+     * Checks whether the animating condition is met.
+     * @return {@code true} if animating; otherwise {@code false}
+     */
     public boolean isAnimating() {
         return isOpening || isClosing;
     }
 
+    /**
+     * Checks whether the open condition is met.
+     * @return {@code true} if open; otherwise {@code false}
+     */
     public boolean isOpen() {
         return !isOpening && !isClosing && animationProgress >= 1.0f;
     }
 
+    /**
+     * Updates the current state.
+     * @param book the book value
+     * @param animSheet the anim sheet value
+     */
     public void update(Book book, SpriteSheet animSheet) {
         if (book == null || !isOpen() || book.getPages().isEmpty() || animSheet == null) {
             hoveredBookLine = null;
@@ -97,6 +152,11 @@ public class BookUI extends UIElement {
         }
     }
 
+    /**
+     * Updates the book line.
+     * @param animSheet the anim sheet value
+     * @param book the book value
+     */
     private void updateBookLine(SpriteSheet animSheet, Book book) {
         float screenWidth = GUI.getScreenWidth();
         float screenHeight = GUI.getScreenHeight();
@@ -136,6 +196,13 @@ public class BookUI extends UIElement {
         }
     }
 
+    /**
+     * Performs the check hover operation.
+     * @param page the page value
+     * @param textX the text x value
+     * @param startY the start y value
+     * @param lineHeight the line height value
+     */
     private void checkHover(Page page, float textX, float startY, float lineHeight) {
         float textY = startY;
         for (BookLine bookLine : page.getLines()) {
@@ -149,6 +216,12 @@ public class BookUI extends UIElement {
         }
     }
 
+    /**
+     * Renders render.
+     * @param book the book value
+     * @param delta the delta value
+     * @param animSheet the anim sheet value
+     */
     public void render(Book book, float delta, SpriteSheet animSheet) {
         if (book == null || animSheet == null) return;
         float screenWidth = GUI.getScreenWidth();
@@ -183,6 +256,10 @@ public class BookUI extends UIElement {
         renderChildren();
     }
 
+    /**
+     * Updates the animation.
+     * @param delta the delta value
+     */
     private void updateAnimation(float delta) {
         float amount = delta / ANIMATION_DURATION;
 
@@ -205,6 +282,9 @@ public class BookUI extends UIElement {
         }
     }
 
+    /**
+     * Performs the next page operation.
+     */
     public void nextPage() {
         if (isFlippingPage) return;
 
@@ -213,6 +293,9 @@ public class BookUI extends UIElement {
         pageFlipTimer = 0.0f;
     }
 
+    /**
+     * Performs the previous page operation.
+     */
     public void previousPage() {
         if (isFlippingPage) return;
 
@@ -221,6 +304,15 @@ public class BookUI extends UIElement {
         pageFlipTimer = 0.0f;
     }
 
+    /**
+     * Renders the spread.
+     * @param book the book value
+     * @param x the x value
+     * @param y the y value
+     * @param animSheet the anim sheet value
+     * @param scale the scale value
+     * @param alpha the alpha value
+     */
     private void renderSpread(Book book, float x, float y, SpriteSheet animSheet, float scale, float alpha) {
         if (book.getPages().isEmpty() || alpha <= 0.0f) return;
         float bookWidth = animSheet.getFrameWidth() * scale;
@@ -238,6 +330,13 @@ public class BookUI extends UIElement {
         }
     }
 
+    /**
+     * Renders the page.
+     * @param page the page value
+     * @param textX the text x value
+     * @param startY the start y value
+     * @param alpha the alpha value
+     */
     private void renderPage(Page page, float textX, float startY, float alpha) {
         float textY = startY;
         float lineHeight = GUI.getNormalFont().getSize();
@@ -263,6 +362,13 @@ public class BookUI extends UIElement {
         }
     }
 
+    /**
+     * Checks whether the mouse hovering condition is met.
+     * @param x the x value
+     * @param y the y value
+     * @param text the text value
+     * @return {@code true} if mouse hovering; otherwise {@code false}
+     */
     public boolean isMouseHovering(float x, float y, String text) {
         if (text == null || text.isEmpty()) {
             return false;
@@ -303,6 +409,9 @@ public class BookUI extends UIElement {
                 && mouseY >= minY - verticalPadding && mouseY <= maxY + verticalPadding;
     }
 
+    /**
+     * Performs the click operation.
+     */
     private void click() {
         if (hoveredBookLine == null || !hoveredBookLine.isInteractive()) {
             return;
@@ -311,6 +420,10 @@ public class BookUI extends UIElement {
         hoveredBookLine.click();
     }
 
+    /**
+     * Performs the reload operation.
+     * @param openedBook the opened book value
+     */
     public void reload(Book openedBook) {
         openedBook.reload(GameMaster.game.getPlayer());
     }

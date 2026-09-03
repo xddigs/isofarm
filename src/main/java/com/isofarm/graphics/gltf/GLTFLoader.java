@@ -26,11 +26,22 @@ import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.stb.STBImage.*;
 
+/**
+ * Provides gltfloader behavior.
+ */
 @SuppressWarnings("all")
 public final class GLTFLoader {
 
+    /**
+     * Creates a new {@code GLTFLoader} instance.
+     */
     private GLTFLoader() {}
 
+    /**
+     * Loads load.
+     * @param path the path value
+     * @return the load result
+     */
     public static GLTFModel load(String path) {
         try {
             String json = loadText(path);
@@ -41,6 +52,12 @@ public final class GLTFLoader {
         }
     }
 
+    /**
+     * Loads the text.
+     * @param path the path value
+     * @return the load text result
+     * @throws IOException if the operation cannot be completed
+     */
     private static String loadText(String path) throws IOException {
         Path file = Path.of(path);
 
@@ -56,6 +73,11 @@ public final class GLTFLoader {
         return new String(resource.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
     }
 
+    /**
+     * Loads the model.
+     * @param root the root value
+     * @return the load model result
+     */
     private static GLTFModel loadModel(JsonObject root) {
         GLTFModel model = new GLTFModel();
         JsonArray buffersJson = root.getAsJsonArray("buffers");
@@ -141,6 +163,11 @@ public final class GLTFLoader {
         return model;
     }
 
+    /**
+     * Loads the buffers.
+     * @param buffersJson the buffers json value
+     * @return the load buffers result
+     */
     private static List<ByteBuffer> loadBuffers(JsonArray buffersJson) {
         List<ByteBuffer> buffers = new ArrayList<>();
         for (int i = 0; i < buffersJson.size(); i++) {
@@ -164,6 +191,14 @@ public final class GLTFLoader {
         return buffers;
     }
 
+    /**
+     * Performs the read float accessor operation.
+     * @param accessorIndex the accessor index value
+     * @param accessors the accessors value
+     * @param bufferViews the buffer views value
+     * @param buffers the buffers value
+     * @return the read float accessor result
+     */
     private static float[] readFloatAccessor(int accessorIndex, JsonArray accessors, JsonArray bufferViews,
                                              List<ByteBuffer> buffers) {
         JsonObject accessor = accessors.get(accessorIndex).getAsJsonObject();
@@ -196,6 +231,14 @@ public final class GLTFLoader {
         return result;
     }
 
+    /**
+     * Performs the read index accessor operation.
+     * @param accessorIndex the accessor index value
+     * @param accessors the accessors value
+     * @param bufferViews the buffer views value
+     * @param buffers the buffers value
+     * @return the read index accessor result
+     */
     private static int[] readIndexAccessor(int accessorIndex, JsonArray accessors,
                                            JsonArray bufferViews, List<ByteBuffer> buffers) {
         JsonObject accessor = accessors.get(accessorIndex).getAsJsonObject();
@@ -225,6 +268,11 @@ public final class GLTFLoader {
         return result;
     }
 
+    /**
+     * Performs the component count operation.
+     * @param type the type value
+     * @return the component count result
+     */
     private static int componentCount(String type) {
         return switch (type) {
             case "SCALAR" -> 1;
@@ -235,6 +283,11 @@ public final class GLTFLoader {
         };
     }
 
+    /**
+     * Performs the component size operation.
+     * @param componentType the component type value
+     * @return the component size result
+     */
     private static int componentSize(int componentType) {
         return switch (componentType) {
             case 5121 -> 1;
@@ -245,6 +298,15 @@ public final class GLTFLoader {
         };
     }
 
+    /**
+     * Creates and returns the mesh.
+     * @param positions the positions value
+     * @param normals the normals value
+     * @param uvs the uvs value
+     * @param indices the indices value
+     * @param textureId the texture id value
+     * @return the created mesh
+     */
     private static GLTFModel.GLTFMesh createMesh(float[] positions, float[] normals,
                                                  float[] uvs, int[] indices, int textureId) {
         int vao = glGenVertexArrays();
@@ -290,6 +352,12 @@ public final class GLTFLoader {
         return new GLTFModel.GLTFMesh(vao, vbo, ebo, indices.length, textureId);
     }
 
+    /**
+     * Loads the texture.
+     * @param root the root value
+     * @param imageIndex the image index value
+     * @return the load texture result
+     */
     private static int loadTexture(JsonObject root, int imageIndex) {
         JsonArray images = root.getAsJsonArray("images");
 
@@ -344,6 +412,13 @@ public final class GLTFLoader {
         }
     }
 
+    /**
+     * Returns the texture id for primitive.
+     * @param root the root value
+     * @param primitive the primitive value
+     * @param textureIds the texture ids value
+     * @return the texture id for primitive
+     */
     private static int getTextureIdForPrimitive(JsonObject root, JsonObject primitive, List<Integer> textureIds) {
         if (!primitive.has("material")) {
             return 0;
@@ -393,6 +468,13 @@ public final class GLTFLoader {
         return textureId;
     }
 
+    /**
+     * Performs the read vector3 operation.
+     * @param object the object value
+     * @param property the property value
+     * @param defaultValue the default value value
+     * @return the read vector3 result
+     */
     private static Vector3f readVector3(JsonObject object, String property, Vector3f defaultValue) {
         if (!object.has(property)) {
             return new Vector3f(defaultValue);
@@ -401,6 +483,11 @@ public final class GLTFLoader {
         return new Vector3f(array.get(0).getAsFloat(), array.get(1).getAsFloat(), array.get(2).getAsFloat());
     }
 
+    /**
+     * Performs the read quaternion operation.
+     * @param object the object value
+     * @return the read quaternion result
+     */
     private static Quaternionf readQuaternion(JsonObject object) {
         if (!object.has("rotation")) {
             return new Quaternionf();

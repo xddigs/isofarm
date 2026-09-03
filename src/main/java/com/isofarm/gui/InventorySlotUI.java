@@ -11,6 +11,9 @@ import org.joml.Vector4f;
 
 import java.lang.Character;
 
+/**
+ * Provides inventory slot ui behavior.
+ */
 @SuppressWarnings("all")
 public class InventorySlotUI extends UIElement {
     private final SlotType slotType;
@@ -27,6 +30,14 @@ public class InventorySlotUI extends UIElement {
     private int lastAmount = 0;
     private Item lastItem = null;
     private float squishTimer = 0.0f;
+    /**
+     * Creates a new {@code InventorySlotUI} instance.
+     * @param x the x value
+     * @param y the y value
+     * @param width the width value
+     * @param height the height value
+     * @param slotType the slot type value
+     */
     public InventorySlotUI(float x, float y, float width, float height, SlotType slotType) {
         super(x, y, width, height);
         this.slotType = slotType;
@@ -34,6 +45,10 @@ public class InventorySlotUI extends UIElement {
         setSlot(getSlotType());
     }
 
+    /**
+     * Updates the current state.
+     * @param delta the delta value
+     */
     @Override
     public void update(float delta) {
         super.update(delta);
@@ -56,10 +71,16 @@ public class InventorySlotUI extends UIElement {
         }
     }
 
+    /**
+     * Performs the trigger squish operation.
+     */
     public void triggerSquish() {
         this.squishTimer = K.UI.SQUISH_DURATION;
     }
 
+    /**
+     * Renders render.
+     */
     @Override
     public void render() {
         float x = getAbsoluteX();
@@ -86,6 +107,10 @@ public class InventorySlotUI extends UIElement {
         renderChildren();
     }
 
+    /**
+     * Returns the slot type.
+     * @return the slot type
+     */
     public InventorySlot getSlotType() {
         return switch (slotType) {
             case BACKPACK -> backpackSlot;
@@ -94,6 +119,10 @@ public class InventorySlotUI extends UIElement {
         };
     }
 
+    /**
+     * Sets the slot.
+     * @param slot the slot value
+     */
     public void setSlot(InventorySlot slot) {
         if (slotType == SlotType.BACKPACK) {
             this.backpackSlot = slot;
@@ -102,6 +131,9 @@ public class InventorySlotUI extends UIElement {
         }
     }
 
+    /**
+     * Renders the item.
+     */
     private void renderItem() {
         float iconSize = Settings.getScaledIcon();
         float scaleX = 1.0f;
@@ -127,6 +159,9 @@ public class InventorySlotUI extends UIElement {
         renderAmount();
     }
 
+    /**
+     * Renders the tool durability.
+     */
     private void renderToolDurability() {
         Item item = getItem();
         if (!(item instanceof Tool tool)) return;
@@ -166,6 +201,9 @@ public class InventorySlotUI extends UIElement {
                 new Vector4f(red, green, blue, getWorldOpacity()));
     }
 
+    /**
+     * Renders the amount.
+     */
     private void renderAmount() {
         Item item = getItem();
         InventorySlot currentSlot = getSlotType();
@@ -190,6 +228,11 @@ public class InventorySlotUI extends UIElement {
                 K.UI.UI_TEXT_COLOR.y, K.UI.UI_TEXT_COLOR.z, K.UI.UI_TEXT_COLOR.w * getWorldOpacity()));
     }
 
+    /**
+     * Returns the text width.
+     * @param value the value value
+     * @return the text width
+     */
     private float getTextWidth(String value) {
         float width = 0.0f;
         for (int i = 0; i < value.length(); ) {
@@ -206,60 +249,116 @@ public class InventorySlotUI extends UIElement {
         return width;
     }
 
+    /**
+     * Returns the slot.
+     * @return the slot
+     */
     public InventorySlot getSlot() {
         return slot;
     }
 
+    /**
+     * Returns the backpack slot.
+     * @return the backpack slot
+     */
     public InventorySlot getBackpackSlot() {
         return backpackSlot;
     }
 
+    /**
+     * Returns the item.
+     * @return the item
+     */
     public Item getItem() {
         InventorySlot currentSlot = getSlotType();
         return currentSlot != null ? currentSlot.getItem() : null;
     }
 
+    /**
+     * Checks whether the empty condition is met.
+     * @return {@code true} if empty; otherwise {@code false}
+     */
     public boolean isEmpty() {
         InventorySlot currentSlot = getSlotType();
         return currentSlot == null || currentSlot.isEmpty();
     }
 
+    /**
+     * Returns the sprite sheet.
+     * @return the sprite sheet
+     */
     public SpriteSheet getSpriteSheet() {
         return spriteSheet;
     }
 
+    /**
+     * Sets the sprite sheet.
+     * @param spriteSheet the sprite sheet value
+     */
     public void setSpriteSheet(SpriteSheet spriteSheet) {
         this.spriteSheet = spriteSheet;
     }
 
+    /**
+     * Returns the sprite frame.
+     * @return the sprite frame
+     */
     public int getSpriteFrame() {
         return spriteFrame;
     }
 
+    /**
+     * Sets the sprite frame.
+     * @param spriteFrame the sprite frame value
+     */
     public void setSpriteFrame(int spriteFrame) {
         this.spriteFrame = Math.max(0, spriteFrame);
     }
 
+    /**
+     * Checks whether the selected condition is met.
+     * @return {@code true} if selected; otherwise {@code false}
+     */
     public boolean isSelected() {
         return selected;
     }
 
+    /**
+     * Sets the selected.
+     * @param selected the selected value
+     */
     public void setSelected(boolean selected) {
         this.selected = selected;
     }
 
+    /**
+     * Checks whether the hovered condition is met.
+     * @return {@code true} if hovered; otherwise {@code false}
+     */
     public boolean isHovered() {
         return hovered;
     }
 
+    /**
+     * Sets the hovered.
+     * @param hovered the hovered value
+     */
     public void setHovered(boolean hovered) {
         this.hovered = hovered;
     }
 
+    /**
+     * Returns the count font.
+     * @return the count font
+     */
     public UIFont getCountFont() {
         return countFont;
     }
 
+    /**
+     * Sets the count font.
+     * @param countFont the count font value
+     */
     public void setCountFont(UIFont countFont) {
         if (countFont != null) {
             this.countFont = countFont;

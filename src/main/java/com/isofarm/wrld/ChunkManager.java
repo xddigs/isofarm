@@ -14,6 +14,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Provides chunk manager behavior.
+ */
 public class ChunkManager {
     private static final float SOIL_GRASS_TIME = 10.0f;
     private final World world;
@@ -28,6 +31,11 @@ public class ChunkManager {
     private int lastPlayerChunkX = Integer.MAX_VALUE;
     private int lastPlayerChunkZ = Integer.MAX_VALUE;
 
+    /**
+     * Creates a new {@code ChunkManager} instance.
+     * @param world the world value
+     * @param waterSimulation the water simulation value
+     */
     public ChunkManager(World world, WaterSimulation waterSimulation) {
         this.world = world;
         this.generator = new WorldGenerator(world, waterSimulation);
@@ -37,6 +45,12 @@ public class ChunkManager {
         this.meshExecutor = Executors.newFixedThreadPool(threads);
     }
 
+    /**
+     * Updates the current state.
+     * @param playerX the player x value
+     * @param playerZ the player z value
+     * @param delta the delta value
+     */
     public void update(float playerX, float playerZ, float delta) {
         processCompletedMeshes();
         updateSoil(delta);
@@ -51,6 +65,11 @@ public class ChunkManager {
         }
     }
 
+    /**
+     * Performs the build single chunk mesh operation.
+     * @param chunkX the chunk x value
+     * @param chunkZ the chunk z value
+     */
     public void buildSingleChunkMesh(int chunkX, int chunkZ) {
         Chunk chunk = world.getChunks().get(world.get2DKey(chunkX, chunkZ));
         if (chunk == null) return;
@@ -64,6 +83,11 @@ public class ChunkManager {
         }
     }
 
+    /**
+     * Updates the loaded chunks.
+     * @param centerChunkX the center chunk x value
+     * @param centerChunkZ the center chunk z value
+     */
     public void updateLoadedChunks(int centerChunkX, int centerChunkZ) {
         int r = Settings.getRenderDistance();
         int unloadDist = r + Settings.getUnloadMargin();
@@ -119,6 +143,10 @@ public class ChunkManager {
         }
     }
 
+    /**
+     * Performs the queue mesh build operation.
+     * @param chunk the chunk value
+     */
     private void queueMeshBuild(Chunk chunk) {
         long key = world.get2DKey(chunk.getChunkX(), chunk.getChunkZ());
 
@@ -136,6 +164,9 @@ public class ChunkManager {
         });
     }
 
+    /**
+     * Performs the process completed meshes operation.
+     */
     private void processCompletedMeshes() {
         MeshBuildResult result;
         while ((result = completedMeshes.poll()) != null) {
@@ -158,6 +189,11 @@ public class ChunkManager {
         }
     }
 
+    /**
+     * Performs the rebuild chunk mesh at operation.
+     * @param worldX the world x value
+     * @param worldZ the world z value
+     */
     public void rebuildChunkMeshAt(int worldX, int worldZ) {
         int chunkX = Math.floorDiv(worldX, Chunk.SIZE_X);
         int chunkZ = Math.floorDiv(worldZ, Chunk.SIZE_Z);
@@ -175,6 +211,11 @@ public class ChunkManager {
         if (localZ == Chunk.SIZE_Z - 1) rebuildSingleChunk(chunkX, chunkZ + 1);
     }
 
+    /**
+     * Performs the rebuild single chunk operation.
+     * @param cx the cx value
+     * @param cz the cz value
+     */
     private void rebuildSingleChunk(int cx, int cz) {
         Chunk chunk = world.getChunks().get(world.get2DKey(cx, cz));
         if (chunk != null) {
@@ -182,6 +223,11 @@ public class ChunkManager {
         }
     }
 
+    /**
+     * Updates the grass.
+     * @param chunkX the chunk x value
+     * @param chunkZ the chunk z value
+     */
     private void updateGrass(int chunkX, int chunkZ) {
         int startX = chunkX * Chunk.SIZE_X;
         int startZ = chunkZ * Chunk.SIZE_Z;
@@ -204,6 +250,10 @@ public class ChunkManager {
         }
     }
 
+    /**
+     * Updates the soil.
+     * @param delta the delta value
+     */
     private void updateSoil(float delta) {
         var iterator = soilTimers.entrySet().iterator();
 
@@ -243,19 +293,44 @@ public class ChunkManager {
         }
     }
 
+    /**
+     * Performs the start soil timer operation.
+     * @param x the x value
+     * @param y the y value
+     * @param z the z value
+     */
     private void startSoilTimer(int x, int y, int z) {
         SoilPosition position = new SoilPosition(x, y, z);
         soilTimers.putIfAbsent(position, SOIL_GRASS_TIME);
     }
 
+    /**
+     * Checks whether the soil condition is met.
+     * @param block the block value
+     * @return {@code true} if soil; otherwise {@code false}
+     */
     private boolean isSoil(byte block) {
         return block == BlockData.DIRT.getId() || block == BlockData.TILLED_DIRT.getId();
     }
 
+    /**
+     * Checks whether the exposed to air condition is met.
+     * @param x the x value
+     * @param y the y value
+     * @param z the z value
+     * @return {@code true} if exposed to air; otherwise {@code false}
+     */
     private boolean isExposedToAir(int x, int y, int z) {
         return world.getBlockTypeAt(x, y + 1, z) == BlockData.AIR.getId();
     }
 
+    /**
+     * Checks whether the water nearby condition is met.
+     * @param x the x value
+     * @param y the y value
+     * @param z the z value
+     * @return {@code true} if water nearby; otherwise {@code false}
+     */
     private boolean hasWaterNearby(int x, int y, int z) {
         for (int dx = -1; dx <= 1; dx++) {
             for (int dz = -1; dz <= 1; dz++) {
@@ -268,6 +343,10 @@ public class ChunkManager {
         return false;
     }
 
+    /**
+     * Performs the cleanup soil timers for chunk operation.
+     * @param chunk the chunk value
+     */
     private void cleanupSoilTimersForChunk(Chunk chunk) {
         int minX = chunk.getChunkX() * Chunk.SIZE_X;
         int maxX = minX + Chunk.SIZE_X;
@@ -277,18 +356,32 @@ public class ChunkManager {
         soilTimers.keySet().removeIf(pos -> pos.x() >= minX && pos.x() < maxX && pos.z() >= minZ && pos.z() < maxZ);
     }
 
+    /**
+     * Returns the chunk meshes.
+     * @return the chunk meshes
+     */
     public Map<Chunk, ChunkMeshBuilder.ChunkRenderMesh> getChunkMeshes() {
         return chunkMeshes;
     }
 
+    /**
+     * Returns the dirty chunks.
+     * @return the dirty chunks
+     */
     public Set<Long> getDirtyChunks() {
         return dirtyChunks;
     }
 
+    /**
+     * Performs the shutdown operation.
+     */
     public void shutdown() {
         meshExecutor.shutdownNow();
     }
 
+    /**
+     * Performs the dispose operation.
+     */
     public void dispose() {
         meshExecutor.shutdownNow();
         completedMeshes.clear();
@@ -298,11 +391,34 @@ public class ChunkManager {
         soilTimers.clear();
     }
 
+    /**
+     * Returns the last player chunk x.
+     * @return the last player chunk x
+     */
     public int getLastPlayerChunkX() { return lastPlayerChunkX; }
+    /**
+     * Sets the last player chunk x.
+     * @param x the x value
+     */
     public void setLastPlayerChunkX(int x) { this.lastPlayerChunkX = x; }
+    /**
+     * Returns the last player chunk z.
+     * @return the last player chunk z
+     */
     public int getLastPlayerChunkZ() { return lastPlayerChunkZ; }
+    /**
+     * Sets the last player chunk z.
+     * @param z the z value
+     */
     public void setLastPlayerChunkZ(int z) { this.lastPlayerChunkZ = z; }
+    /**
+     * Returns the generator.
+     * @return the generator
+     */
     public WorldGenerator getGenerator() { return generator; }
 
+    /**
+     * Stores mesh build result data.
+     */
     private record MeshBuildResult(Chunk chunk, ChunkMeshBuilder.ChunkMeshData data) {}
 }

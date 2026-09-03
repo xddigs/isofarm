@@ -5,6 +5,9 @@ import com.isofarm.entity.Moon;
 import com.isofarm.entity.Sun;
 import org.joml.Vector3f;
 
+/**
+ * Provides celestial lighting behavior.
+ */
 public class CelestialLighting {
     private final Sun sun;
     private final Moon moon;
@@ -15,6 +18,11 @@ public class CelestialLighting {
     private float intensity;
     private float ambientIntensity;
 
+    /**
+     * Creates a new {@code CelestialLighting} instance.
+     * @param sun the sun value
+     * @param moon the moon value
+     */
     public CelestialLighting(Sun sun, Moon moon) {
         this.sun = sun;
         this.moon = moon;
@@ -22,6 +30,11 @@ public class CelestialLighting {
         this.color = new Vector3f();
     }
 
+    /**
+     * Updates the current state.
+     * @param hoveredCell the hovered cell value
+     * @param timeOfDay the time of day value
+     */
     public void update(BlockPos hoveredCell, float timeOfDay) {
         sun.update(hoveredCell, timeOfDay);
         moon.update(hoveredCell, timeOfDay);
@@ -43,26 +56,50 @@ public class CelestialLighting {
         ambientIntensity = 0.35f + daylight * 0.40f;
     }
 
+    /**
+     * Returns the direction.
+     * @return the direction
+     */
     public Vector3f getDirection() {
         return direction;
     }
 
+    /**
+     * Returns the color.
+     * @return the color
+     */
     public Vector3f getColor() {
         return color;
     }
 
+    /**
+     * Returns the intensity.
+     * @return the intensity
+     */
     public float getIntensity() {
         return intensity;
     }
 
+    /**
+     * Returns the ambient intensity.
+     * @return the ambient intensity
+     */
     public float getAmbientIntensity() {
         return ambientIntensity;
     }
 
+    /**
+     * Returns the sun.
+     * @return the sun
+     */
     public Sun getSun() {
         return sun;
     }
 
+    /**
+     * Returns the moon.
+     * @return the moon
+     */
     public Moon getMoon() {
         return moon;
     }

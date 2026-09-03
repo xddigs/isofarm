@@ -28,6 +28,9 @@ import java.util.List;
 import static org.joml.Math.lerp;
 import static org.lwjgl.glfw.GLFW.*;
 
+/**
+ * Provides game interaction behavior.
+ */
 @Singleton
 @GodObject
 public class GameInteraction {
@@ -49,8 +52,17 @@ public class GameInteraction {
 
     private boolean isSmartShift = false;
     
+    /**
+     * Creates a new {@code GameInteraction} instance.
+     */
     private GameInteraction() {}
     
+    /**
+     * Updates the current state.
+     * @param gameMaster the game master value
+     * @param selectedItem the selected item value
+     * @return the update result
+     */
     public BlockPos update(GameMaster gameMaster, Item selectedItem) {
         Player player = GameMaster.game.getPlayer();
         Inventory inventory = player.getInventory();
@@ -210,6 +222,9 @@ public class GameInteraction {
         return hoveredCell;
     }
 
+    /**
+     * Adds the item.
+     */
     public void addItem() {
         Player player = GameMaster.game.getPlayer();
         if (player == null) return;
@@ -237,6 +252,11 @@ public class GameInteraction {
         }
     }
 
+    /**
+     * Performs the drop item operation.
+     * @param selectedItem the selected item value
+     * @param dropAll the drop all value
+     */
     public void dropItem(Item selectedItem, boolean dropAll) {
         if (selectedItem == null) return;
         if (selectedItem instanceof Undroppable) {
@@ -283,6 +303,9 @@ public class GameInteraction {
         }
     }
 
+    /**
+     * Performs the pick up operation.
+     */
     private void pickUp() {
         Player player = GameMaster.game.getPlayer();
         if (player == null) return;
@@ -332,11 +355,21 @@ public class GameInteraction {
         }
     }
 
+    /**
+     * Checks whether the within range condition is met.
+     * @param cell the cell value
+     * @return {@code true} if within range; otherwise {@code false}
+     */
     private boolean isWithinRange(BlockPos cell) {
         float distance = getDistanceToBlock(cell);
         return distance <= Settings.getMaxInteractionDistance();
     }
 
+    /**
+     * Returns the distance to block.
+     * @param cell the cell value
+     * @return the distance to block
+     */
     public float getDistanceToBlock(BlockPos cell) {
         if (cell == null) return Float.MAX_VALUE;
         if (GameMaster.game.getPlayer() == null) return Float.MAX_VALUE;
@@ -352,6 +385,11 @@ public class GameInteraction {
         return (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
 
+    /**
+     * Performs the breaking operation.
+     * @param gameMaster the game master value
+     * @param cell the cell value
+     */
     private void breaking(GameMaster gameMaster, BlockPos cell) {
         if (BookService.bs.isOpen()) return;
         World world = GameMaster.game.getWorld();
@@ -442,6 +480,14 @@ public class GameInteraction {
         }
     }
 
+    /**
+     * Performs the break block operation.
+     * @param gameMaster the game master value
+     * @param cell the cell value
+     * @param blockData the block data value
+     * @param blockId the block id value
+     * @param selectedItem the selected item value
+     */
     private void breakBlock(GameMaster gameMaster, BlockPos cell, BlockData blockData,
                             byte blockId, Item selectedItem) {
         World world = GameMaster.game.getWorld();
@@ -529,6 +575,9 @@ public class GameInteraction {
         this.breakTimeout = TIMEOUT;
     }
 
+    /**
+     * Performs the reset breaking operation.
+     */
     private void resetBreaking() {
         breakingX = Integer.MIN_VALUE;
         breakingY = Integer.MIN_VALUE;
@@ -538,6 +587,12 @@ public class GameInteraction {
         lastBreakTime = 0L;
     }
 
+    /**
+     * Performs the place operation.
+     * @param gameMaster the game master value
+     * @param cell the cell value
+     * @param selectedItem the selected item value
+     */
     private void place(GameMaster gameMaster, BlockPos cell,
                        Item selectedItem) {
         World world = GameMaster.game.getWorld();
@@ -626,6 +681,12 @@ public class GameInteraction {
         }
     }
 
+    /**
+     * Performs the break above operation.
+     * @param x the x value
+     * @param y the y value
+     * @param z the z value
+     */
     private void breakAbove(int x, int y, int z) {
         int aboveY = y + 1;
         if (aboveY >= Chunk.SIZE_Y) {
@@ -656,6 +717,11 @@ public class GameInteraction {
         GameMaster.game.rebuildChunkMeshAt(x, z);
     }
 
+    /**
+     * Returns the block data.
+     * @param blockId the block id value
+     * @return the block data
+     */
     private BlockData getBlockData(byte blockId) {
         for (BlockData data : BlockData.values()) {
             if (data.getId() == blockId) {
@@ -666,18 +732,34 @@ public class GameInteraction {
         return null;
     }
 
+    /**
+     * Checks whether the breaking block condition is met.
+     * @return {@code true} if breaking block; otherwise {@code false}
+     */
     public boolean isBreakingBlock() {
         return breakProgress > 0.0f && breakingX != Integer.MIN_VALUE;
     }
 
+    /**
+     * Returns the breaking block pos.
+     * @return the breaking block pos
+     */
     public Vector3i getBreakingBlockPos() {
         return new Vector3i(breakingX, breakingY, breakingZ);
     }
 
+    /**
+     * Returns the break progress.
+     * @return the break progress
+     */
     public float getBreakProgress() {
         return breakProgress;
     }
 
+    /**
+     * Checks whether the smart shift active condition is met.
+     * @return {@code true} if smart shift active; otherwise {@code false}
+     */
     public boolean isSmartShiftActive() {
         return isSmartShift;
     }

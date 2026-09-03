@@ -7,6 +7,9 @@ import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Provides time service behavior.
+ */
 @Singleton
 public class TimeService {
     public static final TimeService ts = new TimeService();
@@ -25,8 +28,16 @@ public class TimeService {
     private int year = 0;
     private float timeScale = 2.0f;
 
+    /**
+     * Creates a new {@code TimeService} instance.
+     */
     private TimeService() {}
 
+    /**
+     * Updates the current state.
+     * @param delta the delta value
+     * @param weatherService the weather service value
+     */
     public void update(float delta, WeatherService weatherService) {
         secondAccumulator += delta * timeScale;
         while (secondAccumulator >= REAL_SECONDS_PER_IN_GAME_MINUTE) {
@@ -35,46 +46,90 @@ public class TimeService {
         }
     }
 
+    /**
+     * Returns the minute.
+     * @return the minute
+     */
     public int getMinute() {
         return minute;
     }
 
+    /**
+     * Returns the hour.
+     * @return the hour
+     */
     public int getHour() {
         return hour;
     }
 
+    /**
+     * Returns the day.
+     * @return the day
+     */
     public int getDay() {
         return day;
     }
 
+    /**
+     * Returns the current season.
+     * @return the current season
+     */
     public Season getCurrentSeason() {
         return currentSeason;
     }
 
+    /**
+     * Returns the year.
+     * @return the year
+     */
     public int getYear() {
         return year;
     }
 
+    /**
+     * Returns the formatted time.
+     * @return the formatted time
+     */
     public String getFormattedTime() {
         return Local.lang.f("time.formatted", year, currentSeason.getDisplayName(), day, hour, minute);
     }
 
+    /**
+     * Sets the time scale.
+     * @param timeScale the time scale value
+     */
     public void setTimeScale(float timeScale) {
         this.timeScale = Math.max(0.0f, timeScale);
     }
 
+    /**
+     * Returns the time scale.
+     * @return the time scale
+     */
     public float getTimeScale() {
         return timeScale;
     }
 
+    /**
+     * Adds the time scale.
+     * @param delta the delta value
+     */
     public void addTimeScale(float delta) {
         setTimeScale(getTimeScale() + delta);
     }
 
+    /**
+     * Performs the slow time scale operation.
+     * @param delta the delta value
+     */
     public void slowTimeScale(float delta) {
         setTimeScale(getTimeScale() * (1.0f - delta));
     }
 
+    /**
+     * Performs the advance minute operation.
+     * @param weatherService the weather service value
+     */
     private void advanceMinute(WeatherService weatherService) {
         minute++;
         if (minute >= MINUTES_PER_HOUR) {
@@ -83,6 +138,10 @@ public class TimeService {
         }
     }
 
+    /**
+     * Performs the advance hour operation.
+     * @param weatherService the weather service value
+     */
     private void advanceHour(WeatherService weatherService) {
         hour++;
         weatherService.setWeather(weatherService.nextWeather());
@@ -91,6 +150,9 @@ public class TimeService {
         }
     }
 
+    /**
+     * Performs the advance day operation.
+     */
     public void advanceDay() {
         hour = STARTING_HOUR;
         minute = 0;
@@ -105,6 +167,9 @@ public class TimeService {
         log.info("New day started: Year {} {}, Day {}", year, currentSeason, day);
     }
 
+    /**
+     * Performs the advance season operation.
+     */
     private void advanceSeason() {
         Season[] seasons = Season.values();
         int nextSeasonIndex = (currentSeason.ordinal() + 1) % seasons.length;
@@ -118,6 +183,10 @@ public class TimeService {
         log.info("Season changed to {}", currentSeason);
     }
 
+    /**
+     * Returns the sky color.
+     * @return the sky color
+     */
     public static Vector3f getSkyColor() {
         float time = hour + minute / 60.0f;
         Vector3f cloudy = new Vector3f(0.48f, 0.48f, 0.48f);
@@ -158,6 +227,13 @@ public class TimeService {
         return result;
     }
 
+    /**
+     * Performs the smooth step operation.
+     * @param start the start value
+     * @param end the end value
+     * @param value the value value
+     * @return the smooth step result
+     */
     private static float smoothStep(float start, float end, float value) {
         float t = (value - start) / (end - start);
         t = Math.clamp(t, 0.0f, 1.0f);

@@ -4,6 +4,9 @@ import com.isofarm.data.BlockData;
 
 import java.util.Random;
 
+/**
+ * Provides world generator behavior.
+ */
 public class WorldGenerator {
     private static final int ISLAND_CENTER_X = 0;
     private static final int ISLAND_CENTER_Z = 0;
@@ -19,10 +22,21 @@ public class WorldGenerator {
     private final int poolMinZ;
     private int treeX, treeZ;
 
+    /**
+     * Creates a new {@code WorldGenerator} instance.
+     * @param world the world value
+     * @param waterSimulation the water simulation value
+     */
     public WorldGenerator(World world, WaterSimulation waterSimulation) {
         this(world, waterSimulation, new Random().nextLong());
     }
 
+    /**
+     * Creates a new {@code WorldGenerator} instance.
+     * @param world the world value
+     * @param waterSimulation the water simulation value
+     * @param seed the seed value
+     */
     public WorldGenerator(World world, WaterSimulation waterSimulation, long seed) {
         WorldGenerator.world = world;
         WorldGenerator.waterSimulation = waterSimulation;
@@ -38,10 +52,21 @@ public class WorldGenerator {
         } while (isInsidePool(treeX, treeZ));
     }
 
+    /**
+     * Checks whether the inside pool condition is met.
+     * @param x the x value
+     * @param z the z value
+     * @return {@code true} if inside pool; otherwise {@code false}
+     */
     private boolean isInsidePool(int x, int z) {
         return (x >= poolMinX && x <= poolMinX + 1) && (z >= poolMinZ && z <= poolMinZ + 1);
     }
 
+    /**
+     * Performs the generate chunk operation.
+     * @param chunkX the chunk x value
+     * @param chunkZ the chunk z value
+     */
     public void generateChunk(int chunkX, int chunkZ) {
         Chunk chunk = world.getOrCreateChunk(chunkX, chunkZ);
         long chunkSeed = seed ^ ((long) chunkX * 341873128712L + (long) chunkZ * 132897987541L);
@@ -104,6 +129,10 @@ public class WorldGenerator {
         }
     }
 
+    /**
+     * Performs the generate vegetation operation.
+     * @param random the random value
+     */
     private void generateVegetation(Random random) {
         generateTree(treeX, treeZ, random);
         for (int i = 0; i < 16; i++) {
@@ -126,6 +155,13 @@ public class WorldGenerator {
         }
     }
 
+    /**
+     * Performs the generate cluster operation.
+     * @param centerX the center x value
+     * @param centerZ the center z value
+     * @param plant the plant value
+     * @param random the random value
+     */
     public void generateCluster(int centerX, int centerZ, BlockData plant, Random random) {
         int clusterRadius = 2;
         int clusterSize = 4 + random.nextInt(5);
@@ -156,6 +192,12 @@ public class WorldGenerator {
         }
     }
 
+    /**
+     * Performs the generate tree operation.
+     * @param worldX the world x value
+     * @param worldZ the world z value
+     * @param random the random value
+     */
     public static void generateTree(int worldX, int worldZ, Random random) {
         int trunkHeight = 4 + random.nextInt(5);
 

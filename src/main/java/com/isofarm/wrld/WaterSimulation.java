@@ -9,6 +9,9 @@ import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
 
+/**
+ * Provides water simulation behavior.
+ */
 @SuppressWarnings("all")
 @Singleton
 public class WaterSimulation {
@@ -22,8 +25,18 @@ public class WaterSimulation {
     private final Set<FluidPos> sources = new HashSet<>();
     private float timer;
 
+    /**
+     * Creates a new {@code WaterSimulation} instance.
+     */
     private WaterSimulation() {}
 
+    /**
+     * Adds the source.
+     * @param x the x value
+     * @param y the y value
+     * @param z the z value
+     * @return the add source result
+     */
     public boolean addSource(int x, int y, int z) {
         if (y < 0 || y >= Chunk.SIZE_Y) {
             return false;
@@ -40,6 +53,13 @@ public class WaterSimulation {
         return true;
     }
 
+    /**
+     * Removes the water.
+     * @param x the x value
+     * @param y the y value
+     * @param z the z value
+     * @return the remove water result
+     */
     public boolean removeWater(int x, int y, int z) {
         FluidPos pos = new FluidPos(x, y, z);
         if (!isWater(pos)) {
@@ -51,6 +71,10 @@ public class WaterSimulation {
         return true;
     }
 
+    /**
+     * Updates the current state.
+     * @param delta the delta value
+     */
     public void update(float delta) {
         timer += delta;
 
@@ -70,6 +94,10 @@ public class WaterSimulation {
         rebuildChangedChunks();
     }
 
+    /**
+     * Updates the cell.
+     * @param pos the pos value
+     */
     private void updateCell(FluidPos pos) {
         if (!isWater(pos)) {
             return;
@@ -104,6 +132,11 @@ public class WaterSimulation {
         spread(new FluidPos(pos.x(), pos.y(), pos.z() - 1), spreadLevel);
     }
 
+    /**
+     * Performs the spread operation.
+     * @param pos the pos value
+     * @param level the level value
+     */
     private void spread(FluidPos pos, byte level) {
         if (level < MIN_LEVEL) {
             return;
@@ -122,6 +155,11 @@ public class WaterSimulation {
         enqueue(pos);
     }
 
+    /**
+     * Sets the water.
+     * @param pos the pos value
+     * @param level the level value
+     */
     private void setWater(FluidPos pos, byte level) {
         if (pos.y() < 0 || pos.y() >= Chunk.SIZE_Y) {
             return;
@@ -150,6 +188,10 @@ public class WaterSimulation {
         mark(pos);
     }
 
+    /**
+     * Removes the water cell.
+     * @param pos the pos value
+     */
     private void removeWaterCell(FluidPos pos) {
         if (!isWater(pos)) return;
         World.wrld.setWaterLevelAt(pos.x(), pos.y(), pos.z(), (byte) 0);
@@ -157,6 +199,10 @@ public class WaterSimulation {
         mark(pos);
     }
 
+    /**
+     * Removes the and rebuild.
+     * @param removed the removed value
+     */
     private void removeAndRebuild(FluidPos removed) {
         Set<FluidPos> component = collect(removed);
         Set<FluidPos> componentSources = new HashSet<>();
@@ -231,6 +277,14 @@ public class WaterSimulation {
         }
     }
 
+    /**
+     * Performs the rebuild operation.
+     * @param pos the pos value
+     * @param level the level value
+     * @param component the component value
+     * @param rebuilt the rebuilt value
+     * @param rebuildQueue the rebuild queue value
+     */
     private void rebuild(FluidPos pos, byte level, Set<FluidPos> component,
                          Set<FluidPos> rebuilt, Queue<FluidPos> rebuildQueue) {
         if (level < MIN_LEVEL) {
@@ -257,6 +311,11 @@ public class WaterSimulation {
         }
     }
 
+    /**
+     * Performs the collect operation.
+     * @param start the start value
+     * @return the collect result
+     */
     private Set<FluidPos> collect(FluidPos start) {
         Set<FluidPos> component = new HashSet<>();
         Queue<FluidPos> searchQueue = new ArrayDeque<>();
@@ -280,6 +339,12 @@ public class WaterSimulation {
         return component;
     }
 
+    /**
+     * Adds the water neighbour.
+     * @param pos the pos value
+     * @param searchQueue the search queue value
+     * @param visited the visited value
+     */
     private void addWaterNeighbour(FluidPos pos, Queue<FluidPos> searchQueue, Set<FluidPos> visited) {
 
         if (visited.contains(pos)) {
@@ -294,6 +359,11 @@ public class WaterSimulation {
         searchQueue.add(pos);
     }
 
+    /**
+     * Checks whether the contain water condition is met.
+     * @param pos the pos value
+     * @return {@code true} if contain water; otherwise {@code false}
+     */
     private boolean canContainWater(FluidPos pos) {
         if (pos.y() < 0 || pos.y() >= Chunk.SIZE_Y) {
             return false;
@@ -322,16 +392,29 @@ public class WaterSimulation {
         return data != null && (data.isPlant() || crop != null);
     }
 
+    /**
+     * Checks whether the water condition is met.
+     * @param pos the pos value
+     * @return {@code true} if water; otherwise {@code false}
+     */
     private boolean isWater(FluidPos pos) {
         return World.wrld.getBlockTypeAt(pos.x(), pos.y(), pos.z()) == BlockData.WATER.getId();
     }
 
+    /**
+     * Performs the enqueue operation.
+     * @param pos the pos value
+     */
     private void enqueue(FluidPos pos) {
         if (queued.add(pos)) {
             queue.add(pos);
         }
     }
 
+    /**
+     * Performs the enqueue neighbours operation.
+     * @param pos the pos value
+     */
     private void enqueueNeighbours(FluidPos pos) {
         enqueue(pos);
         enqueue(new FluidPos(pos.x() + 1, pos.y(), pos.z()));
@@ -342,18 +425,31 @@ public class WaterSimulation {
         enqueue(new FluidPos(pos.x(), pos.y(), pos.z() - 1));
     }
 
+    /**
+     * Performs the on block destroyed operation.
+     * @param x the x value
+     * @param y the y value
+     * @param z the z value
+     */
     public void onBlockDestroyed(int x, int y, int z) {
         FluidPos pos = new FluidPos(x, y, z);
         mark(pos);
         enqueueNeighbours(pos);
     }
 
+    /**
+     * Performs the mark operation.
+     * @param pos the pos value
+     */
     private void mark(FluidPos pos) {
         long key = World.wrld.get2DKey(Math.floorDiv(pos.x(), Chunk.SIZE_X),
                 Math.floorDiv(pos.z(), Chunk.SIZE_Z));
         changedChunks.add(key);
     }
 
+    /**
+     * Performs the rebuild changed chunks operation.
+     */
     private void rebuildChangedChunks() {
         if (changedChunks.isEmpty()) {
             return;

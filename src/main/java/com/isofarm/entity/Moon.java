@@ -5,11 +5,18 @@ import com.isofarm.data.RenderPass;
 import com.isofarm.wrld.GameMaster;
 import org.joml.Vector3f;
 
+/**
+ * Provides moon behavior.
+ */
 public class Moon extends Entity {
     private final Vector3f direction;
     private final Vector3f color;
     private float intensity;
 
+    /**
+     * Creates a new {@code Moon} instance.
+     * @param name the name value
+     */
     public Moon(String name) {
         super(name);
         this.direction = new Vector3f();
@@ -17,18 +24,35 @@ public class Moon extends Entity {
         this.intensity = 0.0f;
     }
 
+    /**
+     * Returns the direction.
+     * @return the direction
+     */
     public Vector3f getDirection() {
         return direction;
     }
 
+    /**
+     * Returns the color.
+     * @return the color
+     */
     public Vector3f getColor() {
         return color;
     }
 
+    /**
+     * Returns the intensity.
+     * @return the intensity
+     */
     public float getIntensity() {
         return intensity;
     }
 
+    /**
+     * Updates the current state.
+     * @param blockPos the block pos value
+     * @param timeOfDay the time of day value
+     */
     @Override
     public void update(BlockPos blockPos, float timeOfDay) {
         float angle = ((timeOfDay - 18.0f) / 24.0f) * ((float) Math.PI * 2.0f);
@@ -48,6 +72,11 @@ public class Moon extends Entity {
         }
     }
 
+    /**
+     * Renders render.
+     * @param gameMaster the game master value
+     * @param pass the pass value
+     */
     @Override
     public void render(GameMaster gameMaster, RenderPass pass) {}
 }

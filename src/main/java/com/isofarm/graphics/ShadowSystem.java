@@ -20,6 +20,9 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 
+/**
+ * Provides shadow system behavior.
+ */
 @Singleton
 public class ShadowSystem {
     public static final ShadowSystem sys = new ShadowSystem();
@@ -38,6 +41,11 @@ public class ShadowSystem {
 
     private final Matrix4f modelMatrix = new Matrix4f();
 
+    /**
+     * Renders render.
+     * @param gameMaster the game master value
+     * @param chunkMeshes the chunk meshes value
+     */
     public void render(GameMaster gameMaster,
                        Map<Chunk, ChunkMeshBuilder.ChunkRenderMesh> chunkMeshes) {
         ShadowMap shadowMap = gameMaster.getShadowMap();
@@ -130,6 +138,10 @@ public class ShadowSystem {
                 (int) gameMaster.getWindowHeight());
     }
 
+    /**
+     * Updates the light matrix.
+     * @param gameMaster the game master value
+     */
     private void updateLightMatrix(GameMaster gameMaster) {
         lightDirection.set(gameMaster.getCelestialLighting().getDirection()).normalize();
 
@@ -152,6 +164,10 @@ public class ShadowSystem {
         lightSpace.set(projection).mul(view);
     }
 
+    /**
+     * Returns the light space matrix.
+     * @return the light space matrix
+     */
     public Matrix4f getLightSpaceMatrix() {
         return lightSpace;
     }

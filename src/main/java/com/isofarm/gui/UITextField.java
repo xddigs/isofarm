@@ -7,6 +7,9 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 
+/**
+ * Provides uitext field behavior.
+ */
 @SuppressWarnings("all")
 @GodObject
 public class UITextField extends UIElement {
@@ -33,6 +36,13 @@ public class UITextField extends UIElement {
     private int completionCursor = -1;
     private int completionTokenStart = -1;
 
+    /**
+     * Creates a new {@code UITextField} instance.
+     * @param x the x value
+     * @param y the y value
+     * @param width the width value
+     * @param height the height value
+     */
     public UITextField(float x, float y, float width, float height) {
         super(x, y, width, height);
         setFocusable(true);
@@ -40,6 +50,10 @@ public class UITextField extends UIElement {
         hide();
     }
 
+    /**
+     * Updates the current state.
+     * @param delta the delta value
+     */
     @Override
     public void update(float delta) {
         super.update(delta);
@@ -60,6 +74,9 @@ public class UITextField extends UIElement {
         updateScroll();
     }
 
+    /**
+     * Renders render.
+     */
     @Override
     public void render() {
         Vector4f background = isFocused() ? focusedColor : backgroundColor;
@@ -92,6 +109,13 @@ public class UITextField extends UIElement {
         renderChildren();
     }
 
+    /**
+     * Performs the key pressed operation.
+     * @param key the key value
+     * @param scancode the scancode value
+     * @param modifiers the modifiers value
+     * @return the key pressed result
+     */
     @Override
     public boolean keyPressed(int key, int scancode, int modifiers) {
         if (!isActuallyVisible() || !isActuallyEnabled()) {
@@ -226,6 +250,11 @@ public class UITextField extends UIElement {
         return true;
     }
 
+    /**
+     * Performs the char typed operation.
+     * @param codepoint the codepoint value
+     * @return the char typed result
+     */
     @Override
     public boolean charTyped(int codepoint) {
         if (!isActuallyVisible() || !isActuallyEnabled()) {
@@ -271,11 +300,18 @@ public class UITextField extends UIElement {
         return true;
     }
 
+    /**
+     * Sets the completion provider.
+     * @param completionProvider the completion provider value
+     */
     public void setCompletionProvider(CompletionProvider completionProvider) {
         this.completionProvider = completionProvider;
         resetCompletion();
     }
 
+    /**
+     * Performs the reset completion operation.
+     */
     private void resetCompletion() {
         completions = List.of();
         completionIndex = -1;
@@ -284,6 +320,9 @@ public class UITextField extends UIElement {
         completionTokenStart = -1;
     }
 
+    /**
+     * Performs the complete forward operation.
+     */
     private void completeForward() {
         if (completionProvider == null) {
             return;
@@ -299,6 +338,9 @@ public class UITextField extends UIElement {
         applyCompletion(completions.get(completionIndex));
     }
 
+    /**
+     * Performs the complete backward operation.
+     */
     private void completeBackward() {
         if (completionProvider == null) {
             return;
@@ -315,6 +357,10 @@ public class UITextField extends UIElement {
         applyCompletion(completions.get(completionIndex));
     }
 
+    /**
+     * Performs the apply completion operation.
+     * @param completion the completion value
+     */
     private void applyCompletion(String completion) {
         if (completion == null || completion.isEmpty()) {
             return;
@@ -330,6 +376,9 @@ public class UITextField extends UIElement {
         resetCursorBlink();
     }
 
+    /**
+     * Performs the prepare completions operation.
+     */
     private void prepareCompletions() {
         if (!completions.isEmpty()
                 && completionCursor == cursorPosition
@@ -345,6 +394,10 @@ public class UITextField extends UIElement {
         completionIndex = -1;
     }
 
+    /**
+     * Finds and returns the current token start.
+     * @return the located current token start
+     */
     private int findCurrentTokenStart() {
         int position = cursorPosition;
         while (position > 0) {
@@ -358,6 +411,10 @@ public class UITextField extends UIElement {
         return position;
     }
 
+    /**
+     * Finds and returns the current token end.
+     * @return the located current token end
+     */
     private int findCurrentTokenEnd() {
         int position = cursorPosition;
         while (position < text.length()) {
@@ -370,6 +427,10 @@ public class UITextField extends UIElement {
         return position;
     }
 
+    /**
+     * Performs the move cursor left operation.
+     * @param shift the shift value
+     */
     private void moveCursorLeft(boolean shift) {
         resetCompletion();
         if (hasSelection() && !shift) {
@@ -387,6 +448,10 @@ public class UITextField extends UIElement {
         }
     }
 
+    /**
+     * Performs the move cursor right operation.
+     * @param shift the shift value
+     */
     private void moveCursorRight(boolean shift) {
         resetCompletion();
         if (hasSelection() && !shift) {
@@ -404,6 +469,10 @@ public class UITextField extends UIElement {
         }
     }
 
+    /**
+     * Performs the move cursor word left operation.
+     * @param shift the shift value
+     */
     private void moveCursorWordLeft(boolean shift) {
         if (hasSelection() && !shift) {
             cursorPosition = getSelectionStart();
@@ -439,6 +508,10 @@ public class UITextField extends UIElement {
         }
     }
 
+    /**
+     * Performs the move cursor word right operation.
+     * @param shift the shift value
+     */
     private void moveCursorWordRight(boolean shift) {
         if (hasSelection() && !shift) {
             cursorPosition = getSelectionEnd();
@@ -472,26 +545,51 @@ public class UITextField extends UIElement {
         }
     }
 
+    /**
+     * Performs the previous code point operation.
+     * @param position the position value
+     * @return the previous code point result
+     */
     private int previousCodePoint(int position) {
         return Character.offsetByCodePoints(text, position, -1);
     }
 
+    /**
+     * Performs the next code point operation.
+     * @param position the position value
+     * @return the next code point result
+     */
     private int nextCodePoint(int position) {
         return Character.offsetByCodePoints(text, position, 1);
     }
 
+    /**
+     * Checks whether the selection condition is met.
+     * @return {@code true} if selection; otherwise {@code false}
+     */
     private boolean hasSelection() {
         return cursorPosition != selectionAnchor;
     }
 
+    /**
+     * Returns the selection start.
+     * @return the selection start
+     */
     private int getSelectionStart() {
         return Math.min(cursorPosition, selectionAnchor);
     }
 
+    /**
+     * Returns the selection end.
+     * @return the selection end
+     */
     private int getSelectionEnd() {
         return Math.max(cursorPosition, selectionAnchor);
     }
 
+    /**
+     * Performs the delete selection operation.
+     */
     private void deleteSelection() {
         if (!hasSelection()) {
             return;
@@ -505,6 +603,9 @@ public class UITextField extends UIElement {
         selectionAnchor = start;
     }
 
+    /**
+     * Performs the copy selection operation.
+     */
     private void copySelection() {
         if (!hasSelection()) {
             return;
@@ -515,6 +616,9 @@ public class UITextField extends UIElement {
         GLFW.glfwSetClipboardString(GLFW.glfwGetCurrentContext(), selected);
     }
 
+    /**
+     * Performs the paste clipboard operation.
+     */
     private void pasteClipboard() {
         long window = GLFW.glfwGetCurrentContext();
 
@@ -553,12 +657,18 @@ public class UITextField extends UIElement {
         selectionAnchor = cursorPosition;
     }
 
+    /**
+     * Performs the reset cursor blink operation.
+     */
     private void resetCursorBlink() {
         cursorTimer = 0.0f;
         cursorVisible = true;
         updateScroll();
     }
 
+    /**
+     * Updates the scroll.
+     */
     private void updateScroll() {
         float availableWidth = Math.max(1.0f, getAbsoluteWidth() - 16.0f);
         float cursorX = getTextWidth(text.substring(0, cursorPosition));
@@ -575,6 +685,11 @@ public class UITextField extends UIElement {
         scrollOffset = Math.clamp(scrollOffset, 0.0f, maxScroll);
     }
 
+    /**
+     * Returns the text width.
+     * @param value the value value
+     * @return the text width
+     */
     private float getTextWidth(String value) {
         float width = 0.0f;
 
@@ -592,6 +707,10 @@ public class UITextField extends UIElement {
         return width;
     }
 
+    /**
+     * Sets the focused.
+     * @param focused the focused value
+     */
     @Override
     public void setFocused(boolean focused) {
         super.setFocused(focused);
@@ -605,10 +724,18 @@ public class UITextField extends UIElement {
         }
     }
 
+    /**
+     * Returns the text.
+     * @return the text
+     */
     public String getText() {
         return text.toString();
     }
 
+    /**
+     * Sets the text.
+     * @param text the text value
+     */
     public void setText(String text) {
         this.text.setLength(0);
 
@@ -631,6 +758,9 @@ public class UITextField extends UIElement {
         updateScroll();
     }
 
+    /**
+     * Removes clear.
+     */
     public void clear() {
         text.setLength(0);
         cursorPosition = 0;
@@ -639,20 +769,36 @@ public class UITextField extends UIElement {
         resetCursorBlink();
     }
 
+    /**
+     * Returns the cursor position.
+     * @return the cursor position
+     */
     public int getCursorPosition() {
         return cursorPosition;
     }
 
+    /**
+     * Sets the cursor position.
+     * @param position the position value
+     */
     public void setCursorPosition(int position) {
         cursorPosition = Math.clamp(position, 0, text.length());
         selectionAnchor = cursorPosition;
         resetCursorBlink();
     }
 
+    /**
+     * Returns the max length.
+     * @return the max length
+     */
     public int getMaxLength() {
         return maxLength;
     }
 
+    /**
+     * Sets the max length.
+     * @param maxLength the max length value
+     */
     public void setMaxLength(int maxLength) {
         this.maxLength = Math.max(1, maxLength);
 
@@ -666,10 +812,18 @@ public class UITextField extends UIElement {
         updateScroll();
     }
 
+    /**
+     * Returns the font.
+     * @return the font
+     */
     public UIFont getFont() {
         return font;
     }
 
+    /**
+     * Sets the font.
+     * @param font the font value
+     */
     public void setFont(UIFont font) {
         if (font != null) {
             this.font = font;
@@ -677,50 +831,113 @@ public class UITextField extends UIElement {
         }
     }
 
+    /**
+     * Returns the background color.
+     * @return the background color
+     */
     public Vector4f getBackgroundColor() {
         return new Vector4f(backgroundColor);
     }
 
+    /**
+     * Sets the background color.
+     * @param r the r value
+     * @param g the g value
+     * @param b the b value
+     * @param a the a value
+     */
     public void setBackgroundColor(float r, float g, float b, float a) {
         backgroundColor.set(r, g, b, a);
     }
 
+    /**
+     * Returns the focused color.
+     * @return the focused color
+     */
     public Vector4f getFocusedColor() {
         return new Vector4f(focusedColor);
     }
 
+    /**
+     * Sets the focused color.
+     * @param r the r value
+     * @param g the g value
+     * @param b the b value
+     * @param a the a value
+     */
     public void setFocusedColor(float r, float g, float b, float a) {
         focusedColor.set(r, g, b, a);
     }
 
+    /**
+     * Returns the text color.
+     * @return the text color
+     */
     public Vector4f getTextColor() {
         return new Vector4f(textColor);
     }
 
+    /**
+     * Sets the text color.
+     * @param r the r value
+     * @param g the g value
+     * @param b the b value
+     * @param a the a value
+     */
     public void setTextColor(float r, float g, float b, float a) {
         textColor.set(r, g, b, a);
     }
 
+    /**
+     * Returns the cursor color.
+     * @return the cursor color
+     */
     public Vector4f getCursorColor() {
         return new Vector4f(cursorColor);
     }
 
+    /**
+     * Sets the cursor color.
+     * @param r the r value
+     * @param g the g value
+     * @param b the b value
+     * @param a the a value
+     */
     public void setCursorColor(float r, float g, float b, float a) {
         cursorColor.set(r, g, b, a);
     }
 
+    /**
+     * Returns the selection color.
+     * @return the selection color
+     */
     public Vector4f getSelectionColor() {
         return new Vector4f(selectionColor);
     }
 
+    /**
+     * Sets the selection color.
+     * @param r the r value
+     * @param g the g value
+     * @param b the b value
+     * @param a the a value
+     */
     public void setSelectionColor(float r, float g, float b, float a) {
         selectionColor.set(r, g, b, a);
     }
 
+    /**
+     * Checks whether the selection text condition is met.
+     * @return {@code true} if selection text; otherwise {@code false}
+     */
     public boolean hasSelectionText() {
         return hasSelection();
     }
 
+    /**
+     * Returns the selected text.
+     * @return the selected text
+     */
     public String getSelectedText() {
         if (!hasSelection()) {
             return "";

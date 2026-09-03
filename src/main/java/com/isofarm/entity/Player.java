@@ -31,6 +31,9 @@ import static org.joml.Math.lerp;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL13.*;
 
+/**
+ * Provides player behavior.
+ */
 @GodObject
 public class Player extends Character {
     private static final Logger log = LoggerFactory.getLogger(Player.class);
@@ -116,6 +119,11 @@ public class Player extends Character {
     private float attackAnimationTime = 0.0f;
     private boolean isAttacking = false;
 
+    /**
+     * Creates a new {@code Player} instance.
+     * @param name the name value
+     * @param world the world value
+     */
     public Player(String name, World world) {
         super(name);
         this.modelMatrix = new Matrix4f();
@@ -182,6 +190,11 @@ public class Player extends Character {
         this.currentState.enter(this);
     }
 
+    /**
+     * Updates the current state.
+     * @param blockPos the block pos value
+     * @param delta the delta value
+     */
     @Override
     public void update(BlockPos blockPos, float delta) {
         if (!this.isAlive()) {
@@ -365,6 +378,11 @@ public class Player extends Character {
         checkDurability();
     }
 
+    /**
+     * Renders render.
+     * @param game the game value
+     * @param pass the pass value
+     */
     @Override
     public void render(GameMaster game, RenderPass pass) {
         CameraView camera = game.getActiveCamera();
@@ -455,12 +473,19 @@ public class Player extends Character {
         defaultShader.unbind();
     }
 
+    /**
+     * Performs the on damage taken operation.
+     * @param amount the amount value
+     */
     @Override
     public void onDamageTaken(float amount) {
         damageSequence++;
         SoundService.fx.playEntitySound(SoundGroup.ENTITY);
     }
 
+    /**
+     * Performs the drop loot operation.
+     */
     @Override
     protected void dropLoot() {
         for (Item i : List.copyOf(getInventory()
@@ -476,6 +501,11 @@ public class Player extends Character {
         }
     }
 
+    /**
+     * Returns the equipment name.
+     * @param item the item value
+     * @return the equipment name
+     */
     private String getEquipmentName(Item item) {
         if (!(item instanceof Tool)) {
             return null;
@@ -491,6 +521,9 @@ public class Player extends Character {
         };
     }
 
+    /**
+     * Updates the equipment visual.
+     */
     private void updateEquipmentVisual() {
         Item item = Settings.selectedItem;
         if (!(item instanceof Tool tool)) {
@@ -503,6 +536,10 @@ public class Player extends Character {
         EquipmentController.ec.equip(material, type);
     }
 
+    /**
+     * Updates the rotation.
+     * @param delta the delta value
+     */
     private void updateRotation(float delta) {
         float difference = targetModelYaw - modelYaw;
 
@@ -527,6 +564,10 @@ public class Player extends Character {
         }
     }
 
+    /**
+     * Updates the head tracking.
+     * @param delta the delta value
+     */
     private void updateHeadTracking(float delta) {
         if (headNode == null || headRotation == null) return;
 
@@ -562,21 +603,37 @@ public class Player extends Character {
         headNode.setRotation(currentRotation);
     }
 
+    /**
+     * Performs the wrap radians operation.
+     * @param angle the angle value
+     * @return the wrap radians result
+     */
     private static float wrapRadians(float angle) {
         while (angle > Math.PI) angle -= (float) (Math.PI * 2.0);
         while (angle < -Math.PI) angle += (float) (Math.PI * 2.0);
         return angle;
     }
 
+    /**
+     * Performs the interact operation.
+     */
     public void interact() {
         this.isAttacking = true;
         this.attackAnimationTime = 0.0f;
     }
 
+    /**
+     * Checks whether the attacking condition is met.
+     * @return {@code true} if attacking; otherwise {@code false}
+     */
     public boolean isAttacking() {
         return isAttacking;
     }
 
+    /**
+     * Performs the change state operation.
+     * @param newState the new state value
+     */
     public void changeState(PlayerState newState) {
         if (currentState != null) {
             currentState.exit(this);
@@ -586,6 +643,12 @@ public class Player extends Character {
         currentState.enter(this);
     }
 
+    /**
+     * Performs the auto jump operation.
+     * @param world the world value
+     * @param velocity the velocity value
+     * @param delta the delta value
+     */
     public void autoJump(World world, Vector3f velocity, float delta) {
         if (!isOnGround() || (velocity.x == ZERO_VELOCITY && velocity.z == ZERO_VELOCITY)) {
             return;
@@ -611,6 +674,9 @@ public class Player extends Character {
         }
     }
 
+    /**
+     * Performs the check durability operation.
+     */
     private void checkDurability() {
         for (InventorySlot slot : getInventory().getSlots()) {
             if (slot.getItem() instanceof Tool tool) {
@@ -628,14 +694,25 @@ public class Player extends Character {
         }
     }
 
+    /**
+     * Returns the current state.
+     * @return the current state
+     */
     public PlayerState getCurrentState() {
         return currentState;
     }
 
+    /**
+     * Sets the current state.
+     * @param currentState the current state value
+     */
     public void setCurrentState(PlayerState currentState) {
         this.currentState = currentState;
     }
 
+    /**
+     * Performs the respawn operation.
+     */
     public void respawn() {
         if (!Settings.doKeepInventory()) {
             clear();
@@ -670,6 +747,9 @@ public class Player extends Character {
         GameMaster.game.toggleHUD();
     }
 
+    /**
+     * Performs the reset attributes operation.
+     */
     public void resetAttributes() {
         setStrength(1);
         setDexterity(1);
@@ -679,10 +759,19 @@ public class Player extends Character {
         setCharisma(1);
     }
 
+    /**
+     * Returns the damage sequence.
+     * @return the damage sequence
+     */
     public int getDamageSequence() {
         return damageSequence;
     }
 
+    /**
+     * Performs the move operation.
+     * @param world the world value
+     * @param delta the delta value
+     */
     public void move(World world, float delta) {
         if (!isFollowingPath()) {
             setVelocity(new Vector3f(ZERO_VELOCITY, getVelocity().y, ZERO_VELOCITY));
@@ -719,6 +808,13 @@ public class Player extends Character {
         collide(world, getVelocity(), delta);
     }
 
+    /**
+     * Performs the wasd operation.
+     * @param world the world value
+     * @param delta the delta value
+     * @param cameraYaw the camera yaw value
+     * @param isFlying the is flying value
+     */
     public void wasd(World world, float delta, float cameraYaw,
                      boolean isFlying) {
         if (GameMaster.game.isChatOpen() || GameMaster.game.isInventoryOpen() ||
@@ -757,11 +853,24 @@ public class Player extends Character {
         }
     }
 
+    /**
+     * Performs the fly operation.
+     * @param delta the delta value
+     * @param yaw the yaw value
+     * @param isFlying the is flying value
+     */
     public void fly(float delta, float yaw, boolean isFlying) {
         if (isOnGround()) return;
         wasd(GameMaster.game.getWorld(), delta, yaw, isFlying);
     }
 
+    /**
+     * Checks whether the ground below condition is met.
+     * @param world the world value
+     * @param testX the test x value
+     * @param testZ the test z value
+     * @return {@code true} if ground below; otherwise {@code false}
+     */
     public boolean hasGroundBelow(World world, float testX, float testZ) {
         float epsilon = 0.001f;
         float halfWidth = dimensions.x / 2.0f - epsilon;
@@ -784,6 +893,11 @@ public class Player extends Character {
         return false;
     }
 
+    /**
+     * Performs the adjust velocity operation.
+     * @param world the world value
+     * @param delta the delta value
+     */
     @Override
     protected void adjustVelocity(World world, float delta) {
         if (!(currentState instanceof SneakingState) || delta <= ZERO_VELOCITY) return;
@@ -813,11 +927,20 @@ public class Player extends Character {
         velocity.z = moveZ / delta;
     }
 
+    /**
+     * Performs the move toward zero operation.
+     * @param value the value value
+     * @param amount the amount value
+     * @return the move toward zero result
+     */
     private static float moveTowardZero(float value, float amount) {
         if (Math.abs(value) <= amount) return ZERO_VELOCITY;
         return value - Math.copySign(amount, value);
     }
 
+    /**
+     * Sets the up inventory.
+     */
     private void setUpInventory() {
         switch (getGamemode()) {
             case SURVIVAL -> {
@@ -831,6 +954,11 @@ public class Player extends Character {
         }
     }
 
+    /**
+     * Performs the sell operation.
+     * @param item the item value
+     * @param amount the amount value
+     */
     public void sell(Item item, int amount) {
         if (item == null || amount <= 0) return;
 
@@ -847,53 +975,95 @@ public class Player extends Character {
         earn(earnings);
     }
 
+    /**
+     * Adds add.
+     * @param item the item value
+     * @param amount the amount value
+     */
     public void add(Item item, int amount) {
         getInventory().add(item, amount);
         log.info("Added x{} of {} to inventory", amount, item.getName());
     }
 
+    /**
+     * Adds add.
+     * @param item the item value
+     */
     public void add(Item item) {
         add(item, 1);
         log.info("Added x1 of {} to inventory", item.getName());
     }
 
+    /**
+     * Adds the to backpack.
+     * @param item the item value
+     * @param amount the amount value
+     */
     public void addToBackpack(Item item, int amount) {
         if (getBackpack().hasBackpackEquipped()) getBackpack().add(item, amount);
         log.info("Added x{} of {} to backpack", amount, item.getName());
     }
 
+    /**
+     * Adds the to backpack.
+     * @param item the item value
+     */
     public void addToBackpack(Item item) {
         addToBackpack(item, 1);
         log.info("Added x1 of {} to backpack", item.getName());
     }
 
+    /**
+     * Removes the from backpack.
+     * @param item the item value
+     * @param amount the amount value
+     */
     public void removeFromBackpack(Item item, int amount) {
         if (getBackpack().hasBackpackEquipped()) getBackpack().remove(item, amount);
         log.info("Removed x{} of {} from backpack", amount, item.getName());
     }
 
+    /**
+     * Removes the from backpack.
+     * @param item the item value
+     */
     public void removeFromBackpack(Item item) {
         removeFromBackpack(item, 1);
         log.info("Removed x1 of {} from backpack", item.getName());
     }
 
+    /**
+     * Performs the sort operation.
+     */
     public void sort() {
         getInventory().sort();
         getBackpack().sort();
     }
 
+    /**
+     * Removes remove.
+     * @param item the item value
+     * @param amount the amount value
+     */
     public void remove(Item item, int amount) {
         if (getGamemode().isGodmode()) return;
         getInventory().remove(item, amount);
         log.info("Removed x{} of {} to inventory", amount, item.getName());
     }
 
+    /**
+     * Removes remove.
+     * @param item the item value
+     */
     public void remove(Item item) {
         if (getGamemode().isGodmode()) return;
         getInventory().remove(item, 1);
         log.info("Removed x1 of {} from inventory", item.getName());
     }
 
+    /**
+     * Removes clear.
+     */
     public void clear() {
         for (Item item : getInventory().getItems().keySet()) {
             if (item == null) continue;
@@ -903,109 +1073,211 @@ public class Player extends Character {
         log.info("Cleared inventory");
     }
 
+    /**
+     * Checks whether the empty condition is met.
+     * @return {@code true} if empty; otherwise {@code false}
+     */
     public boolean isEmpty() {
         return getInventory().isEmpty();
     }
 
+    /**
+     * Performs the size operation.
+     * @return the size result
+     */
     public int size() {
         return getInventory().size();
     }
 
+    /**
+     * Returns get.
+     * @param index the index value
+     * @return the get result
+     */
     public Item get(int index) {
         return getInventory().get(index);
     }
 
+    /**
+     * Returns get.
+     * @param item the item value
+     * @return the get result
+     */
     public Item get(Item item) {
         return getInventory().get(item);
     }
 
+    /**
+     * Returns the amount.
+     * @param item the item value
+     * @return the amount
+     */
     public int getAmount(Item item) {
         return getInventory().getAmount(item);
     }
 
+    /**
+     * Performs the earn operation.
+     * @param amount the amount value
+     */
     public void earn(int amount) {
         log.info("Earned ${}", amount);
         getPurse().add(amount);
     }
 
+    /**
+     * Performs the spend operation.
+     * @param amount the amount value
+     */
     public void spend(int amount) {
         if (amount <= 0) return;
         log.info("Spent ${}", amount);
         getPurse().remove(amount);
     }
 
+    /**
+     * Checks whether the space condition is met.
+     * @return {@code true} if space; otherwise {@code false}
+     */
     public boolean hasSpace() {
         return !getInventory().isFull() ||
                 (getBackpack().hasBackpackEquipped()
                         && !getBackpack().isFull());
     }
 
+    /**
+     * Checks whether the seeds condition is met.
+     * @return {@code true} if seeds; otherwise {@code false}
+     */
     public boolean hasSeeds() {
         return getInventory().hasItemOfType(Seed.class);
     }
 
+    /**
+     * Returns the current eye height.
+     * @return the current eye height
+     */
     public float getCurrentEyeHeight() {
         return currentEyeHeight;
     }
 
+    /**
+     * Returns the forward.
+     * @return the forward
+     */
     public float getForward() {
         return (float) Math.atan2(velocity.z, velocity.x);
     }
 
+    /**
+     * Returns the direction.
+     * @return the direction
+     */
     public Direction getDirection() {
         return direction;
     }
 
+    /**
+     * Checks whether the following path condition is met.
+     * @return {@code true} if following path; otherwise {@code false}
+     */
     public boolean isFollowingPath() {
         return pathIndex < path.size();
     }
 
+    /**
+     * Returns the path.
+     * @return the path
+     */
     public List<GridPos> getPath() {
         return path;
     }
 
+    /**
+     * Sets the path.
+     * @param path the path value
+     */
     public void setPath(List<GridPos> path) {
         this.path = path != null ? path : List.of();
         this.pathIndex = 0;
     }
 
+    /**
+     * Returns the path index.
+     * @return the path index
+     */
     public int getPathIndex() {
         return pathIndex;
     }
 
+    /**
+     * Sets the path index.
+     * @param pathIndex the path index value
+     */
     public void setPathIndex(int pathIndex) {
         this.pathIndex = Math.max(0, pathIndex);
     }
 
+    /**
+     * Clears the path.
+     */
     public void clearPath() {
         this.path = List.of();
         this.pathIndex = 0;
     }
 
+    /**
+     * Returns the respawn timer.
+     * @return the respawn timer
+     */
     public float getRespawnTimer() {
         return respawnTimer;
     }
 
+    /**
+     * Sets the respawn timer.
+     * @param respawnTimer the respawn timer value
+     */
     public void setRespawnTimer(float respawnTimer) {
         this.respawnTimer = respawnTimer;
     }
 
+    /**
+     * Returns the target eye height.
+     * @return the target eye height
+     */
     public float getTargetEyeHeight() {
         return targetEyeHeight;
     }
 
+    /**
+     * Sets the target eye height.
+     * @param targetEyeHeight the target eye height value
+     */
     public void setTargetEyeHeight(float targetEyeHeight) {
         this.targetEyeHeight = targetEyeHeight;
     }
 
+    /**
+     * Checks whether the falling condition is met.
+     * @return {@code true} if falling; otherwise {@code false}
+     */
     public boolean isFalling() {
         return isFalling;
     }
 
+    /**
+     * Sets the falling.
+     * @param falling the falling value
+     */
     public void setFalling(boolean falling) {
         isFalling = falling;
     }
 
+    /**
+     * Returns the difficulty regen.
+     * @return the difficulty regen
+     */
     public float getDifficultyRegen() {
         return GameMaster.game.getDifficulty().getMultiplier();
     }

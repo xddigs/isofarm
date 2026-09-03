@@ -24,6 +24,9 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
+/**
+ * Provides game behavior.
+ */
 public class Game {
     private static final Logger log = LoggerFactory.getLogger(Game.class);
     private static final String WINDOW_TITLE = "Isofarm";
@@ -34,6 +37,9 @@ public class Game {
 
     private long window;
 
+    /**
+     * Performs the run operation.
+     */
     public void run() {
         log.info("Starting LWJGL 3 application...");
         init();
@@ -46,6 +52,9 @@ public class Game {
         log.info("Application terminated successfully.");
     }
 
+    /**
+     * Initializes the component.
+     */
     private void init() {
         GLFWErrorCallback.create((error, description) ->
                 log.error("GLFW Error [0x{}]: {}", Integer.toHexString(error),
@@ -99,6 +108,9 @@ public class Game {
         log.info("GLFW window successfully initialized.");
     }
 
+    /**
+     * Sets the window icon.
+     */
     private void setWindowIcon() {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             GLFWImage.Buffer icons = GLFWImage.malloc(6, stack);
@@ -113,6 +125,14 @@ public class Game {
         }
     }
 
+    /**
+     * Loads the icon.
+     * @param icons the icons value
+     * @param index the index value
+     * @param resourcePath the resource path value
+     * @param stack the stack value
+     * @return the load icon result
+     */
     private ByteBuffer loadIcon(GLFWImage.Buffer icons, int index, String resourcePath, MemoryStack stack) {
         try (InputStream input = Game.class.getResourceAsStream(resourcePath)) {
             if (input == null) {
@@ -145,6 +165,10 @@ public class Game {
         }
     }
 
+    /**
+     * Performs the main operation.
+     * @param ignoredArgs the ignored args value
+     */
     public static void main(String[] ignoredArgs) {
         new Game().run();
     }

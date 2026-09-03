@@ -14,6 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Provides particle engine behavior.
+ */
 @Singleton
 public class ParticleEngine implements Service<Particle> {
     public static final ParticleEngine peng = new ParticleEngine();
@@ -21,13 +24,25 @@ public class ParticleEngine implements Service<Particle> {
     private final List<Particle> particles = new ArrayList<>();
     private final Matrix4f modelMatrix = new Matrix4f();
 
+    /**
+     * Creates a new {@code ParticleEngine} instance.
+     */
     private ParticleEngine() {}
 
+    /**
+     * Adds add.
+     * @param particle the particle value
+     * @return the add result
+     */
     public Particle add(Particle particle) {
         particles.add(particle);
         return particle;
     }
 
+    /**
+     * Updates the current state.
+     * @param delta the delta value
+     */
     public void update(float delta) {
         for (Particle p : particles) {
             p.update(delta);
@@ -35,6 +50,12 @@ public class ParticleEngine implements Service<Particle> {
         particles.removeIf(Particle::isDead);
     }
 
+    /**
+     * Renders render.
+     * @param shader the shader value
+     * @param quadMesh the quad mesh value
+     * @param camera the camera value
+     */
     public void render(Shader shader, Mesh quadMesh, CameraView camera) {
         if (particles.isEmpty()) return;
 
@@ -83,6 +104,12 @@ public class ParticleEngine implements Service<Particle> {
         shader.unbind();
     }
 
+    /**
+     * Performs the spawn block operation.
+     * @param blockPos the block pos value
+     * @param blockData the block data value
+     * @return the spawn block result
+     */
     public Particle spawnBlock(BlockPos blockPos, BlockData blockData) {
         if (blockData == null || blockData == BlockData.AIR) return null;
 
@@ -123,6 +150,12 @@ public class ParticleEngine implements Service<Particle> {
         return null;
     }
 
+    /**
+     * Performs the spawn plant operation.
+     * @param blockPos the block pos value
+     * @param blockData the block data value
+     * @return the spawn plant result
+     */
     public Particle spawnPlant(BlockPos blockPos, BlockData blockData) {
         if (blockPos == null) return null;
         if (blockData == null || blockData == BlockData.AIR) return null;
@@ -166,6 +199,15 @@ public class ParticleEngine implements Service<Particle> {
         return first;
     }
 
+    /**
+     * Performs the spawn crop operation.
+     * @param x the x value
+     * @param y the y value
+     * @param z the z value
+     * @param cropSheet the crop sheet value
+     * @param frameIndex the frame index value
+     * @return the spawn crop result
+     */
     public Particle spawnCrop(float x, float y, float z, SpriteSheet cropSheet,
                           int frameIndex) {
         if (cropSheet == null) return null;
@@ -200,6 +242,9 @@ public class ParticleEngine implements Service<Particle> {
         return null;
     }
 
+    /**
+     * Removes clear.
+     */
     public void clear() {
         particles.clear();
     }

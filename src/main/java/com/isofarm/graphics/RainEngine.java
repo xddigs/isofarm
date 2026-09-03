@@ -16,6 +16,9 @@ import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 
+/**
+ * Provides rain engine behavior.
+ */
 @SuppressWarnings("all")
 public class RainEngine {
     private static final int DROPS_PER_CHUNK = 400;
@@ -25,6 +28,9 @@ public class RainEngine {
     private final int vbo;
     private float timeAccumulator = 0.0f;
 
+    /**
+     * Creates a new {@code RainEngine} instance.
+     */
     public RainEngine() {
         vao = glGenVertexArrays();
         vbo = glGenBuffers();
@@ -45,6 +51,10 @@ public class RainEngine {
         glBindVertexArray(0);
     }
 
+    /**
+     * Performs the generate chunk rain pattern operation.
+     * @return the generate chunk rain pattern result
+     */
     private float[] generateChunkRainPattern() {
         Random rnd = new Random(1337);
         float[] data = new float[DROPS_PER_CHUNK * VERTICES_PER_DROP * 3];
@@ -67,10 +77,22 @@ public class RainEngine {
         return data;
     }
 
+    /**
+     * Updates the current state.
+     * @param delta the delta value
+     */
     public void update(float delta) {
         timeAccumulator += delta;
     }
 
+    /**
+     * Renders render.
+     * @param shader the shader value
+     * @param view the view value
+     * @param projection the projection value
+     * @param cameraPos the camera pos value
+     * @param world the world value
+     */
     public void render(Shader shader, Matrix4f view, Matrix4f projection,
                        Vector3f cameraPos, World world) {
         shader.bind();
@@ -113,6 +135,9 @@ public class RainEngine {
         shader.unbind();
     }
 
+    /**
+     * Performs the dispose operation.
+     */
     public void dispose() {
         glDeleteBuffers(vbo);
         glDeleteVertexArrays(vao);

@@ -8,6 +8,9 @@ import com.isofarm.wrld.World;
 
 import static org.lwjgl.glfw.GLFW.*;
 
+/**
+ * Provides swimming state behavior.
+ */
 public class SwimmingState implements PlayerState {
 
     private static final float SWIM_UP_SPEED = 4.0f;
@@ -15,11 +18,20 @@ public class SwimmingState implements PlayerState {
     private static final float WATER_DRAG = 0.90f;
     private static final float BUOYANCY = 1.2f;
 
+    /**
+     * Performs the enter operation.
+     * @param player the player value
+     */
     @Override
     public void enter(Player player) {
         player.setTargetEyeHeight(1.2f);
     }
 
+    /**
+     * Performs the input operation.
+     * @param player the player value
+     * @param gameMaster the game master value
+     */
     @Override
     public void input(Player player, GameMaster gameMaster) {
         if (Keyboard.isKeyDown(GLFW_KEY_SPACE)) {
@@ -29,6 +41,11 @@ public class SwimmingState implements PlayerState {
         }
     }
 
+    /**
+     * Updates the current state.
+     * @param player the player value
+     * @param delta the delta value
+     */
     @Override
     public void update(Player player, float delta) {
         float yaw = GameMaster.game.getActiveCamera().getYaw();
@@ -50,6 +67,10 @@ public class SwimmingState implements PlayerState {
         }
     }
 
+    /**
+     * Performs the exit operation.
+     * @param player the player value
+     */
     @Override
     public void exit(Player player) {
         player.setTargetEyeHeight(1.6f);

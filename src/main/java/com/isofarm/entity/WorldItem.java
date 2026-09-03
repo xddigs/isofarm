@@ -12,6 +12,9 @@ import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Provides world item behavior.
+ */
 @SuppressWarnings("unused")
 @DataClass
 public class WorldItem extends Entity {
@@ -36,6 +39,12 @@ public class WorldItem extends Entity {
     private float groundY;
     private boolean isAttracting = false;
 
+    /**
+     * Creates a new {@code WorldItem} instance.
+     * @param item the item value
+     * @param amount the amount value
+     * @param position the position value
+     */
     public WorldItem(Item item, int amount, Vector3f position) {
         super(item.getName());
         this.item = item;
@@ -51,6 +60,11 @@ public class WorldItem extends Entity {
         this.hitpoints = maxHitpoints;
     }
 
+    /**
+     * Updates the current state.
+     * @param blockPos the block pos value
+     * @param delta the delta value
+     */
     @Override
     public void update(BlockPos blockPos, float delta) {
         if (world == null || delta <= 0.0f) {
@@ -89,6 +103,10 @@ public class WorldItem extends Entity {
         }
     }
 
+    /**
+     * Finds and returns the ground y.
+     * @return the located ground y
+     */
     private float findGroundY() {
         int currentX = (int) Math.floor(position.x);
         int currentZ = (int) Math.floor(position.z);
@@ -101,6 +119,11 @@ public class WorldItem extends Entity {
         return 0.0f;
     }
 
+    /**
+     * Renders render.
+     * @param gameMaster the game master value
+     * @param pass the pass value
+     */
     @Override
     public void render(GameMaster gameMaster, RenderPass pass) {
         SpriteSheet spriteSheet = ResourceManager.getItemSpriteSheet(item);
@@ -109,54 +132,108 @@ public class WorldItem extends Entity {
                 this, gameMaster.getCelestialLighting());
     }
 
+    /**
+     * Returns the item.
+     * @return the item
+     */
     public Item getItem() {
         return item;
     }
 
+    /**
+     * Returns the amount.
+     * @return the amount
+     */
     public int getAmount() {
         return amount;
     }
 
+    /**
+     * Sets the amount.
+     * @param amount the amount value
+     */
     public void setAmount(int amount) {
         this.amount = Math.max(0, amount);
     }
 
+    /**
+     * Adds the velocity.
+     * @param x the x value
+     * @param y the y value
+     * @param z the z value
+     */
     public void addVelocity(float x, float y, float z) {
         this.velocity.add(x, y, z);
     }
 
+    /**
+     * Returns the world.
+     * @return the world
+     */
     public World getWorld() {
         return world;
     }
 
+    /**
+     * Sets the world.
+     * @param world the world value
+     */
     public void setWorld(World world) {
         this.world = world;
     }
 
+    /**
+     * Checks whether the be picked up condition is met.
+     * @return {@code true} if be picked up; otherwise {@code false}
+     */
     public boolean canBePickedUp() {
         return pickupTimer <= 0.0f;
     }
 
+    /**
+     * Returns the rotation.
+     * @return the rotation
+     */
     public float getRotation() {
         return rotation;
     }
 
+    /**
+     * Sets the rotation.
+     * @param rotation the rotation value
+     */
     public void setRotation(float rotation) {
         this.rotation = rotation;
     }
 
+    /**
+     * Returns the bob time.
+     * @return the bob time
+     */
     public float getBobTime() {
         return bobTime;
     }
 
+    /**
+     * Sets the bob time.
+     * @param bobTime the bob time value
+     */
     public void setBobTime(float bobTime) {
         this.bobTime = bobTime;
     }
 
+    /**
+     * Checks whether the attracting condition is met.
+     * @return {@code true} if attracting; otherwise {@code false}
+     */
     public boolean isAttracting() {
         return isAttracting;
     }
 
+    /**
+     * Sets the attracting.
+     * @param attracting the attracting value
+     */
     public void setAttracting(boolean attracting) {
         this.isAttracting = attracting;
     }

@@ -8,9 +8,18 @@ import com.isofarm.item.*;
 import com.isofarm.utils.Local;
 import com.isofarm.utils.ToastFactory;
 
+/**
+ * Provides crafting service behavior.
+ */
 public class CraftingService {
     public static final CraftingService cs = new CraftingService();
 
+    /**
+     * Checks whether the craft condition is met.
+     * @param player the player value
+     * @param recipe the recipe value
+     * @return {@code true} if craft; otherwise {@code false}
+     */
     public boolean canCraft(Player player, Recipe recipe) {
         if (player == null || recipe == null) return false;
         Inventory inventory = player.getInventory();
@@ -24,6 +33,12 @@ public class CraftingService {
         return true;
     }
 
+    /**
+     * Performs the craft operation.
+     * @param player the player value
+     * @param recipe the recipe value
+     * @return the craft result
+     */
     public boolean craft(Player player, Recipe recipe) {
         if (player == null || recipe == null) return false;
 
@@ -40,6 +55,11 @@ public class CraftingService {
         return true;
     }
 
+    /**
+     * Performs the consume operation.
+     * @param inputSlots the input slots value
+     * @param recipe the recipe value
+     */
     private void consume(InventorySlot[] inputSlots, Recipe recipe) {
         for (Ingredient ingredient : recipe.ingredients()) {
             int remainingToDeduct = ingredient.amount();
@@ -67,11 +87,22 @@ public class CraftingService {
         }
     }
 
+    /**
+     * Performs the consume operation.
+     * @param inventory the inventory value
+     * @param recipe the recipe value
+     */
     private void consume(Inventory inventory, Recipe recipe) {
         InventorySlot[] slots = inventory.getSlots().toArray(new InventorySlot[0]);
         consume(slots, recipe);
     }
 
+    /**
+     * Performs the count operation.
+     * @param inventory the inventory value
+     * @param ingredient the ingredient value
+     * @return the count result
+     */
     private int count(Inventory inventory, Ingredient ingredient) {
         if (inventory == null || ingredient == null) {
 
@@ -90,6 +121,12 @@ public class CraftingService {
         return amount;
     }
 
+    /**
+     * Performs the matches ingredient operation.
+     * @param ingredient the ingredient value
+     * @param item the item value
+     * @return the matches ingredient result
+     */
     public boolean matchesIngredient(Ingredient ingredient, Item item) {
         if (ingredient == null || item == null) {
             return false;
@@ -114,6 +151,11 @@ public class CraftingService {
         return false;
     }
 
+    /**
+     * Performs the give operation.
+     * @param player the player value
+     * @param recipe the recipe value
+     */
     private void give(Player player, Recipe recipe) {
         Item result = recipe.result().copy();
         Inventory inventory = player.getInventory();
@@ -127,6 +169,12 @@ public class CraftingService {
         }
     }
 
+    /**
+     * Checks whether the same type condition is met.
+     * @param a the a value
+     * @param b the b value
+     * @return {@code true} if same type; otherwise {@code false}
+     */
     public boolean isSameType(Item a, Item b) {
         if (a == null || b == null) {
             return false;

@@ -2,6 +2,9 @@ package com.isofarm.data;
 
 import com.isofarm.utils.Local;
 
+/**
+ * Enumerates the supported difficulty values.
+ */
 public enum Difficulty {
     EASY((byte) 0, "difficulty.easy", 0.5f),
     NORMAL((byte) 1, "difficulty.normal", 1.0f),
@@ -12,24 +15,47 @@ public enum Difficulty {
     private final String name;
     private final float multiplier;
 
+    /**
+     * Creates a new {@code Difficulty} instance.
+     * @param id the id value
+     * @param name the name value
+     * @param multiplier the multiplier value
+     */
     Difficulty(byte id, String name, float multiplier) {
         this.id = id;
         this.name = name;
         this.multiplier = multiplier;
     }
 
+    /**
+     * Returns the id.
+     * @return the id
+     */
     public byte getId() {
         return id;
     }
 
+    /**
+     * Returns the name.
+     * @return the name
+     */
     public String getName() {
         return Local.lang.t(name);
     }
 
+    /**
+     * Returns the multiplier.
+     * @return the multiplier
+     */
     public float getMultiplier() {
         return multiplier;
     }
 
+    /**
+     * Performs the from id operation.
+     * @param id the id value
+     * @return the from id result
+     */
     public static Difficulty fromId(byte id) {
         for (Difficulty difficulty : values()) {
             if (difficulty.getId() == id) {

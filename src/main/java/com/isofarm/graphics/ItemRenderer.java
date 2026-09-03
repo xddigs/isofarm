@@ -13,6 +13,9 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 
+/**
+ * Provides item renderer behavior.
+ */
 public class ItemRenderer {
     private static final int THICKNESS_LAYERS = 24;
     private static final float LAYER_DEPTH = 0.0025f;
@@ -20,15 +23,29 @@ public class ItemRenderer {
     private final Matrix4f baseModelMatrix;
     private final Mesh quadMesh;
 
+    /**
+     * Creates a new {@code ItemRenderer} instance.
+     */
     public ItemRenderer() {
         this.baseModelMatrix = new Matrix4f();
         this.quadMesh = Mesh.createCenteredQuad();
     }
 
+    /**
+     * Performs the clamp operation.
+     * @param value the value value
+     * @return the clamp result
+     */
     private float clamp(float value) {
         return Math.clamp(value, 0.0f, 1.0f);
     }
 
+    /**
+     * Renders the world item.
+     * @param gameMaster the game master value
+     * @param worldItem the world item value
+     * @param lighting the lighting value
+     */
     public void renderWorldItem(GameMaster gameMaster, WorldItem worldItem,
                                 CelestialLighting lighting) {
         if (worldItem == null) return;
@@ -41,6 +58,15 @@ public class ItemRenderer {
         renderWorldItemMesh(gameMaster, worldItem, item, spriteSheet, shader, lighting);
     }
 
+    /**
+     * Renders the world item mesh.
+     * @param gameMaster the game master value
+     * @param worldItem the world item value
+     * @param item the item value
+     * @param spriteSheet the sprite sheet value
+     * @param shader the shader value
+     * @param lighting the lighting value
+     */
     private void renderWorldItemMesh(GameMaster gameMaster, WorldItem worldItem,
                                      Item item, SpriteSheet spriteSheet, Shader shader,
                                      CelestialLighting lighting) {
@@ -93,6 +119,12 @@ public class ItemRenderer {
         shader.unbind();
     }
 
+    /**
+     * Sets setup uniforms.
+     * @param shader the shader value
+     * @param gameMaster the game master value
+     * @param lighting the lighting value
+     */
     private void setupUniforms(Shader shader, GameMaster gameMaster,
                                CelestialLighting lighting) {
         shader.setUniform("uUseTexture", true);
@@ -116,6 +148,9 @@ public class ItemRenderer {
         shader.setUniform("uAmbientIntensity", lighting.getAmbientIntensity());
     }
 
+    /**
+     * Performs the dispose operation.
+     */
     public void dispose() {
         if (quadMesh != null) {
             quadMesh.dispose();

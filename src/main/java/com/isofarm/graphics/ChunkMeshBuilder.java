@@ -5,6 +5,9 @@ import com.isofarm.utils.K;
 import com.isofarm.wrld.Chunk;
 import com.isofarm.wrld.World;
 
+/**
+ * Provides chunk mesh builder behavior.
+ */
 public class ChunkMeshBuilder {
     private static final float PIXEL = 1.0f / K.World.DEFAULT_TEXTURE_SCALE;
     private static final float TILLED_HEIGHT = 1.0f - PIXEL;
@@ -28,16 +31,34 @@ public class ChunkMeshBuilder {
         }
     }
 
+    /**
+     * Stores raw mesh data data.
+     */
     public record RawMeshData(float[] positions, float[] normals, float[] uv, int[] indices) {}
+    /**
+     * Stores chunk mesh data data.
+     */
     public record ChunkMeshData(RawMeshData solidData, RawMeshData waterData) {}
 
+    /**
+     * Stores chunk render mesh data.
+     */
     public record ChunkRenderMesh(Mesh solidMesh, Mesh waterMesh) {
+        /**
+         * Performs the dispose operation.
+         */
         public void dispose() {
             if (solidMesh != null) solidMesh.dispose();
             if (waterMesh != null) waterMesh.dispose();
         }
     }
 
+    /**
+     * Performs the build mesh operation.
+     * @param world the world value
+     * @param chunk the chunk value
+     * @return the build mesh result
+     */
     public static ChunkMeshData buildMesh(World world, Chunk chunk) {
         int posIdx = 0, normIdx = 0, uvIdx = 0, elemIdx = 0, vertexCount = 0;
         int wPosIdx = 0, wNormIdx = 0, wUvIdx = 0, wElemIdx = 0, wVertexCount = 0;
@@ -180,6 +201,18 @@ public class ChunkMeshBuilder {
         return new ChunkMeshData(solidData, waterData);
     }
 
+    /**
+     * Performs the build raw data operation.
+     * @param pBuf the p buf value
+     * @param pIdx the p idx value
+     * @param nBuf the n buf value
+     * @param nIdx the n idx value
+     * @param uBuf the u buf value
+     * @param uIdx the u idx value
+     * @param iBuf the i buf value
+     * @param iIdx the i idx value
+     * @return the build raw data result
+     */
     private static RawMeshData buildRawData(float[] pBuf, int pIdx, float[] nBuf, int nIdx, float[] uBuf, int uIdx, int[] iBuf, int iIdx) {
         if (iIdx == 0) return null;
         float[] pos = new float[pIdx]; System.arraycopy(pBuf, 0, pos, 0, pIdx);
@@ -189,13 +222,32 @@ public class ChunkMeshBuilder {
         return new RawMeshData(pos, norm, uv, idx);
     }
 
+    /**
+     * Creates and returns the mesh.
+     * @param data the data value
+     * @return the created mesh
+     */
     public static ChunkRenderMesh createMesh(ChunkMeshData data) {
         Mesh solid = data.solidData() != null ? new Mesh(data.solidData().positions(), data.solidData().normals(), data.solidData().uv(), data.solidData().indices()) : null;
         Mesh water = data.waterData() != null ? new Mesh(data.waterData().positions(), data.waterData().normals(), data.waterData().uv(), data.waterData().indices()) : null;
         return new ChunkRenderMesh(solid, water);
     }
 
+    /**
+     * Returns the block top y.
+     * @param data the data value
+     * @param y the y value
+     * @return the block top y
+     */
     private static float getBlockTopY(BlockData data, float y) { return (data == BlockData.TILLED_DIRT || data.isFluid()) ? y + TILLED_HEIGHT : y + 1.0f; }
+    /**
+     * Returns the block bottom y.
+     * @param world the world value
+     * @param worldX the world x value
+     * @param worldY the world y value
+     * @param worldZ the world z value
+     * @return the block bottom y
+     */
     private static float getBlockBottomY(World world, int worldX, int worldY, int worldZ) {
         if (worldY < 0 || worldY >= Chunk.SIZE_Y || !world.isChunkLoadedAt(worldX, worldZ)) return 0.0f;
         byte blockId = world.getBlockTypeAt(worldX, worldY, worldZ);
@@ -204,6 +256,14 @@ public class ChunkMeshBuilder {
         return data == null ? 0.0f : worldY;
     }
 
+    /**
+     * Returns the block top y.
+     * @param world the world value
+     * @param worldX the world x value
+     * @param worldY the world y value
+     * @param worldZ the world z value
+     * @return the block top y
+     */
     private static float getBlockTopY(World world, int worldX, int worldY, int worldZ) {
         if (worldY < 0 || worldY >= Chunk.SIZE_Y || !world.isChunkLoadedAt(worldX, worldZ)) return 0.0f;
         byte blockId = world.getBlockTypeAt(worldX, worldY, worldZ);
@@ -212,6 +272,15 @@ public class ChunkMeshBuilder {
         return data == null ? 0.0f : getBlockTopY(data, worldY);
     }
 
+    /**
+     * Performs the should render face operation.
+     * @param world the world value
+     * @param worldX the world x value
+     * @param worldY the world y value
+     * @param worldZ the world z value
+     * @param currentBlock the current block value
+     * @return the should render face result
+     */
     private static boolean shouldRenderFace(World world, int worldX, int worldY, int worldZ, BlockData currentBlock) {
         if (worldY < 0) return false;
         if (worldY >= Chunk.SIZE_Y) return true;
@@ -231,6 +300,14 @@ public class ChunkMeshBuilder {
         return neighborData.isTransparent() && neighborData != currentBlock;
     }
 
+    /**
+     * Performs the should render water top operation.
+     * @param world the world value
+     * @param worldX the world x value
+     * @param y the y value
+     * @param worldZ the world z value
+     * @return the should render water top result
+     */
     private static boolean shouldRenderWaterTop(World world, int worldX, int y, int worldZ) {
         if (y >= Chunk.SIZE_Y - 1) return true;
         byte aboveId = world.getBlockTypeAt(worldX, y + 1, worldZ);
@@ -241,6 +318,14 @@ public class ChunkMeshBuilder {
         return !above.isSolid();
     }
 
+    /**
+     * Returns the water corner height.
+     * @param world the world value
+     * @param wx the wx value
+     * @param wy the wy value
+     * @param wz the wz value
+     * @return the water corner height
+     */
     private static float getWaterCornerHeight(World world, int wx, int wy, int wz) {
         float totalHeight = 0;
         int count = 0;
@@ -266,6 +351,15 @@ public class ChunkMeshBuilder {
         return count > 0 ? (totalHeight / count) : (wy + 0.88f);
     }
 
+    /**
+     * Checks whether the partial side exposure condition is met.
+     * @param world the world value
+     * @param worldX the world x value
+     * @param worldY the world y value
+     * @param worldZ the world z value
+     * @param currentBlock the current block value
+     * @return {@code true} if partial side exposure; otherwise {@code false}
+     */
     private static boolean isPartialSideExposure(World world, int worldX, int worldY, int worldZ, BlockData currentBlock) {
         if (currentBlock.isFluid() || !world.isChunkLoadedAt(worldX, worldZ) || worldY < 0 || worldY >= Chunk.SIZE_Y) return false;
         byte neighborId = world.getBlockTypeAt(worldX, worldY, worldZ);
@@ -274,6 +368,16 @@ public class ChunkMeshBuilder {
         return neighborData == BlockData.TILLED_DIRT && currentBlock != BlockData.TILLED_DIRT;
     }
 
+    /**
+     * Returns the side bottom y.
+     * @param world the world value
+     * @param worldX the world x value
+     * @param worldY the world y value
+     * @param worldZ the world z value
+     * @param currentBottomY the current bottom y value
+     * @param currentBlock the current block value
+     * @return the side bottom y
+     */
     private static float getSideBottomY(World world, int worldX, int worldY, int worldZ, float currentBottomY, BlockData currentBlock) {
         if (!world.isChunkLoadedAt(worldX, worldZ) || worldY < 0 || worldY >= Chunk.SIZE_Y) return currentBottomY;
         byte neighborId = world.getBlockTypeAt(worldX, worldY, worldZ);
@@ -283,6 +387,13 @@ public class ChunkMeshBuilder {
         return currentBottomY;
     }
 
+    /**
+     * Calculates and returns the side uv bottom.
+     * @param expBottom the exp bottom value
+     * @param bottomY the bottom y value
+     * @param topY the top y value
+     * @return the calculate side uv bottom result
+     */
     private static float calculateSideUvBottom(float expBottom, float bottomY, float topY) {
         if (topY <= bottomY) return 0.0f;
         float exposedHeight = topY - expBottom;
@@ -291,6 +402,24 @@ public class ChunkMeshBuilder {
         return Math.clamp(1.0f - (exposedHeight / totalHeight), 0.0f, 1.0f);
     }
 
+    /**
+     * Adds the quad pos.
+     * @param buf the buf value
+     * @param idx the idx value
+     * @param x1 the x1 value
+     * @param y1 the y1 value
+     * @param z1 the z1 value
+     * @param x2 the x2 value
+     * @param y2 the y2 value
+     * @param z2 the z2 value
+     * @param x3 the x3 value
+     * @param y3 the y3 value
+     * @param z3 the z3 value
+     * @param x4 the x4 value
+     * @param y4 the y4 value
+     * @param z4 the z4 value
+     * @return the add quad pos result
+     */
     private static int addQuadPos(float[] buf, int idx, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4) {
         buf[idx] = x1; buf[idx + 1] = y1; buf[idx + 2] = z1;
         buf[idx + 3] = x2; buf[idx + 4] = y2; buf[idx + 5] = z2;
@@ -299,6 +428,20 @@ public class ChunkMeshBuilder {
         return idx + 12;
     }
 
+    /**
+     * Adds the quad uv.
+     * @param buf the buf value
+     * @param idx the idx value
+     * @param u1 the u1 value
+     * @param v1 the v1 value
+     * @param u2 the u2 value
+     * @param v2 the v2 value
+     * @param u3 the u3 value
+     * @param v3 the v3 value
+     * @param u4 the u4 value
+     * @param v4 the v4 value
+     * @return the add quad uv result
+     */
     private static int addQuadUV(float[] buf, int idx, float u1, float v1, float u2, float v2, float u3, float v3, float u4, float v4) {
         buf[idx] = u1; buf[idx + 1] = v1;
         buf[idx + 2] = u2; buf[idx + 3] = v2;
@@ -307,17 +450,58 @@ public class ChunkMeshBuilder {
         return idx + 8;
     }
 
+    /**
+     * Adds the quad norm.
+     * @param buf the buf value
+     * @param idx the idx value
+     * @param nx the nx value
+     * @param ny the ny value
+     * @param nz the nz value
+     * @return the add quad norm result
+     */
     private static int addQuadNorm(float[] buf, int idx, float nx, float ny, float nz) {
         for (int i = 0; i < 4; i++) { buf[idx++] = nx; buf[idx++] = ny; buf[idx++] = nz; }
         return idx;
     }
 
+    /**
+     * Adds the quad indices.
+     * @param buf the buf value
+     * @param idx the idx value
+     * @param vertexCount the vertex count value
+     * @return the add quad indices result
+     */
     private static int addQuadIndices(int[] buf, int idx, int vertexCount) {
         buf[idx] = vertexCount; buf[idx + 1] = vertexCount + 1; buf[idx + 2] = vertexCount + 2;
         buf[idx + 3] = vertexCount + 2; buf[idx + 4] = vertexCount + 3; buf[idx + 5] = vertexCount;
         return idx + 6;
     }
 
+    /**
+     * Adds the side quad direct.
+     * @param pos the pos value
+     * @param norm the norm value
+     * @param uv the uv value
+     * @param idx the idx value
+     * @param posI the pos i value
+     * @param normI the norm i value
+     * @param uvI the uv i value
+     * @param elemI the elem i value
+     * @param vertexCount the vertex count value
+     * @param x1 the x1 value
+     * @param x2 the x2 value
+     * @param y1 the y1 value
+     * @param y2 the y2 value
+     * @param z1 the z1 value
+     * @param z2 the z2 value
+     * @param nx the nx value
+     * @param ny the ny value
+     * @param nz the nz value
+     * @param data the data value
+     * @param uvB the uv b value
+     * @param uvT the uv t value
+     * @return the add side quad direct result
+     */
     private static int addSideQuadDirect(float[] pos, float[] norm, float[] uv, int[] idx,
                                          int posI, int normI, int uvI, int elemI, int vertexCount, float x1,
                                          float x2, float y1, float y2, float z1, float z2, float nx, float ny,

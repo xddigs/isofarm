@@ -10,6 +10,9 @@ import com.isofarm.wrld.World;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 
+/**
+ * Provides falling state behavior.
+ */
 public class FallingState implements PlayerState {
     private static final float FALL_DISTANCE = 4.0f;
     private static final float DOUBLE_JUMP_WINDOW = 0.75f;
@@ -18,6 +21,10 @@ public class FallingState implements PlayerState {
     private float fallTime;
     private float jumpTime;
 
+    /**
+     * Performs the enter operation.
+     * @param player the player value
+     */
     @Override
     public void enter(Player player) {
         this.fallStartY = player.getPosition().y;
@@ -27,6 +34,11 @@ public class FallingState implements PlayerState {
         player.setFalling(true);
     }
 
+    /**
+     * Performs the input operation.
+     * @param player the player value
+     * @param gameMaster the game master value
+     */
     @Override
     public void input(Player player, GameMaster gameMaster) {
         if (gameMaster.isInventoryOpen() || gameMaster.isChatOpen()) {
@@ -39,6 +51,11 @@ public class FallingState implements PlayerState {
         }
     }
 
+    /**
+     * Updates the current state.
+     * @param player the player value
+     * @param delta the delta value
+     */
     @Override
     public void update(Player player, float delta) {
         fallTime += delta;
@@ -66,6 +83,10 @@ public class FallingState implements PlayerState {
         }
     }
 
+    /**
+     * Performs the exit operation.
+     * @param player the player value
+     */
     @Override
     public void exit(Player player) {
         player.setFalling(false);

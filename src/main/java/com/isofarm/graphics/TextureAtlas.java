@@ -18,11 +18,20 @@ import java.util.Map;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 
+/**
+ * Provides texture atlas behavior.
+ */
 public class TextureAtlas {
     private static final Logger log = LoggerFactory.getLogger(TextureAtlas.class);
     private final int textureId;
     private final Map<String, TextureRegion> regions = new HashMap<>();
 
+    /**
+     * Creates a new {@code TextureAtlas} instance.
+     * @param imagePaths the image paths value
+     * @param tileWidth the tile width value
+     * @param tileHeight the tile height value
+     */
     public TextureAtlas(List<String> imagePaths, int tileWidth, int tileHeight) {
         int count = imagePaths.size();
         int cols = (int) Math.ceil(Math.sqrt(count));
@@ -94,6 +103,14 @@ public class TextureAtlas {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
+    /**
+     * Loads the texture from resources.
+     * @param path the path value
+     * @param w the w value
+     * @param h the h value
+     * @param comp the comp value
+     * @return the load texture from resources result
+     */
     private ByteBuffer loadTextureFromResources(String path, IntBuffer w, IntBuffer h, IntBuffer comp) {
         String resourcePath = path.startsWith("/") ? path : "/" + path;
         try (InputStream in = TextureAtlas.class.getResourceAsStream(resourcePath)) {
@@ -113,22 +130,39 @@ public class TextureAtlas {
         }
     }
 
+    /**
+     * Performs the bind operation.
+     */
     public void bind() {
         glBindTexture(GL_TEXTURE_2D, textureId);
     }
 
+    /**
+     * Performs the unbind operation.
+     */
     public void unbind() {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
+    /**
+     * Returns the region.
+     * @param path the path value
+     * @return the region
+     */
     public TextureRegion getRegion(String path) {
         return regions.get(path);
     }
 
+    /**
+     * Performs the dispose operation.
+     */
     public void dispose() {
         glDeleteTextures(textureId);
     }
 
+    /**
+     * Stores texture region data.
+     */
     public record TextureRegion(Vector2f uvMin, Vector2f uvMax, Vector2f scale, Vector2f offset) {
     }
 }

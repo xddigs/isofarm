@@ -9,12 +9,19 @@ import com.isofarm.graphics.gltf.GLTFNode;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Provides equipment controller behavior.
+ */
 @Singleton
 public class EquipmentController {
     public static final EquipmentController ec = new EquipmentController();
     private final Map<String, GLTFNode> equipmentNodes = new HashMap<>();
     private GLTFNode currentActiveNode = null;
 
+    /**
+     * Initializes the component.
+     * @param playerModel the player model value
+     */
     public void init(GLTFModel playerModel) {
         String[] materials = new String[Tier.values().length];
         String[] types = new String[ToolType.values().length];
@@ -41,6 +48,11 @@ public class EquipmentController {
         currentActiveNode = null;
     }
 
+    /**
+     * Performs the equip operation.
+     * @param material the material value
+     * @param type the type value
+     */
     public void equip(String material, String type) {
         if (currentActiveNode != null) {
             currentActiveNode.setVisible(false);

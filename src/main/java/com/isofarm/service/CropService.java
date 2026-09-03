@@ -9,13 +9,30 @@ import com.isofarm.wrld.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Provides crop service behavior.
+ */
 @Singleton
 public class CropService implements Service<Crop> {
     public static final CropService cs = new CropService();
     private static final Logger log = LoggerFactory.getLogger(CropService.class);
 
+    /**
+     * Creates a new {@code CropService} instance.
+     */
     private CropService() {}
 
+    /**
+     * Performs the plant operation.
+     * @param x the x value
+     * @param y the y value
+     * @param z the z value
+     * @param player the player value
+     * @param block the block value
+     * @param type the type value
+     * @param currentSeason the current season value
+     * @return the plant result
+     */
     public Crop plant(int x, int y, int z, Player player, Block block,
                       CropType type, Season currentSeason) {
 
@@ -55,6 +72,11 @@ public class CropService implements Service<Crop> {
         return newCrop;
     }
 
+    /**
+     * Updates the current state.
+     * @param delta the delta value
+     * @param weather the weather value
+     */
     public void update(float delta, WeatherType weather) {
         World.wrld.forEach(b -> {
             if (b instanceof Crop crop) {
@@ -63,6 +85,12 @@ public class CropService implements Service<Crop> {
         });
     }
 
+    /**
+     * Performs the harvest operation.
+     * @param player the player value
+     * @param crop the crop value
+     * @return the harvest result
+     */
     @SuppressWarnings("UnusedReturnValue")
     public int harvest(Player player, Crop crop) {
         if (!crop.isReadyToHarvest()) {
@@ -94,6 +122,10 @@ public class CropService implements Service<Crop> {
         return yield;
     }
 
+    /**
+     * Performs the rip operation.
+     * @param crop the crop value
+     */
     public void rip(Crop crop) {
         World.wrld.removeCrop(crop);
         log.info("Ripped {} from the ground.", crop.getCropType().getName());

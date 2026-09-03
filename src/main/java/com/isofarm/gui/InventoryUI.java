@@ -20,6 +20,9 @@ import java.util.List;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_RIGHT;
 
+/**
+ * Provides inventory ui behavior.
+ */
 @SuppressWarnings("all")
 public class InventoryUI extends UIElement {
     private static final int BACKPACK_COLUMNS = 4;
@@ -58,6 +61,11 @@ public class InventoryUI extends UIElement {
     private float backpackTargetY;
     private float backpackCurrentY;
 
+    /**
+     * Creates a new {@code InventoryUI} instance.
+     * @param x the x value
+     * @param y the y value
+     */
     public InventoryUI(float x, float y) {
         super(x, y, getInventoryWidth(), getInventoryHeight());
         defaultX = x;
@@ -77,34 +85,57 @@ public class InventoryUI extends UIElement {
         hide();
     }
 
+    /**
+     * Returns the inventory width.
+     * @return the inventory width
+     */
     private static float getInventoryWidth() {
         return Settings.getScaledPadding() * 2.0f +
                 K.UI.INVENTORY_COLUMNS * Settings.getScaledSlot() +
                 (K.UI.INVENTORY_COLUMNS - 1) * Settings.getScaledSpacing();
     }
 
+    /**
+     * Returns the inventory height.
+     * @return the inventory height
+     */
     private static float getInventoryHeight() {
         return Settings.getScaledPadding() * 2.0f + Settings.getScaledHeader() +
                 K.UI.INVENTORY_ROWS * Settings.getScaledSlot() +
                 (K.UI.INVENTORY_ROWS - 1) * Settings.getScaledSpacing();
     }
 
+    /**
+     * Returns the backpack width.
+     * @return the backpack width
+     */
     public static float getBackpackWidth() {
         return Settings.getScaledPadding() * 2.0f +
                 BACKPACK_COLUMNS * Settings.getScaledSlot() +
                 (BACKPACK_COLUMNS - 1) * Settings.getScaledSpacing();
     }
 
+    /**
+     * Returns the backpack height.
+     * @return the backpack height
+     */
     public static float getBackpackHeight() {
         return Settings.getScaledPadding() * 2.0f + Settings.getScaledHeader() +
                 BACKPACK_ROWS * Settings.getScaledSlot() +
                 (BACKPACK_ROWS - 1) * Settings.getScaledSpacing();
     }
 
+    /**
+     * Returns the slot uis.
+     * @return the slot uis
+     */
     public InventorySlotUI[] getSlotUIs() {
         return slotUIs;
     }
 
+    /**
+     * Creates and returns the buttons.
+     */
     private void createButtons() {
         float btnWidth = Settings.getScaledSlot(), btnHeight = Settings.getScaledSlot();
         sortButton = new UIButton(Settings.getScaledPadding(),
@@ -140,6 +171,9 @@ public class InventoryUI extends UIElement {
         addChild(backpackButton);
     }
 
+    /**
+     * Creates and returns the slots.
+     */
     public void createSlots() {
         for (int i = 0; i < slotUIs.length; i++) {
             int column = i % K.UI.INVENTORY_COLUMNS;
@@ -154,22 +188,36 @@ public class InventoryUI extends UIElement {
         }
     }
 
+    /**
+     * Returns the buttons.
+     * @return the buttons
+     */
     public List<UIButton> getButtons() {
         return buttons;
     }
 
+    /**
+     * Performs the sort inventory operation.
+     */
     public void sortInventory() {
         if (player != null && inventory != null) {
             inventory.sort();
         }
     }
 
+    /**
+     * Performs the group inventory operation.
+     */
     public void groupInventory() {
         if (player != null && inventory != null) {
             inventory.group();
         }
     }
 
+    /**
+     * Updates the position.
+     * @param delta the delta value
+     */
     private void updatePosition(float delta) {
         float currentX = getX();
         float currentY = getY();
@@ -208,6 +256,10 @@ public class InventoryUI extends UIElement {
         }
     }
 
+    /**
+     * Performs the open backpack operation.
+     * @param backpackUI the backpack ui value
+     */
     public void openBackpack(BackpackInventoryUI backpackUI) {
         if (backpackUI == null) return;
         this.backpackUI = backpackUI;
@@ -224,6 +276,9 @@ public class InventoryUI extends UIElement {
         this.backpackUI.setPosition(getX() + (getWidth() - backpackUI.getWidth()) / 2.0f, backpackCurrentY);
     }
 
+    /**
+     * Performs the close backpack operation.
+     */
     public void closeBackpack() {
         if (!isBackpackOpen || isBackpackClosing) return;
         this.isBackpackClosing = true;
@@ -233,6 +288,10 @@ public class InventoryUI extends UIElement {
         }
     }
 
+    /**
+     * Updates the current state.
+     * @param delta the delta value
+     */
     @Override
     public void update(float delta) {
         super.update(delta);
@@ -254,6 +313,9 @@ public class InventoryUI extends UIElement {
         slotInteract();
     }
 
+    /**
+     * Performs the on open operation.
+     */
     private void onOpen() {
         isClosing = false;
         closeBackpack();
@@ -271,6 +333,9 @@ public class InventoryUI extends UIElement {
         }
     }
 
+    /**
+     * Performs the on close operation.
+     */
     private void onClose() {
         if (backpackUI != null) {
             backpackUI.hide();
@@ -289,6 +354,10 @@ public class InventoryUI extends UIElement {
         returnCarriedItem();
     }
 
+    /**
+     * Performs the hide operation.
+     * @return the hide result
+     */
     @Override
     public UIElement hide() {
         super.hide();
@@ -296,6 +365,9 @@ public class InventoryUI extends UIElement {
         return this;
     }
 
+    /**
+     * Performs the return carried item operation.
+     */
     private void returnCarriedItem() {
         if (carriedItem == null || carriedAmount <= 0 || player == null) {
             clearCarriedItem();
@@ -311,11 +383,17 @@ public class InventoryUI extends UIElement {
         }
     }
 
+    /**
+     * Clears the carried item.
+     */
     private void clearCarriedItem() {
         carriedItem = null;
         carriedAmount = 0;
     }
 
+    /**
+     * Performs the sync inventory operation.
+     */
     protected void syncInventory() {
         if (inventory == null) return;
 
@@ -359,6 +437,10 @@ public class InventoryUI extends UIElement {
         }
     }
 
+    /**
+     * Updates the item sprite.
+     * @param slotUI the slot ui value
+     */
     private void updateItemSprite(InventorySlotUI slotUI) {
         Item item = slotUI.getItem();
 
@@ -383,6 +465,9 @@ public class InventoryUI extends UIElement {
         slotUI.setTooltipText(item.getDisplayName());
     }
 
+    /**
+     * Updates the slots.
+     */
     private void updateSlots() {
         float mouseX = Mouse.getX();
         float mouseY = Mouse.getY();
@@ -410,6 +495,9 @@ public class InventoryUI extends UIElement {
         }
     }
 
+    /**
+     * Performs the slot interact operation.
+     */
     public void slotInteract() {
         if (hotbarUI == null) return;
 
@@ -441,6 +529,10 @@ public class InventoryUI extends UIElement {
         }
     }
 
+    /**
+     * Performs the left click operation.
+     * @param slot the slot value
+     */
     private void leftClick(InventorySlot slot) {
         if (carriedItem == null) {
             pickEntireStack(slot);
@@ -459,6 +551,10 @@ public class InventoryUI extends UIElement {
         }
     }
 
+    /**
+     * Performs the pick entire stack operation.
+     * @param slot the slot value
+     */
     private void pickEntireStack(InventorySlot slot) {
         if (slot.isEmpty()) {
             return;
@@ -470,12 +566,20 @@ public class InventoryUI extends UIElement {
         slot.clear();
     }
 
+    /**
+     * Performs the place entire stack operation.
+     * @param slot the slot value
+     */
     private void placeEntireStack(InventorySlot slot) {
         slot.setItem(carriedItem);
         slot.setAmount(carriedAmount);
         clearCarriedItem();
     }
 
+    /**
+     * Performs the merge carried stack operation.
+     * @param slot the slot value
+     */
     private void mergeCarriedStack(InventorySlot slot) {
         int maxStack = K.World.MAX_STACK;
         int space = maxStack - slot.getAmount();
@@ -493,6 +597,10 @@ public class InventoryUI extends UIElement {
         }
     }
 
+    /**
+     * Performs the swap stacks operation.
+     * @param slot the slot value
+     */
     private void swapStacks(InventorySlot slot) {
         Item tempItem = slot.getItem();
         int tempAmount = slot.getAmount();
@@ -504,6 +612,10 @@ public class InventoryUI extends UIElement {
         carriedAmount = tempAmount;
     }
 
+    /**
+     * Performs the right click operation.
+     * @param slot the slot value
+     */
     private void rightClick(InventorySlot slot) {
         if (carriedItem == null) {
             takeHalf(slot);
@@ -522,6 +634,10 @@ public class InventoryUI extends UIElement {
         addOneToSlot(slot);
     }
 
+    /**
+     * Performs the take half operation.
+     * @param slot the slot value
+     */
     private void takeHalf(InventorySlot slot) {
         if (slot.isEmpty()) {
             return;
@@ -535,6 +651,10 @@ public class InventoryUI extends UIElement {
         slot.setAmount(slot.getAmount() - splitAmount);
     }
 
+    /**
+     * Performs the place one operation.
+     * @param slot the slot value
+     */
     private void placeOne(InventorySlot slot) {
         int maxStack = K.World.MAX_STACK;
         if (maxStack <= 0) {
@@ -549,6 +669,10 @@ public class InventoryUI extends UIElement {
         }
     }
 
+    /**
+     * Adds the one to slot.
+     * @param slot the slot value
+     */
     private void addOneToSlot(InventorySlot slot) {
         int maxStack = K.World.MAX_STACK;
 
@@ -564,6 +688,12 @@ public class InventoryUI extends UIElement {
         }
     }
 
+    /**
+     * Checks whether the same type condition is met.
+     * @param a the a value
+     * @param b the b value
+     * @return {@code true} if same type; otherwise {@code false}
+     */
     private boolean isSameType(Item a, Item b) {
         if (a == null || b == null) {
             return false;
@@ -583,6 +713,9 @@ public class InventoryUI extends UIElement {
         };
     }
 
+    /**
+     * Renders render.
+     */
     @Override
     public void render() {
         renderChildren();
@@ -596,6 +729,9 @@ public class InventoryUI extends UIElement {
         }
     }
 
+    /**
+     * Renders the carried item.
+     */
     private void renderCarriedItem() {
         if (carriedItem == null || carriedAmount <= 0) {
             return;
@@ -622,6 +758,15 @@ public class InventoryUI extends UIElement {
         }
     }
 
+    /**
+     * Sets the icons.
+     * @param seed the seed value
+     * @param crop the crop value
+     * @param block the block value
+     * @param tool the tool value
+     * @param material the material value
+     * @param inv the inv value
+     */
     public void setIcons(SpriteSheet seed, SpriteSheet crop,
                          SpriteSheet block, SpriteSheet tool,
                          SpriteSheet material, SpriteSheet inv) {
@@ -642,6 +787,10 @@ public class InventoryUI extends UIElement {
         }
     }
 
+    /**
+     * Sets the player.
+     * @param player the player value
+     */
     public void setPlayer(Player player) {
         this.player = player;
 
@@ -652,31 +801,59 @@ public class InventoryUI extends UIElement {
         }
     }
 
+    /**
+     * Returns the inventory.
+     * @return the inventory
+     */
     public Inventory getInventory() {
         return inventory;
     }
 
+    /**
+     * Sets the inventory.
+     * @param inventory the inventory value
+     */
     public void setInventory(Inventory inventory) {
         this.inventory = inventory;
     }
 
+    /**
+     * Sets the hotbar ui.
+     * @param gameMaster the game master value
+     * @param hotbarUI the hotbar ui value
+     */
     public void setHotbarUI(GameMaster gameMaster, HotbarUI hotbarUI) {
         this.gameMaster = gameMaster;
         this.hotbarUI = hotbarUI;
     }
 
+    /**
+     * Sets the game master.
+     * @param gameMaster the game master value
+     */
     public void setGameMaster(GameMaster gameMaster) {
         this.gameMaster = gameMaster;
     }
 
+    /**
+     * Returns the backpack ui.
+     * @return the backpack ui
+     */
     public BackpackInventoryUI getBackpackUI() {
         return backpackUI;
     }
 
+    /**
+     * Sets the backpack ui.
+     * @param backpackUI the backpack ui value
+     */
     public void setBackpackUI(BackpackInventoryUI backpackUI) {
         this.backpackUI = backpackUI;
     }
 
+    /**
+     * Enumerates the supported tab values.
+     */
     public enum Tab {
         INVENTORY, CRAFTING
     }
