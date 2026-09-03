@@ -32,8 +32,8 @@ public class GUI {
     private static final UIFont big = new UIFont(K.Paths.FONT, 64.0f);
 
     private static final UIFont smallBold = new UIFont(K.Paths.FONT_BOLD, 16.0f);
-    private static final UIFont normalBold = new UIFont(K.Paths.FONT_BOLD, 24.0f);
-    private static final UIFont bigBold = new UIFont(K.Paths.FONT_BOLD, 32.0f);
+    private static final UIFont normalBold = new UIFont(K.Paths.FONT_BOLD, 32.0f);
+    private static final UIFont bigBold = new UIFont(K.Paths.FONT_BOLD, 64.0f);
 
     private static int screenWidth;
     private static int screenHeight;
