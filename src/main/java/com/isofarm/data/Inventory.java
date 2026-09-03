@@ -55,6 +55,14 @@ public class Inventory {
         return !bookSlot.isEmpty() && bookSlot.getItem() instanceof CraftingBook;
     }
 
+    public Backpack getBackpack() {
+        return backpackSlot.getItem() instanceof Backpack backpack ? backpack : null;
+    }
+
+    public CraftingBook getBook() {
+        return bookSlot.getItem() instanceof CraftingBook book ? book : null;
+    }
+
     public void equipBackpack(Backpack backpack) {
         remove(backpack, 1);
         backpackSlot.setItem(backpack);

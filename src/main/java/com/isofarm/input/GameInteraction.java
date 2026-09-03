@@ -110,7 +110,8 @@ public class GameInteraction {
 
         if (inventory.hasBookEquipped() && Keyboard.isKeyPressed(GLFW_KEY_B)
                 && !gameMaster.isChatOpen()) {
-            if (selectedItem instanceof CraftingBook book) {;
+            CraftingBook book = inventory.getBook();
+            if (book != null) {
                 if (!BookService.bs.isOpen()) {
                     BookService.bs.open(book);
                 } else {
