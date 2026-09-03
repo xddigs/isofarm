@@ -1,8 +1,10 @@
 package com.isofarm.utils;
 
+import com.isofarm.data.Languages;
 import com.isofarm.data.Singleton;
 import com.isofarm.data.Tier;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
@@ -12,29 +14,49 @@ import java.util.Properties;
 @Utils
 @Singleton
 public class Local {
+    private static final Languages[] LANGS = Languages.values();
     public static final Local lang = new Local();
     private final Properties properties = new Properties();
+    private Languages currentLanguage;
 
     private Local() {
-        load(Locale.getDefault().getLanguage());
+        String sysLang = Locale.getDefault().getLanguage();
+        Languages initialLang = Languages.EN;
+        for (Languages l : LANGS) {
+            if (l.getCode().startsWith(sysLang)) {
+                initialLang = l;
+                break;
+            }
+        }
+
+        setLanguage(initialLang);
     }
 
-    private void load(String language) {
-        String file = "/lang/lang_" + language + ".properties";
+    public void setLanguage(Languages language) {
+        if (language == null) return;
+
+        String file = "/lang/lang_" + language.getCode() + ".properties";
         try (InputStream input = Local.class.getResourceAsStream(file)) {
-            if (input == null) return;
+            if (input == null) {
+                throw new FileNotFoundException("Localization file not found: " + file);
+            }
+            properties.clear();
             properties.load(input);
+            this.currentLanguage = language;
         } catch (IOException e) {
             throw new RuntimeException("Failed to load localization: " + file, e);
         }
     }
 
-    public String getLanguage() {
-        return properties.getProperty("lang", "en_US");
+    public Languages nextLanguage() {
+        int nextIndex = (currentLanguage.ordinal() + 1) % LANGS.length;
+        Languages nextLang = LANGS[nextIndex];
+        setLanguage(nextLang);
+        return nextLang;
     }
 
-    public void setLanguage(String language) {
-        load(language);
+    public Languages getCurrentLanguage() {
+        return currentLanguage;
     }
 
     public String t(String key) {
@@ -42,15 +64,15 @@ public class Local {
     }
 
     public String f(String s, Object... args) {
-        return MessageFormat.format(Local.lang.t(s), args);
+        return MessageFormat.format(t(s), args);
     }
 
-    public String item(String itemKey, Tier tier) {
+    public String item(String itemKey, String tierKey) {
         String itemName = t(itemKey);
-        if (tier == null || tier == Tier.NONE) return itemName;
+        if (tierKey == null || !tierKey.equals(Tier.toStr(Tier.NONE))) return itemName;
 
-        String tierKey = "item.tier." + tier.name().toLowerCase(Locale.ROOT);
-        String tierName = t(tierKey);
+        String tier = "item.tier." + tierKey.toLowerCase(Locale.ROOT);
+        String tierName = t(tier);
         return f("item.format.tiered", tierName, itemName);
     }
 }
