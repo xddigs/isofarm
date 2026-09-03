@@ -20,13 +20,21 @@ public class Local {
     }
 
     private void load(String language) {
-        String file = "/lang/" + language + ".properties";
+        String file = "/lang/lang_" + language + ".properties";
         try (InputStream input = Local.class.getResourceAsStream(file)) {
             if (input == null) return;
             properties.load(input);
         } catch (IOException e) {
             throw new RuntimeException("Failed to load localization: " + file, e);
         }
+    }
+
+    public String getLanguage() {
+        return properties.getProperty("lang", "en_US");
+    }
+
+    public void setLanguage(String language) {
+        load(language);
     }
 
     public String t(String key) {
