@@ -26,7 +26,6 @@ import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 @Singleton
 public class GameMaster {
     public static final GameMaster game = new GameMaster();
-
     private static final Logger log = LoggerFactory.getLogger(GameMaster.class);
     private final long windowHandle = Intro.getWindow();
     private final World world = World.wrld;
@@ -39,7 +38,6 @@ public class GameMaster {
     private final ItemRegistry itemRegistry = new ItemRegistry();
     private final RainEngine rainEngine = new RainEngine();
     private final List<Entity> entities = new LinkedList<>();
-
     private List<Recipe> recipes;
     private ShadowMap shadowMap;
     private ChunkManager chunkManager;
