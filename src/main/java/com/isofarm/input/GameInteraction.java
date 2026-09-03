@@ -138,26 +138,35 @@ public class GameInteraction {
             }
         }
 
-        if (selectedItem instanceof Backpack backpack &&
-                isRightPressed && !gameMaster.isInventoryOpen()) {
-            if (isCtrlHeld) {
-                backpack.unequip();
-            } else {
-                backpack.use(gameMaster, isCtrlHeld);
+        if (selectedItem instanceof Usable usable) {
+            switch (usable) {
+                case Backpack backpack -> {
+                    if (isRightPressed && !gameMaster.isInventoryOpen()) {
+                        if (isCtrlHeld) {
+                            backpack.unequip();
+                        } else {
+                            backpack.use(gameMaster, isCtrlHeld);
+                        }
+                        isRightPressed = false;
+                    }
+                }
+
+                case CraftingBook book -> {
+                    if (isRightPressed && !BookService.bs.isOpen()) {
+                        book.use(gameMaster, isCtrlHeld);
+                        isRightPressed = false;
+                    }
+                }
+
+                case Bucket bucket -> {
+                    if (isRightPressed && !gameMaster.isInventoryOpen()) {
+                        bucket.use(gameMaster, isCtrlHeld);
+                        isRightPressed = false;
+                    }
+                }
+                default -> throw new IllegalStateException(
+                        "Unexpected value: " + usable);
             }
-            isRightPressed = false;
-        }
-
-        if (selectedItem instanceof CraftingBook book &&
-                isRightPressed && !BookService.bs.isOpen()) {
-            book.use(gameMaster, isCtrlHeld);
-            isRightPressed = false;
-        }
-
-        if (selectedItem instanceof Bucket bucket &&
-                isRightPressed && !gameMaster.isInventoryOpen()) {
-            bucket.use(gameMaster, isCtrlHeld);
-            isRightPressed = false;
         }
 
         BlockPos hoveredCell = HoveredCell.get(gameMaster, isShiftHeld);
@@ -557,7 +566,8 @@ public class GameInteraction {
 
             byte targetBlock = world.getBlockTypeAt(placeX, placeY, placeZ);
             BlockData target = BlockData.fromId(targetBlock);
-            if (target.equals(BlockData.AIR) || target.equals(BlockData.WATER) || target.isPlant()) {
+            if (target.equals(BlockData.AIR) || target.equals(BlockData.WATER) ||
+                    (target.isPlant() && !block.getType().isPlant())) {
                 Block newBlock = new Block(block.getType(), placeX, placeY, placeZ);
                 if (block.getType().equals(BlockData.OAK_BONSAI)) {
                     gameMaster.getTreeService().plant(placeX, placeY, placeZ, BlockData.OAK_BONSAI);
