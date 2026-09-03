@@ -10,10 +10,7 @@ import com.isofarm.item.Item;
 import com.isofarm.service.BookService;
 import com.isofarm.service.Service;
 import com.isofarm.service.TimeService;
-import com.isofarm.utils.Components;
-import com.isofarm.utils.K;
-import com.isofarm.utils.Settings;
-import com.isofarm.utils.ToastFactory;
+import com.isofarm.utils.*;
 import com.isofarm.wrld.GameMaster;
 import org.joml.Vector2i;
 import org.joml.Vector4f;
@@ -553,7 +550,7 @@ public class GameUIService implements Service<GameMaster> {
         this.windowWidth = width;
         this.windowHeight = height;
         ToastFactory.setWindowWidth(width);
-        ToastFactory.info("Resized to " + width + "x" + height);
+        ToastFactory.info(Local.lang.f("engine.window_resized", width, height));
         resetHotbarPosition();
 
         if (inventoryUI != null) {
@@ -608,9 +605,7 @@ public class GameUIService implements Service<GameMaster> {
         if (player.purse() < totalPrice) {
             log.warn("Player doesn't have enough money to buy {} x{}",
                     item.getName(), amount);
-            ToastFactory.warning(
-                    "You don't have enough money to buy " + amount + " "
-                            + item.getName() + "!");
+            ToastFactory.warning(Local.lang.t("toast.item_not_enough_coins"));
             return;
         }
 
@@ -621,7 +616,7 @@ public class GameUIService implements Service<GameMaster> {
         player.getInventory().add(item, amount);
 
         log.info("Player bought {} x{} from shop", item.getName(), amount);
-        ToastFactory.success(
-                "You bought " + amount + " " + item.getName() + "!");
+        ToastFactory.success(Local.lang.f("toast.item_bought", amount,
+                item.getName(), totalPrice));
     }
 }
