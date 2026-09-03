@@ -84,6 +84,9 @@ public class BookUI extends UIElement {
     public void update(Book book, SpriteSheet animSheet) {
         if (book == null || !isOpen() || book.getPages().isEmpty() || animSheet == null) {
             hoveredBookLine = null;
+            GameMaster.game.getGameUIService()
+                    .getUIManager()
+                    .hideTooltip();
             return;
         }
 
@@ -112,6 +115,11 @@ public class BookUI extends UIElement {
         float paddingTop = K.UI.UI_BOOK_PADDING_TOP;
         float lineHeight = GUI.getNormalFont().getSize();
 
+        setTooltipText(null);
+        GameMaster.game.getGameUIService()
+                .getUIManager()
+                .hideTooltip();
+
         hoveredBookLine = null;
         int leftPageIndex = book.getCurrentPage();
 
@@ -132,6 +140,8 @@ public class BookUI extends UIElement {
         for (BookLine bookLine : page.getLines()) {
             if (bookLine.isInteractive() && isMouseHovering(textX, textY, bookLine.getText(), lineHeight)) {
                 hoveredBookLine = bookLine;
+                GameMaster.game.getGameUIService().getUIManager().showTooltip(bookLine.getTooltipText(),
+                        Mouse.getX(), Mouse.getY());
                 break;
             }
             textY += lineHeight;
@@ -169,6 +179,7 @@ public class BookUI extends UIElement {
             GUI.drawSprite(animSheet, 0, centerX, y, bookWidth, bookHeight, new Vector4f(1.0f));
             renderSpread(book, centerX, y, animSheet, scale, alpha);
         }
+        renderChildren();
     }
 
     private void updateAnimation(float delta) {

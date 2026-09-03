@@ -379,7 +379,9 @@ public class GameMaster {
             }
         }
 
+        BookService.bs.update();
         gameUIservice.update(delta);
+
         if (player == null) {
             return;
         }
@@ -392,7 +394,6 @@ public class GameMaster {
         cropService.update(delta, WeatherService.wes.getWeather());
         treeService.update(this);
         updateEntities(delta);
-        BookService.bs.update();
         orthoCameraController.update(this, delta);
         particles.update(delta);
         stepController.update(this, player, soundService, delta);

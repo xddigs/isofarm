@@ -40,8 +40,6 @@ public class BookService implements Service<Book> {
     public void update() {
         if (openedBook != null && !BookUI.bui.isAnimating()) {
             openedBook.update();
-            BookUI.bui.update(openedBook,
-                    ResourceManager.rem.getBookAnimationSheet());
         }
 
         if (BookUI.bui.isClosed()) {

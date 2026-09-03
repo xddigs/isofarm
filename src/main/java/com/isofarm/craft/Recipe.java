@@ -69,7 +69,7 @@ public record Recipe(Tier tier, Item result, int resultAmount, List<Ingredient> 
 
     public List<String> toBookLines() {
         List<String> lines = new ArrayList<>();
-        lines.add("**" + result.getDisplayName() + " x " + resultAmount);
+        lines.add("**" + result.getDisplayName());
         for (Ingredient ingredient : ingredients) {
             lines.add(ingredient.craftable().getDisplayName() + " x " + ingredient.amount());
         }

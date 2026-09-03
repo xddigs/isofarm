@@ -114,6 +114,21 @@ public class UIManager {
         return tooltip;
     }
 
+    public void showTooltip(String text, float mouseX, float mouseY) {
+        if (text == null || text.isBlank()) {
+            tooltip.hide();
+            return;
+        }
+
+        tooltip.text(text);
+        tooltip.updatePosition(mouseX, mouseY, root.getWidth(), root.getHeight());
+        tooltip.show();
+    }
+
+    public void hideTooltip() {
+        tooltip.hide();
+    }
+
     public UIElement getFocusedElement() {
         return focusedElement;
     }

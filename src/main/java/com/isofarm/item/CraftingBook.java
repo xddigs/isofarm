@@ -1,6 +1,5 @@
 package com.isofarm.item;
 
-import com.isofarm.craft.Ingredient;
 import com.isofarm.craft.Recipe;
 import com.isofarm.craft.RecipeRegistry;
 import com.isofarm.data.Inventory;
@@ -11,6 +10,7 @@ import com.isofarm.wrld.GameMaster;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class CraftingBook extends Book implements Undroppable {
     private static final int LINES_PER_PAGE = 16;
@@ -37,7 +37,6 @@ public class CraftingBook extends Book implements Undroppable {
         for (Recipe recipe : recipes) {
             List<String> lines = recipe.toBookLines();
             if (lines.isEmpty()) continue;
-
             if (tempLineCount + lines.size() > LINES_PER_PAGE) {
                 tempPageIndex++;
                 tempLineCount = 0;
@@ -52,44 +51,25 @@ public class CraftingBook extends Book implements Undroppable {
 
         Page page = new Page();
         addPage(page);
-
         int lineCount = 0;
-
         for (Recipe recipe : recipes) {
             List<String> lines = recipe.toBookLines();
             if (lines.isEmpty()) continue;
-
             if (lineCount + lines.size() > LINES_PER_PAGE) {
                 page = new Page();
                 addPage(page);
                 lineCount = 0;
             }
 
+            String tooltip = recipe.ingredients()
+                    .stream()
+                    .map(ingredient -> ingredient.craftable()
+                            .getDisplayName() + " x " + ingredient.amount())
+                    .collect(Collectors.joining(", "));
+
             page.addLine(lines.getFirst(),
-                    line -> CraftingService.cs.craft(player, recipe));
-            lineCount++;
-
-            for (int i = 1; i < lines.size(); i++) {
-                String lineText = lines.get(i);
-                Ingredient targetIngredient = null;
-                for (Ingredient ingredient : recipe.ingredients()) {
-                    if (ingredient != null && lineText.contains(ingredient.craftable().getDisplayName())) {
-                        if (recipePageMap.containsKey(ingredient)) {
-                            targetIngredient = ingredient;
-                            break;
-                        }
-                    }
-                }
-
-                if (targetIngredient != null) {
-                    int targetPage = recipePageMap.get(targetIngredient);
-                    page.addLine(lineText, line -> navigateTo(targetPage));
-                } else {
-                    page.addLine(lineText);
-                }
-
-                lineCount++;
-            }
+                    line -> CraftingService.cs.craft(player, recipe),
+                    tooltip); lineCount++;
         }
     }
 

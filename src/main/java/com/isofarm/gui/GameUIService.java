@@ -29,6 +29,7 @@ import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.glEnable;
 
 @SuppressWarnings("all")
+@GodObject
 public class GameUIService implements Service<GameMaster> {
     private static final Logger log = LoggerFactory.getLogger(GameUIService.class);
     private static final float CHAT_HISTORY_DURATION = 3.0f;
@@ -258,6 +259,13 @@ public class GameUIService implements Service<GameMaster> {
         }
 
         uiManager.update(delta);
+        if (BookService.bs.isOpen()) {
+            BookUI.bui.update(BookService.bs.getOpenedBook(),
+                    ResourceManager.rem.getBookAnimationSheet());
+        } else {
+            uiManager.hideTooltip();
+        }
+
         ToastFactory.update(delta);
 
         if (!gameMaster.isInventoryOpen()) {
@@ -279,6 +287,13 @@ public class GameUIService implements Service<GameMaster> {
     public void render(boolean isHUDShown, GameMaster gameMaster) {
         if (!gameMaster.getPlayer().isAlive()) return;
         GUI.begin(windowWidth, windowHeight);
+
+        SpriteSheet bookSheet = ResourceManager.rem.getBookAnimationSheet();
+        if (BookService.bs.isOpen()) {
+            BookUI.bui.render(BookService.bs.getOpenedBook(),
+                    gameMaster.getGenDelta(), bookSheet);
+        }
+
         if (isHUDShown) {
             uiManager.render();
             float startX = hotbarUI.getAbsoluteX() + 10.0f;
@@ -290,14 +305,8 @@ public class GameUIService implements Service<GameMaster> {
         } else {}
 
         renderChatHistory();
-        if (!gameMaster.isInventoryOpen()) {
+        if (!gameMaster.isInventoryOpen() && !BookUI.bui.isOpen()) {
             GUI.drawCursor(gameMaster);
-        }
-
-        SpriteSheet bookSheet = ResourceManager.rem.getBookAnimationSheet();
-        if (BookService.bs.isOpen()) {
-            BookUI.bui.render(BookService.bs.getOpenedBook(),
-                    gameMaster.getGenDelta(), bookSheet);
         }
 
         GUI.end();
@@ -334,6 +343,10 @@ public class GameUIService implements Service<GameMaster> {
                 GUI.drawSprite(heartsSheet, overlayFrame, posX, posY, heartSize, heartSize, color);
             }
         }
+    }
+
+    public UIManager getUIManager() {
+        return uiManager;
     }
 
     private void renderChatHistory() {

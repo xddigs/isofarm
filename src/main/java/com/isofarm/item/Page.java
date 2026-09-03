@@ -25,6 +25,12 @@ public class Page {
         bookLines.add(new BookLine(line, action));
     }
 
+    public void addLine(String line, Consumer<BookLine> action, String tooltipText) {
+        BookLine bookLine = new BookLine(line, action);
+        bookLine.setTooltipText(tooltipText);
+        bookLines.add(bookLine);
+    }
+
     public BookLine getLine(int index) {
         return bookLines.get(index);
     }

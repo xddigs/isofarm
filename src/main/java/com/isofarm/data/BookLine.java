@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 public class BookLine {
     private String text;
     private Consumer<BookLine> action;
+    private String tooltipText;
 
     public BookLine(String text) {
         this(text, null);
@@ -35,5 +36,14 @@ public class BookLine {
         if (action != null) {
             action.accept(this);
         }
+    }
+
+    public String getTooltipText() {
+        return tooltipText;
+    }
+
+    public BookLine setTooltipText(String tooltipText) {
+        this.tooltipText = tooltipText;
+        return this;
     }
 }
