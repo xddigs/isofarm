@@ -6,7 +6,7 @@ import com.isofarm.input.Mouse;
 import com.isofarm.item.Book;
 import com.isofarm.item.Page;
 import com.isofarm.utils.K;
-import com.isofarm.utils.Local;
+import com.isofarm.wrld.GameMaster;
 import org.joml.Vector4f;
 
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
@@ -249,5 +249,9 @@ public class BookUI {
             return;
         }
         hoveredBookLine.click();
+    }
+
+    public static void reload(Book openedBook) {
+        openedBook.reload(GameMaster.game.getPlayer());
     }
 }

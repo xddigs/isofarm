@@ -1,10 +1,8 @@
 package com.isofarm.graphics;
 
-import com.isofarm.gui.GUI;
-import com.isofarm.gui.UIFont;
-import com.isofarm.gui.UIManager;
-import com.isofarm.gui.UIProgressBar;
+import com.isofarm.gui.*;
 import com.isofarm.input.Keyboard;
+import com.isofarm.service.BookService;
 import com.isofarm.service.TimeService;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Local;
@@ -221,6 +219,11 @@ public class Intro {
                     Keyboard.isKeyPressed(GLFW_KEY_ESCAPE)) {
                 GameMaster.game.getChunkManager().shutdown();
                 glfwSetWindowShouldClose(window, true);
+            }
+
+            if (Keyboard.isKeyPressed(GLFW_KEY_F5)) {
+                Local.lang.nextLanguage();
+                BookUI.reload(BookService.bs.getOpenedBook());
             }
 
             if (Keyboard.isKeyPressed(GLFW_KEY_F11)) {

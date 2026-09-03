@@ -1,6 +1,7 @@
 package com.isofarm.item;
 
 import com.isofarm.data.*;
+import com.isofarm.entity.Player;
 import com.isofarm.gui.BookUI;
 import com.isofarm.input.Keyboard;
 import com.isofarm.service.BookService;
@@ -41,6 +42,23 @@ public class Book extends Usable {
         return true;
     }
 
+    @Override
+    public void update() {
+        if (Keyboard.isKeyPressed(GLFW_KEY_LEFT)) previousPage();
+        if (Keyboard.isKeyPressed(GLFW_KEY_RIGHT)) nextPage();
+    }
+
+
+    @Override
+    public Item copy() {
+        return new Book(hasContent);
+    }
+
+    @Override
+    public boolean enchanting(Enchantment enchantment) {
+        return false;
+    }
+
     public void open() {
         isOpen = true;
     }
@@ -71,12 +89,6 @@ public class Book extends Usable {
 
     public boolean isClosed() {
         return !isOpen;
-    }
-
-    @Override
-    public void update() {
-        if (Keyboard.isKeyPressed(GLFW_KEY_LEFT)) previousPage();
-        if (Keyboard.isKeyPressed(GLFW_KEY_RIGHT)) nextPage();
     }
 
     public boolean hasContent() {
@@ -131,13 +143,5 @@ public class Book extends Usable {
         return currentPage - 2 >= 0;
     }
 
-    @Override
-    public Item copy() {
-        return new Book(hasContent);
-    }
-
-    @Override
-    public boolean enchanting(Enchantment enchantment) {
-        return false;
-    }
+    public void reload(Player player) {}
 }

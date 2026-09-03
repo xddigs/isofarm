@@ -2,11 +2,12 @@ package com.isofarm.utils;
 
 import com.isofarm.data.Languages;
 import com.isofarm.data.Singleton;
-import com.isofarm.data.Tier;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Properties;
@@ -28,23 +29,22 @@ public class Local {
                 break;
             }
         }
-
         setLanguage(initialLang);
     }
 
     public void setLanguage(Languages language) {
         if (language == null) return;
-
         String file = "/lang/lang_" + language.getCode() + ".properties";
         try (InputStream input = Local.class.getResourceAsStream(file)) {
             if (input == null) {
                 throw new FileNotFoundException("Localization file not found: " + file);
             }
+
             properties.clear();
-            properties.load(input);
+            properties.load(new InputStreamReader(input, StandardCharsets.UTF_8));
             this.currentLanguage = language;
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load localization: " + file, e);
+            throw new RuntimeException(e);
         }
     }
 

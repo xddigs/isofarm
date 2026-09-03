@@ -17,7 +17,7 @@ import static org.lwjgl.system.MemoryUtil.memFree;
 @SuppressWarnings("all")
 public class UIFont {
     private static final int FIRST_CHAR = 32;
-    private static final int LAST_CHAR = 126;
+    private static final int LAST_CHAR = 255;
     private static final int CHAR_COUNT = LAST_CHAR - FIRST_CHAR + 1;
 
     private final String path;
@@ -28,7 +28,7 @@ public class UIFont {
     private final STBTTBakedChar.Buffer glyphs;
 
     public UIFont(String path, float size) {
-        this(path, size, 512, 512);
+        this(path, size, 1024, 1024);
     }
 
     public UIFont(String path, float size, int atlasWidth, int atlasHeight) {

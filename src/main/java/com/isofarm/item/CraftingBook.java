@@ -21,6 +21,12 @@ public class CraftingBook extends Book implements Undroppable {
             return;
         }
 
+        reload(player);
+    }
+
+    @Override
+    public void reload(Player player) {
+        clearPages();
         List<Recipe> recipes = RecipeRegistry.reg.getRecipes();
         if (recipes.isEmpty()) return;
 
