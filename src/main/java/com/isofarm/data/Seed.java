@@ -15,7 +15,7 @@ public class Seed implements Item {
     public Seed(CropType type) {
         this.type = type;
         this.id = type.getId();
-        this.name = type.getName();
+        this.name = type.getName() + " Seed";
         this.value = type.getValue();
         this.description = type.getDescription();
     }

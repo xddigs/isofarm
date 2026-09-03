@@ -4,6 +4,7 @@ import com.isofarm.data.BlockData;
 import com.isofarm.data.Crop;
 import com.isofarm.data.RenderPass;
 import com.isofarm.entity.Entity;
+import com.isofarm.entity.WorldItem;
 import com.isofarm.utils.K;
 import com.isofarm.wrld.Chunk;
 import com.isofarm.wrld.GameMaster;
@@ -64,6 +65,7 @@ public class ShadowSystem {
 
         for (Entity entity : gameMaster.getEntities()) {
             if (entity == null || !entity.isAlive()) continue;
+            if (entity instanceof WorldItem) continue;
             entity.render(gameMaster, RenderPass.SHADOW);
         }
 
