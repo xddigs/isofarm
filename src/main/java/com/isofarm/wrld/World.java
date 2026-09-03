@@ -13,7 +13,7 @@ import java.util.function.Consumer;
 
 @Singleton
 public class World {
-    public static final World wd = new World();
+    public static final World wrld = new World();
     private final Map<Long, Block> blocks = new HashMap<>();
     private final Map<Long, Chunk> chunks = new HashMap<>();
 
