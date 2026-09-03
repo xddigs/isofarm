@@ -35,6 +35,7 @@ public enum Tier {
     }
 
     public String getDisplayName() {
+        if (this == NONE) return null;
         return "item.tier." + toStr(this);
     }
 
