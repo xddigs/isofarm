@@ -380,7 +380,7 @@ public class InventoryUI extends UIElement {
 
         slotUI.setSpriteSheet(spriteSheet);
         slotUI.setSpriteFrame(ResourceManager.getItemFrame(item));
-        slotUI.setTooltipText(item.getName());
+        slotUI.setTooltipText(item.getDisplayName());
     }
 
     private void updateSlots() {

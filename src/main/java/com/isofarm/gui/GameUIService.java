@@ -427,7 +427,7 @@ public class GameUIService implements Service<GameMaster> {
             return;
         }
 
-        hotbarLabel = item.getName();
+        hotbarLabel = item.getDisplayName();
         hotbarLabelTimer = K.UI.HOTBAR_LABEL_DURATION;
     }
 
