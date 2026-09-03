@@ -10,6 +10,7 @@ import com.isofarm.input.Keyboard;
 import com.isofarm.item.*;
 import com.isofarm.pathfinding.GridPos;
 import com.isofarm.service.BookService;
+import com.isofarm.service.SoundService;
 import com.isofarm.service.TimeService;
 import com.isofarm.utils.Settings;
 import com.isofarm.utils.ToastFactory;
@@ -431,7 +432,7 @@ public class Player extends Character {
     @Override
     public void onDamageTaken(float amount) {
         damageSequence++;
-        getSoundService().playEntitySound(SoundGroup.ENTITY);
+        SoundService.fx.playEntitySound(SoundGroup.ENTITY);
     }
 
     @Override
@@ -563,7 +564,7 @@ public class Player extends Character {
 
                 if (tool.getDurability() <= 0) {
                     remove(tool);
-                    getSoundService().playBreakSound(SoundGroup.ITEMS, 1.0f,
+                    SoundService.fx.playBreakSound(SoundGroup.ITEMS, 1.0f,
                             Settings.getMaxInteractionDistance());
                 }
             }

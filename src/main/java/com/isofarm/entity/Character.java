@@ -1,7 +1,6 @@
 package com.isofarm.entity;
 
 import com.isofarm.data.*;
-import com.isofarm.service.SoundService;
 import com.isofarm.utils.ToastFactory;
 
 @DataClass
@@ -12,7 +11,6 @@ public abstract class Character extends Entity implements Levelable {
     private Inventory backpack;
     private Reputation reputation;
     private Gamemode gamemode;
-    private SoundService soundService;
     private int level;
     private int experience;
     private int experienceForNextLevel;
@@ -115,14 +113,6 @@ public abstract class Character extends Entity implements Levelable {
 
     public void setAnimTimer(float animTimer) {
         this.animTimer = animTimer;
-    }
-
-    public SoundService getSoundService() {
-        return soundService;
-    }
-
-    public void setSoundService(SoundService soundService) {
-        this.soundService = soundService;
     }
 
     public void scale(int amount) {
