@@ -139,7 +139,7 @@ public class TreeService {
                     int worldX = chunkStartX + localX;
                     int worldZ = chunkStartZ + localZ;
 
-                    Item item = BlockData.fromId(blockId);
+                    Item item = BlockData.fromIdTo(blockId);
                     if (!isConnectedToLog(worldX, localY, worldZ)) {
                         world.setBlockTypeAt(worldX, localY, worldZ, BlockData.AIR.getId());
                         WorldItem worldItem = new WorldItem(item, 1, new Vector3f(worldX, localY, worldZ));

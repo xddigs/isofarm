@@ -97,10 +97,6 @@ public class CraftingService {
 
         Craftable craftable = ingredient.craftable();
 
-        if (craftable instanceof BlockData bd && item instanceof Block block) {
-            return block.getType() == bd;
-        }
-
         if (craftable instanceof MaterialID materialID && item instanceof Material material) {
             return material.getId() == materialID.getId();
         }

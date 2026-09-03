@@ -22,7 +22,6 @@ public class Local {
         String file = "lang/lang-" + language + ".properties";
         try (InputStream input = Local.class.getResourceAsStream(file)) {
             if (input == null) {
-                load("en");
                 return;
             }
             properties.load(input);
