@@ -9,6 +9,7 @@ import com.isofarm.wrld.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 public class CropService implements Service<Crop> {
     public static final CropService cs = new CropService();
     private static final Logger log = LoggerFactory.getLogger(CropService.class);

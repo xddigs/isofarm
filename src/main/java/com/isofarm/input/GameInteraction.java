@@ -12,6 +12,7 @@ import com.isofarm.utils.HoveredCell;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import com.isofarm.utils.ToastFactory;
+import com.isofarm.wrld.Chunk;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.WaterSimulation;
 import com.isofarm.wrld.World;
@@ -51,38 +52,38 @@ public class GameInteraction {
     private GameInteraction() {}
     
     public BlockPos update(GameMaster gameMaster, Item selectedItem) {
-        Player player = gameMaster.getPlayer();
+        Player player = GameMaster.game.getPlayer();
         Inventory inventory = player.getInventory();
         boolean isCtrlHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL) ||
                 Keyboard.isKeyDown(GLFW_KEY_RIGHT_CONTROL);
 
         boolean isShiftHeld = Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT);
-        isSmartShift = isShiftHeld && !gameMaster.isInventoryOpen();
+        isSmartShift = isShiftHeld && !GameMaster.game.isInventoryOpen();
 
         boolean isLeftHeld = Mouse.isButtonDown(GLFW_MOUSE_BUTTON_LEFT);
         boolean isLeftPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
         boolean isRightPressed = Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_RIGHT);
         boolean canInteract = player != null
                 && !player.getGamemode().isNoClip()
-                && !gameMaster.isInventoryOpen()
-                && !gameMaster.isChatOpen();
+                && !GameMaster.game.isInventoryOpen()
+                && !GameMaster.game.isChatOpen();
 
         if (Keyboard.isKeyPressed(GLFW_KEY_ENTER)) {
-            if (!gameMaster.isChatOpen()) {
-                gameMaster.setChatOpen(true);
+            if (!GameMaster.game.isChatOpen()) {
+                GameMaster.game.setChatOpen(true);
                 GameMaster.game.getGameUIService().openChat();
             } else {
                 String command = GameMaster.game.getGameUIService().getChatText();
                 if (command != null && !command.isEmpty()) {
-                    gameMaster.getCommandService().execute(command);
+                    GameMaster.game.getCommandService().execute(command);
                 }
-                gameMaster.setChatOpen(false);
+                GameMaster.game.setChatOpen(false);
                 GameMaster.game.getGameUIService().closeChat();
             }
         }
 
         if (Keyboard.isKeyPressed(GLFW_KEY_F1)) {
-            gameMaster.toggleHUD();
+            GameMaster.game.toggleHUD();
         }
 
         if (Keyboard.isKeyPressed(GLFW_KEY_F3)) {
@@ -91,16 +92,16 @@ public class GameInteraction {
 
         if (Keyboard.isKeyPressed(GLFW_KEY_Q) && canInteract) {
             boolean dropAll = Keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL);
-            dropItem(gameMaster, selectedItem, dropAll);
+            dropItem(selectedItem, dropAll);
         }
 
-        if (Keyboard.isKeyPressed(GLFW_KEY_E) && !gameMaster.isChatOpen() &&
+        if (Keyboard.isKeyPressed(GLFW_KEY_E) && !GameMaster.game.isChatOpen() &&
                 !BookService.bs.isOpen()) {
-            gameMaster.toggleInventory();
+            GameMaster.game.toggleInventory();
         }
 
         if (inventory.hasBookEquipped() && Keyboard.isKeyPressed(GLFW_KEY_TAB)
-                && !gameMaster.isChatOpen()) {
+                && !GameMaster.game.isChatOpen()) {
             CraftingBook book = inventory.getBook();
             if (book != null) {
                 if (!BookService.bs.isOpen()) {
@@ -114,16 +115,16 @@ public class GameInteraction {
             BookService.bs.close();
         }
 
-        if (!gameMaster.getPlayer().getGamemode().isNoClip()) {
-            pickUp(gameMaster);
-            dropTimer -= gameMaster.getGenDelta();
+        if (!GameMaster.game.getPlayer().getGamemode().isNoClip()) {
+            pickUp();
+            dropTimer -= GameMaster.game.getGenDelta();
             if (dropTimer <= 0.0f) {
-                addItem(gameMaster);
+                addItem();
                 dropTimer = TIMER_MAX;
             }
         }
 
-        if (Keyboard.isKeyPressed(GLFW_KEY_M) && !gameMaster.isChatOpen()) {
+        if (Keyboard.isKeyPressed(GLFW_KEY_M) && !GameMaster.game.isChatOpen()) {
             Settings.toggleMusic();
         }
 
@@ -136,7 +137,7 @@ public class GameInteraction {
         if (selectedItem instanceof Usable usable) {
             switch (usable) {
                 case Backpack backpack -> {
-                    if (isRightPressed && !gameMaster.isInventoryOpen()) {
+                    if (isRightPressed && !GameMaster.game.isInventoryOpen()) {
                         if (isCtrlHeld) {
                             backpack.unequip();
                         } else {
@@ -154,7 +155,7 @@ public class GameInteraction {
                 }
 
                 case Bucket bucket -> {
-                    if (isRightPressed && !gameMaster.isInventoryOpen()) {
+                    if (isRightPressed && !GameMaster.game.isInventoryOpen()) {
                         bucket.use(gameMaster, isCtrlHeld);
                         isRightPressed = false;
                     }
@@ -166,10 +167,10 @@ public class GameInteraction {
 
         BlockPos hoveredCell = HoveredCell.get(gameMaster, isShiftHeld);
         if (isShiftHeld && hoveredCell != null) {
-            byte blockType = gameMaster.getWorld().getBlockTypeAt(hoveredCell);
+            byte blockType = GameMaster.game.getWorld().getBlockTypeAt(hoveredCell);
             if (blockType == BlockData.OAK_LOG.getId()) {
                 int bottomY = hoveredCell.y();
-                while (bottomY > 0 && gameMaster.getWorld().getBlockTypeAt(
+                while (bottomY > 0 && GameMaster.game.getWorld().getBlockTypeAt(
                         hoveredCell.x(), bottomY - 1, hoveredCell.z()) == BlockData.OAK_LOG.getId()) {
                     bottomY--;
                 }
@@ -184,35 +185,35 @@ public class GameInteraction {
             return null;
         }
 
-        if (!isWithinRange(gameMaster, hoveredCell)) {
+        if (!isWithinRange(hoveredCell)) {
             resetBreaking();
             return null;
         }
 
-        breakTimeout -= gameMaster.getGenDelta();
+        breakTimeout -= GameMaster.game.getGenDelta();
         breakTimeout = Math.max(breakTimeout, 0.0f);
 
         if (isLeftHeld && canInteract) {
             if (breakTimeout <= 0.0f) {
-                breakAction(gameMaster, hoveredCell);
+                breaking(gameMaster, hoveredCell);
             }
         } else {
             resetBreaking();
         }
 
-        if (isRightPressed && !gameMaster.isInventoryOpen()) {
+        if (isRightPressed && !GameMaster.game.isInventoryOpen()) {
             if (player != null && !player.isAttacking()) {
                 player.interact();
             }
-            placeAction(gameMaster, hoveredCell, selectedItem);
+            place(gameMaster, hoveredCell, selectedItem);
         }
         return hoveredCell;
     }
 
-    public void addItem(GameMaster gameMaster) {
-        Player player = gameMaster.getPlayer();
+    public void addItem() {
+        Player player = GameMaster.game.getPlayer();
         if (player == null) return;
-        Iterator<Entity> iterator = gameMaster.getEntities().iterator();
+        Iterator<Entity> iterator = GameMaster.game.getEntities().iterator();
         while (iterator.hasNext()) {
             Entity entity = iterator.next();
             if (!(entity instanceof WorldItem worldItem)) continue;
@@ -236,13 +237,13 @@ public class GameInteraction {
         }
     }
 
-    public void dropItem(GameMaster gameMaster, Item selectedItem, boolean dropAll) {
+    public void dropItem(Item selectedItem, boolean dropAll) {
         if (selectedItem == null) return;
         if (selectedItem instanceof Undroppable) {
             ToastFactory.error("toast.item_undroppable");
             return;
         }
-        Player player = gameMaster.getPlayer();
+        Player player = GameMaster.game.getPlayer();
         if (player == null) return;
 
         for (InventorySlot slot : player.getInventory().getSlots()) {
@@ -270,10 +271,10 @@ public class GameInteraction {
             velocity.y += verticalStrength;
 
             worldItem.setVelocity(velocity);
-            worldItem.setWorld(gameMaster.getWorld());
+            worldItem.setWorld(GameMaster.game.getWorld());
 
             player.remove(item, amount);
-            gameMaster.addEntity(worldItem);
+            GameMaster.game.addEntity(worldItem);
             SoundService.fx.playEntitySound(SoundGroup.ITEMS);
 
             log.trace("Dropped x{} {} with velocity ({}, {}, {})", amount,
@@ -282,11 +283,11 @@ public class GameInteraction {
         }
     }
 
-    private void pickUp(GameMaster gameMaster) {
-        Player player = gameMaster.getPlayer();
+    private void pickUp() {
+        Player player = GameMaster.game.getPlayer();
         if (player == null) return;
 
-        Iterator<Entity> iterator = gameMaster.getEntities().iterator();
+        Iterator<Entity> iterator = GameMaster.game.getEntities().iterator();
         while (iterator.hasNext()) {
             Entity entity = iterator.next();
             if (!(entity instanceof WorldItem worldItem)) continue;
@@ -302,7 +303,7 @@ public class GameInteraction {
             }
 
             if (worldItem.isAttracting()) {
-                float delta = gameMaster.getGenDelta();
+                float delta = GameMaster.game.getGenDelta();
                 float lerpFactor = Math.min(1.0f, 10.0f * delta);
 
                 Vector3f targetPos = new Vector3f(playerPos.x,
@@ -331,16 +332,16 @@ public class GameInteraction {
         }
     }
 
-    private boolean isWithinRange(GameMaster gameMaster, BlockPos cell) {
-        float distance = getDistanceToBlock(gameMaster, cell);
+    private boolean isWithinRange(BlockPos cell) {
+        float distance = getDistanceToBlock(cell);
         return distance <= Settings.getMaxInteractionDistance();
     }
 
-    public float getDistanceToBlock(GameMaster gameMaster, BlockPos cell) {
+    public float getDistanceToBlock(BlockPos cell) {
         if (cell == null) return Float.MAX_VALUE;
-        if (gameMaster.getPlayer() == null) return Float.MAX_VALUE;
+        if (GameMaster.game.getPlayer() == null) return Float.MAX_VALUE;
 
-        Vector3f playerPos = gameMaster.getPlayer().getPosition();
+        Vector3f playerPos = GameMaster.game.getPlayer().getPosition();
         float targetX = cell.x() + 0.5f;
         float targetY = cell.y() + 0.5f;
         float targetZ = cell.z() + 0.5f;
@@ -351,17 +352,17 @@ public class GameInteraction {
         return (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
 
-    private void breakAction(GameMaster gameMaster, BlockPos cell) {
+    private void breaking(GameMaster gameMaster, BlockPos cell) {
         if (BookService.bs.isOpen()) return;
-        World world = gameMaster.getWorld();
+        World world = GameMaster.game.getWorld();
         int x = cell.x();
         int y = cell.y();
         int z = cell.z();
 
         Item selectedItem = Settings.selectedItem;
-        if (gameMaster.getPlayer() != null) {
-            if (!gameMaster.getPlayer().isAttacking()) {
-                gameMaster.getPlayer().interact();
+        if (GameMaster.game.getPlayer() != null) {
+            if (!GameMaster.game.getPlayer().isAttacking()) {
+                GameMaster.game.getPlayer().interact();
             }
         }
 
@@ -372,9 +373,9 @@ public class GameInteraction {
         if (crop != null) {
             CropType cropType = crop.getCropType();
             int frameIndex = crop.getStage().getFrameIndex();
-            SpriteSheet sheet = gameMaster.getCropSpriteSheet(cropType);
+            SpriteSheet sheet = GameMaster.game.getCropSpriteSheet(cropType);
             if (crop.isReadyToHarvest()) {
-                CropService.cs.harvest(gameMaster.getPlayer(), crop);
+                CropService.cs.harvest(GameMaster.game.getPlayer(), crop);
             } else {
                 CropService.cs.rip(crop);
             }
@@ -404,7 +405,7 @@ public class GameInteraction {
             lastBreakTime = System.nanoTime();
         }
 
-        Gamemode gamemode = gameMaster.getPlayer().getGamemode();
+        Gamemode gamemode = GameMaster.game.getPlayer().getGamemode();
         if (gamemode.isGodmode()) {
             breakBlock(gameMaster, cell, blockData, blockId, selectedItem);
             resetBreaking();
@@ -443,7 +444,7 @@ public class GameInteraction {
 
     private void breakBlock(GameMaster gameMaster, BlockPos cell, BlockData blockData,
                             byte blockId, Item selectedItem) {
-        World world = gameMaster.getWorld();
+        World world = GameMaster.game.getWorld();
         if (blockData.getSoundGroup() != null) {
             SoundService.fx.playBreakSound(blockData.getSoundGroup());
         }
@@ -456,7 +457,7 @@ public class GameInteraction {
             boolean isUsableOn = Arrays.stream(tool.getType().getUsableOn())
                     .anyMatch(b -> b.getId() == blockId);
 
-            tool.setPlayer(gameMaster.getPlayer());
+            tool.setPlayer(GameMaster.game.getPlayer());
             if (!isUsableOn) {
                 tool.misuse();
             } else {
@@ -467,7 +468,6 @@ public class GameInteraction {
                 List<BlockPos> destroyedBlocks = TreeService.chop(gameMaster, axe);
                 for (BlockPos pos : destroyedBlocks) {
                     GameMaster.game.getGameUIService().logAction(new BlockPos(blockData, pos.x(), pos.y(), pos.z()));
-
                     BlockData bData = pos.data();
                     Block brokenBlock = new Block(bData, pos.x(), pos.y(), pos.z());
 
@@ -491,7 +491,7 @@ public class GameInteraction {
 
                     int count = (int) (Math.random() * 2) + 1;
                     WorldItem dropEntity = new WorldItem(itemToDrop, count, dropPos);
-                    gameMaster.addEntity(dropEntity);
+                    GameMaster.game.addEntity(dropEntity);
                 }
 
                 log.info("Tree chopped successfully at base {},{},{}", cell.x(), cell.y(), cell.z());
@@ -501,8 +501,9 @@ public class GameInteraction {
 
         world.setBlockTypeAt(cell, BlockData.AIR.getId());
         world.setWaterLevelAt(cell.x(), cell.y(), cell.z(), (byte) 0);
+        breakAbove(cell.x(), cell.y(), cell.z());
         WaterSimulation.ws.onBlockDestroyed(cell.x(), cell.y(), cell.z());
-        gameMaster.rebuildChunkMeshAt(cell);
+        GameMaster.game.rebuildChunkMeshAt(cell);
         ParticleEngine.peng.spawnBlock(cell, blockData);
 
         if (removedBlock.getType().hasDrops()) {
@@ -521,7 +522,7 @@ public class GameInteraction {
         }
 
         WorldItem dropEntity = new WorldItem(itemToDrop, (int) (Math.random()) + 1, position);
-        gameMaster.addEntity(dropEntity);
+        GameMaster.game.addEntity(dropEntity);
 
         GameMaster.game.getGameUIService().logAction(cell);
         log.trace("Block removed: {} at {},{},{}", blockData.getDisplayName(), cell.x(), cell.y(), cell.z());
@@ -537,10 +538,10 @@ public class GameInteraction {
         lastBreakTime = 0L;
     }
 
-    private void placeAction(GameMaster gameMaster, BlockPos cell,
-                             Item selectedItem) {
-        World world = gameMaster.getWorld();
-        Player player = gameMaster.getPlayer();
+    private void place(GameMaster gameMaster, BlockPos cell,
+                       Item selectedItem) {
+        World world = GameMaster.game.getWorld();
+        Player player = GameMaster.game.getPlayer();
 
         if (BookService.bs.isOpen()) return;
         if (player.checkCollision(world)) return;
@@ -549,40 +550,41 @@ public class GameInteraction {
             player.interact();
         }
 
-        int normalX = gameMaster.getOrthoCamera().getLastHitNormalX();
-        int normalY = gameMaster.getOrthoCamera().getLastHitNormalY();
-        int normalZ = gameMaster.getOrthoCamera().getLastHitNormalZ();
+        int normalX = GameMaster.game.getOrthoCamera().getLastHitNormalX();
+        int normalY = GameMaster.game.getOrthoCamera().getLastHitNormalY();
+        int normalZ = GameMaster.game.getOrthoCamera().getLastHitNormalZ();
 
         if (selectedItem instanceof Block block) {
             int placeX = cell.x() + normalX;
             int placeY = cell.y() + normalY;
             int placeZ = cell.z() + normalZ;
+
             if (player.intersectsBlock(placeX, placeY, placeZ)) return;
 
             byte targetBlock = world.getBlockTypeAt(placeX, placeY, placeZ);
             BlockData target = BlockData.fromId(targetBlock);
-            if (target.equals(BlockData.AIR) || target.equals(BlockData.WATER) ||
-                    (target.isPlant() && !block.getType().isPlant())) {
-                Block newBlock = new Block(block.getType(), placeX, placeY, placeZ);
-                if (block.getType().equals(BlockData.OAK_BONSAI)) {
-                    TreeService.ts.plant(placeX, placeY, placeZ, BlockData.OAK_BONSAI);
-                } else {
-                    if (target.isPlant()) {
-                        breakBlock(gameMaster, new BlockPos(target, placeX, placeY, placeZ),
-                                target, targetBlock, selectedItem);
-                        world.setBlockTypeAt(placeX, placeY, placeZ, block.getType().getId());
-                    }
-                }
 
-                player.remove(selectedItem);
-                SoundService.fx.playBreakSound(newBlock.getType().getSoundGroup());
-                gameMaster.rebuildChunkMeshAt(placeX, placeZ);
-                GameMaster.game.getGameUIService().logAction(new BlockPos(newBlock.getType(), placeX, placeY, placeZ));
-                log.trace("Block placed: {} at {},{},{}", newBlock.getType().getName(), placeX, placeY, placeZ);
+            if (target == null || !target.equals(BlockData.AIR)) {
+                return;
             }
+
+            Block newBlock = new Block(block.getType(), placeX, placeY, placeZ);
+
+            if (block.getType().equals(BlockData.OAK_BONSAI)) {
+                TreeService.ts.plant(placeX, placeY, placeZ, BlockData.OAK_BONSAI);
+            } else {
+                world.setBlockTypeAt(placeX, placeY, placeZ, block.getType().getId());
+            }
+
+            player.remove(selectedItem);
+            SoundService.fx.playBreakSound(newBlock.getType().getSoundGroup());
+            GameMaster.game.rebuildChunkMeshAt(placeX, placeZ);
+            GameMaster.game.getGameUIService().logAction(
+                    new BlockPos(newBlock.getType(), placeX, placeY, placeZ));
+            log.trace("Block placed: {} at {},{},{}",
+                    newBlock.getType().getName(), placeX, placeY, placeZ);
             return;
         }
-
 
         if (selectedItem instanceof Hoe hoe) {
             Block block = world.getBlockAt(cell.x(), cell.y(), cell.z());
@@ -593,7 +595,7 @@ public class GameInteraction {
             } else {
                 hoe.use(gameMaster, block);
             }
-            gameMaster.rebuildChunkMeshAt(block.getX(), block.getZ());
+            GameMaster.game.rebuildChunkMeshAt(block.getX(), block.getZ());
             return;
         }
 
@@ -622,6 +624,36 @@ public class GameInteraction {
                 log.info("Planted {} at {},{},{}", seed.getType().getName(), x, y, z);
             }
         }
+    }
+
+    private void breakAbove(int x, int y, int z) {
+        int aboveY = y + 1;
+        if (aboveY >= Chunk.SIZE_Y) {
+            return;
+        }
+
+        Crop crop = World.wrld.getCropAt(x, aboveY, z);
+        if (crop != null) {
+            CropService.cs.rip(crop);
+            World.wrld.removeBlockAt(x, aboveY, z);
+            World.wrld.setBlockTypeAt(x, aboveY, z, BlockData.AIR.getId());
+            World.wrld.setWaterLevelAt(x, aboveY, z, (byte) 0);
+            GameMaster.game.rebuildChunkMeshAt(x, z);
+            return;
+        }
+
+        byte aboveBlockId = World.wrld.getBlockTypeAt(x, aboveY, z);
+        BlockData aboveBlock = BlockData.fromId(aboveBlockId);
+
+        if (aboveBlock == null || !aboveBlock.isPlant()) {
+            return;
+        }
+
+        World.wrld.removeBlockAt(x, aboveY, z);
+        World.wrld.setBlockTypeAt(x, aboveY, z, BlockData.AIR.getId());
+        World.wrld.setWaterLevelAt(x, aboveY, z, (byte) 0);
+        ParticleEngine.peng.spawnBlock(new BlockPos(aboveBlock, x, aboveY, z), aboveBlock);
+        GameMaster.game.rebuildChunkMeshAt(x, z);
     }
 
     private BlockData getBlockData(byte blockId) {

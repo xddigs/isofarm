@@ -31,8 +31,6 @@ public class Bucket extends Usable {
     @Override
     public boolean use(GameMaster gameMaster, boolean isCtrlHeld) {
         Player player = gameMaster.getPlayer();
-        World world = gameMaster.getWorld();
-
         if (player == null) {
             return false;
         }
@@ -43,7 +41,7 @@ public class Bucket extends Usable {
                 return false;
             }
 
-            if (world.getBlockTypeAt(targetBlock) != BlockData.WATER.getId()) {
+            if (World.wrld.getBlockTypeAt(targetBlock) != BlockData.WATER.getId()) {
                 return false;
             }
 
