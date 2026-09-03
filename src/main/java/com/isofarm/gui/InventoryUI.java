@@ -34,6 +34,7 @@ public class InventoryUI extends UIElement {
     private UIButton backpackButton;
     private Player player;
     private Inventory inventory;
+    private GameMaster gameMaster;
     private Tab currentTab;
     private SpriteSheet seedIcons;
     private SpriteSheet cropIcons;
@@ -42,10 +43,9 @@ public class InventoryUI extends UIElement {
     private SpriteSheet materialIcons;
     private SpriteSheet inventoryIcons;
     private Item carriedItem;
-    private int carriedAmount;
     private HotbarUI hotbarUI;
     private BackpackInventoryUI backpackUI;
-    private GameMaster gameMaster;
+    private int carriedAmount;
 
     private float defaultX;
     private float targetX;

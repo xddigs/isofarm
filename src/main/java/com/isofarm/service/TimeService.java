@@ -1,7 +1,6 @@
 package com.isofarm.service;
 
 import com.isofarm.data.Season;
-import com.isofarm.data.WeatherType;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -7,6 +7,7 @@ import com.isofarm.entity.WorldItem;
 import com.isofarm.graphics.ParticleEngine;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.graphics.TextureAtlas;
+import com.isofarm.gui.BackpackInventoryUI;
 import com.isofarm.gui.GameUIService;
 import com.isofarm.item.*;
 import com.isofarm.service.*;
@@ -108,7 +109,7 @@ public class GameInteraction {
             gameMaster.toggleInventory();
         }
 
-        if (inventory.hasBookEquipped() && Keyboard.isKeyPressed(GLFW_KEY_B)
+        if (inventory.hasBookEquipped() && Keyboard.isKeyPressed(GLFW_KEY_TAB)
                 && !gameMaster.isChatOpen()) {
             CraftingBook book = inventory.getBook();
             if (book != null) {
@@ -118,10 +119,8 @@ public class GameInteraction {
                     BookService.bs.close();
                 }
             }
-        }
-
-        if (Keyboard.isKeyPressed(GLFW_KEY_E) && BookService.bs.isOpen() &&
-            !inventory.hasBookEquipped()) {
+        } else if (Keyboard.isKeyPressed(GLFW_KEY_E) && BookService.bs.isOpen() &&
+                !inventory.hasBookEquipped()) {
             BookService.bs.close();
         }
 
