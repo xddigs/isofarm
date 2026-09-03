@@ -9,7 +9,6 @@ import com.isofarm.gui.GUI;
 import com.isofarm.gui.GameUIService;
 import com.isofarm.gui.UIManager;
 import com.isofarm.input.*;
-import com.isofarm.item.Craftable;
 import com.isofarm.item.Item;
 import com.isofarm.pathfinding.GridPos;
 import com.isofarm.service.*;
@@ -180,10 +179,6 @@ public class GameMaster {
 
     public ChunkManager getChunkManager() {
         return chunkManager;
-    }
-
-    public GameRenderer getGameRenderer() {
-        return gameRenderer;
     }
 
     public ItemRenderer getItemRenderer() {
@@ -513,11 +508,5 @@ public class GameMaster {
 
     public void rebuildChunkMeshAt(BlockPos pos) {
         rebuildChunkMeshAt(pos.x(), pos.z());
-    }
-
-    public List<Recipe> getRecipesFor(Craftable material) {
-        return recipes.stream()
-                .filter(r -> r.ingredients().stream().anyMatch(
-                        i -> i.craftable() == material)).toList();
     }
 }
