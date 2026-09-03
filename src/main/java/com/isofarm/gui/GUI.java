@@ -28,14 +28,12 @@ public class GUI {
     private static final Matrix4f model = new Matrix4f();
 
     private static final UIFont small = new UIFont(K.Paths.FONT, 16.0f);
-    private static final UIFont normal = new UIFont(K.Paths.FONT, 24.0f);
-    private static final UIFont big = new UIFont(K.Paths.FONT, 32.0f);
-    private static final UIFont large = new UIFont(K.Paths.FONT, 48.0f);
+    private static final UIFont normal = new UIFont(K.Paths.FONT, 32.0f);
+    private static final UIFont big = new UIFont(K.Paths.FONT, 64.0f);
 
     private static final UIFont smallBold = new UIFont(K.Paths.FONT_BOLD, 16.0f);
     private static final UIFont normalBold = new UIFont(K.Paths.FONT_BOLD, 24.0f);
     private static final UIFont bigBold = new UIFont(K.Paths.FONT_BOLD, 32.0f);
-    private static final UIFont largeBold = new UIFont(K.Paths.FONT_BOLD, 48.0f);
 
     private static int screenWidth;
     private static int screenHeight;
@@ -484,10 +482,6 @@ public class GUI {
         return big;
     }
 
-    public static UIFont getLargeFont() {
-        return large;
-    }
-
     public static UIFont getSmallBoldFont() {
         return smallBold;
     }
@@ -498,10 +492,6 @@ public class GUI {
 
     public static UIFont getBigBoldFont() {
         return bigBold;
-    }
-
-    public static UIFont getLargeBoldFont() {
-        return largeBold;
     }
 
     public static void dispose() {
