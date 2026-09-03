@@ -4,7 +4,6 @@ import com.isofarm.data.DataClass;
 import com.isofarm.data.GodObject;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.graphics.Texture;
-import com.isofarm.utils.Local;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 
@@ -357,7 +356,7 @@ public abstract class UIElement {
     }
 
     public void setTooltipText(String tooltipText) {
-        this.tooltipText = Local.lang.t(tooltipText);
+        this.tooltipText = tooltipText;
     }
 
     public UIElement tooltip(String tooltipText) {

@@ -7,6 +7,7 @@ import com.isofarm.gui.UIProgressBar;
 import com.isofarm.input.Keyboard;
 import com.isofarm.service.TimeService;
 import com.isofarm.utils.K;
+import com.isofarm.utils.Local;
 import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
 import org.joml.Vector3f;
@@ -84,7 +85,7 @@ public class Intro {
             completedTasks[0]++;
             float overallProgress = ((float) completedTasks[0] / totalTasks) * 100.0f;
             progressBar.setValue(overallProgress);
-            renderLoadingFrame("Loading engine resources...");
+            renderLoadingFrame(Local.lang.t("engine.loading"));
         });
 
         int minZ = -r;
@@ -105,7 +106,7 @@ public class Intro {
             float overallProgress = ((float) completedTasks[0] / totalTasks) * 100.0f;
             progressBar.setValue(overallProgress);
 
-            String stepText = String.format("Generating terrain [%d,%d]...", currentChunkX, currentChunkZ);
+            String stepText = String.format(Local.lang.f("engine.generating_terrain", currentChunkX, currentChunkZ));
             renderLoadingFrame(stepText);
         }
 
@@ -126,7 +127,7 @@ public class Intro {
             float overallProgress = ((float) completedTasks[0] / totalTasks) * 100.0f;
             progressBar.setValue(overallProgress);
 
-            String stepText = String.format("Building meshes [%d,%d]...", currentChunkX, currentChunkZ);
+            String stepText = String.format(Local.lang.f("engine.building_meshes", currentChunkX, currentChunkZ));
             renderLoadingFrame(stepText);
         }
 
@@ -136,12 +137,12 @@ public class Intro {
         GameMaster.game.spawn();
         completedTasks[0]++;
         progressBar.setValue(((float) completedTasks[0] / totalTasks) * 100.0f);
-        renderLoadingFrame("Spawning player...");
+        renderLoadingFrame(Local.lang.t("engine.spawning_player"));
 
         GameMaster.game.initUI();
         completedTasks[0]++;
         progressBar.setValue(100.0f);
-        renderLoadingFrame("Setting up the UI...");
+        renderLoadingFrame(Local.lang.t("engine.post_processing"));
 
         progressBar.hide();
         loop();

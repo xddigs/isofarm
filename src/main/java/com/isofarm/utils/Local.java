@@ -19,11 +19,9 @@ public class Local {
     }
 
     private void load(String language) {
-        String file = "lang/lang-" + language + ".properties";
+        String file = "/lang/lang-" + language + ".properties";
         try (InputStream input = Local.class.getResourceAsStream(file)) {
-            if (input == null) {
-                return;
-            }
+            if (input == null) return;
             properties.load(input);
         } catch (IOException e) {
             throw new RuntimeException("Failed to load localization: " + file, e);

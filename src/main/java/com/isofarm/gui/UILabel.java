@@ -13,7 +13,7 @@ public class UILabel extends UIElement {
 
     public UILabel(float x, float y, float width, float height, String text) {
         super(x, y, width, height);
-        this.text = Local.lang.t(text);
+        this.text = text;
         this.font = GUI.getNormalFont();
     }
 
