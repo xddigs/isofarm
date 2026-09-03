@@ -593,10 +593,6 @@ public class Player extends Character {
         return previousState;
     }
 
-    public void setPreviousState(PlayerState previousState) {
-        this.previousState = previousState;
-    }
-
     public void respawn() {
         if (!Settings.doKeepInventory()) {
             clear();
