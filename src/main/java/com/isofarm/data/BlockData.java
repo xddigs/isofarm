@@ -8,6 +8,7 @@ import com.isofarm.utils.Local;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @DataClass
 public enum BlockData {
@@ -193,7 +194,7 @@ public enum BlockData {
     }
 
     public String getDisplayName() {
-        return Local.lang.t("block." + name());
+        return Local.lang.t("block." + name().toLowerCase(Locale.ROOT));
     }
 
     public int getValue() {

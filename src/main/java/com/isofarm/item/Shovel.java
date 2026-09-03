@@ -7,8 +7,8 @@ import com.isofarm.data.ToolType;
 public class Shovel extends Tool {
 
     public Shovel(Tier tier) {
-        super((byte) 4, tier.getDisplayName() + ToolType.SHOVEL.getDisplayName(), 50, ToolType.SHOVEL,
-                tier,tier.getDurability() + ToolType.SHOVEL.getBaseDurability());
+        super((byte) 4, ToolType.SHOVEL.getName(), 50, ToolType.SHOVEL,
+                tier, tier.getDurability() + ToolType.SHOVEL.getBaseDurability());
     }
 
     public Shovel() {

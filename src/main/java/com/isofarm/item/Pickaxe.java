@@ -7,8 +7,8 @@ import com.isofarm.data.ToolType;
 public class Pickaxe extends Tool {
 
     public Pickaxe(Tier tier) {
-        super((byte) 1, tier.getDisplayName() + ToolType.PICKAXE.getDisplayName(), 100, ToolType.PICKAXE,
-                tier,tier.getDurability() + ToolType.PICKAXE.getBaseDurability());
+        super((byte) 1, ToolType.PICKAXE.getName(), 100, ToolType.PICKAXE,
+                tier, tier.getDurability() + ToolType.PICKAXE.getBaseDurability());
     }
 
     public Pickaxe() {

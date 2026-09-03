@@ -9,7 +9,7 @@ import com.isofarm.wrld.World;
 public class Hoe extends Tool {
 
     public Hoe(Tier tier) {
-        super((byte) 3, tier.getDisplayName() + ToolType.HOE.getDisplayName(), 150, ToolType.HOE,
+        super((byte) 3, ToolType.HOE.getName(), 150, ToolType.HOE,
                 tier, tier.getDurability() + ToolType.HOE.getBaseDurability());
     }
 

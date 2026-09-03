@@ -33,10 +33,6 @@ public class RecipeRegistry {
             registerToolSet(requiredStationTier, mainMaterial);
         });
 
-        recipes.sort(Comparator.comparing(
-                recipe -> recipe.result().getDisplayName(),
-                String.CASE_INSENSITIVE_ORDER
-        ));
         return recipes;
     }
 
@@ -72,7 +68,12 @@ public class RecipeRegistry {
     }
 
     public List<Recipe> getRecipes() {
-        return recipes;
+        List<Recipe> sortedRecipes = new ArrayList<>(recipes);
+        sortedRecipes.sort(Comparator.comparing(
+                recipe -> recipe.result().getDisplayName(),
+                String.CASE_INSENSITIVE_ORDER
+        ));
+        return sortedRecipes;
     }
 
     public RecipeBuilder create(Tier tier) {

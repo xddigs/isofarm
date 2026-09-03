@@ -583,7 +583,7 @@ public class GameInteraction {
                 SoundService.fx.playBreakSound(newBlock.getType().getSoundGroup());
                 gameMaster.rebuildChunkMeshAt(placeX, placeZ);
                 gameUIservice.logAction(new BlockPos(newBlock.getType(), placeX, placeY, placeZ));
-                log.trace("Block placed: {} at {},{},{}", newBlock.getType().getDisplayName(), placeX, placeY, placeZ);
+                log.trace("Block placed: {} at {},{},{}", newBlock.getType().getName(), placeX, placeY, placeZ);
             }
             return;
         }

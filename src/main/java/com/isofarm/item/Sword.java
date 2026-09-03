@@ -7,8 +7,8 @@ import com.isofarm.data.ToolType;
 public class Sword extends Tool {
 
     public Sword(Tier tier) {
-        super((byte) 0, tier.getDisplayName() + ToolType.SWORD.getDisplayName(), 150, ToolType.SWORD,
-                tier,tier.getDurability() + ToolType.SWORD.getBaseDurability());
+        super((byte) 0, ToolType.SWORD.getName(), 150, ToolType.SWORD,
+                tier, tier.getDurability() + ToolType.SWORD.getBaseDurability());
     }
 
     public Sword() {

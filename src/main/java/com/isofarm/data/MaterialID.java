@@ -2,11 +2,14 @@ package com.isofarm.data;
 
 import com.isofarm.item.Craftable;
 import com.isofarm.item.Item;
+import com.isofarm.utils.Local;
+
+import java.util.Locale;
 
 @DataClass
 public enum MaterialID implements Craftable {
-    RAW_ORE((byte) 0, (byte) 0, " Raw Ore", 15),
-    INGOT((byte) 1, (byte) 0, " Ingot", 50),
+    RAW_ORE((byte) 0, (byte) 0, "Raw Ore", 15),
+    INGOT((byte) 1, (byte) 0, "Ingot", 50),
     STICK((byte) 0, (byte) 1, "Stick", 1),
     PAPER((byte) 1, (byte) 1, "Paper", 10),
     LEATHER((byte) 2, (byte) 1, "Leather", 40);
@@ -33,7 +36,7 @@ public enum MaterialID implements Craftable {
 
     @Override
     public String getDisplayName() {
-        return "item.material." + name().toLowerCase();
+        return Local.lang.t("item.material." + name().toLowerCase(Locale.ROOT));
     }
 
     @Override
