@@ -41,27 +41,24 @@ public class FallingState implements PlayerState {
 
     @Override
     public void update(Player player, float delta) {
-        World world = GameMaster.game.getWorld();
         fallTime += delta;
         jumpTime += delta;
 
-        if (player.isInFluid(world)) {
+        if (player.isInFluid(World.wrld)) {
             player.setFalling(false);
             player.changeState(new SwimmingState());
             return;
         }
 
         float yaw = GameMaster.game.getActiveCamera().getYaw();
-        player.wasd(world, delta, yaw, false);
+        player.wasd(World.wrld, delta, yaw, false);
 
         if (player.isOnGround()) {
             float fallDistance = fallStartY - player.getPosition().y;
-
             if (fallDistance > FALL_DISTANCE) {
                 float damage = (fallDistance - FALL_DISTANCE) * 2.0f;
-
                 player.fallDamage(damage);
-               SoundService.fx.playBreakSound(SoundGroup.ENTITY);
+                SoundService.fx.playBreakSound(SoundGroup.ENTITY);
             }
 
             player.setFalling(false);

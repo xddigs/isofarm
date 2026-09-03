@@ -24,10 +24,6 @@ public class GroundedState implements PlayerState {
             player.changeState(new SneakingState());
             return;
         }
-
-        if (Keyboard.isKeyPressed(GLFW_KEY_SPACE)) {
-            player.jump();
-        }
     }
 
     @Override

@@ -31,20 +31,17 @@ public class SwimmingState implements PlayerState {
 
     @Override
     public void update(Player player, float delta) {
-        World world = GameMaster.game.getWorld();
-
         float yaw = GameMaster.game.getActiveCamera().getYaw();
-        player.wasd(world, delta, yaw, false);
+        player.wasd(World.wrld, delta, yaw, false);
 
         if (player.isOnGround()) {
             if (Keyboard.isKeyDown(GLFW_KEY_SPACE)) {
-                player.jump();
                 player.changeState(new GroundedState());
                 return;
             }
         }
 
-        if (!player.isInFluid(world)) {
+        if (!player.isInFluid(World.wrld)) {
             if (player.isOnGround()) {
                 player.changeState(new GroundedState());
             } else {
