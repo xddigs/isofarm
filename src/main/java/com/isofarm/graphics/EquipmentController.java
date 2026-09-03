@@ -1,5 +1,6 @@
 package com.isofarm.graphics;
 
+import com.isofarm.data.Singleton;
 import com.isofarm.data.Tier;
 import com.isofarm.data.ToolType;
 import com.isofarm.graphics.gltf.GLTFModel;
@@ -8,10 +9,9 @@ import com.isofarm.graphics.gltf.GLTFNode;
 import java.util.HashMap;
 import java.util.Map;
 
+@Singleton
 public class EquipmentController {
-
     public static final EquipmentController ec = new EquipmentController();
-
     private final Map<String, GLTFNode> equipmentNodes = new HashMap<>();
     private GLTFNode currentActiveNode = null;
 

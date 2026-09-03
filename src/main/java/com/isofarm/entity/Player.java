@@ -7,6 +7,7 @@ import com.isofarm.graphics.*;
 import com.isofarm.graphics.gltf.GLTFModel;
 import com.isofarm.graphics.gltf.GLTFNode;
 import com.isofarm.input.Keyboard;
+import com.isofarm.input.Mouse;
 import com.isofarm.item.*;
 import com.isofarm.pathfinding.GridPos;
 import com.isofarm.service.BookService;
@@ -74,6 +75,9 @@ public class Player extends Character {
     private static final float ANIMATION_SPEED_FACTOR = 10.0f;
     private static final float FULL_DEGREES = 360.0f;
     private static final float HALF_DEGREES = 180.0f;
+    private static final float MAX_HEAD_YAW = (float) Math.toRadians(65.0f);
+    private static final float MAX_HEAD_PITCH = (float) Math.toRadians(35.0f);
+    private static final float HEAD_TRACKING_SPEED = 12.0f;
 
     private final Matrix4f modelMatrix;
     private final GLTFModel playerModel;
@@ -88,7 +92,6 @@ public class Player extends Character {
     private float modelYaw = 0.0f;
     private float targetModelYaw = 0.0f;
     private PlayerState currentState;
-    private PlayerState previousState;
     private GLTFNode headNode;
     private GLTFNode torsoNode;
     private GLTFNode backpackNode;
@@ -96,6 +99,7 @@ public class Player extends Character {
     private GLTFNode leftArmNode;
     private GLTFNode rightLegNode;
     private GLTFNode leftLegNode;
+    private Quaternionf headRotation;
     private Vector3f headTranslation;
     private Vector3f torsoTranslation;
     private Vector3f backpackTranslation;
@@ -132,6 +136,7 @@ public class Player extends Character {
 
         if (headNode != null) {
             headTranslation = new Vector3f(headNode.getTranslation());
+            headRotation = new Quaternionf(headNode.getRotation());
         }
 
         if (torsoNode != null) {
@@ -324,6 +329,7 @@ public class Player extends Character {
         if (leftArmNode != null) leftArmNode.setRotation(leftArmRotation);
         if (rightLegNode != null) rightLegNode.setRotation(rightLegRotation);
         if (leftLegNode != null) leftLegNode.setRotation(leftLegRotation);
+        updateHeadTracking(delta);
 
         if (playerModel != null) {
             playerModel.updateTransforms();
@@ -521,6 +527,47 @@ public class Player extends Character {
         }
     }
 
+    private void updateHeadTracking(float delta) {
+        if (headNode == null || headRotation == null) return;
+
+        GameMaster game = GameMaster.game;
+        float screenWidth = Math.max(game.getWindowWidth(), 1.0f);
+        float screenHeight = Math.max(game.getWindowHeight(), 1.0f);
+
+        Ray mouseRay = game.getOrthoCamera().getMouseRay(
+                Mouse.getX(), Mouse.getY(), screenWidth, screenHeight);
+        Vector3f mouseWorldPosition = new Vector3f(mouseRay.origin());
+
+        if (Math.abs(mouseRay.direction().y) > 0.0001f) {
+            float t = (position.y - mouseRay.origin().y) / mouseRay.direction().y;
+            mouseWorldPosition.fma(t, mouseRay.direction());
+        }
+
+        Vector3f toMouse = mouseWorldPosition.sub(position);
+        float targetWorldYaw = (float) Math.atan2(toMouse.x, toMouse.z) + (float) Math.PI;
+        float bodyYaw = (float) Math.toRadians(modelYaw);
+        float targetYaw = Math.clamp(wrapRadians(targetWorldYaw - bodyYaw),
+                -MAX_HEAD_YAW, MAX_HEAD_YAW);
+
+        float normalizedMouseY = Math.clamp(
+                (Mouse.getY() - screenHeight * 0.5f) / (screenHeight * 0.5f), -1.0f, 1.0f);
+        float targetPitch = normalizedMouseY * MAX_HEAD_PITCH;
+
+        Quaternionf targetRotation = new Quaternionf(headRotation)
+                .rotateY(targetYaw)
+                .rotateX(targetPitch);
+        float blend = 1.0f - (float) Math.exp(-HEAD_TRACKING_SPEED * delta);
+        Quaternionf currentRotation = new Quaternionf(headNode.getRotation());
+        currentRotation.slerp(targetRotation, Math.clamp(blend, 0.0f, 1.0f));
+        headNode.setRotation(currentRotation);
+    }
+
+    private static float wrapRadians(float angle) {
+        while (angle > Math.PI) angle -= (float) (Math.PI * 2.0);
+        while (angle < -Math.PI) angle += (float) (Math.PI * 2.0);
+        return angle;
+    }
+
     public void interact() {
         this.isAttacking = true;
         this.attackAnimationTime = 0.0f;
@@ -587,10 +634,6 @@ public class Player extends Character {
 
     public void setCurrentState(PlayerState currentState) {
         this.currentState = currentState;
-    }
-
-    public PlayerState getPreviousState() {
-        return previousState;
     }
 
     public void respawn() {
