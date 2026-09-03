@@ -243,7 +243,7 @@ public class GameRenderer {
         glDepthFunc(GL_LESS);
         glDepthMask(true);
         glEnable(GL_DEPTH_TEST);
-        renderDestroyOverlay(gameMaster.getGameInteraction(), defaultShader,
+        renderDestroyOverlay(GameInteraction.gami, defaultShader,
                 ResourceManager.rem.getDestroyOverlayMesh(),
                 ResourceManager.rem.getDestroyTexture(), camera);
 
@@ -365,8 +365,8 @@ public class GameRenderer {
     }
 
     private Vector3f getOutlineColor(GameMaster gameMaster) {
-        boolean isSmartShift = gameMaster.getGameInteraction() != null
-                && gameMaster.getGameInteraction().isSmartShiftActive();
+        boolean isSmartShift = GameInteraction.gami != null
+                && GameInteraction.gami.isSmartShiftActive();
         return isSmartShift ? new Vector3f(1.0f, 1.0f, 0.2f) : K.Colors.OUTLINE_DEFAULT;
     }
 

@@ -33,7 +33,6 @@ public class GameMaster {
     private final Sun sun = new Sun("Sun");
     private final Moon moon = new Moon("Moon");
     private final CelestialLighting celestialLighting = new CelestialLighting(sun, moon);
-    private final SoundService soundService = new SoundService();
     private final UIManager uiManager = Intro.getUiManager();
     private final CropService cropService = new CropService(world);
     private final TreeService treeService = new TreeService(world);
@@ -46,7 +45,6 @@ public class GameMaster {
 
     private List<Recipe> recipes;
     private ShadowMap shadowMap;
-    private GameInteraction gameInteraction;
     private ChunkManager chunkManager;
     private GameRenderer gameRenderer;
     private ItemRenderer itemRenderer;
@@ -133,7 +131,6 @@ public class GameMaster {
                 ResourceManager.rem.getMaterialIcons(),
                 ResourceManager.rem.getInventoryIcons());
 
-        gameInteraction = new GameInteraction(this);
         gameUIservice.setPlayer(this.player);
         commandService.setGameUIService(gameUIservice);
         gameUIservice.setShop(shop);
@@ -240,10 +237,6 @@ public class GameMaster {
 
     public CameraController getOrthoCameraController() {
         return orthoCameraController;
-    }
-
-    public GameInteraction getGameInteraction() {
-        return gameInteraction;
     }
 
     public Framebuffer getBlurFbo() {
@@ -367,15 +360,15 @@ public class GameMaster {
         if (WeatherService.isRaining()) {
             rainEngine.update(delta);
             if (Settings.doEnableMusic()) {
-                soundService.setBackgroundSound(SoundGroup.RAIN);
+                SoundService.fx.setBackgroundSound(SoundGroup.RAIN);
             } else {
-                soundService.setBackgroundSound(null);
+                SoundService.fx.setBackgroundSound(null);
             }
         } else {
             if (Settings.doEnableMusic()) {
-                soundService.setBackgroundSound(SoundGroup.NATURE);
+                SoundService.fx.setBackgroundSound(SoundGroup.NATURE);
             } else {
-                soundService.setBackgroundSound(null);
+                SoundService.fx.setBackgroundSound(null);
             }
         }
 
@@ -396,8 +389,8 @@ public class GameMaster {
         updateEntities(delta);
         orthoCameraController.update(this, delta);
         particles.update(delta);
-        stepController.update(this, player, soundService, delta);
-        gameInteraction.update(this, Settings.selectedItem);
+        stepController.update(this, player, SoundService.fx, delta);
+        GameInteraction.gami.update(this, Settings.selectedItem);
 
         WaterSimulation.ws.update(delta);
         if (player != null) {
@@ -427,7 +420,7 @@ public class GameMaster {
         shadowMap.dispose();
 
         orthoCameraController.release(this);
-        soundService.cleanup();
+        SoundService.fx.cleanup();
         log.info("GameMaster resources successfully cleaned up");
     }
 

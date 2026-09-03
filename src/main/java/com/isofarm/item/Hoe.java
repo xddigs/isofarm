@@ -1,7 +1,9 @@
 package com.isofarm.item;
 
-import com.isofarm.data.*;
-import com.isofarm.input.GameInteraction;
+import com.isofarm.data.BlockData;
+import com.isofarm.data.Enchantment;
+import com.isofarm.data.Tier;
+import com.isofarm.data.ToolType;
 import com.isofarm.service.SoundService;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
@@ -21,7 +23,6 @@ public class Hoe extends Tool {
         setPlayer(gameMaster.getPlayer());
         super.use();
         World world = gameMaster.getWorld();
-        GameInteraction interaction = gameMaster.getGameInteraction();
         Block target = world.getBlockAt(block.getX(), block.getY(), block.getZ());
 
         if (target == null) return;

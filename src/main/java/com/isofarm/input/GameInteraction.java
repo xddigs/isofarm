@@ -4,12 +4,16 @@ import com.isofarm.data.*;
 import com.isofarm.entity.Entity;
 import com.isofarm.entity.Player;
 import com.isofarm.entity.WorldItem;
-import com.isofarm.graphics.ParticleEngine;
 import com.isofarm.graphics.SpriteSheet;
-import com.isofarm.gui.GameUIService;
 import com.isofarm.item.*;
-import com.isofarm.service.*;
-import com.isofarm.utils.*;
+import com.isofarm.service.BookService;
+import com.isofarm.service.SoundService;
+import com.isofarm.service.TimeService;
+import com.isofarm.service.TreeService;
+import com.isofarm.utils.HoveredCell;
+import com.isofarm.utils.K;
+import com.isofarm.utils.Settings;
+import com.isofarm.utils.ToastFactory;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.WaterSimulation;
 import com.isofarm.wrld.World;
@@ -25,15 +29,15 @@ import java.util.List;
 import static org.joml.Math.lerp;
 import static org.lwjgl.glfw.GLFW.*;
 
+@Singleton
+@GodObject
 public class GameInteraction {
+    public static final GameInteraction gami = new GameInteraction();
     private static final float PICKUP_DISTANCE = 1.5f;
     private static final float TIMEOUT = 0.4f;
     private static final float TIMER_MAX = 5.0f;
 
     private static final Logger log = LoggerFactory.getLogger(GameInteraction.class);
-    private final CropService cropService;
-    private final GameUIService gameUIservice;
-    private final ParticleEngine particles;
 
     private int breakingX = Integer.MIN_VALUE;
     private int breakingY = Integer.MIN_VALUE;
@@ -45,13 +49,9 @@ public class GameInteraction {
     private long lastBreakTime = 0L;
 
     private boolean isSmartShift = false;
-
-    public GameInteraction(GameMaster gameMaster) {
-        this.cropService = gameMaster.getCropService();
-        this.gameUIservice = gameMaster.getGameUIService();
-        this.particles = gameMaster.getParticles();
-    }
-
+    
+    private GameInteraction() {}
+    
     public BlockPos update(GameMaster gameMaster, Item selectedItem) {
         Player player = gameMaster.getPlayer();
         Inventory inventory = player.getInventory();
@@ -72,14 +72,14 @@ public class GameInteraction {
         if (Keyboard.isKeyPressed(GLFW_KEY_ENTER)) {
             if (!gameMaster.isChatOpen()) {
                 gameMaster.setChatOpen(true);
-                gameUIservice.openChat();
+                GameMaster.game.getGameUIService().openChat();
             } else {
-                String command = gameUIservice.getChatText();
+                String command = GameMaster.game.getGameUIService().getChatText();
                 if (command != null && !command.isEmpty()) {
                     gameMaster.getCommandService().execute(command);
                 }
                 gameMaster.setChatOpen(false);
-                gameUIservice.closeChat();
+                GameMaster.game.getGameUIService().closeChat();
             }
         }
 
@@ -376,15 +376,15 @@ public class GameInteraction {
             int frameIndex = crop.getStage().getFrameIndex();
             SpriteSheet sheet = gameMaster.getCropSpriteSheet(cropType);
             if (crop.isReadyToHarvest()) {
-                cropService.harvest(gameMaster.getPlayer(), crop);
+                GameMaster.game.getCropService().harvest(gameMaster.getPlayer(), crop);
             } else {
-                cropService.rip(crop);
+                GameMaster.game.getCropService().rip(crop);
             }
 
             SoundService.fx.playBreakSound(SoundGroup.SOIL);
-            if (sheet != null) particles.spawnCrop(x, y + K.World.SHORTER_BLOCK_HEIGHT,
+            if (sheet != null) GameMaster.game.getParticles().spawnCrop(x, y + K.World.SHORTER_BLOCK_HEIGHT,
                     z, sheet, frameIndex);
-            gameUIservice.logAction(cell);
+            GameMaster.game.getGameUIService().logAction(cell);
             return;
         }
 
@@ -468,7 +468,7 @@ public class GameInteraction {
             if (tool instanceof Axe axe && isSmartShift) {
                 List<BlockPos> destroyedBlocks = TreeService.chop(gameMaster, axe);
                 for (BlockPos pos : destroyedBlocks) {
-                    gameUIservice.logAction(new BlockPos(blockData, pos.x(), pos.y(), pos.z()));
+                    GameMaster.game.getGameUIService().logAction(new BlockPos(blockData, pos.x(), pos.y(), pos.z()));
 
                     BlockData bData = pos.data();
                     Block brokenBlock = new Block(bData, pos.x(), pos.y(), pos.z());
@@ -488,7 +488,7 @@ public class GameInteraction {
                         itemToDrop = brokenBlock;
                     }
 
-                    particles.spawnBlock(pos, bData);
+                    GameMaster.game.getParticles().spawnBlock(pos, bData);
                     Vector3f dropPos = new Vector3f(pos.x() + 0.5f, pos.y() + 0.5f, pos.z() + 0.5f);
 
                     int count = (int) (Math.random() * 2) + 1;
@@ -505,7 +505,7 @@ public class GameInteraction {
         world.setWaterLevelAt(cell.x(), cell.y(), cell.z(), (byte) 0);
         WaterSimulation.ws.onBlockDestroyed(cell.x(), cell.y(), cell.z());
         gameMaster.rebuildChunkMeshAt(cell);
-        particles.spawnBlock(cell, blockData);
+        GameMaster.game.getParticles().spawnBlock(cell, blockData);
 
         if (removedBlock.getType().hasDrops()) {
             Object dropObj = removedBlock.getType().getRandomDrop();
@@ -525,7 +525,7 @@ public class GameInteraction {
         WorldItem dropEntity = new WorldItem(itemToDrop, (int) (Math.random()) + 1, position);
         gameMaster.addEntity(dropEntity);
 
-        gameUIservice.logAction(cell);
+        GameMaster.game.getGameUIService().logAction(cell);
         log.trace("Block removed: {} at {},{},{}", blockData.getDisplayName(), cell.x(), cell.y(), cell.z());
         this.breakTimeout = TIMEOUT;
     }
@@ -579,7 +579,7 @@ public class GameInteraction {
                 player.remove(selectedItem);
                 SoundService.fx.playBreakSound(newBlock.getType().getSoundGroup());
                 gameMaster.rebuildChunkMeshAt(placeX, placeZ);
-                gameUIservice.logAction(new BlockPos(newBlock.getType(), placeX, placeY, placeZ));
+                GameMaster.game.getGameUIService().logAction(new BlockPos(newBlock.getType(), placeX, placeY, placeZ));
                 log.trace("Block placed: {} at {},{},{}", newBlock.getType().getName(), placeX, placeY, placeZ);
             }
             return;
@@ -616,11 +616,11 @@ public class GameInteraction {
             if (seed.getType() == null) return;
 
             Block tilledDirt = new Block(BlockData.TILLED_DIRT, x, y, z);
-            Crop planted = cropService.plant(x, y, z, player, tilledDirt, seed.getType(),
+            Crop planted = GameMaster.game.getCropService().plant(x, y, z, player, tilledDirt, seed.getType(),
                     TimeService.ts.getCurrentSeason());
 
             if (planted != null) {
-                gameUIservice.logAction(cell);
+                GameMaster.game.getGameUIService().logAction(cell);
                 log.info("Planted {} at {},{},{}", seed.getType().getName(), x, y, z);
             }
         }
