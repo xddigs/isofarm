@@ -25,11 +25,7 @@ import static org.lwjgl.opengl.GL13.*;
 public class GameRenderer {
     private final Matrix4f modelMatrix = new Matrix4f();
     private final Matrix4f viewProjMatrix = new Matrix4f();
-    private final Matrix4f lightProjection = new Matrix4f();
-    private final Matrix4f lightView = new Matrix4f();
     private final Matrix4f lightSpaceMatrix = new Matrix4f();
-    private final Vector3f lightPosition = new Vector3f();
-    private final Vector3f lightTarget = new Vector3f();
     private final FrustumIntersection frustum = new FrustumIntersection();
     private float previousCameraYaw;
     private float previousCameraPitch;
@@ -39,13 +35,12 @@ public class GameRenderer {
 
     public void render(GameMaster gameMaster, ResourceManager rm,
                        Map<Chunk, ChunkMeshBuilder.ChunkRenderMesh> chunkMeshes) {
+        ShadowSystem.sys.render(gameMaster, rm, chunkMeshes);
         waterTime += gameMaster.getGenDelta();
-        renderShadowPass(gameMaster, rm, chunkMeshes);
         CameraView camera = gameMaster.getActiveCamera();
         float windowWidth = gameMaster.getWindowWidth();
         float windowHeight = gameMaster.getWindowHeight();
         Framebuffer sceneFbo = gameMaster.getSceneFbo();
-        Framebuffer maskFbo = gameMaster.getMaskFbo();
 
         sceneFbo.bind();
         glViewport(0, 0, (int) windowWidth, (int) windowHeight);
@@ -374,89 +369,6 @@ public class GameRenderer {
         boolean isSmartShift = gameMaster.getGameInteraction() != null
                 && gameMaster.getGameInteraction().isSmartShiftActive();
         return isSmartShift ? new Vector3f(1.0f, 0.95f, 0.25f) : K.Colors.OUTLINE_DEFAULT;
-    }
-
-    private void renderShadowPass(GameMaster gameMaster, ResourceManager rm,
-                                  Map<Chunk, ChunkMeshBuilder.ChunkRenderMesh> chunkMeshes) {
-        ShadowMap shadowMap = gameMaster.getShadowMap();
-        Shader shadowShader = rm.getShadowMapShader();
-
-        updateLightSpaceMatrix(gameMaster);
-        shadowMap.bind();
-        glEnable(GL_DEPTH_TEST);
-        glDepthMask(true);
-        glEnable(GL_POLYGON_OFFSET_FILL);
-        glPolygonOffset(-1.1f, -1.0f);
-        shadowShader.bind();
-        shadowShader.setUniform("uLightSpaceMatrix", lightSpaceMatrix);
-        chunkMeshes.forEach((chunk, chunkMesh) -> {
-            if (chunkMesh == null) return;
-            float minX = chunk.getChunkX() * Chunk.SIZE_X;
-            float minZ = chunk.getChunkZ() * Chunk.SIZE_Z;
-            modelMatrix.identity().translate(minX, 0.0f, minZ);
-            shadowShader.setUniform("uModel", modelMatrix);
-
-            if (chunkMesh.solidMesh() != null && chunkMesh.solidMesh().getIndicesCount() > 0) {
-                chunkMesh.solidMesh().render();
-            }
-            if (chunkMesh.waterMesh() != null && chunkMesh.waterMesh().getIndicesCount() > 0) {
-                chunkMesh.waterMesh().render();
-            }
-        });
-
-        gameMaster.getWorld().forEach(block -> {
-            if (!(block instanceof Crop crop)) return;
-            float renderX = crop.getX() + 0.5f;
-            float renderY = crop.getY() + K.World.SHORTER_BLOCK_HEIGHT;
-            float renderZ = crop.getZ() + 0.5f;
-            modelMatrix.identity().translate(renderX, renderY, renderZ);
-            shadowShader.setUniform("uModel", modelMatrix);
-            rm.getSpriteMesh().render();
-        });
-
-        gameMaster.getWorld().forEachPlant(plant -> {
-            float renderX = plant.x() + 0.5f;
-            float renderY = plant.y();
-            float renderZ = plant.z() + 0.5f;
-            modelMatrix.identity().translate(renderX, renderY, renderZ);
-            shadowShader.setUniform("uModel", modelMatrix);
-            rm.getFlowerMesh().render();
-        });
-
-        glDisable(GL_POLYGON_OFFSET_FILL);
-        glPolygonOffset(0.0f, 0.0f);
-        shadowShader.unbind();
-        shadowMap.unbind((int) gameMaster.getWindowWidth(), (int) gameMaster.getWindowHeight());
-    }
-
-    private void updateLightSpaceMatrix(GameMaster gameMaster) {
-        CameraView camera = gameMaster.getActiveCamera();
-        Vector3f cameraPosition = new Vector3f(camera.getPosition());
-        Vector3f lightDirection = new Vector3f(gameMaster.getCelestialLighting().getDirection()).normalize();
-
-        lightTarget.set(cameraPosition);
-        lightPosition.set(cameraPosition).sub(new Vector3f(lightDirection).mul(80.0f));
-
-        Vector3f up = new Vector3f(0.0f, 1.0f, 0.0f);
-        if (Math.abs(lightDirection.y) > 0.98f) {
-            up.set(0.0f, 0.0f, 1.0f);
-        }
-
-        lightProjection.identity().ortho(-60.0f, 60.0f, -60.0f, 60.0f, 1.0f, 180.0f);
-        lightView.identity().lookAt(lightPosition, lightTarget, up);
-
-        lightSpaceMatrix.set(lightProjection).mul(lightView);
-        Vector4f shadowCoord = new Vector4f(0.0f, 0.0f, 0.0f, 1.0f).mul(lightSpaceMatrix);
-        shadowCoord.mul(Settings.getShadowMapSize() / 2.0f);
-
-        float roundedX = Math.round(shadowCoord.x);
-        float roundedY = Math.round(shadowCoord.y);
-        float dx = (roundedX - shadowCoord.x) * (2.0f / Settings.getShadowMapSize());
-        float dy = (roundedY - shadowCoord.y) * (2.0f / Settings.getShadowMapSize());
-
-        Matrix4f texelFix = new Matrix4f().translate(dx, dy, 0.0f);
-        lightProjection.mul(texelFix);
-        lightSpaceMatrix.set(lightProjection).mul(lightView);
     }
 
     public void renderDestroyOverlay(GameInteraction interaction, Shader shader, Mesh blockMesh,

@@ -32,9 +32,12 @@ float calculateShadow(vec4 lightSpacePosition, vec3 normal) {
     vec3 projectionCoordinates = lightSpacePosition.xyz / lightSpacePosition.w;
     projectionCoordinates = projectionCoordinates * 0.5 + 0.5;
 
-    if (projectionCoordinates.z > 1.0 || projectionCoordinates.x < 0.0 ||
-        projectionCoordinates.x > 1.0 || projectionCoordinates.y < 0.0 ||
-        projectionCoordinates.y > 1.0) {
+    if (projectionCoordinates.x < 0.0 ||
+        projectionCoordinates.x > 1.0 ||
+        projectionCoordinates.y < 0.0 ||
+        projectionCoordinates.y > 1.0 ||
+        projectionCoordinates.z < 0.0 ||
+        projectionCoordinates.z > 1.0) {
         return 0.0;
     }
 

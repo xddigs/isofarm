@@ -27,7 +27,6 @@ import java.util.function.Consumer;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 
-@SuppressWarnings("all")
 public class GameMaster {
     private static final Logger log = LoggerFactory.getLogger(GameMaster.class);
     private final long windowHandle;
@@ -56,7 +55,6 @@ public class GameMaster {
     private GameRenderer gameRenderer;
     private ItemRenderer itemRenderer;
     private GameUIService gameUIservice;
-    private Framebuffer maskFbo;
     private Framebuffer sceneFbo;
     private Framebuffer blurFbo;
     private Camera orthoCamera;
@@ -115,7 +113,6 @@ public class GameMaster {
                 (int) Settings.getShadowMapSize());
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
-        this.maskFbo = new Framebuffer((int) windowWidth, (int) windowHeight);
         this.sceneFbo = new Framebuffer((int) windowWidth, (int) windowHeight);
         this.blurFbo = new Framebuffer((int) windowWidth, (int) windowHeight);
         notifyProgress(progressCallback, ++currentStep / totalSteps);
@@ -162,10 +159,10 @@ public class GameMaster {
 
     public void initUI() {
         gameUIservice = new GameUIService(windowHandle, this,
-                uiManager, resourceManager.getSeedIcons(), resourceManager.getCropIcons(),
-                resourceManager.getBlockIcons(), resourceManager.getToolIcons(),
-                resourceManager.getMaterialIcons(),
-                resourceManager.getInventoryIcons());
+                uiManager, ResourceManager.getSeedIcons(), ResourceManager.getCropIcons(),
+                ResourceManager.getBlockIcons(), ResourceManager.getToolIcons(),
+                ResourceManager.getMaterialIcons(),
+                ResourceManager.getInventoryIcons());
 
         gameInteraction = new GameInteraction(this,
                 resourceManager.getBlocksAtlas());
@@ -223,10 +220,6 @@ public class GameMaster {
 
     public ParticleEngine getParticles() {
         return particles;
-    }
-
-    public Framebuffer getMaskFbo() {
-        return maskFbo;
     }
 
     public Framebuffer getSceneFbo() {
@@ -419,7 +412,7 @@ public class GameMaster {
     }
 
     public void update(float delta) {
-        if (weatherService.isRaining()) {
+        if (WeatherService.isRaining()) {
             rainEngine.update(delta);
             if (Settings.doEnableMusic()) {
                 soundService.setBackgroundSound(SoundGroup.RAIN);
@@ -474,7 +467,6 @@ public class GameMaster {
         itemRenderer.dispose();
 
         GUI.dispose();
-        maskFbo.dispose();
         sceneFbo.dispose();
         blurFbo.dispose();
 
@@ -511,11 +503,6 @@ public class GameMaster {
         if (orthoCamera != null) {
             orthoCamera.updateProjection(newWidth, newHeight,
                     Settings.getRenderDistance());
-        }
-
-        if (maskFbo != null) {
-            maskFbo.dispose();
-            maskFbo = new Framebuffer(newWidth, newHeight);
         }
 
         if (sceneFbo != null) {
