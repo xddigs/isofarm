@@ -1,9 +1,13 @@
 package com.isofarm.item;
 
-import com.isofarm.data.*;
+import com.isofarm.data.BlockData;
+import com.isofarm.data.BlockPos;
+import com.isofarm.data.Enchantment;
+import com.isofarm.data.Usables;
 import com.isofarm.entity.Player;
 import com.isofarm.utils.HoveredCell;
 import com.isofarm.wrld.GameMaster;
+import com.isofarm.wrld.WaterSimulation;
 import com.isofarm.wrld.World;
 
 public class Bucket extends Usable {
@@ -42,7 +46,7 @@ public class Bucket extends Usable {
                 return false;
             }
 
-            if (!gameMaster.getWaterSimulation().removeWater(
+            if (!WaterSimulation.ws.removeWater(
                     targetBlock.x(),
                     targetBlock.y(),
                     targetBlock.z())) {
@@ -65,7 +69,7 @@ public class Bucket extends Usable {
         int placeY = targetBlock.y() + normalY;
         int placeZ = targetBlock.z() + normalZ;
 
-        gameMaster.getWaterSimulation().addSource(placeX, placeY, placeZ);
+        WaterSimulation.ws.addSource(placeX, placeY, placeZ);
         empty();
         return true;
     }

@@ -29,7 +29,6 @@ import static org.joml.Math.lerp;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL13.*;
 
-@SuppressWarnings("all")
 @GodObject
 public class Player extends Character {
     private static final Logger log = LoggerFactory.getLogger(Player.class);
@@ -76,7 +75,6 @@ public class Player extends Character {
     private static final float HALF_DEGREES = 180.0f;
 
     private final Matrix4f modelMatrix;
-    private final GameMaster gameMaster;
     private final GLTFModel playerModel;
     private Direction direction = Direction.S;
     private List<GridPos> path;
@@ -113,9 +111,8 @@ public class Player extends Character {
     private float attackAnimationTime = 0.0f;
     private boolean isAttacking = false;
 
-    public Player(String name, World world, GameMaster gameMaster) {
+    public Player(String name, World world) {
         super(name);
-        this.gameMaster = gameMaster;
         this.modelMatrix = new Matrix4f();
         this.path = new LinkedList<>();
 
@@ -185,7 +182,7 @@ public class Player extends Character {
             if (respawnTimer <= ZERO_VELOCITY) {
                 respawnTimer = DEATH_RESPAWN_TIME;
                 dropLoot();
-                gameMaster.toggleHUD();
+                GameMaster.game.toggleHUD();
                 setGamemode(Gamemode.NO_CLIP);
             }
 
@@ -197,7 +194,7 @@ public class Player extends Character {
             return;
         }
 
-        currentState.input(this, gameMaster);
+        currentState.input(this, GameMaster.game);
         currentState.update(this, delta);
         updateRotation(delta);
 
@@ -355,15 +352,15 @@ public class Player extends Character {
         setAnimTimer(getAnimTimer() + delta);
         heal(((0.5f + getLevel()) * delta) / getDifficultyRegen());
         if (!(currentState instanceof SneakingState)) {
-            autoJump(gameMaster.getWorld(), getVelocity(), delta);
+            autoJump(GameMaster.game.getWorld(), getVelocity(), delta);
         }
         updateEquipmentVisual();
         checkDurability();
     }
 
     @Override
-    public void render(GameMaster gameMaster, RenderPass pass) {
-        CameraView camera = gameMaster.getActiveCamera();
+    public void render(GameMaster game, RenderPass pass) {
+        CameraView camera = game.getActiveCamera();
 
         if (pass.equals(RenderPass.SHADOW)) {
             Shader shadowShader = ResourceManager.rem.getShadowMapShader();
@@ -397,7 +394,7 @@ public class Player extends Character {
         Shader defaultShader = ResourceManager.rem.getDefaultShader();
         if (defaultShader == null) return;
 
-        CelestialLighting lighting = gameMaster.getCelestialLighting();
+        CelestialLighting lighting = GameMaster.game.getCelestialLighting();
         defaultShader.bind();
         defaultShader.setUniform("uProjection", camera.getProjectionMatrix());
         defaultShader.setUniform("uView", camera.getViewMatrix());
@@ -468,7 +465,7 @@ public class Player extends Character {
             WorldItem item = new WorldItem(i, amount, new Vector3f(position.x,
                     position.y, position.z));
             remove(i, amount);
-            gameMaster.addEntity(item);
+            GameMaster.game.addEntity(item);
         }
     }
 
@@ -607,8 +604,8 @@ public class Player extends Character {
         float spawnX = SPAWN_X;
         float spawnZ = SPAWN_Z;
 
-        GridPos highestAltitude = gameMaster.getWorld().getHighestY(spawnX, spawnZ);
-        gameMaster.addEntity(this);
+        GridPos highestAltitude = GameMaster.game.getWorld().getHighestY(spawnX, spawnZ);
+        GameMaster.game.addEntity(this);
         setPosition(new Vector3f(spawnX, highestAltitude.y() + RESPAWN_Y_OFFSET, spawnZ));
         setVelocity(new Vector3f(INITIAL_HORIZONTAL_VELOCITY, INITIAL_Y_VELOCITY, INITIAL_HORIZONTAL_VELOCITY));
         setDimensions(new Vector3f(PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_WIDTH));
@@ -630,7 +627,7 @@ public class Player extends Character {
         setLevel(1);
         resetAttributes();
         respawnTimer = -1.0f;
-        gameMaster.toggleHUD();
+        GameMaster.game.toggleHUD();
     }
 
     public void resetAttributes() {
@@ -684,7 +681,7 @@ public class Player extends Character {
 
     public void wasd(World world, float delta, float cameraYaw,
                      boolean isFlying) {
-        if (gameMaster.isChatOpen() || gameMaster.isInventoryOpen() ||
+        if (GameMaster.game.isChatOpen() || GameMaster.game.isInventoryOpen() ||
                 BookService.bs.isOpen()) return;
 
         if (isFollowingPath()) {
@@ -740,7 +737,7 @@ public class Player extends Character {
 
     public void fly(float delta, float yaw, boolean isFlying) {
         if (isOnGround()) return;
-        wasd(gameMaster.getWorld(), delta, yaw, isFlying);
+        wasd(GameMaster.game.getWorld(), delta, yaw, isFlying);
     }
 
     public boolean hasGroundBelow(World world, float testX, float testZ) {
@@ -870,10 +867,6 @@ public class Player extends Character {
         return getInventory().getAmount(item);
     }
 
-    public GameMaster getGameMaster() {
-        return gameMaster;
-    }
-
     public void earn(int amount) {
         log.info("Earned ${}", amount);
         getPurse().add(amount);
@@ -958,6 +951,6 @@ public class Player extends Character {
     }
 
     public float getDifficultyRegen() {
-        return gameMaster.getDifficulty().getMultiplier();
+        return GameMaster.game.getDifficulty().getMultiplier();
     }
 }

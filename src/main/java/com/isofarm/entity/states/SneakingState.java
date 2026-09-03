@@ -36,13 +36,13 @@ public class SneakingState implements PlayerState {
 
     @Override
     public void update(Player player, float delta) {
-        if (player.isInFluid(player.getGameMaster().getWorld())) {
+        if (player.isInFluid(GameMaster.game.getWorld())) {
             player.changeState(new SwimmingState());
             return;
         }
 
-        float yaw = player.getGameMaster().getActiveCamera().getYaw();
-        player.wasd(player.getGameMaster().getWorld(), delta, yaw, false);
+        float yaw = GameMaster.game.getActiveCamera().getYaw();
+        player.wasd(GameMaster.game.getWorld(), delta, yaw, false);
     }
 
     @Override

@@ -36,7 +36,7 @@ public class Backpack extends Usable implements Undroppable {
     public void unequip() {
         if (getPlayer() != null && getPlayer().getInventory().hasBackpackEquipped()) {
             getPlayer().getInventory().unequipBackpack();
-            getPlayer().getGameMaster().getGameUIService().resetHotbarPosition();
+            GameMaster.game.getGameUIService().resetHotbarPosition();
         }
     }
 

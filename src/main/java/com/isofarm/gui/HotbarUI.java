@@ -13,6 +13,7 @@ import com.isofarm.item.Book;
 import com.isofarm.item.Item;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
+import com.isofarm.wrld.GameMaster;
 
 import java.util.List;
 
@@ -130,6 +131,7 @@ public class HotbarUI extends UIElement {
             return;
         }
         selectedSlot = index;
+        updateSelectedItem();
     }
 
     public void selectNext() {
@@ -344,7 +346,7 @@ public class HotbarUI extends UIElement {
                     selectSlot(index);
                 }
                 if (backpackSlotUI.getItem() instanceof Backpack backpack) {
-                    backpack.use(player.getGameMaster(), isCtrlHeld);
+                    backpack.use(GameMaster.game, isCtrlHeld);
                 }
                 return;
             }
@@ -355,7 +357,7 @@ public class HotbarUI extends UIElement {
                     selectSlot(index);
                 }
                 if (bookSlotUI.getItem() instanceof Book book) {
-                    book.use(player.getGameMaster(), isCtrlHeld);
+                    book.use(GameMaster.game, isCtrlHeld);
                 }
                 return;
             }

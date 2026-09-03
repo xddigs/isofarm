@@ -88,7 +88,7 @@ public class TreeService {
             );
 
             for (ChunkPos chunk : affectedChunks) {
-                gamemaster.getWorld().getGameMaster().rebuildChunkMeshAt(chunk.x(), chunk.z());
+                gamemaster.rebuildChunkMeshAt(chunk.x(), chunk.z());
             }
             return choppedBlocks;
         }
@@ -121,7 +121,7 @@ public class TreeService {
 
         world.setBlockTypeAt(x, y, z, BlockData.AIR.getId());
         WorldGenerator.generateTree(x, z, random);
-        world.getGameMaster().rebuildChunkMeshAt(x, z);
+        GameMaster.game.rebuildChunkMeshAt(x, z);
     }
 
     private void updateLeaves(GameMaster gameMaster) {
@@ -145,7 +145,7 @@ public class TreeService {
                         world.setBlockTypeAt(worldX, localY, worldZ, BlockData.AIR.getId());
                         WorldItem worldItem = new WorldItem(item, 1, new Vector3f(worldX, localY, worldZ));
                         gameMaster.addEntity(worldItem);
-                        world.getGameMaster().rebuildChunkMeshAt(worldX, worldZ);
+                        gameMaster.rebuildChunkMeshAt(worldX, worldZ);
                     }
                 }
             }

@@ -367,7 +367,7 @@ public class GameRenderer {
     private Vector3f getOutlineColor(GameMaster gameMaster) {
         boolean isSmartShift = gameMaster.getGameInteraction() != null
                 && gameMaster.getGameInteraction().isSmartShiftActive();
-        return isSmartShift ? new Vector3f(1.0f, 0.95f, 0.25f) : K.Colors.OUTLINE_DEFAULT;
+        return isSmartShift ? new Vector3f(1.0f, 1.0f, 0.2f) : K.Colors.OUTLINE_DEFAULT;
     }
 
     public void renderDestroyOverlay(GameInteraction interaction, Shader shader, Mesh blockMesh,

@@ -31,9 +31,9 @@ public class SwimmingState implements PlayerState {
 
     @Override
     public void update(Player player, float delta) {
-        World world = player.getGameMaster().getWorld();
+        World world = GameMaster.game.getWorld();
 
-        float yaw = player.getGameMaster().getActiveCamera().getYaw();
+        float yaw = GameMaster.game.getActiveCamera().getYaw();
         player.wasd(world, delta, yaw, false);
 
         if (player.isOnGround()) {

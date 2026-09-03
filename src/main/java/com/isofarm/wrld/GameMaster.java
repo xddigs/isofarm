@@ -27,24 +27,27 @@ import java.util.function.Consumer;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 
+@Singleton
 public class GameMaster {
+    public static final GameMaster game = new GameMaster();
+
     private static final Logger log = LoggerFactory.getLogger(GameMaster.class);
-    private final long windowHandle;
-    private final World world;
-    private final Sun sun;
-    private final Moon moon;
-    private final CelestialLighting celestialLighting;
-    private final SoundService soundService;
-    private final UIManager uiManager;
-    private final CropService cropService;
-    private final TreeService treeService;
-    private final CommandService commandService;
-    private final ParticleEngine particles;
-    private final RainEngine rainEngine;
-    private final CommandRegistry commandRegistry;
-    private final ItemRegistry itemRegistry;
-    private final List<Entity> entities;
-    private final WaterSimulation waterSimulation;
+    private final long windowHandle = Intro.getWindow();
+    private final World world = World.wd;
+    private final Sun sun = new Sun("Sun");
+    private final Moon moon = new Moon("Moon");
+    private final CelestialLighting celestialLighting = new CelestialLighting(sun, moon);
+    private final SoundService soundService = new SoundService();
+    private final UIManager uiManager = Intro.getUiManager();
+    private final CropService cropService = new CropService(world);
+    private final TreeService treeService = new TreeService(world);
+    private final CommandRegistry commandRegistry = new CommandRegistry();
+    private final CommandService commandService = new CommandService(commandRegistry);
+    private final ItemRegistry itemRegistry = new ItemRegistry();
+    private final ParticleEngine particles = new ParticleEngine();
+    private final RainEngine rainEngine = new RainEngine();
+    private final List<Entity> entities = new LinkedList<>();
+
     private List<Recipe> recipes;
     private ShadowMap shadowMap;
     private GameInteraction gameInteraction;
@@ -58,11 +61,11 @@ public class GameMaster {
     private Camera orthoCamera;
     private CameraController orthoCameraController;
     private StepController stepController;
-    private float windowWidth;
-    private float windowHeight;
+    private float windowWidth = K.Window.DEFAULT_WIDTH;
+    private float windowHeight = K.Window.DEFAULT_HEIGHT;
     private Player player;
     private Shop shop;
-    private Difficulty difficulty;
+    private Difficulty difficulty = Difficulty.NORMAL;
 
     private boolean isChatOpen = false;
     private boolean isInventoryOpen = false;
@@ -70,31 +73,7 @@ public class GameMaster {
 
     private float genDelta;
 
-    public GameMaster(long windowHandle, UIManager uiManager) {
-        this.windowHandle = windowHandle;
-        this.uiManager = uiManager;
-
-        this.windowWidth = K.Window.DEFAULT_WIDTH;
-        this.windowHeight = K.Window.DEFAULT_HEIGHT;
-
-        this.world = new World(this);
-        this.waterSimulation = new WaterSimulation(world);
-        this.sun = new Sun("Sun");
-        this.moon = new Moon("Moon");
-        this.celestialLighting = new CelestialLighting(sun, moon);
-
-        this.soundService = new SoundService();
-        this.particles = new ParticleEngine();
-        this.cropService = new CropService(world);
-        this.treeService = new TreeService(world);
-        this.commandRegistry = new CommandRegistry();
-        this.commandService = new CommandService(commandRegistry);
-        this.itemRegistry = new ItemRegistry();
-        this.rainEngine = new RainEngine();
-        this.entities = new LinkedList<>();
-
-        this.difficulty = Difficulty.NORMAL;
-    }
+    private GameMaster() {}
 
     public void loadResources(Consumer<Float> progressCallback) {
         float totalSteps = 10.0f;
@@ -116,7 +95,7 @@ public class GameMaster {
 
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
-        this.chunkManager = new ChunkManager(world, waterSimulation);
+        this.chunkManager = new ChunkManager(world, WaterSimulation.ws);
         this.gameRenderer = new GameRenderer();
         this.itemRenderer = new ItemRenderer();
         this.shop = new Shop();
@@ -135,7 +114,7 @@ public class GameMaster {
         recipes = RecipeRegistry.reg.init();
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
-        this.player = new Player(null, world, this);
+        this.player = new Player(null, world);
         addEntity(player);
         shop.setPlayer(player);
         notifyProgress(progressCallback, ++currentStep / totalSteps);
@@ -166,7 +145,12 @@ public class GameMaster {
         gameUIservice.setPlayer(this.player);
         commandService.setGameUIService(gameUIservice);
         gameUIservice.setShop(shop);
-        player.setName("Gabi");
+
+        String[] defaultNames = {"Alex", "Avery", "Blake", "Casey", "Charlie", "Cameron", "Dakota",
+                "Drew", "Eden", "Emery", "Finley", "Harper", "Hayden", "Jamie", "Jordan", "Jesse",
+                "Kai", "Kendall", "Logan", "Morgan", "Parker", "Quinn", "Reese", "Riley", "River",
+                "Robin", "Rowan", "Sam", "Shawn", "Skyler", "Taylor", "Terry", "Tristan", "Wren"};
+        player.setName(defaultNames[(int) (Math.random() * defaultNames.length)]);
         ToastFactory.info("Press E to open inventory");
     }
 
@@ -176,10 +160,6 @@ public class GameMaster {
         float spawnY = spawn.y() + 1.8f;
         player.setPosition(0.5f, spawnY, 0.5f);
         orthoCamera.setPosition(0.5f, spawnY + 10.0f, 0.5f);
-    }
-
-    public WaterSimulation getWaterSimulation() {
-        return waterSimulation;
     }
 
     public Sun getSun() {
@@ -434,7 +414,7 @@ public class GameMaster {
         stepController.update(this, player, soundService, delta);
         gameInteraction.update(this, Settings.selectedItem);
 
-        waterSimulation.update(delta);
+        WaterSimulation.ws.update(delta);
         if (player != null) {
             chunkManager.update(player.getPosition().x,
                     player.getPosition().z, delta);

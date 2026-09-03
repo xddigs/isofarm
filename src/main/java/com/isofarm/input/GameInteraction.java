@@ -15,6 +15,7 @@ import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import com.isofarm.utils.ToastFactory;
 import com.isofarm.wrld.GameMaster;
+import com.isofarm.wrld.WaterSimulation;
 import com.isofarm.wrld.World;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
@@ -501,8 +502,7 @@ public class GameInteraction {
 
         world.setBlockTypeAt(cell, BlockData.AIR.getId());
         world.setWaterLevelAt(cell.x(), cell.y(), cell.z(), (byte) 0);
-        gameMaster.getWaterSimulation()
-                .onBlockDestroyed(cell.x(), cell.y(), cell.z());
+        WaterSimulation.ws.onBlockDestroyed(cell.x(), cell.y(), cell.z());
         gameMaster.rebuildChunkMeshAt(cell);
         particles.spawnBlock(cell, blockData);
 
@@ -562,12 +562,16 @@ public class GameInteraction {
 
             byte targetBlock = world.getBlockTypeAt(placeX, placeY, placeZ);
             BlockData target = BlockData.fromId(targetBlock);
-            if (target.equals(BlockData.AIR) || target.equals(BlockData.WATER)) {
+            if (target.equals(BlockData.AIR) || target.equals(BlockData.WATER) || target.isPlant()) {
                 Block newBlock = new Block(block.getType(), placeX, placeY, placeZ);
                 if (block.getType().equals(BlockData.OAK_BONSAI)) {
                     gameMaster.getTreeService().plant(placeX, placeY, placeZ, BlockData.OAK_BONSAI);
                 } else {
-                    world.setBlockTypeAt(placeX, placeY, placeZ, block.getType().getId());
+                    if (target.isPlant()) {
+                        breakBlock(gameMaster, new BlockPos(target, placeX, placeY, placeZ),
+                                target, targetBlock, selectedItem);
+                        world.setBlockTypeAt(placeX, placeY, placeZ, block.getType().getId());
+                    }
                 }
 
                 player.remove(selectedItem);

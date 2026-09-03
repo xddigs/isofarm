@@ -37,7 +37,7 @@ public class FlyingState implements PlayerState {
 
     @Override
     public void update(Player player, float delta) {
-        float yaw = player.getGameMaster()
+        float yaw = GameMaster.game
                 .getActiveCamera()
                 .getYaw();
 

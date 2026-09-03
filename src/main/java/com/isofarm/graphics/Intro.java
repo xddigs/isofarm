@@ -20,12 +20,10 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
 public class Intro {
-    private final long window;
-    private GameMaster gameMaster;
-    private UIProgressBar progressBar;
-    private UIManager uiManager;
-
     private static final float CLEAR_COLOR_ALPHA = 1.0f;
+    private static long window;
+    private static UIManager uiManager;
+    private UIProgressBar progressBar;
     private int framebufferWidth;
     private int framebufferHeight;
 
@@ -37,7 +35,15 @@ public class Intro {
     private int windowedHeight;
 
     public Intro(long window) {
-        this.window = window;
+        Intro.window = window;
+    }
+
+    public static long getWindow() {
+        return window;
+    }
+
+    public static UIManager getUiManager() {
+        return uiManager;
     }
 
     public void setupUI() {
@@ -62,9 +68,8 @@ public class Intro {
     public void show() {
         setupUI();
         toggleFullscreen();
-        gameMaster = new GameMaster(window, uiManager);
         updateFramebufferSize();
-        gameMaster.onResize(framebufferWidth, framebufferHeight);
+        GameMaster.game.onResize(framebufferWidth, framebufferHeight);
         setupCallbacks();
 
         int r = Settings.getRenderDistance();
@@ -75,7 +80,7 @@ public class Intro {
 
         final int[] completedTasks = {0};
 
-        gameMaster.loadResources(progress -> {
+        GameMaster.game.loadResources(progress -> {
             completedTasks[0]++;
             float overallProgress = ((float) completedTasks[0] / totalTasks) * 100.0f;
             progressBar.setValue(overallProgress);
@@ -87,7 +92,7 @@ public class Intro {
         while (!glfwWindowShouldClose(window) && completedTasks[0] < (resourceSteps + totalChunks)) {
             glfwPollEvents();
 
-            gameMaster.getChunkManager().getGenerator()
+            GameMaster.game.getChunkManager().getGenerator()
                     .generateChunk(currentChunkX, currentChunkZ);
 
             completedTasks[0]++;
@@ -109,7 +114,7 @@ public class Intro {
 
         while (!glfwWindowShouldClose(window) && currentChunkX <= r) {
             glfwPollEvents();
-            gameMaster.getChunkManager()
+            GameMaster.game.getChunkManager()
                     .buildSingleChunkMesh(currentChunkX, currentChunkZ);
             completedTasks[0]++;
             currentChunkZ++;
@@ -125,15 +130,15 @@ public class Intro {
             renderLoadingFrame(stepText);
         }
 
-        gameMaster.getChunkManager().setLastPlayerChunkX(0);
-        gameMaster.getChunkManager().setLastPlayerChunkZ(0);
+        GameMaster.game.getChunkManager().setLastPlayerChunkX(0);
+        GameMaster.game.getChunkManager().setLastPlayerChunkZ(0);
 
-        gameMaster.spawn();
+        GameMaster.game.spawn();
         completedTasks[0]++;
         progressBar.setValue(((float) completedTasks[0] / totalTasks) * 100.0f);
         renderLoadingFrame("Spawning player...");
 
-        gameMaster.initUI();
+        GameMaster.game.initUI();
         completedTasks[0]++;
         progressBar.setValue(100.0f);
         renderLoadingFrame("Setting up the UI...");
@@ -182,8 +187,8 @@ public class Intro {
                 GUI.resize(width, height);
             }
 
-            if (gameMaster != null) {
-                gameMaster.onResize(width, height);
+            if (GameMaster.game != null) {
+                GameMaster.game.onResize(width, height);
             }
 
             repositionProgressBar();
@@ -213,7 +218,7 @@ public class Intro {
 
             if (Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT) &&
                     Keyboard.isKeyPressed(GLFW_KEY_ESCAPE)) {
-                gameMaster.getChunkManager().shutdown();
+                GameMaster.game.getChunkManager().shutdown();
                 glfwSetWindowShouldClose(window, true);
             }
 
@@ -223,10 +228,10 @@ public class Intro {
 
             Vector3f skyColor = TimeService.getSkyColor();
             glClearColor(skyColor.x, skyColor.y, skyColor.z, CLEAR_COLOR_ALPHA);
-            gameMaster.update(delta);
+            GameMaster.game.update(delta);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glEnable(GL_DEPTH_TEST);
-            gameMaster.render();
+            GameMaster.game.render();
             glfwSwapBuffers(window);
         }
     }
@@ -279,8 +284,8 @@ public class Intro {
         }
 
         GUI.resize(framebufferWidth, framebufferHeight);
-        if (gameMaster != null) {
-            gameMaster.onResize(framebufferWidth, framebufferHeight);
+        if (GameMaster.game != null) {
+            GameMaster.game.onResize(framebufferWidth, framebufferHeight);
         }
 
         repositionProgressBar();

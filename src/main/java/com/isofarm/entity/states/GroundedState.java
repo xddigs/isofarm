@@ -32,7 +32,7 @@ public class GroundedState implements PlayerState {
 
     @Override
     public void update(Player player, float delta) {
-        if (player.isInFluid(player.getGameMaster().getWorld())) {
+        if (player.isInFluid(GameMaster.game.getWorld())) {
             player.changeState(new SwimmingState());
             return;
         }
@@ -42,11 +42,11 @@ public class GroundedState implements PlayerState {
             return;
         }
 
-        float yaw = player.getGameMaster()
+        float yaw = GameMaster.game
                 .getActiveCamera()
                 .getYaw();
 
-        player.wasd(player.getGameMaster().getWorld(), delta, yaw, false);
+        player.wasd(GameMaster.game.getWorld(), delta, yaw, false);
     }
 
     @Override
