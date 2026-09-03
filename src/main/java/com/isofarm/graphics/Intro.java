@@ -7,6 +7,7 @@ import com.isofarm.service.TimeService;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Local;
 import com.isofarm.utils.Settings;
+import com.isofarm.utils.ToastFactory;
 import com.isofarm.wrld.GameMaster;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -224,6 +225,14 @@ public class Intro {
             if (Keyboard.isKeyPressed(GLFW_KEY_F5)) {
                 Local.lang.nextLanguage();
                 BookUI.reload(BookService.bs.getOpenedBook());
+                ToastFactory.reload();
+                ToastFactory.info(Local.lang.f("engine.language_changed",
+                        Local.lang.getCurrentLanguage().getName()));
+            }
+
+            if (Keyboard.isKeyPressed(GLFW_KEY_F6)) {
+                ToastFactory.info(Local.lang.f("engine.current_language",
+                        Local.lang.getCurrentLanguage().getName()));
             }
 
             if (Keyboard.isKeyPressed(GLFW_KEY_F11)) {

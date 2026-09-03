@@ -34,6 +34,11 @@ public class ToastFactory implements Service<Toast> {
         rearrange();
     }
 
+    public static void reload() {
+        toasts.clear();
+        rearrange();
+    }
+
     public void remove(Toast toast) {
         if (toasts.remove(toast)) {
             rearrange();

@@ -8,20 +8,22 @@ crops featuring real-time seasonal and weather cycles, manage your inventory, an
 environment driven by custom 3D mesh rendering, particle systems, and dynamic day-night lighting.
 
 ## Featured Controls
-| Action                    | Key / Input          |
-|---------------------------|----------------------|
-| **Move**                  | `WASD`<br>           |
-| **Jump**                  | `Space`<br>          |
-| **Interact/Place Blocks** | `Mouse RB`<br>       |
-| **Attack/Break Blocks**   | `Mouse LB`<br>       |
-| **Zoom Camera**           | `C`<br>              |
+| Action                     | Key / Input          |
+|----------------------------|----------------------|
+| **Move**                   | `WASD`<br>           |
+| **Jump**                   | `Space`<br>          |
+| **Interact/Place Blocks**  | `Mouse RB`<br>       |
+| **Attack/Break Blocks**    | `Mouse LB`<br>       |
+| **Zoom Camera**            | `C`<br>              |
 | **Open / Close Inventory** | `E`<br>              |
-| **Toggle Chat / Console** | `Enter` <br>         |
-| **Toggle HUD (F1 mode)**  | `F1`<br>             |
-| **Toggle Debug Info**     | `F3`<br>             |
-| **Rotate Language**       | `F5`<br>             |
-| **Toggle Fullscreen**     | `F11`<br>            |
-| **Force Exit**            | `Shift + Escape`<br> |
+| **Toggle Chat / Console**  | `Enter` <br>         |
+| **Toggle HUD (F1 mode)**   | `F1`<br>             |
+| **Toggle Debug Info**      | `F3`<br>             |
+| **Rotate Language**        | `F5`<br>             |
+| **Show Current Language**  | `F6`<br>             |
+| **Toggle Fullscreen**      | `F11`<br>            |
+| **Mute Background**        | `M`<br>      
+| **Force Exit**             | `Shift + Escape`<br> |
 
 ## Getting Started
 To run the game, clone the repository and run the game on your favorite IDE!
