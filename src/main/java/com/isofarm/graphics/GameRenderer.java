@@ -32,9 +32,8 @@ public class GameRenderer {
     private float blurY;
     private float waterTime;
 
-    public void render(GameMaster gameMaster, ResourceManager rm,
-                       Map<Chunk, ChunkMeshBuilder.ChunkRenderMesh> chunkMeshes) {
-        ShadowSystem.sys.render(gameMaster, rm, chunkMeshes);
+    public void render(GameMaster gameMaster, Map<Chunk, ChunkMeshBuilder.ChunkRenderMesh> chunkMeshes) {
+        ShadowSystem.sys.render(gameMaster, chunkMeshes);
         waterTime += gameMaster.getGenDelta();
         CameraView camera = gameMaster.getActiveCamera();
         float windowWidth = gameMaster.getWindowWidth();
@@ -49,7 +48,7 @@ public class GameRenderer {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glActiveTexture(GL_TEXTURE0);
-        Shader defaultShader = rm.getDefaultShader();
+        Shader defaultShader = ResourceManager.rem.getDefaultShader();
         defaultShader.bind();
         defaultShader.setUniform("uIsWater", false);
         defaultShader.setUniform("uIsSubmergedEntity", false);
@@ -82,7 +81,7 @@ public class GameRenderer {
         defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
         defaultShader.setUniform("uIsSprite", false);
 
-        TextureAtlas blockAtlas = rm.getBlocksAtlas();
+        TextureAtlas blockAtlas = ResourceManager.rem.getBlocksAtlas();
         if (blockAtlas != null) {
             glActiveTexture(GL_TEXTURE0 + textureUnit);
             blockAtlas.bind();
@@ -156,7 +155,7 @@ public class GameRenderer {
 
         gameMaster.getWorld().forEach(block -> {
             if (!(block instanceof Crop crop)) return;
-            SpriteSheet sheet = rm.getCropSpritesheets().get(crop.getCropType());
+            SpriteSheet sheet = ResourceManager.rem.getCropSpritesheets().get(crop.getCropType());
             if (sheet == null) return;
 
             glActiveTexture(GL_TEXTURE0 + K.Render.PRIMARY_TEXTURE_UNIT);
@@ -180,7 +179,7 @@ public class GameRenderer {
 
             modelMatrix.identity().translate(renderX, renderY, renderZ);
             defaultShader.setUniform("uModel", modelMatrix);
-            rm.getSpriteMesh().render();
+            ResourceManager.rem.getSpriteMesh().render();
             sheet.unbind();
         });
 
@@ -208,9 +207,9 @@ public class GameRenderer {
 
             glDisable(GL_CULL_FACE);
             glActiveTexture(GL_TEXTURE0 + K.Render.PRIMARY_TEXTURE_UNIT);
-            rm.getBlocksAtlas().bind();
+            ResourceManager.rem.getBlocksAtlas().bind();
             defaultShader.setUniform("uAmbientIntensity", 1.0f);
-            rm.getFlowerMesh().render();
+            ResourceManager.rem.getFlowerMesh().render();
             defaultShader.setUniform("uAmbientIntensity", lighting.getAmbientIntensity());
             glEnable(GL_CULL_FACE);
         });
@@ -245,11 +244,12 @@ public class GameRenderer {
         glDepthMask(true);
         glEnable(GL_DEPTH_TEST);
         renderDestroyOverlay(gameMaster.getGameInteraction(), defaultShader,
-                rm.getDestroyOverlayMesh(), ResourceManager.getDestroyTexture(), camera);
+                ResourceManager.rem.getDestroyOverlayMesh(),
+                ResourceManager.rem.getDestroyTexture(), camera);
 
         glDepthMask(false);
         defaultShader.setUniform("uParticleAlpha", 1.0f);
-        gameMaster.getParticles().render(defaultShader, rm.getSpriteMesh(),
+        gameMaster.getParticles().render(defaultShader, ResourceManager.rem.getSpriteMesh(),
                 gameMaster.getActiveCamera());
 
         glDepthMask(true);
@@ -260,7 +260,7 @@ public class GameRenderer {
                     player.getPosition().z())
                     : camera.getPosition();
 
-            gameMaster.getRainEngine().render(rm.getRainShader(),
+            gameMaster.getRainEngine().render(ResourceManager.rem.getRainShader(),
                     camera.getViewMatrix(), camera.getProjectionMatrix(),
                     rainTargetPos, gameMaster.getWorld());
         }
@@ -292,7 +292,7 @@ public class GameRenderer {
                     hoveredCell.z());
 
             defaultShader.setUniform("uModel", modelMatrix);
-            rm.getSelectionMesh().renderLines();
+            ResourceManager.rem.getSelectionMesh().renderLines();
 
             glDepthMask(true);
             glEnable(GL_DEPTH_TEST);
@@ -305,7 +305,7 @@ public class GameRenderer {
 
         if (gameMaster.isInventoryOpen() || BookService.bs.isOpen()) {
             glDisable(GL_DEPTH_TEST);
-            Shader blurShader = rm.getBlurShader();
+            Shader blurShader = ResourceManager.rem.getBlurShader();
             Vector2f resolution = new Vector2f(windowWidth, windowHeight);
 
             Framebuffer blurFbo = gameMaster.getBlurFbo();
@@ -320,7 +320,7 @@ public class GameRenderer {
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, sceneFbo.getTextureId());
             blurShader.setUniform("screenTexture", 0);
-            rm.getScreenQuadMesh().render();
+            ResourceManager.rem.getScreenQuadMesh().render();
             blurShader.unbind();
             blurFbo.unbind((int) windowWidth, (int) windowHeight);
 
@@ -334,13 +334,13 @@ public class GameRenderer {
             glBindTexture(GL_TEXTURE_2D, blurFbo.getTextureId());
             blurShader.setUniform("screenTexture", 0);
 
-            rm.getScreenQuadMesh().render();
+            ResourceManager.rem.getScreenQuadMesh().render();
             blurShader.unbind();
             glEnable(GL_DEPTH_TEST);
 
         } else {
             glDisable(GL_DEPTH_TEST);
-            Shader motionBlurShader = rm.getMotionBlurShader();
+            Shader motionBlurShader = ResourceManager.rem.getMotionBlurShader();
             motionBlurShader.bind();
             motionBlurShader.setUniform("uScene", 0);
             motionBlurShader.setUniform("uVelocity", new Vector2f(blurX, blurY));
@@ -349,7 +349,7 @@ public class GameRenderer {
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, sceneFbo.getTextureId());
 
-            rm.getScreenQuadMesh().render();
+            ResourceManager.rem.getScreenQuadMesh().render();
 
             motionBlurShader.unbind();
             glEnable(GL_DEPTH_TEST);

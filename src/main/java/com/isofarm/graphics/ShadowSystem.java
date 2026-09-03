@@ -3,6 +3,7 @@ package com.isofarm.graphics;
 import com.isofarm.data.BlockData;
 import com.isofarm.data.Crop;
 import com.isofarm.data.RenderPass;
+import com.isofarm.data.Singleton;
 import com.isofarm.entity.Entity;
 import com.isofarm.entity.WorldItem;
 import com.isofarm.utils.K;
@@ -19,6 +20,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 
+@Singleton
 public class ShadowSystem {
     public static final ShadowSystem sys = new ShadowSystem();
     private static final float SHADOW_DISTANCE = 100.0f;
@@ -36,7 +38,7 @@ public class ShadowSystem {
 
     private final Matrix4f modelMatrix = new Matrix4f();
 
-    public void render(GameMaster gameMaster, ResourceManager rm,
+    public void render(GameMaster gameMaster,
                        Map<Chunk, ChunkMeshBuilder.ChunkRenderMesh> chunkMeshes) {
         ShadowMap shadowMap = gameMaster.getShadowMap();
         updateLightMatrix(gameMaster);
@@ -47,7 +49,7 @@ public class ShadowSystem {
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
 
-        Shader shadowShader = rm.getShadowMapShader();
+        Shader shadowShader = ResourceManager.rem.getShadowMapShader();
         shadowShader.bind();
         shadowShader.setUniform("uLightSpaceMatrix", lightSpace);
         for (Map.Entry<Chunk, ChunkMeshBuilder.ChunkRenderMesh> entry : chunkMeshes.entrySet()) {
@@ -71,7 +73,7 @@ public class ShadowSystem {
 
         gameMaster.getWorld().forEach(block -> {
             if (!(block instanceof Crop crop)) return;
-            SpriteSheet sheet = rm.getCropSpritesheets().get(crop.getCropType());
+            SpriteSheet sheet = ResourceManager.rem.getCropSpritesheets().get(crop.getCropType());
             if (sheet == null) return;
 
             glActiveTexture(GL_TEXTURE0 + K.Render.PRIMARY_TEXTURE_UNIT);
@@ -89,7 +91,7 @@ public class ShadowSystem {
                     .translate(renderX, renderY, renderZ);
 
             shadowShader.setUniform("uModel", modelMatrix);
-            rm.getSpriteMesh().render();
+            ResourceManager.rem.getSpriteMesh().render();
             sheet.unbind();
         });
 
@@ -99,7 +101,7 @@ public class ShadowSystem {
             if (region == null) return;
 
             glActiveTexture(GL_TEXTURE0 + K.Render.PRIMARY_TEXTURE_UNIT);
-            rm.getBlocksAtlas().bind();
+            ResourceManager.rem.getBlocksAtlas().bind();
 
             shadowShader.setUniform("uTexture", K.Render.PRIMARY_TEXTURE_UNIT);
             shadowShader.setUniform("uAlphaTest", true);
@@ -119,7 +121,7 @@ public class ShadowSystem {
                     .translate(renderX, renderY, renderZ);
 
             shadowShader.setUniform("uModel", modelMatrix);
-            rm.getFlowerMesh().render();
+            ResourceManager.rem.getFlowerMesh().render();
         });
 
         shadowShader.unbind();

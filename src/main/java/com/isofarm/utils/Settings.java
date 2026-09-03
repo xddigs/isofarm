@@ -1,8 +1,10 @@
 package com.isofarm.utils;
 
+import com.isofarm.data.Singleton;
 import com.isofarm.item.Item;
 
 @SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
+@Singleton
 public class Settings {
     private static final float BASE_ICON_SIZE = 16.0f;
     private static final float[] GUI_SCALES = {1.0f, 2.0f, 3.0f};

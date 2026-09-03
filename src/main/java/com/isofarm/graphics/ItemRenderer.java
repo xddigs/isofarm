@@ -36,7 +36,7 @@ public class ItemRenderer {
         if (item == null) return;
         SpriteSheet spriteSheet = ResourceManager.getItemSpriteSheet(item);
         if (spriteSheet == null) return;
-        Shader shader = gameMaster.getResourceManager().getShader("item");
+        Shader shader = ResourceManager.rem.getShader("item");
         if (shader == null) return;
         renderWorldItemMesh(gameMaster, worldItem, item, spriteSheet, shader, lighting);
     }

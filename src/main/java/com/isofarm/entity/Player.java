@@ -119,7 +119,7 @@ public class Player extends Character {
         this.modelMatrix = new Matrix4f();
         this.path = new LinkedList<>();
 
-        this.playerModel = ResourceManager.getPlayerModel();
+        this.playerModel = ResourceManager.rem.getPlayerModel();
 
         if (this.playerModel != null) {
             this.headNode = playerModel.findNode("Head");
@@ -363,11 +363,10 @@ public class Player extends Character {
 
     @Override
     public void render(GameMaster gameMaster, RenderPass pass) {
-        ResourceManager rm = gameMaster.getResourceManager();
         CameraView camera = gameMaster.getActiveCamera();
 
         if (pass.equals(RenderPass.SHADOW)) {
-            Shader shadowShader = rm.getShadowMapShader();
+            Shader shadowShader = ResourceManager.rem.getShadowMapShader();
             if (shadowShader == null) return;
             shadowShader.bind();
             shadowShader.setUniform("uLightSpaceMatrix",
@@ -395,7 +394,7 @@ public class Player extends Character {
         }
 
         if (playerModel == null) return;
-        Shader defaultShader = rm.getDefaultShader();
+        Shader defaultShader = ResourceManager.rem.getDefaultShader();
         if (defaultShader == null) return;
 
         CelestialLighting lighting = gameMaster.getCelestialLighting();

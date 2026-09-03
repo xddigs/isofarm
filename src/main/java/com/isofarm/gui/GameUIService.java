@@ -9,6 +9,7 @@ import com.isofarm.input.Mouse;
 import com.isofarm.item.Item;
 import com.isofarm.service.BookService;
 import com.isofarm.service.Service;
+import com.isofarm.service.TimeService;
 import com.isofarm.utils.Components;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
@@ -224,7 +225,7 @@ public class GameUIService implements Service<GameMaster> {
             }
         }
 
-        time.setText(gameMaster.getTimeService().getFormattedTime());
+        time.setText(TimeService.ts.getFormattedTime());
         fps.setText(gameMaster.getFps());
         if (player != null) {
             coords.setText(player.getPositionString());
@@ -274,7 +275,7 @@ public class GameUIService implements Service<GameMaster> {
             uiManager.render();
             float startX = hotbarUI.getAbsoluteX() + 10.0f;
             float startY = hotbarUI.getAbsoluteY() - 25.0f;
-            renderHearts(gameMaster.getResourceManager().getHeartsSpriteSheet(),
+            renderHearts(ResourceManager.rem.getHeartsSpriteSheet(),
                     startX, startY, player);
             renderHotbarLabel();
             renderToasts();
@@ -285,7 +286,7 @@ public class GameUIService implements Service<GameMaster> {
             GUI.drawCursor(gameMaster);
         }
 
-        SpriteSheet bookSheet = ResourceManager.getBookAnimationSheet();
+        SpriteSheet bookSheet = ResourceManager.rem.getBookAnimationSheet();
         if (BookService.bs.isOpen()) {
             BookUI.render(BookService.bs.getOpenedBook(),
                     gameMaster.getGenDelta(), bookSheet);

@@ -1,11 +1,11 @@
 package com.isofarm.service;
 
-import com.isofarm.data.SoundGroup;
+import com.isofarm.data.Singleton;
 import com.isofarm.graphics.ResourceManager;
 import com.isofarm.gui.BookUI;
-import com.isofarm.input.Mouse;
 import com.isofarm.item.Book;
 
+@Singleton
 public class BookService implements Service<Book> {
     public static final BookService bs = new BookService();
     private Book openedBook;
@@ -41,7 +41,7 @@ public class BookService implements Service<Book> {
         if (openedBook != null && !BookUI.isAnimating()) {
             openedBook.update();
             BookUI.update(openedBook,
-                    ResourceManager.getBookAnimationSheet());
+                    ResourceManager.rem.getBookAnimationSheet());
         }
 
         if (BookUI.isClosed()) {

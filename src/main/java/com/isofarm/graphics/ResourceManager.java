@@ -12,86 +12,62 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+@Singleton
 public class ResourceManager {
+    public static final ResourceManager rem = new ResourceManager();
     private static final Logger log = LoggerFactory.getLogger(ResourceManager.class);
-    private static SpriteSheet seedIcons;
-    private static SpriteSheet cropIcons;
-    private static SpriteSheet toolIcons;
-    private static SpriteSheet blockIcons;
-    private static SpriteSheet materialIcons;
-    private static SpriteSheet usablesIcons;
-    private static SpriteSheet inventoryIcons;
-    private static SpriteSheet bookAnimationSheet;
-    private static Map<CropType, SpriteSheet> cropSpritesheets;
-    private static SpriteSheet heartsSpriteSheet;
-    private static SpriteSheet destroyTexture;
-    private static SpriteSheet wheat;
-    private static SpriteSheet carrot;
-    private static SpriteSheet potato;
-    private static SpriteSheet beetroot;
-    private static GLTFModel playerModel;
-    private final Shader defaultShader;
-    private final Shader rainShader;
-    private final Shader motionBlurShader;
-    private final Shader shadowMapShader;
-    private final Shader blurShader;
-    private final Mesh screenQuadMesh;
-    private final Mesh blockMesh;
-    private final Mesh selectionMesh;
-    private final Mesh spriteMesh;
-    private final Mesh flowerMesh;
-    private final Mesh playerMesh;
-    private final Mesh destroyOverlayMesh;
-    private final Texture backgroundGUI;
-    private final TextureAtlas blocksAtlas;
 
-    public ResourceManager() {
-        this.defaultShader = new Shader(K.Paths.DEFAULT_VERT_SHADER, K.Paths.DEFAULT_FRAG_SHADER);
-        this.rainShader = new Shader(K.Paths.RAIN_VERT_SHADER, K.Paths.RAIN_FRAG_SHADER);
-        this.motionBlurShader = new Shader(K.Paths.MOTION_BLUR_VERT_SHADER, K.Paths.MOTION_BLUR_FRAG_SHADER);
-        this.shadowMapShader = new Shader(K.Paths.SHADOW_VERT_SHADER, K.Paths.SHADOW_FRAG_SHADER);
-        this.blurShader = new Shader(K.Paths.BLUR_VERT_SHADER, K.Paths.BLUR_FRAG_SHADER);
+    private static final SpriteSheet seedIcons = new SpriteSheet(K.Paths.SEED_ICONS, K.UI.ICON_SEED_CROPS_COLS, 1);
+    private static final SpriteSheet cropIcons = new SpriteSheet(K.Paths.CROP_ICONS, K.UI.ICON_SEED_CROPS_COLS, 1);
+    private static final SpriteSheet toolIcons = new SpriteSheet(K.Paths.TOOL_ICONS, K.UI.ICON_TOOL_COLS, K.UI.ICON_TOOL_ROWS);
+    private static final SpriteSheet blockIcons = new SpriteSheet(K.Paths.BLOCK_ICONS, K.UI.ICON_BLOCK_COLS, K.UI.ICON_BLOCK_ROWS);
+    private static final SpriteSheet materialIcons = new SpriteSheet(K.Paths.MATERIAL_ICONS, K.UI.ICON_MATERIAL_COLS, K.UI.ICON_MATERIAL_ROWS);
+    private static final SpriteSheet usablesIcons = new SpriteSheet(K.Paths.USABLES_ICONS, K.UI.ICON_USABLES_COLS, 1);
+    private static final SpriteSheet inventoryIcons = new SpriteSheet(K.Paths.INVENTORY_ICONS, K.UI.ICON_INV_COLS, 1);
+    private static final SpriteSheet bookAnimationSheet = new SpriteSheet(K.Paths.BOOK_ANIMATION, 16, 1);
+    private static final SpriteSheet heartsSpriteSheet = new SpriteSheet(K.Paths.HEARTS_SPRITESHEET, 1, K.UI.ICON_HEARTS_ROWS);
+    private static final SpriteSheet destroyTexture = new SpriteSheet(K.Paths.DESTROY_STAGES, K.UI.DESTROY_FRAMES, 1);
 
-        this.screenQuadMesh = Mesh.screenQuad();
-        this.blockMesh = Mesh.createMesh(K.World.DEFAULT_BLOCK_DEPTH);
-        this.selectionMesh = Mesh.selection();
-        this.spriteMesh = Mesh.createCrop();
-        this.flowerMesh = Mesh.createCrossMesh();
-        this.playerMesh = Mesh.quadVertical();
-        this.destroyOverlayMesh = Mesh.createDestroyOverlayMesh();
+    private static final SpriteSheet wheat = new SpriteSheet(K.Paths.WHEAT_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
+    private static final SpriteSheet carrot = new SpriteSheet(K.Paths.CARROT_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
+    private static final SpriteSheet potato = new SpriteSheet(K.Paths.POTATO_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
+    private static final SpriteSheet beetroot = new SpriteSheet(K.Paths.BEETROOT_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
 
+    private static final GLTFModel playerModel = GLTFLoader.load(K.Paths.PLAYER_MODEL);
+
+    private static final Map<CropType, SpriteSheet> cropSpritesheets = new EnumMap<>(CropType.class);
+
+    private static final Shader defaultShader = new Shader(K.Paths.DEFAULT_VERT_SHADER, K.Paths.DEFAULT_FRAG_SHADER);
+    private static final Shader rainShader = new Shader(K.Paths.RAIN_VERT_SHADER, K.Paths.RAIN_FRAG_SHADER);
+    private static final Shader motionBlurShader = new Shader(K.Paths.MOTION_BLUR_VERT_SHADER, K.Paths.MOTION_BLUR_FRAG_SHADER);
+    private static final Shader shadowMapShader = new Shader(K.Paths.SHADOW_VERT_SHADER, K.Paths.SHADOW_FRAG_SHADER);
+    private static final Shader blurShader = new Shader(K.Paths.BLUR_VERT_SHADER, K.Paths.BLUR_FRAG_SHADER);
+
+    private static final Mesh screenQuadMesh = Mesh.screenQuad();
+    private static final Mesh blockMesh = Mesh.createMesh(K.World.DEFAULT_BLOCK_DEPTH);
+    private static final Mesh selectionMesh = Mesh.selection();
+    private static final Mesh spriteMesh = Mesh.createCrop();
+    private static final Mesh flowerMesh = Mesh.createCrossMesh();
+    private static final Mesh playerMesh = Mesh.quadVertical();
+    private static final Mesh destroyOverlayMesh = Mesh.createDestroyOverlayMesh();
+    private static final Texture backgroundGUI = new Texture(K.Paths.DEFAULT_BACKGROUND_GUI);
+    private static final TextureAtlas blocksAtlas;
+
+    static {
         List<String> allPaths = BlockData.getAllTexturePaths();
-        this.blocksAtlas = new TextureAtlas(allPaths, 16, 16);
+        blocksAtlas = new TextureAtlas(allPaths, 16, 16);
+
         for (BlockData block : BlockData.values()) {
-            block.initRegions(this.blocksAtlas);
+            block.initRegions(blocksAtlas);
         }
 
-        this.backgroundGUI = new Texture(K.Paths.DEFAULT_BACKGROUND_GUI);
-
-        wheat = new SpriteSheet(K.Paths.WHEAT_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
-        carrot = new SpriteSheet(K.Paths.CARROT_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
-        potato = new SpriteSheet(K.Paths.POTATO_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
-        beetroot = new SpriteSheet(K.Paths.BEETROOT_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
-
-        blockIcons = new SpriteSheet(K.Paths.BLOCK_ICONS, K.UI.ICON_BLOCK_COLS, K.UI.ICON_BLOCK_ROWS);
-        toolIcons = new SpriteSheet(K.Paths.TOOL_ICONS, K.UI.ICON_TOOL_COLS, K.UI.ICON_TOOL_ROWS);
-        cropIcons = new SpriteSheet(K.Paths.CROP_ICONS, K.UI.ICON_SEED_CROPS_COLS, 1);
-        seedIcons = new SpriteSheet(K.Paths.SEED_ICONS, K.UI.ICON_SEED_CROPS_COLS, 1);
-        materialIcons = new SpriteSheet(K.Paths.MATERIAL_ICONS, K.UI.ICON_MATERIAL_COLS, K.UI.ICON_MATERIAL_ROWS);
-        usablesIcons = new SpriteSheet(K.Paths.USABLES_ICONS, K.UI.ICON_USABLES_COLS, 1);
-        inventoryIcons = new SpriteSheet(K.Paths.INVENTORY_ICONS, K.UI.ICON_INV_COLS, 1);
-
-        bookAnimationSheet = new SpriteSheet(K.Paths.BOOK_ANIMATION, 16, 1);
-        heartsSpriteSheet = new SpriteSheet(K.Paths.HEARTS_SPRITESHEET, 1, K.UI.ICON_HEARTS_ROWS);
-
-        destroyTexture = new SpriteSheet(K.Paths.DESTROY_STAGES, K.UI.DESTROY_FRAMES, 1);
-        playerModel = GLTFLoader.load(K.Paths.PLAYER_MODEL);
-
-        cropSpritesheets = new EnumMap<>(CropType.class);
         cropSpritesheets.put(CropType.WHEAT, wheat);
         cropSpritesheets.put(CropType.CARROT, carrot);
         cropSpritesheets.put(CropType.POTATO, potato);
         cropSpritesheets.put(CropType.BEETROOT, beetroot);
+    }
+
+    private ResourceManager() {
     }
 
     public static SpriteSheet getItemSpriteSheet(Item item) {
@@ -110,6 +86,7 @@ public class ResourceManager {
     private static int getMaterialFrame(Material material) {
         MaterialID materialID = material.getMaterialID();
         int row = materialID.getRow();
+
         if (row == 1) {
             int col = switch (materialID) {
                 case PAPER -> 1;
@@ -132,6 +109,7 @@ public class ResourceManager {
             int column = (materialID == MaterialID.INGOT) ? baseCol + 1 : baseCol;
             return (row * K.UI.ICON_MATERIAL_COLS) + column;
         }
+
         return 0;
     }
 
@@ -155,9 +133,7 @@ public class ResourceManager {
         }
 
         if (item instanceof Tool tool) {
-            int row = tool.getRow();
-            int col = tool.getCol();
-            return (row * K.UI.ICON_TOOL_COLS) + col;
+            return (tool.getRow() * K.UI.ICON_TOOL_COLS) + tool.getCol();
         }
 
         if (item instanceof Usable usable) {
@@ -266,43 +242,43 @@ public class ResourceManager {
         return blocksAtlas;
     }
 
-    public static SpriteSheet getDestroyTexture() {
+    public SpriteSheet getDestroyTexture() {
         return destroyTexture;
     }
 
-    public static GLTFModel getPlayerModel() {
+    public GLTFModel getPlayerModel() {
         return playerModel;
     }
 
-    public static SpriteSheet getSeedIcons() {
+    public SpriteSheet getSeedIcons() {
         return seedIcons;
     }
 
-    public static SpriteSheet getCropIcons() {
+    public SpriteSheet getCropIcons() {
         return cropIcons;
     }
 
-    public static SpriteSheet getToolIcons() {
+    public SpriteSheet getToolIcons() {
         return toolIcons;
     }
 
-    public static SpriteSheet getBlockIcons() {
+    public SpriteSheet getBlockIcons() {
         return blockIcons;
     }
 
-    public static SpriteSheet getMaterialIcons() {
+    public SpriteSheet getMaterialIcons() {
         return materialIcons;
     }
 
-    public static SpriteSheet getUsablesIcons() {
+    public SpriteSheet getUsablesIcons() {
         return usablesIcons;
     }
 
-    public static SpriteSheet getInventoryIcons() {
+    public SpriteSheet getInventoryIcons() {
         return inventoryIcons;
     }
 
-    public static SpriteSheet getBookAnimationSheet() {
+    public SpriteSheet getBookAnimationSheet() {
         return bookAnimationSheet;
     }
 
@@ -316,6 +292,7 @@ public class ResourceManager {
 
     public Shader getShader(String name) {
         if (name == null) return defaultShader;
+
         return switch (name.toLowerCase()) {
             case "rain" -> rainShader;
             case "motion_blur" -> motionBlurShader;

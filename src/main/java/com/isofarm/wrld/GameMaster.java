@@ -38,7 +38,6 @@ public class GameMaster {
     private final UIManager uiManager;
     private final CropService cropService;
     private final TreeService treeService;
-    private final TimeService timeService;
     private final CommandService commandService;
     private final ParticleEngine particles;
     private final RainEngine rainEngine;
@@ -50,7 +49,6 @@ public class GameMaster {
     private ShadowMap shadowMap;
     private GameInteraction gameInteraction;
     private WeatherService weatherService;
-    private ResourceManager resourceManager;
     private ChunkManager chunkManager;
     private GameRenderer gameRenderer;
     private ItemRenderer itemRenderer;
@@ -89,7 +87,6 @@ public class GameMaster {
         this.particles = new ParticleEngine();
         this.cropService = new CropService(world);
         this.treeService = new TreeService(world);
-        this.timeService = new TimeService();
         this.commandRegistry = new CommandRegistry();
         this.commandService = new CommandService(commandRegistry);
         this.itemRegistry = new ItemRegistry();
@@ -117,7 +114,6 @@ public class GameMaster {
         this.blurFbo = new Framebuffer((int) windowWidth, (int) windowHeight);
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
-        this.resourceManager = new ResourceManager();
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
         this.chunkManager = new ChunkManager(world, waterSimulation);
@@ -159,13 +155,13 @@ public class GameMaster {
 
     public void initUI() {
         gameUIservice = new GameUIService(windowHandle, this,
-                uiManager, ResourceManager.getSeedIcons(), ResourceManager.getCropIcons(),
-                ResourceManager.getBlockIcons(), ResourceManager.getToolIcons(),
-                ResourceManager.getMaterialIcons(),
-                ResourceManager.getInventoryIcons());
+                uiManager, ResourceManager.rem.getSeedIcons(), ResourceManager.rem.getCropIcons(),
+                ResourceManager.rem.getBlockIcons(), ResourceManager.rem.getToolIcons(),
+                ResourceManager.rem.getMaterialIcons(),
+                ResourceManager.rem.getInventoryIcons());
 
         gameInteraction = new GameInteraction(this,
-                resourceManager.getBlocksAtlas());
+                ResourceManager.rem.getBlocksAtlas());
 
         gameUIservice.setPlayer(this.player);
         commandService.setGameUIService(gameUIservice);
@@ -200,10 +196,6 @@ public class GameMaster {
 
     public ShadowMap getShadowMap() {
         return shadowMap;
-    }
-
-    public ResourceManager getResourceManager() {
-        return resourceManager;
     }
 
     public ChunkManager getChunkManager() {
@@ -264,10 +256,6 @@ public class GameMaster {
 
     public WeatherService getWeatherService() {
         return weatherService;
-    }
-
-    public TimeService getTimeService() {
-        return timeService;
     }
 
     public CommandService getCommandService() {
@@ -339,11 +327,11 @@ public class GameMaster {
     }
 
     public SpriteSheet getCropSpriteSheet(CropType type) {
-        return resourceManager.getCropSpritesheets().get(type);
+        return ResourceManager.rem.getCropSpritesheets().get(type);
     }
 
     public Season getSeason() {
-        return timeService.getCurrentSeason();
+        return TimeService.ts.getCurrentSeason();
     }
 
     public List<Entity> getEntitiesImmutable() {
@@ -433,10 +421,10 @@ public class GameMaster {
         }
 
         genDelta = delta;
-        timeService.update(delta, weatherService);
-        float timeOfDay = timeService.getHour() + (timeService.getMinute() / 60.0f);
+        TimeService.ts.update(delta, weatherService);
+        float timeOfDay = TimeService.ts.getHour() + (TimeService.ts.getMinute() / 60.0f);
         celestialLighting.update(HoveredCell.get(this), timeOfDay);
-        shop.update(timeService);
+        shop.update(TimeService.ts);
         cropService.update(delta, weatherService.getWeather());
         treeService.update(this);
         updateEntities(delta);
@@ -457,13 +445,13 @@ public class GameMaster {
     }
 
     public void render() {
-        gameRenderer.render(this, resourceManager, chunkManager.getChunkMeshes());
+        gameRenderer.render(this, chunkManager.getChunkMeshes());
         gameUIservice.render(isHUDShown(), this);
     }
 
     public void dispose() {
         chunkManager.dispose();
-        resourceManager.dispose();
+        ResourceManager.rem.dispose();
         itemRenderer.dispose();
 
         GUI.dispose();

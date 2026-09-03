@@ -1,5 +1,6 @@
 package com.isofarm.service;
 
+import com.isofarm.data.Singleton;
 import com.isofarm.data.SoundGroup;
 import org.lwjgl.openal.AL;
 import org.lwjgl.openal.AL10;
@@ -21,6 +22,7 @@ import static org.lwjgl.openal.AL10.*;
 import static org.lwjgl.openal.ALC10.*;
 import static org.lwjgl.stb.STBVorbis.stb_vorbis_decode_memory;
 
+@Singleton
 public class SoundService implements Service<SoundGroup> {
     public static final SoundService fx = new SoundService();
     private static final Logger log = LoggerFactory.getLogger(SoundService.class);

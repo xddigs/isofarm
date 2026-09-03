@@ -1,11 +1,14 @@
 package com.isofarm.service;
 
 import com.isofarm.data.Season;
+import com.isofarm.data.Singleton;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 public class TimeService {
+    public static final TimeService ts = new TimeService();
     private static final Logger log = LoggerFactory.getLogger(TimeService.class);
     private static final float REAL_SECONDS_PER_IN_GAME_MINUTE = 0.7f;
     private static final int MINUTES_PER_HOUR = 60;
@@ -21,10 +24,7 @@ public class TimeService {
     private int year = 0;
     private float timeScale = 2.0f;
 
-    public TimeService() {
-        log.info("TimeService initialized. Starting at Year {} {}, Day {} - {}:00",
-                year, currentSeason, day, hour);
-    }
+    private TimeService() {}
 
     public void update(float delta, WeatherService weatherService) {
         secondAccumulator += delta * timeScale;

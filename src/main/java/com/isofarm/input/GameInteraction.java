@@ -7,7 +7,6 @@ import com.isofarm.entity.WorldItem;
 import com.isofarm.graphics.ParticleEngine;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.graphics.TextureAtlas;
-import com.isofarm.gui.BackpackInventoryUI;
 import com.isofarm.gui.GameUIService;
 import com.isofarm.item.*;
 import com.isofarm.service.*;
@@ -37,7 +36,6 @@ public class GameInteraction {
     private static final Logger log = LoggerFactory.getLogger(GameInteraction.class);
     private final CropService cropService;
     private final GameUIService gameUIservice;
-    private final TimeService timeService;
     private final ParticleEngine particles;
     private final TextureAtlas blocksTexture;
 
@@ -55,7 +53,6 @@ public class GameInteraction {
     public GameInteraction(GameMaster gameMaster, TextureAtlas blockTexture) {
         this.cropService = gameMaster.getCropService();
         this.gameUIservice = gameMaster.getGameUIService();
-        this.timeService = gameMaster.getTimeService();
         this.particles = gameMaster.getParticles();
         this.blocksTexture = blockTexture;
     }
@@ -615,7 +612,7 @@ public class GameInteraction {
 
             Block tilledDirt = new Block(BlockData.TILLED_DIRT, x, y, z);
             Crop planted = cropService.plant(x, y, z, player, tilledDirt, seed.getType(),
-                    timeService.getCurrentSeason());
+                    TimeService.ts.getCurrentSeason());
 
             if (planted != null) {
                 gameUIservice.logAction(cell);

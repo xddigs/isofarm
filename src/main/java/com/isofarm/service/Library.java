@@ -152,7 +152,7 @@ public class Library implements Service<GameMaster> {
                 log.warn("Amount must be between 0 and 24000.");
                 return;
             }
-            gameMaster.getTimeService().setTimeScale(amount / 24000.0f);
+            TimeService.ts.setTimeScale(amount / 24000.0f);
         }));
 
         cr.register(new Command("/gm", new CommandArgument[]{dynamic("mode", () ->
