@@ -1,8 +1,10 @@
 package com.isofarm.wrld;
 
 import com.isofarm.data.BlockData;
+import com.isofarm.data.BlockPos;
 import com.isofarm.data.FluidPos;
 import com.isofarm.data.Singleton;
+import com.isofarm.graphics.ParticleEngine;
 
 import java.util.ArrayDeque;
 import java.util.HashSet;
@@ -34,7 +36,7 @@ public class WaterSimulation {
         }
 
         FluidPos pos = new FluidPos(x, y, z);
-        if (World.wd.getBlockTypeAt(x, y, z) != BlockData.AIR.getId()) {
+        if (World.wrld.getBlockTypeAt(x, y, z) != BlockData.AIR.getId()) {
             return false;
         }
         sources.add(pos);
@@ -75,14 +77,14 @@ public class WaterSimulation {
             return;
         }
 
-        byte level = World.wd.getWaterLevelAt(pos.x(), pos.y(), pos.z());
+        byte level = World.wrld.getWaterLevelAt(pos.x(), pos.y(), pos.z());
         if (level < MIN_LEVEL) {
             return;
         }
 
         FluidPos below = new FluidPos(pos.x(), pos.y() - 1, pos.z());
         if (canContainWater(below)) {
-            byte belowLevel = World.wd.getWaterLevelAt(below.x(), below.y(), below.z());
+            byte belowLevel = World.wrld.getWaterLevelAt(below.x(), below.y(), below.z());
             if (belowLevel < MAX_LEVEL) {
                 setWater(below, MAX_LEVEL);
                 enqueue(below);
@@ -110,7 +112,7 @@ public class WaterSimulation {
             return;
         }
 
-        byte currentLevel = World.wd.getWaterLevelAt(pos.x(), pos.y(), pos.z());
+        byte currentLevel = World.wrld.getWaterLevelAt(pos.x(), pos.y(), pos.z());
 
         if (currentLevel >= level) {
             return;
@@ -125,7 +127,7 @@ public class WaterSimulation {
             return;
         }
 
-        byte currentBlock = World.wd.getBlockTypeAt(pos.x(), pos.y(), pos.z());
+        byte currentBlock = World.wrld.getBlockTypeAt(pos.x(), pos.y(), pos.z());
         if (!canContainWater(pos)) {
             return;
         }
@@ -136,16 +138,16 @@ public class WaterSimulation {
                 return;
             }
 
-            World.wd.removeBlockAt(pos.x(), pos.y(), pos.z());
+            World.wrld.removeBlockAt(pos.x(), pos.y(), pos.z());
         }
 
-        byte currentLevel = World.wd.getWaterLevelAt(pos.x(), pos.y(), pos.z());
+        byte currentLevel = World.wrld.getWaterLevelAt(pos.x(), pos.y(), pos.z());
         if (currentBlock == BlockData.WATER.getId() && currentLevel == level) {
             return;
         }
 
-        World.wd.setBlockTypeAt(pos.x(), pos.y(), pos.z(), BlockData.WATER.getId());
-        World.wd.setWaterLevelAt(pos.x(), pos.y(), pos.z(), level);
+        World.wrld.setBlockTypeAt(pos.x(), pos.y(), pos.z(), BlockData.WATER.getId());
+        World.wrld.setWaterLevelAt(pos.x(), pos.y(), pos.z(), level);
         mark(pos);
     }
 
@@ -154,8 +156,8 @@ public class WaterSimulation {
             return;
         }
 
-        World.wd.setWaterLevelAt(pos.x(), pos.y(), pos.z(), (byte) 0);
-        World.wd.setBlockTypeAt(pos.x(), pos.y(), pos.z(), BlockData.AIR.getId());
+        World.wrld.setWaterLevelAt(pos.x(), pos.y(), pos.z(), (byte) 0);
+        World.wrld.setBlockTypeAt(pos.x(), pos.y(), pos.z(), BlockData.AIR.getId());
         mark(pos);
     }
 
@@ -224,7 +226,7 @@ public class WaterSimulation {
             return false;
         }
 
-        byte blockId = World.wd.getBlockTypeAt(pos.x(), pos.y(), pos.z());
+        byte blockId = World.wrld.getBlockTypeAt(pos.x(), pos.y(), pos.z());
         if (blockId == BlockData.AIR.getId()) {
             return true;
         }
@@ -234,11 +236,15 @@ public class WaterSimulation {
         }
 
         BlockData data = BlockData.fromId(blockId);
+        if (data.isPlant()) {
+            ParticleEngine.peng.spawnPlant(new BlockPos(data,
+                    pos.x(), pos.y(), pos.z()), data);
+        }
         return data != null && data.isPlant();
     }
 
     private boolean isWater(FluidPos pos) {
-        return World.wd.getBlockTypeAt(pos.x(), pos.y(), pos.z()) == BlockData.WATER.getId();
+        return World.wrld.getBlockTypeAt(pos.x(), pos.y(), pos.z()) == BlockData.WATER.getId();
     }
 
     private void enqueue(FluidPos pos) {
@@ -264,7 +270,7 @@ public class WaterSimulation {
     }
 
     private void mark(FluidPos pos) {
-        long key = World.wd.get2DKey(Math.floorDiv(pos.x(), Chunk.SIZE_X),
+        long key = World.wrld.get2DKey(Math.floorDiv(pos.x(), Chunk.SIZE_X),
                 Math.floorDiv(pos.z(), Chunk.SIZE_Z));
         changedChunks.add(key);
     }
