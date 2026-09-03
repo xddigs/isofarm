@@ -6,7 +6,6 @@ import com.isofarm.entity.Player;
 import com.isofarm.entity.WorldItem;
 import com.isofarm.graphics.ParticleEngine;
 import com.isofarm.graphics.SpriteSheet;
-import com.isofarm.graphics.TextureAtlas;
 import com.isofarm.gui.GameUIService;
 import com.isofarm.item.*;
 import com.isofarm.service.*;
@@ -38,7 +37,6 @@ public class GameInteraction {
     private final CropService cropService;
     private final GameUIService gameUIservice;
     private final ParticleEngine particles;
-    private final TextureAtlas blocksTexture;
 
     private int breakingX = Integer.MIN_VALUE;
     private int breakingY = Integer.MIN_VALUE;
@@ -51,11 +49,10 @@ public class GameInteraction {
 
     private boolean isSmartShift = false;
 
-    public GameInteraction(GameMaster gameMaster, TextureAtlas blockTexture) {
+    public GameInteraction(GameMaster gameMaster) {
         this.cropService = gameMaster.getCropService();
         this.gameUIservice = gameMaster.getGameUIService();
         this.particles = gameMaster.getParticles();
-        this.blocksTexture = blockTexture;
     }
 
     public BlockPos update(GameMaster gameMaster, Item selectedItem) {
@@ -642,10 +639,6 @@ public class GameInteraction {
 
     public float getBreakProgress() {
         return breakProgress;
-    }
-
-    public TextureAtlas getBlocksTexture() {
-        return blocksTexture;
     }
 
     public boolean isSmartShiftActive() {

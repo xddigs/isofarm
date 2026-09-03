@@ -430,9 +430,4 @@ public class GameRenderer {
         blurX = yawDelta / K.Camera.FULL_DEGREES;
         blurY = pitchDelta / K.Camera.HALF_DEGREES;
     }
-
-    public void initCamera(CameraView camera) {
-        previousCameraYaw = camera.getYaw();
-        previousCameraPitch = camera.getPitch();
-    }
 }

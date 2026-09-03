@@ -138,9 +138,7 @@ public class GameMaster {
                 ResourceManager.rem.getMaterialIcons(),
                 ResourceManager.rem.getInventoryIcons());
 
-        gameInteraction = new GameInteraction(this,
-                ResourceManager.rem.getBlocksAtlas());
-
+        gameInteraction = new GameInteraction(this);
         gameUIservice.setPlayer(this.player);
         commandService.setGameUIService(gameUIservice);
         gameUIservice.setShop(shop);
