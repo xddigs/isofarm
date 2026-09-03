@@ -440,17 +440,7 @@ public class Player extends Character {
         for (Item i : List.copyOf(getInventory()
                 .getItems().keySet())) {
             if (i == null) continue;
-            switch (i) {
-                case Backpack ignored -> {
-                    continue;
-                }
-                case CraftingBook ignored -> {
-                    continue;
-                }
-                default -> {
-                }
-            }
-
+            if (i instanceof Undroppable) continue;
             int amount = getInventory().getAmount(i);
             if (amount <= 0) continue;
             WorldItem item = new WorldItem(i, amount, new Vector3f(position.x,
