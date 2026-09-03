@@ -45,7 +45,8 @@ public abstract class Tool implements Item,
 
     @Override
     public String getDisplayName() {
-        return Local.lang.item(type.getDisplayName(), tier);
+        return Local.lang.item(type.getDisplayName(),
+                tier.getDisplayName());
     }
 
     @Override

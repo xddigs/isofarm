@@ -60,7 +60,11 @@ public class Library implements Service<GameMaster> {
 
     private static void registerDefault(ItemRegistry itemR, Supplier<Item> supplier) {
         Item item = supplier.get();
-        itemR.register(getFormattedName(item.getName()), supplier);
+        String rawName = item.getName();
+        if (item instanceof Tool tool && tool.getTier() != null && tool.getTier() != Tier.NONE) {
+            rawName = tool.getTier().getName() + " " + rawName;
+        }
+        itemR.register(getFormattedName(rawName), supplier);
     }
 
     public static void initCommands(float delta, GameMaster gameMaster) {
@@ -97,6 +101,11 @@ public class Library implements Service<GameMaster> {
             }
 
             Item item = ir.create(itemId);
+            if (item == null) {
+                ToastFactory.error(Local.lang.f("toast.unknown_item", itemId));
+                return;
+            }
+
             if (itemId.equals(null)) {
                 player.earn(amount);
             } else if (!player.hasSpace()) {
@@ -104,6 +113,7 @@ public class Library implements Service<GameMaster> {
             } else if (player.hasSpace()){
                 player.add(item, amount);
             }
+
             log.info("Command add executed: {} x{}", itemId, amount);
             ToastFactory.success(Local.lang.f("toast.item_added", amount, item.getDisplayName()));
         }));

@@ -27,7 +27,8 @@ public class Material implements Craftable {
 
     @Override
     public String getDisplayName() {
-        return Local.lang.item(materialID.getDisplayName(), tier);
+        return Local.lang.item(materialID.getDisplayName(),
+                tier.getDisplayName());
     }
 
     @Override

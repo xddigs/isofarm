@@ -6,6 +6,7 @@ import com.isofarm.input.Mouse;
 import com.isofarm.item.Book;
 import com.isofarm.item.Page;
 import com.isofarm.utils.K;
+import com.isofarm.utils.Local;
 import org.joml.Vector4f;
 
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;

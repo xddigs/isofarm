@@ -35,7 +35,11 @@ public enum Tier {
     }
 
     public String getDisplayName() {
-        return "item.tier." + name().toLowerCase(Locale.ROOT);
+        return "item.tier." + toStr(this);
+    }
+
+    public static String toStr(Tier tier) {
+        return tier.name().toLowerCase(Locale.ROOT);
     }
 
     public int getDurability() {

@@ -23,7 +23,8 @@ public class MiningComponent extends Material implements Craftable {
 
     @Override
     public String getDisplayName() {
-        return Local.lang.item(getMaterialID().getDisplayName(), getTier());
+        return Local.lang.item(getMaterialID().getDisplayName(),
+                getTier().getDisplayName());
     }
 
     @Override
