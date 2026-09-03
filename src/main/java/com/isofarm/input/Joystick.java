@@ -8,10 +8,6 @@ import java.nio.FloatBuffer;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-/**
- * Polling input facade for controllers supported by GLFW's gamepad mapping.
- * Call {@link #update()} once per game tick before querying its state.
- */
 public final class Joystick {
     public static final int BUTTON_A = GLFW_GAMEPAD_BUTTON_A;
     public static final int BUTTON_B = GLFW_GAMEPAD_BUTTON_B;
@@ -46,10 +42,8 @@ public final class Joystick {
     private static final boolean[] connected = new boolean[JOYSTICK_COUNT];
     private static int activeJoystick = -1;
 
-    private Joystick() {
-    }
+    private Joystick() {}
 
-    /** Initializes controller state without producing artificial press events. */
     public static void init() {
         poll();
         for (int joystick = 0; joystick < JOYSTICK_COUNT; joystick++) {
@@ -57,7 +51,6 @@ public final class Joystick {
         }
     }
 
-    /** Advances the button history and polls every connected, mapped gamepad. */
     public static void update() {
         for (int joystick = 0; joystick < JOYSTICK_COUNT; joystick++) {
             System.arraycopy(buttons[joystick], 0, lastButtons[joystick], 0, BUTTON_COUNT);

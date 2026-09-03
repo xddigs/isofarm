@@ -1,6 +1,7 @@
 package com.isofarm;
 
 import com.isofarm.graphics.Intro;
+import com.isofarm.input.Joystick;
 import com.isofarm.input.Keyboard;
 import com.isofarm.input.Mouse;
 import com.isofarm.utils.K;
@@ -77,6 +78,7 @@ public class Game {
         glfwWindowHint(GLFW_SAMPLES, 16);
         Keyboard.init(window);
         Mouse.init(window);
+        Joystick.init();
 
         glfwMakeContextCurrent(window);
         GL.createCapabilities();

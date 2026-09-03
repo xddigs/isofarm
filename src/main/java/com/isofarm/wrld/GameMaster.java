@@ -355,6 +355,7 @@ public class GameMaster {
 
         Mouse.update();
         Keyboard.update();
+        Joystick.update();
     }
 
     public void render() {
