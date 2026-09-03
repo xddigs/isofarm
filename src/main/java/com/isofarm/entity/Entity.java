@@ -220,6 +220,7 @@ public abstract class Entity {
 
         velocity.x += (targetVelocity.x - velocity.x) * smooth;
         velocity.z += (targetVelocity.z - velocity.z) * smooth;
+        adjustVelocity(world, delta);
 
         float submergedHeight = getFluidSubmersion(world);
         boolean inFluid = submergedHeight > 0.0f;
@@ -258,6 +259,8 @@ public abstract class Entity {
             velocity.z = 0.0f;
         }
     }
+
+    protected void adjustVelocity(World world, float delta) {}
 
     public boolean checkCollision(World world) {
         float epsilon = 0.001f;

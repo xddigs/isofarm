@@ -551,7 +551,7 @@ public class Player extends Character {
 
         float normalizedMouseY = Math.clamp(
                 (Mouse.getY() - screenHeight * 0.5f) / (screenHeight * 0.5f), -1.0f, 1.0f);
-        float targetPitch = normalizedMouseY * MAX_HEAD_PITCH;
+        float targetPitch = -normalizedMouseY * MAX_HEAD_PITCH;
 
         Quaternionf targetRotation = new Quaternionf(headRotation)
                 .rotateY(targetYaw)
@@ -750,24 +750,6 @@ public class Player extends Character {
             float worldZ = inputDir.x * sin + inputDir.z * cos;
 
             Vector3f targetVelocity = new Vector3f(worldX * getSpeed(), getVelocity().y, worldZ * getSpeed());
-            if (currentState instanceof SneakingState) {
-                float nextX = position.x + targetVelocity.x * delta;
-                float nextZ = position.z + targetVelocity.z * delta;
-                boolean nearGround = isOnGround() || hasGroundBelow(world, position.x, position.z);
-                if (nearGround) {
-                    if (!hasGroundBelow(world, nextX, position.z)) {
-                        targetVelocity.x = ZERO_VELOCITY;
-                    }
-
-                    if (!hasGroundBelow(world, position.x, nextZ)) {
-                        targetVelocity.z = ZERO_VELOCITY;
-                    }
-
-                    if (targetVelocity.y < 0) {
-                        targetVelocity.y = ZERO_VELOCITY;
-                    }
-                }
-            }
             if (!isFlying) collide(world, targetVelocity, delta);
         } else {
             Vector3f targetVelocity = new Vector3f(ZERO_VELOCITY, getVelocity().y, ZERO_VELOCITY);
@@ -800,6 +782,40 @@ public class Player extends Character {
         }
 
         return false;
+    }
+
+    @Override
+    protected void adjustVelocity(World world, float delta) {
+        if (!(currentState instanceof SneakingState) || delta <= ZERO_VELOCITY) return;
+        if (!isOnGround() && !hasGroundBelow(world, position.x, position.z)) return;
+
+        float moveX = velocity.x * delta;
+        float moveZ = velocity.z * delta;
+        float edgeStep = 0.05f;
+
+        while (moveX != ZERO_VELOCITY &&
+                !hasGroundBelow(world, position.x + moveX, position.z)) {
+            moveX = moveTowardZero(moveX, edgeStep);
+        }
+
+        while (moveZ != ZERO_VELOCITY &&
+                !hasGroundBelow(world, position.x, position.z + moveZ)) {
+            moveZ = moveTowardZero(moveZ, edgeStep);
+        }
+
+        while (moveX != ZERO_VELOCITY && moveZ != ZERO_VELOCITY &&
+                !hasGroundBelow(world, position.x + moveX, position.z + moveZ)) {
+            moveX = moveTowardZero(moveX, edgeStep);
+            moveZ = moveTowardZero(moveZ, edgeStep);
+        }
+
+        velocity.x = moveX / delta;
+        velocity.z = moveZ / delta;
+    }
+
+    private static float moveTowardZero(float value, float amount) {
+        if (Math.abs(value) <= amount) return ZERO_VELOCITY;
+        return value - Math.copySign(amount, value);
     }
 
     private void setUpInventory() {
