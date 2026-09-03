@@ -366,33 +366,56 @@ public class Player extends Character {
         ResourceManager rm = gameMaster.getResourceManager();
         CameraView camera = gameMaster.getActiveCamera();
 
-        if (playerModel == null) {
+        if (pass.equals(RenderPass.SHADOW)) {
+            Shader shadowShader = rm.getShadowMapShader();
+            if (shadowShader == null) return;
+            shadowShader.bind();
+            shadowShader.setUniform("uLightSpaceMatrix",
+                    ShadowSystem.sys.getLightSpaceMatrix());
+
+            float globalScale = Settings.getScaledEntity();
+
+            modelMatrix.identity()
+                    .translate(position.x, position.y, position.z)
+                    .rotateY((float) Math.toRadians(modelYaw))
+                    .scale(globalScale);
+
+            shadowShader.setUniform("uModel", modelMatrix);
+
+            glEnable(GL_DEPTH_TEST);
+            glDepthFunc(GL_LESS);
+            glDepthMask(true);
+
+            playerModel.render(shadowShader, modelMatrix);
+
+            glDepthMask(true);
+            glDepthFunc(GL_LESS);
+            shadowShader.unbind();
             return;
         }
 
-        Shader shader = rm.getDefaultShader();
-        if (shader == null) {
-            return;
-        }
+        if (playerModel == null) return;
+        Shader defaultShader = rm.getDefaultShader();
+        if (defaultShader == null) return;
 
         CelestialLighting lighting = gameMaster.getCelestialLighting();
-        shader.bind();
-        shader.setUniform("uProjection", camera.getProjectionMatrix());
-        shader.setUniform("uView", camera.getViewMatrix());
+        defaultShader.bind();
+        defaultShader.setUniform("uProjection", camera.getProjectionMatrix());
+        defaultShader.setUniform("uView", camera.getViewMatrix());
 
-        shader.setUniform("uLightIntensity", lighting.getIntensity());
-        shader.setUniform("uLightDirection", lighting.getDirection());
-        shader.setUniform("uAmbientIntensity", lighting.getAmbientIntensity());
-        shader.setUniform("uSkyColor", TimeService.getSkyColor());
-        shader.setUniform("uBaseColor", new Vector3f(1.0f));
+        defaultShader.setUniform("uLightIntensity", lighting.getIntensity());
+        defaultShader.setUniform("uLightDirection", lighting.getDirection());
+        defaultShader.setUniform("uAmbientIntensity", lighting.getAmbientIntensity());
+        defaultShader.setUniform("uSkyColor", TimeService.getSkyColor());
+        defaultShader.setUniform("uBaseColor", new Vector3f(1.0f));
 
-        shader.setUniform("uIsSprite", false);
-        shader.setUniform("uUseTexture", true);
-        shader.setUniform("uParticleAlpha", 1.0f);
-        shader.setUniform("uIsMaskPass", false);
-        shader.setUniform("uEnableShadows", false);
-        shader.setUniform("uLightSpaceMatrix", new Matrix4f());
-        shader.setUniform("uIsSubmergedEntity", pass == RenderPass.SUBMERGED);
+        defaultShader.setUniform("uIsSprite", false);
+        defaultShader.setUniform("uUseTexture", true);
+        defaultShader.setUniform("uParticleAlpha", 1.0f);
+        defaultShader.setUniform("uIsMaskPass", false);
+        defaultShader.setUniform("uEnableShadows", Settings.doEnableShadows());
+        defaultShader.setUniform("uLightSpaceMatrix", ShadowSystem.sys.getLightSpaceMatrix());
+        defaultShader.setUniform("uIsSubmergedEntity", pass == RenderPass.SUBMERGED);
 
         float globalScale = Settings.getScaledEntity();
         float idleBobbingY = (float) Math.sin(idleAnimationTime) * IDLE_BOBBING_AMPLITUDE * idleWeight;
@@ -402,7 +425,7 @@ public class Player extends Character {
                 .rotateY((float) Math.toRadians(modelYaw))
                 .scale(globalScale);
 
-        shader.setUniform("uModel", modelMatrix);
+        defaultShader.setUniform("uModel", modelMatrix);
 
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
@@ -413,20 +436,20 @@ public class Player extends Character {
         if (pass == RenderPass.NORMAL) {
             glDepthFunc(GL_LESS);
             glDepthMask(true);
-            shader.setUniform("uIsSubmergedEntity", false);
+            defaultShader.setUniform("uIsSubmergedEntity", false);
 
         } else {
             glDepthFunc(GL_GREATER);
             glDepthMask(false);
-            shader.setUniform("uIsSubmergedEntity", true);
+            defaultShader.setUniform("uIsSubmergedEntity", true);
         }
 
-        playerModel.render(shader, modelMatrix);
+        playerModel.render(defaultShader, modelMatrix);
         glDepthFunc(GL_LESS);
         glDepthMask(true);
         glBindTexture(GL_TEXTURE_2D, 0);
         glDisable(GL_BLEND);
-        shader.unbind();
+        defaultShader.unbind();
     }
 
     @Override

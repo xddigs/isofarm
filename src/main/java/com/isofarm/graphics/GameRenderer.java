@@ -25,7 +25,6 @@ import static org.lwjgl.opengl.GL13.*;
 public class GameRenderer {
     private final Matrix4f modelMatrix = new Matrix4f();
     private final Matrix4f viewProjMatrix = new Matrix4f();
-    private final Matrix4f lightSpaceMatrix = new Matrix4f();
     private final FrustumIntersection frustum = new FrustumIntersection();
     private float previousCameraYaw;
     private float previousCameraPitch;
@@ -77,7 +76,7 @@ public class GameRenderer {
         defaultShader.setUniform("uLightDirection", lighting.getDirection());
         defaultShader.setUniform("uAmbientIntensity", lighting.getAmbientIntensity());
         defaultShader.setUniform("uSkyColor", TimeService.getSkyColor());
-        defaultShader.setUniform("uLightSpaceMatrix", lightSpaceMatrix);
+        defaultShader.setUniform("uLightSpaceMatrix", ShadowSystem.sys.getLightSpaceMatrix());
         defaultShader.setUniform("uUVBounds", new Vector4f(0.0f, 0.0f, 1.0f, 1.0f));
         defaultShader.setUniform("uAtlasScale", new Vector2f(1.0f, 1.0f));
         defaultShader.setUniform("uAtlasOffset", new Vector2f(0.0f, 0.0f));
@@ -173,7 +172,7 @@ public class GameRenderer {
             defaultShader.setUniform("uLightDirection", lighting.getDirection());
             defaultShader.setUniform("uLightIntensity", lighting.getIntensity());
             defaultShader.setUniform("uAmbientIntensity", lighting.getAmbientIntensity());
-            defaultShader.setUniform("uLightSpaceMatrix", lightSpaceMatrix);
+            defaultShader.setUniform("uLightSpaceMatrix", ShadowSystem.sys.getLightSpaceMatrix());
 
             float renderX = crop.getX() + 0.5f;
             float renderY = crop.getY() + K.World.SHORTER_BLOCK_HEIGHT;
