@@ -1,5 +1,6 @@
 package com.isofarm.input;
 
+import com.isofarm.data.Singleton;
 import com.isofarm.item.Block;
 import com.isofarm.entity.Player;
 import com.isofarm.data.SoundGroup;
@@ -10,7 +11,9 @@ import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
 import org.joml.Vector3f;
 
+@Singleton
 public class StepController {
+    public static final StepController step = new StepController();
     private float stepDistanceAccumulator = 0.0f;
     private static final float STEP_DISTANCE_THRESHOLD = 1.6f;
     private final Vector3f lastPosition = new Vector3f();
