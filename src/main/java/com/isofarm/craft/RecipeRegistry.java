@@ -33,8 +33,10 @@ public class RecipeRegistry {
             registerToolSet(requiredStationTier, mainMaterial);
         });
 
-        recipes.sort(Comparator.comparing(recipe -> recipe.result().getName(),
-                String.CASE_INSENSITIVE_ORDER));
+        recipes.sort(Comparator.comparing(
+                recipe -> recipe.result().getDisplayName(),
+                String.CASE_INSENSITIVE_ORDER
+        ));
         return recipes;
     }
 

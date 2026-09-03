@@ -2,6 +2,7 @@ package com.isofarm.data;
 
 import com.isofarm.utils.Local;
 
+import java.util.Locale;
 import java.util.function.Consumer;
 
 public enum Tier {
@@ -36,7 +37,7 @@ public enum Tier {
     }
 
     public String getDisplayName() {
-        return Local.lang.t("item.tier." + name().toLowerCase());
+        return Local.lang.t("item.tier." + name().toLowerCase(Locale.ROOT));
     }
 
     public int getDurability() {

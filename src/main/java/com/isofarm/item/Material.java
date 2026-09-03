@@ -3,6 +3,7 @@ package com.isofarm.item;
 import com.isofarm.data.DataClass;
 import com.isofarm.data.MaterialID;
 import com.isofarm.data.Tier;
+import com.isofarm.utils.Local;
 
 @DataClass
 public class Material implements Craftable {
@@ -26,10 +27,7 @@ public class Material implements Craftable {
 
     @Override
     public String getDisplayName() {
-        String name = materialID.getDisplayName();
-        // TODO localization order for languaages other than English #2
-        name = tier.equals(Tier.NONE) ? name : tier.getName() + name;
-        return name;
+        return Local.lang.item(materialID.getDisplayName(), tier);
     }
 
     @Override

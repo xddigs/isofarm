@@ -1,6 +1,7 @@
 package com.isofarm.utils;
 
 import com.isofarm.data.Singleton;
+import com.isofarm.data.Tier;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,7 +20,7 @@ public class Local {
     }
 
     private void load(String language) {
-        String file = "/lang/lang-" + language + ".properties";
+        String file = "/lang/" + language + ".properties";
         try (InputStream input = Local.class.getResourceAsStream(file)) {
             if (input == null) return;
             properties.load(input);
@@ -34,5 +35,11 @@ public class Local {
 
     public String f(String s, Object... args) {
         return MessageFormat.format(Local.lang.t(s), args);
+    }
+
+    public String item(String itemKey, Tier tier) {
+        String itemName = t(itemKey);
+        if (tier == Tier.NONE) return itemName;
+        return f("item.format.tiered", tier.getDisplayName(), itemName);
     }
 }

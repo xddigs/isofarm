@@ -30,7 +30,7 @@ public abstract class Tool implements Item,
         this.tier = tier;
         this.durability = durability;
         this.baseDamage = type.getBaseDamage();
-        this.enchantments = new Enchantment[3];
+        this.enchantments = new Enchantment[4];
     }
 
     @Override
@@ -43,8 +43,9 @@ public abstract class Tool implements Item,
         return name;
     }
 
+    @Override
     public String getDisplayName() {
-        return type.getDisplayName();
+        return Local.lang.item(type.getDisplayName(), tier);
     }
 
     @Override
