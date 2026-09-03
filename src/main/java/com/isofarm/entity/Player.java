@@ -873,7 +873,6 @@ public class Player extends Character {
         return getInventory().hasItemOfType(Seed.class);
     }
 
-    @Override
     public float getCurrentEyeHeight() {
         return currentEyeHeight;
     }

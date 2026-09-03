@@ -26,7 +26,6 @@ public abstract class Entity {
     private boolean onGround;
     private boolean wasOnGround;
 
-    private float currentEyeHeight = 1.6f;
     private float speed;
 
     public Entity(String name) {
@@ -330,10 +329,6 @@ public abstract class Entity {
 
     public void setSpeed(float speed) {
         this.speed = speed;
-    }
-
-    public float getCurrentEyeHeight() {
-        return currentEyeHeight;
     }
 
     public abstract void update(BlockPos blockPos, float delta);
