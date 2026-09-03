@@ -3,6 +3,7 @@ package com.isofarm.graphics;
 import com.isofarm.data.BlockData;
 import com.isofarm.data.BlockPos;
 import com.isofarm.data.Particle;
+import com.isofarm.data.Singleton;
 import com.isofarm.service.Service;
 import com.isofarm.utils.K;
 import org.joml.Matrix4f;
@@ -13,14 +14,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+@Singleton
 public class ParticleEngine implements Service<Particle> {
+    public static final ParticleEngine peng = new ParticleEngine();
     private static final Random random = new Random();
     private final List<Particle> particles = new ArrayList<>();
-    private final Matrix4f modelMatrix;
+    private final Matrix4f modelMatrix = new Matrix4f();
 
-    public ParticleEngine() {
-        this.modelMatrix = new Matrix4f();
-    }
+    private ParticleEngine() {}
 
     public void add(Particle particle) {
         particles.add(particle);
@@ -125,7 +126,8 @@ public class ParticleEngine implements Service<Particle> {
         }
     }
 
-    public void spawnCrop(float x, float y, float z, SpriteSheet cropSheet, int frameIndex) {
+    public void spawnCrop(float x, float y, float z, SpriteSheet cropSheet,
+                          int frameIndex) {
         if (cropSheet == null) return;
 
         int totalParticles = K.World.MAX_PARTICLES;
