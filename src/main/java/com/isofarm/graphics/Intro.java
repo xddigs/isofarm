@@ -224,9 +224,9 @@ public class Intro {
 
             if (Keyboard.isKeyPressed(GLFW_KEY_F5)) {
                 Local.lang.nextLanguage();
-                BookUI.reload(BookService.bs.getOpenedBook());
+                BookUI.bui.reload(BookService.bs.getOpenedBook());
                 ToastFactory.reload();
-                ToastFactory.info(Local.lang.f("engine.language_changed",
+                ToastFactory.success(Local.lang.f("engine.language_changed",
                         Local.lang.getCurrentLanguage().getName()));
             }
 

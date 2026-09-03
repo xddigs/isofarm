@@ -103,7 +103,7 @@ public class Book extends Usable {
         if (hasNextPage()) {
             currentPage += 2;
             SoundService.fx.playUseSound(SoundGroup.BOOKS);
-            BookUI.nextPage();
+            BookUI.bui.nextPage();
         }
     }
 
@@ -111,7 +111,7 @@ public class Book extends Usable {
         if (hasPreviousPage()) {
             currentPage -= 2;
             SoundService.fx.playUseSound(SoundGroup.BOOKS);
-            BookUI.previousPage();
+            BookUI.bui.previousPage();
         }
     }
 
@@ -127,11 +127,11 @@ public class Book extends Usable {
         if (targetPage > currentPage) {
             currentPage = targetPage;
             SoundService.fx.playUseSound(SoundGroup.BOOKS);
-            BookUI.nextPage();
+            BookUI.bui.nextPage();
         } else if (targetPage < currentPage) {
             currentPage = targetPage;
             SoundService.fx.playUseSound(SoundGroup.BOOKS);
-            BookUI.previousPage();
+            BookUI.bui.previousPage();
         }
     }
 

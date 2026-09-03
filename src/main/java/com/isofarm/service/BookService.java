@@ -27,24 +27,24 @@ public class BookService implements Service<Book> {
 
         openedBook = book;
         book.open();
-        BookUI.open();
+        BookUI.bui.open();
     }
 
     public void close() {
         if (openedBook == null) {
             return;
         }
-        BookUI.close();
+        BookUI.bui.close();
     }
 
     public void update() {
-        if (openedBook != null && !BookUI.isAnimating()) {
+        if (openedBook != null && !BookUI.bui.isAnimating()) {
             openedBook.update();
-            BookUI.update(openedBook,
+            BookUI.bui.update(openedBook,
                     ResourceManager.rem.getBookAnimationSheet());
         }
 
-        if (BookUI.isClosed()) {
+        if (BookUI.bui.isClosed()) {
             if (openedBook != null) {
                 openedBook.close();
             }

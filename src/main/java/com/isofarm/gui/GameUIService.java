@@ -102,6 +102,14 @@ public class GameUIService implements Service<GameMaster> {
 
         this.backpackUI = new BackpackInventoryUI(0,0);
 
+        SpriteSheet bookSheet = ResourceManager.rem.getBookAnimationSheet();
+        float scale = 2.0f;
+        float bookWidth = bookSheet.getFrameWidth() * scale;
+        float bookHeight = bookSheet.getFrameHeight() * scale;
+        float centerX = (windowWidth - bookWidth) * 0.5f;
+        float centerY = (windowHeight - bookHeight) * 0.5f;
+        BookUI.init(centerX, centerY, bookWidth, bookHeight);
+
         inventoryUI.setHotbarUI(gameMaster, hotbarUI);
         inventoryUI.setIcons(seedIcons, cropIcons, blockIcons,
                 toolIcons, materialIcons, inventoryIcons);
@@ -288,7 +296,7 @@ public class GameUIService implements Service<GameMaster> {
 
         SpriteSheet bookSheet = ResourceManager.rem.getBookAnimationSheet();
         if (BookService.bs.isOpen()) {
-            BookUI.render(BookService.bs.getOpenedBook(),
+            BookUI.bui.render(BookService.bs.getOpenedBook(),
                     gameMaster.getGenDelta(), bookSheet);
         }
 
