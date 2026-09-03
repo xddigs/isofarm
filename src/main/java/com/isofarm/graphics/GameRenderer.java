@@ -23,6 +23,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;
 
 public class GameRenderer {
+    public static final GameRenderer gamr = new GameRenderer();
     private final Matrix4f modelMatrix = new Matrix4f();
     private final Matrix4f viewProjMatrix = new Matrix4f();
     private final FrustumIntersection frustum = new FrustumIntersection();
@@ -249,7 +250,7 @@ public class GameRenderer {
 
         glDepthMask(false);
         defaultShader.setUniform("uParticleAlpha", 1.0f);
-        gameMaster.getParticles().render(defaultShader, ResourceManager.rem.getSpriteMesh(),
+        ParticleEngine.peng.render(defaultShader, ResourceManager.rem.getSpriteMesh(),
                 gameMaster.getActiveCamera());
 
         glDepthMask(true);
