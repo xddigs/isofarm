@@ -22,7 +22,6 @@ public class Library implements Service<GameMaster> {
         registerDefault(itemR, () -> new Book(false));
         registerDefault(itemR, () -> new CraftingBook(player));
         registerDefault(itemR, () -> new Bucket(BlockData.AIR));
-        registerDefault(itemR, () -> new Bucket(BlockData.WATER));
 
         for (MaterialID material : MaterialID.values()) {
             if (material.equals(MaterialID.INGOT) || material.equals(MaterialID.RAW_ORE)) continue;
