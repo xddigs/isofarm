@@ -1,6 +1,5 @@
 package com.isofarm.craft;
 
-import com.isofarm.data.BlockData;
 import com.isofarm.data.MaterialID;
 import com.isofarm.data.Tier;
 import com.isofarm.item.*;
@@ -70,12 +69,10 @@ public record Recipe(Tier tier, Item result, int resultAmount, List<Ingredient> 
 
     public List<String> toBookLines() {
         List<String> lines = new ArrayList<>();
-        lines.add("**"+ result.getName() + " x " + resultAmount);
-
+        lines.add("**" + result.getDisplayName() + " x " + resultAmount);
         for (Ingredient ingredient : ingredients) {
-            lines.add(ingredient.craftable().getName() + " x " + ingredient.amount());
+            lines.add(ingredient.craftable().getDisplayName() + " x " + ingredient.amount());
         }
-
         lines.add("-");
         return lines;
     }

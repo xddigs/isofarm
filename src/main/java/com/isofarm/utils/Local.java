@@ -69,10 +69,10 @@ public class Local {
 
     public String item(String itemKey, String tierKey) {
         String itemName = t(itemKey);
-        if (tierKey == null || !tierKey.equals(Tier.toStr(Tier.NONE))) return itemName;
-
-        String tier = "item.tier." + tierKey.toLowerCase(Locale.ROOT);
-        String tierName = t(tier);
+        if (tierKey == null || tierKey.isBlank()) {
+            return itemName;
+        }
+        String tierName = t(tierKey);
         return f("item.format.tiered", tierName, itemName);
     }
 }
