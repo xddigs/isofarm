@@ -27,13 +27,17 @@ public class GUI {
     private static final Matrix4f projection = new Matrix4f();
     private static final Matrix4f model = new Matrix4f();
 
-    private static final UIFont small = new UIFont(K.Paths.FONT, 16.0f);
-    private static final UIFont normal = new UIFont(K.Paths.FONT, 32.0f);
-    private static final UIFont big = new UIFont(K.Paths.FONT, 64.0f);
+    private static final float FONT_SMALL = 16.0f;
+    private static final float FONT_NORMAL = 24.0f;
+    private static final float FONT_BIG = 32.0f;
 
-    private static final UIFont smallBold = new UIFont(K.Paths.FONT_BOLD, 16.0f);
-    private static final UIFont normalBold = new UIFont(K.Paths.FONT_BOLD, 32.0f);
-    private static final UIFont bigBold = new UIFont(K.Paths.FONT_BOLD, 64.0f);
+    private static final UIFont small = new UIFont(K.Paths.FONT, FONT_SMALL);
+    private static final UIFont normal = new UIFont(K.Paths.FONT, FONT_NORMAL);
+    private static final UIFont big = new UIFont(K.Paths.FONT, FONT_BIG);
+
+    private static final UIFont smallBold = new UIFont(K.Paths.FONT_BOLD, FONT_SMALL);
+    private static final UIFont normalBold = new UIFont(K.Paths.FONT_BOLD, FONT_NORMAL);
+    private static final UIFont bigBold = new UIFont(K.Paths.FONT_BOLD, FONT_BIG);
 
     private static int screenWidth;
     private static int screenHeight;
