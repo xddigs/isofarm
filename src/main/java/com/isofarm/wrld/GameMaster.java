@@ -34,7 +34,6 @@ public class GameMaster {
     private final Moon moon = new Moon("Moon");
     private final CelestialLighting celestialLighting = new CelestialLighting(sun, moon);
     private final UIManager uiManager = Intro.getUiManager();
-    private final CropService cropService = new CropService(world);
     private final CommandRegistry commandRegistry = new CommandRegistry();
     private final CommandService commandService = new CommandService(commandRegistry);
     private final ItemRegistry itemRegistry = new ItemRegistry();
@@ -187,10 +186,6 @@ public class GameMaster {
 
     public Player getPlayer() {
         return player;
-    }
-
-    public CropService getCropService() {
-        return cropService;
     }
 
     public CommandRegistry getCommandRegistry() {
@@ -346,7 +341,7 @@ public class GameMaster {
         float timeOfDay = TimeService.ts.getHour() + (TimeService.ts.getMinute() / 60.0f);
         celestialLighting.update(HoveredCell.get(this), timeOfDay);
         shop.update(TimeService.ts);
-        cropService.update(delta, WeatherService.wes.getWeather());
+        CropService.cs.update(delta, WeatherService.wes.getWeather());
         TreeService.ts.update(this);
         updateEntities(delta);
         orthoCameraController.update(this, delta);

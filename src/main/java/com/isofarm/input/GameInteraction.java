@@ -7,10 +7,7 @@ import com.isofarm.entity.WorldItem;
 import com.isofarm.graphics.ParticleEngine;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.item.*;
-import com.isofarm.service.BookService;
-import com.isofarm.service.SoundService;
-import com.isofarm.service.TimeService;
-import com.isofarm.service.TreeService;
+import com.isofarm.service.*;
 import com.isofarm.utils.HoveredCell;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
@@ -377,9 +374,9 @@ public class GameInteraction {
             int frameIndex = crop.getStage().getFrameIndex();
             SpriteSheet sheet = gameMaster.getCropSpriteSheet(cropType);
             if (crop.isReadyToHarvest()) {
-                GameMaster.game.getCropService().harvest(gameMaster.getPlayer(), crop);
+                CropService.cs.harvest(gameMaster.getPlayer(), crop);
             } else {
-                GameMaster.game.getCropService().rip(crop);
+                CropService.cs.rip(crop);
             }
 
             SoundService.fx.playBreakSound(SoundGroup.SOIL);
@@ -617,7 +614,7 @@ public class GameInteraction {
             if (seed.getType() == null) return;
 
             Block tilledDirt = new Block(BlockData.TILLED_DIRT, x, y, z);
-            Crop planted = GameMaster.game.getCropService().plant(x, y, z, player, tilledDirt, seed.getType(),
+            Crop planted = CropService.cs.plant(x, y, z, player, tilledDirt, seed.getType(),
                     TimeService.ts.getCurrentSeason());
 
             if (planted != null) {

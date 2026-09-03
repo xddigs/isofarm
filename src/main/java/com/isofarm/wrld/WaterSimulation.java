@@ -1,10 +1,8 @@
 package com.isofarm.wrld;
 
-import com.isofarm.data.BlockData;
-import com.isofarm.data.BlockPos;
-import com.isofarm.data.FluidPos;
-import com.isofarm.data.Singleton;
+import com.isofarm.data.*;
 import com.isofarm.graphics.ParticleEngine;
+import com.isofarm.graphics.ResourceManager;
 
 import java.util.ArrayDeque;
 import java.util.HashSet;
@@ -236,11 +234,17 @@ public class WaterSimulation {
         }
 
         BlockData data = BlockData.fromId(blockId);
+        Crop crop = World.wrld.getCropAt(pos.x(), pos.y(), pos.z());
         if (data.isPlant()) {
             ParticleEngine.peng.spawnPlant(new BlockPos(data,
                     pos.x(), pos.y(), pos.z()), data);
+        } else if (crop != null) {
+            int frameIndex = crop.getStage().getFrameIndex();
+            ParticleEngine.peng.spawnCrop(pos.x(), pos.y(), pos.z(),
+                    ResourceManager.rem.getCropSpritesheets().get(crop),frameIndex);
         }
-        return data != null && data.isPlant();
+
+        return data != null && (data.isPlant() || crop != null);
     }
 
     private boolean isWater(FluidPos pos) {

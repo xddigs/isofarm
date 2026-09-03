@@ -10,12 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CropService implements Service<Crop> {
+    public static final CropService cs = new CropService();
     private static final Logger log = LoggerFactory.getLogger(CropService.class);
-    private final World world;
 
-    public CropService(World world) {
-        this.world = world;
-    }
+    private CropService() {}
 
     public Crop plant(int x, int y, int z, Player player, Block block,
                       CropType type, Season currentSeason) {
@@ -31,7 +29,7 @@ public class CropService implements Service<Crop> {
             return null;
         }
 
-        Crop existingCrop = world.getCropAt(x, y, z);
+        Crop existingCrop = World.wrld.getCropAt(x, y, z);
         if (existingCrop != null) {
             log.warn("Attempted to plant {} at ({}, {}) but a crop already exists!",
                     type.getName(), x, z);
@@ -51,13 +49,13 @@ public class CropService implements Service<Crop> {
 
         player.remove(seedOpt.get(), 1);
         Crop newCrop = new Crop(x, y, z, type, block, currentSeason);
-        world.addCrop(newCrop);
+        World.wrld.addCrop(newCrop);
         log.info("Planted {} at ({}, {}) during season {}", type.getName(), x, z, currentSeason.getName());
         return newCrop;
     }
 
     public void update(float delta, WeatherType weather) {
-        world.forEach(b -> {
+        World.wrld.forEach(b -> {
             if (b instanceof Crop crop) {
                 crop.update(delta, weather);
             }
@@ -69,6 +67,7 @@ public class CropService implements Service<Crop> {
         if (!crop.isReadyToHarvest()) {
             log.warn("Attempted to harvest {} " +
                     "before it was fully grown.", crop.getCropType().getName());
+            ToastFactory.warning("toast.crop_not_ready");
             return 1;
         }
 
@@ -86,7 +85,7 @@ public class CropService implements Service<Crop> {
 
         crop.setHarvested(true);
         player.gain(cropValue);
-        world.removeCrop(crop);
+        World.wrld.removeCrop(crop);
         log.info("Successfully harvested {}" +
                 " giving {} items.", crop.getCropType().getName(), yield);
         ToastFactory.success(Local.lang.f("toast.harvest", yield,
@@ -95,7 +94,7 @@ public class CropService implements Service<Crop> {
     }
 
     public void rip(Crop crop) {
-        world.removeCrop(crop);
+        World.wrld.removeCrop(crop);
         log.info("Ripped {} from the ground.", crop.getCropType().getName());
     }
 }
