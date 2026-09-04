@@ -111,12 +111,28 @@ public class Bucket extends Usable {
 
     @Override
     public String getName() {
-        if (type != null && type.equals(BlockData.WATER)) {
-            return Local.lang.t("item.usable.water_bucket");
-        } else if (type != null && type.equals(BlockData.LAVA)) {
-            return Local.lang.t("item.usable.lava_bucket");
-        }
-        return Local.lang.t("item.usable.bucket");
+        return getBucketDisplayName();
+    }
+
+    /**
+     * Returns the localized name for the bucket's current contents.
+     * @return {@link String} the localized display name
+     */
+    @Override
+    public String getDisplayName() {
+        return getBucketDisplayName();
+    }
+
+    /**
+     * Returns the localized name for the bucket's current contents.
+     * @return {@link String} the localized display name
+     */
+    private String getBucketDisplayName() {
+        return switch (type) {
+            case WATER -> Local.lang.t("item.usable.water_bucket");
+            case LAVA -> Local.lang.t("item.usable.lava_bucket");
+            case null, default -> Local.lang.t("item.usable.bucket");
+        };
     }
 
     /**
@@ -150,7 +166,8 @@ public class Bucket extends Usable {
      * @param fluidType the fluid block type
      */
     public void fill(BlockData fluidType) {
-        if (FluidSimulation.forBlock(fluidType) != null) setBlockType(fluidType);
+        FluidSimulation simulation = FluidSimulation.forBlock(fluidType);
+        if (simulation != null) setBlockType(simulation.getFluidType());
     }
 
     /**

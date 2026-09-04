@@ -2,6 +2,7 @@ package com.isofarm.gui;
 
 import com.isofarm.data.*;
 import com.isofarm.graphics.SpriteSheet;
+import com.isofarm.graphics.ResourceManager;
 import com.isofarm.item.Bucket;
 import com.isofarm.item.Item;
 import com.isofarm.item.Tool;
@@ -54,6 +55,10 @@ public class InventorySlotUI extends UIElement {
         super.update(delta);
         int currentAmount = slot != null ? slot.getAmount() : 0;
         Item currentItem = getItem();
+
+        if (currentItem instanceof Bucket && spriteSheet != null) {
+            spriteFrame = ResourceManager.getItemFrame(currentItem);
+        }
 
         if (currentAmount != lastAmount || currentItem != lastItem) {
             if (currentAmount > 0) {
