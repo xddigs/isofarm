@@ -16,6 +16,7 @@ public class WorldGenerator implements Generator {
     public static final int LAKE_ORGANICITY_PERCENT = 60;
     public static final boolean GENERATE_MOUNTAINS = false;
     public static final int MAX_MOUNTAIN_HEIGHT = 25;
+    public static final boolean GENERATE_LAKE_SAND_SHORES = true;
 
     private static final int ISLAND_CENTER_X = 0;
     private static final int ISLAND_CENTER_Z = 0;
@@ -23,6 +24,7 @@ public class WorldGenerator implements Generator {
     private static final int SURFACE_Y = 25;
     private static final int MAX_DEPTH = 50;
     private static final float LAKE_RADIUS = 4.0f;
+    private static final float LAKE_SHORE_WIDTH = 1.5f;
     private static final int PLANT_ATTEMPTS = 16;
 
     private static World world;
@@ -79,6 +81,7 @@ public class WorldGenerator implements Generator {
                 if (distance > ISLAND_RADIUS) continue;
 
                 Lake lake = lakeAt(worldX, worldZ);
+                boolean lakeShore = lake == null && isLakeShore(worldX, worldZ);
                 int terrainY = terrainHeight(worldX, worldZ);
                 int topY = lake == null ? terrainY : SURFACE_Y - 1;
 
@@ -88,7 +91,11 @@ public class WorldGenerator implements Generator {
                     if (distance > allowedRadius && y <= SURFACE_Y) continue;
 
                     byte blockId;
-                    if (y == topY) blockId = lake == null ? BlockData.GRASS.getId() : BlockData.DIRT.getId();
+                    if (y == topY) {
+                        blockId = lake != null || lakeShore
+                                ? BlockData.SAND.getId()
+                                : BlockData.GRASS.getId();
+                    }
                     else if (y >= topY - 3) blockId = BlockData.DIRT.getId();
                     else if (random.nextFloat() < 0.03f && y < topY - 5) blockId = BlockData.getRandomOre().getId();
                     else blockId = BlockData.STONE.getId();
@@ -158,7 +165,7 @@ public class WorldGenerator implements Generator {
             int z = random.nextInt((int) ISLAND_RADIUS * 2 - 8) - (int) ISLAND_RADIUS + 4;
             int localX = Math.floorMod(x, Chunk.SIZE_X);
             int localZ = Math.floorMod(z, Chunk.SIZE_Z);
-            if (distance(x, z, 0, 0) > ISLAND_RADIUS - 4 || lakeAt(x, z) != null
+            if (distance(x, z, 0, 0) > ISLAND_RADIUS - 4 || lakeAt(x, z) != null || isLakeShore(x, z)
                     || nearTree(x, z) || localX < 2 || localX > 13 || localZ < 2 || localZ > 13) continue;
             trees.add(new Tree(x, terrainHeight(x, z), z));
         }
@@ -182,12 +189,38 @@ public class WorldGenerator implements Generator {
      * @return the lake at the position, or {@code null} when none is present
      */
     private Lake lakeAt(int x, int z) {
-        float organicity = Math.clamp(LAKE_ORGANICITY_PERCENT, 0, 100) / 100.0f;
         for (Lake lake : lakes) {
-            float shoreVariation = noise(x, z, 3) * lake.radius * 0.55f * organicity;
-            if (distance(x, z, lake.x, lake.z) <= lake.radius + shoreVariation) return lake;
+            if (distance(x, z, lake.x, lake.z) <= lakeBoundaryAt(lake, x, z)) return lake;
         }
         return null;
+    }
+
+    /**
+     * Checks whether a position belongs to the conditional sand shore around a lake.
+     * @param x the world x value
+     * @param z the world z value
+     * @return {@code true} if sand should be generated at the position; otherwise {@code false}
+     */
+    private boolean isLakeShore(int x, int z) {
+        if (!GENERATE_LAKE_SAND_SHORES || lakeAt(x, z) != null) return false;
+        for (Lake lake : lakes) {
+            float distance = distance(x, z, lake.x, lake.z);
+            float boundary = lakeBoundaryAt(lake, x, z);
+            if (distance > boundary && distance <= boundary + LAKE_SHORE_WIDTH) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Returns the organic shoreline radius for a lake at a world position.
+     * @param lake the lake value
+     * @param x the world x value
+     * @param z the world z value
+     * @return the shoreline radius at the position
+     */
+    private float lakeBoundaryAt(Lake lake, int x, int z) {
+        float organicity = Math.clamp(LAKE_ORGANICITY_PERCENT, 0, 100) / 100.0f;
+        return lake.radius + noise(x, z, 3) * lake.radius * 0.55f * organicity;
     }
 
     /**
@@ -229,7 +262,7 @@ public class WorldGenerator implements Generator {
             int x = random.nextInt(14) - 7;
             int z = random.nextInt(14) - 7;
             int y = terrainHeight(x, z);
-            if (lakeAt(x, z) != null || nearTree(x, z)) continue;
+            if (lakeAt(x, z) != null || isLakeShore(x, z) || nearTree(x, z)) continue;
             BlockData[] plants = BlockData.allPlants();
             BlockData plant = plants[random.nextInt(plants.length)];
             if (plant != BlockData.OAK_BONSAI && world.getBlockTypeAt(x, y, z) == BlockData.GRASS.getId()
@@ -265,7 +298,8 @@ public class WorldGenerator implements Generator {
             int x = centerX + random.nextInt(5) - 2;
             int z = centerZ + random.nextInt(5) - 2;
             int y = terrainHeight(x, z);
-            if (lakeAt(x, z) == null && !nearTree(x, z) && Math.abs(y - surfaceY) <= 2
+            if (lakeAt(x, z) == null && !isLakeShore(x, z) && !nearTree(x, z)
+                    && Math.abs(y - surfaceY) <= 2
                     && world.getBlockTypeAt(x, y, z) == BlockData.GRASS.getId()
                     && world.getBlockTypeAt(x, y + 1, z) == BlockData.AIR.getId()) {
                 world.setBlockTypeAt(x, y + 1, z, plant.getId());
