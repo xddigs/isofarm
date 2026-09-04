@@ -3,7 +3,6 @@ package com.isofarm.entity.states;
 import com.isofarm.data.PlayerState;
 import com.isofarm.data.SoundGroup;
 import com.isofarm.entity.Player;
-import com.isofarm.input.Keyboard;
 import com.isofarm.service.SoundService;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
@@ -15,10 +14,15 @@ public class FallingState implements PlayerState {
     private final Player player = Player.plyr;
     private static final float FALL_DISTANCE = 4.0f;
     private static final float DOUBLE_JUMP_WINDOW = 0.75f;
+    private static final float VOID_DAMAGE_DELAY = 10.0f;
+    private static final float VOID_DAMAGE_INTERVAL = 1.0f;
+    private static final float VOID_DAMAGE_STEP = 0.1f;
 
     private float fallStartY;
     private float fallTime;
     private float jumpTime;
+    private float voidDamageTimer;
+    private int voidDamageTicks;
 
     /**
      * Performs the enter operation.
@@ -28,6 +32,8 @@ public class FallingState implements PlayerState {
         this.fallStartY = player.getPosition().y;
         this.fallTime = 0.0f;
         this.jumpTime = 0.0f;
+        this.voidDamageTimer = 0.0f;
+        this.voidDamageTicks = 0;
 
         player.setFalling(true);
     }
@@ -40,11 +46,6 @@ public class FallingState implements PlayerState {
     public void input(GameMaster gameMaster) {
         if (gameMaster.isInventoryOpen() || gameMaster.isChatOpen()) {
             return;
-        }
-
-        if (player.getGamemode().isGodmode() && jumpTime <= DOUBLE_JUMP_WINDOW
-                && Keyboard.isKeyPressed(Keyboard.KEY_SPACE)) {
-            player.changeState(new FlyingState());
         }
     }
 
@@ -65,6 +66,9 @@ public class FallingState implements PlayerState {
 
         float yaw = GameMaster.game.getActiveCamera().getYaw();
         player.wasd(delta, yaw, false);
+        applyVoidDamage(delta);
+
+        if (!player.isAlive()) return;
 
         if (player.isOnGround()) {
             float fallDistance = fallStartY - player.getPosition().y;
@@ -76,6 +80,31 @@ public class FallingState implements PlayerState {
 
             player.setFalling(false);
             player.changeState(new GroundedState());
+        }
+    }
+
+    /**
+     * Applies increasingly severe damage after falling continuously into the
+     * void for ten seconds.
+     *
+     * @param delta frame time in seconds
+     */
+    private void applyVoidDamage(float delta) {
+        if (fallTime < VOID_DAMAGE_DELAY) return;
+
+        if (voidDamageTicks == 0 && voidDamageTimer == 0.0f) {
+            voidDamageTimer = VOID_DAMAGE_INTERVAL;
+        } else {
+            voidDamageTimer += delta;
+        }
+        while (voidDamageTimer >= VOID_DAMAGE_INTERVAL && player.isAlive()) {
+            voidDamageTimer -= VOID_DAMAGE_INTERVAL;
+            voidDamageTicks++;
+
+            float healthFraction = VOID_DAMAGE_STEP * voidDamageTicks;
+            float damage = Math.max(1.0f,
+                    player.getMaxHitpoints() * healthFraction);
+            player.fallDamage(damage);
         }
     }
 
