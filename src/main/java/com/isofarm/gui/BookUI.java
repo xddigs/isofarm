@@ -24,9 +24,11 @@ public class BookUI extends UIElement {
     private static final int GRID_COLUMNS = 4;
     private static final int GRID_ROWS = 4;
     private static final float GRID_ICON_SIZE = 48.0f;
-    private static final float GRID_GAP = 24.0f;
+    private static final float GRID_GAP = 16.0f;
     private static final float GRID_OUTLINE_SIZE = 3.0f;
     private static final float PAGE_CONTENT_CURVE = 18.0f;
+    private static final float PAGE_STATIC_CONTENT_HIDE_PROGRESS = 0.99f;
+    private static final float BASE_CONTENT_HEIGHT_OFFSET = 0.15f;
 
     public static BookUI bui;
     private float animationProgress = 0.0f;
@@ -285,7 +287,8 @@ public class BookUI extends UIElement {
         float y = lerp(screenHeight, centerY, alpha);
 
         Vector4f color = new Vector4f(0.8706f, 0.8196f, 0.6745f, 1.0f);
-        GUI.drawRect(centerX, y, bookWidth, bookHeight, color);
+        GUI.drawRect(centerX, y + BASE_CONTENT_HEIGHT_OFFSET + BASE_CONTENT_HEIGHT_OFFSET/2f, bookWidth, bookHeight + BASE_CONTENT_HEIGHT_OFFSET, color);
+
         if (isFlippingPage) {
             pageFlipTimer += delta;
             float progress = Math.min(1.0f, pageFlipTimer / PAGE_FLIP_DURATION);
@@ -320,8 +323,11 @@ public class BookUI extends UIElement {
         if (isFlippingNext) {
             int oldLeft = currentPage - 2;
             int oldRight = currentPage - 1;
+            if (progress < PAGE_STATIC_CONTENT_HIDE_PROGRESS) {
+                renderPageAt(book, oldLeft, bookX, bookY,
+                        pageWidth, bookHeight, alpha);
+            }
             if (progress < 0.5f) {
-                renderPageAt(book, oldLeft, bookX, bookY, pageWidth, bookHeight, alpha);
                 float fold = easeInOutCubic(progress * 2.0f);
                 renderTransformedPage(book, oldRight, bookX + pageWidth, bookY,
                         pageWidth, bookHeight, alpha, spineX, 1.0f - fold, foldCurve);
@@ -335,9 +341,11 @@ public class BookUI extends UIElement {
         } else {
             int oldLeft = currentPage + 2;
             int oldRight = currentPage + 3;
-            if (progress < 0.5f) {
+            if (progress < PAGE_STATIC_CONTENT_HIDE_PROGRESS) {
                 renderPageAt(book, oldRight, bookX + pageWidth, bookY,
                         pageWidth, bookHeight, alpha);
+            }
+            if (progress < 0.5f) {
                 float fold = easeInOutCubic(progress * 2.0f);
                 renderTransformedPage(book, oldLeft, bookX, bookY,
                         pageWidth, bookHeight, alpha, spineX, 1.0f - fold, foldCurve);
