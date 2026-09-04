@@ -17,7 +17,7 @@ public enum MaterialID implements Craftable {
     PAPER((byte) 1, (byte) 1, "Paper", 10),
     LEATHER((byte) 2, (byte) 1, "Leather", 40),
     SUGAR_CANE((byte) 3, (byte) 1, "Sugar Cane", 10),
-    SUGAR((byte) 4, (byte) 1, "Sugar", 10);
+    SUGAR((byte) 4, (byte) 1, "Sugar", 20);
 
     private final byte id;
     private final byte row;

@@ -107,12 +107,8 @@ public class ResourceManager {
         MaterialID materialID = material.getMaterialID();
         int row = materialID.getRow();
 
-        if (row == 1) {
-            int col = switch (materialID) {
-                case PAPER -> 1;
-                case LEATHER -> 2;
-                default -> 0;
-            };
+        if (row >= 1) {
+            int col = materialID.getId();
             return (row * K.UI.ICON_MATERIAL_COLS) + col;
         }
 
