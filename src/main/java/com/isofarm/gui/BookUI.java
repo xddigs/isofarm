@@ -284,21 +284,23 @@ public class BookUI extends UIElement {
         float alpha = easeInOutCubic(animationProgress);
         float y = lerp(screenHeight, centerY, alpha);
 
+        Vector4f color = new Vector4f(0.8706f, 0.8196f, 0.6745f, 1.0f);
+        GUI.drawRect(centerX, y, bookWidth, bookHeight, color);
         if (isFlippingPage) {
             pageFlipTimer += delta;
             float progress = Math.min(1.0f, pageFlipTimer / PAGE_FLIP_DURATION);
             float animFrameProgress = isFlippingNext ? progress : (1.0f - progress);
             int currentFrame = (int) (animFrameProgress * (TOTAL_ANIM_FRAMES - 1));
-            GUI.drawSprite(animSheet, currentFrame, centerX, y, bookWidth, bookHeight, new Vector4f(1.0f));
             renderFlippingSpread(book, centerX, y, bookWidth, bookHeight, alpha, progress);
+            GUI.drawSprite(animSheet, currentFrame, centerX, y, bookWidth, bookHeight, new Vector4f(1.0f));
 
             if (progress >= 1.0f) {
                 isFlippingPage = false;
             }
 
         } else {
-            GUI.drawSprite(animSheet, 0, centerX, y, bookWidth, bookHeight, new Vector4f(1.0f));
             renderSpread(book, centerX, y, animSheet, scale, alpha);
+            GUI.drawSprite(animSheet, 0, centerX, y, bookWidth, bookHeight, new Vector4f(1.0f));
         }
         renderChildren();
     }
