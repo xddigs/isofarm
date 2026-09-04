@@ -21,7 +21,7 @@ public class World {
     private final Map<Long, Chunk> chunks = new HashMap<>();
 
     /**
-     * Creates a new {@code World} instance.
+     * Creates a new private {@code World} instance.
      */
     private World() {}
 

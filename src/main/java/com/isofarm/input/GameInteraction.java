@@ -53,7 +53,7 @@ public class GameInteraction {
     private boolean isSmartShift = false;
     
     /**
-     * Creates a new {@code GameInteraction} instance.
+     * Creates a new private {@code GameInteraction} instance.
      */
     private GameInteraction() {}
     

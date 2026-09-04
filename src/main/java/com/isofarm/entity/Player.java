@@ -18,9 +18,7 @@ import java.util.List;
 /** Represents the local player and orchestrates its focused components. */
 @Singleton
 public class Player extends Character {
-    /** Shared player instance. */
     public static final Player plyr;
-
     static {
         plyr = new Player();
         plyr.initialize();
