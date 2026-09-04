@@ -1,17 +1,16 @@
 package com.isofarm.item;
 
-import com.isofarm.data.DataClass;
-import com.isofarm.data.MaterialID;
-import com.isofarm.data.Tier;
+import com.isofarm.data.*;
 import com.isofarm.utils.Local;
 
 /**
  * Provides material behavior.
  */
 @DataClass
-public class Material implements Craftable {
+public class Material implements Craftable, Plantable {
     private final Tier tier;
     private final MaterialID materialID;
+    private final boolean isSugarCane;
 
     /**
      * Creates a new {@code Material} instance.
@@ -21,6 +20,7 @@ public class Material implements Craftable {
     public Material(Tier tier, MaterialID materialID) {
         this.tier = tier;
         this.materialID = materialID;
+        this.isSugarCane = materialID.equals(MaterialID.SUGAR_CANE);
     }
 
     /**
@@ -49,6 +49,16 @@ public class Material implements Craftable {
     public String getDisplayName() {
         return Local.lang.item(materialID.getDisplayName(),
                 tier.getDisplayName());
+    }
+
+    /**
+     * Returns the crop type, either {@code null} or {@code SUGAR_CANE}
+     * @return {@code null} or {@code CropType.SUGAR_CANE}
+     */
+    @Override
+    public CropType getType() {
+        if (isSugarCane()) return CropType.SUGAR_CANE;
+        return null;
     }
 
     /**
@@ -83,5 +93,13 @@ public class Material implements Craftable {
      */
     public MaterialID getMaterialID() {
         return materialID;
+    }
+
+    /**
+     * Returns if the material is sugar cane.
+     * @return {@code true} if sugar cane; otherwise {@code false}
+     */
+    public boolean isSugarCane() {
+        return isSugarCane;
     }
 }

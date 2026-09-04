@@ -3,13 +3,14 @@ package com.isofarm.data;
 import com.isofarm.item.Item;
 import com.isofarm.utils.Local;
 
+import java.util.Locale;
 import java.util.Objects;
 
 /**
  * Provides seed behavior.
  */
 @DataClass
-public class Seed implements Item {
+public class Seed implements Item, Plantable {
     private final CropType type;
     private final byte id;
     private final String displayName;
@@ -23,7 +24,7 @@ public class Seed implements Item {
     public Seed(CropType type) {
         this.type = type;
         this.id = type.getId();
-        this.displayName = getDisplayName(type.getName());
+        this.displayName = getDisplayName(type.getName().toLowerCase(Locale.ROOT));
         this.name = type.getName() + "_seed";
         this.value = type.getValue();
     }
@@ -74,6 +75,7 @@ public class Seed implements Item {
      * Returns the type.
      * @return the type
      */
+    @Override
     public CropType getType() {
         return type;
     }
