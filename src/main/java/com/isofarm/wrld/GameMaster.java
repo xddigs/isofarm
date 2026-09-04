@@ -100,7 +100,6 @@ public class GameMaster {
         this.orthoCameraController = new CameraController(orthoCamera);
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
-        this.recenter();
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
         recipes = RecipeRegistry.reg.init();
@@ -541,14 +540,6 @@ public class GameMaster {
         orthoCameraController.release(this);
         SoundService.fx.cleanup();
         log.info("GameMaster resources successfully cleaned up");
-    }
-
-    /**
-     * Performs the recenter operation.
-     */
-    public void recenter() {
-        float center = (K.World.MAP_WORLD_SIZE - 1) / 2.0f;
-        float worldCenter = center * K.World.TILE_SIZE;
     }
 
     /**
