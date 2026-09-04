@@ -154,7 +154,7 @@ public final class PlayerGameplay {
     /** Sorts both storage containers. */ public void sort() { player.getInventory().sort(); player.getBackpack().sort(); }
     /** @param item item @param amount quantity */ public void remove(Item item, int amount) { if (!player.getGamemode().isGodmode()) { player.getInventory().remove(item, amount); log.info("Removed x{} of {} to inventory", amount, item.getName()); } }
     /** @param item item */ public void remove(Item item) { if (!player.getGamemode().isGodmode()) { player.getInventory().remove(item, 1); log.info("Removed x1 of {} from inventory", item.getName()); } }
-    /** Clears non-backpack inventory items. */ public void clear() { for (Item item : List.copyOf(player.getInventory().getItems().keySet())) if (item != null && !(item instanceof Backpack)) remove(item); log.info("Cleared inventory"); }
+    /** Clears non-backpack inventory items. */ public void clear() { for (Item item :List.copyOf(player.getInventory().getItems().keySet())) if (item != null && !(item instanceof CraftingBook)) remove(item); log.info("Cleared inventory"); }
     /** @return whether inventory is empty */ public boolean isEmpty() { return player.getInventory().isEmpty(); }
     /** @return inventory size */ public int size() { return player.getInventory().size(); }
     /** @param index index @return indexed item */ public Item get(int index) { return player.getInventory().get(index); }
