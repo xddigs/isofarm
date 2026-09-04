@@ -9,21 +9,24 @@ import java.util.Locale;
  */
 @DataClass
 public enum InteractiveBlocks implements Blockable {
-    EMPTY(null, (byte) 0, (byte) -1, (byte) -1, -1),
-    CHEST("assets/models/blocks/chest.gltf", (byte) 1, (byte) 0, (byte) 2, 10),;
+    EMPTY(null, (byte) 0, (byte) -1, (byte) -1, -1, 0.0f),
+    CHEST("assets/models/blocks/chest.gltf", (byte) 1, (byte) 0, (byte) 2, 10, 2.5f),;
 
-    private final String texturePath;
+    private final String modelPath;
     private final byte id;
     private final byte col;
     private final byte row;
     private final int value;
+    private final float destroyTime;
 
-    InteractiveBlocks(String texturePath, byte id, byte col, byte row, int value) {
-        this.texturePath = texturePath;
+    InteractiveBlocks(String modelPath, byte id, byte col, byte row, int value,
+                      float destroyTime) {
+        this.modelPath = modelPath;
         this.id = id;
         this.col = col;
         this.row = row;
         this.value = value;
+        this.destroyTime = destroyTime;
     }
 
     /**
@@ -43,11 +46,12 @@ public enum InteractiveBlocks implements Blockable {
     }
 
     /**
-     * Returns the texture path of the block.
-     * @return {@link String} the texture path of the block
+     * Returns the GLTF model path of the block.
+     *
+     * @return the model path, or {@code null} when the type has no model
      */
-    public String getTexturePath() {
-        return texturePath;
+    public String getModelPath() {
+        return modelPath;
     }
 
     /**
@@ -80,5 +84,14 @@ public enum InteractiveBlocks implements Blockable {
      */
     public int getValue() {
         return value;
+    }
+
+    /**
+     * Returns the time required to destroy the block.
+     *
+     * @return the destroy time in seconds
+     */
+    public float getDestroyTime() {
+        return destroyTime;
     }
 }

@@ -254,6 +254,17 @@ public class Camera implements CameraView {
         int previousZ = z;
 
         do {
+            var interactiveBlock = world.getInteractiveBlockAt(x, y, z);
+            if (interactiveBlock != null) {
+                float distToPlayer = playerPos.distance(x + 0.5f, y + 0.5f, z + 0.5f);
+                if (distToPlayer > Settings.getMaxInteractionDistance()) return null;
+
+                lastHitNormalX = previousX - x;
+                lastHitNormalY = previousY - y;
+                lastHitNormalZ = previousZ - z;
+                return new BlockPos(interactiveBlock.getType(), x, y, z);
+            }
+
             byte block = world.getBlockTypeAt(x, y, z);
             BlockData data = BlockData.fromId(block);
             boolean hasBlock = data != BlockData.AIR;

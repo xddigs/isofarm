@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +40,7 @@ public class ResourceManager {
 
     private static final GLTFModel playerModel = GLTFLoader.load(K.Paths.PLAYER_MODEL);
 
+    private static final Map<Blockable, GLTFModel> blockModels = new LinkedHashMap<>();
     private static final Map<CropType, SpriteSheet> cropSpritesheets = new EnumMap<>(CropType.class);
 
     private static final Shader defaultShader = new Shader(K.Paths.DEFAULT_VERT_SHADER, K.Paths.DEFAULT_FRAG_SHADER);
@@ -63,6 +65,12 @@ public class ResourceManager {
 
         for (BlockData block : BlockData.values()) {
             block.initRegions(blocksAtlas);
+        }
+
+        for (InteractiveBlocks block : InteractiveBlocks.values()) {
+            if (block.getModelPath() != null) {
+                blockModels.put(block, GLTFLoader.load(block.getModelPath()));
+            }
         }
 
         cropSpritesheets.put(CropType.WHEAT, wheat);
@@ -92,6 +100,7 @@ public class ResourceManager {
             case Tool ignored -> toolIcons;
             case Material ignored -> materialIcons;
             case Usable ignored -> usablesIcons;
+            case iBlock ignored -> blockIcons;
             case Block ignored -> blockIcons;
             case null, default -> null;
         };
@@ -134,6 +143,11 @@ public class ResourceManager {
      * @return the item frame
      */
     public static int getItemFrame(Item item) {
+        if (item instanceof iBlock block && block.getType() != null) {
+            return (block.getType().getRow() * K.UI.ICON_BLOCK_COLS)
+                    + block.getType().getCol();
+        }
+
         if (item instanceof Block block && block.getType() != null) {
             int col = block.getType().getCol() - 1;
             int row = block.getType().getRow();
@@ -202,6 +216,8 @@ public class ResourceManager {
         inventoryIcons.dispose();
 
         playerModel.dispose();
+        blockModels.values().forEach(GLTFModel::dispose);
+        blockModels.clear();
         bookAnimationSheet.dispose();
         heartsSpriteSheet.dispose();
 
@@ -418,6 +434,15 @@ public class ResourceManager {
      */
     public Map<CropType, SpriteSheet> getCropSpritesheets() {
         return cropSpritesheets;
+    }
+
+    /**
+     * Returns the models associated with interactive block types.
+     *
+     * @return the interactive block model map
+     */
+    public Map<Blockable, GLTFModel> getBlockModels() {
+        return blockModels;
     }
 
     /**

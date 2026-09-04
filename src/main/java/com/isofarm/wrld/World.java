@@ -5,6 +5,7 @@ import com.isofarm.data.BlockPos;
 import com.isofarm.data.Crop;
 import com.isofarm.data.Singleton;
 import com.isofarm.item.Block;
+import com.isofarm.item.iBlock;
 import com.isofarm.pathfinding.GridPos;
 
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import java.util.function.Consumer;
 public class World {
     public static final World wrld = new World();
     private final Map<Long, Block> blocks = new HashMap<>();
+    private final Map<Long, iBlock> interactiveBlocks = new HashMap<>();
     private final Map<Long, Chunk> chunks = new HashMap<>();
 
     /**
@@ -123,6 +125,49 @@ public class World {
         if (blocks.get(key) == block) {
             blocks.remove(key);
         }
+    }
+
+    /**
+     * Adds an interactive block to the world.
+     *
+     * @param block the interactive block
+     */
+    public void addInteractiveBlock(iBlock block) {
+        if (block == null) return;
+        interactiveBlocks.put(getBlockKey(block.getX(), block.getY(), block.getZ()), block);
+    }
+
+    /**
+     * Returns the interactive block at a world position.
+     *
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @param z the z coordinate
+     * @return the interactive block, or {@code null} when the position is empty
+     */
+    public iBlock getInteractiveBlockAt(int x, int y, int z) {
+        return interactiveBlocks.get(getBlockKey(x, y, z));
+    }
+
+    /**
+     * Removes and returns the interactive block at a world position.
+     *
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @param z the z coordinate
+     * @return the removed block, or {@code null} when none was present
+     */
+    public iBlock removeInteractiveBlockAt(int x, int y, int z) {
+        return interactiveBlocks.remove(getBlockKey(x, y, z));
+    }
+
+    /**
+     * Visits every placed interactive block.
+     *
+     * @param consumer the block consumer
+     */
+    public void forEachInteractiveBlock(Consumer<iBlock> consumer) {
+        interactiveBlocks.values().forEach(consumer);
     }
 
     /**
@@ -370,6 +415,7 @@ public class World {
      * @return {@code true} if block solid; otherwise {@code false}
      */
     public boolean isBlockSolid(int x, int y, int z) {
+        if (getInteractiveBlockAt(x, y, z) != null) return true;
         byte blockId = getBlockTypeAt(x, y, z);
         BlockData block = BlockData.fromId(blockId);
         if (block == null) return false;

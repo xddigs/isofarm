@@ -216,6 +216,14 @@ public class GameInteraction {
             if (player != null && !player.isAttacking()) {
                 player.interact();
             }
+            if (hoveredCell.data() instanceof InteractiveBlocks) {
+                iBlock interactiveBlock = GameMaster.game.getWorld().getInteractiveBlockAt(
+                        hoveredCell.x(), hoveredCell.y(), hoveredCell.z());
+                if (interactiveBlock != null) {
+                    interactiveBlock.use();
+                    return hoveredCell;
+                }
+            }
             place(gameMaster, hoveredCell, selectedItem);
         }
         return hoveredCell;
@@ -428,6 +436,12 @@ public class GameInteraction {
             return;
         }
 
+        iBlock interactiveBlock = world.getInteractiveBlockAt(x, y, z);
+        if (interactiveBlock != null) {
+            breakInteractiveBlock(gameMaster, world, cell, interactiveBlock);
+            return;
+        }
+
         if (blockId == 0) {
             resetBreaking();
             return;
@@ -481,6 +495,60 @@ public class GameInteraction {
             breakBlock(gameMaster, cell, blockData, blockId, selectedItem);
             resetBreaking();
         }
+    }
+
+    /** Advances or completes the destruction of an interactive block. */
+    private void breakInteractiveBlock(GameMaster gameMaster, World world,
+                                       BlockPos cell, iBlock block) {
+        int x = cell.x();
+        int y = cell.y();
+        int z = cell.z();
+
+        if (breakingX != x || breakingY != y || breakingZ != z) {
+            breakingX = x;
+            breakingY = y;
+            breakingZ = z;
+            breakProgress = 0.0f;
+            lastBreakTime = System.nanoTime();
+        }
+
+        if (Player.plyr.getGamemode().isGodmode()) {
+            destroyInteractiveBlock(gameMaster, world, block);
+            resetBreaking();
+            return;
+        }
+
+        long now = System.nanoTime();
+        float deltaTime = (now - lastBreakTime) / 1_000_000_000.0f;
+        lastBreakTime = now;
+        breakProgress += deltaTime / block.getType().getDestroyTime();
+
+        if (breakProgress >= 1.0f) {
+            destroyInteractiveBlock(gameMaster, world, block);
+            resetBreaking();
+        }
+    }
+
+    /** Removes an interactive block and drops it together with all its contents. */
+    private void destroyInteractiveBlock(GameMaster gameMaster, World world, iBlock block) {
+        Vector3f dropPosition = new Vector3f(
+                block.getX() + 0.5f, block.getY() + 0.5f, block.getZ() + 0.5f);
+
+        world.removeInteractiveBlockAt(block.getX(), block.getY(), block.getZ());
+        gameMaster.addEntity(new WorldItem(new iBlock(block.getType()), 1,
+                new Vector3f(dropPosition)));
+
+        for (InventorySlot slot : block.getInventory().getSlots()) {
+            if (slot.isEmpty()) continue;
+            gameMaster.addEntity(new WorldItem(slot.getItem(), slot.getAmount(),
+                    new Vector3f(dropPosition)));
+        }
+        block.getInventory().clear();
+        gameMaster.getGameUIService().logAction(
+                new BlockPos(block.getType(), block.getX(), block.getY(), block.getZ()));
+        log.trace("Interactive block removed: {} at {},{},{}",
+                block.getType().getName().toUpperCase(),
+                block.getX(), block.getY(), block.getZ());
     }
 
     /** Removes a stackable crop from the selected segment upwards. */
@@ -543,7 +611,9 @@ public class GameInteraction {
                 List<BlockPos> destroyedBlocks = TreeService.chop(gameMaster, axe);
                 for (BlockPos pos : destroyedBlocks) {
                     GameMaster.game.getGameUIService().logAction(new BlockPos(blockData, pos.x(), pos.y(), pos.z()));
-                    BlockData bData = pos.data();
+                    if (!(pos.data() instanceof BlockData bData)) {
+                        continue;
+                    }
                     Block brokenBlock = new Block(bData, pos.x(), pos.y(), pos.z());
 
                     if (bData.hasDrops()) {
@@ -637,6 +707,47 @@ public class GameInteraction {
         int normalX = GameMaster.game.getOrthoCamera().getLastHitNormalX();
         int normalY = GameMaster.game.getOrthoCamera().getLastHitNormalY();
         int normalZ = GameMaster.game.getOrthoCamera().getLastHitNormalZ();
+
+        if (selectedItem instanceof iBlock interactiveBlock) {
+            int placeX = cell.x() + normalX;
+            int placeY = cell.y() + normalY;
+            int placeZ = cell.z() + normalZ;
+
+            if (player.intersectsBlock(placeX, placeY, placeZ)) return;
+            if (world.getInteractiveBlockAt(placeX, placeY, placeZ) != null) return;
+
+            BlockData target = BlockData.fromId(
+                    world.getBlockTypeAt(placeX, placeY, placeZ));
+            boolean replacesWater = target == BlockData.WATER;
+            if (target == null || (target != BlockData.AIR && !replacesWater)
+                    || world.getCropAt(placeX, placeY, placeZ) != null) {
+                return;
+            }
+
+            if (replacesWater
+                    && !WaterSimulation.ws.removeWater(placeX, placeY, placeZ)) {
+                return;
+            }
+
+            Vector3f playerPosition = player.getPosition();
+            float directionX = playerPosition.x - (placeX + 0.5f);
+            float directionZ = playerPosition.z - (placeZ + 0.5f);
+            float orientation = (float) Math.atan2(directionX, directionZ)
+                    + (float) Math.PI;
+            float quarterTurn = (float) (Math.PI * 0.5);
+            orientation = Math.round(orientation / quarterTurn) * quarterTurn;
+
+            iBlock placedBlock = new iBlock(
+                    interactiveBlock.getType(), placeX, placeY, placeZ, orientation);
+            world.addInteractiveBlock(placedBlock);
+            WaterSimulation.ws.onBlockPlaced(placeX, placeY, placeZ);
+            player.remove(selectedItem);
+            GameMaster.game.getGameUIService().logAction(
+                    new BlockPos(placedBlock.getType(), placeX, placeY, placeZ));
+            log.trace("Interactive block placed: {} at {},{},{}",
+                    placedBlock.getType().getName().toUpperCase(), placeX, placeY, placeZ);
+            return;
+        }
 
         if (selectedItem instanceof Block block) {
             int placeX = cell.x() + normalX;

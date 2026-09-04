@@ -17,6 +17,7 @@ public class Block implements Craftable {
     private BlockData type;
     private int x, y, z;
     private int waterLevel = 15;
+    private boolean isInteractive;
 
     /**
      * Creates a new {@code Block} instance.
@@ -33,6 +34,7 @@ public class Block implements Craftable {
         this.x = x;
         this.y = y;
         this.z = z;
+        this.isInteractive = false;
     }
 
     /**
@@ -176,6 +178,22 @@ public class Block implements Craftable {
      */
     public boolean hasWater() {
         return waterLevel > 0;
+    }
+
+    /**
+     * Checks whether the interactive condition is met.
+     * @return {@code true} if interactive; otherwise {@code false}
+     */
+    public boolean isInteractive() {
+        return isInteractive;
+    }
+
+    /**
+     * Sets the isInteractive value
+     * @param interactive the interactive value
+     */
+    public void setInteractive(boolean interactive) {
+        isInteractive = interactive;
     }
 
     /**

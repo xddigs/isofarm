@@ -283,8 +283,6 @@ public class GameUIService implements Service<GameMaster> {
         if (BookService.bs.isOpen()) {
             BookUI.bui.update(BookService.bs.getOpenedBook(),
                     ResourceManager.rem.getBookAnimationSheet());
-        } else {
-            uiManager.hideTooltip();
         }
 
         ToastFactory.update(delta);

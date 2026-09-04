@@ -40,6 +40,7 @@ public class InventoryUI extends UIElement {
     private UIButton backpackButton;
     private final Player player = Player.plyr;
     private Inventory inventory;
+    private iBlock containerBlock;
     private Tab currentTab;
     private SpriteSheet seedIcons;
     private SpriteSheet cropIcons;
@@ -384,6 +385,7 @@ public class InventoryUI extends UIElement {
             hotbarUI.setInventoryMode(false);
         }
         returnCarriedItem();
+        closeContainer();
     }
 
     /**
@@ -477,7 +479,8 @@ public class InventoryUI extends UIElement {
 
     /** Switches the controls and contents when GODMODE changes. */
     private void updateInventoryMode() {
-        boolean creative = player != null && player.getGamemode().isGodmode();
+        boolean creative = containerBlock == null
+                && player != null && player.getGamemode().isGodmode();
         if (creative == isGodmode) return;
 
         isGodmode = creative;
@@ -579,7 +582,7 @@ public class InventoryUI extends UIElement {
     /** Assigns the requested representative item icon to every creative tab. */
     private void configureCreativeTabIcons() {
         Item[] icons = {
-                new Block(BlockData.DIRT),
+                new Block(BlockData.GRASS),
                 new Hoe(Tier.DIAMOND),
                 new Backpack(),
                 new Produce(CropType.WHEAT),
@@ -977,6 +980,28 @@ public class InventoryUI extends UIElement {
      */
     public void setInventory(Inventory inventory) {
         this.inventory = inventory;
+    }
+
+    /**
+     * Opens the inventory owned by an interactive block.
+     *
+     * @param block the block whose inventory will be displayed
+     */
+    public void openContainer(iBlock block) {
+        if (block == null || GameMaster.game == null) return;
+
+        this.containerBlock = block;
+        this.inventory = block.getInventory();
+        GameMaster.game.setInventoryOpen(true);
+    }
+
+    /** Restores the player's inventory after closing a block container. */
+    private void closeContainer() {
+        if (containerBlock == null) return;
+
+        containerBlock.setActivated(false);
+        containerBlock = null;
+        inventory = player == null ? null : player.getInventory();
     }
 
     /**

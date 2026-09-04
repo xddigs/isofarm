@@ -200,6 +200,25 @@ public class GameRenderer {
             sheet.unbind();
         });
 
+        gameMaster.getWorld().forEachInteractiveBlock(block -> {
+            if (block.getBlockModel() == null) return;
+
+            block.animate();
+            defaultShader.setUniform("uUseFaceAtlas", false);
+            defaultShader.setUniform("uIsSprite", false);
+            defaultShader.setUniform("uUseTexture", true);
+            defaultShader.setUniform("uSunColor", lighting.getColor());
+            defaultShader.setUniform("uSkyColor", TimeService.getSkyColor());
+            defaultShader.setUniform("uLightDirection", lighting.getDirection());
+            defaultShader.setUniform("uLightIntensity", lighting.getIntensity());
+            defaultShader.setUniform("uAmbientIntensity", lighting.getAmbientIntensity());
+
+            modelMatrix.identity().translate(
+                    block.getX() + 0.5f, block.getY(), block.getZ() + 0.5f)
+                    .rotateY(block.getOrientation());
+            block.getBlockModel().render(defaultShader, modelMatrix);
+        });
+
         defaultShader.setUniform("uIsWater", false);
         defaultShader.setUniform("uIsSubmergedEntity", false);
 
