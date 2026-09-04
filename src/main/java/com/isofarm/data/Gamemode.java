@@ -1,5 +1,7 @@
 package com.isofarm.data;
 
+import java.util.Locale;
+
 /**
  * Enumerates the supported gamemode values.
  */
@@ -22,6 +24,14 @@ public enum Gamemode {
      */
     public byte getId() {
         return id;
+    }
+
+    /**
+     * Returns the name.
+     * @return {@code String} the name
+     */
+    public String getName() {
+        return name().toLowerCase(Locale.ROOT);
     }
 
     /**

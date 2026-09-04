@@ -7,31 +7,26 @@ import java.util.function.Consumer;
  * Enumerates the supported tier values.
  */
 public enum Tier {
-    NONE((byte) -1, "None", 0),
-    LEATHER((byte) 0, "Leather", 1),
-
-    WOODEN((byte) 0, "Wooden", 64),
-
-    COPPER((byte) 1, "Copper", 128),
-    IRON((byte) 2, "Iron", 160),
-    STEEL((byte) 3, "Steel", 192),
-    GOLDEN((byte) 4, "Golden", 64),
-    PLATINUM((byte) 5, "Platinum", 512),
-    DIAMOND((byte) 6, "Diamond", 1024);
+    NONE((byte) -1, 0),
+    LEATHER((byte) 0, 1),
+    WOODEN((byte) 0, 64),
+    COPPER((byte) 1, 128),
+    IRON((byte) 2, 160),
+    STEEL((byte) 3, 192),
+    GOLDEN((byte) 4, 64),
+    PLATINUM((byte) 5, 512),
+    DIAMOND((byte) 6, 1024);
 
     private final byte id;
-    private final String name;
     private final int durability;
 
     /**
      * Creates a new {@code Tier} instance.
      * @param id the id value
-     * @param name the name value
      * @param durability the durability value
      */
-    Tier(byte id, String name, int durability) {
+    Tier(byte id, int durability) {
         this.id = id;
-        this.name = name;
         this.durability = durability;
     }
 
@@ -48,7 +43,7 @@ public enum Tier {
      * @return the name
      */
     public String getName() {
-        return name;
+        return name().toLowerCase(Locale.ROOT);
     }
 
     /**
@@ -61,7 +56,7 @@ public enum Tier {
     }
 
     /**
-     * Performs the to str operation.
+     * Performs the to {@link String} operation.
      * @param tier the tier value
      * @return the to str result
      */

@@ -1,17 +1,21 @@
 package com.isofarm.data;
 
+import com.isofarm.utils.Local;
+
+import java.util.Locale;
+
 /**
  * Enumerates the supported enchantments values.
  */
 public enum Enchantments {
-    EFFICIENCY(0, "Efficiency", "Efficient ", "Break blocks faster", new ToolType[]{ToolType.HOE, ToolType.AXE, ToolType.PICKAXE, ToolType.SHOVEL}, 3, false),
-    DURABILITY(1, "Durability", "Long Lasting ", "Reduces durability loss", new ToolType[]{ToolType.HOE, ToolType.AXE , ToolType.PICKAXE, ToolType.SHOVEL, ToolType.SWORD}, 3, false),
-    FORTUNE(2, "Fortune", "Fortunate ", "Gives a chance for extra drops", new ToolType[]{ToolType.HOE, ToolType.AXE, ToolType.PICKAXE, ToolType.SHOVEL}, 3, false),
-    SHARPNESS(3, "Sharpness", "Sharp ", "Deals more damage to enemies", new ToolType[]{ToolType.SWORD, ToolType.AXE}, 3, false),
-    HARVEST(4, "Harvest", "Harvesting ", "Increases crop yield when harvesting", new ToolType[]{ToolType.HOE}, 2, false),
-    SWIFT(5, "Swift", "Swifted ", "Increases movement speed while equipped", new ToolType[]{ToolType.HOE, ToolType.AXE, ToolType.PICKAXE, ToolType.SHOVEL, ToolType.SWORD}, 2, false),
-    REPAIR(6, "Repair", "Repairing ", "Restores a small amount of durability over time", new ToolType[]{ToolType.HOE, ToolType.AXE, ToolType.PICKAXE, ToolType.SHOVEL, ToolType.SWORD}, 1, true),
-    LUCKY(7, "Lucky", "Lucky ", "Gives a small chance to avoid consuming durability", new ToolType[]{ToolType.HOE, ToolType.AXE, ToolType.PICKAXE, ToolType.SHOVEL, ToolType.SWORD}, 1, true);
+    EFFICIENCY(0, new ToolType[]{ToolType.HOE, ToolType.AXE, ToolType.PICKAXE, ToolType.SHOVEL}, 3, false),
+    DURABILITY(1, new ToolType[]{ToolType.HOE, ToolType.AXE, ToolType.PICKAXE, ToolType.SHOVEL, ToolType.SWORD}, 3, false),
+    FORTUNE(2, new ToolType[]{ToolType.HOE, ToolType.AXE, ToolType.PICKAXE, ToolType.SHOVEL}, 3, false),
+    SHARPNESS(3, new ToolType[]{ToolType.SWORD, ToolType.AXE}, 3, false),
+    HARVEST(4, new ToolType[]{ToolType.HOE}, 2, false),
+    SWIFT(5, new ToolType[]{ToolType.HOE, ToolType.AXE, ToolType.PICKAXE, ToolType.SHOVEL, ToolType.SWORD}, 2, false),
+    REPAIR(6, new ToolType[]{ToolType.HOE, ToolType.AXE, ToolType.PICKAXE, ToolType.SHOVEL, ToolType.SWORD}, 1, true),
+    LUCKY(7, new ToolType[]{ToolType.HOE, ToolType.AXE, ToolType.PICKAXE, ToolType.SHOVEL, ToolType.SWORD}, 1, true);
 
     private static final Enchantments[] BY_ID;
     static {
@@ -22,9 +26,6 @@ public enum Enchantments {
     }
 
     private final int id;
-    private final String name;
-    private final String displayName;
-    private final String description;
     private final ToolType[] applicableTools;
     private final int maxLevel;
     private final boolean singleLevel;
@@ -32,19 +33,13 @@ public enum Enchantments {
     /**
      * Creates a new {@code Enchantments} instance.
      * @param id the id value
-     * @param name the name value
-     * @param displayName the display name value
-     * @param description the description value
      * @param applicableTools the applicable tools value
      * @param maxLevel the max level value
      * @param singleLevel the single level value
      */
-    Enchantments(int id, String name, String displayName, String description,
-                 ToolType[] applicableTools, int maxLevel, boolean singleLevel) {
+    Enchantments(int id, ToolType[] applicableTools,
+                 int maxLevel, boolean singleLevel) {
         this.id = id;
-        this.name = name;
-        this.displayName = displayName;
-        this.description = description;
         this.applicableTools = applicableTools;
         this.maxLevel = maxLevel;
         this.singleLevel = singleLevel;
@@ -60,10 +55,10 @@ public enum Enchantments {
 
     /**
      * Returns the name.
-     * @return the name
+     * @return {@code String} the name
      */
     public String getName() {
-        return name;
+        return name().toLowerCase(Locale.ROOT);
     }
 
     /**
@@ -71,7 +66,15 @@ public enum Enchantments {
      * @return the display name
      */
     public String getDisplayName() {
-        return displayName;
+        return Local.lang.t(getTranslationKey() + ".name");
+    }
+
+    /**
+     * Returns the localized adjective used to decorate enchanted item names.
+     * @return the localized adjective
+     */
+    public String getAdjective() {
+        return Local.lang.t(getTranslationKey() + ".adjective");
     }
 
     /**
@@ -79,7 +82,15 @@ public enum Enchantments {
      * @return the description
      */
     public String getDescription() {
-        return description;
+        return Local.lang.t(getTranslationKey() + ".description");
+    }
+
+    /**
+     * Returns the common localization-key prefix for this enchantment.
+     * @return the localization-key prefix
+     */
+    public String getTranslationKey() {
+        return "enchantment." + getName();
     }
 
     /**

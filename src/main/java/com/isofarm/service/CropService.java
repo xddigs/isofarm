@@ -39,7 +39,7 @@ public class CropService implements Service<Crop> {
         if (type == null || !hasValidSubstrate(world, x, y, z, type)) {
             log.warn("Attempted to plant {} at ({}, {}, {}) on invalid terrain",
                     type == null ? "unknown crop" : type.getName(), x, y, z);
-            ToastFactory.warning(type == CropType.SUGAR_CANE
+            ToastFactory.warning(type == CropType.SUGAR_CANE_CROP
                     ? "toast.sugar_cane_terrain_warn"
                     : "toast.tilled_dirt_warn");
             return null;
@@ -57,17 +57,17 @@ public class CropService implements Service<Crop> {
             return null;
         }
 
-        var seedOpt = player.getInventory().getItems().keySet().stream().filter(
-                Seed.class::isInstance).map(Seed.class::cast).filter(
+        var plantableOptional = player.getInventory().getItems().keySet().stream().filter(
+                Plantable.class::isInstance).map(Plantable.class::cast).filter(
                         seed -> seed.getType() == type).findFirst();
 
-        if (seedOpt.isEmpty()) {
+        if (plantableOptional.isEmpty()) {
             log.warn("You don't have seeds of {}", type.getName());
             ToastFactory.error(Local.lang.f("toast.not_enough_seeds", type.getDisplayName()));
             return null;
         }
 
-        player.remove(seedOpt.get(), 1);
+        player.remove(plantableOptional.get(), 1);
         int baseY = findColumnBase(world, x, y, z, type);
         BlockData substrate = BlockData.fromId(world.getBlockTypeAt(x, baseY, z));
         Crop newCrop = new Crop(x, y, z, type,
@@ -82,7 +82,7 @@ public class CropService implements Service<Crop> {
      */
     private boolean hasValidSubstrate(World world, int x, int y, int z,
                                       CropType type) {
-        if (type != CropType.SUGAR_CANE) {
+        if (type != CropType.SUGAR_CANE_CROP) {
             return world.getBlockTypeAt(x, y, z) == BlockData.TILLED_DIRT.getId();
         }
 
@@ -157,12 +157,12 @@ public class CropService implements Service<Crop> {
 
         if (player.hasSpace()) {
             player.add(new Produce(crop.getCropType()), yield);
-            if (!crop.getCropType().equals(CropType.SUGAR_CANE)) {
+            if (!crop.getCropType().equals(CropType.SUGAR_CANE_CROP)) {
                 player.add(new Seed(crop.getCropType()), seeds);
             }
         } else {
             player.addToBackpack(new Produce(crop.getCropType()), yield);
-            if (!crop.getCropType().equals(CropType.SUGAR_CANE)) {
+            if (!crop.getCropType().equals(CropType.SUGAR_CANE_CROP)) {
                 player.addToBackpack(new Seed(crop.getCropType()), seeds);
             }
         }

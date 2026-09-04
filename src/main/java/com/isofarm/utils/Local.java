@@ -110,4 +110,19 @@ public class Local {
         String tierName = t(tierKey);
         return f("item.format.tiered", tierName, itemName);
     }
+
+    /**
+     * Formats an enchanted item name according to the active language's
+     * grammatical ordering.
+     *
+     * @param itemKey localization key of the base item
+     * @param enchantmentKey common enchantment key without the
+     *                       {@code .adjective} suffix
+     * @return the localized enchanted item name
+     */
+    public static String enchanted(String itemKey, String enchantmentKey) {
+        String itemName = lang.t(itemKey);
+        String adjective = lang.t(enchantmentKey + ".adjective");
+        return lang.f("item.enchanted.format", adjective, itemName);
+    }
 }

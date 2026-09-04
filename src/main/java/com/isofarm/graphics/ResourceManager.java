@@ -69,7 +69,7 @@ public class ResourceManager {
         cropSpritesheets.put(CropType.CARROT, carrot);
         cropSpritesheets.put(CropType.POTATO, potato);
         cropSpritesheets.put(CropType.BEETROOT, beetroot);
-        cropSpritesheets.put(CropType.SUGAR_CANE, sugarCane);
+        cropSpritesheets.put(CropType.SUGAR_CANE_CROP, sugarCane);
     }
 
     /**
@@ -86,9 +86,9 @@ public class ResourceManager {
     public static SpriteSheet getItemSpriteSheet(Item item) {
         return switch (item) {
             case Crop crop -> cropSpritesheets.get(crop.getCropType());
-            case Produce produce when produce.getType() == CropType.SUGAR_CANE -> sugarCane;
+            case Produce produce when produce.getType() == CropType.SUGAR_CANE_CROP -> sugarCane;
             case Produce ignored -> cropIcons;
-            case Seed seed when seed.getType() == CropType.SUGAR_CANE -> sugarCane;
+            case Seed seed when seed.getType() == CropType.SUGAR_CANE_CROP -> sugarCane;
             case Seed ignored -> seedIcons;
             case Tool ignored -> toolIcons;
             case Material ignored -> materialIcons;
@@ -142,14 +142,14 @@ public class ResourceManager {
         }
 
         if (item instanceof Produce produce && produce.getType() != null) {
-            if (produce.getType() == CropType.SUGAR_CANE) {
+            if (produce.getType() == CropType.SUGAR_CANE_CROP) {
                 return GrowthStage.HARVESTABLE.getFrameIndex();
             }
             return produce.getType().getId();
         }
 
         if (item instanceof Seed seed && seed.getType() != null) {
-            if (seed.getType() == CropType.SUGAR_CANE) {
+            if (seed.getType() == CropType.SUGAR_CANE_CROP) {
                 return GrowthStage.SEED.getFrameIndex();
             }
             return seed.getType().getId();

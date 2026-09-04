@@ -2,18 +2,19 @@ package com.isofarm.data;
 
 import com.isofarm.utils.Local;
 
+import java.util.Locale;
+
 /**
  * Enumerates the supported crop type values.
  */
 public enum CropType {
-    WHEAT((byte) 0, "Wheat", "crop.wheat", 4, 5, 4),
-    CARROT((byte) 1, "Carrot", "crop.carrot", 3, 8, 6),
-    POTATO((byte) 2, "Potato", "crop.potato", 6, 12, 8),
-    BEETROOT((byte) 3, "Beetroot", "crop.beetroot", 4, 16, 2),
-    SUGAR_CANE((byte) 4, "Sugar Cane", "crop.sugar_cane", 3, 10, 2);
+    WHEAT((byte) 0, "crop.wheat", 4, 5, 4),
+    CARROT((byte) 1, "crop.carrot", 3, 8, 6),
+    POTATO((byte) 2, "crop.potato", 6, 12, 8),
+    BEETROOT((byte) 3, "crop.beetroot", 4, 16, 2),
+    SUGAR_CANE_CROP((byte) 4, "crop.sugar_cane", 3, 10, 2);
 
     private final byte id;
-    private final String name;
     private final String displayName;
     private final int yield;
     private final int value;
@@ -22,16 +23,14 @@ public enum CropType {
     /**
      * Creates a new {@code CropType} instance.
      * @param id the id value
-     * @param name the name value
      * @param displayName the display name value
      * @param yield the yield value
      * @param value the value value
      * @param seeds the seeds value
      */
-    CropType(byte id, String name, String displayName,
+    CropType(byte id, String displayName,
              int yield, int value, int seeds) {
         this.id = id;
-        this.name = name;
         this.displayName = displayName;
         this.yield = yield;
         this.value = value;
@@ -51,7 +50,7 @@ public enum CropType {
      * @return the name
      */
     public String getName() {
-        return name;
+        return name().toLowerCase(Locale.ROOT);
     }
 
     /**
@@ -92,7 +91,7 @@ public enum CropType {
      * @return {@code true} only for sugar cane
      */
     public boolean isStackable() {
-        return this == SUGAR_CANE;
+        return this == SUGAR_CANE_CROP;
     }
 
     /**
@@ -101,7 +100,7 @@ public enum CropType {
      * @return {@code true} when the plant mesh should be used
      */
     public boolean usesPlantMesh() {
-        return this == SUGAR_CANE;
+        return this == SUGAR_CANE_CROP;
     }
 
     /**

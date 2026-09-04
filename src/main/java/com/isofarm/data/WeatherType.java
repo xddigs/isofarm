@@ -2,31 +2,30 @@ package com.isofarm.data;
 
 import com.isofarm.utils.Local;
 
+import java.util.Locale;
+
 /**
  * Enumerates the supported weather type values.
  */
 public enum WeatherType {
-    CLEAR("Sunny", 1.0f, 0, 0.0f),
-    RAIN("Rain", 1.25f, 2, 0.0f),
-    THUNDERSTORM("Thunderstorm", 0.5f, 5, 0.05f),
-    DROUGHT("Draught", 0.0f, -1, 0.0f),
-    FROST("Ice Age", 0.0f, 0, 0.10f);
+    CLEAR(1.0f, 0, 0.0f),
+    RAIN(1.25f, 2, 0.0f),
+    THUNDERSTORM(0.5f, 5, 0.05f),
+    DROUGHT(0.0f, -1, 0.0f),
+    FROST(0.0f, 0, 0.10f);
 
-    private final String name;
     private final float growthMultiplier;
     private final int waterDPS;
     private final float cropDamageChance;
 
     /**
      * Creates a new {@code WeatherType} instance.
-     * @param name the name value
      * @param growthMultiplier the growth multiplier value
      * @param waterDPS the water dps value
      * @param cropDamageChance the crop damage chance value
      */
-    WeatherType(String name, float growthMultiplier,
+    WeatherType(float growthMultiplier,
                 int waterDPS, float cropDamageChance) {
-        this.name = name;
         this.growthMultiplier = growthMultiplier;
         this.waterDPS = waterDPS;
         this.cropDamageChance = cropDamageChance;
@@ -36,7 +35,7 @@ public enum WeatherType {
      * Returns the name.
      * @return the name
      */
-    public String getName() { return name; }
+    public String getName() { return name().toLowerCase(Locale.ROOT); }
     /**
      * Returns the display name.
      * @return the display name

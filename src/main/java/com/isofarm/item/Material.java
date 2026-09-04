@@ -57,7 +57,7 @@ public class Material implements Craftable, Plantable {
      */
     @Override
     public CropType getType() {
-        if (isSugarCane()) return CropType.SUGAR_CANE;
+        if (isSugarCane()) return CropType.SUGAR_CANE_CROP;
         return null;
     }
 

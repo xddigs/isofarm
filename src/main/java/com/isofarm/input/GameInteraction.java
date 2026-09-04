@@ -575,7 +575,7 @@ public class GameInteraction {
         GameMaster.game.addEntity(dropEntity);
 
         GameMaster.game.getGameUIService().logAction(cell);
-        log.trace("Block removed: {} at {},{},{}", blockData.getDisplayName(), cell.x(), cell.y(), cell.z());
+        log.trace("Block removed: {} at {},{},{}", blockData.getName().toUpperCase(), cell.x(), cell.y(), cell.z());
         this.breakTimeout = TIMEOUT;
     }
 
@@ -650,7 +650,7 @@ public class GameInteraction {
             GameMaster.game.getGameUIService().logAction(
                     new BlockPos(newBlock.getType(), placeX, placeY, placeZ));
             log.trace("Block placed: {} at {},{},{}",
-                    newBlock.getType().getName(), placeX, placeY, placeZ);
+                    newBlock.getType().getName().toUpperCase(), placeX, placeY, placeZ);
             return;
         }
 
@@ -687,7 +687,7 @@ public class GameInteraction {
                 } while (crop != null && crop.getCropType() == p.getType());
 
                 if (crop != null) return;
-            } else if (p.getType() != CropType.SUGAR_CANE
+            } else if (p.getType() != CropType.SUGAR_CANE_CROP
                     && blockId != BlockData.TILLED_DIRT.getId()) {
                 log.trace("Cannot plant at {},{},{}: selected block is not TILLED_DIRT", x, y, z);
                 return;

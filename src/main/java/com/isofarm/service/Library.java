@@ -52,7 +52,7 @@ public class Library implements Service<GameMaster> {
 
         for (CropType type : CropType.values()) {
             registerDefault(itemR, () -> new Produce(type));
-            if (type.equals(CropType.SUGAR_CANE)) continue;
+            if (type.equals(CropType.SUGAR_CANE_CROP)) continue;
             registerDefault(itemR, () -> new Seed(type));
         }
 
@@ -182,7 +182,7 @@ public class Library implements Service<GameMaster> {
         }));
 
         cr.register(new Command("/gm", new CommandArgument[]{dynamic("mode", () ->
-                Arrays.stream(Gamemode.values()).map(Enum::name).toList())}, args -> {
+                Arrays.stream(Gamemode.values()).map(Gamemode::getName).toList())}, args -> {
             if (player == null) {
                 log.warn("Cannot execute command: player does not exist.");
                 return;
@@ -199,7 +199,7 @@ public class Library implements Service<GameMaster> {
             player.setGamemode(targetMode);
             if (targetMode.isNoClip()) gameMaster.toggleHUD();
             log.info("Command gamemode executed: {}", targetMode);
-            ToastFactory.success(Local.lang.f("toast.gamemode_changed", targetMode.name().toLowerCase()));
+            ToastFactory.success(Local.lang.f("toast.gamemode_changed", targetMode.getName()));
         }));
 
         cr.register(new Command("/gamerule", new CommandArgument[]{dynamic("rule", () ->
