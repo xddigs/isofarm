@@ -21,6 +21,8 @@ public class Camera implements CameraView {
 
     private static final float DEFAULT_YAW = 45.0f;
     private static final float PITCH = 35.2643897f;
+    private static final float MAX_DAMAGE_TILT = 3.0f;
+    private static final float DAMAGE_TILT_RECOVERY = 7.0f;
 
     private static final float NEAR_PLANE = 0.1f;
     private static final float FAR_PLANE = 2000.0f;
@@ -31,6 +33,8 @@ public class Camera implements CameraView {
 
     private float zoom = 25.0f;
     private float aspectRatio = 1.0f;
+    private float damageTilt;
+    private boolean tiltRight;
 
     private BlockPos lastHit;
     private int lastHitNormalX;
@@ -79,6 +83,7 @@ public class Camera implements CameraView {
     public Matrix4f getViewMatrix() {
         return new Matrix4f()
                 .identity()
+                .rotateZ((float) Math.toRadians(damageTilt))
                 .rotateX((float) Math.toRadians(PITCH))
                 .rotateY((float) Math.toRadians(yaw))
                 .translate(-position.x, -position.y, -position.z);
@@ -109,6 +114,34 @@ public class Camera implements CameraView {
     @Override
     public float getYaw() {
         return yaw;
+    }
+
+    /**
+     * Applies a small screen tilt in response to player damage.
+     * Consecutive impacts alternate direction to avoid a permanent visual bias.
+     *
+     * @param amount the received damage
+     */
+    public void applyDamageTilt(float amount) {
+        if (amount <= 0.0f) return;
+
+        tiltRight = !tiltRight;
+        float strength = Math.clamp(0.75f + amount * 0.2f,
+                0.75f, MAX_DAMAGE_TILT);
+        damageTilt = tiltRight ? strength : -strength;
+    }
+
+    /**
+     * Smoothly restores the camera to its normal roll.
+     *
+     * @param delta frame time in seconds
+     */
+    public void updateDamageTilt(float delta) {
+        if (delta <= 0.0f || damageTilt == 0.0f) return;
+
+        damageTilt = lerp(damageTilt, 0.0f,
+                Math.clamp(DAMAGE_TILT_RECOVERY * delta, 0.0f, 1.0f));
+        if (Math.abs(damageTilt) < 0.01f) damageTilt = 0.0f;
     }
 
     /**

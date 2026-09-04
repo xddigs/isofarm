@@ -74,6 +74,9 @@ public class Player extends Character {
     @Override
     public void onDamageTaken(float amount) {
         gameplay.onDamageTaken(amount);
+        if (GameMaster.game != null && GameMaster.game.getOrthoCamera() != null) {
+            GameMaster.game.getOrthoCamera().applyDamageTilt(amount);
+        }
     }
 
     /**

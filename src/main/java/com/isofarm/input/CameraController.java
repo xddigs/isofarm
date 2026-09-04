@@ -36,6 +36,8 @@ public record CameraController(Camera camera) implements Service<Camera> {
      * @param delta the delta value
      */
     public void update(GameMaster gameMaster, float delta) {
+        camera.updateDamageTilt(delta);
+
         if (gameMaster.isInventoryOpen() || gameMaster.isChatOpen()) {
             lastGoal = null;
             return;
