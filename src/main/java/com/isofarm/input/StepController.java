@@ -24,12 +24,11 @@ public class StepController {
     /**
      * Updates the current state.
      * @param gameMaster the game master value
-     * @param player the player value
      * @param soundService the sound service value
      * @param delta the delta value
      */
-    public void update(GameMaster gameMaster, Player player, SoundService soundService, float delta) {
-        if (player == null) return;
+    public void update(GameMaster gameMaster, SoundService soundService, float delta) {
+        Player player = Player.plyr;
         Vector3f currentPos = player.getPosition();
         float dx = currentPos.x - lastPosition.x;
         float dz = currentPos.z - lastPosition.z;

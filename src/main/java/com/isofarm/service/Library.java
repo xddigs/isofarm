@@ -23,12 +23,11 @@ public class Library implements Service<GameMaster> {
     /**
      * Initializes the items.
      * @param itemR the item r value
-     * @param player the player value
      */
-    public static void initItems(ItemRegistry itemR, Player player) {
+    public static void initItems(ItemRegistry itemR) {
         registerDefault(itemR, Backpack::new);
         registerDefault(itemR, () -> new Book(false));
-        registerDefault(itemR, () -> new CraftingBook(player));
+        registerDefault(itemR, CraftingBook::new);
         registerDefault(itemR, () -> new Bucket(BlockData.AIR));
 
         for (MaterialID material : MaterialID.values()) {
@@ -85,7 +84,7 @@ public class Library implements Service<GameMaster> {
      * @param gameMaster the game master value
      */
     public static void initCommands(float delta, GameMaster gameMaster) {
-        Player player = gameMaster.getPlayer();
+        Player player = Player.plyr;
         CommandRegistry cr = gameMaster.getCommandRegistry();
         ItemRegistry ir = gameMaster.getItemRegistry();
         WeatherService weatherService = WeatherService.wes;

@@ -4,35 +4,46 @@ import com.isofarm.data.BlockPos;
 import com.isofarm.data.Direction;
 import com.isofarm.data.PlayerState;
 import com.isofarm.data.RenderPass;
+import com.isofarm.data.Singleton;
 import com.isofarm.entity.plyr.PlayerAnimator;
 import com.isofarm.entity.plyr.PlayerGameplay;
 import com.isofarm.entity.plyr.PlayerManager;
 import com.isofarm.item.Item;
 import com.isofarm.pathfinding.GridPos;
 import com.isofarm.wrld.GameMaster;
-import com.isofarm.wrld.World;
 import org.joml.Vector3f;
 
 import java.util.List;
 
 /** Represents the local player and orchestrates its focused components. */
+@Singleton
 public class Player extends Character {
+    /** Shared player instance. */
+    public static final Player plyr;
+
+    static {
+        plyr = new Player();
+        plyr.initialize();
+    }
     private final PlayerAnimator animator;
     private final PlayerGameplay gameplay;
     private final PlayerManager manager;
 
     /**
      * Creates and initializes a player.
-     * @param name player name
-     * @param world spawn world
      */
-    public Player(String name, World world) {
-        super(name);
-        gameplay = new PlayerGameplay(this);
-        manager = new PlayerManager(this);
-        animator = new PlayerAnimator(this);
-        gameplay.initialize(world);
+    private Player() {
+        super(null);
+        gameplay = new PlayerGameplay();
+        manager = new PlayerManager();
+        animator = new PlayerAnimator();
+    }
+
+    /** Initializes singleton components after the shared instance is assigned. */
+    private void initialize() {
+        gameplay.initialize();
         manager.initialize();
+        animator.initialize();
     }
 
     /** {@inheritDoc} */
@@ -53,17 +64,17 @@ public class Player extends Character {
     /** Starts the attack animation. */ public void interact() { animator.interact(); }
     /** @return whether an attack animation is active */ public boolean isAttacking() { return animator.isAttacking(); }
     /** @param state state to enter */ public void changeState(PlayerState state) { manager.changeState(state); }
-    /** @param world world @param velocity velocity @param delta frame time */ public void autoJump(World world, Vector3f velocity, float delta) { manager.autoJump(world, velocity, delta); }
+    /** @param velocity velocity @param delta frame time */ public void autoJump(Vector3f velocity, float delta) { manager.autoJump(velocity, delta); }
     /** @return active state */ public PlayerState getCurrentState() { return manager.getCurrentState(); }
     /** @param state state to store */ public void setCurrentState(PlayerState state) { manager.setCurrentState(state); }
     /** Respawns the player. */ public void respawn() { gameplay.respawn(); }
     /** Resets attributes. */ public void resetAttributes() { gameplay.resetAttributes(); }
     /** @return damage event sequence */ public int getDamageSequence() { return gameplay.getDamageSequence(); }
-    /** @param world world @param delta frame time */ public void move(World world, float delta) { manager.move(world, delta); }
-    /** @param world world @param delta frame time @param yaw camera yaw @param flying flight flag */ public void wasd(World world, float delta, float yaw, boolean flying) { manager.wasd(world, delta, yaw, flying); }
+    /** @param delta frame time */ public void move(float delta) { manager.move(delta); }
+    /** @param delta frame time @param yaw camera yaw @param flying flight flag */ public void wasd(float delta, float yaw, boolean flying) { manager.wasd(delta, yaw, flying); }
     /** @param delta frame time @param yaw camera yaw @param flying flight flag */ public void fly(float delta, float yaw, boolean flying) { manager.fly(delta, yaw, flying); }
-    /** @return whether support exists below the proposed position */ public boolean hasGroundBelow(World world, float x, float z) { return manager.hasGroundBelow(world, x, z); }
-    /** {@inheritDoc} */ @Override protected void adjustVelocity(World world, float delta) { manager.adjustVelocity(world, delta); }
+    /** @return whether support exists below the proposed position */ public boolean hasGroundBelow(float x, float z) { return manager.hasGroundBelow(x, z); }
+    /** {@inheritDoc} */ @Override protected void adjustVelocity(float delta) { manager.adjustVelocity(delta); }
 
     /** @param item item @param amount quantity */ public void sell(Item item, int amount) { gameplay.sell(item, amount); }
     /** @param item item @param amount quantity */ public void add(Item item, int amount) { gameplay.add(item, amount); }

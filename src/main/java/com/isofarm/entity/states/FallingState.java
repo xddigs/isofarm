@@ -12,6 +12,7 @@ import com.isofarm.wrld.World;
  * Provides falling state behavior.
  */
 public class FallingState implements PlayerState {
+    private final Player player = Player.plyr;
     private static final float FALL_DISTANCE = 4.0f;
     private static final float DOUBLE_JUMP_WINDOW = 0.75f;
 
@@ -21,10 +22,9 @@ public class FallingState implements PlayerState {
 
     /**
      * Performs the enter operation.
-     * @param player the player value
      */
     @Override
-    public void enter(Player player) {
+    public void enter() {
         this.fallStartY = player.getPosition().y;
         this.fallTime = 0.0f;
         this.jumpTime = 0.0f;
@@ -34,11 +34,10 @@ public class FallingState implements PlayerState {
 
     /**
      * Performs the input operation.
-     * @param player the player value
      * @param gameMaster the game master value
      */
     @Override
-    public void input(Player player, GameMaster gameMaster) {
+    public void input(GameMaster gameMaster) {
         if (gameMaster.isInventoryOpen() || gameMaster.isChatOpen()) {
             return;
         }
@@ -51,11 +50,10 @@ public class FallingState implements PlayerState {
 
     /**
      * Updates the current state.
-     * @param player the player value
      * @param delta the delta value
      */
     @Override
-    public void update(Player player, float delta) {
+    public void update(float delta) {
         fallTime += delta;
         jumpTime += delta;
 
@@ -66,7 +64,7 @@ public class FallingState implements PlayerState {
         }
 
         float yaw = GameMaster.game.getActiveCamera().getYaw();
-        player.wasd(World.wrld, delta, yaw, false);
+        player.wasd(delta, yaw, false);
 
         if (player.isOnGround()) {
             float fallDistance = fallStartY - player.getPosition().y;
@@ -83,10 +81,9 @@ public class FallingState implements PlayerState {
 
     /**
      * Performs the exit operation.
-     * @param player the player value
      */
     @Override
-    public void exit(Player player) {
+    public void exit() {
         player.setFalling(false);
     }
 }

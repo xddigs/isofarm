@@ -337,7 +337,7 @@ public abstract class Entity {
 
         velocity.x += (targetVelocity.x - velocity.x) * smooth;
         velocity.z += (targetVelocity.z - velocity.z) * smooth;
-        adjustVelocity(world, delta);
+        adjustVelocity(delta);
 
         float submergedHeight = getFluidSubmersion(world);
         boolean inFluid = submergedHeight > 0.0f;
@@ -379,10 +379,9 @@ public abstract class Entity {
 
     /**
      * Performs the adjust velocity operation.
-     * @param world the world value
      * @param delta the delta value
      */
-    protected void adjustVelocity(World world, float delta) {}
+    protected void adjustVelocity(float delta) {}
 
     /**
      * Performs the check collision operation.

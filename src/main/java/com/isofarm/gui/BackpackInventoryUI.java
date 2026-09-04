@@ -20,6 +20,8 @@ public class BackpackInventoryUI extends InventoryUI {
      */
     public BackpackInventoryUI(float x, float y) {
         super(x, y);
+        backpack = Player.plyr.getBackpack();
+        setInventory(backpack);
         setBackpackUI(this);
         getButtons().forEach(this::removeChild);
 
@@ -55,23 +57,6 @@ public class BackpackInventoryUI extends InventoryUI {
     @Override
     public InventorySlotUI[] getSlotUIs() {
         return backpackSlots;
-    }
-
-    /**
-     * Sets the player.
-     * @param player the player value
-     */
-    @Override
-    public void setPlayer(Player player) {
-        super.setPlayer(player);
-
-        if (player != null) {
-            backpack = player.getBackpack();
-            setInventory(backpack);
-        } else {
-            backpack = null;
-            setInventory(null);
-        }
     }
 
     /**

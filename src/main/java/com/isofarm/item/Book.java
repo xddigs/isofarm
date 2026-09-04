@@ -227,9 +227,6 @@ public class Book extends Usable {
         return currentPage - 2 >= 0;
     }
 
-    /**
-     * Performs the reload operation.
-     * @param player the player value
-     */
-    public void reload(Player player) {}
+    /** Reloads dynamic book contents. */
+    public void reload() {}
 }

@@ -16,12 +16,12 @@ public class CraftingService {
 
     /**
      * Checks whether the craft condition is met.
-     * @param player the player value
      * @param recipe the recipe value
      * @return {@code true} if craft; otherwise {@code false}
      */
-    public boolean canCraft(Player player, Recipe recipe) {
-        if (player == null || recipe == null) return false;
+    public boolean canCraft(Recipe recipe) {
+        Player player = Player.plyr;
+        if (recipe == null) return false;
         Inventory inventory = player.getInventory();
         if (inventory == null) return false;
 
@@ -35,21 +35,21 @@ public class CraftingService {
 
     /**
      * Performs the craft operation.
-     * @param player the player value
      * @param recipe the recipe value
      * @return the craft result
      */
-    public boolean craft(Player player, Recipe recipe) {
-        if (player == null || recipe == null) return false;
+    public boolean craft(Recipe recipe) {
+        Player player = Player.plyr;
+        if (recipe == null) return false;
 
-        if (!canCraft(player, recipe)) {
+        if (!canCraft(recipe)) {
             ToastFactory.error("toast.no_ingredients");
             return false;
         }
 
         Inventory inventory = player.getInventory();
         consume(inventory, recipe);
-        give(player, recipe);
+        give(recipe);
         SoundService.fx.playEntitySound(SoundGroup.ITEMS);
         ToastFactory.success(Local.lang.f("toast.crafted", recipe.result().getDisplayName()));
         return true;
@@ -153,10 +153,10 @@ public class CraftingService {
 
     /**
      * Performs the give operation.
-     * @param player the player value
      * @param recipe the recipe value
      */
-    private void give(Player player, Recipe recipe) {
+    private void give(Recipe recipe) {
+        Player player = Player.plyr;
         Item result = recipe.result().copy();
         Inventory inventory = player.getInventory();
         int remaining = inventory.add(result, recipe.resultAmount());

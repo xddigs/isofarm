@@ -52,7 +52,6 @@ public class GameMaster {
     private CameraController orthoCameraController;
     private float windowWidth = K.Window.DEFAULT_WIDTH;
     private float windowHeight = K.Window.DEFAULT_HEIGHT;
-    private Player player;
     private Shop shop;
     private Difficulty difficulty = Difficulty.NORMAL;
 
@@ -107,12 +106,10 @@ public class GameMaster {
         recipes = RecipeRegistry.reg.init();
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
-        this.player = new Player(null, world);
-        addEntity(player);
-        shop.setPlayer(player);
+        addEntity(Player.plyr);
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
-        Library.initItems(itemRegistry, player);
+        Library.initItems(itemRegistry);
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
         Library.initCommands(genDelta, this);
@@ -140,7 +137,6 @@ public class GameMaster {
                 ResourceManager.rem.getMaterialIcons(),
                 ResourceManager.rem.getInventoryIcons());
 
-        gameUIservice.setPlayer(this.player);
         commandService.setGameUIService(gameUIservice);
         gameUIservice.setShop(shop);
 
@@ -148,8 +144,8 @@ public class GameMaster {
                 "Drew", "Eden", "Emery", "Finley", "Harper", "Hayden", "Jamie", "Jordan", "Jesse",
                 "Kai", "Kendall", "Logan", "Morgan", "Parker", "Quinn", "Reese", "Riley", "River",
                 "Robin", "Rowan", "Sam", "Shawn", "Skyler", "Taylor", "Terry", "Tristan", "Wren"};
-        player.setName(defaultNames[(int) (Math.random() * defaultNames.length)]);
-        ToastFactory.info(Local.lang.f("toast.open_inventory", player.getName()));
+        Player.plyr.setName(defaultNames[(int) (Math.random() * defaultNames.length)]);
+        ToastFactory.info(Local.lang.f("toast.open_inventory", Player.plyr.getName()));
     }
 
     /**
@@ -159,7 +155,7 @@ public class GameMaster {
         chunkManager.updateLoadedChunks(0, 0);
         GridPos spawn = world.getHighestY(0.5f, 0.5f);
         float spawnY = spawn.y() + 1.8f;
-        player.setPosition(0.5f, spawnY, 0.5f);
+        Player.plyr.setPosition(0.5f, spawnY, 0.5f);
         orthoCamera.setPosition(0.5f, spawnY + 10.0f, 0.5f);
     }
 
@@ -241,14 +237,6 @@ public class GameMaster {
      */
     public World getWorld() {
         return world;
-    }
-
-    /**
-     * Returns the player.
-     * @return the player
-     */
-    public Player getPlayer() {
-        return player;
     }
 
     /**
@@ -457,15 +445,13 @@ public class GameMaster {
      * @param delta the delta value
      */
     private void updateEntities(float delta) {
-        if (player != null) {
-            player.update(HoveredCell.get(this), delta);
-        }
+        Player.plyr.update(HoveredCell.get(this), delta);
 
         for (Entity entity : entities) {
             if (entity instanceof Player) continue;
             entity.update(HoveredCell.get(this), delta);
         }
-        entities.removeIf(e -> e != player && !e.isAlive());
+        entities.removeIf(e -> e != Player.plyr && !e.isAlive());
     }
 
     /**
@@ -507,10 +493,6 @@ public class GameMaster {
         BookService.bs.update();
         gameUIservice.update(delta);
 
-        if (player == null) {
-            return;
-        }
-
         genDelta = delta;
         TimeService.ts.update(delta, WeatherService.wes);
         float timeOfDay = TimeService.ts.getHour() + (TimeService.ts.getMinute() / 60.0f);
@@ -521,14 +503,12 @@ public class GameMaster {
         updateEntities(delta);
         orthoCameraController.update(this, delta);
         ParticleEngine.peng.update(delta);
-        StepController.step.update(this, player, SoundService.fx, delta);
+        StepController.step.update(this, SoundService.fx, delta);
         GameInteraction.gami.update(this, Settings.selectedItem);
 
         WaterSimulation.ws.update(delta);
-        if (player != null) {
-            chunkManager.update(player.getPosition().x,
-                    player.getPosition().z, delta);
-        }
+        chunkManager.update(Player.plyr.getPosition().x,
+                Player.plyr.getPosition().z, delta);
 
         Mouse.update();
         Keyboard.update();

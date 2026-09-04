@@ -41,9 +41,7 @@ public record CameraController(Camera camera) implements Service<Camera> {
             return;
         }
 
-        Player player = gameMaster.getPlayer();
-        if (player == null) return;
-
+        Player player = Player.plyr;
         if (Keyboard.isKeyDown(Keyboard.KEY_W) || Keyboard.isKeyDown(Keyboard.KEY_A) ||
                 Keyboard.isKeyDown(Keyboard.KEY_S) || Keyboard.isKeyDown(Keyboard.KEY_D)) {
             player.clearPath();
@@ -58,7 +56,7 @@ public record CameraController(Camera camera) implements Service<Camera> {
         }
 
         updateZoom();
-        followPlayer(gameMaster, player, delta);
+        followPlayer(gameMaster, delta);
     }
 
     /**
@@ -76,10 +74,10 @@ public record CameraController(Camera camera) implements Service<Camera> {
     /**
      * Performs the follow player operation.
      * @param gameMaster the game master value
-     * @param player the player value
      * @param delta the delta value
      */
-    private void followPlayer(GameMaster gameMaster, Player player, float delta) {
+    private void followPlayer(GameMaster gameMaster, float delta) {
+        Player player = Player.plyr;
         Vector3f playerPos = player.getPosition();
 
         float mouseX = Mouse.getX();
@@ -119,10 +117,10 @@ public record CameraController(Camera camera) implements Service<Camera> {
     /**
      * Performs the click operation.
      * @param gameMaster the game master value
-     * @param player the player value
      * @param world the world value
      */
-    private void click(GameMaster gameMaster, Player player, World world) {
+    private void click(GameMaster gameMaster, World world) {
+        Player player = Player.plyr;
         boolean isRightClickDown = Mouse.isButtonDown(Mouse.BUTTON_RIGHT);
         if (!isRightClickDown) {
             lastGoal = null;
@@ -138,12 +136,12 @@ public record CameraController(Camera camera) implements Service<Camera> {
                 screenWidth, screenHeight, false);
 
         if (blockPos == null) return;
-        GridPos start = PathFinder.getPlayerGridPosition(player);
+        GridPos start = PathFinder.getPlayerGridPosition();
         GridPos goal = getGoalPosition(world, blockPos);
         if (goal == null) return;
         if (start.equals(goal)) return;
         if (goal.equals(lastGoal)) return;
-        var path = PathFinder.findPath(world, player, start, goal);
+        var path = PathFinder.findPath(world, start, goal);
         if (path.isEmpty()) return;
         player.setPath(path);
         lastGoal = goal;
@@ -151,13 +149,13 @@ public record CameraController(Camera camera) implements Service<Camera> {
 
     /**
      * Performs the follow path operation.
-     * @param player the player value
      * @param world the world value
      * @param delta the delta value
      */
-    private void followPath(Player player, World world, float delta) {
+    private void followPath(World world, float delta) {
+        Player player = Player.plyr;
         if (player.isFollowingPath()) {
-            player.move(world, delta);
+            player.move(delta);
         }
     }
 

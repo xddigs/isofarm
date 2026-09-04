@@ -1,7 +1,6 @@
 package com.isofarm.item;
 
 import com.isofarm.data.Usables;
-import com.isofarm.entity.Player;
 import com.isofarm.utils.Local;
 import com.isofarm.wrld.GameMaster;
 
@@ -14,7 +13,6 @@ public abstract class Usable implements Craftable,
     private final byte id;
     private final int value;
     private String name;
-    private Player player;
 
     /**
      * Creates a new {@code Usable} instance.
@@ -85,22 +83,6 @@ public abstract class Usable implements Craftable,
      */
     public void setName(String name) {
         this.name = name;
-    }
-
-    /**
-     * Returns the player.
-     * @return the player
-     */
-    public Player getPlayer() {
-        return player;
-    }
-
-    /**
-     * Sets the player.
-     * @param player the player value
-     */
-    public void setPlayer(Player player) {
-        this.player = player;
     }
 
     /**

@@ -55,7 +55,7 @@ public class GameUIService implements Service<GameMaster> {
     private final SpriteSheet blockIcons;
     private final SpriteSheet toolIcons;
     private final SpriteSheet materialIcons;
-    private Player player;
+    private final Player player = Player.plyr;
     private Shop shop;
     private float windowWidth;
     private float windowHeight;
@@ -114,6 +114,10 @@ public class GameUIService implements Service<GameMaster> {
                 windowHeight - hotbarUI.getAbsoluteHeight() - K.UI.HOTBAR_OFFSET);
 
         this.backpackUI = new BackpackInventoryUI(0,0);
+        inventoryUI.setInventory(player.getInventory());
+        inventoryUI.createSlots();
+        hotbarUI.setInventory(player.getInventory());
+        backpackUI.setInventory(player.getBackpack());
 
         SpriteSheet bookSheet = ResourceManager.rem.getBookAnimationSheet();
         float scale = 2.0f;
@@ -205,25 +209,6 @@ public class GameUIService implements Service<GameMaster> {
      */
     public BackpackInventoryUI getBackpackInventoryUI() {
         return backpackUI;
-    }
-
-    /**
-     * Sets the player.
-     * @param player the player value
-     */
-    public void setPlayer(Player player) {
-        if (player == null) {
-            return;
-        }
-
-        this.player = player;
-        inventoryUI.setPlayer(player);
-        inventoryUI.setInventory(player.getInventory());
-        inventoryUI.createSlots();
-        hotbarUI.setPlayer(player);
-        hotbarUI.setInventory(player.getInventory());
-        backpackUI.setPlayer(player);
-        backpackUI.setInventory(player.getBackpack());
     }
 
     /**
@@ -332,7 +317,7 @@ public class GameUIService implements Service<GameMaster> {
      * @param gameMaster the game master value
      */
     public void render(boolean isHUDShown, GameMaster gameMaster) {
-        if (!gameMaster.getPlayer().isAlive()) return;
+        if (!Player.plyr.isAlive()) return;
         GUI.begin(windowWidth, windowHeight);
 
         SpriteSheet bookSheet = ResourceManager.rem.getBookAnimationSheet();
@@ -346,7 +331,7 @@ public class GameUIService implements Service<GameMaster> {
             float startX = hotbarUI.getAbsoluteX() + 10.0f;
             float startY = hotbarUI.getAbsoluteY() - 25.0f;
             renderHearts(ResourceManager.rem.getHeartsSpriteSheet(),
-                    startX, startY, player);
+                    startX, startY);
             renderHotbarLabel();
             renderToasts();
         } else {}
@@ -365,11 +350,10 @@ public class GameUIService implements Service<GameMaster> {
      * @param heartsSheet the hearts sheet value
      * @param startX the start x value
      * @param startY the start y value
-     * @param player the player value
      */
     public void renderHearts(SpriteSheet heartsSheet, float startX,
-                             float startY, Player player) {
-        if (player == null || heartsSheet == null) return;
+                             float startY) {
+        if (heartsSheet == null) return;
         int currentHp = (int) player.getHitpoints();
         int maxHp = (int) player.getMaxHitpoints();
 

@@ -20,23 +20,21 @@ public class CraftingBook extends Book implements Undroppable {
 
     /**
      * Creates a new {@code CraftingBook} instance.
-     * @param player the player value
      */
-    public CraftingBook(Player player) {
+    public CraftingBook() {
         super();
-        if (!hasContent() || player == null) {
+        if (!hasContent()) {
             return;
         }
 
-        reload(player);
+        reload();
     }
 
     /**
      * Performs the reload operation.
-     * @param player the player value
      */
     @Override
-    public void reload(Player player) {
+    public void reload() {
         clearPages();
         List<Recipe> recipes = RecipeRegistry.reg.getRecipes();
         if (recipes.isEmpty()) return;
@@ -79,7 +77,7 @@ public class CraftingBook extends Book implements Undroppable {
                     .collect(Collectors.joining("\n"));
 
             page.addLine(lines.getFirst(),
-                    line -> CraftingService.cs.craft(player, recipe),
+                    line -> CraftingService.cs.craft(recipe),
                     tooltip); lineCount++;
         }
     }
@@ -92,7 +90,7 @@ public class CraftingBook extends Book implements Undroppable {
      */
     @Override
     public boolean use(GameMaster gameMaster, boolean isCtrlHeld) {
-        Inventory inventory = gameMaster.getPlayer().getInventory();
+        Inventory inventory = Player.plyr.getInventory();
         if (inventory == null) return false;
         if (isCtrlHeld) {
             if (!inventory.hasBookEquipped()) {

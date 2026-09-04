@@ -50,7 +50,7 @@ public class Bucket extends Usable {
      */
     @Override
     public boolean use(GameMaster gameMaster, boolean isCtrlHeld) {
-        Player player = gameMaster.getPlayer();
+        Player player = Player.plyr;
         if (player == null) {
             return false;
         }

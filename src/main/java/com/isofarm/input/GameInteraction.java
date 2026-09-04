@@ -64,7 +64,7 @@ public class GameInteraction {
      * @return the update result
      */
     public BlockPos update(GameMaster gameMaster, Item selectedItem) {
-        Player player = GameMaster.game.getPlayer();
+        Player player = Player.plyr;
         Inventory inventory = player.getInventory();
         boolean isCtrlHeld = Keyboard.isKeyDown(Keyboard.KEY_LEFT_CONTROL) ||
                 Keyboard.isKeyDown(Keyboard.KEY_RIGHT_CONTROL);
@@ -127,7 +127,7 @@ public class GameInteraction {
             BookService.bs.close();
         }
 
-        if (!GameMaster.game.getPlayer().getGamemode().isNoClip()) {
+        if (!Player.plyr.getGamemode().isNoClip()) {
             pickUp();
             dropTimer -= GameMaster.game.getGenDelta();
             if (dropTimer <= 0.0f) {
@@ -226,7 +226,7 @@ public class GameInteraction {
      * Adds the item.
      */
     public void addItem() {
-        Player player = GameMaster.game.getPlayer();
+        Player player = Player.plyr;
         if (player == null) return;
         Iterator<Entity> iterator = GameMaster.game.getEntities().iterator();
         while (iterator.hasNext()) {
@@ -263,7 +263,7 @@ public class GameInteraction {
             ToastFactory.error("toast.item_undroppable");
             return;
         }
-        Player player = GameMaster.game.getPlayer();
+        Player player = Player.plyr;
         if (player == null) return;
 
         for (InventorySlot slot : player.getInventory().getSlots()) {
@@ -307,7 +307,7 @@ public class GameInteraction {
      * Performs the pick up operation.
      */
     private void pickUp() {
-        Player player = GameMaster.game.getPlayer();
+        Player player = Player.plyr;
         if (player == null) return;
 
         Iterator<Entity> iterator = GameMaster.game.getEntities().iterator();
@@ -372,9 +372,7 @@ public class GameInteraction {
      */
     public float getDistanceToBlock(BlockPos cell) {
         if (cell == null) return Float.MAX_VALUE;
-        if (GameMaster.game.getPlayer() == null) return Float.MAX_VALUE;
-
-        Vector3f playerPos = GameMaster.game.getPlayer().getPosition();
+        Vector3f playerPos = Player.plyr.getPosition();
         float targetX = cell.x() + 0.5f;
         float targetY = cell.y() + 0.5f;
         float targetZ = cell.z() + 0.5f;
@@ -398,9 +396,9 @@ public class GameInteraction {
         int z = cell.z();
 
         Item selectedItem = Settings.selectedItem;
-        if (GameMaster.game.getPlayer() != null) {
-            if (!GameMaster.game.getPlayer().isAttacking()) {
-                GameMaster.game.getPlayer().interact();
+        {
+            if (!Player.plyr.isAttacking()) {
+                Player.plyr.interact();
             }
         }
 
@@ -413,7 +411,7 @@ public class GameInteraction {
             int frameIndex = crop.getStage().getFrameIndex();
             SpriteSheet sheet = GameMaster.game.getCropSpriteSheet(cropType);
             if (crop.isReadyToHarvest()) {
-                CropService.cs.harvest(GameMaster.game.getPlayer(), crop);
+                CropService.cs.harvest(crop);
             } else {
                 CropService.cs.rip(crop);
             }
@@ -443,7 +441,7 @@ public class GameInteraction {
             lastBreakTime = System.nanoTime();
         }
 
-        Gamemode gamemode = GameMaster.game.getPlayer().getGamemode();
+        Gamemode gamemode = Player.plyr.getGamemode();
         if (gamemode.isGodmode()) {
             breakBlock(gameMaster, cell, blockData, blockId, selectedItem);
             resetBreaking();
@@ -503,7 +501,6 @@ public class GameInteraction {
             boolean isUsableOn = Arrays.stream(tool.getType().getUsableOn())
                     .anyMatch(b -> b.getId() == blockId);
 
-            tool.setPlayer(GameMaster.game.getPlayer());
             if (!isUsableOn) {
                 tool.misuse();
             } else {
@@ -596,7 +593,7 @@ public class GameInteraction {
     private void place(GameMaster gameMaster, BlockPos cell,
                        Item selectedItem) {
         World world = GameMaster.game.getWorld();
-        Player player = GameMaster.game.getPlayer();
+        Player player = Player.plyr;
 
         if (BookService.bs.isOpen()) return;
         if (player.checkCollision(world)) return;
@@ -645,7 +642,6 @@ public class GameInteraction {
             Block block = world.getBlockAt(cell.x(), cell.y(), cell.z());
             if (Arrays.stream(hoe.getType().getUsableOn()).noneMatch(
                     b -> b.getId() == block.getType().getId())) {
-                hoe.setPlayer(player);
                 hoe.misuse();
             } else {
                 hoe.use(gameMaster, block);
@@ -671,7 +667,7 @@ public class GameInteraction {
             if (seed.getType() == null) return;
 
             Block tilledDirt = new Block(BlockData.TILLED_DIRT, x, y, z);
-            Crop planted = CropService.cs.plant(x, y, z, player, tilledDirt, seed.getType(),
+            Crop planted = CropService.cs.plant(x, y, z, tilledDirt, seed.getType(),
                     TimeService.ts.getCurrentSeason());
 
             if (planted != null) {

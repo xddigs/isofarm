@@ -12,25 +12,24 @@ import static org.lwjgl.glfw.GLFW.*;
  * Provides sneaking state behavior.
  */
 public class SneakingState implements PlayerState {
+    private final Player player = Player.plyr;
     private static final float SNEAK_EYE_HEIGHT = 1.2f;
 
     /**
      * Performs the enter operation.
-     * @param player the player value
      */
     @Override
-    public void enter(Player player) {
+    public void enter() {
         player.setTargetEyeHeight(SNEAK_EYE_HEIGHT);
         player.setSpeed(player.getSpeed() * 0.5f);
     }
 
     /**
      * Performs the input operation.
-     * @param player the player value
      * @param gameMaster the game master value
      */
     @Override
-    public void input(Player player, GameMaster gameMaster) {
+    public void input(GameMaster gameMaster) {
         if (gameMaster.isInventoryOpen() || gameMaster.isChatOpen()) {
             return;
         }
@@ -48,26 +47,24 @@ public class SneakingState implements PlayerState {
 
     /**
      * Updates the current state.
-     * @param player the player value
      * @param delta the delta value
      */
     @Override
-    public void update(Player player, float delta) {
+    public void update(float delta) {
         if (player.isInFluid(GameMaster.game.getWorld())) {
             player.changeState(new SwimmingState());
             return;
         }
 
         float yaw = GameMaster.game.getActiveCamera().getYaw();
-        player.wasd(GameMaster.game.getWorld(), delta, yaw, false);
+        player.wasd(delta, yaw, false);
     }
 
     /**
      * Performs the exit operation.
-     * @param player the player value
      */
     @Override
-    public void exit(Player player) {
+    public void exit() {
         player.setTargetEyeHeight(1.6f);
         player.setSpeed(player.getSpeed() * 2.0f);
     }

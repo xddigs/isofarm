@@ -28,15 +28,17 @@ public final class PlayerGameplay {
     private static final float WIDTH = 0.5f, HEIGHT = 2.0f, SPAWN_X = 0.5f, SPAWN_Z = 0.5f;
     private static final float SPEED = 6.0f, RESPAWN_DELAY = 5.0f;
     private static final int MAX_HITPOINTS = 20, MAX_STAMINA = 100;
-    private final Player player;
+    private Player player;
     private int damageSequence;
     private float respawnTimer = -1.0f;
 
-    /** @param player player whose gameplay data is managed */
-    public PlayerGameplay(Player player) { this.player = player; }
+    /** Creates the shared player's gameplay component. */
+    public PlayerGameplay() {}
 
-    /** @param world world used to determine the initial spawn point */
-    public void initialize(World world) {
+    /** Initializes the player from the shared world. */
+    public void initialize() {
+        player = Player.plyr;
+        World world = World.wrld;
         GridPos altitude = world.getHighestY(SPAWN_X, SPAWN_Z);
         player.setPosition(new Vector3f(SPAWN_X, altitude.y(), SPAWN_Z));
         player.setVelocity(new Vector3f());
@@ -114,7 +116,7 @@ public final class PlayerGameplay {
 
     private void setUpInventory() {
         if (player.getGamemode() == Gamemode.SURVIVAL)
-            for (Item item : new StartingKit(player).getItems()) add(item);
+            for (Item item : new StartingKit().getItems()) add(item);
     }
 
     private void checkDurability() {

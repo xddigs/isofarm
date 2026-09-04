@@ -145,7 +145,7 @@ public class ShadowSystem {
     private void updateLightMatrix(GameMaster gameMaster) {
         lightDirection.set(gameMaster.getCelestialLighting().getDirection()).normalize();
 
-        Player player = gameMaster.getPlayer();
+        Player player = Player.plyr;
         if (player != null) {
             target.set(player.getPosition());
         } else {

@@ -35,7 +35,6 @@ public class Hoe extends Tool {
      * @param block the block value
      */
     public void use(GameMaster gameMaster, Block block) {
-        setPlayer(gameMaster.getPlayer());
         super.use();
         World world = gameMaster.getWorld();
         Block target = world.getBlockAt(block.getX(), block.getY(), block.getZ());

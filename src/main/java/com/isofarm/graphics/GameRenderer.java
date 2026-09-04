@@ -156,7 +156,7 @@ public class GameRenderer {
         glDepthMask(true);
         glEnable(GL_DEPTH_TEST);
 
-        Player player = gameMaster.getPlayer();
+        Player player = Player.plyr;
         BlockPos hoveredCell = HoveredCell.get(gameMaster);
 
         defaultShader.setUniform("uIsWater", false);

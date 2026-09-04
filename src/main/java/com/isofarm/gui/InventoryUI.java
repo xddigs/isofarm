@@ -32,7 +32,7 @@ public class InventoryUI extends UIElement {
     private UIButton sortButton;
     private UIButton groupButton;
     private UIButton backpackButton;
-    private Player player;
+    private final Player player = Player.plyr;
     private Inventory inventory;
     private GameMaster gameMaster;
     private Tab currentTab;
@@ -408,7 +408,7 @@ public class InventoryUI extends UIElement {
         }
 
         if (backpackUI != null && backpackUI.getSlotUIs() != null) {
-            Inventory backpackInv = (player != null) ? player.getBackpack() : null;
+            Inventory backpackInv = player.getBackpack();
             for (int i = 0; i < backpackUI.getSlotUIs().length; i++) {
                 InventorySlotUI slotUI = backpackUI.getSlotUIs()[i];
                 if (slotUI == null) continue;
@@ -781,20 +781,6 @@ public class InventoryUI extends UIElement {
             hotbarUI.setToolIcons(toolIcons);
             hotbarUI.setMaterialIcons(materialIcons);
             hotbarUI.setInventoryIcons(inventoryIcons);
-        }
-    }
-
-    /**
-     * Sets the player.
-     * @param player the player value
-     */
-    public void setPlayer(Player player) {
-        this.player = player;
-
-        if (player != null) {
-            this.inventory = player.getInventory();
-        } else {
-            this.inventory = null;
         }
     }
 

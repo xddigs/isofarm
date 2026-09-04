@@ -26,9 +26,9 @@ public final class PlayerAnimator {
     private static final float ROTATION_SPEED = 720.0f, FULL_DEGREES = 360.0f, HALF_DEGREES = 180.0f;
     private static final float MAX_HEAD_YAW = (float) Math.toRadians(65), MAX_HEAD_PITCH = (float) Math.toRadians(35);
     private static final float HEAD_SPEED = 12.0f;
-    private final Player player;
+    private Player player;
     private final Matrix4f modelMatrix = new Matrix4f();
-    private final GLTFModel model;
+    private GLTFModel model;
     private GLTFNode head, torso, backpack, rightArm, leftArm, rightLeg, leftLeg;
     private Quaternionf baseHeadRotation;
     private Vector3f headPosition, torsoPosition, backpackPosition, rightArmPosition, leftArmPosition, rightLegPosition, leftLegPosition;
@@ -36,9 +36,12 @@ public final class PlayerAnimator {
     private float modelYaw, targetYaw, idleTime, idleWeight, sneakWeight, walkTime, walkWeight, attackTime;
     private boolean attacking;
 
-    /** @param player player represented by this animator */
-    public PlayerAnimator(Player player) {
-        this.player = player;
+    /** Creates the shared player's animator. */
+    public PlayerAnimator() {}
+
+    /** Initializes model state after singleton construction completes. */
+    public void initialize() {
+        player = Player.plyr;
         model = ResourceManager.rem.getPlayerModel();
         if (model == null) return;
         head = node("Head"); torso = node("Body"); backpack = node("Backpack");

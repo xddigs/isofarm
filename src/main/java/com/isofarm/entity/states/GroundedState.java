@@ -11,23 +11,22 @@ import static org.lwjgl.glfw.GLFW.*;
  * Provides grounded state behavior.
  */
 public class GroundedState implements PlayerState {
+    private final Player player = Player.plyr;
 
     /**
      * Performs the enter operation.
-     * @param player the player value
      */
     @Override
-    public void enter(Player player) {
+    public void enter() {
         player.setTargetEyeHeight(1.6f);
     }
 
     /**
      * Performs the input operation.
-     * @param player the player value
      * @param gameMaster the game master value
      */
     @Override
-    public void input(Player player, GameMaster gameMaster) {
+    public void input(GameMaster gameMaster) {
         if (gameMaster.isInventoryOpen() || gameMaster.isChatOpen()) {
             return;
         }
@@ -40,11 +39,10 @@ public class GroundedState implements PlayerState {
 
     /**
      * Updates the current state.
-     * @param player the player value
      * @param delta the delta value
      */
     @Override
-    public void update(Player player, float delta) {
+    public void update(float delta) {
         if (player.isInFluid(GameMaster.game.getWorld())) {
             player.changeState(new SwimmingState());
             return;
@@ -59,14 +57,13 @@ public class GroundedState implements PlayerState {
                 .getActiveCamera()
                 .getYaw();
 
-        player.wasd(GameMaster.game.getWorld(), delta, yaw, false);
+        player.wasd(delta, yaw, false);
     }
 
     /**
      * Performs the exit operation.
-     * @param player the player value
      */
     @Override
-    public void exit(Player player) {
+    public void exit() {
     }
 }

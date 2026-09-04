@@ -24,7 +24,7 @@ import static org.lwjgl.glfw.GLFW.*;
  */
 public class HotbarUI extends UIElement {
     private final InventorySlotUI[] slotUIs = new InventorySlotUI[K.UI.INVENTORY_COLUMNS];
-    private Player player;
+    private final Player player = Player.plyr;
     private Inventory inventory;
     private InventorySlotUI backpackSlotUI;
     private InventorySlotUI bookSlotUI;
@@ -540,22 +540,6 @@ public class HotbarUI extends UIElement {
         float y = slot.getAbsoluteY() - thickness;
         float size = slot.getAbsoluteWidth() + thickness * 2.0f;
         GUI.drawBorder(x, y, size, size, K.UI.UI_HOTBAR_SELECTED_COLOR, thickness);
-    }
-
-    /**
-     * Returns the player.
-     * @return the player
-     */
-    public Player getPlayer() {
-        return player;
-    }
-
-    /**
-     * Sets the player.
-     * @param player the player value
-     */
-    public void setPlayer(Player player) {
-        this.player = player;
     }
 
     /**

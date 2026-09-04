@@ -12,6 +12,7 @@ import static org.lwjgl.glfw.GLFW.*;
  * Provides swimming state behavior.
  */
 public class SwimmingState implements PlayerState {
+    private final Player player = Player.plyr;
 
     private static final float SWIM_UP_SPEED = 4.0f;
     private static final float SWIM_DOWN_SPEED = -3.0f;
@@ -20,20 +21,18 @@ public class SwimmingState implements PlayerState {
 
     /**
      * Performs the enter operation.
-     * @param player the player value
      */
     @Override
-    public void enter(Player player) {
+    public void enter() {
         player.setTargetEyeHeight(1.2f);
     }
 
     /**
      * Performs the input operation.
-     * @param player the player value
      * @param gameMaster the game master value
      */
     @Override
-    public void input(Player player, GameMaster gameMaster) {
+    public void input(GameMaster gameMaster) {
         if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
             player.getVelocity().y = SWIM_UP_SPEED;
         } else if (Keyboard.isKeyDown(Keyboard.KEY_LEFT_CONTROL)) {
@@ -43,13 +42,12 @@ public class SwimmingState implements PlayerState {
 
     /**
      * Updates the current state.
-     * @param player the player value
      * @param delta the delta value
      */
     @Override
-    public void update(Player player, float delta) {
+    public void update(float delta) {
         float yaw = GameMaster.game.getActiveCamera().getYaw();
-        player.wasd(World.wrld, delta, yaw, false);
+        player.wasd(delta, yaw, false);
 
         if (player.isOnGround()) {
             if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
@@ -69,10 +67,9 @@ public class SwimmingState implements PlayerState {
 
     /**
      * Performs the exit operation.
-     * @param player the player value
      */
     @Override
-    public void exit(Player player) {
+    public void exit() {
         player.setTargetEyeHeight(1.6f);
     }
 }

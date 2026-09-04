@@ -1,6 +1,5 @@
 package com.isofarm.data;
 
-import com.isofarm.entity.Player;
 import com.isofarm.item.*;
 import com.isofarm.service.TimeService;
 import com.isofarm.utils.K;
@@ -16,7 +15,6 @@ public class Shop {
     private final String owner;
     private final Inventory stock;
     private final Purse purse;
-    private Player player;
 
     /**
      * Creates a new {@code Shop} instance.
@@ -193,19 +191,4 @@ public class Shop {
         return names[(int) (Math.random() * names.length)];
     }
 
-    /**
-     * Returns the player.
-     * @return the player
-     */
-    public Player getPlayer() {
-        return player;
-    }
-
-    /**
-     * Sets the player.
-     * @param player the player value
-     */
-    public void setPlayer(Player player) {
-        this.player = player;
-    }
 }

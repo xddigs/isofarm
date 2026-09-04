@@ -20,7 +20,6 @@ public abstract class Tool implements Item,
     private final ToolType type;
     private Tier tier;
     private int durability;
-    private Player player;
     private final Enchantment[] enchantments;
     private final float baseDamage;
 
@@ -160,26 +159,10 @@ public abstract class Tool implements Item,
     }
 
     /**
-     * Returns the player.
-     * @return the player
-     */
-    public Player getPlayer() {
-        return player;
-    }
-
-    /**
-     * Sets the player.
-     * @param player the player value
-     */
-    public void setPlayer(Player player) {
-        this.player = player;
-    }
-
-    /**
      * Performs the use operation.
      */
     public void use() {
-        if (player.getGamemode().isGodmode()) return;
+        if (Player.plyr.getGamemode().isGodmode()) return;
         if (canBeUsed()) {
             durability--;
         }
@@ -189,7 +172,7 @@ public abstract class Tool implements Item,
      * Performs the misuse operation.
      */
     public void misuse() {
-        if (player.getGamemode().isGodmode()) return;
+        if (Player.plyr.getGamemode().isGodmode()) return;
         if (canBeUsed()) {
             durability -= 2;
         }
@@ -199,7 +182,7 @@ public abstract class Tool implements Item,
      * Performs the repair operation.
      */
     public void repair() {
-        if (player.getGamemode().isGodmode()) return;
+        if (Player.plyr.getGamemode().isGodmode()) return;
         durability += Math.clamp(durability,
                 0, tier.getDurability());
     }

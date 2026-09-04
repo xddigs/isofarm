@@ -26,10 +26,7 @@ public class Backpack extends Usable implements Undroppable {
      */
     @Override
     public boolean use(GameMaster gameMaster,  boolean isCtrlHeld) {
-        Player player = gameMaster.getPlayer();
-        if (player == null) return false;
-        setPlayer(player);
-
+        Player player = Player.plyr;
         if (!player.getInventory().hasBackpackEquipped()) {
             player.getInventory().equipBackpack(this);
             gameMaster.getGameUIService().resetHotbarPosition();
@@ -53,8 +50,8 @@ public class Backpack extends Usable implements Undroppable {
      * Performs the unequip operation.
      */
     public void unequip() {
-        if (getPlayer() != null && getPlayer().getInventory().hasBackpackEquipped()) {
-            getPlayer().getInventory().unequipBackpack();
+        if (Player.plyr.getInventory().hasBackpackEquipped()) {
+            Player.plyr.getInventory().unequipBackpack();
             GameMaster.game.getGameUIService().resetHotbarPosition();
         }
     }

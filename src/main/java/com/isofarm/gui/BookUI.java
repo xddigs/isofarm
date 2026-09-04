@@ -423,6 +423,6 @@ public class BookUI extends UIElement {
      * @param openedBook the opened book value
      */
     public void reload(Book openedBook) {
-        openedBook.reload(GameMaster.game.getPlayer());
+        openedBook.reload();
     }
 }

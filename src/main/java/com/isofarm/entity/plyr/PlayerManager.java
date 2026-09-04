@@ -25,7 +25,6 @@ public final class PlayerManager {
     private static final float PATH_DISTANCE_SQUARED = 0.01f;
     private static final float WAYPOINT_OFFSET = 0.5f;
 
-    private final Player player;
     private List<GridPos> path = new LinkedList<>();
     private int pathIndex;
     private float currentEyeHeight = EYE_HEIGHT;
@@ -33,35 +32,37 @@ public final class PlayerManager {
     private boolean falling;
     private PlayerState currentState;
 
-    /** @param player player controlled by this manager */
-    public PlayerManager(Player player) { this.player = player; }
+    /** Creates the shared player's movement manager. */
+    public PlayerManager() {}
 
     /** Installs the initial grounded state. */
     public void initialize() {
         currentState = new GroundedState();
-        currentState.enter(player);
+        currentState.enter();
     }
 
     /** @param delta frame time in seconds */
     public void update(float delta) {
-        currentState.input(player, GameMaster.game);
-        currentState.update(player, delta);
+        currentState.input(GameMaster.game);
+        currentState.update(delta);
         currentEyeHeight = lerp(currentEyeHeight, targetEyeHeight,
                 Math.clamp(delta * EYE_LERP_SPEED, ZERO, 1.0f));
         if (!(currentState instanceof SneakingState)) {
-            autoJump(GameMaster.game.getWorld(), player.getVelocity(), delta);
+            autoJump(Player.plyr.getVelocity(), delta);
         }
     }
 
     /** @param newState state to enter */
     public void changeState(PlayerState newState) {
-        if (currentState != null) currentState.exit(player);
+        if (currentState != null) currentState.exit();
         currentState = newState;
-        currentState.enter(player);
+        currentState.enter();
     }
 
-    /** @param world world @param velocity intended velocity @param delta frame time */
-    public void autoJump(World world, Vector3f velocity, float delta) {
+    /** @param velocity intended velocity @param delta frame time */
+    public void autoJump(Vector3f velocity, float delta) {
+        Player player = Player.plyr;
+        World world = World.wrld;
         if (!player.isOnGround() || (velocity.x == ZERO && velocity.z == ZERO)) return;
         Vector3f original = new Vector3f(player.getPosition());
         player.getPosition().add(velocity.x * delta, ZERO, velocity.z * delta);
@@ -75,8 +76,10 @@ public final class PlayerManager {
         }
     }
 
-    /** @param world world @param delta frame time */
-    public void move(World world, float delta) {
+    /** @param delta frame time */
+    public void move(float delta) {
+        Player player = Player.plyr;
+        World world = World.wrld;
         if (!isFollowingPath()) {
             player.setVelocity(new Vector3f(ZERO, player.getVelocity().y, ZERO));
         } else {
@@ -97,10 +100,12 @@ public final class PlayerManager {
         player.collide(world, player.getVelocity(), delta);
     }
 
-    /** @param world world @param delta frame time @param cameraYaw camera yaw @param flying flight flag */
-    public void wasd(World world, float delta, float cameraYaw, boolean flying) {
+    /** @param delta frame time @param cameraYaw camera yaw @param flying flight flag */
+    public void wasd(float delta, float cameraYaw, boolean flying) {
+        Player player = Player.plyr;
+        World world = World.wrld;
         if (GameMaster.game.isChatOpen() || GameMaster.game.isInventoryOpen() || BookService.bs.isOpen()) return;
-        if (isFollowingPath()) { move(world, delta); return; }
+        if (isFollowingPath()) { move(delta); return; }
         float x = ZERO, z = ZERO;
         if (Keyboard.isKeyDown(Keyboard.KEY_W)) z--;
         if (Keyboard.isKeyDown(Keyboard.KEY_S)) z++;
@@ -123,11 +128,13 @@ public final class PlayerManager {
 
     /** @param delta frame time @param yaw camera yaw @param flying flight flag */
     public void fly(float delta, float yaw, boolean flying) {
-        if (!player.isOnGround()) wasd(GameMaster.game.getWorld(), delta, yaw, flying);
+        if (!Player.plyr.isOnGround()) wasd(delta, yaw, flying);
     }
 
     /** @return whether a solid block supports at least one player corner */
-    public boolean hasGroundBelow(World world, float testX, float testZ) {
+    public boolean hasGroundBelow(float testX, float testZ) {
+        Player player = Player.plyr;
+        World world = World.wrld;
         float epsilon = 0.001f;
         float halfWidth = player.getDimensions().x / 2.0f - epsilon;
         float halfDepth = player.getDimensions().z / 2.0f - epsilon;
@@ -139,15 +146,17 @@ public final class PlayerManager {
     }
 
     /** Restricts sneaking velocity just enough to retain support while allowing edge travel. */
-    public void adjustVelocity(World world, float delta) {
+    public void adjustVelocity(float delta) {
+        Player player = Player.plyr;
+        World world = World.wrld;
         if (!(currentState instanceof SneakingState) || delta <= ZERO) return;
         Vector3f position = player.getPosition(), velocity = player.getVelocity();
-        if (!player.isOnGround() && !hasGroundBelow(world, position.x, position.z)) return;
+        if (!player.isOnGround() && !hasGroundBelow(position.x, position.z)) return;
         float x = velocity.x * delta, z = velocity.z * delta;
         float step = 0.05f;
-        while (x != ZERO && !hasGroundBelow(world, position.x + x, position.z)) x = towardZero(x, step);
-        while (z != ZERO && !hasGroundBelow(world, position.x, position.z + z)) z = towardZero(z, step);
-        while (x != ZERO && z != ZERO && !hasGroundBelow(world, position.x + x, position.z + z)) {
+        while (x != ZERO && !hasGroundBelow(position.x + x, position.z)) x = towardZero(x, step);
+        while (z != ZERO && !hasGroundBelow(position.x, position.z + z)) z = towardZero(z, step);
+        while (x != ZERO && z != ZERO && !hasGroundBelow(position.x + x, position.z + z)) {
             x = towardZero(x, step); z = towardZero(z, step);
         }
         velocity.x = x / delta; velocity.z = z / delta;
@@ -164,7 +173,7 @@ public final class PlayerManager {
     /** @param height desired eye height */ public void setTargetEyeHeight(float height) { targetEyeHeight = height; }
     /** @return whether falling */ public boolean isFalling() { return falling; }
     /** @param value falling flag */ public void setFalling(boolean value) { falling = value; }
-    /** @return movement direction angle */ public float getForward() { return (float) Math.atan2(player.getVelocity().z, player.getVelocity().x); }
+    /** @return movement direction angle */ public float getForward() { return (float) Math.atan2(Player.plyr.getVelocity().z, Player.plyr.getVelocity().x); }
     /** @return whether a waypoint remains */ public boolean isFollowingPath() { return pathIndex < path.size(); }
     /** @return active path */ public List<GridPos> getPath() { return path; }
     /** @param value path to follow */ public void setPath(List<GridPos> value) { path = value != null ? value : List.of(); pathIndex = 0; }

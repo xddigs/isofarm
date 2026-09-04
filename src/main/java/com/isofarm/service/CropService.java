@@ -27,14 +27,14 @@ public class CropService implements Service<Crop> {
      * @param x the x value
      * @param y the y value
      * @param z the z value
-     * @param player the player value
      * @param block the block value
      * @param type the type value
      * @param currentSeason the current season value
      * @return the plant result
      */
-    public Crop plant(int x, int y, int z, Player player, Block block,
+    public Crop plant(int x, int y, int z, Block block,
                       CropType type, Season currentSeason) {
+        Player player = Player.plyr;
 
         if (block == null || block.getType() != BlockData.TILLED_DIRT) {
             log.warn("Attempted to plant {} at ({}, {}) but block is not tilled!",
@@ -87,12 +87,12 @@ public class CropService implements Service<Crop> {
 
     /**
      * Performs the harvest operation.
-     * @param player the player value
      * @param crop the crop value
      * @return the harvest result
      */
     @SuppressWarnings("UnusedReturnValue")
-    public int harvest(Player player, Crop crop) {
+    public int harvest(Crop crop) {
+        Player player = Player.plyr;
         if (!crop.isReadyToHarvest()) {
             log.warn("Attempted to harvest {} " +
                     "before it was fully grown.", crop.getCropType().getName());

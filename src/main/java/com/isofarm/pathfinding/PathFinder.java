@@ -18,22 +18,20 @@ public final class PathFinder {
     /**
      * Finds and returns the path.
      * @param world the world value
-     * @param player the player value
      * @param start the start value
      * @param goal the goal value
      * @return the located path
      */
-    public static List<GridPos> findPath(World world, Player player,
-                                         GridPos start, GridPos goal) {
+    public static List<GridPos> findPath(World world, GridPos start, GridPos goal) {
         return AStar.findPath(world, start, goal);
     }
 
     /**
      * Returns the player grid position.
-     * @param player the player value
      * @return the player grid position
      */
-    public static GridPos getPlayerGridPosition(Player player) {
+    public static GridPos getPlayerGridPosition() {
+        Player player = Player.plyr;
         return new GridPos(
                 (int) Math.floor(player.getPosition().x),
                 (int) Math.floor(player.getPosition().y),
