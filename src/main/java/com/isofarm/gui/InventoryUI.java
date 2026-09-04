@@ -999,12 +999,11 @@ public class InventoryUI extends UIElement {
     /** Restores the player's inventory after closing a block container. */
     private void closeContainer() {
         if (containerBlock == null) return;
-
         containerBlock.setActivated(false);
-        containerBlock = null;
-        inventory = player == null ? null : player.getInventory();
         SoundService.fx.playUseSound(containerBlock.getType()
                 .getSoundGroup(), 1);
+        containerBlock = null;
+        inventory = player == null ? null : player.getInventory();
     }
 
     /**
