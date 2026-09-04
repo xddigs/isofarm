@@ -43,7 +43,8 @@ public class WaterSimulation {
         }
 
         FluidPos pos = new FluidPos(x, y, z);
-        if (World.wrld.getBlockTypeAt(x, y, z) != BlockData.AIR.getId()) {
+        byte block = World.wrld.getBlockTypeAt(x, y, z);
+        if (block != BlockData.AIR.getId() && block != BlockData.WATER.getId()) {
             return false;
         }
 
@@ -119,6 +120,11 @@ public class WaterSimulation {
             return;
         }
 
+        renewSource(pos);
+        if (sources.contains(pos)) {
+            level = MAX_LEVEL;
+        }
+
         FluidPos below = new FluidPos(pos.x(), pos.y() - 1, pos.z());
 
         if (canContainWater(below)) {
@@ -141,6 +147,40 @@ public class WaterSimulation {
         spread(new FluidPos(pos.x() - 1, pos.y(), pos.z()), spreadLevel);
         spread(new FluidPos(pos.x(), pos.y(), pos.z() + 1), spreadLevel);
         spread(new FluidPos(pos.x(), pos.y(), pos.z() - 1), spreadLevel);
+    }
+
+    /**
+     * Converts a supported flowing cell into a source when two horizontal
+     * neighbouring source blocks feed it, matching voxel infinite-water pools.
+     * @param pos the candidate water cell
+     */
+    private void renewSource(FluidPos pos) {
+        if (sources.contains(pos) || !hasSourceSupport(pos)) {
+            return;
+        }
+
+        int adjacentSources = 0;
+        if (sources.contains(new FluidPos(pos.x() + 1, pos.y(), pos.z()))) adjacentSources++;
+        if (sources.contains(new FluidPos(pos.x() - 1, pos.y(), pos.z()))) adjacentSources++;
+        if (sources.contains(new FluidPos(pos.x(), pos.y(), pos.z() + 1))) adjacentSources++;
+        if (sources.contains(new FluidPos(pos.x(), pos.y(), pos.z() - 1))) adjacentSources++;
+
+        if (adjacentSources >= 2) {
+            sources.add(pos);
+            setWater(pos, MAX_LEVEL);
+            enqueueNeighbours(pos);
+        }
+    }
+
+    /** Checks whether an infinite source may rest at the given position. */
+    private boolean hasSourceSupport(FluidPos pos) {
+        if (pos.y() <= 0) {
+            return false;
+        }
+
+        FluidPos below = new FluidPos(pos.x(), pos.y() - 1, pos.z());
+        return sources.contains(below)
+                || World.wrld.isBlockSolid(below.x(), below.y(), below.z());
     }
 
     /**

@@ -13,7 +13,8 @@ public class StartingKit extends Kit {
         setItems(new Item[]{
                 new CraftingBook(),
                 new Block(BlockData.SAND),
-                new Material(Tier.NONE, MaterialID.SUGAR_CANE)
+                new Material(Tier.NONE, MaterialID.SUGAR_CANE),
+                new Produce(CropType.SUGAR_CANE_CROP)
         });
     }
 }

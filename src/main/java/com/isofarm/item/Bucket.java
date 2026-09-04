@@ -65,6 +65,11 @@ public class Bucket extends Usable {
                 return false;
             }
 
+            if (!WaterSimulation.ws.isSource(
+                    targetBlock.x(), targetBlock.y(), targetBlock.z())) {
+                return false;
+            }
+
             if (!WaterSimulation.ws.removeWater(
                     targetBlock.x(),
                     targetBlock.y(),
