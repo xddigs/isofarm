@@ -5,9 +5,7 @@ import com.isofarm.entity.Player;
 import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.input.Mouse;
-import com.isofarm.item.Block;
-import com.isofarm.item.Item;
-import com.isofarm.item.Tool;
+import com.isofarm.item.*;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
@@ -15,7 +13,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Provides inventory ui behavior.
@@ -27,14 +29,17 @@ public class InventoryUI extends UIElement {
     private static final Logger log = LoggerFactory.getLogger(InventoryUI.class);
 
     private final InventorySlotUI[] slotUIs;
+    private final InventorySlot[] creativeSlotData;
+    private final Set<InventorySlot> creativeSlots;
+    private final Map<Tab, List<Item>> creativeItems;
 
     private final List<UIButton> buttons;
+    private final List<UIButton> creativeTabButtons;
     private UIButton sortButton;
     private UIButton groupButton;
     private UIButton backpackButton;
     private final Player player = Player.plyr;
     private Inventory inventory;
-    private GameMaster gameMaster;
     private Tab currentTab;
     private SpriteSheet seedIcons;
     private SpriteSheet cropIcons;
@@ -46,6 +51,7 @@ public class InventoryUI extends UIElement {
     private HotbarUI hotbarUI;
     private BackpackInventoryUI backpackUI;
     private int carriedAmount;
+    private boolean isGodmode;
 
     private float defaultX;
     private float targetX;
@@ -73,7 +79,11 @@ public class InventoryUI extends UIElement {
 
         int totalVisualSlots = (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
         this.slotUIs = new InventorySlotUI[totalVisualSlots];
+        this.creativeSlotData = new InventorySlot[totalVisualSlots];
+        this.creativeSlots = java.util.Collections.newSetFromMap(new IdentityHashMap<>());
+        this.creativeItems = new EnumMap<>(Tab.class);
         this.buttons = new ArrayList<>();
+        this.creativeTabButtons = new ArrayList<>();
         this.currentTab = Tab.INVENTORY;
         setFocusable(true);
         createButtons();
@@ -150,7 +160,7 @@ public class InventoryUI extends UIElement {
             if (isBackpackOpen && !isBackpackClosing) {
                 closeBackpack();
             } else if (!isBackpackOpen) {
-                openBackpack(gameMaster.getGameUIService().getBackpackInventoryUI());
+                openBackpack(GameMaster.game.getGameUIService().getBackpackInventoryUI());
             }
         });
 
@@ -166,6 +176,31 @@ public class InventoryUI extends UIElement {
         addChild(sortButton);
         addChild(groupButton);
         addChild(backpackButton);
+
+        createCreativeTabButtons(btnWidth, btnHeight);
+    }
+
+    /**
+     * Creates the five category buttons used by the creative inventory.
+     * @param width the button width
+     * @param height the button height
+     */
+    private void createCreativeTabButtons(float width, float height) {
+        Tab[] tabs = {Tab.BLOCKS, Tab.TOOLS_ITEMS, Tab.USABLES,
+                Tab.CROPS_SEEDS, Tab.MATERIALS};
+
+        for (int i = 0; i < tabs.length; i++) {
+            Tab tab = tabs[i];
+            UIButton button = new UIButton(
+                    Settings.getScaledPadding() + i * (width + Settings.getScaledSpacing()),
+                    Settings.getScaledPadding() - Settings.getScaledSpacing(),
+                    width, height);
+            button.setOnClick(() -> selectCreativeTab(tab));
+            button.hide();
+            creativeTabButtons.add(button);
+            buttons.add(button);
+            addChild(button);
+        }
     }
 
     /**
@@ -296,7 +331,7 @@ public class InventoryUI extends UIElement {
 
         if (player == null) return;
         boolean wasOpen = isVisible();
-        boolean isOpen = gameMaster != null && gameMaster.isInventoryOpen();
+        boolean isOpen = GameMaster.game != null && GameMaster.game.isInventoryOpen();
 
         if (isOpen && !wasOpen) {
             show();
@@ -317,12 +352,12 @@ public class InventoryUI extends UIElement {
         isClosing = false;
         closeBackpack();
 
-        if (gameMaster != null) {
-            this.defaultX = (gameMaster.getWindowWidth() - getWidth()) / 2.0f;
+        if (GameMaster.game != null) {
+            this.defaultX = (GameMaster.game.getWindowWidth() - getWidth()) / 2.0f;
             this.targetX = defaultX;
-            this.defaultY = (gameMaster.getWindowHeight() - getHeight()) / 2.0f;
+            this.defaultY = (GameMaster.game.getWindowHeight() - getHeight()) / 2.0f;
             this.targetY = defaultY;
-            setPosition(defaultX, gameMaster.getWindowHeight());
+            setPosition(defaultX, GameMaster.game.getWindowHeight());
         }
 
         if (hotbarUI != null) {
@@ -340,8 +375,8 @@ public class InventoryUI extends UIElement {
             isBackpackClosing = false;
         }
 
-        if (gameMaster != null) {
-            this.targetY = gameMaster.getWindowHeight();
+        if (GameMaster.game != null) {
+            this.targetY = GameMaster.game.getWindowHeight();
             this.isClosing = true;
         }
 
@@ -394,6 +429,12 @@ public class InventoryUI extends UIElement {
     protected void syncInventory() {
         if (inventory == null) return;
 
+        updateInventoryMode();
+        if (isGodmode) {
+            syncCreativeInventory();
+            return;
+        }
+
         for (int i = 0; i < slotUIs.length; i++) {
             InventorySlotUI slotUI = slotUIs[i];
             if (slotUI == null) continue;
@@ -431,6 +472,117 @@ public class InventoryUI extends UIElement {
 
             backpackButton.setSpriteSheet(inventoryIcons);
             backpackButton.setSpriteColumn(2);
+        }
+    }
+
+    /** Switches the controls and contents when GODMODE changes. */
+    private void updateInventoryMode() {
+        boolean creative = player != null && player.getGamemode().isGodmode();
+        if (creative == isGodmode) return;
+
+        isGodmode = creative;
+        if (creative) {
+            currentTab = Tab.BLOCKS;
+            if (backpackUI != null) {
+                backpackUI.hide();
+                isBackpackOpen = false;
+                isBackpackClosing = false;
+                targetY = defaultY;
+            }
+            sortButton.hide();
+            groupButton.hide();
+            backpackButton.hide();
+            creativeTabButtons.forEach(UIButton::show);
+            buildCreativeCatalog();
+            configureCreativeTabIcons();
+        } else {
+            currentTab = Tab.INVENTORY;
+            creativeTabButtons.forEach(UIButton::hide);
+            sortButton.show();
+            groupButton.show();
+        }
+    }
+
+    /** Builds the creative catalog from every item registered by the game. */
+    private void buildCreativeCatalog() {
+        creativeItems.clear();
+        for (Tab tab : Tab.values()) {
+            creativeItems.put(tab, new ArrayList<>());
+        }
+        if (GameMaster.game == null) return;
+
+        for (String id : GameMaster.game.getItemRegistry().getIds()) {
+            Item item = GameMaster.game.getItemRegistry().create(id);
+            Tab tab = getCreativeTab(item);
+            if (tab != null) creativeItems.get(tab).add(item);
+        }
+    }
+
+    /**
+     * Returns the creative category for an item.
+     * @param item the item to classify
+     * @return its creative tab, or {@code null} when unsupported
+     */
+    private Tab getCreativeTab(Item item) {
+        return switch (item) {
+            case Block ignored -> Tab.BLOCKS;
+            case Tool ignored -> Tab.TOOLS_ITEMS;
+            case Usable ignored -> Tab.USABLES;
+            case Produce ignored -> Tab.CROPS_SEEDS;
+            case Seed ignored -> Tab.CROPS_SEEDS;
+            case Material ignored -> Tab.MATERIALS;
+            case null, default -> null;
+        };
+    }
+
+    /** Displays the selected creative category in the virtual slots. */
+    private void syncCreativeInventory() {
+        List<Item> items = creativeItems.getOrDefault(currentTab, List.of());
+        for (int i = 0; i < slotUIs.length; i++) {
+            InventorySlotUI slotUI = slotUIs[i];
+            if (slotUI == null) continue;
+
+            InventorySlot slot = creativeSlotData[i];
+            if (slot == null) {
+                slot = new InventorySlot();
+                creativeSlotData[i] = slot;
+                creativeSlots.add(slot);
+            }
+
+            if (i < items.size()) {
+                Item item = items.get(i);
+                slot.setItem(item);
+                slot.setAmount(Math.max(1, inventory.getMaxStack(item)));
+            } else {
+                slot.clear();
+            }
+            slotUI.setSlot(slot);
+            updateItemSprite(slotUI);
+        }
+    }
+
+    /** Selects one of the creative inventory filters. */
+    private void selectCreativeTab(Tab tab) {
+        if (!isGodmode || !tab.isCreative()) return;
+        currentTab = tab;
+        syncCreativeInventory();
+    }
+
+    /** Assigns the requested representative item icon to every creative tab. */
+    private void configureCreativeTabIcons() {
+        Item[] icons = {
+                new Block(BlockData.DIRT),
+                new Hoe(Tier.DIAMOND),
+                new Backpack(),
+                new Produce(CropType.WHEAT),
+                new Material(Tier.NONE, MaterialID.LEATHER)
+        };
+
+        for (int i = 0; i < creativeTabButtons.size(); i++) {
+            UIButton button = creativeTabButtons.get(i);
+            Item icon = icons[i];
+            button.setSpriteSheet(ResourceManager.getItemSpriteSheet(icon));
+            button.setSpriteColumn(ResourceManager.getItemFrame(icon));
         }
     }
 
@@ -515,15 +667,34 @@ public class InventoryUI extends UIElement {
             if (slot == null) continue;
 
             if (Mouse.isButtonPressed(Mouse.BUTTON_LEFT)) {
+                if (isGodmode && creativeSlots.contains(slot)) {
+                    takeCreativeItem(slot, false);
+                    break;
+                }
                 leftClick(slot);
                 break;
             }
 
             if (Mouse.isButtonPressed(Mouse.BUTTON_RIGHT)) {
+                if (isGodmode && creativeSlots.contains(slot)) {
+                    takeCreativeItem(slot, true);
+                    break;
+                }
                 rightClick(slot);
                 break;
             }
         }
+    }
+
+    /**
+     * Copies an item from an infinite creative slot to the cursor.
+     * @param slot the creative source slot
+     * @param isSingle whether only one item should be copied
+     */
+    private void takeCreativeItem(InventorySlot slot, boolean isSingle) {
+        if (slot.isEmpty()) return;
+        carriedItem = slot.getItem().copy();
+        carriedAmount = isSingle ? 1 : Math.max(1, inventory.getMaxStack(carriedItem));
     }
 
     /**
@@ -718,7 +889,7 @@ public class InventoryUI extends UIElement {
         renderChildren();
         renderCarriedItem();
 
-        if (inventory != null && inventory.getBackpackSlot() != null
+        if (!isGodmode && inventory != null && inventory.getBackpackSlot() != null
                 && inventory.getBackpackSlot().getItem() != null) {
             backpackButton.show();
         } else {
@@ -802,20 +973,10 @@ public class InventoryUI extends UIElement {
 
     /**
      * Sets the hotbar ui.
-     * @param gameMaster the game master value
      * @param hotbarUI the hotbar ui value
      */
-    public void setHotbarUI(GameMaster gameMaster, HotbarUI hotbarUI) {
-        this.gameMaster = gameMaster;
+    public void setHotbarUI(HotbarUI hotbarUI) {
         this.hotbarUI = hotbarUI;
-    }
-
-    /**
-     * Sets the game master.
-     * @param gameMaster the game master value
-     */
-    public void setGameMaster(GameMaster gameMaster) {
-        this.gameMaster = gameMaster;
     }
 
     /**
@@ -838,6 +999,20 @@ public class InventoryUI extends UIElement {
      * Enumerates the supported tab values.
      */
     public enum Tab {
-        INVENTORY, CRAFTING
+        INVENTORY,
+        CRAFTING,
+        BLOCKS,
+        TOOLS_ITEMS,
+        USABLES,
+        CROPS_SEEDS,
+        MATERIALS;
+
+        /**
+         * Checks whether this tab belongs to the creative inventory.
+         * @return {@code true} for creative category tabs
+         */
+        public boolean isCreative() {
+            return this != INVENTORY && this != CRAFTING;
+        }
     }
 }

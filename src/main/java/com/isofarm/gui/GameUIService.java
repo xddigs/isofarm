@@ -127,12 +127,9 @@ public class GameUIService implements Service<GameMaster> {
         float centerY = (windowHeight - bookHeight) * 0.5f;
         BookUI.init(centerX, centerY, bookWidth, bookHeight);
 
-        inventoryUI.setHotbarUI(gameMaster, hotbarUI);
+        inventoryUI.setHotbarUI(hotbarUI);
         inventoryUI.setIcons(seedIcons, cropIcons, blockIcons,
                 toolIcons, materialIcons, inventoryIcons);
-
-        inventoryUI.setGameMaster(gameMaster);
-        backpackUI.setGameMaster(gameMaster);
 
         uiManager.getRoot().addChild(inventoryUI);
         uiManager.getRoot().addChild(hotbarUI);
