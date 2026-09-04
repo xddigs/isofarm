@@ -26,6 +26,7 @@ public class BookUI extends UIElement {
     private static final float GRID_ICON_SIZE = 48.0f;
     private static final float GRID_GAP = 24.0f;
     private static final float GRID_OUTLINE_SIZE = 3.0f;
+    private static final float PAGE_CONTENT_CURVE = 18.0f;
 
     public static BookUI bui;
     private float animationProgress = 0.0f;
@@ -143,7 +144,8 @@ public class BookUI extends UIElement {
      * @param animSheet the anim sheet value
      */
     public void update(Book book, SpriteSheet animSheet) {
-        if (book == null || !isOpen() || book.getPages().isEmpty() || animSheet == null) {
+        if (book == null || !isOpen() || isFlippingPage
+                || book.getPages().isEmpty() || animSheet == null) {
             hoveredBookLine = null;
             GameMaster.game.getGameUIService()
                     .getUIManager()
@@ -288,6 +290,7 @@ public class BookUI extends UIElement {
             float animFrameProgress = isFlippingNext ? progress : (1.0f - progress);
             int currentFrame = (int) (animFrameProgress * (TOTAL_ANIM_FRAMES - 1));
             GUI.drawSprite(animSheet, currentFrame, centerX, y, bookWidth, bookHeight, new Vector4f(1.0f));
+            renderFlippingSpread(book, centerX, y, bookWidth, bookHeight, alpha, progress);
 
             if (progress >= 1.0f) {
                 isFlippingPage = false;
@@ -298,6 +301,70 @@ public class BookUI extends UIElement {
             renderSpread(book, centerX, y, animSheet, scale, alpha);
         }
         renderChildren();
+    }
+
+    /**
+     * Keeps page content attached to the animated sheet while it folds around
+     * the spine. The outgoing page contracts and the incoming page unfolds.
+     */
+    private void renderFlippingSpread(Book book, float bookX, float bookY,
+                                      float bookWidth, float bookHeight,
+                                      float alpha, float progress) {
+        float pageWidth = bookWidth / 2.0f;
+        float spineX = bookX + pageWidth;
+        float foldCurve = (float) Math.sin(progress * Math.PI) * PAGE_CONTENT_CURVE;
+        int currentPage = book.getCurrentPage();
+
+        if (isFlippingNext) {
+            int oldLeft = currentPage - 2;
+            int oldRight = currentPage - 1;
+            if (progress < 0.5f) {
+                renderPageAt(book, oldLeft, bookX, bookY, pageWidth, bookHeight, alpha);
+                float fold = easeInOutCubic(progress * 2.0f);
+                renderTransformedPage(book, oldRight, bookX + pageWidth, bookY,
+                        pageWidth, bookHeight, alpha, spineX, 1.0f - fold, foldCurve);
+            } else {
+                float unfold = easeInOutCubic((progress - 0.5f) * 2.0f);
+                renderPageAt(book, currentPage + 1, bookX + pageWidth, bookY,
+                        pageWidth, bookHeight, alpha);
+                renderTransformedPage(book, currentPage, bookX, bookY,
+                        pageWidth, bookHeight, alpha, spineX, unfold, foldCurve);
+            }
+        } else {
+            int oldLeft = currentPage + 2;
+            int oldRight = currentPage + 3;
+            if (progress < 0.5f) {
+                renderPageAt(book, oldRight, bookX + pageWidth, bookY,
+                        pageWidth, bookHeight, alpha);
+                float fold = easeInOutCubic(progress * 2.0f);
+                renderTransformedPage(book, oldLeft, bookX, bookY,
+                        pageWidth, bookHeight, alpha, spineX, 1.0f - fold, foldCurve);
+            } else {
+                float unfold = easeInOutCubic((progress - 0.5f) * 2.0f);
+                renderPageAt(book, currentPage, bookX, bookY,
+                        pageWidth, bookHeight, alpha);
+                renderTransformedPage(book, currentPage + 1, bookX + pageWidth, bookY,
+                        pageWidth, bookHeight, alpha, spineX, unfold, foldCurve);
+            }
+        }
+    }
+
+    /** Renders a page when its index exists. */
+    private void renderPageAt(Book book, int pageIndex, float pageX, float pageY,
+                              float pageWidth, float pageHeight, float alpha) {
+        if (pageIndex < 0 || pageIndex >= book.getPages().size()) return;
+        renderPage(book.getPage(pageIndex), pageX, pageY, pageWidth, pageHeight, alpha);
+    }
+
+    /** Renders one page with the temporary shader fold enabled. */
+    private void renderTransformedPage(Book book, int pageIndex,
+                                       float pageX, float pageY,
+                                       float pageWidth, float pageHeight, float alpha,
+                                       float spineX, float scaleX, float curve) {
+        if (pageIndex < 0 || pageIndex >= book.getPages().size()) return;
+        GUI.beginPageTransform(spineX, scaleX, pageWidth, curve);
+        renderPage(book.getPage(pageIndex), pageX, pageY, pageWidth, pageHeight, alpha);
+        GUI.endPageTransform();
     }
 
     /**

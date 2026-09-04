@@ -9,6 +9,12 @@ out vec2 vTexCoord;
 uniform mat4 uModel;
 uniform mat4 uProjection;
 
+uniform bool uUsePageTransform;
+uniform float uPagePivotX;
+uniform float uPageScaleX;
+uniform float uPageWidth;
+uniform float uPageCurve;
+
 uniform bool uUseFont;
 uniform bool uUseTexture;
 
@@ -16,7 +22,14 @@ uniform vec4 uGlyphUV;
 uniform vec4 uUVBounds;
 
 void main() {
-    gl_Position = uProjection * uModel * vec4(aPos, 1.0);
+    vec4 worldPosition = uModel * vec4(aPos, 1.0);
+    if (uUsePageTransform) {
+        float distanceFromSpine = worldPosition.x - uPagePivotX;
+        float pageProgress = clamp(abs(distanceFromSpine) / uPageWidth, 0.0, 1.0);
+        worldPosition.x = uPagePivotX + distanceFromSpine * uPageScaleX;
+        worldPosition.y -= sin(pageProgress * 3.14159265) * uPageCurve;
+    }
+    gl_Position = uProjection * worldPosition;
 
     if (uUseFont) {
         vTexCoord = mix(uGlyphUV.xy,uGlyphUV.zw, aTexCoord);

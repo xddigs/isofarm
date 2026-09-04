@@ -71,6 +71,7 @@ public class GUI {
         shader.setUniform("uTexture", 0);
         shader.setUniform("uUseFont", false);
         shader.setUniform("uUseSilhouette", false);
+        shader.setUniform("uUsePageTransform", false);
     }
 
     /**
@@ -333,6 +334,25 @@ public class GUI {
         shader.setUniform("uUseSilhouette", true);
         drawSprite(spriteSheet, frame, x, y, width, height, color);
         shader.setUniform("uUseSilhouette", false);
+    }
+
+    /**
+     * Applies a temporary horizontal fold and curve around a book spine.
+     * Every UI primitive rendered until {@link #endPageTransform()} receives
+     * the same deformation.
+     */
+    public static void beginPageTransform(float pivotX, float scaleX,
+                                          float pageWidth, float curve) {
+        shader.setUniform("uPagePivotX", pivotX);
+        shader.setUniform("uPageScaleX", Math.max(0.0f, scaleX));
+        shader.setUniform("uPageWidth", Math.max(1.0f, pageWidth));
+        shader.setUniform("uPageCurve", curve);
+        shader.setUniform("uUsePageTransform", true);
+    }
+
+    /** Restores normal UI rendering after a page fold. */
+    public static void endPageTransform() {
+        shader.setUniform("uUsePageTransform", false);
     }
 
     /**
