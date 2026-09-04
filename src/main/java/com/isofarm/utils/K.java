@@ -78,7 +78,8 @@ public final class K {
 
         public static final float SQUISH_DURATION = 0.25f;
 
-        public static final int ICON_SEED_CROPS_COLS = 4;
+        public static final int ICON_SEED_CROPS_COLS = 5;
+        public static final int ICON_SEED_SEEDS_COLS = 4;
         public static final int ICON_BLOCK_COLS = 10;
         public static final int ICON_BLOCK_ROWS = 4;
         public static final int ICON_TOOL_COLS = 5;
@@ -162,6 +163,7 @@ public final class K {
         public static final String CARROT_TEXTURE = "assets/crops/carrot_crop.png";
         public static final String POTATO_TEXTURE = "assets/crops/potato_crop.png";
         public static final String BEETROOT_TEXTURE = "assets/crops/beetroot_crop.png";
+        public static final String SUGAR_CANE_TEXTURE = "assets/crops/sugar_cane_crop.png";
 
         public static final String SEED_ICONS = "assets/sprites/seeds.png";
         public static final String CROP_ICONS = "assets/sprites/crops.png";
