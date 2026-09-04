@@ -97,7 +97,9 @@ void main() {
     vec3 finalColor = texColor.rgb * totalLight;
 
     if (vIsWater > 0.5 && vIsLava < 0.5) {
-        alpha *= 0.50;
+        if (uIsWater) {
+            alpha *= 0.50;
+        }
     }
 
     if (uIsSubmergedEntity) {

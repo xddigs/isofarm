@@ -176,7 +176,15 @@ public class ResourceManager {
         if (item instanceof Usable usable) {
             int col = usable.getUsablesID().getCol();
             int row = usable.getUsablesID().getRow();
-            int bucketOffset = (usable instanceof Bucket bucket && bucket.isFull()) ? 1 : 0;
+            int bucketOffset = 0;
+            if (usable instanceof Bucket bucket) {
+                if (bucket.getBlockType() == BlockData.WATER) {
+                    bucketOffset = 1;
+                } else if (bucket.getBlockType() == BlockData.LAVA) {
+                    bucketOffset = 2;
+                }
+            }
+
             return (row * K.UI.ICON_USABLES_COLS) + col + bucketOffset;
         }
 

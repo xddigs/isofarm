@@ -450,7 +450,7 @@ public class GameMaster {
             entities.removeIf(e -> e != Player.plyr && !e.isAlive());
         }
 
-        if (!Player.plyr.isAlive() && Player.plyr.getRespawnTimer() <= 0.0f) {
+        if (!Player.plyr.isAlive() && Player.plyr.getRespawnTimer() == 0.0f) {
             Player.plyr.respawn();
         }
     }

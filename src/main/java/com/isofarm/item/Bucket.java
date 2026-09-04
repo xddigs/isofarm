@@ -24,7 +24,6 @@ public class Bucket extends Usable {
     public Bucket(BlockData type) {
         super(Usables.BUCKET, Local.lang.t("item.usable.bucket"));
         this.type = type;
-        updateName();
     }
 
     /**
@@ -110,6 +109,16 @@ public class Bucket extends Usable {
     @Override
     public void update() {}
 
+    @Override
+    public String getName() {
+        if (type != null && type.equals(BlockData.WATER)) {
+            return Local.lang.t("item.usable.water_bucket");
+        } else if (type != null && type.equals(BlockData.LAVA)) {
+            return Local.lang.t("item.usable.lava_bucket");
+        }
+        return Local.lang.t("item.usable.bucket");
+    }
+
     /**
      * Performs the enchanting operation.
      * @param enchantment the enchantment value
@@ -134,14 +143,6 @@ public class Bucket extends Usable {
      */
     public void setBlockType(BlockData type) {
         this.type = type;
-        updateName();
-    }
-
-    /**
-     * Performs the fill operation.
-     */
-    public void fill() {
-        fill(BlockData.WATER);
     }
 
     /**
@@ -165,12 +166,5 @@ public class Bucket extends Usable {
      */
     public boolean isFull() {
         return type != null && type.isFluid();
-    }
-
-    /** Updates the displayed name to match the bucket contents. */
-    private void updateName() {
-        if (type == BlockData.WATER) setName(Local.lang.t("item.usable.water_bucket"));
-        else if (type == BlockData.LAVA) setName(Local.lang.t("item.usable.lava_bucket"));
-        else setName(Local.lang.t("item.usable.bucket"));
     }
 }
