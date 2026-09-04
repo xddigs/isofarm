@@ -446,6 +446,9 @@ public class GameMaster {
     private void updateEntities(float delta) {
         for (Entity entity : entities) {
             entity.update(HoveredCell.get(this), delta);
+            if (!Player.plyr.isAlive() && Player.plyr.getRespawnTimer() <= 0.0f) {
+                Player.plyr.respawn();
+            }
         }
         entities.removeIf(e -> e != Player.plyr && !e.isAlive());
     }

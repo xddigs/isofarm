@@ -21,7 +21,7 @@ public class Camera implements CameraView {
 
     private static final float DEFAULT_YAW = 45.0f;
     private static final float PITCH = 35.2643897f;
-    private static final float MAX_DAMAGE_TILT = 3.0f;
+    private static final float MAX_DAMAGE_TILT = 8.0f;
     private static final float DAMAGE_TILT_RECOVERY = 7.0f;
 
     private static final float NEAR_PLANE = 0.1f;
