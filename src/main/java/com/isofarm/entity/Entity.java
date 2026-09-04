@@ -14,6 +14,9 @@ import org.joml.Vector3f;
  */
 @DataClass
 public abstract class Entity {
+    private static final float LAVA_DAMAGE_INTERVAL = 1.0f;
+    private static final float LAVA_DAMAGE_STEP = 0.1f;
+
     private final byte id;
     private String name;
 
@@ -30,6 +33,8 @@ public abstract class Entity {
     private boolean wasOnGround;
 
     private float speed;
+    private float lavaDamageTimer;
+    private int lavaDamageTicks;
 
     /**
      * Creates a new {@code Entity} instance.
@@ -57,6 +62,82 @@ public abstract class Entity {
      */
     public boolean isAlive() {
         return hitpoints > 0;
+    }
+
+    /**
+     * Applies damage to the entity.
+     * @param amount the damage amount
+     */
+    public void damage(float amount) {
+        if (!isAlive() || amount <= 0) return;
+        float previousHitpoints = hitpoints;
+        hitpoints = Math.max(0.0f, hitpoints - amount);
+        if (hitpoints < previousHitpoints) onDamageTaken(amount);
+    }
+
+    /**
+     * Handles an applied damage event.
+     * @param amount the applied damage amount
+     */
+    protected void onDamageTaken(float amount) {}
+
+    /**
+     * Returns the maximum hitpoints used to scale environmental damage.
+     * @return the maximum hitpoints
+     */
+    public float getMaxHitpoints() {
+        return maxHitpoints;
+    }
+
+    /**
+     * Applies increasingly severe damage while the entity remains in direct
+     * contact with lava. Leaving the lava resets the damage progression.
+     * @param world the world value
+     * @param delta the elapsed time in seconds
+     */
+    public final void updateEnvironmentalDamage(World world, float delta) {
+        if (!isAlive() || delta <= 0 || !isTouchingLava(world)) {
+            lavaDamageTimer = 0;
+            lavaDamageTicks = 0;
+            return;
+        }
+
+        if (lavaDamageTicks == 0 && lavaDamageTimer == 0) {
+            lavaDamageTimer = LAVA_DAMAGE_INTERVAL;
+        } else {
+            lavaDamageTimer += delta;
+        }
+        while (lavaDamageTimer >= LAVA_DAMAGE_INTERVAL && isAlive()) {
+            lavaDamageTimer -= LAVA_DAMAGE_INTERVAL;
+            lavaDamageTicks++;
+            damage(Math.max(1.0f, getMaxHitpoints() * LAVA_DAMAGE_STEP * lavaDamageTicks));
+        }
+    }
+
+    /**
+     * Checks whether the entity bounds touch the occupied portion of a lava cell.
+     * @param world the world value
+     * @return {@code true} when the entity touches lava; otherwise {@code false}
+     */
+    private boolean isTouchingLava(World world) {
+        float epsilon = 0.001f;
+        float minX = position.x - dimensions.x / 2.0f + epsilon;
+        float maxX = position.x + dimensions.x / 2.0f - epsilon;
+        float minY = position.y;
+        float maxY = position.y + dimensions.y;
+        float minZ = position.z - dimensions.z / 2.0f + epsilon;
+        float maxZ = position.z + dimensions.z / 2.0f - epsilon;
+
+        for (int x = (int) Math.floor(minX); x <= (int) Math.floor(maxX); x++) {
+            for (int y = (int) Math.floor(minY); y <= (int) Math.floor(maxY); y++) {
+                for (int z = (int) Math.floor(minZ); z <= (int) Math.floor(maxZ); z++) {
+                    if (world.getBlockTypeAt(x, y, z) != BlockData.LAVA.getId()) continue;
+                    float lavaTop = y + world.getFluidLevelAt(x, y, z) / 8.0f;
+                    if (maxY > y && minY <= lavaTop + 0.05f) return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

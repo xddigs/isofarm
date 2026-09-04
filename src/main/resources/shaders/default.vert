@@ -9,6 +9,7 @@ out vec3 vNormal;
 out vec3 vFragPos;
 out vec4 vLightSpacePosition;
 out float vIsWater;
+out float vIsLava;
 
 uniform mat4 uProjection;
 uniform mat4 uView;
@@ -18,10 +19,13 @@ uniform float uTime;
 
 uniform vec4 uUVBounds;
 uniform bool uIsWater;
+uniform vec4 uLavaUVBounds;
 
 void main() {
     vec3 animatedPos = aPos;
-    if (uIsWater && aNormal.y > 0.5) {
+    bool isLava = aTexCoord.x >= uLavaUVBounds.x && aTexCoord.x <= uLavaUVBounds.z &&
+                  aTexCoord.y >= uLavaUVBounds.y && aTexCoord.y <= uLavaUVBounds.w;
+    if (uIsWater && !isLava && aNormal.y > 0.5) {
         float wave = sin((aPos.x + uTime) * 4.0) * 0.015 +
         cos((aPos.z + uTime * 0.8) * 4.0) * 0.015;
         animatedPos.y += wave;
@@ -36,4 +40,5 @@ void main() {
 
     vTexCoord = mix(uUVBounds.xy, uUVBounds.zw, aTexCoord);
     vIsWater = uIsWater ? 1.0 : 0.0;
+    vIsLava = isLava ? 1.0 : 0.0;
 }

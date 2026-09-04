@@ -446,6 +446,7 @@ public class GameMaster {
     private void updateEntities(float delta) {
         for (Entity entity : entities) {
             entity.update(HoveredCell.get(this), delta);
+            entity.updateEnvironmentalDamage(world, delta);
             entities.removeIf(e -> e != Player.plyr && !e.isAlive());
         }
 

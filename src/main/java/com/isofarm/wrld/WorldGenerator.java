@@ -25,7 +25,8 @@ public class WorldGenerator implements Generator {
     private static final int MAX_DEPTH = 50;
     private static final float LAKE_RADIUS = 4.0f;
     private static final float LAKE_SHORE_WIDTH = 1.5f;
-    private static final int PLANT_ATTEMPTS = 16;
+    private static final float LAVA_CLEARANCE = 4.0f;
+    private static final int PLANT_ATTEMPTS = 24;
 
     private static World world;
     private static FluidSimulation fluidSimulation;
@@ -34,6 +35,7 @@ public class WorldGenerator implements Generator {
     private final List<Tree> trees = new ArrayList<>();
     private final int mountainX;
     private final int mountainZ;
+    private final LavaPuddle lavaPuddle;
 
     /**
      * Creates a new {@code WorldGenerator} instance with a random seed.
@@ -58,6 +60,7 @@ public class WorldGenerator implements Generator {
         Random random = new Random(seed);
         mountainX = random.nextInt(13) - 6;
         mountainZ = -10 - random.nextInt(7);
+        lavaPuddle = chooseLavaPuddle();
         chooseLakes(random);
         chooseTrees(random);
     }
@@ -83,7 +86,8 @@ public class WorldGenerator implements Generator {
                 Lake lake = lakeAt(worldX, worldZ);
                 boolean lakeShore = lake == null && isLakeShore(worldX, worldZ);
                 int terrainY = terrainHeight(worldX, worldZ);
-                int topY = lake == null ? terrainY : SURFACE_Y - 1;
+                boolean lavaBlock = isLavaPuddle(worldX, worldZ);
+                int topY = lavaBlock ? lavaPuddle.y - 1 : lake == null ? terrainY : SURFACE_Y - 1;
 
                 for (int y = topY; y >= Math.max(1, topY - MAX_DEPTH); y--) {
                     float depthFactor = (float) (y - (SURFACE_Y - MAX_DEPTH)) / MAX_DEPTH;
@@ -105,11 +109,15 @@ public class WorldGenerator implements Generator {
                 if (lake != null) {
                     chunk.setBlock(x, SURFACE_Y, z, fluidSimulation.getFluidType().getId());
                     chunk.setFluidLevel(x, SURFACE_Y, z, (byte) 8);
+                } else if (lavaBlock) {
+                    chunk.setBlock(x, lavaPuddle.y, z, BlockData.LAVA.getId());
+                    chunk.setFluidLevel(x, lavaPuddle.y, z, (byte) 8);
                 }
             }
         }
 
         registerFluidSources(chunk, chunkX, chunkZ);
+        registerLavaSource(chunkX, chunkZ);
         generateTreesInChunk(chunkX, chunkZ, random);
         if (chunkX == 0 && chunkZ == 0) generatePlants(random);
     }
@@ -136,9 +144,23 @@ public class WorldGenerator implements Generator {
         for (int attempts = 0; lakes.size() < requested && attempts < requested * 100 + 100; attempts++) {
             int x = random.nextInt((int) ISLAND_RADIUS * 2 - 12) - (int) ISLAND_RADIUS + 6;
             int z = random.nextInt((int) ISLAND_RADIUS - 7); // Keep lakes away from the northern mountain.
-            if (distance(x, z, 0, 0) > ISLAND_RADIUS - LAKE_RADIUS - 2 || overlapsLake(x, z)) continue;
+            if (distance(x, z, 0, 0) > ISLAND_RADIUS - LAKE_RADIUS - 2
+                    || overlapsLake(x, z) || isLakeTooCloseToLava(x, z)) continue;
             lakes.add(new Lake(x, z, LAKE_RADIUS));
         }
+    }
+
+    /**
+     * Checks whether a lake would violate the reserved clearance around lava.
+     * @param x the lake center x value
+     * @param z the lake center z value
+     * @return {@code true} if the lake would be too close; otherwise {@code false}
+     */
+    private boolean isLakeTooCloseToLava(int x, int z) {
+        float maximumVariation = LAKE_RADIUS * 0.55f
+                * (Math.clamp(LAKE_ORGANICITY_PERCENT, 0, 100) / 100.0f);
+        return distance(x, z, lavaPuddle.x, lavaPuddle.z)
+                < LAKE_RADIUS + maximumVariation + LAKE_SHORE_WIDTH + LAVA_CLEARANCE;
     }
 
     /**
@@ -155,6 +177,54 @@ public class WorldGenerator implements Generator {
     }
 
     /**
+     * Selects a guaranteed interior position away from the island spawn and coast.
+     * @return the selected one-block lava puddle
+     */
+    private LavaPuddle chooseLavaPuddle() {
+        int bestX = ISLAND_CENTER_X;
+        int bestZ = ISLAND_CENTER_Z;
+        float bestClearance = -1;
+        for (int x = -11; x <= 11; x++) {
+            for (int z = -11; z <= -4; z++) {
+                if (distance(x, z, ISLAND_CENTER_X, ISLAND_CENTER_Z) > ISLAND_RADIUS - 4) continue;
+                float clearance = ISLAND_RADIUS - distance(x, z, ISLAND_CENTER_X, ISLAND_CENTER_Z);
+                clearance = Math.min(clearance,
+                        distance(x, z, ISLAND_CENTER_X, ISLAND_CENTER_Z) - 5.0f);
+                float tieBreaker = noise(x, z, 1) * 0.01f;
+                if (clearance + tieBreaker > bestClearance) {
+                    bestClearance = clearance + tieBreaker;
+                    bestX = x;
+                    bestZ = z;
+                }
+            }
+        }
+        int y = Math.min(terrainHeight(bestX, bestZ), Math.min(
+                Math.min(terrainHeight(bestX + 1, bestZ), terrainHeight(bestX - 1, bestZ)),
+                Math.min(terrainHeight(bestX, bestZ + 1), terrainHeight(bestX, bestZ - 1))));
+        return new LavaPuddle(bestX, y, bestZ);
+    }
+
+    /**
+     * Checks whether a horizontal position contains the generated lava puddle.
+     * @param x the world x value
+     * @param z the world z value
+     * @return {@code true} if the position contains lava; otherwise {@code false}
+     */
+    private boolean isLavaPuddle(int x, int z) {
+        return lavaPuddle.x == x && lavaPuddle.z == z;
+    }
+
+    /**
+     * Checks whether a position must remain clear around the lava puddle.
+     * @param x the world x value
+     * @param z the world z value
+     * @return {@code true} if the position is near lava; otherwise {@code false}
+     */
+    private boolean nearLavaPuddle(int x, int z) {
+        return distance(x, z, lavaPuddle.x, lavaPuddle.z) < 5;
+    }
+
+    /**
      * Selects valid positions for the configured trees.
      * @param random the random value
      */
@@ -166,6 +236,7 @@ public class WorldGenerator implements Generator {
             int localX = Math.floorMod(x, Chunk.SIZE_X);
             int localZ = Math.floorMod(z, Chunk.SIZE_Z);
             if (distance(x, z, 0, 0) > ISLAND_RADIUS - 4 || lakeAt(x, z) != null || isLakeShore(x, z)
+                    || nearLavaPuddle(x, z)
                     || nearTree(x, z) || localX < 2 || localX > 13 || localZ < 2 || localZ > 13) continue;
             trees.add(new Tree(x, terrainHeight(x, z), z));
         }
@@ -239,6 +310,18 @@ public class WorldGenerator implements Generator {
     }
 
     /**
+     * Registers the guaranteed lava puddle when its owning chunk is generated.
+     * @param chunkX the chunk x value
+     * @param chunkZ the chunk z value
+     */
+    private void registerLavaSource(int chunkX, int chunkZ) {
+        if (Math.floorDiv(lavaPuddle.x, Chunk.SIZE_X) == chunkX
+                && Math.floorDiv(lavaPuddle.z, Chunk.SIZE_Z) == chunkZ) {
+            LavaSimulation.ls.addSource(lavaPuddle.x, lavaPuddle.y, lavaPuddle.z);
+        }
+    }
+
+    /**
      * Generates every selected tree owned by a chunk.
      * @param chunkX the chunk x value
      * @param chunkZ the chunk z value
@@ -262,7 +345,8 @@ public class WorldGenerator implements Generator {
             int x = random.nextInt(14) - 7;
             int z = random.nextInt(14) - 7;
             int y = terrainHeight(x, z);
-            if (lakeAt(x, z) != null || isLakeShore(x, z) || nearTree(x, z)) continue;
+            if (lakeAt(x, z) != null || isLakeShore(x, z) || nearLavaPuddle(x, z)
+                    || nearTree(x, z)) continue;
             BlockData[] plants = BlockData.allPlants();
             BlockData plant = plants[random.nextInt(plants.length)];
             if (plant != BlockData.OAK_BONSAI && world.getBlockTypeAt(x, y, z) == BlockData.GRASS.getId()
@@ -298,7 +382,8 @@ public class WorldGenerator implements Generator {
             int x = centerX + random.nextInt(5) - 2;
             int z = centerZ + random.nextInt(5) - 2;
             int y = terrainHeight(x, z);
-            if (lakeAt(x, z) == null && !isLakeShore(x, z) && !nearTree(x, z)
+            if (lakeAt(x, z) == null && !isLakeShore(x, z) && !nearLavaPuddle(x, z)
+                    && !nearTree(x, z)
                     && Math.abs(y - surfaceY) <= 2
                     && world.getBlockTypeAt(x, y, z) == BlockData.GRASS.getId()
                     && world.getBlockTypeAt(x, y + 1, z) == BlockData.AIR.getId()) {
@@ -390,4 +475,7 @@ public class WorldGenerator implements Generator {
 
     /** Stores the base position of a generated tree. */
     private record Tree(int x, int y, int z) {}
+
+    /** Stores the position of the guaranteed one-block lava puddle. */
+    private record LavaPuddle(int x, int y, int z) {}
 }

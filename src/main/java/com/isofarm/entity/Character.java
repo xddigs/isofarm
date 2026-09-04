@@ -196,20 +196,18 @@ public abstract class Character extends Entity implements Levelable {
      * Performs the damage operation.
      * @param amount the amount value
      */
+    @Override
     public void damage(float amount) {
         if (!isAlive() || amount <= 0) return;
         if (gamemode.isGodmode() || gamemode.isNoClip()) return;
-        float previousHitpoints = hitpoints;
-        hitpoints = Math.max(0.0f, hitpoints - amount);
-        if (hitpoints < previousHitpoints) {
-            onDamageTaken(amount);
-        }
+        super.damage(amount);
     }
 
     /**
      * Performs the on damage taken operation.
      * @param amount the amount value
      */
+    @Override
     protected void onDamageTaken(float amount) {
     }
 
@@ -316,6 +314,7 @@ public abstract class Character extends Entity implements Levelable {
      * Returns the max hitpoints.
      * @return the max hitpoints
      */
+    @Override
     public float getMaxHitpoints() {
         return maxHitpoints * level;
     }

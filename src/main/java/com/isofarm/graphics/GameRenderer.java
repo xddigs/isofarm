@@ -97,6 +97,12 @@ public class GameRenderer {
             defaultShader.setUniform("uUseTexture", true);
             defaultShader.setUniform("uUseFaceAtlas", false);
             defaultShader.setUniform("uUVBounds", new Vector4f(0.0f, 0.0f, 1.0f, 1.0f));
+            TextureAtlas.TextureRegion lavaRegion = BlockData.LAVA.getTopRegion();
+            if (lavaRegion != null) {
+                defaultShader.setUniform("uLavaUVBounds", new Vector4f(
+                        lavaRegion.uvMin().x, lavaRegion.uvMin().y,
+                        lavaRegion.uvMax().x, lavaRegion.uvMax().y));
+            }
         }
 
         viewProjMatrix.set(camera.getProjectionMatrix()).mul(camera.getViewMatrix());

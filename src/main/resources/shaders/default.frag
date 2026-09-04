@@ -5,6 +5,7 @@ in vec2 vTexCoord;
 in vec3 vFragPos;
 in vec4 vLightSpacePosition;
 in float vIsWater;
+in float vIsLava;
 
 out vec4 FragColor;
 
@@ -95,7 +96,7 @@ void main() {
     float alpha = texColor.a * uParticleAlpha;
     vec3 finalColor = texColor.rgb * totalLight;
 
-    if (vIsWater > 0.5) {
+    if (vIsWater > 0.5 && vIsLava < 0.5) {
         alpha *= 0.50;
     }
 

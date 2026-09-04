@@ -50,7 +50,7 @@ public enum BlockData implements Blockable {
     TULIP((byte) 30, (byte) 10, (byte) (K.UI.ICON_BLOCK_ROWS - 1), false, true, 10, "assets/textures/blocks/tulip.png", SoundGroup.SOIL, 0.01f, true, new Object[]{}, Tier.NONE),
 
     OAK_BONSAI((byte) 31, (byte) 1, (byte) (K.UI.ICON_BLOCK_ROWS - 2), false, true, 100, "assets/textures/blocks/oak_bonsai.png", SoundGroup.SOIL, 0.01f, true, new Object[]{}, Tier.NONE),
-    LAVA((byte) 126, (byte) -1, (byte) -1, false, false, 150, "assets/textures/blocks/lava.png", SoundGroup.LAVA, 0.0f, true, new Object[]{}, Tier.NONE),
+    LAVA((byte) 126, (byte) -1, (byte) -1, false, false, 150, "assets/textures/blocks/lava.png", SoundGroup.LAVA, 0.0f, false, new Object[]{}, Tier.NONE),
     WATER((byte) 127, (byte) -1, (byte) -1, false, false, 80, "assets/textures/blocks/water.png", SoundGroup.WATER, 0.0f, true, new Object[]{}, Tier.NONE);
 
     public static final BlockData[] ORES = {COPPER_ORE, IRON_ORE, STEEL_ORE, GOLD_ORE, PLATINUM_ORE, DIAMOND_ORE};
