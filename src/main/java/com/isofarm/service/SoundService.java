@@ -25,6 +25,7 @@ import static org.lwjgl.stb.STBVorbis.stb_vorbis_decode_memory;
 /**
  * Provides sound service behavior.
  */
+@SuppressWarnings("all")
 @Singleton
 public class SoundService implements Service<SoundGroup> {
     public static final SoundService fx = new SoundService();
@@ -169,6 +170,18 @@ public class SoundService implements Service<SoundGroup> {
     }
 
     /**
+     * Plays a specific use sound without randomizing either the selected effect
+     * or its pitch.
+     *
+     * @param group the sound group
+     * @param soundIndex the index of the sound within the group's use sounds
+     */
+    public void playUseSound(SoundGroup group, int soundIndex) {
+        if (group == null) return;
+        playSound(useSource, group.getUseSounds(), 1.0f, 1.0f, soundIndex);
+    }
+
+    /**
      * Sets the background sound.
      * @param group the group value
      */
@@ -222,12 +235,33 @@ public class SoundService implements Service<SoundGroup> {
                            float pitchVariation, float volume) {
         if (sounds == null || sounds.length == 0) return;
         String selectedSoundPath = sounds[(int) (Math.random() * sounds.length)];
-        Integer bufferId = soundBuffers.get(selectedSoundPath);
+        playSoundBuffer(source, selectedSoundPath,
+                basePitch + (float) Math.random() * pitchVariation, volume);
+    }
+
+    /**
+     * Plays one concrete sound from an array without random selection or pitch.
+     *
+     * @param source the OpenAL source
+     * @param sounds the available sound paths
+     * @param pitch the exact playback pitch
+     * @param volume the playback volume
+     * @param soundIndex the sound path index to play
+     */
+    private void playSound(int source, String[] sounds, float pitch,
+                           float volume, int soundIndex) {
+        if (sounds == null || soundIndex < 0 || soundIndex >= sounds.length) return;
+        playSoundBuffer(source, sounds[soundIndex], pitch, volume);
+    }
+
+    /** Plays a loaded sound buffer with the supplied source settings. */
+    private void playSoundBuffer(int source, String soundPath, float pitch, float volume) {
+        Integer bufferId = soundBuffers.get(soundPath);
 
         if (bufferId != null && bufferId > 0) {
             alSourceStop(source);
             alSourcei(source, AL_BUFFER, bufferId);
-            alSourcef(source, AL_PITCH, basePitch + (float) Math.random() * pitchVariation);
+            alSourcef(source, AL_PITCH, pitch);
             alSourcef(source, AL_GAIN, volume);
             alSourcePlay(source);
         }

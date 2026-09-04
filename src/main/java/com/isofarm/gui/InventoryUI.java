@@ -6,6 +6,7 @@ import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.input.Mouse;
 import com.isofarm.item.*;
+import com.isofarm.service.SoundService;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
@@ -993,6 +994,7 @@ public class InventoryUI extends UIElement {
         this.containerBlock = block;
         this.inventory = block.getInventory();
         GameMaster.game.setInventoryOpen(true);
+        SoundService.fx.playUseSound(SoundGroup.CHEST, 0);
     }
 
     /** Restores the player's inventory after closing a block container. */
@@ -1002,6 +1004,7 @@ public class InventoryUI extends UIElement {
         containerBlock.setActivated(false);
         containerBlock = null;
         inventory = player == null ? null : player.getInventory();
+        SoundService.fx.playUseSound(SoundGroup.CHEST, 1);
     }
 
     /**
