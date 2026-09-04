@@ -9,19 +9,21 @@ import java.util.Locale;
  */
 @DataClass
 public enum InteractiveBlocks implements Blockable {
-    EMPTY(null, (byte) 0, (byte) -1, (byte) -1, -1, 0.0f),
-    CHEST("assets/models/blocks/chest.gltf", (byte) 1, (byte) 0, (byte) 2, 10, 2.5f),;
+    EMPTY(null, null, (byte) 0, (byte) -1, (byte) -1, -1, 0.0f),
+    CHEST("assets/models/blocks/chest.gltf", SoundGroup.CHEST, (byte) 1, (byte) 0, (byte) 2, 10, 2.5f),;
 
     private final String modelPath;
+    private final SoundGroup soundGroup;
     private final byte id;
     private final byte col;
     private final byte row;
     private final int value;
     private final float destroyTime;
 
-    InteractiveBlocks(String modelPath, byte id, byte col, byte row, int value,
+    InteractiveBlocks(String modelPath, SoundGroup soundGroup, byte id, byte col, byte row, int value,
                       float destroyTime) {
         this.modelPath = modelPath;
+        this.soundGroup = soundGroup;
         this.id = id;
         this.col = col;
         this.row = row;
@@ -47,11 +49,18 @@ public enum InteractiveBlocks implements Blockable {
 
     /**
      * Returns the GLTF model path of the block.
-     *
      * @return the model path, or {@code null} when the type has no model
      */
     public String getModelPath() {
         return modelPath;
+    }
+
+    /**
+     * Returns the sound group of the block.
+     * @return {@link SoundGroup} the sound group of the block
+     */
+    public SoundGroup getSoundGroup() {
+        return soundGroup;
     }
 
     /**

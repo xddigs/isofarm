@@ -583,15 +583,25 @@ public class GameInteraction {
      * Performs the break block operation.
      * @param gameMaster the game master value
      * @param cell the cell value
-     * @param blockData the block data value
+     * @param blockable the block data value
      * @param blockId the block id value
      * @param selectedItem the selected item value
      */
-    private void breakBlock(GameMaster gameMaster, BlockPos cell, BlockData blockData,
+    private void breakBlock(GameMaster gameMaster, BlockPos cell, Blockable blockable,
                             byte blockId, Item selectedItem) {
         World world = GameMaster.game.getWorld();
+
+        BlockData blockData = blockable instanceof BlockData ? (BlockData) blockable :
+                BlockData.fromId(blockId);
+        InteractiveBlocks interactive = blockable instanceof InteractiveBlocks ?
+                (InteractiveBlocks) blockable : null;
+
         if (blockData.getSoundGroup() != null) {
             SoundService.fx.playBreakSound(blockData.getSoundGroup());
+        }
+
+        if (interactive != null) {
+            SoundService.fx.playBreakSound(interactive.getSoundGroup());
         }
 
         Vector3f position = new Vector3f(cell.x() + 0.5f, cell.y() + 0.5f, cell.z() + 0.5f);
@@ -743,6 +753,7 @@ public class GameInteraction {
             world.addInteractiveBlock(placedBlock);
             WaterSimulation.ws.onBlockPlaced(placeX, placeY, placeZ);
             player.remove(selectedItem);
+            SoundService.fx.playPlaceSound(placedBlock.getType().getSoundGroup());
             GameMaster.game.getGameUIService().logAction(
                     new BlockPos(placedBlock.getType(), placeX, placeY, placeZ));
             log.trace("Interactive block placed: {} at {},{},{}",
@@ -778,8 +789,7 @@ public class GameInteraction {
                 }
             }
 
-            if (replacesWater
-                    && !WaterSimulation.ws.removeWater(placeX, placeY, placeZ)) {
+            if (replacesWater && !WaterSimulation.ws.removeWater(placeX, placeY, placeZ)) {
                 return;
             }
 

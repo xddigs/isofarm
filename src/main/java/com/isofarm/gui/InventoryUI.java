@@ -990,11 +990,10 @@ public class InventoryUI extends UIElement {
      */
     public void openContainer(iBlock block) {
         if (block == null || GameMaster.game == null) return;
-
         this.containerBlock = block;
         this.inventory = block.getInventory();
         GameMaster.game.setInventoryOpen(true);
-        SoundService.fx.playUseSound(SoundGroup.CHEST, 0);
+        SoundService.fx.playUseSound(block.getType().getSoundGroup(), 0);
     }
 
     /** Restores the player's inventory after closing a block container. */
@@ -1004,7 +1003,8 @@ public class InventoryUI extends UIElement {
         containerBlock.setActivated(false);
         containerBlock = null;
         inventory = player == null ? null : player.getInventory();
-        SoundService.fx.playUseSound(SoundGroup.CHEST, 1);
+        SoundService.fx.playUseSound(containerBlock.getType()
+                .getSoundGroup(), 1);
     }
 
     /**
