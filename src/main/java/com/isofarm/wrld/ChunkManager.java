@@ -20,7 +20,7 @@ import java.util.concurrent.Executors;
 public class ChunkManager {
     private static final float SOIL_GRASS_TIME = 10.0f;
     private final World world;
-    private final WorldGenerator generator;
+    private final Generator generator;
     private final Map<Chunk, ChunkMeshBuilder.ChunkRenderMesh> chunkMeshes;
     private final Map<SoilPosition, Float> soilTimers;
     private final ExecutorService meshExecutor;
@@ -415,7 +415,7 @@ public class ChunkManager {
      * Returns the generator.
      * @return the generator
      */
-    public WorldGenerator getGenerator() { return generator; }
+    public Generator getGenerator() { return generator; }
 
     /**
      * Stores mesh build result data.
