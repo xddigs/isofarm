@@ -19,6 +19,7 @@ public class RecipeRegistry {
      */
     public List<Recipe> init() {
         recipes.clear();
+        registeriBlocksRecipes();
         registerSmeltingRecipes();
         registerMaterialRecipes();
 
@@ -83,6 +84,15 @@ public class RecipeRegistry {
      */
     private Tier getTierFromMaterial(Craftable mat) {
         return (mat instanceof MiningComponent mc) ? mc.getTier() : Tier.WOODEN;
+    }
+
+    /**
+     * Performs the register {@link iBlock}'s recipes operation.
+     */
+    private void registeriBlocksRecipes() {
+        create(Tier.WOODEN)
+                .with(new Block(BlockData.OAK_WOOD), 6)
+                .result(new iBlock(InteractiveBlocks.CHEST), 1);
     }
 
     /**
