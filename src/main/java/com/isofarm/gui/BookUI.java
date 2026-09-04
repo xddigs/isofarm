@@ -2,9 +2,11 @@ package com.isofarm.gui;
 
 import com.isofarm.data.BookLine;
 import com.isofarm.data.Singleton;
+import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.input.Mouse;
 import com.isofarm.item.Book;
+import com.isofarm.item.Item;
 import com.isofarm.item.Page;
 import com.isofarm.utils.K;
 import com.isofarm.wrld.GameMaster;
@@ -19,6 +21,11 @@ public class BookUI extends UIElement {
     private static final float ANIMATION_DURATION = 0.35f;
     private static final float PAGE_FLIP_DURATION = 0.4f;
     private static final int TOTAL_ANIM_FRAMES = 16;
+    private static final int GRID_COLUMNS = 4;
+    private static final int GRID_ROWS = 4;
+    private static final float GRID_ICON_SIZE = 48.0f;
+    private static final float GRID_GAP = 24.0f;
+    private static final float GRID_OUTLINE_SIZE = 3.0f;
 
     public static BookUI bui;
     private float animationProgress = 0.0f;
@@ -181,28 +188,41 @@ public class BookUI extends UIElement {
 
         hoveredBookLine = null;
         int leftPageIndex = book.getCurrentPage();
+        float pageWidth = bookWidth / 2.0f;
 
         if (leftPageIndex < book.getPages().size()) {
-            float textX = centerX + paddingX;
-            checkHover(book.getPage(leftPageIndex), textX, y + paddingTop, lineHeight);
+            checkHover(book.getPage(leftPageIndex), centerX, y,
+                    pageWidth, bookHeight, paddingX, paddingTop, lineHeight);
         }
 
         int rightPageIndex = leftPageIndex + 1;
         if (hoveredBookLine == null && rightPageIndex < book.getPages().size()) {
-            float textX = centerX + (bookWidth / 2.0f) + paddingX;
-            checkHover(book.getPage(rightPageIndex), textX, y + paddingTop, lineHeight);
+            checkHover(book.getPage(rightPageIndex), centerX + pageWidth, y,
+                    pageWidth, bookHeight, paddingX, paddingTop, lineHeight);
         }
     }
 
     /**
      * Performs the check hover operation.
      * @param page the page value
-     * @param textX the text x value
-     * @param startY the start y value
+     * @param pageX the page x value
+     * @param pageY the page y value
+     * @param pageWidth the page width value
+     * @param pageHeight the page height value
+     * @param paddingX the horizontal text padding
+     * @param paddingTop the vertical text padding
      * @param lineHeight the line height value
      */
-    private void checkHover(Page page, float textX, float startY, float lineHeight) {
-        float textY = startY;
+    private void checkHover(Page page, float pageX, float pageY,
+                            float pageWidth, float pageHeight,
+                            float paddingX, float paddingTop, float lineHeight) {
+        if (hasItemIcons(page)) {
+            checkGridHover(page, pageX, pageY, pageWidth, pageHeight);
+            return;
+        }
+
+        float textX = pageX + paddingX;
+        float textY = pageY + paddingTop;
         for (BookLine bookLine : page.getLines()) {
             if (bookLine.isInteractive() && isMouseHovering(textX, textY, bookLine.getText())) {
                 hoveredBookLine = bookLine;
@@ -211,6 +231,32 @@ public class BookUI extends UIElement {
                 break;
             }
             textY += lineHeight;
+        }
+    }
+
+    /** Checks which recipe icon in a page grid is under the mouse. */
+    private void checkGridHover(Page page, float pageX, float pageY,
+                                float pageWidth, float pageHeight) {
+        float gridWidth = getGridWidth();
+        float gridHeight = getGridHeight();
+        float gridX = pageX + (pageWidth - gridWidth) * 0.5f;
+        float gridY = pageY + (pageHeight - gridHeight) * 0.5f;
+
+        int count = Math.min(page.getLines().size(), GRID_COLUMNS * GRID_ROWS);
+        for (int index = 0; index < count; index++) {
+            BookLine bookLine = page.getLine(index);
+            if (!bookLine.isInteractive() || bookLine.getItem() == null) continue;
+
+            int column = index % GRID_COLUMNS;
+            int row = index / GRID_COLUMNS;
+            float iconX = gridX + column * (GRID_ICON_SIZE + GRID_GAP);
+            float iconY = gridY + row * (GRID_ICON_SIZE + GRID_GAP);
+            if (isMouseHovering(iconX, iconY, GRID_ICON_SIZE, GRID_ICON_SIZE)) {
+                hoveredBookLine = bookLine;
+                GameMaster.game.getGameUIService().getUIManager().showTooltip(
+                        bookLine.getTooltipText(), Mouse.getX(), Mouse.getY());
+                return;
+            }
         }
     }
 
@@ -314,29 +360,39 @@ public class BookUI extends UIElement {
     private void renderSpread(Book book, float x, float y, SpriteSheet animSheet, float scale, float alpha) {
         if (book.getPages().isEmpty() || alpha <= 0.0f) return;
         float bookWidth = animSheet.getFrameWidth() * scale;
-        float leftPageX = x + K.UI.UI_BOOK_PADDING_X;
-        float rightPageX = x + (bookWidth / 2.0f) + K.UI.UI_BOOK_PADDING_X;
+        float bookHeight = animSheet.getFrameHeight() * scale;
+        float pageWidth = bookWidth / 2.0f;
 
         int leftPageIndex = book.getCurrentPage();
         if (leftPageIndex < book.getPages().size()) {
-            renderPage(book.getPage(leftPageIndex), leftPageX, y + K.UI.UI_BOOK_PADDING_TOP, alpha);
+            renderPage(book.getPage(leftPageIndex), x, y, pageWidth, bookHeight, alpha);
         }
 
         int rightPageIndex = leftPageIndex + 1;
         if (rightPageIndex < book.getPages().size()) {
-            renderPage(book.getPage(rightPageIndex), rightPageX, y + K.UI.UI_BOOK_PADDING_TOP, alpha);
+            renderPage(book.getPage(rightPageIndex), x + pageWidth, y,
+                    pageWidth, bookHeight, alpha);
         }
     }
 
     /**
      * Renders the page.
      * @param page the page value
-     * @param textX the text x value
-     * @param startY the start y value
+     * @param pageX the page x value
+     * @param pageY the page y value
+     * @param pageWidth the page width value
+     * @param pageHeight the page height value
      * @param alpha the alpha value
      */
-    private void renderPage(Page page, float textX, float startY, float alpha) {
-        float textY = startY;
+    private void renderPage(Page page, float pageX, float pageY,
+                            float pageWidth, float pageHeight, float alpha) {
+        if (hasItemIcons(page)) {
+            renderItemGrid(page, pageX, pageY, pageWidth, pageHeight, alpha);
+            return;
+        }
+
+        float textX = pageX + K.UI.UI_BOOK_PADDING_X;
+        float textY = pageY + K.UI.UI_BOOK_PADDING_TOP;
         float lineHeight = GUI.getNormalFont().getSize();
         for (BookLine bookLine : page.getLines()) {
             String renderText = bookLine.getText();
@@ -358,6 +414,63 @@ public class BookUI extends UIElement {
             GUI.drawNormalString(renderText, textX, textY, finalColor);
             textY += lineHeight;
         }
+    }
+
+    /** Renders up to sixteen recipe results in a centered 4x4 grid. */
+    private void renderItemGrid(Page page, float pageX, float pageY,
+                                float pageWidth, float pageHeight, float alpha) {
+        float gridX = pageX + (pageWidth - getGridWidth()) * 0.5f;
+        float gridY = pageY + (pageHeight - getGridHeight()) * 0.5f;
+        int count = Math.min(page.getLines().size(), GRID_COLUMNS * GRID_ROWS);
+
+        for (int index = 0; index < count; index++) {
+            BookLine bookLine = page.getLine(index);
+            Item item = bookLine.getItem();
+            if (item == null) continue;
+
+            SpriteSheet spriteSheet = ResourceManager.getItemSpriteSheet(item);
+            if (spriteSheet == null) continue;
+
+            int column = index % GRID_COLUMNS;
+            int row = index / GRID_COLUMNS;
+            float iconX = gridX + column * (GRID_ICON_SIZE + GRID_GAP);
+            float iconY = gridY + row * (GRID_ICON_SIZE + GRID_GAP);
+            int frame = ResourceManager.getItemFrame(item);
+
+            if (bookLine == hoveredBookLine) {
+                renderIconOutline(spriteSheet, frame, iconX, iconY, alpha);
+            }
+
+            GUI.drawSprite(spriteSheet, frame, iconX, iconY,
+                    GRID_ICON_SIZE, GRID_ICON_SIZE, new Vector4f(1.0f, 1.0f, 1.0f, alpha));
+        }
+    }
+
+    /** Draws a white outline shaped by the selected icon's alpha channel. */
+    private void renderIconOutline(SpriteSheet spriteSheet, int frame,
+                                   float x, float y, float alpha) {
+        Vector4f white = new Vector4f(1.0f, 1.0f, 1.0f, alpha);
+        for (int offsetX = -1; offsetX <= 1; offsetX++) {
+            for (int offsetY = -1; offsetY <= 1; offsetY++) {
+                if (offsetX == 0 && offsetY == 0) continue;
+                GUI.drawSpriteSilhouette(spriteSheet, frame,
+                        x + offsetX * GRID_OUTLINE_SIZE,
+                        y + offsetY * GRID_OUTLINE_SIZE,
+                        GRID_ICON_SIZE, GRID_ICON_SIZE, white);
+            }
+        }
+    }
+
+    private boolean hasItemIcons(Page page) {
+        return page.getLines().stream().anyMatch(line -> line.getItem() != null);
+    }
+
+    private float getGridWidth() {
+        return GRID_COLUMNS * GRID_ICON_SIZE + (GRID_COLUMNS - 1) * GRID_GAP;
+    }
+
+    private float getGridHeight() {
+        return GRID_ROWS * GRID_ICON_SIZE + (GRID_ROWS - 1) * GRID_GAP;
     }
 
     /**
@@ -405,6 +518,14 @@ public class BookUI extends UIElement {
         float verticalPadding = 2.0f;
         return mouseX >= x - horizontalPadding && mouseX <= x + width + horizontalPadding
                 && mouseY >= minY - verticalPadding && mouseY <= maxY + verticalPadding;
+    }
+
+    /** Checks whether the mouse is inside a rectangular icon. */
+    private boolean isMouseHovering(float x, float y, float width, float height) {
+        float mouseX = Mouse.getX();
+        float mouseY = Mouse.getY();
+        return mouseX >= x && mouseX <= x + width
+                && mouseY >= y && mouseY <= y + height;
     }
 
     /**

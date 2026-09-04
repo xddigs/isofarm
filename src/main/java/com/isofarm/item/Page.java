@@ -57,6 +57,18 @@ public class Page {
     }
 
     /**
+     * Adds an icon-backed interactive line.
+     * @param item the item displayed as an icon
+     * @param action the action value
+     * @param tooltipText the tooltip text value
+     */
+    public void addItem(Item item, Consumer<BookLine> action, String tooltipText) {
+        BookLine bookLine = new BookLine(item, action);
+        bookLine.setTooltipText(tooltipText);
+        bookLines.add(bookLine);
+    }
+
+    /**
      * Returns the line.
      * @param index the index value
      * @return the line

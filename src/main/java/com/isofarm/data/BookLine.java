@@ -1,5 +1,7 @@
 package com.isofarm.data;
 
+import com.isofarm.item.Item;
+
 import java.util.function.Consumer;
 
 /**
@@ -9,6 +11,7 @@ public class BookLine {
     private String text;
     private Consumer<BookLine> action;
     private String tooltipText;
+    private Item item;
 
     /**
      * Creates a new {@code BookLine} instance.
@@ -26,6 +29,16 @@ public class BookLine {
     public BookLine(String text, Consumer<BookLine> action) {
         this.text = text;
         this.action = action;
+    }
+
+    /**
+     * Creates an icon-backed interactive book line.
+     * @param item the item rendered by the book UI
+     * @param action the action value
+     */
+    public BookLine(Item item, Consumer<BookLine> action) {
+        this(item != null ? item.getDisplayName() : "", action);
+        this.item = item;
     }
 
     /**
@@ -85,5 +98,13 @@ public class BookLine {
     public BookLine setTooltipText(String tooltipText) {
         this.tooltipText = tooltipText;
         return this;
+    }
+
+    /**
+     * Returns the item represented by this line.
+     * @return the represented item, or {@code null} for a text line
+     */
+    public Item getItem() {
+        return item;
     }
 }

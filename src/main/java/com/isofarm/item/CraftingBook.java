@@ -7,9 +7,7 @@ import com.isofarm.entity.Player;
 import com.isofarm.service.CraftingService;
 import com.isofarm.wrld.GameMaster;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -39,46 +37,28 @@ public class CraftingBook extends Book implements Undroppable {
         List<Recipe> recipes = RecipeRegistry.reg.getRecipes();
         if (recipes.isEmpty()) return;
 
-        Map<Item, Integer> recipePageMap = new HashMap<>();
-        int tempLineCount = 0;
-        int tempPageIndex = 0;
-
-        for (Recipe recipe : recipes) {
-            List<String> lines = recipe.toBookLines();
-            if (lines.isEmpty()) continue;
-            if (tempLineCount + lines.size() > LINES_PER_PAGE) {
-                tempPageIndex++;
-                tempLineCount = 0;
-            }
-
-            if (recipe.result() != null) {
-                recipePageMap.putIfAbsent(recipe.result(), tempPageIndex);
-            }
-
-            tempLineCount += lines.size();
-        }
-
         Page page = new Page();
         addPage(page);
         int lineCount = 0;
         for (Recipe recipe : recipes) {
-            List<String> lines = recipe.toBookLines();
-            if (lines.isEmpty()) continue;
-            if (lineCount + lines.size() > LINES_PER_PAGE) {
+            if (recipe.result() == null) continue;
+            if (lineCount >= LINES_PER_PAGE) {
                 page = new Page();
                 addPage(page);
                 lineCount = 0;
             }
 
-            String tooltip = recipe.ingredients()
+            String ingredients = recipe.ingredients()
                     .stream()
                     .map(ingredient -> ingredient.craftable()
                             .getDisplayName() + " x " + ingredient.amount())
                     .collect(Collectors.joining("\n"));
+            String tooltip = recipe.result().getDisplayName()
+                    + (ingredients.isEmpty() ? "" : "\n" + ingredients);
 
-            page.addLine(lines.getFirst(),
-                    line -> CraftingService.cs.craft(recipe),
-                    tooltip); lineCount++;
+            page.addItem(recipe.result(),
+                    line -> CraftingService.cs.craft(recipe), tooltip);
+            lineCount++;
         }
     }
 

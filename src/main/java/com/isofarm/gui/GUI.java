@@ -70,6 +70,7 @@ public class GUI {
         shader.setUniform("uProjection", projection);
         shader.setUniform("uTexture", 0);
         shader.setUniform("uUseFont", false);
+        shader.setUniform("uUseSilhouette", false);
     }
 
     /**
@@ -323,6 +324,15 @@ public class GUI {
                                   float x, float y, float width, float height, Vector4f tint) {
         drawSprite(spriteSheet, frame % spriteSheet.getCols(),
                 frame / spriteSheet.getCols(), x, y, width, height, tint);
+    }
+
+    /** Draws a sprite as a solid color while preserving its texture alpha. */
+    public static void drawSpriteSilhouette(SpriteSheet spriteSheet, int frame,
+                                            float x, float y, float width, float height,
+                                            Vector4f color) {
+        shader.setUniform("uUseSilhouette", true);
+        drawSprite(spriteSheet, frame, x, y, width, height, color);
+        shader.setUniform("uUseSilhouette", false);
     }
 
     /**

@@ -7,6 +7,7 @@ out vec4 FragColor;
 uniform sampler2D uTexture;
 uniform bool uUseTexture;
 uniform bool uUseFont;
+uniform bool uUseSilhouette;
 
 uniform bool uUseRoundedRect;
 uniform vec2 uRectSize;
@@ -37,7 +38,12 @@ void main() {
     vec4 finalColor = uColor;
 
     if (uUseTexture) {
-        finalColor *= texture(uTexture, vTexCoord);
+        vec4 textureColor = texture(uTexture, vTexCoord);
+        if (uUseSilhouette) {
+            finalColor.a *= textureColor.a;
+        } else {
+            finalColor *= textureColor;
+        }
     }
 
     if (uUseRoundedRect) {
