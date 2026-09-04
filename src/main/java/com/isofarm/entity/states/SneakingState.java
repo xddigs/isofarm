@@ -2,11 +2,9 @@ package com.isofarm.entity.states;
 
 import com.isofarm.data.PlayerState;
 import com.isofarm.entity.Player;
-import com.isofarm.input.Keyboard;
-import com.isofarm.input.Mouse;
+import com.isofarm.input.ControlAction;
+import com.isofarm.input.Controls;
 import com.isofarm.wrld.GameMaster;
-
-import static org.lwjgl.glfw.GLFW.*;
 
 /**
  * Provides sneaking state behavior.
@@ -34,13 +32,13 @@ public class SneakingState implements PlayerState {
             return;
         }
 
-        if (Mouse.isButtonPressed(Mouse.BUTTON_LEFT) ||
-                Mouse.isButtonPressed(Mouse.BUTTON_RIGHT)) {
+        if (Controls.isPressed(ControlAction.PRIMARY_ACTION) ||
+                Controls.isPressed(ControlAction.SECONDARY_ACTION)) {
             player.interact();
             return;
         }
 
-        if (!Keyboard.isKeyDown(Keyboard.KEY_LEFT_CONTROL)) {
+        if (!Controls.isDown(ControlAction.SNEAK)) {
             player.changeState(new GroundedState());
         }
     }

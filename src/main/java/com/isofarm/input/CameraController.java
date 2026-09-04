@@ -44,15 +44,19 @@ public record CameraController(Camera camera) implements Service<Camera> {
         }
 
         Player player = Player.plyr;
-        if (Keyboard.isKeyDown(Keyboard.KEY_W) || Keyboard.isKeyDown(Keyboard.KEY_A) ||
-                Keyboard.isKeyDown(Keyboard.KEY_S) || Keyboard.isKeyDown(Keyboard.KEY_D)) {
+        if (Controls.isDown(ControlAction.MOVE_FORWARD)
+                || Controls.isDown(ControlAction.MOVE_BACKWARD)
+                || Controls.isDown(ControlAction.MOVE_LEFT)
+                || Controls.isDown(ControlAction.MOVE_RIGHT)
+                || Controls.getAxis(ControlAction.MOVE_X) != 0.0f
+                || Controls.getAxis(ControlAction.MOVE_Y) != 0.0f) {
             player.clearPath();
         }
 
         if (player.getCurrentState() instanceof SwimmingState) {
-            if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
+            if (Controls.isDown(ControlAction.SWIM_UP)) {
                 player.getVelocity().y = 4.0f;
-            } else if (Keyboard.isKeyDown(Keyboard.KEY_LEFT_CONTROL)) {
+            } else if (Controls.isDown(ControlAction.SWIM_DOWN)) {
                 player.getVelocity().y = -3.0f;
             }
         }
@@ -65,9 +69,8 @@ public record CameraController(Camera camera) implements Service<Camera> {
      * Updates the zoom.
      */
     private void updateZoom() {
-        boolean isPressingC = Keyboard.isKeyDown(Keyboard.KEY_C);
-        boolean isMiddleClickDown = Mouse.isButtonDown(Mouse.BUTTON_MIDDLE);
-        float targetZoom = isPressingC || isMiddleClickDown ? ZOOMED_ZOOM : NORMAL_ZOOM;
+        boolean isZooming = Controls.isDown(ControlAction.ZOOM);
+        float targetZoom = isZooming ? ZOOMED_ZOOM : NORMAL_ZOOM;
         if (camera.getZoom() != targetZoom) {
             camera.setZoom(targetZoom);
         }
@@ -93,7 +96,7 @@ public record CameraController(Camera camera) implements Service<Camera> {
         Vector3f directionToMouse = new Vector3f(mouseWorldPos).sub(playerPos);
         directionToMouse.y = 0.0f;
 
-        boolean isZoomed = Keyboard.isKeyDown(Keyboard.KEY_C);
+        boolean isZoomed = Controls.isDown(ControlAction.ZOOM);
         float cursorWeight = isZoomed ? ZOOMED_CURSOR_WEIGHT : NORMAL_CURSOR_WEIGHT;
 
         Vector3f targetOffset = new Vector3f(directionToMouse).mul(cursorWeight);
@@ -123,7 +126,7 @@ public record CameraController(Camera camera) implements Service<Camera> {
      */
     private void click(GameMaster gameMaster, World world) {
         Player player = Player.plyr;
-        boolean isRightClickDown = Mouse.isButtonDown(Mouse.BUTTON_RIGHT);
+        boolean isRightClickDown = Controls.isDown(ControlAction.PATHFIND);
         if (!isRightClickDown) {
             lastGoal = null;
             return;

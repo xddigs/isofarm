@@ -4,6 +4,8 @@ import com.isofarm.data.BookLine;
 import com.isofarm.data.Singleton;
 import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.SpriteSheet;
+import com.isofarm.input.ControlAction;
+import com.isofarm.input.Controls;
 import com.isofarm.input.Mouse;
 import com.isofarm.item.Book;
 import com.isofarm.item.Item;
@@ -156,7 +158,7 @@ public class BookUI extends UIElement {
         }
 
         updateBookLine(animSheet, book);
-        if (Mouse.isButtonPressed(Mouse.BUTTON_LEFT)) {
+        if (Controls.isPressed(ControlAction.UI_SELECT)) {
             click();
         }
     }

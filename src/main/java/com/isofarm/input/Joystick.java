@@ -76,6 +76,8 @@ public final class Joystick {
     private static void poll() {
         activeJoystick = -1;
 
+        int preferredJoystick = ControlConfigParser.controls.getPreferredJoystick();
+
         try (MemoryStack stack = MemoryStack.stackPush()) {
             GLFWGamepadState state = GLFWGamepadState.malloc(stack);
 
@@ -85,7 +87,7 @@ public final class Joystick {
                 clearCurrentState(joystick);
 
                 if (!available || !glfwGetGamepadState(joystick, state)) continue;
-                if (activeJoystick < 0) activeJoystick = joystick;
+                if (activeJoystick < 0 || joystick == preferredJoystick) activeJoystick = joystick;
 
                 ByteBuffer polledButtons = state.buttons();
                 for (int button = 0; button < BUTTON_COUNT; button++) {
@@ -118,6 +120,14 @@ public final class Joystick {
         return isButtonPressed(activeJoystick, button);
     }
 
+    /** Checks whether any gamepad binding for the logical action was pressed. */
+    public static boolean isButtonPressed(ControlAction action) {
+        for (int button : ControlConfigParser.controls.getJoystickButtonCodes(action)) {
+            if (isButtonPressed(button)) return true;
+        }
+        return false;
+    }
+
     /**
      * Checks whether the button pressed condition is met.
      * @param joystick the joystick value
@@ -137,6 +147,14 @@ public final class Joystick {
         return isButtonDown(activeJoystick, button);
     }
 
+    /** Checks whether any gamepad binding for the logical action is down. */
+    public static boolean isButtonDown(ControlAction action) {
+        for (int button : ControlConfigParser.controls.getJoystickButtonCodes(action)) {
+            if (isButtonDown(button)) return true;
+        }
+        return false;
+    }
+
     /**
      * Checks whether the button down condition is met.
      * @param joystick the joystick value
@@ -154,6 +172,14 @@ public final class Joystick {
      */
     public static boolean isButtonReleased(int button) {
         return isButtonReleased(activeJoystick, button);
+    }
+
+    /** Checks whether any gamepad binding for the logical action was released. */
+    public static boolean isButtonReleased(ControlAction action) {
+        for (int button : ControlConfigParser.controls.getJoystickButtonCodes(action)) {
+            if (isButtonReleased(button)) return true;
+        }
+        return false;
     }
 
     /**
@@ -222,6 +248,13 @@ public final class Joystick {
     public static float getAxis(int axis, float deadZone) {
         float value = getAxis(axis);
         return Math.abs(value) < Math.clamp(deadZone, 0.0f, 1.0f) ? 0.0f : value;
+    }
+
+    /** Returns the configured axis value after applying the configured dead zone. */
+    public static float getAxis(ControlAction action) {
+        int axis = ControlConfigParser.controls.getJoystickAxis(action);
+        return axis < 0 ? 0.0f : getAxis(axis,
+                ControlConfigParser.controls.getJoystickDeadZone());
     }
 
     /**

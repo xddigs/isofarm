@@ -2,10 +2,9 @@ package com.isofarm.entity.states;
 
 import com.isofarm.data.PlayerState;
 import com.isofarm.entity.Player;
-import com.isofarm.input.Keyboard;
+import com.isofarm.input.ControlAction;
+import com.isofarm.input.Controls;
 import com.isofarm.wrld.GameMaster;
-
-import static org.lwjgl.glfw.GLFW.*;
 
 /**
  * Provides grounded state behavior.
@@ -31,7 +30,7 @@ public class GroundedState implements PlayerState {
             return;
         }
 
-        if (Keyboard.isKeyDown(Keyboard.KEY_LEFT_CONTROL)) {
+        if (Controls.isDown(ControlAction.SNEAK)) {
             player.changeState(new SneakingState());
             return;
         }

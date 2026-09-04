@@ -2,11 +2,10 @@ package com.isofarm.entity.states;
 
 import com.isofarm.data.PlayerState;
 import com.isofarm.entity.Player;
-import com.isofarm.input.Keyboard;
+import com.isofarm.input.ControlAction;
+import com.isofarm.input.Controls;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
-
-import static org.lwjgl.glfw.GLFW.*;
 
 /**
  * Provides swimming state behavior.
@@ -33,9 +32,9 @@ public class SwimmingState implements PlayerState {
      */
     @Override
     public void input(GameMaster gameMaster) {
-        if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
+        if (Controls.isDown(ControlAction.SWIM_UP)) {
             player.getVelocity().y = SWIM_UP_SPEED;
-        } else if (Keyboard.isKeyDown(Keyboard.KEY_LEFT_CONTROL)) {
+        } else if (Controls.isDown(ControlAction.SWIM_DOWN)) {
             player.getVelocity().y = SWIM_DOWN_SPEED;
         }
     }
@@ -50,7 +49,7 @@ public class SwimmingState implements PlayerState {
         player.wasd(delta, yaw, false);
 
         if (player.isOnGround()) {
-            if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
+            if (Controls.isDown(ControlAction.SWIM_UP)) {
                 player.changeState(new GroundedState());
                 return;
             }

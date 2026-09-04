@@ -87,6 +87,14 @@ public final class Mouse {
         return button >= 0 && button <= BUTTON_LAST && buttons[button];
     }
 
+    /** Checks whether any mouse binding for the logical action is down. */
+    public static boolean isButtonDown(ControlAction action) {
+        for (int button : ControlConfigParser.controls.getMouseCodes(action)) {
+            if (isButtonDown(button)) return true;
+        }
+        return false;
+    }
+
     /**
      * Checks whether the button pressed condition is met.
      * @param button the button value
@@ -95,6 +103,14 @@ public final class Mouse {
     public static boolean isButtonPressed(int button) {
         return button >= 0 && button <= BUTTON_LAST
                 && buttons[button] && !lastButtons[button];
+    }
+
+    /** Checks whether any mouse binding for the logical action was pressed. */
+    public static boolean isButtonPressed(ControlAction action) {
+        for (int button : ControlConfigParser.controls.getMouseCodes(action)) {
+            if (isButtonPressed(button)) return true;
+        }
+        return false;
     }
 
     /**
@@ -107,6 +123,14 @@ public final class Mouse {
                 button <= BUTTON_LAST &&
                 !buttons[button] &&
                 lastButtons[button];
+    }
+
+    /** Checks whether any mouse binding for the logical action was released. */
+    public static boolean isButtonReleased(ControlAction action) {
+        for (int button : ControlConfigParser.controls.getMouseCodes(action)) {
+            if (isButtonReleased(button)) return true;
+        }
+        return false;
     }
 
     /**

@@ -4,6 +4,8 @@ import com.isofarm.data.*;
 import com.isofarm.entity.Player;
 import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.SpriteSheet;
+import com.isofarm.input.ControlAction;
+import com.isofarm.input.Controls;
 import com.isofarm.input.Mouse;
 import com.isofarm.item.*;
 import com.isofarm.service.SoundService;
@@ -678,7 +680,7 @@ public class InventoryUI extends UIElement {
             InventorySlot slot = slotUI.getSlotType();
             if (slot == null) continue;
 
-            if (Mouse.isButtonPressed(Mouse.BUTTON_LEFT)) {
+            if (Controls.isPressed(ControlAction.UI_SELECT)) {
                 if (isGodmode && creativeSlots.contains(slot)) {
                     takeCreativeItem(slot, false);
                     break;
@@ -687,7 +689,7 @@ public class InventoryUI extends UIElement {
                 break;
             }
 
-            if (Mouse.isButtonPressed(Mouse.BUTTON_RIGHT)) {
+            if (Controls.isPressed(ControlAction.UI_CONTEXT)) {
                 if (isGodmode && creativeSlots.contains(slot)) {
                     takeCreativeItem(slot, true);
                     break;

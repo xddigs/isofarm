@@ -3,15 +3,14 @@ package com.isofarm.item;
 import com.isofarm.data.*;
 import com.isofarm.entity.Player;
 import com.isofarm.gui.BookUI;
-import com.isofarm.input.Keyboard;
+import com.isofarm.input.ControlAction;
+import com.isofarm.input.Controls;
 import com.isofarm.service.BookService;
 import com.isofarm.service.SoundService;
 import com.isofarm.wrld.GameMaster;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.lwjgl.glfw.GLFW.*;
 
 /**
  * Provides book behavior.
@@ -63,8 +62,8 @@ public class Book extends Usable {
      */
     @Override
     public void update() {
-        if (Keyboard.isKeyPressed(Keyboard.KEY_LEFT)) previousPage();
-        if (Keyboard.isKeyPressed(Keyboard.KEY_RIGHT)) nextPage();
+        if (Controls.isPressed(ControlAction.PREVIOUS_PAGE)) previousPage();
+        if (Controls.isPressed(ControlAction.NEXT_PAGE)) nextPage();
     }
 
 

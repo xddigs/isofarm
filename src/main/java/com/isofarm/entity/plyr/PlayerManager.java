@@ -4,7 +4,8 @@ import com.isofarm.entity.Player;
 import com.isofarm.data.PlayerState;
 import com.isofarm.entity.states.GroundedState;
 import com.isofarm.entity.states.SneakingState;
-import com.isofarm.input.Keyboard;
+import com.isofarm.input.ControlAction;
+import com.isofarm.input.Controls;
 import com.isofarm.pathfinding.GridPos;
 import com.isofarm.service.BookService;
 import com.isofarm.wrld.GameMaster;
@@ -106,11 +107,12 @@ public final class PlayerManager {
         World world = World.wrld;
         if (GameMaster.game.isChatOpen() || GameMaster.game.isInventoryOpen() || BookService.bs.isOpen()) return;
         if (isFollowingPath()) { move(delta); return; }
-        float x = ZERO, z = ZERO;
-        if (Keyboard.isKeyDown(Keyboard.KEY_W)) z--;
-        if (Keyboard.isKeyDown(Keyboard.KEY_S)) z++;
-        if (Keyboard.isKeyDown(Keyboard.KEY_A)) x--;
-        if (Keyboard.isKeyDown(Keyboard.KEY_D)) x++;
+        float x = Controls.getAxis(ControlAction.MOVE_X);
+        float z = Controls.getAxis(ControlAction.MOVE_Y);
+        if (Controls.isDown(ControlAction.MOVE_FORWARD)) z--;
+        if (Controls.isDown(ControlAction.MOVE_BACKWARD)) z++;
+        if (Controls.isDown(ControlAction.MOVE_LEFT)) x--;
+        if (Controls.isDown(ControlAction.MOVE_RIGHT)) x++;
         Vector3f input = new Vector3f(x, ZERO, z);
         if (input.lengthSquared() > ZERO) {
             input.normalize();

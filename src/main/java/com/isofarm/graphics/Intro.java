@@ -1,7 +1,8 @@
 package com.isofarm.graphics;
 
 import com.isofarm.gui.*;
-import com.isofarm.input.Keyboard;
+import com.isofarm.input.ControlAction;
+import com.isofarm.input.Controls;
 import com.isofarm.service.BookService;
 import com.isofarm.service.TimeService;
 import com.isofarm.utils.K;
@@ -250,13 +251,13 @@ public class Intro {
 
             glfwPollEvents();
 
-            if (Keyboard.isKeyDown(Keyboard.KEY_LEFT_SHIFT) &&
-                    Keyboard.isKeyPressed(Keyboard.KEY_ESCAPE)) {
+            if (Controls.isDown(ControlAction.SMART_SHIFT) &&
+                    Controls.isPressed(ControlAction.QUIT)) {
                 GameMaster.game.getChunkManager().shutdown();
                 glfwSetWindowShouldClose(window, true);
             }
 
-            if (Keyboard.isKeyPressed(Keyboard.KEY_F5)) {
+            if (Controls.isPressed(ControlAction.CHANGE_LANGUAGE)) {
                 Local.lang.nextLanguage();
                 if (BookService.bs.isOpen() && BookService.bs.getOpenedBook() != null) {
                     BookUI.bui.reload(BookService.bs.getOpenedBook());
@@ -266,12 +267,12 @@ public class Intro {
                         Local.lang.getCurrentLanguage().getName()));
             }
 
-            if (Keyboard.isKeyPressed(Keyboard.KEY_F6)) {
+            if (Controls.isPressed(ControlAction.SHOW_LANGUAGE)) {
                 ToastFactory.info(Local.lang.f("engine.current_language",
                         Local.lang.getCurrentLanguage().getName()));
             }
 
-            if (Keyboard.isKeyPressed(Keyboard.KEY_F11)) {
+            if (Controls.isPressed(ControlAction.TOGGLE_FULLSCREEN)) {
                 toggleFullscreen();
             }
 

@@ -6,7 +6,8 @@ import com.isofarm.data.SlotType;
 import com.isofarm.entity.Player;
 import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.SpriteSheet;
-import com.isofarm.input.Keyboard;
+import com.isofarm.input.ControlAction;
+import com.isofarm.input.Controls;
 import com.isofarm.input.Mouse;
 import com.isofarm.item.Backpack;
 import com.isofarm.item.Book;
@@ -16,8 +17,6 @@ import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
 
 import java.util.List;
-
-import static org.lwjgl.glfw.GLFW.*;
 
 /**
  * Provides hotbar ui behavior.
@@ -427,9 +426,8 @@ public class HotbarUI extends UIElement {
      * Performs the interact operation.
      */
     private void interact() {
-        boolean isLeftClick = Mouse.isButtonPressed(Mouse.BUTTON_LEFT);
-        boolean isCtrlHeld = Keyboard.isKeyDown(Keyboard.KEY_LEFT_CONTROL) ||
-                Keyboard.isKeyDown(Keyboard.KEY_RIGHT_CONTROL);
+        boolean isLeftClick = Controls.isPressed(ControlAction.UI_SELECT);
+        boolean isCtrlHeld = Controls.isDown(ControlAction.MODIFIER);
 
         if (isLeftClick) {
             if (backpackSlotUI.isVisible() && isSlotHovered(backpackSlotUI)) {

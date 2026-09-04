@@ -173,6 +173,14 @@ public final class Keyboard {
         return keyCode >= 0 && keyCode <= KEY_LAST && keys[keyCode] && !lastKeys[keyCode];
     }
 
+    /** Checks whether any keyboard binding for the logical action was pressed. */
+    public static boolean isKeyPressed(ControlAction action) {
+        for (int keyCode : ControlConfigParser.controls.getKeyboardCodes(action)) {
+            if (isKeyPressed(keyCode)) return true;
+        }
+        return false;
+    }
+
     /**
      * Checks whether the key down condition is met.
      * @param keyCode the key code value
@@ -182,6 +190,14 @@ public final class Keyboard {
         return keyCode >= 0 && keyCode <= KEY_LAST && keys[keyCode];
     }
 
+    /** Checks whether any keyboard binding for the logical action is down. */
+    public static boolean isKeyDown(ControlAction action) {
+        for (int keyCode : ControlConfigParser.controls.getKeyboardCodes(action)) {
+            if (isKeyDown(keyCode)) return true;
+        }
+        return false;
+    }
+
     /**
      * Checks whether the key released condition is met.
      * @param keyCode the key code value
@@ -189,6 +205,14 @@ public final class Keyboard {
      */
     public static boolean isKeyReleased(int keyCode) {
         return keyCode >= 0 && keyCode <= KEY_LAST && !keys[keyCode] && lastKeys[keyCode];
+    }
+
+    /** Checks whether any keyboard binding for the logical action was released. */
+    public static boolean isKeyReleased(ControlAction action) {
+        for (int keyCode : ControlConfigParser.controls.getKeyboardCodes(action)) {
+            if (isKeyReleased(keyCode)) return true;
+        }
+        return false;
     }
 
     /**
