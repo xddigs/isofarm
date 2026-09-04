@@ -86,7 +86,6 @@ public class ResourceManager {
     public static SpriteSheet getItemSpriteSheet(Item item) {
         return switch (item) {
             case Crop crop -> cropSpritesheets.get(crop.getCropType());
-            case Produce produce when produce.getType() == CropType.SUGAR_CANE_CROP -> sugarCane;
             case Produce ignored -> cropIcons;
             case Seed seed when seed.getType() == CropType.SUGAR_CANE_CROP -> sugarCane;
             case Seed ignored -> seedIcons;
@@ -142,9 +141,6 @@ public class ResourceManager {
         }
 
         if (item instanceof Produce produce && produce.getType() != null) {
-            if (produce.getType() == CropType.SUGAR_CANE_CROP) {
-                return GrowthStage.HARVESTABLE.getFrameIndex();
-            }
             return produce.getType().getId();
         }
 
