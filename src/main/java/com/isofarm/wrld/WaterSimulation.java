@@ -72,6 +72,17 @@ public class WaterSimulation {
     }
 
     /**
+     * Checks whether the given water cell is a source.
+     * @param x the x value
+     * @param y the y value
+     * @param z the z value
+     * @return {@code true} if the cell is a water source; otherwise {@code false}
+     */
+    public boolean isSource(int x, int y, int z) {
+        return sources.contains(new FluidPos(x, y, z));
+    }
+
+    /**
      * Updates the current state.
      * @param delta the delta value
      */
@@ -433,6 +444,20 @@ public class WaterSimulation {
      */
     public void onBlockDestroyed(int x, int y, int z) {
         FluidPos pos = new FluidPos(x, y, z);
+        mark(pos);
+        enqueueNeighbours(pos);
+    }
+
+    /**
+     * Updates the simulation after a block replaces an empty or water cell.
+     * @param x the x value
+     * @param y the y value
+     * @param z the z value
+     */
+    public void onBlockPlaced(int x, int y, int z) {
+        FluidPos pos = new FluidPos(x, y, z);
+        sources.remove(pos);
+        World.wrld.setWaterLevelAt(x, y, z, (byte) 0);
         mark(pos);
         enqueueNeighbours(pos);
     }

@@ -622,8 +622,12 @@ public class GameInteraction {
 
             byte targetBlock = world.getBlockTypeAt(placeX, placeY, placeZ);
             BlockData target = BlockData.fromId(targetBlock);
+            boolean isWater = target == BlockData.WATER;
+            boolean replacesWater = isWater
+                    && (WaterSimulation.ws.isSource(placeX, placeY, placeZ)
+                    || block.getType().isSolid());
 
-            if (target == null || !target.equals(BlockData.AIR)
+            if (target == null || (!target.equals(BlockData.AIR) && !replacesWater)
                     || world.getCropAt(placeX, placeY, placeZ) != null) {
                 return;
             }
@@ -637,12 +641,18 @@ public class GameInteraction {
                 }
             }
 
+            if (replacesWater
+                    && !WaterSimulation.ws.removeWater(placeX, placeY, placeZ)) {
+                return;
+            }
+
             Block newBlock = new Block(block.getType(), placeX, placeY, placeZ);
             if (block.getType().equals(BlockData.OAK_BONSAI)) {
                 TreeService.ts.plant(placeX, placeY, placeZ, BlockData.OAK_BONSAI);
             } else {
                 world.setBlockTypeAt(placeX, placeY, placeZ, block.getType().getId());
             }
+            WaterSimulation.ws.onBlockPlaced(placeX, placeY, placeZ);
 
             player.remove(selectedItem);
             SoundService.fx.playBreakSound(newBlock.getType().getSoundGroup());
