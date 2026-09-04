@@ -28,7 +28,7 @@ public class WorldGenerator implements Generator {
     private static final int PLANT_ATTEMPTS = 16;
 
     private static World world;
-    private static WaterSimulation waterSimulation;
+    private static FluidSimulation fluidSimulation;
     private final long seed;
     private final List<Lake> lakes = new ArrayList<>();
     private final List<Tree> trees = new ArrayList<>();
@@ -38,21 +38,21 @@ public class WorldGenerator implements Generator {
     /**
      * Creates a new {@code WorldGenerator} instance with a random seed.
      * @param world the world value
-     * @param waterSimulation the water simulation value
+     * @param fluidSimulation the fluid simulation used for generated lakes
      */
-    public WorldGenerator(World world, WaterSimulation waterSimulation) {
-        this(world, waterSimulation, new Random().nextLong());
+    public WorldGenerator(World world, FluidSimulation fluidSimulation) {
+        this(world, fluidSimulation, new Random().nextLong());
     }
 
     /**
      * Creates a new {@code WorldGenerator} instance.
      * @param world the world value
-     * @param waterSimulation the water simulation value
+     * @param fluidSimulation the fluid simulation used for generated lakes
      * @param seed the seed value
      */
-    public WorldGenerator(World world, WaterSimulation waterSimulation, long seed) {
+    public WorldGenerator(World world, FluidSimulation fluidSimulation, long seed) {
         WorldGenerator.world = world;
-        WorldGenerator.waterSimulation = waterSimulation;
+        WorldGenerator.fluidSimulation = fluidSimulation;
         this.seed = seed;
 
         Random random = new Random(seed);
@@ -103,13 +103,13 @@ public class WorldGenerator implements Generator {
                 }
 
                 if (lake != null) {
-                    chunk.setBlock(x, SURFACE_Y, z, BlockData.WATER.getId());
-                    chunk.setWaterLevel(x, SURFACE_Y, z, (byte) 8);
+                    chunk.setBlock(x, SURFACE_Y, z, fluidSimulation.getFluidType().getId());
+                    chunk.setFluidLevel(x, SURFACE_Y, z, (byte) 8);
                 }
             }
         }
 
-        registerWaterSources(chunk, chunkX, chunkZ);
+        registerFluidSources(chunk, chunkX, chunkZ);
         generateTreesInChunk(chunkX, chunkZ, random);
         if (chunkX == 0 && chunkZ == 0) generatePlants(random);
     }
@@ -224,15 +224,15 @@ public class WorldGenerator implements Generator {
     }
 
     /**
-     * Registers generated lake blocks as water simulation sources.
+     * Registers generated lake blocks as fluid simulation sources.
      * @param chunk the generated chunk
      * @param chunkX the chunk x value
      * @param chunkZ the chunk z value
      */
-    private void registerWaterSources(Chunk chunk, int chunkX, int chunkZ) {
+    private void registerFluidSources(Chunk chunk, int chunkX, int chunkZ) {
         for (int x = 0; x < Chunk.SIZE_X; x++) for (int z = 0; z < Chunk.SIZE_Z; z++) {
-            if (chunk.getBlock(x, SURFACE_Y, z) == BlockData.WATER.getId()) {
-                waterSimulation.addSource(chunkX * Chunk.SIZE_X + x, SURFACE_Y,
+            if (chunk.getBlock(x, SURFACE_Y, z) == fluidSimulation.getFluidType().getId()) {
+                fluidSimulation.addSource(chunkX * Chunk.SIZE_X + x, SURFACE_Y,
                         chunkZ * Chunk.SIZE_Z + z);
             }
         }
@@ -328,7 +328,8 @@ public class WorldGenerator implements Generator {
     private static int findSurface(int x, int z) {
         for (int y = Chunk.SIZE_Y - 2; y >= 0; y--) {
             byte block = world.getBlockTypeAt(x, y, z);
-            if (block != BlockData.AIR.getId() && block != BlockData.WATER.getId()) return y;
+            BlockData data = BlockData.fromId(block);
+            if (data != null && data != BlockData.AIR && !data.isFluid()) return y;
         }
         return SURFACE_Y;
     }

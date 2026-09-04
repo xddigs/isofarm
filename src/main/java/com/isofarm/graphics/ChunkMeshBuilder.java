@@ -91,28 +91,27 @@ public class ChunkMeshBuilder {
                     boolean isWater = data.isFluid();
                     float topY;
                     if (data.isFluid()) {
-                        byte level = chunk.getWaterLevel(x, y, z);
+                        byte level = chunk.getFluidLevel(x, y, z);
                         int waterLevel = (level <= 0) ? 8 : level;
-                        boolean hasWaterAbove = (y < Chunk.SIZE_Y - 1) &&
-                                BLOCK_LUT[chunk.getBlock(x, y + 1, z) & 0xFF] != null &&
-                                BLOCK_LUT[chunk.getBlock(x, y + 1, z) & 0xFF].isFluid();
+                        boolean hasWaterAbove = y < Chunk.SIZE_Y - 1
+                                && chunk.getBlock(x, y + 1, z) == blockId;
                         topY = hasWaterAbove ? (y + 1.0f) : (y + (waterLevel / 8.0f) * 0.9f);
                     } else {
                         topY = y + 1.0f;
                     }
 
                     boolean renderTopFace = isWater
-                            ? shouldRenderWaterTop(world, worldX, y, worldZ)
+                            ? shouldRenderWaterTop(world, worldX, y, worldZ, data)
                             : (shouldRenderFace(world, worldX, y + 1, worldZ, data) || getBlockBottomY(world, worldX, y + 1, worldZ) > topY);
 
                     if (renderTopFace) {
                         TextureAtlas.TextureRegion region = data.getTopRegion();
                         if (region != null) {
                             if (isWater) {
-                                float y00 = getWaterCornerHeight(world, worldX, y, worldZ);
-                                float y10 = getWaterCornerHeight(world, worldX + 1, y, worldZ);
-                                float y11 = getWaterCornerHeight(world, worldX + 1, y, worldZ + 1);
-                                float y01 = getWaterCornerHeight(world, worldX, y, worldZ + 1);
+                                float y00 = getWaterCornerHeight(world, worldX, y, worldZ, data);
+                                float y10 = getWaterCornerHeight(world, worldX + 1, y, worldZ, data);
+                                float y11 = getWaterCornerHeight(world, worldX + 1, y, worldZ + 1, data);
+                                float y01 = getWaterCornerHeight(world, worldX, y, worldZ + 1, data);
 
                                 wPosIdx = addQuadPos(wPosBuf, wPosIdx, x, y01, z + 1, x + 1, y11, z + 1, x + 1, y10, z, x, y00, z);
 
@@ -293,7 +292,7 @@ public class ChunkMeshBuilder {
         if (neighborData == null) return true;
 
         if (currentBlock.isFluid()) {
-            return !neighborData.isSolid() && !neighborData.isFluid();
+            return !neighborData.isSolid() && neighborData != currentBlock;
         }
 
         if (neighborData.isFluid()) return true;
@@ -306,15 +305,17 @@ public class ChunkMeshBuilder {
      * @param worldX the world x value
      * @param y the y value
      * @param worldZ the world z value
+     * @param currentFluid the fluid being rendered
      * @return the should render water top result
      */
-    private static boolean shouldRenderWaterTop(World world, int worldX, int y, int worldZ) {
+    private static boolean shouldRenderWaterTop(World world, int worldX, int y, int worldZ,
+                                                BlockData currentFluid) {
         if (y >= Chunk.SIZE_Y - 1) return true;
         byte aboveId = world.getBlockTypeAt(worldX, y + 1, worldZ);
         if (aboveId == 0) return true;
         BlockData above = BLOCK_LUT[aboveId & 0xFF];
         if (above == null) return true;
-        if (above.isFluid()) return false;
+        if (above == currentFluid) return false;
         return !above.isSolid();
     }
 
@@ -324,9 +325,11 @@ public class ChunkMeshBuilder {
      * @param wx the wx value
      * @param wy the wy value
      * @param wz the wz value
+     * @param currentFluid the fluid being rendered
      * @return the water corner height
      */
-    private static float getWaterCornerHeight(World world, int wx, int wy, int wz) {
+    private static float getWaterCornerHeight(World world, int wx, int wy, int wz,
+                                              BlockData currentFluid) {
         float totalHeight = 0;
         int count = 0;
         for (int dx = -1; dx <= 0; dx++) {
@@ -336,8 +339,8 @@ public class ChunkMeshBuilder {
                 if (world.isChunkLoadedAt(nx, nz)) {
                     byte blockId = world.getBlockTypeAt(nx, wy, nz);
                     BlockData bData = BLOCK_LUT[blockId & 0xFF];
-                    if (bData != null && bData.isFluid()) {
-                        byte lvl = world.getWaterLevelAt(nx, wy, nz);
+                    if (bData == currentFluid) {
+                        byte lvl = world.getFluidLevelAt(nx, wy, nz);
                         float level = (lvl <= 0) ? 8 : lvl;
                         totalHeight += wy + (level / 8.0f) * 0.88f;
                         count++;

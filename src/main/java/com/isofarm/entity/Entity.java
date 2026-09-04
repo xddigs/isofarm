@@ -312,7 +312,7 @@ public abstract class Entity {
                         continue;
                     }
 
-                    float waterLevel = world.getWaterLevelAt(x, y, z) / 8.0f;
+                    float waterLevel = world.getFluidLevelAt(x, y, z) / 8.0f;
                     float waterTop = y + waterLevel;
                     float overlapMin = Math.max(position.y, y);
                     float overlapMax = Math.min(maxY, waterTop);

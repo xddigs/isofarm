@@ -302,7 +302,7 @@ public class Camera implements CameraView {
             BlockData data = BlockData.fromId(block);
             boolean hasBlock = data != BlockData.AIR;
 
-            if (hasBlock && (data != BlockData.WATER || isBucket)) {
+            if (hasBlock && (!data.isFluid() || isBucket)) {
                 boolean isTransparentObject = data == BlockData.OAK_LEAVES;
 
                 if (!isSmartFilter || !isTransparentObject) {

@@ -8,7 +8,7 @@ import com.isofarm.entity.Player;
 import com.isofarm.utils.HoveredCell;
 import com.isofarm.utils.Local;
 import com.isofarm.wrld.GameMaster;
-import com.isofarm.wrld.WaterSimulation;
+import com.isofarm.wrld.FluidSimulation;
 import com.isofarm.wrld.World;
 
 /**
@@ -24,6 +24,7 @@ public class Bucket extends Usable {
     public Bucket(BlockData type) {
         super(Usables.BUCKET, Local.lang.t("item.usable.bucket"));
         this.type = type;
+        updateName();
     }
 
     /**
@@ -61,22 +62,24 @@ public class Bucket extends Usable {
                 return false;
             }
 
-            if (World.wrld.getBlockTypeAt(targetBlock) != BlockData.WATER.getId()) {
+            BlockData fluidType = BlockData.fromId(World.wrld.getBlockTypeAt(targetBlock));
+            FluidSimulation simulation = FluidSimulation.forBlock(fluidType);
+            if (simulation == null) {
                 return false;
             }
 
-            if (!WaterSimulation.ws.isSource(
+            if (!simulation.isSource(
                     targetBlock.x(), targetBlock.y(), targetBlock.z())) {
                 return false;
             }
 
-            if (!WaterSimulation.ws.removeWater(
+            if (!simulation.removeFluid(
                     targetBlock.x(),
                     targetBlock.y(),
                     targetBlock.z())) {
                 return false;
             }
-            fill();
+            fill(fluidType);
             return true;
         }
 
@@ -93,7 +96,10 @@ public class Bucket extends Usable {
         int placeY = targetBlock.y() + normalY;
         int placeZ = targetBlock.z() + normalZ;
 
-        WaterSimulation.ws.addSource(placeX, placeY, placeZ);
+        FluidSimulation simulation = FluidSimulation.forBlock(type);
+        if (simulation == null || !simulation.addSource(placeX, placeY, placeZ)) {
+            return false;
+        }
         empty();
         return true;
     }
@@ -128,14 +134,22 @@ public class Bucket extends Usable {
      */
     public void setBlockType(BlockData type) {
         this.type = type;
+        updateName();
     }
 
     /**
      * Performs the fill operation.
      */
     public void fill() {
-        setBlockType(BlockData.WATER);
-        setName(Local.lang.t("item.usable.water_bucket"));
+        fill(BlockData.WATER);
+    }
+
+    /**
+     * Fills the bucket with a supported fluid.
+     * @param fluidType the fluid block type
+     */
+    public void fill(BlockData fluidType) {
+        if (FluidSimulation.forBlock(fluidType) != null) setBlockType(fluidType);
     }
 
     /**
@@ -143,7 +157,6 @@ public class Bucket extends Usable {
      */
     public void empty() {
         setBlockType(BlockData.AIR);
-        setName(Local.lang.t("item.usable.bucket"));
     }
 
     /**
@@ -151,6 +164,13 @@ public class Bucket extends Usable {
      * @return {@code true} if full; otherwise {@code false}
      */
     public boolean isFull() {
-        return type.equals(BlockData.WATER);
+        return type != null && type.isFluid();
+    }
+
+    /** Updates the displayed name to match the bucket contents. */
+    private void updateName() {
+        if (type == BlockData.WATER) setName(Local.lang.t("item.usable.water_bucket"));
+        else if (type == BlockData.LAVA) setName(Local.lang.t("item.usable.lava_bucket"));
+        else setName(Local.lang.t("item.usable.bucket"));
     }
 }

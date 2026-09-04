@@ -34,11 +34,11 @@ public class ChunkManager {
     /**
      * Creates a new {@code ChunkManager} instance.
      * @param world the world value
-     * @param waterSimulation the water simulation value
+     * @param fluidSimulation the fluid simulation used by the world generator
      */
-    public ChunkManager(World world, WaterSimulation waterSimulation) {
+    public ChunkManager(World world, FluidSimulation fluidSimulation) {
         this.world = world;
-        this.generator = new WorldGenerator(world, waterSimulation);
+        this.generator = new WorldGenerator(world, fluidSimulation);
         this.chunkMeshes = new HashMap<>();
         this.soilTimers = new HashMap<>();
         int threads = Math.max(1, Runtime.getRuntime().availableProcessors() - 2);

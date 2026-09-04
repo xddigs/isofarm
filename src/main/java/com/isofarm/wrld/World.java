@@ -348,6 +348,26 @@ public class World {
     }
 
     /**
+     * Returns the fluid level at a world position.
+     * @param x the x value
+     * @param y the y value
+     * @param z the z value
+     * @return the stored fluid level
+     */
+    public byte getFluidLevelAt(int x, int y, int z) {
+        return getWaterLevelAt(x, y, z);
+    }
+
+    /**
+     * Returns the fluid level at a world position.
+     * @param pos the position value
+     * @return the stored fluid level
+     */
+    public byte getFluidLevelAt(BlockPos pos) {
+        return getFluidLevelAt(pos.x(), pos.y(), pos.z());
+    }
+
+    /**
      * Sets the water level at.
      * @param x the x value
      * @param y the y value
@@ -377,6 +397,26 @@ public class World {
      */
     public void setWaterLevelAt(BlockPos pos, byte waterLevel) {
         setWaterLevelAt(pos.x(), pos.y(), pos.z(), waterLevel);
+    }
+
+    /**
+     * Sets the fluid level at a world position.
+     * @param x the x value
+     * @param y the y value
+     * @param z the z value
+     * @param fluidLevel the fluid level value
+     */
+    public void setFluidLevelAt(int x, int y, int z, byte fluidLevel) {
+        setWaterLevelAt(x, y, z, fluidLevel);
+    }
+
+    /**
+     * Sets the fluid level at a world position.
+     * @param pos the position value
+     * @param fluidLevel the fluid level value
+     */
+    public void setFluidLevelAt(BlockPos pos, byte fluidLevel) {
+        setFluidLevelAt(pos.x(), pos.y(), pos.z(), fluidLevel);
     }
 
     /**

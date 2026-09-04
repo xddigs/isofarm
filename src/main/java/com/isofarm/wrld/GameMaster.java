@@ -90,7 +90,7 @@ public class GameMaster {
 
         notifyProgress(progressCallback, ++currentStep / totalSteps);
 
-        this.chunkManager = new ChunkManager(world, WaterSimulation.ws);
+        this.chunkManager = new ChunkManager(world, FluidSimulation.forBlock(BlockData.WATER));
         this.itemRenderer = new ItemRenderer();
         this.shop = new Shop();
         notifyProgress(progressCallback, ++currentStep / totalSteps);
@@ -506,7 +506,7 @@ public class GameMaster {
         StepController.step.update(this, SoundService.fx, delta);
         GameInteraction.gami.update(this, Settings.selectedItem);
 
-        WaterSimulation.ws.update(delta);
+        FluidSimulation.updateAll(delta);
         chunkManager.update(Player.plyr.getPosition().x,
                 Player.plyr.getPosition().z, delta);
 

@@ -352,7 +352,7 @@ public enum BlockData implements Blockable {
      * @return {@code true} if fluid; otherwise {@code false}
      */
     public boolean isFluid() {
-        return this == WATER;
+        return this == WATER || this == LAVA;
     }
 
     /**

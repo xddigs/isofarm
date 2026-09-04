@@ -98,6 +98,17 @@ public class Chunk {
     }
 
     /**
+     * Returns the fluid level stored at a local chunk position.
+     * @param x the local x value
+     * @param y the local y value
+     * @param z the local z value
+     * @return the stored fluid level
+     */
+    public byte getFluidLevel(int x, int y, int z) {
+        return getWaterLevel(x, y, z);
+    }
+
+    /**
      * Sets the water level.
      * @param x the x value
      * @param y the y value
@@ -108,6 +119,17 @@ public class Chunk {
         if (!isOutOfBounds(x, y, z)) {
             waterLevels[getIndex(x, y, z)] = waterLevel;
         }
+    }
+
+    /**
+     * Sets the fluid level at a local chunk position.
+     * @param x the local x value
+     * @param y the local y value
+     * @param z the local z value
+     * @param fluidLevel the fluid level value
+     */
+    public void setFluidLevel(int x, int y, int z, byte fluidLevel) {
+        setWaterLevel(x, y, z, fluidLevel);
     }
 
     /**

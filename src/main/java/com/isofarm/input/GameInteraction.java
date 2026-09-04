@@ -14,7 +14,7 @@ import com.isofarm.utils.Settings;
 import com.isofarm.utils.ToastFactory;
 import com.isofarm.wrld.Chunk;
 import com.isofarm.wrld.GameMaster;
-import com.isofarm.wrld.WaterSimulation;
+import com.isofarm.wrld.FluidSimulation;
 import com.isofarm.wrld.World;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
@@ -673,9 +673,9 @@ public class GameInteraction {
         }
 
         world.setBlockTypeAt(cell, BlockData.AIR.getId());
-        world.setWaterLevelAt(cell.x(), cell.y(), cell.z(), (byte) 0);
+        world.setFluidLevelAt(cell.x(), cell.y(), cell.z(), (byte) 0);
         breakAbove(cell.x(), cell.y(), cell.z());
-        WaterSimulation.ws.onBlockDestroyed(cell.x(), cell.y(), cell.z());
+        FluidSimulation.notifyBlockDestroyed(cell.x(), cell.y(), cell.z());
         GameMaster.game.rebuildChunkMeshAt(cell);
         ParticleEngine.peng.spawnBlock(cell, blockData);
 
@@ -746,14 +746,14 @@ public class GameInteraction {
 
             BlockData target = BlockData.fromId(
                     world.getBlockTypeAt(placeX, placeY, placeZ));
-            boolean replacesWater = target == BlockData.WATER;
-            if (target == null || (target != BlockData.AIR && !replacesWater)
+            FluidSimulation targetFluid = FluidSimulation.forBlock(target);
+            boolean replacesFluid = targetFluid != null;
+            if (target == null || (target != BlockData.AIR && !replacesFluid)
                     || world.getCropAt(placeX, placeY, placeZ) != null) {
                 return;
             }
 
-            if (replacesWater
-                    && !WaterSimulation.ws.removeWater(placeX, placeY, placeZ)) {
+            if (replacesFluid && !targetFluid.removeFluid(placeX, placeY, placeZ)) {
                 return;
             }
 
@@ -768,7 +768,7 @@ public class GameInteraction {
             iBlock placedBlock = new iBlock(
                     interactiveBlock.getType(), placeX, placeY, placeZ, orientation);
             world.addInteractiveBlock(placedBlock);
-            WaterSimulation.ws.onBlockPlaced(placeX, placeY, placeZ);
+            FluidSimulation.notifyBlockPlaced(placeX, placeY, placeZ);
             player.remove(selectedItem);
             SoundService.fx.playPlaceSound(placedBlock.getType().getSoundGroup());
             GameMaster.game.getGameUIService().logAction(
@@ -787,12 +787,12 @@ public class GameInteraction {
 
             byte targetBlock = world.getBlockTypeAt(placeX, placeY, placeZ);
             BlockData target = BlockData.fromId(targetBlock);
-            boolean isWater = target == BlockData.WATER;
-            boolean replacesWater = isWater
-                    && (WaterSimulation.ws.isSource(placeX, placeY, placeZ)
+            FluidSimulation targetFluid = FluidSimulation.forBlock(target);
+            boolean replacesFluid = targetFluid != null
+                    && (targetFluid.isSource(placeX, placeY, placeZ)
                     || block.getType().isSolid());
 
-            if (target == null || (!target.equals(BlockData.AIR) && !replacesWater)
+            if (target == null || (!target.equals(BlockData.AIR) && !replacesFluid)
                     || world.getCropAt(placeX, placeY, placeZ) != null) {
                 return;
             }
@@ -806,17 +806,22 @@ public class GameInteraction {
                 }
             }
 
-            if (replacesWater && !WaterSimulation.ws.removeWater(placeX, placeY, placeZ)) {
+            if (replacesFluid && !targetFluid.removeFluid(placeX, placeY, placeZ)) {
                 return;
             }
 
             Block newBlock = new Block(block.getType(), placeX, placeY, placeZ);
             if (block.getType().equals(BlockData.OAK_BONSAI)) {
                 TreeService.ts.plant(placeX, placeY, placeZ, BlockData.OAK_BONSAI);
+            } else if (block.getType().isFluid()) {
+                FluidSimulation placedFluid = FluidSimulation.forBlock(block.getType());
+                if (placedFluid == null || !placedFluid.addSource(placeX, placeY, placeZ)) return;
             } else {
                 world.setBlockTypeAt(placeX, placeY, placeZ, block.getType().getId());
             }
-            WaterSimulation.ws.onBlockPlaced(placeX, placeY, placeZ);
+            if (!block.getType().isFluid()) {
+                FluidSimulation.notifyBlockPlaced(placeX, placeY, placeZ);
+            }
 
             player.remove(selectedItem);
             SoundService.fx.playBreakSound(newBlock.getType().getSoundGroup());
@@ -884,7 +889,7 @@ public class GameInteraction {
             CropService.cs.rip(crop);
             World.wrld.removeBlockAt(x, aboveY, z);
             World.wrld.setBlockTypeAt(x, aboveY, z, BlockData.AIR.getId());
-            World.wrld.setWaterLevelAt(x, aboveY, z, (byte) 0);
+            World.wrld.setFluidLevelAt(x, aboveY, z, (byte) 0);
             GameMaster.game.rebuildChunkMeshAt(x, z);
             return;
         }
@@ -898,7 +903,7 @@ public class GameInteraction {
 
         World.wrld.removeBlockAt(x, aboveY, z);
         World.wrld.setBlockTypeAt(x, aboveY, z, BlockData.AIR.getId());
-        World.wrld.setWaterLevelAt(x, aboveY, z, (byte) 0);
+        World.wrld.setFluidLevelAt(x, aboveY, z, (byte) 0);
         ParticleEngine.peng.spawnBlock(new BlockPos(aboveBlock, x, aboveY, z), aboveBlock);
         GameMaster.game.rebuildChunkMeshAt(x, z);
     }
