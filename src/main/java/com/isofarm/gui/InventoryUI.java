@@ -516,6 +516,14 @@ public class InventoryUI extends UIElement {
             Tab tab = getCreativeTab(item);
             if (tab != null) creativeItems.get(tab).add(item);
         }
+
+        List<Item> materials = creativeItems.get(Tab.MATERIALS);
+        materials.removeIf(MiningComponent.class::isInstance);
+        Tier.forEach(tier -> {
+            if (tier.isInvalidTier()) return;
+            materials.add(new MiningComponent(tier, MaterialID.RAW_ORE));
+            materials.add(new MiningComponent(tier, MaterialID.INGOT));
+        });
     }
 
     /**
@@ -552,7 +560,7 @@ public class InventoryUI extends UIElement {
             if (i < items.size()) {
                 Item item = items.get(i);
                 slot.setItem(item);
-                slot.setAmount(Math.max(1, inventory.getMaxStack(item)));
+                slot.setAmount(1);
             } else {
                 slot.clear();
             }
