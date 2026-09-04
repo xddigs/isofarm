@@ -445,7 +445,7 @@ public enum BlockData implements Blockable {
             Object rawDrop = drops[index];
 
             if (rawDrop instanceof String blockKey) {
-                return BlockData.valueOf(blockKey);
+                return new Block(BlockData.valueOf(blockKey));
             }
 
             return rawDrop;

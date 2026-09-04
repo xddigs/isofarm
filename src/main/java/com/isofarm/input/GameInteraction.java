@@ -247,15 +247,18 @@ public class GameInteraction {
                 continue;
             }
 
-            if (!player.hasSpace()) {
-                player.addToBackpack(item, amount);
+            int remaining = storeItem(player, item, amount);
+            int stored = amount - remaining;
+            if (remaining > 0) {
+                worldItem.setAmount(remaining);
             } else {
-                player.add(item, amount);
+                iterator.remove();
             }
 
-            iterator.remove();
-            SoundService.fx.playEntitySound(SoundGroup.ITEMS);
-            log.info("Added x{} {}", amount, item.getName());
+            if (stored > 0) {
+                SoundService.fx.playEntitySound(SoundGroup.ITEMS);
+                log.info("Added x{} {}", stored, item.getName());
+            }
         }
     }
 
@@ -348,18 +351,33 @@ public class GameInteraction {
                     int amount = worldItem.getAmount();
 
                     if (item != null && amount > 0) {
-                        if (!player.hasSpace()) {
-                            player.addToBackpack(item, amount);
+                        int remaining = storeItem(player, item, amount);
+                        int stored = amount - remaining;
+                        if (remaining > 0) {
+                            worldItem.setAmount(remaining);
+                            worldItem.setAttracting(false);
                         } else {
-                            player.add(item, amount);
+                            iterator.remove();
                         }
-                        SoundService.fx.playEntitySound(SoundGroup.ITEMS);
-                        log.info("Picked up x{} {}", amount, item.getName());
+                        if (stored > 0) {
+                            SoundService.fx.playEntitySound(SoundGroup.ITEMS);
+                            log.info("Picked up x{} {}", stored, item.getName());
+                        }
+                    } else {
+                        iterator.remove();
                     }
-                    iterator.remove();
                 }
             }
         }
+    }
+
+    /** Stores as much of a world item as possible and returns the remainder. */
+    private int storeItem(Player player, Item item, int amount) {
+        int remaining = player.getInventory().add(item, amount);
+        if (remaining > 0 && player.getInventory().hasBackpackEquipped()) {
+            remaining = player.getBackpack().add(item, remaining);
+        }
+        return remaining;
     }
 
     /**

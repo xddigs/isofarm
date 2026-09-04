@@ -2,8 +2,7 @@ package com.isofarm.service;
 
 import com.isofarm.data.*;
 import com.isofarm.entity.WorldItem;
-import com.isofarm.item.Axe;
-import com.isofarm.item.Item;
+import com.isofarm.item.*;
 import com.isofarm.utils.HoveredCell;
 import com.isofarm.utils.Settings;
 import com.isofarm.wrld.Chunk;
@@ -169,16 +168,30 @@ public class TreeService {
                     int worldX = chunkStartX + localX;
                     int worldZ = chunkStartZ + localZ;
 
-                    Item item = BlockData.fromIdTo(blockId);
                     if (!isConnectedToLog(worldX, localY, worldZ)) {
                         World.wrld.setBlockTypeAt(worldX, localY, worldZ, BlockData.AIR.getId());
-                        WorldItem worldItem = new WorldItem(item, 1, new Vector3f(worldX, localY, worldZ));
-                        gameMaster.addEntity(worldItem);
+                        Item item = createLeafDrop(BlockData.OAK_LEAVES.getRandomDrop());
+                        if (item != null) {
+                            WorldItem worldItem = new WorldItem(item, 1,
+                                    new Vector3f(worldX + 0.5f, localY + 0.5f,
+                                            worldZ + 0.5f));
+                            gameMaster.addEntity(worldItem);
+                        }
                         gameMaster.rebuildChunkMeshAt(worldX, worldZ);
                     }
                 }
             }
         }
+    }
+
+    /** Converts a configured leaf drop into a concrete inventory item. */
+    private Item createLeafDrop(Object drop) {
+        return switch (drop) {
+            case MaterialID materialID -> new Material(Tier.NONE, materialID);
+            case BlockData blockData -> new Block(blockData);
+            case Item item -> item;
+            case null, default -> null;
+        };
     }
 
     /**
