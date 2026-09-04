@@ -486,6 +486,7 @@ public class GameInteraction {
             return;
         }
 
+        SoundService.fx.playBreakingSound(blockData.getSoundGroup());
         long now = System.nanoTime();
         float deltaTime = (now - lastBreakTime) / 1_000_000_000.0f;
         lastBreakTime = now;
@@ -678,10 +679,10 @@ public class GameInteraction {
      * Performs the reset breaking operation.
      */
     private void resetBreaking() {
+        SoundService.fx.stopBreakingSound();
         breakingX = Integer.MIN_VALUE;
         breakingY = Integer.MIN_VALUE;
         breakingZ = Integer.MIN_VALUE;
-
         breakProgress = 0.0f;
         lastBreakTime = 0L;
     }

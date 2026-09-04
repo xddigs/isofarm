@@ -36,6 +36,7 @@ public class SoundService implements Service<SoundGroup> {
 
     private int stepSource;
     private int breakSource;
+    private int breakingSource;
     private int placeSource;
     private int entitySource;
     private int backgroundSource;
@@ -43,6 +44,7 @@ public class SoundService implements Service<SoundGroup> {
     private int useSource;
 
     private String currentBackgroundSound;
+    private SoundGroup currentBreakingSoundGroup;
     private boolean hasLoaded = false;
 
     /**
@@ -58,6 +60,7 @@ public class SoundService implements Service<SoundGroup> {
         for (SoundGroup group : SoundGroup.values()) {
             loadSoundArray(group.getStepSounds());
             loadSoundArray(group.getBreakSounds());
+            loadSoundArray(group.getBreakingSounds());
             loadSoundArray(group.getPlaceSounds());
             loadSoundArray(group.getEntitySounds());
             loadSoundArray(group.getBackgroundSounds());
@@ -96,6 +99,7 @@ public class SoundService implements Service<SoundGroup> {
 
         stepSource = alGenSources();
         breakSource = alGenSources();
+        breakingSource = alGenSources();
         placeSource = alGenSources();
         entitySource = alGenSources();
         backgroundSource = alGenSources();
@@ -103,6 +107,7 @@ public class SoundService implements Service<SoundGroup> {
         useSource = alGenSources();
 
         alSourcef(breakSource, AL_GAIN, 1.0f);
+        alSourcef(breakingSource, AL_GAIN, 1.0f);
         alSourcef(stepSource, AL_GAIN, 1.0f);
         alSourcef(placeSource, AL_GAIN, 1.0f);
         alSourcef(entitySource, AL_GAIN, 1.0f);
@@ -127,6 +132,31 @@ public class SoundService implements Service<SoundGroup> {
     public void playBreakSound(SoundGroup group) {
         playSound(breakSource, group != null ? group.getBreakSounds() : null,
                 0.8f, 0.2f, 1.0f);
+    }
+
+    /**
+     * Performs the play breaking sound operation.
+     * @param group the group value
+     */
+    public void playBreakingSound(SoundGroup group) {
+        String[] sounds = group != null ? group.getBreakingSounds() : null;
+        if (sounds == null || sounds.length == 0) {
+            stopBreakingSound();
+            return;
+        }
+
+        boolean isPlaying = alGetSourcei(breakingSource, AL_SOURCE_STATE) == AL_PLAYING;
+        if (isPlaying && group == currentBreakingSoundGroup) return;
+
+        currentBreakingSoundGroup = group;
+        playSound(breakingSource, sounds, 0.8f, 0.2f, 1.0f);
+    }
+
+    /** Stops the sound played while a block is being broken. */
+    public void stopBreakingSound() {
+        alSourceStop(breakingSource);
+        alSourcei(breakingSource, AL_BUFFER, 0);
+        currentBreakingSoundGroup = null;
     }
 
     /**
