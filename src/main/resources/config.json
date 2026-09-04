@@ -1,0 +1,59 @@
+{
+  "keyboard": {
+    "move_forward": "GLFW_KEY_W",
+    "move_backward": "GLFW_KEY_S",
+    "move_left": "GLFW_KEY_A",
+    "move_right": "GLFW_KEY_D",
+    "swim_up": "GLFW_KEY_SPACE",
+    "swim_down": "GLFW_KEY_LEFT_CONTROL",
+    "sneak": "GLFW_KEY_LEFT_CONTROL",
+    "zoom": "GLFW_KEY_C",
+    "open_chat": "GLFW_KEY_ENTER",
+    "toggle_hud": "GLFW_KEY_F1",
+    "toggle_debug": "GLFW_KEY_F3",
+    "drop_item": "GLFW_KEY_Q",
+    "modifier": ["GLFW_KEY_LEFT_CONTROL", "GLFW_KEY_RIGHT_CONTROL"],
+    "smart_shift": "GLFW_KEY_LEFT_SHIFT",
+    "toggle_inventory": "GLFW_KEY_E",
+    "toggle_book": "GLFW_KEY_TAB",
+    "toggle_music": "GLFW_KEY_M",
+    "previous_page": "GLFW_KEY_LEFT",
+    "next_page": "GLFW_KEY_RIGHT",
+    "quit": "GLFW_KEY_ESCAPE",
+    "change_language": "GLFW_KEY_F5",
+    "show_language": "GLFW_KEY_F6",
+    "toggle_fullscreen": "GLFW_KEY_F11"
+  },
+  "mouse": {
+    "primary_action": "GLFW_MOUSE_BUTTON_LEFT",
+    "secondary_action": "GLFW_MOUSE_BUTTON_RIGHT",
+    "pathfind": "GLFW_MOUSE_BUTTON_RIGHT",
+    "zoom": "GLFW_MOUSE_BUTTON_MIDDLE",
+    "ui_select": "GLFW_MOUSE_BUTTON_LEFT",
+    "ui_context": "GLFW_MOUSE_BUTTON_RIGHT"
+  },
+  "joystick": {
+    "preferred": "AUTO",
+    "dead_zone": 0.2,
+    "buttons": {
+      "move_forward": "GLFW_GAMEPAD_BUTTON_DPAD_UP",
+      "move_backward": "GLFW_GAMEPAD_BUTTON_DPAD_DOWN",
+      "move_left": "GLFW_GAMEPAD_BUTTON_DPAD_LEFT",
+      "move_right": "GLFW_GAMEPAD_BUTTON_DPAD_RIGHT",
+      "swim_up": "GLFW_GAMEPAD_BUTTON_A",
+      "swim_down": "GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER",
+      "sneak": "GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER",
+      "primary_action": "GLFW_GAMEPAD_BUTTON_X",
+      "secondary_action": "GLFW_GAMEPAD_BUTTON_B",
+      "toggle_inventory": "GLFW_GAMEPAD_BUTTON_Y",
+      "toggle_book": "GLFW_GAMEPAD_BUTTON_BACK",
+      "open_chat": "GLFW_GAMEPAD_BUTTON_START",
+      "previous_page": "GLFW_GAMEPAD_BUTTON_LEFT_BUMPER",
+      "next_page": "GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER"
+    },
+    "axes": {
+      "move_x": "GLFW_GAMEPAD_AXIS_LEFT_X",
+      "move_y": "GLFW_GAMEPAD_AXIS_LEFT_Y"
+    }
+  }
+}
