@@ -20,6 +20,8 @@ public class RecipeRegistry {
     public List<Recipe> init() {
         recipes.clear();
         registerSmeltingRecipes();
+        registerMaterialRecipes();
+
         create(Tier.LEATHER).result(new Block(BlockData.OAK_WOOD), 4).with(BlockData.fromIdTo(BlockData.OAK_LOG.getId()),1).add();
         create(Tier.LEATHER).result(new Material(Tier.NONE, MaterialID.STICK), 4).with(BlockData.fromIdTo(BlockData.OAK_WOOD.getId()), 1).add();
         create(Tier.LEATHER).result(new Book(false), 1).with(MaterialID.LEATHER, 3).with(MaterialID.PAPER, 2).add();
@@ -93,6 +95,19 @@ public class RecipeRegistry {
                     .result(new MiningComponent(tier, MaterialID.INGOT), 1)
                     .with(new MiningComponent(tier, MaterialID.RAW_ORE), 1).add();
         }
+    }
+
+    /**
+     * Performs the register material recipes operation.
+     */
+    private void registerMaterialRecipes() {
+        Tier tier = Tier.NONE;
+        create(Tier.LEATHER)
+                .with(new Material(tier, MaterialID.SUGAR_CANE), 1)
+                .result(new Material(tier, MaterialID.PAPER), 2).add();
+        create(Tier.LEATHER)
+                .with(new Material(tier, MaterialID.SUGAR_CANE), 1)
+                .result(new Material(tier, MaterialID.SUGAR), 4).add();
     }
 
     /**
