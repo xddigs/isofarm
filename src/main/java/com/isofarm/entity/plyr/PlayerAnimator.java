@@ -26,6 +26,8 @@ public final class PlayerAnimator {
     private static final float ROTATION_SPEED = 720.0f, FULL_DEGREES = 360.0f, HALF_DEGREES = 180.0f;
     private static final float MAX_HEAD_YAW = (float) Math.toRadians(65), MAX_HEAD_PITCH = (float) Math.toRadians(35);
     private static final float HEAD_SPEED = 12.0f;
+    private static final float DEATH_FALL_DURATION = 0.75f;
+    private static final float DEATH_FADE_DURATION = 0.75f;
     private Player player;
     private final Matrix4f modelMatrix = new Matrix4f();
     private GLTFModel model;
@@ -34,6 +36,7 @@ public final class PlayerAnimator {
     private Vector3f headPosition, torsoPosition, backpackPosition, rightArmPosition, leftArmPosition, rightLegPosition, leftLegPosition;
     private Direction direction = Direction.S;
     private float modelYaw, targetYaw, idleTime, idleWeight, sneakWeight, walkTime, walkWeight, attackTime;
+    private float deathTime, deathWeight, deathAlpha = 1.0f;
     private boolean attacking;
 
     /** Creates the shared player's animator. */
@@ -59,6 +62,13 @@ public final class PlayerAnimator {
 
     /** @param delta frame time in seconds */
     public void update(float delta) {
+        if (!player.isAlive()) {
+            updateDeath(delta);
+            return;
+        }
+        deathTime = 0.0f;
+        deathWeight = 0.0f;
+        deathAlpha = 1.0f;
         updateRotation(delta);
         if (backpack != null) backpack.setVisible(player.getInventory().hasBackpackEquipped());
         Vector3f velocity = player.getVelocity();
@@ -102,6 +112,43 @@ public final class PlayerAnimator {
         if (model != null) model.updateTransforms();
         if (moving) updateFacing(velocity);
         updateEquipment();
+    }
+
+    /** Advances a short procedural ragdoll pose while awaiting respawn. */
+    private void updateDeath(float delta) {
+        deathTime += delta;
+        float progress = Math.min(deathTime / DEATH_FALL_DURATION, 1.0f);
+        deathWeight = 1.0f - (float) Math.pow(1.0f - progress, 3.0f);
+        float fadeProgress = Math.clamp(
+                (deathTime - DEATH_FALL_DURATION) / DEATH_FADE_DURATION, 0.0f, 1.0f);
+        deathAlpha = 1.0f - fadeProgress;
+        attacking = false;
+        attackTime = 0.0f;
+
+        float loosen = deathWeight;
+        translate(head, headPosition, 0.0f, -0.08f * loosen, 0.0f);
+        translate(torso, torsoPosition, 0.0f, -0.04f * loosen, 0.0f);
+        translate(backpack, backpackPosition, 0.0f, 0.04f * loosen, 0.0f);
+        translate(rightArm, rightArmPosition, 0.0f, -0.05f * loosen, 0.0f);
+        translate(leftArm, leftArmPosition, 0.0f, -0.05f * loosen, 0.0f);
+        translate(rightLeg, rightLegPosition, 0.0f, 0.0f, 0.0f);
+        translate(leftLeg, leftLegPosition, 0.0f, 0.0f, 0.0f);
+
+        rotate(torso, new Quaternionf().rotateX((float) Math.toRadians(8.0f) * loosen));
+        rotate(backpack, new Quaternionf().rotateX((float) Math.toRadians(8.0f) * loosen));
+        if (baseHeadRotation != null) {
+            rotate(head, new Quaternionf(baseHeadRotation)
+                    .rotateZ((float) Math.toRadians(-18.0f) * loosen));
+        }
+        rotate(leftArm, new Quaternionf().rotateX((float) Math.toRadians(-35.0f) * loosen)
+                .rotateZ((float) Math.toRadians(-28.0f) * loosen));
+        rotate(rightArm, new Quaternionf().rotateX((float) Math.toRadians(25.0f) * loosen)
+                .rotateZ((float) Math.toRadians(32.0f) * loosen));
+        rotate(leftLeg, new Quaternionf().rotateX((float) Math.toRadians(18.0f) * loosen));
+        rotate(rightLeg, new Quaternionf().rotateX((float) Math.toRadians(-12.0f) * loosen));
+
+        if (model != null) model.updateTransforms();
+        EquipmentController.ec.equip(null, null);
     }
 
     private static void translate(GLTFNode node, Vector3f base, float x, float y, float z) {
@@ -161,10 +208,13 @@ public final class PlayerAnimator {
     public void render(GameMaster game, RenderPass pass) {
         if (model == null) return;
         float scale = Settings.getScaledEntity();
+        float deathRoll = (float) Math.toRadians(82.0f) * deathWeight;
+        float deathDrop = 0.35f * deathWeight;
         if (pass == RenderPass.SHADOW) {
             Shader shader = ResourceManager.rem.getShadowMapShader(); if (shader == null) return;
             shader.bind(); shader.setUniform("uLightSpaceMatrix", ShadowSystem.sys.getLightSpaceMatrix());
-            modelMatrix.identity().translate(player.getPosition()).rotateY((float) Math.toRadians(modelYaw)).scale(scale);
+            modelMatrix.identity().translate(player.getPosition().x, player.getPosition().y - deathDrop, player.getPosition().z)
+                    .rotateY((float) Math.toRadians(modelYaw)).rotateZ(deathRoll).scale(scale);
             shader.setUniform("uModel", modelMatrix); glEnable(GL_DEPTH_TEST); glDepthFunc(GL_LESS); glDepthMask(true);
             model.render(shader, modelMatrix); glDepthMask(true); glDepthFunc(GL_LESS); shader.unbind(); return;
         }
@@ -174,10 +224,11 @@ public final class PlayerAnimator {
         shader.setUniform("uLightIntensity", light.getIntensity()); shader.setUniform("uLightDirection", light.getDirection());
         shader.setUniform("uAmbientIntensity", light.getAmbientIntensity()); shader.setUniform("uSkyColor", TimeService.getSkyColor());
         shader.setUniform("uBaseColor", new Vector3f(1)); shader.setUniform("uIsSprite", false); shader.setUniform("uUseTexture", true);
-        shader.setUniform("uParticleAlpha", 1f); shader.setUniform("uIsMaskPass", false); shader.setUniform("uEnableShadows", Settings.doEnableShadows());
+        shader.setUniform("uParticleAlpha", deathAlpha); shader.setUniform("uIsMaskPass", false); shader.setUniform("uEnableShadows", Settings.doEnableShadows());
         shader.setUniform("uLightSpaceMatrix", ShadowSystem.sys.getLightSpaceMatrix()); shader.setUniform("uIsSubmergedEntity", pass == RenderPass.SUBMERGED);
         float bob = (float) Math.sin(idleTime) * .025f * idleWeight;
-        modelMatrix.identity().translate(player.getPosition().x, player.getPosition().y + bob, player.getPosition().z).rotateY((float) Math.toRadians(modelYaw)).scale(scale);
+        modelMatrix.identity().translate(player.getPosition().x, player.getPosition().y + bob - deathDrop, player.getPosition().z)
+                .rotateY((float) Math.toRadians(modelYaw)).rotateZ(deathRoll).scale(scale);
         shader.setUniform("uModel", modelMatrix); glEnable(GL_DEPTH_TEST); glEnable(GL_CULL_FACE); glCullFace(GL_BACK);
         glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         if (pass == RenderPass.NORMAL) { glDepthFunc(GL_LESS); glDepthMask(true); shader.setUniform("uIsSubmergedEntity", false); }

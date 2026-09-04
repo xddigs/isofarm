@@ -96,15 +96,13 @@ void main() {
     float alpha = texColor.a * uParticleAlpha;
     vec3 finalColor = texColor.rgb * totalLight;
 
-    if (vIsWater > 0.5 && vIsLava < 0.5) {
-        if (uIsWater) {
-            alpha *= 0.50;
-        }
+    if (vIsWater > 0.5 && uIsWater) {
+        alpha = vIsLava > 0.5 ? 1.0 : 0.50;
     }
 
     if (uIsSubmergedEntity) {
         finalColor *= vec3(0.65, 0.85, 1.0);
-        alpha = 1.0;
+        alpha = uParticleAlpha;
     }
 
     FragColor = vec4(finalColor, alpha);

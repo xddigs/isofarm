@@ -30,7 +30,6 @@ public final class K {
         public static final float GRAVITY = -25.0f;
         public static final float JUMP_FORCE = 9.0f;
 
-        public static final int MAP_WORLD_SIZE = 96;
         public static final float TILE_SIZE = 1.0f;
         public static final float DEFAULT_BLOCK_DEPTH = 0.4f;
         public static final float WEATHER_CHANGE_PROBABILITY = 0.01f;

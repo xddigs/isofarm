@@ -268,6 +268,7 @@ public class Library implements Service<GameMaster> {
                 return;
             }
             player.setHitpoints(-player.getHitpoints());
+            SoundService.fx.playEntitySound(SoundGroup.ENTITY);
             log.info("Command kill executed");
             ToastFactory.success(Local.lang.t("toast.self_kill"));
         }));

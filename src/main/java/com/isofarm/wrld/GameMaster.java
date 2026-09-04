@@ -16,6 +16,7 @@ import com.isofarm.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -41,6 +42,8 @@ public class GameMaster {
     private final ItemRegistry itemRegistry = new ItemRegistry();
     private final RainEngine rainEngine = new RainEngine();
     private final List<Entity> entities = new LinkedList<>();
+    private final List<Entity> entitiesToAdd = new ArrayList<>();
+    private final List<Entity> entitiesToRemove = new ArrayList<>();
     private List<Recipe> recipes;
     private ShadowMap shadowMap;
     private ChunkManager chunkManager;
@@ -419,15 +422,13 @@ public class GameMaster {
      * @param entity the entity value
      */
     public void addEntity(Entity entity) {
-        if (entity == null) {
-            return;
-        }
-
+        if (entity == null) return;
         if (entity instanceof WorldItem worldItem) {
             worldItem.setWorld(world);
         }
-
-        entities.add(entity);
+        if (!entities.contains(entity) && !entitiesToAdd.contains(entity)) {
+            entitiesToAdd.add(entity);
+        }
     }
 
     /**
@@ -436,7 +437,7 @@ public class GameMaster {
      */
     public void removeEntity(Entity entity) {
         if (entity == null) return;
-        entities.remove(entity);
+        entitiesToRemove.add(entity);
     }
 
     /**
@@ -444,12 +445,21 @@ public class GameMaster {
      * @param delta the delta value
      */
     private void updateEntities(float delta) {
+        if (!entitiesToAdd.isEmpty()) {
+            entities.addAll(entitiesToAdd);
+            entitiesToAdd.clear();
+        }
+        if (!entitiesToRemove.isEmpty()) {
+            entities.removeAll(entitiesToRemove);
+            entitiesToRemove.clear();
+        }
+
         for (Entity entity : entities) {
             entity.update(HoveredCell.get(this), delta);
             entity.updateEnvironmentalDamage(world, delta);
-            entities.removeIf(e -> e != Player.plyr && !e.isAlive());
         }
 
+        entities.removeIf(e -> e != Player.plyr && !e.isAlive());
         if (!Player.plyr.isAlive() && Player.plyr.getRespawnTimer() == 0.0f) {
             Player.plyr.respawn();
         }

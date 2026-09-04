@@ -96,7 +96,6 @@ public final class PlayerGameplay {
     public void respawn() {
         if (!Settings.doKeepInventory()) clear();
         GridPos altitude = GameMaster.game.getWorld().getHighestY(SPAWN_X, SPAWN_Z);
-        GameMaster.game.addEntity(player);
         player.setPosition(new Vector3f(SPAWN_X, altitude.y() + 1.0f, SPAWN_Z));
         player.setVelocity(new Vector3f()); player.setDimensions(new Vector3f(WIDTH, HEIGHT, WIDTH));
         player.setSpeed(SPEED); player.setReputation(Reputation.NEUTRAL); player.setGamemode(Gamemode.SURVIVAL);

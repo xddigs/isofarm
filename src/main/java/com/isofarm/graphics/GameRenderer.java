@@ -268,7 +268,6 @@ public class GameRenderer {
 
         defaultShader.setUniform("uIsWater", false);
         defaultShader.setUniform("uIsSubmergedEntity", false);
-        gameMaster.getEntities().removeIf(e -> !e.isAlive());
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LESS);
         glDepthMask(true);
