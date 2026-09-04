@@ -1,5 +1,6 @@
 package com.isofarm.graphics;
 
+import com.isofarm.Game;
 import com.isofarm.gui.*;
 import com.isofarm.input.ControlAction;
 import com.isofarm.input.Controls;
@@ -330,6 +331,7 @@ public class Intro {
             glfwSetWindowSize(window, windowedWidth, windowedHeight);
         }
 
+        Game.setWindowIcon(window);
         updateFramebufferSize();
         glViewport(0, 0, framebufferWidth, framebufferHeight);
         if (uiManager != null) {

@@ -82,7 +82,7 @@ public class Game {
             throw new RuntimeException("Failed to create GLFW window");
         }
 
-        setWindowIcon();
+        setWindowIcon(window);
 
         glfwWindowHint(GLFW_SAMPLES, 16);
         Keyboard.init(window);
@@ -111,17 +111,30 @@ public class Game {
     /**
      * Sets the window icon.
      */
-    private void setWindowIcon() {
+    public static void setWindowIcon(long windowHandle) {
+        int[] sizes = {16, 24, 32, 48, 64, 128, 256};
+        String[] resources = {
+                "/assets/gui/iconx32.png",
+                "/assets/gui/iconx32.png",
+                "/assets/gui/iconx32.png",
+                "/assets/gui/iconx64.png",
+                "/assets/gui/iconx64.png",
+                "/assets/gui/iconx128.png",
+                "/assets/gui/iconx256.png"
+        };
+        ByteBuffer[] pixels = new ByteBuffer[sizes.length];
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            GLFWImage.Buffer icons = GLFWImage.malloc(6, stack);
-            ByteBuffer[] pixels = new ByteBuffer[6];
-
-            int initialSize = 32;
-            for (int i = 0; i < pixels.length; i++) {
-                pixels[i] = loadIcon(icons, i, "/assets/gui/iconx" + initialSize + ".png", stack);
-                initialSize *= 2;
+            GLFWImage.Buffer icons = GLFWImage.malloc(sizes.length, stack);
+            for (int i = 0; i < sizes.length; i++) {
+                pixels[i] = loadIcon(icons, i, resources[i], sizes[i], stack);
             }
-            glfwSetWindowIcon(window, icons);
+            icons.position(0);
+            icons.limit(sizes.length);
+            glfwSetWindowIcon(windowHandle, icons);
+        } finally {
+            for (ByteBuffer pixelBuffer : pixels) {
+                if (pixelBuffer != null) MemoryUtil.memFree(pixelBuffer);
+            }
         }
     }
 
@@ -133,7 +146,8 @@ public class Game {
      * @param stack the stack value
      * @return the load icon result
      */
-    private ByteBuffer loadIcon(GLFWImage.Buffer icons, int index, String resourcePath, MemoryStack stack) {
+    private static ByteBuffer loadIcon(GLFWImage.Buffer icons, int index, String resourcePath,
+                                       int targetSize, MemoryStack stack) {
         try (InputStream input = Game.class.getResourceAsStream(resourcePath)) {
             if (input == null) {
                 throw new NullPointerException("Window icon not found: " + resourcePath);
@@ -146,23 +160,57 @@ public class Game {
             IntBuffer width = stack.mallocInt(1);
             IntBuffer height = stack.mallocInt(1);
             IntBuffer channels = stack.mallocInt(1);
-            ByteBuffer pixels = STBImage.stbi_load_from_memory(imageBuffer, width,
-                    height, channels, 4);
+            ByteBuffer sourcePixels;
+            try {
+                sourcePixels = STBImage.stbi_load_from_memory(imageBuffer, width,
+                        height, channels, 4);
+            } finally {
+                MemoryUtil.memFree(imageBuffer);
+            }
 
-            MemoryUtil.memFree(imageBuffer);
-
-            if (pixels == null) {
+            if (sourcePixels == null) {
                 throw new NullPointerException(STBImage.stbi_failure_reason());
             }
 
-            icons.position(index);
-            icons.width(width.get(0));
-            icons.height(height.get(0));
-            icons.pixels(pixels);
-            return pixels;
+            ByteBuffer squarePixels;
+            try {
+                squarePixels = fit(sourcePixels, width.get(0), height.get(0), targetSize);
+            } finally {
+                STBImage.stbi_image_free(sourcePixels);
+            }
+
+            icons.get(index)
+                    .width(targetSize)
+                    .height(targetSize)
+                    .pixels(squarePixels);
+            return squarePixels;
         } catch (IOException e) {
             throw new RuntimeException("Failed to read window icon: " + resourcePath, e);
         }
+    }
+
+    /** Fits a non-square source image into a transparent square RGBA canvas. */
+    private static ByteBuffer fit(ByteBuffer source, int width, int height,
+                                  int targetSize) {
+        ByteBuffer result = MemoryUtil.memCalloc(targetSize * targetSize * 4);
+        float scale = Math.min((float) targetSize / width, (float) targetSize / height);
+        int scaledWidth = Math.max(1, Math.round(width * scale));
+        int scaledHeight = Math.max(1, Math.round(height * scale));
+        int offsetX = (targetSize - scaledWidth) / 2;
+        int offsetY = (targetSize - scaledHeight) / 2;
+
+        for (int y = 0; y < scaledHeight; y++) {
+            int sourceY = Math.min(height - 1, y * height / scaledHeight);
+            for (int x = 0; x < scaledWidth; x++) {
+                int sourceX = Math.min(width - 1, x * width / scaledWidth);
+                int sourceIndex = (sourceY * width + sourceX) * 4;
+                int targetIndex = ((y + offsetY) * targetSize + x + offsetX) * 4;
+                for (int channel = 0; channel < 4; channel++) {
+                    result.put(targetIndex + channel, source.get(sourceIndex + channel));
+                }
+            }
+        }
+        return result;
     }
 
     /**
