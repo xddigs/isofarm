@@ -3,6 +3,8 @@ package com.isofarm.service;
 import com.isofarm.data.*;
 import com.isofarm.entity.Player;
 import com.isofarm.item.Block;
+import com.isofarm.item.Item;
+import com.isofarm.item.Material;
 import com.isofarm.utils.Local;
 import com.isofarm.utils.ToastFactory;
 import com.isofarm.wrld.World;
@@ -45,10 +47,6 @@ public class CropService implements Service<Crop> {
             return null;
         }
 
-        if (!player.hasSeeds()) {
-            return null;
-        }
-
         Crop existingCrop = world.getCropAt(x, y, z);
         if (existingCrop != null) {
             log.warn("Attempted to plant {} at ({}, {}) but a crop already exists!",
@@ -57,17 +55,17 @@ public class CropService implements Service<Crop> {
             return null;
         }
 
-        var plantableOptional = player.getInventory().getItems().keySet().stream().filter(
+        var popt = player.getInventory().getItems().keySet().stream().filter(
                 Plantable.class::isInstance).map(Plantable.class::cast).filter(
                         seed -> seed.getType() == type).findFirst();
 
-        if (plantableOptional.isEmpty()) {
+        if (popt.isEmpty()) {
             log.warn("You don't have seeds of {}", type.getName());
             ToastFactory.error(Local.lang.f("toast.not_enough_seeds", type.getDisplayName()));
             return null;
         }
 
-        player.remove(plantableOptional.get(), 1);
+        player.remove(popt.get(), 1);
         int baseY = findColumnBase(world, x, y, z, type);
         BlockData substrate = BlockData.fromId(world.getBlockTypeAt(x, baseY, z));
         Crop newCrop = new Crop(x, y, z, type,
@@ -155,16 +153,16 @@ public class CropService implements Service<Crop> {
         int cropValue = crop.getValue();
         int seeds = crop.getCropType().getSeeds();
 
+        Item plantingItem = crop.getCropType() == CropType.SUGAR_CANE_CROP
+                ? new Material(Tier.NONE, MaterialID.SUGAR_CANE)
+                : new Seed(crop.getCropType());
+
         if (player.hasSpace()) {
             player.add(new Produce(crop.getCropType()), yield);
-            if (!crop.getCropType().equals(CropType.SUGAR_CANE_CROP)) {
-                player.add(new Seed(crop.getCropType()), seeds);
-            }
+            player.add(plantingItem, seeds);
         } else {
             player.addToBackpack(new Produce(crop.getCropType()), yield);
-            if (!crop.getCropType().equals(CropType.SUGAR_CANE_CROP)) {
-                player.addToBackpack(new Seed(crop.getCropType()), seeds);
-            }
+            player.addToBackpack(plantingItem, seeds);
         }
 
         crop.setHarvested(true);

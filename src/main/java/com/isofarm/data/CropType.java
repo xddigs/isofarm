@@ -87,7 +87,6 @@ public enum CropType {
 
     /**
      * Checks whether this crop may grow in a vertical stack.
-     *
      * @return {@code true} only for sugar cane
      */
     public boolean isStackable() {
@@ -96,11 +95,10 @@ public enum CropType {
 
     /**
      * Checks whether this crop uses the crossed plant mesh.
-     *
-     * @return {@code true} when the plant mesh should be used
+     * @return {@code false}; all crops use the standard crop mesh
      */
     public boolean usesPlantMesh() {
-        return this == SUGAR_CANE_CROP;
+        return false;
     }
 
     /**

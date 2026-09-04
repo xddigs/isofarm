@@ -106,7 +106,7 @@ public class Crop extends Block {
      * @param weather the weather value
      */
     public void update(float delta, WeatherType weather) {
-        if (isReadyToHarvest()) {
+        if (isReadyToHarvest() && !type.equals(CropType.SUGAR_CANE_CROP)) {
             return;
         }
 
