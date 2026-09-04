@@ -1,12 +1,15 @@
 package com.isofarm.data;
 
 import com.isofarm.item.Block;
+import com.isofarm.wrld.Chunk;
+import com.isofarm.wrld.World;
 
 /**
  * Provides crop behavior.
  */
 @DataClass
 public class Crop extends Block {
+    private static final int MAX_STACK_HEIGHT = 3;
     private final CropType type;
     private final Block block;
     private final Season season;
@@ -117,6 +120,7 @@ public class Crop extends Block {
 
         if (progress >= 1.0f) {
             stage = GrowthStage.HARVESTABLE;
+            growStack();
         } else if (progress >= 0.75f) {
             stage = GrowthStage.MATURE;
         } else if (progress >= 0.50f) {
@@ -126,5 +130,43 @@ public class Crop extends Block {
         } else {
             stage = GrowthStage.SEED;
         }
+    }
+
+    /**
+     * Adds one harvestable segment to a stackable crop column, up to three blocks.
+     * A segment is never created before the crop that triggered the growth is harvestable.
+     * @return the new segment, or {@code null} when the column cannot grow
+     */
+    public Crop growStack() {
+        if (!type.isStackable() || !isReadyToHarvest()) {
+            return null;
+        }
+
+        World world = World.wrld;
+        int baseY = getY();
+        while (baseY > 0) {
+            Crop below = world.getCropAt(getX(), baseY - 1, getZ());
+            if (below == null || below.getCropType() != type) break;
+            baseY--;
+        }
+
+        int topY = baseY;
+        while (world.getCropAt(getX(), topY + 1, getZ()) instanceof Crop above
+                && above.getCropType() == type) {
+            topY++;
+        }
+
+        int height = topY - baseY + 1;
+        int newY = topY + 1;
+        if (height >= MAX_STACK_HEIGHT || newY >= Chunk.SIZE_Y
+                || world.getBlockTypeAt(getX(), newY, getZ()) != BlockData.AIR.getId()) {
+            return null;
+        }
+
+        Crop segment = new Crop(getX(), newY, getZ(), type, block, season);
+        segment.stage = GrowthStage.HARVESTABLE;
+        segment.currentGrowthTime = targetGrowthTime;
+        world.addCrop(segment);
+        return segment;
     }
 }

@@ -11,6 +11,9 @@ import com.isofarm.wrld.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Provides crop service behavior.
  */
@@ -127,11 +130,13 @@ public class CropService implements Service<Crop> {
      * @param weather the weather value
      */
     public void update(float delta, WeatherType weather) {
+        List<Crop> crops = new ArrayList<>();
         World.wrld.forEach(b -> {
             if (b instanceof Crop crop) {
-                crop.update(delta, weather);
+                crops.add(crop);
             }
         });
+        crops.forEach(crop -> crop.update(delta, weather));
     }
 
     /**

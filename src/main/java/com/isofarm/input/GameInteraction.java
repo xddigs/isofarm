@@ -406,13 +406,11 @@ public class GameInteraction {
 
         Crop crop = world.getCropAt(x, y, z);
         if (crop != null) {
-            if (crop.getCropType().isStackable() && crop.isReadyToHarvest()) {
-                Crop above = world.getCropAt(x, y + 1, z);
-                while (above != null && above.getCropType() == crop.getCropType()) {
-                    crop = above;
-                    y++;
-                    above = world.getCropAt(x, y + 1, z);
-                }
+            if (crop.getCropType().isStackable()) {
+                breakStackedCrop(world, crop);
+                SoundService.fx.playBreakSound(SoundGroup.SOIL);
+                GameMaster.game.getGameUIService().logAction(cell);
+                return;
             }
             CropType cropType = crop.getCropType();
             int frameIndex = crop.getStage().getFrameIndex();
@@ -482,6 +480,33 @@ public class GameInteraction {
         if (breakProgress >= 1.0f) {
             breakBlock(gameMaster, cell, blockData, blockId, selectedItem);
             resetBreaking();
+        }
+    }
+
+    /** Removes a stackable crop from the selected segment upwards. */
+    private void breakStackedCrop(World world, Crop first) {
+        int x = first.getX();
+        int y = first.getY();
+        int z = first.getZ();
+        CropType type = first.getCropType();
+        SpriteSheet sheet = GameMaster.game.getCropSpriteSheet(type);
+
+        Crop crop = first;
+        while (crop != null && crop.getCropType() == type) {
+            int frameIndex = crop.getStage().getFrameIndex();
+            CropService.cs.rip(crop);
+
+            WorldItem drop = new WorldItem(new Produce(type), 1,
+                    new Vector3f(x + 0.5f, y + 0.5f, z + 0.5f));
+            GameMaster.game.addEntity(drop);
+
+            if (sheet != null) {
+                ParticleEngine.peng.spawnCrop(x, y + K.World.SHORTER_BLOCK_HEIGHT,
+                        z, sheet, frameIndex);
+            }
+
+            y++;
+            crop = world.getCropAt(x, y, z);
         }
     }
 
@@ -686,17 +711,7 @@ public class GameInteraction {
             byte blockId = world.getBlockTypeAt(x, y, z);
 
             if (crop != null) {
-                if (!p.getType().isStackable()
-                        || crop.getCropType() != p.getType()) {
-                    return;
-                }
-
-                do {
-                    y++;
-                    crop = world.getCropAt(x, y, z);
-                } while (crop != null && crop.getCropType() == p.getType());
-
-                if (crop != null) return;
+                return;
             } else if (p.getType() != CropType.SUGAR_CANE_CROP
                     && blockId != BlockData.TILLED_DIRT.getId()) {
                 log.trace("Cannot plant at {},{},{}: selected block is not TILLED_DIRT", x, y, z);
