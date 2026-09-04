@@ -444,10 +444,7 @@ public class GameMaster {
      * @param delta the delta value
      */
     private void updateEntities(float delta) {
-        Player.plyr.update(HoveredCell.get(this), delta);
-
         for (Entity entity : entities) {
-            if (entity instanceof Player) continue;
             entity.update(HoveredCell.get(this), delta);
         }
         entities.removeIf(e -> e != Player.plyr && !e.isAlive());

@@ -9,7 +9,8 @@ public enum CropType {
     WHEAT((byte) 0, "Wheat", "crop.wheat", 4, 5, 4),
     CARROT((byte) 1, "Carrot", "crop.carrot", 3, 8, 6),
     POTATO((byte) 2, "Potato", "crop.potato", 6, 12, 8),
-    BEETROOT((byte) 3, "Beetroot", "crop.beetroot", 4, 16, 2);
+    BEETROOT((byte) 3, "Beetroot", "crop.beetroot", 4, 16, 2),
+    SUGAR_CANE((byte) 4, "Sugar Cane", "crop.sugar_cane", 3, 10, 2);
 
     private final byte id;
     private final String name;
@@ -83,6 +84,24 @@ public enum CropType {
      */
     public int getSeeds() {
         return seeds;
+    }
+
+    /**
+     * Checks whether this crop may grow in a vertical stack.
+     *
+     * @return {@code true} only for sugar cane
+     */
+    public boolean isStackable() {
+        return this == SUGAR_CANE;
+    }
+
+    /**
+     * Checks whether this crop uses the crossed plant mesh.
+     *
+     * @return {@code true} when the plant mesh should be used
+     */
+    public boolean usesPlantMesh() {
+        return this == SUGAR_CANE;
     }
 
     /**

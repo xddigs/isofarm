@@ -27,19 +27,21 @@ public class CropService implements Service<Crop> {
      * @param x the x value
      * @param y the y value
      * @param z the z value
-     * @param block the block value
      * @param type the type value
      * @param currentSeason the current season value
      * @return the plant result
      */
-    public Crop plant(int x, int y, int z, Block block,
-                      CropType type, Season currentSeason) {
+    public Crop plant(int x, int y, int z, CropType type,
+                      Season currentSeason) {
         Player player = Player.plyr;
+        World world = World.wrld;
 
-        if (block == null || block.getType() != BlockData.TILLED_DIRT) {
-            log.warn("Attempted to plant {} at ({}, {}) but block is not tilled!",
-                    type.getName(), x, z);
-            ToastFactory.warning("toast.tilled_dirt_warn");
+        if (type == null || !hasValidSubstrate(world, x, y, z, type)) {
+            log.warn("Attempted to plant {} at ({}, {}, {}) on invalid terrain",
+                    type == null ? "unknown crop" : type.getName(), x, y, z);
+            ToastFactory.warning(type == CropType.SUGAR_CANE
+                    ? "toast.sugar_cane_terrain_warn"
+                    : "toast.tilled_dirt_warn");
             return null;
         }
 
@@ -47,7 +49,7 @@ public class CropService implements Service<Crop> {
             return null;
         }
 
-        Crop existingCrop = World.wrld.getCropAt(x, y, z);
+        Crop existingCrop = world.getCropAt(x, y, z);
         if (existingCrop != null) {
             log.warn("Attempted to plant {} at ({}, {}) but a crop already exists!",
                     type.getName(), x, z);
@@ -66,10 +68,59 @@ public class CropService implements Service<Crop> {
         }
 
         player.remove(seedOpt.get(), 1);
-        Crop newCrop = new Crop(x, y, z, type, block, currentSeason);
-        World.wrld.addCrop(newCrop);
+        int baseY = findColumnBase(world, x, y, z, type);
+        BlockData substrate = BlockData.fromId(world.getBlockTypeAt(x, baseY, z));
+        Crop newCrop = new Crop(x, y, z, type,
+                new Block(substrate, x, baseY, z), currentSeason);
+        world.addCrop(newCrop);
         log.info("Planted {} at ({}, {}) during season {}", type.getName(), x, z, currentSeason.getName());
         return newCrop;
+    }
+
+    /**
+     * Validates the terrain rules for a crop at the requested position.
+     */
+    private boolean hasValidSubstrate(World world, int x, int y, int z,
+                                      CropType type) {
+        if (type != CropType.SUGAR_CANE) {
+            return world.getBlockTypeAt(x, y, z) == BlockData.TILLED_DIRT.getId();
+        }
+
+        int baseY = findColumnBase(world, x, y, z, type);
+        if (y > baseY && world.getBlockTypeAt(x, y, z) != BlockData.AIR.getId()) {
+            return false;
+        }
+        if (world.getBlockTypeAt(x, baseY, z) != BlockData.SAND.getId()) {
+            return false;
+        }
+
+        return hasAdjacentWater(world, x, baseY, z);
+    }
+
+    /** Returns the terrain level beneath a potentially stacked crop column. */
+    private int findColumnBase(World world, int x, int y, int z,
+                               CropType type) {
+        int baseY = y;
+        Crop below = world.getCropAt(x, baseY - 1, z);
+        while (below != null && below.getCropType() == type) {
+            baseY--;
+            below = world.getCropAt(x, baseY - 1, z);
+        }
+        return baseY;
+    }
+
+    /** Checks the four horizontal cells beside the sugar-cane substrate. */
+    private boolean hasAdjacentWater(World world, int x, int y, int z) {
+        int[][] offsets = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+        for (int[] offset : offsets) {
+            int waterX = x + offset[0];
+            int waterZ = z + offset[1];
+            if (world.getBlockTypeAt(waterX, y, waterZ) == BlockData.WATER.getId()
+                    || world.getWaterLevelAt(waterX, y, waterZ) > 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -106,10 +157,14 @@ public class CropService implements Service<Crop> {
 
         if (player.hasSpace()) {
             player.add(new Produce(crop.getCropType()), yield);
-            player.add(new Seed(crop.getCropType()), seeds);
+            if (!crop.getCropType().equals(CropType.SUGAR_CANE)) {
+                player.add(new Seed(crop.getCropType()), seeds);
+            }
         } else {
             player.addToBackpack(new Produce(crop.getCropType()), yield);
-            player.addToBackpack(new Seed(crop.getCropType()), seeds);
+            if (!crop.getCropType().equals(CropType.SUGAR_CANE)) {
+                player.addToBackpack(new Seed(crop.getCropType()), seeds);
+            }
         }
 
         crop.setHarvested(true);

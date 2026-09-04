@@ -92,14 +92,20 @@ public class ShadowSystem {
             int frame = crop.getStage().getFrameIndex();
             shadowShader.setUniform("uUVBounds", sheet.getUVBounds(frame));
             float renderX = crop.getX() + 0.5f;
-            float renderY = crop.getY() + K.World.SHORTER_BLOCK_HEIGHT;
+            boolean usesPlantMesh = crop.getCropType().usesPlantMesh();
+            float renderY = crop.getY() + (usesPlantMesh
+                    ? 1.0f : K.World.SHORTER_BLOCK_HEIGHT);
             float renderZ = crop.getZ() + 0.5f;
 
             modelMatrix.identity()
                     .translate(renderX, renderY, renderZ);
 
             shadowShader.setUniform("uModel", modelMatrix);
-            ResourceManager.rem.getSpriteMesh().render();
+            if (usesPlantMesh) {
+                ResourceManager.rem.getFlowerMesh().render();
+            } else {
+                ResourceManager.rem.getSpriteMesh().render();
+            }
             sheet.unbind();
         });
 

@@ -50,11 +50,10 @@ public class Library implements Service<GameMaster> {
             registerDefault(itemR, () -> new Shovel(tier));
         });
 
-        for (CropType type : new CropType[]{
-                CropType.WHEAT, CropType.CARROT,
-                CropType.POTATO, CropType.BEETROOT}) {
-            registerDefault(itemR, () -> new Seed(type));
+        for (CropType type : CropType.values()) {
             registerDefault(itemR, () -> new Produce(type));
+            if (type.equals(CropType.SUGAR_CANE)) continue;
+            registerDefault(itemR, () -> new Seed(type));
         }
 
         for (BlockData block : BlockData.values()) {

@@ -20,7 +20,7 @@ public class ResourceManager {
     public static final ResourceManager rem = new ResourceManager();
     private static final Logger log = LoggerFactory.getLogger(ResourceManager.class);
 
-    private static final SpriteSheet seedIcons = new SpriteSheet(K.Paths.SEED_ICONS, K.UI.ICON_SEED_CROPS_COLS, 1);
+    private static final SpriteSheet seedIcons = new SpriteSheet(K.Paths.SEED_ICONS, K.UI.ICON_SEED_SEEDS_COLS, 1);
     private static final SpriteSheet cropIcons = new SpriteSheet(K.Paths.CROP_ICONS, K.UI.ICON_SEED_CROPS_COLS, 1);
     private static final SpriteSheet toolIcons = new SpriteSheet(K.Paths.TOOL_ICONS, K.UI.ICON_TOOL_COLS, K.UI.ICON_TOOL_ROWS);
     private static final SpriteSheet blockIcons = new SpriteSheet(K.Paths.BLOCK_ICONS, K.UI.ICON_BLOCK_COLS, K.UI.ICON_BLOCK_ROWS);
@@ -35,6 +35,7 @@ public class ResourceManager {
     private static final SpriteSheet carrot = new SpriteSheet(K.Paths.CARROT_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
     private static final SpriteSheet potato = new SpriteSheet(K.Paths.POTATO_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
     private static final SpriteSheet beetroot = new SpriteSheet(K.Paths.BEETROOT_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
+    private static final SpriteSheet sugarCane = new SpriteSheet(K.Paths.SUGAR_CANE_TEXTURE, K.Render.CROP_TOTAL_FRAMES, 1);
 
     private static final GLTFModel playerModel = GLTFLoader.load(K.Paths.PLAYER_MODEL);
 
@@ -68,6 +69,7 @@ public class ResourceManager {
         cropSpritesheets.put(CropType.CARROT, carrot);
         cropSpritesheets.put(CropType.POTATO, potato);
         cropSpritesheets.put(CropType.BEETROOT, beetroot);
+        cropSpritesheets.put(CropType.SUGAR_CANE, sugarCane);
     }
 
     /**
@@ -84,7 +86,9 @@ public class ResourceManager {
     public static SpriteSheet getItemSpriteSheet(Item item) {
         return switch (item) {
             case Crop crop -> cropSpritesheets.get(crop.getCropType());
+            case Produce produce when produce.getType() == CropType.SUGAR_CANE -> sugarCane;
             case Produce ignored -> cropIcons;
+            case Seed seed when seed.getType() == CropType.SUGAR_CANE -> sugarCane;
             case Seed ignored -> seedIcons;
             case Tool ignored -> toolIcons;
             case Material ignored -> materialIcons;
@@ -142,10 +146,16 @@ public class ResourceManager {
         }
 
         if (item instanceof Produce produce && produce.getType() != null) {
+            if (produce.getType() == CropType.SUGAR_CANE) {
+                return GrowthStage.HARVESTABLE.getFrameIndex();
+            }
             return produce.getType().getId();
         }
 
         if (item instanceof Seed seed && seed.getType() != null) {
+            if (seed.getType() == CropType.SUGAR_CANE) {
+                return GrowthStage.SEED.getFrameIndex();
+            }
             return seed.getType().getId();
         }
 

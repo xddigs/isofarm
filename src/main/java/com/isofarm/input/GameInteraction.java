@@ -26,7 +26,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import static org.joml.Math.lerp;
-import static org.lwjgl.glfw.GLFW.*;
 
 /**
  * Provides game interaction behavior.
@@ -407,6 +406,14 @@ public class GameInteraction {
 
         Crop crop = world.getCropAt(x, y, z);
         if (crop != null) {
+            if (crop.getCropType().isStackable() && crop.isReadyToHarvest()) {
+                Crop above = world.getCropAt(x, y + 1, z);
+                while (above != null && above.getCropType() == crop.getCropType()) {
+                    crop = above;
+                    y++;
+                    above = world.getCropAt(x, y + 1, z);
+                }
+            }
             CropType cropType = crop.getCropType();
             int frameIndex = crop.getStage().getFrameIndex();
             SpriteSheet sheet = GameMaster.game.getCropSpriteSheet(cropType);
@@ -616,12 +623,21 @@ public class GameInteraction {
             byte targetBlock = world.getBlockTypeAt(placeX, placeY, placeZ);
             BlockData target = BlockData.fromId(targetBlock);
 
-            if (target == null || !target.equals(BlockData.AIR)) {
+            if (target == null || !target.equals(BlockData.AIR)
+                    || world.getCropAt(placeX, placeY, placeZ) != null) {
                 return;
             }
 
-            Block newBlock = new Block(block.getType(), placeX, placeY, placeZ);
+            if (block.getType().isPlant()) {
+                BlockData support = BlockData.fromId(
+                        world.getBlockTypeAt(placeX, placeY - 1, placeZ));
+                if (support == null || support.isPlant()
+                        || world.getCropAt(placeX, placeY - 1, placeZ) != null) {
+                    return;
+                }
+            }
 
+            Block newBlock = new Block(block.getType(), placeX, placeY, placeZ);
             if (block.getType().equals(BlockData.OAK_BONSAI)) {
                 TreeService.ts.plant(placeX, placeY, placeZ, BlockData.OAK_BONSAI);
             } else {
@@ -650,7 +666,8 @@ public class GameInteraction {
             return;
         }
 
-        if (selectedItem instanceof Seed seed) {
+        if (selectedItem instanceof Plantable p) {
+            if (p.getType() == null) return;
             int x = cell.x();
             int y = cell.y();
             int z = cell.z();
@@ -658,21 +675,30 @@ public class GameInteraction {
             Crop crop = world.getCropAt(x, y, z);
             byte blockId = world.getBlockTypeAt(x, y, z);
 
-            if (blockId != BlockData.TILLED_DIRT.getId()) {
+            if (crop != null) {
+                if (!p.getType().isStackable()
+                        || crop.getCropType() != p.getType()) {
+                    return;
+                }
+
+                do {
+                    y++;
+                    crop = world.getCropAt(x, y, z);
+                } while (crop != null && crop.getCropType() == p.getType());
+
+                if (crop != null) return;
+            } else if (p.getType() != CropType.SUGAR_CANE
+                    && blockId != BlockData.TILLED_DIRT.getId()) {
                 log.trace("Cannot plant at {},{},{}: selected block is not TILLED_DIRT", x, y, z);
                 return;
             }
 
-            if (crop != null) return;
-            if (seed.getType() == null) return;
-
-            Block tilledDirt = new Block(BlockData.TILLED_DIRT, x, y, z);
-            Crop planted = CropService.cs.plant(x, y, z, tilledDirt, seed.getType(),
+            Crop planted = CropService.cs.plant(x, y, z, p.getType(),
                     TimeService.ts.getCurrentSeason());
 
             if (planted != null) {
                 GameMaster.game.getGameUIService().logAction(cell);
-                log.info("Planted {} at {},{},{}", seed.getType().getName(), x, y, z);
+                log.info("Planted {} at {},{},{}", p.getType().getName(), x, y, z);
             }
         }
     }
