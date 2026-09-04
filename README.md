@@ -11,7 +11,6 @@ environment driven by custom 3D mesh rendering, particle systems, and dynamic da
 | Action                     | Key / Input          |
 |----------------------------|----------------------|
 | **Move**                   | `WASD`<br>           |
-| **Jump**                   | `Space`<br>          |
 | **Interact/Place Blocks**  | `Mouse RB`<br>       |
 | **Attack/Break Blocks**    | `Mouse LB`<br>       |
 | **Zoom Camera**            | `C`<br>              |
