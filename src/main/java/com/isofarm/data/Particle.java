@@ -4,7 +4,7 @@ import com.isofarm.graphics.SpriteSheet;
 import org.joml.Vector2f;
 
 /**
- * Provides particle behavior.
+ * Encapsulates the state and operations required by particle within the game runtime.
  */
 @DataClass
 public class Particle {
@@ -20,17 +20,17 @@ public class Particle {
 
     /**
      * Creates a new {@code Particle} instance.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
-     * @param vx the vx value
-     * @param vy the vy value
-     * @param vz the vz value
-     * @param size the size value
-     * @param maxLife the max life value
-     * @param uvOffset the uv offset value
-     * @param uvScale the uv scale value
-     * @param texture the texture value
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param z the {@code float} supplied as {@code z}
+     * @param vx the {@code float} supplied as {@code vx}
+     * @param vy the {@code float} supplied as {@code vy}
+     * @param vz the {@code float} supplied as {@code vz}
+     * @param size the {@code float} supplied as {@code size}
+     * @param maxLife the {@code float} supplied as {@code maxLife}
+     * @param uvOffset the {@link Vector2f} supplied as {@code uvOffset}
+     * @param uvScale the {@link Vector2f} supplied as {@code uvScale}
+     * @param texture the {@link SpriteSheet} supplied as {@code texture}
      */
     public Particle(float x, float y, float z, float vx, float vy, float vz,
                     float size, float maxLife, Vector2f uvOffset, Vector2f uvScale,
@@ -51,7 +51,7 @@ public class Particle {
 
     /**
      * Returns the texture.
-     * @return the texture
+     * @return the {@link SpriteSheet} representing the texture
      */
     public SpriteSheet getTexture() {
         return texture;
@@ -59,7 +59,7 @@ public class Particle {
 
     /**
      * Updates the current state.
-     * @param delta the delta value
+     * @param delta the {@code float} supplied as {@code delta}
      */
     public void update(float delta) {
         life += delta;
@@ -83,7 +83,7 @@ public class Particle {
 
     /**
      * Returns the alpha.
-     * @return the alpha
+     * @return {@code float}; the alpha
      */
     public float getAlpha() {
         return 1.0f - (life / maxLife);
@@ -91,7 +91,7 @@ public class Particle {
 
     /**
      * Returns the x.
-     * @return the x
+     * @return {@code float}; the x
      */
     public float getX() {
         return x;
@@ -99,7 +99,7 @@ public class Particle {
 
     /**
      * Returns the y.
-     * @return the y
+     * @return {@code float}; the y
      */
     public float getY() {
         return y;
@@ -107,7 +107,7 @@ public class Particle {
 
     /**
      * Returns the z.
-     * @return the z
+     * @return {@code float}; the z
      */
     public float getZ() {
         return z;
@@ -115,7 +115,7 @@ public class Particle {
 
     /**
      * Returns the vx.
-     * @return the vx
+     * @return {@code float}; the vx
      */
     public float getVx() {
         return vx;
@@ -123,7 +123,7 @@ public class Particle {
 
     /**
      * Returns the vy.
-     * @return the vy
+     * @return {@code float}; the vy
      */
     public float getVy() {
         return vy;
@@ -131,7 +131,7 @@ public class Particle {
 
     /**
      * Returns the vz.
-     * @return the vz
+     * @return {@code float}; the vz
      */
     public float getVz() {
         return vz;
@@ -139,7 +139,7 @@ public class Particle {
 
     /**
      * Returns the life.
-     * @return the life
+     * @return {@code float}; the life
      */
     public float getLife() {
         return life;
@@ -147,7 +147,7 @@ public class Particle {
 
     /**
      * Returns the max life.
-     * @return the max life
+     * @return {@code float}; the max life
      */
     public float getMaxLife() {
         return maxLife;
@@ -155,7 +155,7 @@ public class Particle {
 
     /**
      * Returns the size.
-     * @return the size
+     * @return {@code float}; the size
      */
     public float getSize() {
         return size;
@@ -163,7 +163,7 @@ public class Particle {
 
     /**
      * Returns the uv offset.
-     * @return the uv offset
+     * @return the {@link Vector2f} representing the uv offset
      */
     public Vector2f getUvOffset() {
         return uvOffset;
@@ -171,7 +171,7 @@ public class Particle {
 
     /**
      * Returns the uv scale.
-     * @return the uv scale
+     * @return the {@link Vector2f} representing the uv scale
      */
     public Vector2f getUvScale() {
         return uvScale;

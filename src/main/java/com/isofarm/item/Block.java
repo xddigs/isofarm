@@ -6,7 +6,7 @@ import com.isofarm.data.DataClass;
 import com.isofarm.utils.K;
 
 /**
- * Provides block behavior.
+ * Encapsulates the state and operations required by block within the game runtime.
  */
 @DataClass
 public class Block implements Craftable {
@@ -21,10 +21,10 @@ public class Block implements Craftable {
 
     /**
      * Creates a new {@code Block} instance.
-     * @param type the type value
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
+     * @param type the {@link BlockData} supplied as {@code type}
+     * @param x the {@code int} supplied as {@code x}
+     * @param y the {@code int} supplied as {@code y}
+     * @param z the {@code int} supplied as {@code z}
      */
     public Block(BlockData type, int x, int y, int z) {
         this.id = type.getId();
@@ -39,8 +39,8 @@ public class Block implements Craftable {
 
     /**
      * Creates a new {@code Block} instance.
-     * @param type the type value
-     * @param pos the pos value
+     * @param type the {@link BlockData} supplied as {@code type}
+     * @param pos the {@link BlockPos} supplied as {@code pos}
      */
     public Block(BlockData type, BlockPos pos) {
         this(type, pos.x(), 0, pos.y());
@@ -48,7 +48,7 @@ public class Block implements Craftable {
 
     /**
      * Creates a new {@code Block} instance.
-     * @param type the type value
+     * @param type the {@link BlockData} supplied as {@code type}
      */
     public Block(BlockData type) {
         this.id = type.getId();
@@ -65,8 +65,9 @@ public class Block implements Craftable {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the id.
-     * @return the id
+     * @return {@code byte}; the id
      */
     @Override
     public byte getId() {
@@ -74,8 +75,9 @@ public class Block implements Craftable {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the name.
-     * @return the name
+     * @return the {@link String} representing the name
      */
     @Override
     public String getName() {
@@ -83,8 +85,9 @@ public class Block implements Craftable {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the display name.
-     * @return the display name
+     * @return the {@link String} representing the display name
      */
     @Override
     public String getDisplayName() {
@@ -92,8 +95,9 @@ public class Block implements Craftable {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the value.
-     * @return the value
+     * @return {@code int}; the value
      */
     @Override
     public int getValue() {
@@ -102,7 +106,7 @@ public class Block implements Craftable {
 
     /**
      * Returns the type.
-     * @return the type
+     * @return the {@link BlockData} representing the type
      */
     public BlockData getType() {
         return type;
@@ -110,7 +114,7 @@ public class Block implements Craftable {
 
     /**
      * Sets the type.
-     * @param type the type value
+     * @param type the {@link BlockData} supplied as {@code type}
      */
     public void setType(BlockData type) {
         this.type = type;
@@ -118,7 +122,7 @@ public class Block implements Craftable {
 
     /**
      * Returns the x.
-     * @return the x
+     * @return {@code int}; the x
      */
     public int getX() {
         return x;
@@ -126,7 +130,7 @@ public class Block implements Craftable {
 
     /**
      * Returns the y.
-     * @return the y
+     * @return {@code int}; the y
      */
     public int getY() {
         return y;
@@ -134,7 +138,7 @@ public class Block implements Craftable {
 
     /**
      * Returns the z.
-     * @return the z
+     * @return {@code int}; the z
      */
     public int getZ() {
         return z;
@@ -142,7 +146,7 @@ public class Block implements Craftable {
 
     /**
      * Returns the water level max.
-     * @return the water level max
+     * @return {@code int}; the water level max
      */
     public int getWaterLevelMax() {
         return waterLevelMax;
@@ -150,7 +154,7 @@ public class Block implements Craftable {
 
     /**
      * Returns the water level.
-     * @return the water level
+     * @return {@code int}; the water level
      */
     public int getWaterLevel() {
         return waterLevel;
@@ -158,7 +162,7 @@ public class Block implements Craftable {
 
     /**
      * Adds the water.
-     * @param amount the amount value
+     * @param amount the {@code int} supplied as {@code amount}
      */
     public void addWater(int amount) {
         waterLevel = Math.min(waterLevelMax, waterLevel + amount);
@@ -166,7 +170,7 @@ public class Block implements Craftable {
 
     /**
      * Sets the water level.
-     * @param waterLevel the water level value
+     * @param waterLevel the {@code int} supplied as {@code waterLevel}
      */
     public void setWaterLevel(int waterLevel) {
         this.waterLevel = waterLevel;
@@ -190,15 +194,16 @@ public class Block implements Craftable {
 
     /**
      * Sets the isInteractive value
-     * @param interactive the interactive value
+     * @param interactive the {@code boolean} supplied as {@code interactive}
      */
     public void setInteractive(boolean interactive) {
         isInteractive = interactive;
     }
 
     /**
-     * Performs the copy operation.
-     * @return the copy result
+     * {@inheritDoc}
+     * Creates an independent copy that preserves the relevant state of this object.
+     * @return the {@link Item} representing the copy result
      */
     @Override
     public Item copy() {

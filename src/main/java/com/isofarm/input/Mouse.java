@@ -13,7 +13,7 @@ import static org.lwjgl.stb.STBImage.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 /**
- * Provides mouse behavior.
+ * Encapsulates the state and operations required by mouse within the game runtime.
  */
 public final class Mouse {
     public static final int BUTTON_1 = GLFW_MOUSE_BUTTON_1;
@@ -49,7 +49,7 @@ public final class Mouse {
 
     /**
      * Initializes the component.
-     * @param windowId the window id value
+     * @param windowId the {@code long} supplied as {@code windowId}
      */
     public static void init(long windowId) {
         Mouse.windowId = windowId;
@@ -95,14 +95,16 @@ public final class Mouse {
 
     /**
      * Checks whether the button down condition is met.
-     * @param button the button value
+     * @param button the {@code int} supplied as {@code button}
      * @return {@code true} if button down; otherwise {@code false}
      */
     public static boolean isButtonDown(int button) {
         return button >= 0 && button <= BUTTON_LAST && buttons[button];
     }
 
-    /** Checks whether any mouse binding for the logical action is down. */
+    /**
+     * Checks whether any mouse binding for the logical action is down.
+     */
     public static boolean isButtonDown(ControlAction action) {
         for (int button : ControlConfigParser.controls.getMouseCodes(action)) {
             if (isButtonDown(button)) return true;
@@ -112,7 +114,7 @@ public final class Mouse {
 
     /**
      * Checks whether the button pressed condition is met.
-     * @param button the button value
+     * @param button the {@code int} supplied as {@code button}
      * @return {@code true} if button pressed; otherwise {@code false}
      */
     public static boolean isButtonPressed(int button) {
@@ -120,7 +122,9 @@ public final class Mouse {
                 && buttons[button] && !lastButtons[button];
     }
 
-    /** Checks whether any mouse binding for the logical action was pressed. */
+    /**
+     * Checks whether any mouse binding for the logical action was pressed.
+     */
     public static boolean isButtonPressed(ControlAction action) {
         for (int button : ControlConfigParser.controls.getMouseCodes(action)) {
             if (isButtonPressed(button)) return true;
@@ -130,7 +134,7 @@ public final class Mouse {
 
     /**
      * Checks whether the button released condition is met.
-     * @param button the button value
+     * @param button the {@code int} supplied as {@code button}
      * @return {@code true} if button released; otherwise {@code false}
      */
     public static boolean isButtonReleased(int button) {
@@ -140,7 +144,9 @@ public final class Mouse {
                 lastButtons[button];
     }
 
-    /** Checks whether any mouse binding for the logical action was released. */
+    /**
+     * Checks whether any mouse binding for the logical action was released.
+     */
     public static boolean isButtonReleased(ControlAction action) {
         for (int button : ControlConfigParser.controls.getMouseCodes(action)) {
             if (isButtonReleased(button)) return true;
@@ -151,7 +157,7 @@ public final class Mouse {
     /**
      * Loads a horizontal two-frame cursor spritesheet. Frame 0 is the default
      * cursor and frame 1 is used while hovering an interactive UI element.
-     * @param path classpath path to the cursor spritesheet
+     * @param path the {@link String} argument; classpath path to the cursor spritesheet
      */
     public static void setCursorImage(String path) {
         byte[] rawData;
@@ -240,14 +246,18 @@ public final class Mouse {
         }
     }
 
-    /** Selects the hover or default frame of the configured cursor. */
+    /**
+     * Selects the hover or default frame of the configured cursor.
+     */
     public static void setCursorHovered(boolean hovered) {
         if (cursorHovered == hovered || defaultCursor == NULL || hoverCursor == NULL) return;
         cursorHovered = hovered;
         glfwSetCursor(windowId, hovered ? hoverCursor : defaultCursor);
     }
 
-    /** Releases the native cursor handles. */
+    /**
+     * Releases the native cursor handles.
+     */
     public static void dispose() {
         destroyCursors();
         windowId = NULL;
@@ -263,28 +273,28 @@ public final class Mouse {
 
     /**
      * Returns the delta x.
-     * @return the delta x
+     * @return {@code float}; the delta x
      */
     public static float getDeltaX() { return deltaX; }
     /**
      * Returns the delta y.
-     * @return the delta y
+     * @return {@code float}; the delta y
      */
     public static float getDeltaY() { return deltaY; }
     /**
      * Returns the x.
-     * @return the x
+     * @return {@code float}; the x
      */
     public static float getX() { return x; }
     /**
      * Returns the y.
-     * @return the y
+     * @return {@code float}; the y
      */
     public static float getY() { return y; }
 
     /**
      * Returns the scroll y.
-     * @return the scroll y
+     * @return {@code float}; the scroll y
      */
     public static float getScrollY() {
         return scrollY;
@@ -292,7 +302,7 @@ public final class Mouse {
 
     /**
      * Sets the scroll y.
-     * @param scrollY the scroll y value
+     * @param scrollY the {@code float} supplied as {@code scrollY}
      */
     public static void setScrollY(float scrollY) {
         Mouse.scrollY = scrollY;

@@ -15,7 +15,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Provides chunk manager behavior.
+ * Encapsulates the state and operations required by chunk manager within the game runtime.
  */
 public class ChunkManager {
     private static final float SOIL_GRASS_TIME = 10.0f;
@@ -33,8 +33,8 @@ public class ChunkManager {
 
     /**
      * Creates a new {@code ChunkManager} instance.
-     * @param world the world value
-     * @param fluidSimulation the fluid simulation used by the world generator
+     * @param world the {@link World} supplied as {@code world}
+     * @param fluidSimulation the {@link FluidSimulation} argument; the fluid simulation used by the world generator
      */
     public ChunkManager(World world, FluidSimulation fluidSimulation) {
         this.world = world;
@@ -47,9 +47,9 @@ public class ChunkManager {
 
     /**
      * Updates the current state.
-     * @param playerX the player x value
-     * @param playerZ the player z value
-     * @param delta the delta value
+     * @param playerX the {@code float} supplied as {@code playerX}
+     * @param playerZ the {@code float} supplied as {@code playerZ}
+     * @param delta the {@code float} supplied as {@code delta}
      */
     public void update(float playerX, float playerZ, float delta) {
         processCompletedMeshes();
@@ -66,9 +66,9 @@ public class ChunkManager {
     }
 
     /**
-     * Performs the build single chunk mesh operation.
-     * @param chunkX the chunk x value
-     * @param chunkZ the chunk z value
+     * Creates single chunk mesh from the supplied state and configuration.
+     * @param chunkX the {@code int} supplied as {@code chunkX}
+     * @param chunkZ the {@code int} supplied as {@code chunkZ}
      */
     public void buildSingleChunkMesh(int chunkX, int chunkZ) {
         Chunk chunk = world.getChunks().get(world.get2DKey(chunkX, chunkZ));
@@ -85,8 +85,8 @@ public class ChunkManager {
 
     /**
      * Updates the loaded chunks.
-     * @param centerChunkX the center chunk x value
-     * @param centerChunkZ the center chunk z value
+     * @param centerChunkX the {@code int} supplied as {@code centerChunkX}
+     * @param centerChunkZ the {@code int} supplied as {@code centerChunkZ}
      */
     public void updateLoadedChunks(int centerChunkX, int centerChunkZ) {
         int r = Settings.getRenderDistance();
@@ -144,8 +144,8 @@ public class ChunkManager {
     }
 
     /**
-     * Performs the queue mesh build operation.
-     * @param chunk the chunk value
+     * Refreshes dependent runtime state for queue mesh build.
+     * @param chunk the {@link Chunk} supplied as {@code chunk}
      */
     private void queueMeshBuild(Chunk chunk) {
         long key = world.get2DKey(chunk.getChunkX(), chunk.getChunkZ());
@@ -165,7 +165,7 @@ public class ChunkManager {
     }
 
     /**
-     * Performs the process completed meshes operation.
+     * Processes completed meshes and applies the resulting state changes.
      */
     private void processCompletedMeshes() {
         MeshBuildResult result;
@@ -190,9 +190,9 @@ public class ChunkManager {
     }
 
     /**
-     * Performs the rebuild chunk mesh at operation.
-     * @param worldX the world x value
-     * @param worldZ the world z value
+     * Rebuilds chunk mesh at from the authoritative runtime state.
+     * @param worldX the {@code int} supplied as {@code worldX}
+     * @param worldZ the {@code int} supplied as {@code worldZ}
      */
     public void rebuildChunkMeshAt(int worldX, int worldZ) {
         int chunkX = Math.floorDiv(worldX, Chunk.SIZE_X);
@@ -212,9 +212,9 @@ public class ChunkManager {
     }
 
     /**
-     * Performs the rebuild single chunk operation.
-     * @param cx the cx value
-     * @param cz the cz value
+     * Rebuilds single chunk from the authoritative runtime state.
+     * @param cx the {@code int} supplied as {@code cx}
+     * @param cz the {@code int} supplied as {@code cz}
      */
     private void rebuildSingleChunk(int cx, int cz) {
         Chunk chunk = world.getChunks().get(world.get2DKey(cx, cz));
@@ -225,8 +225,8 @@ public class ChunkManager {
 
     /**
      * Updates the grass.
-     * @param chunkX the chunk x value
-     * @param chunkZ the chunk z value
+     * @param chunkX the {@code int} supplied as {@code chunkX}
+     * @param chunkZ the {@code int} supplied as {@code chunkZ}
      */
     private void updateGrass(int chunkX, int chunkZ) {
         int startX = chunkX * Chunk.SIZE_X;
@@ -252,7 +252,7 @@ public class ChunkManager {
 
     /**
      * Updates the soil.
-     * @param delta the delta value
+     * @param delta the {@code float} supplied as {@code delta}
      */
     private void updateSoil(float delta) {
         var iterator = soilTimers.entrySet().iterator();
@@ -294,10 +294,10 @@ public class ChunkManager {
     }
 
     /**
-     * Performs the start soil timer operation.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
+     * Refreshes dependent runtime state for start soil timer.
+     * @param x the {@code int} supplied as {@code x}
+     * @param y the {@code int} supplied as {@code y}
+     * @param z the {@code int} supplied as {@code z}
      */
     private void startSoilTimer(int x, int y, int z) {
         SoilPosition position = new SoilPosition(x, y, z);
@@ -306,7 +306,7 @@ public class ChunkManager {
 
     /**
      * Checks whether the soil condition is met.
-     * @param block the block value
+     * @param block the {@code byte} supplied as {@code block}
      * @return {@code true} if soil; otherwise {@code false}
      */
     private boolean isSoil(byte block) {
@@ -315,9 +315,9 @@ public class ChunkManager {
 
     /**
      * Checks whether the exposed to air condition is met.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
+     * @param x the {@code int} supplied as {@code x}
+     * @param y the {@code int} supplied as {@code y}
+     * @param z the {@code int} supplied as {@code z}
      * @return {@code true} if exposed to air; otherwise {@code false}
      */
     private boolean isExposedToAir(int x, int y, int z) {
@@ -326,9 +326,9 @@ public class ChunkManager {
 
     /**
      * Checks whether the water nearby condition is met.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
+     * @param x the {@code int} supplied as {@code x}
+     * @param y the {@code int} supplied as {@code y}
+     * @param z the {@code int} supplied as {@code z}
      * @return {@code true} if water nearby; otherwise {@code false}
      */
     private boolean hasWaterNearby(int x, int y, int z) {
@@ -344,8 +344,8 @@ public class ChunkManager {
     }
 
     /**
-     * Performs the cleanup soil timers for chunk operation.
-     * @param chunk the chunk value
+     * Releases the resources associated with soil timers for chunk.
+     * @param chunk the {@link Chunk} supplied as {@code chunk}
      */
     private void cleanupSoilTimersForChunk(Chunk chunk) {
         int minX = chunk.getChunkX() * Chunk.SIZE_X;
@@ -358,7 +358,7 @@ public class ChunkManager {
 
     /**
      * Returns the chunk meshes.
-     * @return the chunk meshes
+     * @return the {@link Map} representing the chunk meshes
      */
     public Map<Chunk, ChunkMeshBuilder.ChunkRenderMesh> getChunkMeshes() {
         return chunkMeshes;
@@ -366,21 +366,21 @@ public class ChunkManager {
 
     /**
      * Returns the dirty chunks.
-     * @return the dirty chunks
+     * @return the {@link Set} representing the dirty chunks
      */
     public Set<Long> getDirtyChunks() {
         return dirtyChunks;
     }
 
     /**
-     * Performs the shutdown operation.
+     * Releases the resources associated with this object.
      */
     public void shutdown() {
         meshExecutor.shutdownNow();
     }
 
     /**
-     * Performs the dispose operation.
+     * Releases the resources associated with this object.
      */
     public void dispose() {
         meshExecutor.shutdownNow();
@@ -393,32 +393,32 @@ public class ChunkManager {
 
     /**
      * Returns the last player chunk x.
-     * @return the last player chunk x
+     * @return {@code int}; the last player chunk x
      */
     public int getLastPlayerChunkX() { return lastPlayerChunkX; }
     /**
      * Sets the last player chunk x.
-     * @param x the x value
+     * @param x the {@code int} supplied as {@code x}
      */
     public void setLastPlayerChunkX(int x) { this.lastPlayerChunkX = x; }
     /**
      * Returns the last player chunk z.
-     * @return the last player chunk z
+     * @return {@code int}; the last player chunk z
      */
     public int getLastPlayerChunkZ() { return lastPlayerChunkZ; }
     /**
      * Sets the last player chunk z.
-     * @param z the z value
+     * @param z the {@code int} supplied as {@code z}
      */
     public void setLastPlayerChunkZ(int z) { this.lastPlayerChunkZ = z; }
     /**
      * Returns the generator.
-     * @return the generator
+     * @return the {@link Generator} representing the generator
      */
     public Generator getGenerator() { return generator; }
 
     /**
-     * Stores mesh build result data.
+     * Immutable value object containing mesh build result.
      */
     private record MeshBuildResult(Chunk chunk, ChunkMeshBuilder.ChunkMeshData data) {}
 }

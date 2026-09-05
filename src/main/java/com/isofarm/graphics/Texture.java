@@ -15,7 +15,7 @@ import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.stb.STBImage.*;
 
 /**
- * Provides texture behavior.
+ * Encapsulates the state and operations required by texture within the game runtime.
  */
 public class Texture {
     private static final Logger log = LoggerFactory.getLogger(Texture.class);
@@ -25,7 +25,7 @@ public class Texture {
 
     /**
      * Creates a new {@code Texture} instance.
-     * @param resourcePath the resource path value
+     * @param resourcePath the {@link String} supplied as {@code resourcePath}
      */
     public Texture(String resourcePath) {
         stbi_set_flip_vertically_on_load(true);
@@ -89,7 +89,7 @@ public class Texture {
 
     /**
      * Returns the texture long
-     * @param texture path to the texture
+     * @param texture the {@link Texture} argument; path to the texture
      * @return {@link Long} the texture long
      */
     public static long getTextureLong(Texture texture) {
@@ -97,7 +97,7 @@ public class Texture {
     }
 
     /**
-     * Performs the bind operation.
+     * Binds this object to the active runtime context.
      */
     public void bind() {
         glActiveTexture(GL_TEXTURE0);
@@ -105,14 +105,14 @@ public class Texture {
     }
 
     /**
-     * Performs the unbind operation.
+     * Unbinds this object from the active runtime context.
      */
     public void unbind() {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     /**
-     * Performs the dispose operation.
+     * Releases the resources associated with this object.
      */
     public void dispose() {
         glDeleteTextures(id);
@@ -121,7 +121,7 @@ public class Texture {
 
     /**
      * Returns the id.
-     * @return the id
+     * @return {@code int}; the id
      */
     public int getId() {
         return id;
@@ -129,7 +129,7 @@ public class Texture {
 
     /**
      * Returns the width.
-     * @return the width
+     * @return {@code int}; the width
      */
     public int getWidth() {
         return width;
@@ -137,7 +137,7 @@ public class Texture {
 
     /**
      * Returns the height.
-     * @return the height
+     * @return {@code int}; the height
      */
     public int getHeight() {
         return height;

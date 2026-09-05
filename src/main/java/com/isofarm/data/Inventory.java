@@ -7,7 +7,7 @@ import com.isofarm.utils.K;
 import java.util.*;
 
 /**
- * Provides inventory behavior.
+ * Encapsulates the state and operations required by inventory within the game runtime.
  */
 @DataClass
 public class Inventory {
@@ -31,7 +31,7 @@ public class Inventory {
 
     /**
      * Returns the items.
-     * @return the items
+     * @return the {@link Map} representing the items
      */
     public Map<Item, Integer> getItems() {
         Map<Item, Integer> result = new LinkedHashMap<>();
@@ -47,7 +47,7 @@ public class Inventory {
 
     /**
      * Returns the equipped extra items.
-     * @return the equipped extra items
+     * @return the {@link List} representing the equipped extra items
      */
     public List<InventorySlot> getEquippedExtraItems() {
         return equippedExtraItems;
@@ -55,7 +55,7 @@ public class Inventory {
 
     /**
      * Returns the backpack slot.
-     * @return the backpack slot
+     * @return the {@link InventorySlot} representing the backpack slot
      */
     public InventorySlot getBackpackSlot() {
         return backpackSlot;
@@ -63,7 +63,7 @@ public class Inventory {
 
     /**
      * Returns the book slot.
-     * @return the book slot
+     * @return the {@link InventorySlot} representing the book slot
      */
     public InventorySlot getBookSlot() {
         return bookSlot;
@@ -87,7 +87,7 @@ public class Inventory {
 
     /**
      * Returns the backpack.
-     * @return the backpack
+     * @return the {@link Backpack} representing the backpack
      */
     public Backpack getBackpack() {
         return backpackSlot.getItem() instanceof Backpack backpack ? backpack : null;
@@ -95,15 +95,15 @@ public class Inventory {
 
     /**
      * Returns the book.
-     * @return the book
+     * @return the {@link CraftingBook} representing the book
      */
     public CraftingBook getBook() {
         return bookSlot.getItem() instanceof CraftingBook book ? book : null;
     }
 
     /**
-     * Performs the equip backpack operation.
-     * @param backpack the backpack value
+     * Applies equip backpack and updates the affected character or item state.
+     * @param backpack the {@link Backpack} supplied as {@code backpack}
      */
     public void equipBackpack(Backpack backpack) {
         remove(backpack, 1);
@@ -113,8 +113,8 @@ public class Inventory {
     }
 
     /**
-     * Performs the equip book operation.
-     * @param book the book value
+     * Applies equip book and updates the affected character or item state.
+     * @param book the {@link Book} supplied as {@code book}
      */
     public void equipBook(Book book) {
         remove(book, 1);
@@ -124,7 +124,7 @@ public class Inventory {
     }
 
     /**
-     * Performs the unequip backpack operation.
+     * Applies unequip backpack and updates the affected character or item state.
      */
     public void unequipBackpack() {
         Item backpack = backpackSlot.getItem();
@@ -135,7 +135,7 @@ public class Inventory {
     }
 
     /**
-     * Performs the unequip book operation.
+     * Applies unequip book and updates the affected character or item state.
      */
     public void unequipBook() {
         Item book = bookSlot.getItem();
@@ -147,9 +147,9 @@ public class Inventory {
 
     /**
      * Adds add.
-     * @param item the item value
-     * @param amount the amount value
-     * @return the add result
+     * @param item the {@link Item} supplied as {@code item}
+     * @param amount the {@code int} supplied as {@code amount}
+     * @return {@code int}; the add result
      */
     public int add(Item item, int amount) {
         if (item == null || amount <= 0) {
@@ -172,11 +172,11 @@ public class Inventory {
 
     /**
      * Adds the to existing stacks.
-     * @param item the item value
-     * @param amount the amount value
-     * @param start the start value
-     * @param end the end value
-     * @return the add to existing stacks result
+     * @param item the {@link Item} supplied as {@code item}
+     * @param amount the {@code int} supplied as {@code amount}
+     * @param start the {@code int} supplied as {@code start}
+     * @param end the {@code int} supplied as {@code end}
+     * @return {@code int}; the add to existing stacks result
      */
     private int addToExistingStacks(Item item, int amount, int start, int end) {
         int remaining = amount;
@@ -209,11 +209,11 @@ public class Inventory {
 
     /**
      * Adds the to empty slots.
-     * @param item the item value
-     * @param amount the amount value
-     * @param start the start value
-     * @param end the end value
-     * @return the add to empty slots result
+     * @param item the {@link Item} supplied as {@code item}
+     * @param amount the {@code int} supplied as {@code amount}
+     * @param start the {@code int} supplied as {@code start}
+     * @param end the {@code int} supplied as {@code end}
+     * @return {@code int}; the add to empty slots result
      */
     private int addToEmptySlots(Item item, int amount, int start, int end) {
         int remaining = amount;
@@ -238,8 +238,8 @@ public class Inventory {
 
     /**
      * Removes remove.
-     * @param item the item value
-     * @param amount the amount value
+     * @param item the {@link Item} supplied as {@code item}
+     * @param amount the {@code int} supplied as {@code amount}
      */
     public void remove(Item item, int amount) {
         if (item == null || amount <= 0) {
@@ -268,7 +268,7 @@ public class Inventory {
     }
 
     /**
-     * Performs the sort operation.
+     * Reorganizes inventory state for sort.
      */
     public void sort() {
         group();
@@ -301,7 +301,7 @@ public class Inventory {
     }
 
     /**
-     * Performs the group operation.
+     * Creates or returns group from the supplied arguments.
      */
     public void group() {
         for (int i = 0; i < slots.size(); i++) {
@@ -340,10 +340,10 @@ public class Inventory {
     }
 
     /**
-     * Performs the take operation.
-     * @param index the index value
-     * @param amount the amount value
-     * @return the take result
+     * Transfers or creates the relevant entity or item for take.
+     * @param index the {@code int} supplied as {@code index}
+     * @param amount the {@code int} supplied as {@code amount}
+     * @return {@code int}; the take result
      */
     public int take(int index, int amount) {
         if (!isValidIndex(index) || amount <= 0) {
@@ -365,10 +365,10 @@ public class Inventory {
 
     /**
      * Adds the to stack.
-     * @param targetIndex the target index value
-     * @param item the item value
-     * @param amount the amount value
-     * @return the add to stack result
+     * @param targetIndex the {@code int} supplied as {@code targetIndex}
+     * @param item the {@link Item} supplied as {@code item}
+     * @param amount the {@code int} supplied as {@code amount}
+     * @return {@code int}; the add to stack result
      */
     public int addToStack(int targetIndex, Item item, int amount) {
         if (!isValidIndex(targetIndex) || item == null || amount <= 0) {
@@ -404,9 +404,9 @@ public class Inventory {
 
     /**
      * Adds the one.
-     * @param targetIndex the target index value
-     * @param item the item value
-     * @return the add one result
+     * @param targetIndex the {@code int} supplied as {@code targetIndex}
+     * @param item the {@link Item} supplied as {@code item}
+     * @return {@code int}; the add one result
      */
     public int addOne(int targetIndex, Item item) {
         return addToStack(targetIndex, item, 1);
@@ -414,7 +414,7 @@ public class Inventory {
 
     /**
      * Returns the hotbar items.
-     * @return the hotbar items
+     * @return the {@link List} representing the hotbar items
      */
     public List<Item> getHotbarItems() {
         List<Item> hotbar = new ArrayList<>();
@@ -465,8 +465,8 @@ public class Inventory {
     }
 
     /**
-     * Performs the size operation.
-     * @return the size result
+     * Returns the number or extent represented by size.
+     * @return {@code int}; the size result
      */
     public int size() {
         return (int) slots.stream().filter(slot -> !slot.isEmpty()).count();
@@ -474,8 +474,8 @@ public class Inventory {
 
     /**
      * Returns get.
-     * @param index the index value
-     * @return the get result
+     * @param index the {@code int} supplied as {@code index}
+     * @return the {@link Item} representing the get result
      */
     public Item get(int index) {
         InventorySlot slot = getSlot(index);
@@ -489,8 +489,8 @@ public class Inventory {
 
     /**
      * Returns get.
-     * @param item the item value
-     * @return the get result
+     * @param item the {@link Item} supplied as {@code item}
+     * @return the {@link Item} representing the get result
      */
     public Item get(Item item) {
         if (item == null) {
@@ -508,8 +508,8 @@ public class Inventory {
 
     /**
      * Returns the amount.
-     * @param item the item value
-     * @return the amount
+     * @param item the {@link Item} supplied as {@code item}
+     * @return {@code int}; the amount
      */
     public int getAmount(Item item) {
         if (item == null) {
@@ -530,7 +530,7 @@ public class Inventory {
     /**
      * Checks whether the item of type condition is met.
      * @param <T> the generic type
-     * @param type the type value
+     * @param type the {@link Class} supplied as {@code type}
      * @return {@code true} if item of type; otherwise {@code false}
      */
     public <T extends Item> boolean hasItemOfType(Class<T> type) {
@@ -541,8 +541,8 @@ public class Inventory {
     /**
      * Returns the item of type.
      * @param <T> the generic type
-     * @param type the type value
-     * @return the item of type
+     * @param type the {@link Class} supplied as {@code type}
+     * @return the {@link Optional} representing the item of type
      */
     public <T extends Item> Optional<T> getItemOfType(Class<T> type) {
         return slots.stream().filter(slot -> !slot.isEmpty()).filter(
@@ -553,8 +553,8 @@ public class Inventory {
     /**
      * Returns the first item id of type.
      * @param <T> the generic type
-     * @param type the type value
-     * @return the first item id of type
+     * @param type the {@link Class} supplied as {@code type}
+     * @return the {@link Optional} representing the first item id of type
      */
     public <T extends Item> Optional<Byte> getFirstItemIdOfType(Class<T> type) {
         return slots.stream().filter(slot -> !slot.isEmpty()).filter(
@@ -565,8 +565,8 @@ public class Inventory {
     /**
      * Checks whether the item with id condition is met.
      * @param <T> the generic type
-     * @param type the type value
-     * @param id the id value
+     * @param type the {@link Class} supplied as {@code type}
+     * @param id the {@code byte} supplied as {@code id}
      * @return {@code true} if item with id; otherwise {@code false}
      */
     public <T extends Item> boolean hasItemWithId(Class<T> type, byte id) {
@@ -577,8 +577,8 @@ public class Inventory {
 
     /**
      * Returns the amount of material.
-     * @param id the id value
-     * @return the amount of material
+     * @param id the {@link MaterialID} supplied as {@code id}
+     * @return {@code int}; the amount of material
      */
     public int getAmountOfMaterial(MaterialID id) {
         return slots.stream()
@@ -591,7 +591,7 @@ public class Inventory {
 
     /**
      * Returns the slots.
-     * @return the slots
+     * @return the {@link List} representing the slots
      */
     public List<InventorySlot> getSlots() {
         return Collections.unmodifiableList(slots);
@@ -599,8 +599,8 @@ public class Inventory {
 
     /**
      * Returns the slot.
-     * @param index the index value
-     * @return the slot
+     * @param index the {@code int} supplied as {@code index}
+     * @return the {@link InventorySlot} representing the slot
      */
     public InventorySlot getSlot(int index) {
         if (!isValidIndex(index)) {
@@ -612,8 +612,8 @@ public class Inventory {
 
     /**
      * Returns the slot amount.
-     * @param index the index value
-     * @return the slot amount
+     * @param index the {@code int} supplied as {@code index}
+     * @return {@code int}; the slot amount
      */
     public int getSlotAmount(int index) {
         return getSlot(index).getAmount();
@@ -621,7 +621,7 @@ public class Inventory {
 
     /**
      * Returns the hotbar start.
-     * @return the hotbar start
+     * @return {@code int}; the hotbar start
      */
     public int getHotbarStart() {
         return (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
@@ -629,8 +629,8 @@ public class Inventory {
 
     /**
      * Returns the max stack.
-     * @param item the item value
-     * @return the max stack
+     * @param item the {@link Item} supplied as {@code item}
+     * @return {@code int}; the max stack
      */
     public int getMaxStack(Item item) {
         if (item == null) {
@@ -650,8 +650,8 @@ public class Inventory {
 
     /**
      * Checks whether the same type condition is met.
-     * @param a the a value
-     * @param b the b value
+     * @param a the {@link Item} supplied as {@code a}
+     * @param b the {@link Item} supplied as {@code b}
      * @return {@code true} if same type; otherwise {@code false}
      */
     private boolean isSameType(Item a, Item b) {
@@ -675,7 +675,7 @@ public class Inventory {
 
     /**
      * Checks whether the valid index condition is met.
-     * @param index the index value
+     * @param index the {@code int} supplied as {@code index}
      * @return {@code true} if valid index; otherwise {@code false}
      */
     private boolean isValidIndex(int index) {

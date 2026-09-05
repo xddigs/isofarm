@@ -21,7 +21,7 @@ import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 
 /**
- * Provides shadow system behavior.
+ * Encapsulates the state and operations required by shadow system within the game runtime.
  */
 @Singleton
 public class ShadowSystem {
@@ -42,9 +42,9 @@ public class ShadowSystem {
     private final Matrix4f modelMatrix = new Matrix4f();
 
     /**
-     * Renders render.
-     * @param gameMaster the game master value
-     * @param chunkMeshes the chunk meshes value
+     * Renders this object in the requested render pass.
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
+     * @param chunkMeshes the {@link Map} supplied as {@code chunkMeshes}
      */
     public void render(GameMaster gameMaster,
                        Map<Chunk, ChunkMeshBuilder.ChunkRenderMesh> chunkMeshes) {
@@ -146,7 +146,7 @@ public class ShadowSystem {
 
     /**
      * Updates the light matrix.
-     * @param gameMaster the game master value
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
      */
     private void updateLightMatrix(GameMaster gameMaster) {
         lightDirection.set(gameMaster.getCelestialLighting().getDirection()).normalize();
@@ -172,7 +172,7 @@ public class ShadowSystem {
 
     /**
      * Returns the light space matrix.
-     * @return the light space matrix
+     * @return the {@link Matrix4f} representing the light space matrix
      */
     public Matrix4f getLightSpaceMatrix() {
         return lightSpace;

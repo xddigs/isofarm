@@ -9,10 +9,10 @@ import java.util.List;
 @FunctionalInterface
 public interface CompletionProvider {
     /**
-     * Performs the complete operation.
-     * @param text the text value
-     * @param cursorPosition the cursor position value
-     * @return the complete result
+     * Updates text or selection state for complete.
+     * @param text the {@link String} supplied as {@code text}
+     * @param cursorPosition the {@code int} supplied as {@code cursorPosition}
+     * @return the {@link List} representing the complete result
      */
     List<String> complete(String text, int cursorPosition);
 }

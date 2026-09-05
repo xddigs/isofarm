@@ -17,7 +17,7 @@ import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 
 /**
- * Provides rain engine behavior.
+ * Encapsulates the state and operations required by rain engine within the game runtime.
  */
 @SuppressWarnings("all")
 public class RainEngine {
@@ -52,8 +52,8 @@ public class RainEngine {
     }
 
     /**
-     * Performs the generate chunk rain pattern operation.
-     * @return the generate chunk rain pattern result
+     * Creates chunk rain pattern from the supplied state and configuration.
+     * @return an array of {@code float} values; the generate chunk rain pattern result
      */
     private float[] generateChunkRainPattern() {
         Random rnd = new Random(1337);
@@ -79,19 +79,19 @@ public class RainEngine {
 
     /**
      * Updates the current state.
-     * @param delta the delta value
+     * @param delta the {@code float} supplied as {@code delta}
      */
     public void update(float delta) {
         timeAccumulator += delta;
     }
 
     /**
-     * Renders render.
-     * @param shader the shader value
-     * @param view the view value
-     * @param projection the projection value
-     * @param cameraPos the camera pos value
-     * @param world the world value
+     * Renders this object in the requested render pass.
+     * @param shader the {@link Shader} supplied as {@code shader}
+     * @param view the {@link Matrix4f} supplied as {@code view}
+     * @param projection the {@link Matrix4f} supplied as {@code projection}
+     * @param cameraPos the {@link Vector3f} supplied as {@code cameraPos}
+     * @param world the {@link World} supplied as {@code world}
      */
     public void render(Shader shader, Matrix4f view, Matrix4f projection,
                        Vector3f cameraPos, World world) {
@@ -136,7 +136,7 @@ public class RainEngine {
     }
 
     /**
-     * Performs the dispose operation.
+     * Releases the resources associated with this object.
      */
     public void dispose() {
         glDeleteBuffers(vbo);

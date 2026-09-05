@@ -29,7 +29,7 @@ public enum Cause {
 
     /**
      * Returns the cause of death from the id
-     * @param id the id
+     * @param id the {@code byte} supplied as {@code id}
      * @return {@link Cause} the cause of death
      */
     public static Cause fromId(byte id) {

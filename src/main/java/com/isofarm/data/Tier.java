@@ -22,8 +22,8 @@ public enum Tier {
 
     /**
      * Creates a new {@code Tier} instance.
-     * @param id the id value
-     * @param durability the durability value
+     * @param id the {@code byte} supplied as {@code id}
+     * @param durability the {@code int} supplied as {@code durability}
      */
     Tier(byte id, int durability) {
         this.id = id;
@@ -32,7 +32,7 @@ public enum Tier {
 
     /**
      * Returns the id.
-     * @return the id
+     * @return {@code byte}; the id
      */
     public byte getId() {
         return id;
@@ -40,7 +40,7 @@ public enum Tier {
 
     /**
      * Returns the name.
-     * @return the name
+     * @return the {@link String} representing the name
      */
     public String getName() {
         return name().toLowerCase(Locale.ROOT);
@@ -48,7 +48,7 @@ public enum Tier {
 
     /**
      * Returns the display name.
-     * @return the display name
+     * @return the {@link String} representing the display name
      */
     public String getDisplayName() {
         if (this == NONE) return null;
@@ -56,9 +56,9 @@ public enum Tier {
     }
 
     /**
-     * Performs the to {@link String} operation.
-     * @param tier the tier value
-     * @return the to str result
+     * Produces the textual or converted representation for to str.
+     * @param tier the {@link Tier} supplied as {@code tier}
+     * @return the {@link String} representing the to str result
      */
     public static String toStr(Tier tier) {
         return tier.name().toLowerCase(Locale.ROOT);
@@ -66,7 +66,7 @@ public enum Tier {
 
     /**
      * Returns the durability.
-     * @return the durability
+     * @return {@code int}; the durability
      */
     public int getDurability() {
         return durability;
@@ -81,8 +81,8 @@ public enum Tier {
     }
 
     /**
-     * Performs the for each operation.
-     * @param consumer the consumer value
+     * Processes each applicable element for for each.
+     * @param consumer the {@link Consumer} supplied as {@code consumer}
      */
     public static void forEach(Consumer<Tier> consumer) {
         for (Tier tier : values()) {

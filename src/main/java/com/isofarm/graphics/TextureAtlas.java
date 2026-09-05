@@ -19,7 +19,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 
 /**
- * Provides texture atlas behavior.
+ * Encapsulates the state and operations required by texture atlas within the game runtime.
  */
 public class TextureAtlas {
     private static final Logger log = LoggerFactory.getLogger(TextureAtlas.class);
@@ -28,9 +28,9 @@ public class TextureAtlas {
 
     /**
      * Creates a new {@code TextureAtlas} instance.
-     * @param imagePaths the image paths value
-     * @param tileWidth the tile width value
-     * @param tileHeight the tile height value
+     * @param imagePaths the {@link List} supplied as {@code imagePaths}
+     * @param tileWidth the {@code int} supplied as {@code tileWidth}
+     * @param tileHeight the {@code int} supplied as {@code tileHeight}
      */
     public TextureAtlas(List<String> imagePaths, int tileWidth, int tileHeight) {
         int count = imagePaths.size();
@@ -105,11 +105,11 @@ public class TextureAtlas {
 
     /**
      * Loads the texture from resources.
-     * @param path the path value
-     * @param w the w value
-     * @param h the h value
-     * @param comp the comp value
-     * @return the load texture from resources result
+     * @param path the {@link String} supplied as {@code path}
+     * @param w the {@link IntBuffer} supplied as {@code w}
+     * @param h the {@link IntBuffer} supplied as {@code h}
+     * @param comp the {@link IntBuffer} supplied as {@code comp}
+     * @return the {@link ByteBuffer} representing the load texture from resources result
      */
     private ByteBuffer loadTextureFromResources(String path, IntBuffer w, IntBuffer h, IntBuffer comp) {
         String resourcePath = path.startsWith("/") ? path : "/" + path;
@@ -131,14 +131,14 @@ public class TextureAtlas {
     }
 
     /**
-     * Performs the bind operation.
+     * Binds this object to the active runtime context.
      */
     public void bind() {
         glBindTexture(GL_TEXTURE_2D, textureId);
     }
 
     /**
-     * Performs the unbind operation.
+     * Unbinds this object from the active runtime context.
      */
     public void unbind() {
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -146,22 +146,22 @@ public class TextureAtlas {
 
     /**
      * Returns the region.
-     * @param path the path value
-     * @return the region
+     * @param path the {@link String} supplied as {@code path}
+     * @return the {@link TextureRegion} representing the region
      */
     public TextureRegion getRegion(String path) {
         return regions.get(path);
     }
 
     /**
-     * Performs the dispose operation.
+     * Releases the resources associated with this object.
      */
     public void dispose() {
         glDeleteTextures(textureId);
     }
 
     /**
-     * Stores texture region data.
+     * Immutable value object containing texture region.
      */
     public record TextureRegion(Vector2f uvMin, Vector2f uvMax, Vector2f scale, Vector2f offset) {
     }

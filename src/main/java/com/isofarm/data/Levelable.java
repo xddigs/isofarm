@@ -6,46 +6,46 @@ package com.isofarm.data;
 public interface Levelable {
     /**
      * Returns the level.
-     * @return the level
+     * @return {@code int}; the level
      */
     int getLevel();
     /**
      * Sets the level.
-     * @param level the level value
+     * @param level the {@code int} supplied as {@code level}
      */
     void setLevel(int level);
     /**
      * Returns the experience.
-     * @return the experience
+     * @return {@code int}; the experience
      */
     int getExperience();
     /**
      * Sets the experience.
-     * @param experience the experience value
+     * @param experience the {@code int} supplied as {@code experience}
      */
     void setExperience(int experience);
     /**
      * Returns the experience for next level.
-     * @return the experience for next level
+     * @return {@code int}; the experience for next level
      */
     int getExperienceForNextLevel();
     /**
      * Sets the experience for next level.
-     * @param experienceForNextLevel the experience for next level value
+     * @param experienceForNextLevel the {@code int} supplied as {@code experienceForNextLevel}
      */
     void setExperienceForNextLevel(int experienceForNextLevel);
     /**
-     * Performs the calc next level operation.
-     * @return the calc next level result
+     * Calculates next level from the current inputs.
+     * @return {@code int}; the calc next level result
      */
     int calcNextLevel();
     /**
-     * Performs the level up operation.
+     * Advances this object to the next progression level and updates dependent statistics.
      */
     void levelUp();
     /**
-     * Performs the gain operation.
-     * @param experience the experience value
+     * Adds the supplied amount to accumulated progression and applies any resulting transitions.
+     * @param experience the {@code int} supplied as {@code experience}
      */
     void gain(int experience);
 }

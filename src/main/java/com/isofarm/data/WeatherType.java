@@ -20,9 +20,9 @@ public enum WeatherType {
 
     /**
      * Creates a new {@code WeatherType} instance.
-     * @param growthMultiplier the growth multiplier value
-     * @param waterDPS the water dps value
-     * @param cropDamageChance the crop damage chance value
+     * @param growthMultiplier the {@code float} supplied as {@code growthMultiplier}
+     * @param waterDPS the {@code int} supplied as {@code waterDPS}
+     * @param cropDamageChance the {@code float} supplied as {@code cropDamageChance}
      */
     WeatherType(float growthMultiplier,
                 int waterDPS, float cropDamageChance) {
@@ -33,27 +33,27 @@ public enum WeatherType {
 
     /**
      * Returns the name.
-     * @return the name
+     * @return the {@link String} representing the name
      */
     public String getName() { return name().toLowerCase(Locale.ROOT); }
     /**
      * Returns the display name.
-     * @return the display name
+     * @return the {@link String} representing the display name
      */
     public String getDisplayName() { return Local.lang.t("weather." + name().toLowerCase()); }
     /**
      * Returns the growth multiplier.
-     * @return the growth multiplier
+     * @return {@code float}; the growth multiplier
      */
     public float getGrowthMultiplier() { return growthMultiplier; }
     /**
      * Returns the water dps.
-     * @return the water dps
+     * @return {@code int}; the water dps
      */
     public int getWaterDPS() { return waterDPS; }
     /**
      * Returns the crop damage chance.
-     * @return the crop damage chance
+     * @return {@code float}; the crop damage chance
      */
     public float getCropDamageChance() { return cropDamageChance; }
 }

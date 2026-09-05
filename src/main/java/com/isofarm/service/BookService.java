@@ -5,7 +5,7 @@ import com.isofarm.gui.BookUI;
 import com.isofarm.item.Book;
 
 /**
- * Provides book service behavior.
+ * Encapsulates the state and operations required by book service within the game runtime.
  */
 @Singleton
 public class BookService implements Service<Book> {
@@ -19,7 +19,7 @@ public class BookService implements Service<Book> {
 
     /**
      * Returns the opened book.
-     * @return the opened book
+     * @return the {@link Book} representing the opened book
      */
     public Book getOpenedBook() {
         return openedBook;
@@ -34,8 +34,8 @@ public class BookService implements Service<Book> {
     }
 
     /**
-     * Performs the open operation.
-     * @param book the book value
+     * Activates this object and prepares any state it requires.
+     * @param book the {@link Book} supplied as {@code book}
      */
     public void open(Book book) {
         if (book == null || openedBook != null) {
@@ -48,7 +48,7 @@ public class BookService implements Service<Book> {
     }
 
     /**
-     * Performs the close operation.
+     * Releases the resources associated with this object.
      */
     public void close() {
         if (openedBook == null) {

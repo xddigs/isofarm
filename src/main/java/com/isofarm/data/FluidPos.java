@@ -1,7 +1,7 @@
 package com.isofarm.data;
 
 /**
- * Stores fluid pos data.
+ * Immutable value object containing fluid pos.
  */
 @DataClass
 public record FluidPos(int x, int y, int z) {}

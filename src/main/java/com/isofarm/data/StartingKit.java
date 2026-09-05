@@ -3,7 +3,7 @@ package com.isofarm.data;
 import com.isofarm.item.*;
 
 /**
- * Provides starting kit behavior.
+ * Encapsulates the state and operations required by starting kit within the game runtime.
  */
 public class StartingKit extends Kit {
     /**

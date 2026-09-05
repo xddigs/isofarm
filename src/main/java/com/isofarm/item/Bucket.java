@@ -12,14 +12,14 @@ import com.isofarm.wrld.FluidSimulation;
 import com.isofarm.wrld.World;
 
 /**
- * Provides bucket behavior.
+ * Encapsulates the state and operations required by bucket within the game runtime.
  */
 public class Bucket extends Usable {
     private BlockData type;
 
     /**
      * Creates a new {@code Bucket} instance.
-     * @param type the type value
+     * @param type the {@link BlockData} supplied as {@code type}
      */
     public Bucket(BlockData type) {
         super(Usables.BUCKET, Local.lang.t("item.usable.bucket"));
@@ -34,8 +34,9 @@ public class Bucket extends Usable {
     }
 
     /**
-     * Performs the copy operation.
-     * @return the copy result
+     * {@inheritDoc}
+     * Creates an independent copy that preserves the relevant state of this object.
+     * @return the {@link Item} representing the copy result
      */
     @Override
     public Item copy() {
@@ -43,10 +44,11 @@ public class Bucket extends Usable {
     }
 
     /**
-     * Performs the use operation.
-     * @param gameMaster the game master value
-     * @param isCtrlHeld the is ctrl held value
-     * @return the use result
+     * {@inheritDoc}
+     * Handles use and applies its effect to the current interaction state.
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
+     * @param isCtrlHeld the {@code boolean} supplied as {@code isCtrlHeld}
+     * @return {@code boolean}; the use result
      */
     @Override
     public boolean use(GameMaster gameMaster, boolean isCtrlHeld) {
@@ -104,17 +106,23 @@ public class Bucket extends Usable {
     }
 
     /**
+     * {@inheritDoc}
      * Updates the current state.
      */
     @Override
     public void update() {}
 
+    /**
+     * Returns name according to the current object state.
+     * {@inheritDoc}
+     */
     @Override
     public String getName() {
         return getBucketDisplayName();
     }
 
     /**
+     * {@inheritDoc}
      * Returns the localized name for the bucket's current contents.
      * @return {@link String} the localized display name
      */
@@ -136,9 +144,10 @@ public class Bucket extends Usable {
     }
 
     /**
-     * Performs the enchanting operation.
-     * @param enchantment the enchantment value
-     * @return the enchanting result
+     * {@inheritDoc}
+     * Applies enchanting and updates the affected character or item state.
+     * @param enchantment the {@link Enchantment} supplied as {@code enchantment}
+     * @return {@code boolean}; the enchanting result
      */
     @Override
     public boolean enchanting(Enchantment enchantment) {
@@ -147,7 +156,7 @@ public class Bucket extends Usable {
 
     /**
      * Returns the block type.
-     * @return the block type
+     * @return the {@link BlockData} representing the block type
      */
     public BlockData getBlockType() {
         return type;
@@ -155,7 +164,7 @@ public class Bucket extends Usable {
 
     /**
      * Sets the block type.
-     * @param type the type value
+     * @param type the {@link BlockData} supplied as {@code type}
      */
     public void setBlockType(BlockData type) {
         this.type = type;
@@ -163,7 +172,7 @@ public class Bucket extends Usable {
 
     /**
      * Fills the bucket with a supported fluid.
-     * @param fluidType the fluid block type
+     * @param fluidType the {@link BlockData} argument; the fluid block type
      */
     public void fill(BlockData fluidType) {
         FluidSimulation simulation = FluidSimulation.forBlock(fluidType);
@@ -171,7 +180,7 @@ public class Bucket extends Usable {
     }
 
     /**
-     * Performs the empty operation.
+     * Determines whether this object contains no elements or active content.
      */
     public void empty() {
         setBlockType(BlockData.AIR);

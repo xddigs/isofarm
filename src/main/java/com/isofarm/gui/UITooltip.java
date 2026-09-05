@@ -5,7 +5,7 @@ import com.isofarm.utils.Local;
 import com.isofarm.utils.Settings;
 
 /**
- * Provides uitooltip behavior.
+ * Encapsulates the state and operations required by uitooltip within the game runtime.
  */
 @SuppressWarnings("unused")
 public class UITooltip extends UIElement {
@@ -26,7 +26,8 @@ public class UITooltip extends UIElement {
     }
 
     /**
-     * Renders render.
+     * {@inheritDoc}
+     * Renders this object in the requested render pass.
      */
     @Override
     public void render() {
@@ -49,7 +50,7 @@ public class UITooltip extends UIElement {
 
     /**
      * Returns the text.
-     * @return the text
+     * @return the {@link String} representing the text
      */
     public String getText() {
         return text;
@@ -57,16 +58,16 @@ public class UITooltip extends UIElement {
 
     /**
      * Sets the text.
-     * @param text the text value
+     * @param text the {@link String} supplied as {@code text}
      */
     public void setText(String text) {
         this.text = text == null ? "" : Local.lang.t(text);
     }
 
     /**
-     * Performs the text operation.
-     * @param text the text value
-     * @return the text result
+     * Creates or returns text from the supplied arguments.
+     * @param text the {@link String} supplied as {@code text}
+     * @return the {@link UITooltip} representing the text result
      */
     public UITooltip text(String text) {
         setText(text);
@@ -89,7 +90,7 @@ public class UITooltip extends UIElement {
 
     /**
      * Returns the padding.
-     * @return the padding
+     * @return {@code float}; the padding
      */
     public float getPadding() {
         return padding;
@@ -97,16 +98,16 @@ public class UITooltip extends UIElement {
 
     /**
      * Sets the padding.
-     * @param padding the padding value
+     * @param padding the {@code float} supplied as {@code padding}
      */
     public void setPadding(float padding) {
         this.padding = Math.max(0.0f, padding);
     }
 
     /**
-     * Performs the padding operation.
-     * @param padding the padding value
-     * @return the padding result
+     * Creates or returns padding from the supplied arguments.
+     * @param padding the {@code float} supplied as {@code padding}
+     * @return the {@link UITooltip} representing the padding result
      */
     public UITooltip padding(float padding) {
         setPadding(padding);
@@ -115,7 +116,7 @@ public class UITooltip extends UIElement {
 
     /**
      * Returns the offset x.
-     * @return the offset x
+     * @return {@code float}; the offset x
      */
     public float getOffsetX() {
         return offsetX;
@@ -123,7 +124,7 @@ public class UITooltip extends UIElement {
 
     /**
      * Sets the offset x.
-     * @param offsetX the offset x value
+     * @param offsetX the {@code float} supplied as {@code offsetX}
      */
     public void setOffsetX(float offsetX) {
         this.offsetX = offsetX;
@@ -131,7 +132,7 @@ public class UITooltip extends UIElement {
 
     /**
      * Returns the offset y.
-     * @return the offset y
+     * @return {@code float}; the offset y
      */
     public float getOffsetY() {
         return offsetY;
@@ -139,17 +140,17 @@ public class UITooltip extends UIElement {
 
     /**
      * Sets the offset y.
-     * @param offsetY the offset y value
+     * @param offsetY the {@code float} supplied as {@code offsetY}
      */
     public void setOffsetY(float offsetY) {
         this.offsetY = offsetY;
     }
 
     /**
-     * Performs the offset operation.
-     * @param x the x value
-     * @param y the y value
-     * @return the offset result
+     * Transforms this object according to the supplied values.
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @return the {@link UITooltip} representing the offset result
      */
     public UITooltip offset(float x, float y) {
         setOffsetX(x);
@@ -159,10 +160,10 @@ public class UITooltip extends UIElement {
 
     /**
      * Updates the position.
-     * @param mouseX the mouse x value
-     * @param mouseY the mouse y value
-     * @param windowWidth the window width value
-     * @param windowHeight the window height value
+     * @param mouseX the {@code float} supplied as {@code mouseX}
+     * @param mouseY the {@code float} supplied as {@code mouseY}
+     * @param windowWidth the {@code float} supplied as {@code windowWidth}
+     * @param windowHeight the {@code float} supplied as {@code windowHeight}
      */
     public void updatePosition(float mouseX, float mouseY,
                                float windowWidth, float windowHeight) {

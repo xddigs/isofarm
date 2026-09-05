@@ -3,7 +3,7 @@ package com.isofarm.gui;
 import org.joml.Vector4f;
 
 /**
- * Provides uiprogress bar behavior.
+ * Encapsulates the state and operations required by uiprogress bar within the game runtime.
  */
 public class UIProgressBar extends UIElement {
     private float value;
@@ -20,13 +20,13 @@ public class UIProgressBar extends UIElement {
 
     /**
      * Creates a new {@code UIProgressBar} instance.
-     * @param x the x value
-     * @param y the y value
-     * @param width the width value
-     * @param height the height value
-     * @param value the value value
-     * @param maxValue the max value value
-     * @param showText the show text value
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param width the {@code float} supplied as {@code width}
+     * @param height the {@code float} supplied as {@code height}
+     * @param value the {@code float} supplied as {@code value}
+     * @param maxValue the {@code float} supplied as {@code maxValue}
+     * @param showText the {@code boolean} supplied as {@code showText}
      */
     public UIProgressBar(float x, float y, float width, float height,
                          float value, float maxValue, boolean showText) {
@@ -37,7 +37,8 @@ public class UIProgressBar extends UIElement {
     }
 
     /**
-     * Renders render.
+     * {@inheritDoc}
+     * Renders this object in the requested render pass.
      */
     @Override
     public void render() {
@@ -78,9 +79,9 @@ public class UIProgressBar extends UIElement {
 
     /**
      * Sets the values.
-     * @param value the value value
-     * @param maxValue the max value value
-     * @return the set values result
+     * @param value the {@code float} supplied as {@code value}
+     * @param maxValue the {@code float} supplied as {@code maxValue}
+     * @return the {@link UIProgressBar} representing the set values result
      */
     public UIProgressBar setValues(float value, float maxValue) {
         this.maxValue = Math.max(1.0f, maxValue);
@@ -90,8 +91,8 @@ public class UIProgressBar extends UIElement {
 
     /**
      * Sets the value.
-     * @param value the value value
-     * @return the set value result
+     * @param value the {@code float} supplied as {@code value}
+     * @return the {@link UIProgressBar} representing the set value result
      */
     public UIProgressBar setValue(float value) {
         this.value = Math.clamp(value, 0.0f, maxValue);
@@ -100,9 +101,9 @@ public class UIProgressBar extends UIElement {
 
     /**
      * Sets the colors.
-     * @param fillColor the fill color value
-     * @param backgroundColor the background color value
-     * @return the set colors result
+     * @param fillColor the {@link Vector4f} supplied as {@code fillColor}
+     * @param backgroundColor the {@link Vector4f} supplied as {@code backgroundColor}
+     * @return the {@link UIProgressBar} representing the set colors result
      */
     public UIProgressBar setColors(Vector4f fillColor, Vector4f backgroundColor) {
         if (fillColor != null) this.fillColor.set(fillColor);
@@ -112,9 +113,9 @@ public class UIProgressBar extends UIElement {
 
     /**
      * Sets the border.
-     * @param borderColor the border color value
-     * @param borderWidth the border width value
-     * @return the set border result
+     * @param borderColor the {@link Vector4f} supplied as {@code borderColor}
+     * @param borderWidth the {@code float} supplied as {@code borderWidth}
+     * @return the {@link UIProgressBar} representing the set border result
      */
     public UIProgressBar setBorder(Vector4f borderColor, float borderWidth) {
         if (borderColor != null) this.borderColor.set(borderColor);
@@ -124,8 +125,8 @@ public class UIProgressBar extends UIElement {
 
     /**
      * Sets the corner radius.
-     * @param cornerRadius the corner radius value
-     * @return the set corner radius result
+     * @param cornerRadius the {@code float} supplied as {@code cornerRadius}
+     * @return the {@link UIProgressBar} representing the set corner radius result
      */
     public UIProgressBar setCornerRadius(float cornerRadius) {
         this.cornerRadius = cornerRadius;
@@ -134,8 +135,8 @@ public class UIProgressBar extends UIElement {
 
     /**
      * Sets the show text.
-     * @param showText the show text value
-     * @return the set show text result
+     * @param showText the {@code boolean} supplied as {@code showText}
+     * @return the {@link UIProgressBar} representing the set show text result
      */
     public UIProgressBar setShowText(boolean showText) {
         this.showText = showText;
@@ -144,12 +145,12 @@ public class UIProgressBar extends UIElement {
 
     /**
      * Returns the value.
-     * @return the value
+     * @return {@code float}; the value
      */
     public float getValue() { return value; }
     /**
      * Returns the max value.
-     * @return the max value
+     * @return {@code float}; the max value
      */
     public float getMaxValue() { return maxValue; }
 }

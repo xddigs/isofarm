@@ -9,7 +9,7 @@ import java.nio.FloatBuffer;
 import static org.lwjgl.glfw.GLFW.*;
 
 /**
- * Provides joystick behavior.
+ * Encapsulates the state and operations required by joystick within the game runtime.
  */
 public final class Joystick {
     public static final int BUTTON_A = GLFW_GAMEPAD_BUTTON_A;
@@ -71,7 +71,7 @@ public final class Joystick {
     }
 
     /**
-     * Performs the poll operation.
+     * Processes each applicable element for poll.
      */
     private static void poll() {
         activeJoystick = -1;
@@ -104,7 +104,7 @@ public final class Joystick {
 
     /**
      * Clears the current state.
-     * @param joystick the joystick value
+     * @param joystick the {@code int} supplied as {@code joystick}
      */
     private static void clearCurrentState(int joystick) {
         for (int button = 0; button < BUTTON_COUNT; button++) buttons[joystick][button] = false;
@@ -113,14 +113,16 @@ public final class Joystick {
 
     /**
      * Checks whether the button pressed condition is met.
-     * @param button the button value
+     * @param button the {@code int} supplied as {@code button}
      * @return {@code true} if button pressed; otherwise {@code false}
      */
     public static boolean isButtonPressed(int button) {
         return isButtonPressed(activeJoystick, button);
     }
 
-    /** Checks whether any gamepad binding for the logical action was pressed. */
+    /**
+     * Checks whether any gamepad binding for the logical action was pressed.
+     */
     public static boolean isButtonPressed(ControlAction action) {
         for (int button : ControlConfigParser.controls.getJoystickButtonCodes(action)) {
             if (isButtonPressed(button)) return true;
@@ -130,8 +132,8 @@ public final class Joystick {
 
     /**
      * Checks whether the button pressed condition is met.
-     * @param joystick the joystick value
-     * @param button the button value
+     * @param joystick the {@code int} supplied as {@code joystick}
+     * @param button the {@code int} supplied as {@code button}
      * @return {@code true} if button pressed; otherwise {@code false}
      */
     public static boolean isButtonPressed(int joystick, int button) {
@@ -140,14 +142,16 @@ public final class Joystick {
 
     /**
      * Checks whether the button down condition is met.
-     * @param button the button value
+     * @param button the {@code int} supplied as {@code button}
      * @return {@code true} if button down; otherwise {@code false}
      */
     public static boolean isButtonDown(int button) {
         return isButtonDown(activeJoystick, button);
     }
 
-    /** Checks whether any gamepad binding for the logical action is down. */
+    /**
+     * Checks whether any gamepad binding for the logical action is down.
+     */
     public static boolean isButtonDown(ControlAction action) {
         for (int button : ControlConfigParser.controls.getJoystickButtonCodes(action)) {
             if (isButtonDown(button)) return true;
@@ -157,8 +161,8 @@ public final class Joystick {
 
     /**
      * Checks whether the button down condition is met.
-     * @param joystick the joystick value
-     * @param button the button value
+     * @param joystick the {@code int} supplied as {@code joystick}
+     * @param button the {@code int} supplied as {@code button}
      * @return {@code true} if button down; otherwise {@code false}
      */
     public static boolean isButtonDown(int joystick, int button) {
@@ -167,14 +171,16 @@ public final class Joystick {
 
     /**
      * Checks whether the button released condition is met.
-     * @param button the button value
+     * @param button the {@code int} supplied as {@code button}
      * @return {@code true} if button released; otherwise {@code false}
      */
     public static boolean isButtonReleased(int button) {
         return isButtonReleased(activeJoystick, button);
     }
 
-    /** Checks whether any gamepad binding for the logical action was released. */
+    /**
+     * Checks whether any gamepad binding for the logical action was released.
+     */
     public static boolean isButtonReleased(ControlAction action) {
         for (int button : ControlConfigParser.controls.getJoystickButtonCodes(action)) {
             if (isButtonReleased(button)) return true;
@@ -184,8 +190,8 @@ public final class Joystick {
 
     /**
      * Checks whether the button released condition is met.
-     * @param joystick the joystick value
-     * @param button the button value
+     * @param joystick the {@code int} supplied as {@code joystick}
+     * @param button the {@code int} supplied as {@code button}
      * @return {@code true} if button released; otherwise {@code false}
      */
     public static boolean isButtonReleased(int joystick, int button) {
@@ -194,7 +200,7 @@ public final class Joystick {
 
     /**
      * Checks whether the key pressed condition is met.
-     * @param button the button value
+     * @param button the {@code int} supplied as {@code button}
      * @return {@code true} if key pressed; otherwise {@code false}
      */
     public static boolean isKeyPressed(int button) {
@@ -203,7 +209,7 @@ public final class Joystick {
 
     /**
      * Checks whether the key down condition is met.
-     * @param button the button value
+     * @param button the {@code int} supplied as {@code button}
      * @return {@code true} if key down; otherwise {@code false}
      */
     public static boolean isKeyDown(int button) {
@@ -212,7 +218,7 @@ public final class Joystick {
 
     /**
      * Checks whether the key released condition is met.
-     * @param button the button value
+     * @param button the {@code int} supplied as {@code button}
      * @return {@code true} if key released; otherwise {@code false}
      */
     public static boolean isKeyReleased(int button) {
@@ -221,8 +227,8 @@ public final class Joystick {
 
     /**
      * Returns the axis.
-     * @param axis the axis value
-     * @return the axis
+     * @param axis the {@code int} supplied as {@code axis}
+     * @return {@code float}; the axis
      */
     public static float getAxis(int axis) {
         return getAxis(activeJoystick, axis);
@@ -230,9 +236,9 @@ public final class Joystick {
 
     /**
      * Returns the axis.
-     * @param joystick the joystick value
-     * @param axis the axis value
-     * @return the axis
+     * @param joystick the {@code int} supplied as {@code joystick}
+     * @param axis the {@code int} supplied as {@code axis}
+     * @return {@code float}; the axis
      */
     public static float getAxis(int joystick, int axis) {
         if (joystick < 0 || joystick >= JOYSTICK_COUNT || axis < 0 || axis >= AXIS_COUNT) return 0.0f;
@@ -241,16 +247,18 @@ public final class Joystick {
 
     /**
      * Returns the axis.
-     * @param axis the axis value
-     * @param deadZone the dead zone value
-     * @return the axis
+     * @param axis the {@code int} supplied as {@code axis}
+     * @param deadZone the {@code float} supplied as {@code deadZone}
+     * @return {@code float}; the axis
      */
     public static float getAxis(int axis, float deadZone) {
         float value = getAxis(axis);
         return Math.abs(value) < Math.clamp(deadZone, 0.0f, 1.0f) ? 0.0f : value;
     }
 
-    /** Returns the configured axis value after applying the configured dead zone. */
+    /**
+     * Returns the configured axis value after applying the configured dead zone.
+     */
     public static float getAxis(ControlAction action) {
         int axis = ControlConfigParser.controls.getJoystickAxis(action);
         return axis < 0 ? 0.0f : getAxis(axis,
@@ -267,7 +275,7 @@ public final class Joystick {
 
     /**
      * Checks whether the connected condition is met.
-     * @param joystick the joystick value
+     * @param joystick the {@code int} supplied as {@code joystick}
      * @return {@code true} if connected; otherwise {@code false}
      */
     public static boolean isConnected(int joystick) {
@@ -276,7 +284,7 @@ public final class Joystick {
 
     /**
      * Returns the active joystick.
-     * @return the active joystick
+     * @return {@code int}; the active joystick
      */
     public static int getActiveJoystick() {
         return activeJoystick;
@@ -284,18 +292,18 @@ public final class Joystick {
 
     /**
      * Returns the name.
-     * @param joystick the joystick value
-     * @return the name
+     * @param joystick the {@code int} supplied as {@code joystick}
+     * @return the {@link String} representing the name
      */
     public static String getName(int joystick) {
         return isConnected(joystick) ? glfwGetGamepadName(joystick) : null;
     }
 
     /**
-     * Performs the valid operation.
-     * @param joystick the joystick value
-     * @param button the button value
-     * @return the valid result
+     * Determines whether valid satisfies the required comparison or validity rules.
+     * @param joystick the {@code int} supplied as {@code joystick}
+     * @param button the {@code int} supplied as {@code button}
+     * @return {@code boolean}; the valid result
      */
     private static boolean valid(int joystick, int button) {
         return joystick >= 0 && joystick < JOYSTICK_COUNT && button >= 0 && button < BUTTON_COUNT;

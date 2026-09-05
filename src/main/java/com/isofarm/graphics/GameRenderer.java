@@ -23,7 +23,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;
 
 /**
- * Provides game renderer behavior.
+ * Encapsulates the state and operations required by game renderer within the game runtime.
  */
 public class GameRenderer {
     public static final GameRenderer gamr = new GameRenderer();
@@ -37,9 +37,9 @@ public class GameRenderer {
     private float waterTime;
 
     /**
-     * Renders render.
-     * @param gameMaster the game master value
-     * @param chunkMeshes the chunk meshes value
+     * Renders this object in the requested render pass.
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
+     * @param chunkMeshes the {@link Map} supplied as {@code chunkMeshes}
      */
     public void render(GameMaster gameMaster, Map<Chunk, ChunkMeshBuilder.ChunkRenderMesh> chunkMeshes) {
         ShadowSystem.sys.render(gameMaster, chunkMeshes);
@@ -407,8 +407,8 @@ public class GameRenderer {
 
     /**
      * Returns the outline color.
-     * @param gameMaster the game master value
-     * @return the outline color
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
+     * @return the {@link Vector3f} representing the outline color
      */
     private Vector3f getOutlineColor(GameMaster gameMaster) {
         boolean isSmartShift = GameInteraction.gami != null
@@ -418,11 +418,11 @@ public class GameRenderer {
 
     /**
      * Renders the destroy overlay.
-     * @param interaction the interaction value
-     * @param shader the shader value
-     * @param blockMesh the block mesh value
-     * @param destroyTexture the destroy texture value
-     * @param camera the camera value
+     * @param interaction the {@link GameInteraction} supplied as {@code interaction}
+     * @param shader the {@link Shader} supplied as {@code shader}
+     * @param blockMesh the {@link Mesh} supplied as {@code blockMesh}
+     * @param destroyTexture the {@link SpriteSheet} supplied as {@code destroyTexture}
+     * @param camera the {@link CameraView} supplied as {@code camera}
      */
     public void renderDestroyOverlay(GameInteraction interaction, Shader shader, Mesh blockMesh,
                                      SpriteSheet destroyTexture, CameraView camera) {
@@ -475,7 +475,7 @@ public class GameRenderer {
 
     /**
      * Updates the blur.
-     * @param camera the camera value
+     * @param camera the {@link CameraView} supplied as {@code camera}
      */
     private void updateBlur(CameraView camera) {
         float yawDelta = camera.getYaw() - previousCameraYaw;

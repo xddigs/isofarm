@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Provides gltfnode behavior.
+ * Encapsulates the state and operations required by gltfnode within the game runtime.
  */
 public class GLTFNode {
 
@@ -33,11 +33,11 @@ public class GLTFNode {
 
     /**
      * Creates a new {@code GLTFNode} instance.
-     * @param name the name value
-     * @param meshIndex the mesh index value
-     * @param translation the translation value
-     * @param rotation the rotation value
-     * @param scale the scale value
+     * @param name the {@link String} supplied as {@code name}
+     * @param meshIndex the {@code int} supplied as {@code meshIndex}
+     * @param translation the {@link Vector3f} supplied as {@code translation}
+     * @param rotation the {@link Quaternionf} supplied as {@code rotation}
+     * @param scale the {@link Vector3f} supplied as {@code scale}
      */
     public GLTFNode(String name, int meshIndex, Vector3f translation, Quaternionf rotation, Vector3f scale) {
         this.name = name;
@@ -77,10 +77,10 @@ public class GLTFNode {
     }
 
     /**
-     * Renders render.
-     * @param model the model value
-     * @param parentMatrix the parent matrix value
-     * @param shader the shader value
+     * Renders this object in the requested render pass.
+     * @param model the {@link GLTFModel} supplied as {@code model}
+     * @param parentMatrix the {@link Matrix4f} supplied as {@code parentMatrix}
+     * @param shader the {@link Shader} supplied as {@code shader}
      */
     public void render(GLTFModel model, Matrix4f parentMatrix, Shader shader) {
         worldMatrix.set(parentMatrix).mul(localMatrix);
@@ -103,8 +103,8 @@ public class GLTFNode {
 
     /**
      * Returns find.
-     * @param nodeName the node name value
-     * @return the find result
+     * @param nodeName the {@link String} supplied as {@code nodeName}
+     * @return the {@link GLTFNode} representing the find result
      */
     public GLTFNode find(String nodeName) {
 
@@ -126,7 +126,7 @@ public class GLTFNode {
 
     /**
      * Adds the child.
-     * @param child the child value
+     * @param child the {@link GLTFNode} supplied as {@code child}
      */
     public void addChild(GLTFNode child) {
         children.add(child);
@@ -134,7 +134,7 @@ public class GLTFNode {
 
     /**
      * Returns the name.
-     * @return the name
+     * @return the {@link String} representing the name
      */
     public String getName() {
         return name;
@@ -142,7 +142,7 @@ public class GLTFNode {
 
     /**
      * Returns the mesh index.
-     * @return the mesh index
+     * @return {@code int}; the mesh index
      */
     public int getMeshIndex() {
         return meshIndex;
@@ -150,7 +150,7 @@ public class GLTFNode {
 
     /**
      * Returns the translation.
-     * @return the translation
+     * @return the {@link Vector3f} representing the translation
      */
     public Vector3f getTranslation() {
         return translation;
@@ -158,7 +158,7 @@ public class GLTFNode {
 
     /**
      * Sets the translation.
-     * @param value the value value
+     * @param value the {@link Vector3f} supplied as {@code value}
      */
     public void setTranslation(Vector3f value) {
         translation.set(value);
@@ -167,7 +167,7 @@ public class GLTFNode {
 
     /**
      * Returns the rotation.
-     * @return the rotation
+     * @return the {@link Quaternionf} representing the rotation
      */
     public Quaternionf getRotation() {
         return rotation;
@@ -175,7 +175,7 @@ public class GLTFNode {
 
     /**
      * Sets the rotation.
-     * @param value the value value
+     * @param value the {@link Quaternionf} supplied as {@code value}
      */
     public void setRotation(Quaternionf value) {
         rotation.set(value);
@@ -184,7 +184,7 @@ public class GLTFNode {
 
     /**
      * Returns the scale.
-     * @return the scale
+     * @return the {@link Vector3f} representing the scale
      */
     public Vector3f getScale() {
         return scale;
@@ -192,7 +192,7 @@ public class GLTFNode {
 
     /**
      * Sets the scale.
-     * @param value the value value
+     * @param value the {@link Vector3f} supplied as {@code value}
      */
     public void setScale(Vector3f value) {
         scale.set(value);
@@ -201,7 +201,7 @@ public class GLTFNode {
 
     /**
      * Returns the local matrix.
-     * @return the local matrix
+     * @return the {@link Matrix4f} representing the local matrix
      */
     public Matrix4f getLocalMatrix() {
         return localMatrix;
@@ -209,7 +209,7 @@ public class GLTFNode {
 
     /**
      * Returns the world matrix.
-     * @return the world matrix
+     * @return the {@link Matrix4f} representing the world matrix
      */
     public Matrix4f getWorldMatrix() {
         return worldMatrix;
@@ -217,7 +217,7 @@ public class GLTFNode {
 
     /**
      * Returns the children.
-     * @return the children
+     * @return the {@link List} representing the children
      */
     public List<GLTFNode> getChildren() {
         return children;
@@ -233,7 +233,7 @@ public class GLTFNode {
 
     /**
      * Sets the visible.
-     * @param visible the visible value
+     * @param visible the {@code boolean} supplied as {@code visible}
      */
     public void setVisible(boolean visible) {
         isVisible = visible;
@@ -241,8 +241,8 @@ public class GLTFNode {
 
     /**
      * Sets the texture override.
-     * @param textureId the texture id value
-     * @param uvBounds the uv bounds value
+     * @param textureId the {@code int} supplied as {@code textureId}
+     * @param uvBounds the {@link Vector4f} supplied as {@code uvBounds}
      */
     public void setTextureOverride(int textureId, Vector4f uvBounds) {
         this.textureOverride = textureId;
@@ -259,7 +259,7 @@ public class GLTFNode {
 
     /**
      * Returns the texture override.
-     * @return the texture override
+     * @return {@code int}; the texture override
      */
     public int getTextureOverride() {
         return textureOverride;
@@ -267,7 +267,7 @@ public class GLTFNode {
 
     /**
      * Returns the uv override.
-     * @return the uv override
+     * @return the {@link Vector4f} representing the uv override
      */
     public Vector4f getUvOverride() {
         return uvOverride;

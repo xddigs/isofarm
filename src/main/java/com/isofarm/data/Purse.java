@@ -1,7 +1,7 @@
 package com.isofarm.data;
 
 /**
- * Provides purse behavior.
+ * Encapsulates the state and operations required by purse within the game runtime.
  */
 @DataClass
 public class Purse {
@@ -16,7 +16,7 @@ public class Purse {
 
     /**
      * Returns the balance.
-     * @return the balance
+     * @return {@code int}; the balance
      */
     public int getBalance() {
         return coins;
@@ -24,7 +24,7 @@ public class Purse {
 
     /**
      * Adds add.
-     * @param amount the amount value
+     * @param amount the {@code int} supplied as {@code amount}
      */
     public void add(int amount) {
         if (amount <= 0) return;
@@ -33,7 +33,7 @@ public class Purse {
 
     /**
      * Removes remove.
-     * @param amount the amount value
+     * @param amount the {@code int} supplied as {@code amount}
      */
     public void remove(int amount) {
         if (amount <= 0 || getBalance() < amount) return;
@@ -41,7 +41,7 @@ public class Purse {
     }
 
     /**
-     * Performs the empty operation.
+     * Determines whether this object contains no elements or active content.
      */
     public void empty() {
         coins = 0;

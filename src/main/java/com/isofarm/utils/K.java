@@ -4,7 +4,7 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 /**
- * Provides k behavior.
+ * Encapsulates the state and operations required by k within the game runtime.
  */
 @Utils
 public final class K {
@@ -16,7 +16,7 @@ public final class K {
     }
 
     /**
-     * Provides camera behavior.
+     * Encapsulates the state and operations required by camera within the game runtime.
      */
     public static final class Camera {
         public static final float FULL_DEGREES = 360.0f;
@@ -24,7 +24,7 @@ public final class K {
     }
 
     /**
-     * Provides world behavior.
+     * Encapsulates the state and operations required by world within the game runtime.
      */
     public static final class World {
         public static final float GRAVITY = -25.0f;
@@ -44,7 +44,7 @@ public final class K {
     }
 
     /**
-     * Provides window behavior.
+     * Encapsulates the state and operations required by window within the game runtime.
      */
     public static final class Window {
         public static final float DEFAULT_WIDTH = 1280.0f;
@@ -52,7 +52,7 @@ public final class K {
     }
 
     /**
-     * Provides style behavior.
+     * Encapsulates the state and operations required by style within the game runtime.
      */
     public static final class Style {
         public static final float[] COLOR_TOAST_SUCCESS = {0.30f, 0.85f, 0.40f, 1.0f};
@@ -68,7 +68,7 @@ public final class K {
     }
 
     /**
-     * Provides ui behavior.
+     * Encapsulates the state and operations required by ui within the game runtime.
      */
     public static final class UI {
         public static final int INVENTORY_COLUMNS = 9;
@@ -135,7 +135,7 @@ public final class K {
     }
 
     /**
-     * Provides paths behavior.
+     * Encapsulates the state and operations required by paths within the game runtime.
      */
     public static final class Paths {
         public static final String FONT = "font/LeagueSpartan-Regular.ttf";
@@ -183,7 +183,7 @@ public final class K {
     }
 
     /**
-     * Provides render behavior.
+     * Encapsulates the state and operations required by render within the game runtime.
      */
     public static final class Render {
         public static final float LINE_WIDTH = 2.0f;
@@ -192,7 +192,7 @@ public final class K {
     }
 
     /**
-     * Provides colors behavior.
+     * Encapsulates the state and operations required by colors within the game runtime.
      */
     public static final class Colors {
         public static final Vector3f OUTLINE_DEFAULT = new Vector3f(0.0f, 0.0f, 0.0f);

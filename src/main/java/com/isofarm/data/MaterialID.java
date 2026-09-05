@@ -25,9 +25,9 @@ public enum MaterialID implements Craftable {
 
     /**
      * Creates a new {@code MaterialID} instance.
-     * @param id the id value
-     * @param row the row value
-     * @param value the value value
+     * @param id the {@code byte} supplied as {@code id}
+     * @param row the {@code byte} supplied as {@code row}
+     * @param value the {@code int} supplied as {@code value}
      */
     MaterialID(byte id, byte row, int value) {
         this.id = id;
@@ -37,18 +37,19 @@ public enum MaterialID implements Craftable {
 
     /**
      * Returns the id.
-     * @return the id
+     * @return {@code byte}; the id
      */
     public byte getId() { return id; }
     /**
      * Returns the row.
-     * @return the row
+     * @return {@code byte}; the row
      */
     public byte getRow() { return row; }
 
     /**
+     * {@inheritDoc}
      * Returns the name.
-     * @return the name
+     * @return the {@link String} representing the name
      */
     @Override
     public String getName() {
@@ -56,8 +57,9 @@ public enum MaterialID implements Craftable {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the display name.
-     * @return the display name
+     * @return the {@link String} representing the display name
      */
     @Override
     public String getDisplayName() {
@@ -65,15 +67,17 @@ public enum MaterialID implements Craftable {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the value.
-     * @return the value
+     * @return {@code int}; the value
      */
     @Override
     public int getValue() { return value; }
 
     /**
-     * Performs the copy operation.
-     * @return the copy result
+     * {@inheritDoc}
+     * Creates an independent copy that preserves the relevant state of this object.
+     * @return the {@link Item} representing the copy result
      */
     @Override
     public Item copy() {

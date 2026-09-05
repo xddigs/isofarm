@@ -9,7 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Provides game rules behavior.
+ * Encapsulates the state and operations required by game rules within the game runtime.
  */
 @SuppressWarnings("all")
 public final class GameRules {
@@ -32,9 +32,9 @@ public final class GameRules {
     private GameRules() {}
 
     /**
-     * Performs the exists operation.
-     * @param rule the rule value
-     * @return the exists result
+     * Determines whether exists satisfies the required comparison or validity rules.
+     * @param rule the {@link String} supplied as {@code rule}
+     * @return {@code boolean}; the exists result
      */
     public static boolean exists(String rule) {
         return RULES.containsKey(rule);
@@ -42,8 +42,8 @@ public final class GameRules {
 
     /**
      * Returns get.
-     * @param rule the rule value
-     * @return the get result
+     * @param rule the {@link String} supplied as {@code rule}
+     * @return the {@link Object} representing the get result
      */
     public static Object get(String rule) {
         return RULES.get(rule);
@@ -51,7 +51,7 @@ public final class GameRules {
 
     /**
      * Returns the rules.
-     * @return the rules
+     * @return the {@link Map} representing the rules
      */
     public static Map<String, Object> getRules() {
         return Map.copyOf(RULES);
@@ -59,8 +59,8 @@ public final class GameRules {
 
     /**
      * Returns the boolean.
-     * @param rule the rule value
-     * @return the boolean
+     * @param rule the {@link String} supplied as {@code rule}
+     * @return {@code boolean}; the boolean
      */
     public static boolean getBoolean(String rule) {
         Object value = RULES.get(rule);
@@ -76,8 +76,8 @@ public final class GameRules {
 
     /**
      * Returns the int.
-     * @param rule the rule value
-     * @return the int
+     * @param rule the {@link String} supplied as {@code rule}
+     * @return {@code int}; the int
      */
     public static int getInt(String rule) {
         Object value = RULES.get(rule);
@@ -93,8 +93,8 @@ public final class GameRules {
 
     /**
      * Returns the float.
-     * @param rule the rule value
-     * @return the float
+     * @param rule the {@link String} supplied as {@code rule}
+     * @return {@code float}; the float
      */
     public static float getFloat(String rule) {
         Object value = RULES.get(rule);
@@ -110,8 +110,8 @@ public final class GameRules {
 
     /**
      * Sets set.
-     * @param rule the rule value
-     * @param value the value value
+     * @param rule the {@link String} supplied as {@code rule}
+     * @param value the {@link Object} supplied as {@code value}
      */
     public static void set(String rule, Object value) {
         if (!RULES.containsKey(rule)) {
@@ -132,9 +132,9 @@ public final class GameRules {
     }
 
     /**
-     * Performs the apply operation.
-     * @param rule the rule value
-     * @param value the value value
+     * Applies this object to the current state.
+     * @param rule the {@link String} supplied as {@code rule}
+     * @param value the {@link Object} supplied as {@code value}
      */
     private static void apply(String rule, Object value) {
         try {

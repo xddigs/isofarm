@@ -9,14 +9,14 @@ import com.isofarm.utils.Local;
 import com.isofarm.utils.ToastFactory;
 
 /**
- * Provides crafting service behavior.
+ * Encapsulates the state and operations required by crafting service within the game runtime.
  */
 public class CraftingService {
     public static final CraftingService cs = new CraftingService();
 
     /**
      * Checks whether the craft condition is met.
-     * @param recipe the recipe value
+     * @param recipe the {@link Recipe} supplied as {@code recipe}
      * @return {@code true} if craft; otherwise {@code false}
      */
     public boolean canCraft(Recipe recipe) {
@@ -34,9 +34,9 @@ public class CraftingService {
     }
 
     /**
-     * Performs the craft operation.
-     * @param recipe the recipe value
-     * @return the craft result
+     * Applies the world or inventory action represented by craft.
+     * @param recipe the {@link Recipe} supplied as {@code recipe}
+     * @return {@code boolean}; the craft result
      */
     public boolean craft(Recipe recipe) {
         Player player = Player.plyr;
@@ -56,9 +56,9 @@ public class CraftingService {
     }
 
     /**
-     * Performs the consume operation.
-     * @param inputSlots the input slots value
-     * @param recipe the recipe value
+     * Applies consume and updates the affected character or item state.
+     * @param inputSlots an array of {@link InventorySlot} values supplied as {@code inputSlots}
+     * @param recipe the {@link Recipe} supplied as {@code recipe}
      */
     private void consume(InventorySlot[] inputSlots, Recipe recipe) {
         for (Ingredient ingredient : recipe.ingredients()) {
@@ -88,9 +88,9 @@ public class CraftingService {
     }
 
     /**
-     * Performs the consume operation.
-     * @param inventory the inventory value
-     * @param recipe the recipe value
+     * Applies consume and updates the affected character or item state.
+     * @param inventory the {@link Inventory} supplied as {@code inventory}
+     * @param recipe the {@link Recipe} supplied as {@code recipe}
      */
     private void consume(Inventory inventory, Recipe recipe) {
         InventorySlot[] slots = inventory.getSlots().toArray(new InventorySlot[0]);
@@ -98,10 +98,10 @@ public class CraftingService {
     }
 
     /**
-     * Performs the count operation.
-     * @param inventory the inventory value
-     * @param ingredient the ingredient value
-     * @return the count result
+     * Returns the number or extent represented by count.
+     * @param inventory the {@link Inventory} supplied as {@code inventory}
+     * @param ingredient the {@link Ingredient} supplied as {@code ingredient}
+     * @return {@code int}; the count result
      */
     private int count(Inventory inventory, Ingredient ingredient) {
         if (inventory == null || ingredient == null) {
@@ -122,10 +122,10 @@ public class CraftingService {
     }
 
     /**
-     * Performs the matches ingredient operation.
-     * @param ingredient the ingredient value
-     * @param item the item value
-     * @return the matches ingredient result
+     * Updates or derives runtime state for matches ingredient according to the supplied arguments.
+     * @param ingredient the {@link Ingredient} supplied as {@code ingredient}
+     * @param item the {@link Item} supplied as {@code item}
+     * @return {@code boolean}; the matches ingredient result
      */
     public boolean matchesIngredient(Ingredient ingredient, Item item) {
         if (ingredient == null || item == null) {
@@ -152,8 +152,8 @@ public class CraftingService {
     }
 
     /**
-     * Performs the give operation.
-     * @param recipe the recipe value
+     * Processes give and updates the affected inventory or currency balances.
+     * @param recipe the {@link Recipe} supplied as {@code recipe}
      */
     private void give(Recipe recipe) {
         Player player = Player.plyr;
@@ -171,8 +171,8 @@ public class CraftingService {
 
     /**
      * Checks whether the same type condition is met.
-     * @param a the a value
-     * @param b the b value
+     * @param a the {@link Item} supplied as {@code a}
+     * @param b the {@link Item} supplied as {@code b}
      * @return {@code true} if same type; otherwise {@code false}
      */
     public boolean isSameType(Item a, Item b) {

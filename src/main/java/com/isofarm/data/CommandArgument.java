@@ -4,24 +4,24 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * Stores command argument data.
+ * Immutable value object containing command argument.
  */
 @DataClass
 public record CommandArgument(String name, BiFunction<String, Integer, List<String>> completion) {
 
     /**
      * Creates a new {@code CommandArgument} instance.
-     * @param name the name value
+     * @param name the {@link String} supplied as {@code name}
      */
     public CommandArgument(String name) {
         this(name, null);
     }
 
     /**
-     * Performs the of operation.
-     * @param name the name value
-     * @param completion the completion value
-     * @return the of result
+     * Creates or returns of from the supplied arguments.
+     * @param name the {@link String} supplied as {@code name}
+     * @param completion the {@link BiFunction} supplied as {@code completion}
+     * @return the {@link CommandArgument} representing the of result
      */
     public static CommandArgument of(String name, BiFunction<String, Integer, List<String>> completion) {
         return new CommandArgument(name, completion);
@@ -36,10 +36,10 @@ public record CommandArgument(String name, BiFunction<String, Integer, List<Stri
     }
 
     /**
-     * Performs the complete operation.
-     * @param text the text value
-     * @param cursorPosition the cursor position value
-     * @return the complete result
+     * Updates text or selection state for complete.
+     * @param text the {@link String} supplied as {@code text}
+     * @param cursorPosition the {@code int} supplied as {@code cursorPosition}
+     * @return the {@link List} representing the complete result
      */
     public List<String> complete(String text, int cursorPosition) {
         if (completion == null) {

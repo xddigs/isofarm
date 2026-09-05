@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * Provides page behavior.
+ * Encapsulates the state and operations required by page within the game runtime.
  */
 public class Page {
     private final List<BookLine> bookLines;
@@ -21,7 +21,7 @@ public class Page {
 
     /**
      * Returns the lines.
-     * @return the lines
+     * @return the {@link List} representing the lines
      */
     public List<BookLine> getLines() {
         return bookLines;
@@ -29,7 +29,7 @@ public class Page {
 
     /**
      * Adds the line.
-     * @param line the line value
+     * @param line the {@link String} supplied as {@code line}
      */
     public void addLine(String line) {
         bookLines.add(new BookLine(line));
@@ -37,8 +37,8 @@ public class Page {
 
     /**
      * Adds the line.
-     * @param line the line value
-     * @param action the action value
+     * @param line the {@link String} supplied as {@code line}
+     * @param action the {@link Consumer} supplied as {@code action}
      */
     public void addLine(String line, Consumer<BookLine> action) {
         bookLines.add(new BookLine(line, action));
@@ -46,9 +46,9 @@ public class Page {
 
     /**
      * Adds the line.
-     * @param line the line value
-     * @param action the action value
-     * @param tooltipText the tooltip text value
+     * @param line the {@link String} supplied as {@code line}
+     * @param action the {@link Consumer} supplied as {@code action}
+     * @param tooltipText the {@link String} supplied as {@code tooltipText}
      */
     public void addLine(String line, Consumer<BookLine> action, String tooltipText) {
         BookLine bookLine = new BookLine(line, action);
@@ -58,9 +58,9 @@ public class Page {
 
     /**
      * Adds an icon-backed interactive line.
-     * @param item the item displayed as an icon
-     * @param action the action value
-     * @param tooltipText the tooltip text value
+     * @param item the {@link Item} argument; the item displayed as an icon
+     * @param action the {@link Consumer} supplied as {@code action}
+     * @param tooltipText the {@link String} supplied as {@code tooltipText}
      */
     public void addItem(Item item, Consumer<BookLine> action, String tooltipText) {
         BookLine bookLine = new BookLine(item, action);
@@ -70,8 +70,8 @@ public class Page {
 
     /**
      * Returns the line.
-     * @param index the index value
-     * @return the line
+     * @param index the {@code int} supplied as {@code index}
+     * @return the {@link BookLine} representing the line
      */
     public BookLine getLine(int index) {
         return bookLines.get(index);
@@ -79,17 +79,17 @@ public class Page {
 
     /**
      * Sets the line.
-     * @param index the index value
-     * @param line the line value
+     * @param index the {@code int} supplied as {@code index}
+     * @param line the {@link String} supplied as {@code line}
      */
     public void setLine(int index, String line) {
         bookLines.set(index, new BookLine(line));
     }
 
     /**
-     * Performs the insert line operation.
-     * @param index the index value
-     * @param line the line value
+     * Adds line to the corresponding collection or processing queue.
+     * @param index the {@code int} supplied as {@code index}
+     * @param line the {@link String} supplied as {@code line}
      */
     public void insertLine(int index, String line) {
         bookLines.add(index, new BookLine(line));
@@ -97,7 +97,7 @@ public class Page {
 
     /**
      * Removes the line.
-     * @param index the index value
+     * @param index the {@code int} supplied as {@code index}
      */
     public void removeLine(int index) {
         bookLines.remove(index);
@@ -111,16 +111,16 @@ public class Page {
     }
 
     /**
-     * Performs the size operation.
-     * @return the size result
+     * Returns the number or extent represented by size.
+     * @return {@code int}; the size result
      */
     public int size() {
         return bookLines.size();
     }
 
     /**
-     * Performs the for each line operation.
-     * @param consumer the consumer value
+     * Updates or derives runtime state for for each line according to the supplied arguments.
+     * @param consumer the {@link Consumer} supplied as {@code consumer}
      */
     public void forEachLine(Consumer<BookLine> consumer) {
         bookLines.forEach(consumer);

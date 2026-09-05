@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.function.Function;
 
 /**
- * Provides recipe registry behavior.
+ * Encapsulates the state and operations required by recipe registry within the game runtime.
  */
 public class RecipeRegistry {
     public static final RecipeRegistry reg = new RecipeRegistry();
@@ -15,7 +15,7 @@ public class RecipeRegistry {
 
     /**
      * Initializes the component.
-     * @return the init result
+     * @return the {@link List} representing the init result
      */
     public List<Recipe> init() {
         recipes.clear();
@@ -47,9 +47,9 @@ public class RecipeRegistry {
     }
 
     /**
-     * Performs the register tool set operation.
-     * @param stationTier the station tier value
-     * @param primaryMat the primary mat value
+     * Adds tool set to the corresponding collection or processing queue.
+     * @param stationTier the {@link Tier} supplied as {@code stationTier}
+     * @param primaryMat the {@link Craftable} supplied as {@code primaryMat}
      */
     private void registerToolSet(Tier stationTier, Craftable primaryMat) {
         if (stationTier.equals(Tier.NONE)) return;
@@ -61,12 +61,12 @@ public class RecipeRegistry {
     }
 
     /**
-     * Performs the register tool operation.
-     * @param stationTier the station tier value
-     * @param mat the mat value
-     * @param matAmount the mat amount value
-     * @param stickAmount the stick amount value
-     * @param constructor the constructor value
+     * Adds tool to the corresponding collection or processing queue.
+     * @param stationTier the {@link Tier} supplied as {@code stationTier}
+     * @param mat the {@link Craftable} supplied as {@code mat}
+     * @param matAmount the {@code int} supplied as {@code matAmount}
+     * @param stickAmount the {@code int} supplied as {@code stickAmount}
+     * @param constructor the {@link Function} supplied as {@code constructor}
      */
     private void registerTool(Tier stationTier, Craftable mat, int matAmount, int stickAmount,
                                      Function<Tier, Item> constructor) {
@@ -79,15 +79,15 @@ public class RecipeRegistry {
 
     /**
      * Returns the tier from material.
-     * @param mat the mat value
-     * @return the tier from material
+     * @param mat the {@link Craftable} supplied as {@code mat}
+     * @return the {@link Tier} representing the tier from material
      */
     private Tier getTierFromMaterial(Craftable mat) {
         return (mat instanceof MiningComponent mc) ? mc.getTier() : Tier.WOODEN;
     }
 
     /**
-     * Performs the register {@link iBlock}'s recipes operation.
+     * Registers the recipes contributed by interactive block items.
      */
     private void registeriBlocksRecipes() {
         create(Tier.WOODEN)
@@ -96,7 +96,7 @@ public class RecipeRegistry {
     }
 
     /**
-     * Performs the register smelting recipes operation.
+     * Adds smelting recipes to the corresponding collection or processing queue.
      */
     private void registerSmeltingRecipes() {
         Tier[] metalTiers = {Tier.COPPER, Tier.IRON, Tier.STEEL, Tier.GOLDEN, Tier.PLATINUM, Tier.DIAMOND};
@@ -108,7 +108,7 @@ public class RecipeRegistry {
     }
 
     /**
-     * Performs the register material recipes operation.
+     * Adds material recipes to the corresponding collection or processing queue.
      */
     private void registerMaterialRecipes() {
         Tier tier = Tier.NONE;
@@ -122,7 +122,7 @@ public class RecipeRegistry {
 
     /**
      * Returns the recipes.
-     * @return the recipes
+     * @return the {@link List} representing the recipes
      */
     public List<Recipe> getRecipes() {
         List<Recipe> sortedRecipes = new ArrayList<>(recipes);
@@ -135,15 +135,15 @@ public class RecipeRegistry {
 
     /**
      * Returns create.
-     * @param tier the tier value
-     * @return the create result
+     * @param tier the {@link Tier} supplied as {@code tier}
+     * @return the {@link RecipeBuilder} representing the create result
      */
     public RecipeBuilder create(Tier tier) {
         return new RecipeBuilder(tier);
     }
 
     /**
-     * Provides recipe builder behavior.
+     * Encapsulates the state and operations required by recipe builder within the game runtime.
      */
     public static class RecipeBuilder {
         private final Tier tier;
@@ -153,17 +153,17 @@ public class RecipeRegistry {
 
         /**
          * Creates a new {@code RecipeBuilder} instance.
-         * @param tier the tier value
+         * @param tier the {@link Tier} supplied as {@code tier}
          */
         public RecipeBuilder(Tier tier) {
             this.tier = tier;
         }
 
         /**
-         * Performs the result operation.
-         * @param result the result value
-         * @param amount the amount value
-         * @return the result result
+         * Creates or returns result from the supplied arguments.
+         * @param result the {@link Item} supplied as {@code result}
+         * @param amount the {@code int} supplied as {@code amount}
+         * @return the {@link RecipeBuilder} representing the result result
          */
         public RecipeBuilder result(Item result, int amount) {
             this.result = result;
@@ -172,10 +172,10 @@ public class RecipeRegistry {
         }
 
         /**
-         * Performs the with operation.
-         * @param craftable the craftable value
-         * @param count the count value
-         * @return the with result
+         * Updates or derives runtime state for with according to the supplied arguments.
+         * @param craftable the {@link Craftable} supplied as {@code craftable}
+         * @param count the {@code int} supplied as {@code count}
+         * @return the {@link RecipeBuilder} representing the with result
          */
         public RecipeBuilder with(Craftable craftable, int count) {
             this.ingredients.add(new Ingredient(craftable, count));
@@ -184,7 +184,7 @@ public class RecipeRegistry {
 
         /**
          * Adds add.
-         * @return the add result
+         * @return the {@link Recipe} representing the add result
          */
         public Recipe add() {
             Recipe recipe = new Recipe(tier, result, amount, List.copyOf(ingredients));

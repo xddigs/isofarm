@@ -5,7 +5,7 @@ import com.isofarm.wrld.World;
 import java.util.*;
 
 /**
- * Provides astar behavior.
+ * Encapsulates the state and operations required by astar within the game runtime.
  */
 public class AStar {
     private static final float STRAIGHT_COST = 1.0f;
@@ -15,10 +15,10 @@ public class AStar {
 
     /**
      * Finds and returns the path.
-     * @param world the world value
-     * @param start the start value
-     * @param goal the goal value
-     * @return the located path
+     * @param world the {@link World} supplied as {@code world}
+     * @param start the {@link GridPos} supplied as {@code start}
+     * @param goal the {@link GridPos} supplied as {@code goal}
+     * @return the {@link List} representing the located path
      */
     public static List<GridPos> findPath(World world, GridPos start, GridPos goal) {
         if (start == null || goal == null) return List.of();
@@ -60,9 +60,9 @@ public class AStar {
 
     /**
      * Returns the neighbors.
-     * @param world the world value
-     * @param current the current value
-     * @return the neighbors
+     * @param world the {@link World} supplied as {@code world}
+     * @param current the {@link GridPos} supplied as {@code current}
+     * @return the {@link List} representing the neighbors
      */
     private static List<Neighbor> getNeighbors(World world, GridPos current) {
         List<Neighbor> neighbors = new ArrayList<>(8);
@@ -82,12 +82,12 @@ public class AStar {
 
     /**
      * Adds the horizontal neighbor.
-     * @param world the world value
-     * @param neighbors the neighbors value
-     * @param current the current value
-     * @param dx the dx value
-     * @param dz the dz value
-     * @param baseCost the base cost value
+     * @param world the {@link World} supplied as {@code world}
+     * @param neighbors the {@link List} supplied as {@code neighbors}
+     * @param current the {@link GridPos} supplied as {@code current}
+     * @param dx the {@code int} supplied as {@code dx}
+     * @param dz the {@code int} supplied as {@code dz}
+     * @param baseCost the {@code float} supplied as {@code baseCost}
      */
     private static void addHorizontalNeighbor(World world, List<Neighbor> neighbors,
                                               GridPos current, int dx, int dz, float baseCost) {
@@ -114,11 +114,11 @@ public class AStar {
 
     /**
      * Adds the diagonal neighbor.
-     * @param world the world value
-     * @param neighbors the neighbors value
-     * @param current the current value
-     * @param dx the dx value
-     * @param dz the dz value
+     * @param world the {@link World} supplied as {@code world}
+     * @param neighbors the {@link List} supplied as {@code neighbors}
+     * @param current the {@link GridPos} supplied as {@code current}
+     * @param dx the {@code int} supplied as {@code dx}
+     * @param dz the {@code int} supplied as {@code dz}
      */
     private static void addDiagonalNeighbor(World world, List<Neighbor> neighbors, GridPos current, int dx, int dz) {
         GridPos side1 = new GridPos(current.x() + dx, current.y(), current.z());
@@ -133,8 +133,8 @@ public class AStar {
 
     /**
      * Checks whether the stand at condition is met.
-     * @param world the world value
-     * @param position the position value
+     * @param world the {@link World} supplied as {@code world}
+     * @param position the {@link GridPos} supplied as {@code position}
      * @return {@code true} if stand at; otherwise {@code false}
      */
     private static boolean canStandAt(World world, GridPos position) {
@@ -153,10 +153,10 @@ public class AStar {
     }
 
     /**
-     * Performs the heuristic operation.
-     * @param a the a value
-     * @param b the b value
-     * @return the heuristic result
+     * Calculates the value represented by heuristic from the current state.
+     * @param a the {@link GridPos} supplied as {@code a}
+     * @param b the {@link GridPos} supplied as {@code b}
+     * @return {@code float}; the heuristic result
      */
     private static float heuristic(GridPos a, GridPos b) {
         float dx = Math.abs(a.x() - b.x());
@@ -169,9 +169,9 @@ public class AStar {
     }
 
     /**
-     * Performs the reconstruct path operation.
-     * @param node the node value
-     * @return the reconstruct path result
+     * Refreshes dependent runtime state for reconstruct path.
+     * @param node the {@link Node} supplied as {@code node}
+     * @return the {@link List} representing the reconstruct path result
      */
     private static List<GridPos> reconstructPath(Node node) {
         LinkedList<GridPos> path = new LinkedList<>();
@@ -186,7 +186,7 @@ public class AStar {
     }
 
     /**
-     * Stores neighbor data.
+     * Immutable value object containing neighbor.
      */
     private record Neighbor(GridPos position, float cost) {}
 }

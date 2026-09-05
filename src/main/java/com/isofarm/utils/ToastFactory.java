@@ -9,7 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Provides toast factory behavior.
+ * Encapsulates the state and operations required by toast factory within the game runtime.
  */
 @Utils
 public class ToastFactory implements Service<Toast> {
@@ -18,7 +18,7 @@ public class ToastFactory implements Service<Toast> {
 
     /**
      * Returns the toasts.
-     * @return the toasts
+     * @return the {@link List} representing the toasts
      */
     public static List<Toast> getToasts() {
         return toasts;
@@ -26,7 +26,7 @@ public class ToastFactory implements Service<Toast> {
 
     /**
      * Sets the window width.
-     * @param windowWidth the window width value
+     * @param windowWidth the {@code float} supplied as {@code windowWidth}
      */
     public static void setWindowWidth(float windowWidth) {
         ToastFactory.windowWidth = windowWidth;
@@ -38,7 +38,7 @@ public class ToastFactory implements Service<Toast> {
 
     /**
      * Adds add.
-     * @param toast the toast value
+     * @param toast the {@link Toast} supplied as {@code toast}
      */
     public static void add(Toast toast) {
         if (toast == null) {
@@ -50,7 +50,7 @@ public class ToastFactory implements Service<Toast> {
     }
 
     /**
-     * Performs the reload operation.
+     * Reloads this object from its authoritative source.
      */
     public static void reload() {
         toasts.clear();
@@ -59,7 +59,7 @@ public class ToastFactory implements Service<Toast> {
 
     /**
      * Removes remove.
-     * @param toast the toast value
+     * @param toast the {@link Toast} supplied as {@code toast}
      */
     public void remove(Toast toast) {
         if (toasts.remove(toast)) {
@@ -69,8 +69,8 @@ public class ToastFactory implements Service<Toast> {
 
     /**
      * Returns get.
-     * @param index the index value
-     * @return the get result
+     * @param index the {@code int} supplied as {@code index}
+     * @return the {@link Toast} representing the get result
      */
     public static Toast get(int index) {
         return toasts.get(index);
@@ -84,8 +84,8 @@ public class ToastFactory implements Service<Toast> {
     }
 
     /**
-     * Performs the size operation.
-     * @return the size result
+     * Returns the number or extent represented by size.
+     * @return {@code int}; the size result
      */
     public static int size() {
         return toasts.size();
@@ -101,7 +101,7 @@ public class ToastFactory implements Service<Toast> {
 
     /**
      * Updates the current state.
-     * @param delta the delta value
+     * @param delta the {@code float} supplied as {@code delta}
      */
     public static void update(float delta) {
         if (toasts.isEmpty()) {
@@ -123,56 +123,56 @@ public class ToastFactory implements Service<Toast> {
     }
 
     /**
-     * Performs the info operation.
-     * @param message the message value
+     * Publishes the notification represented by info.
+     * @param message the {@link String} supplied as {@code message}
      */
     public static void info(String message) {
         create(ToastData.INFO, message);
     }
 
     /**
-     * Performs the success operation.
-     * @param message the message value
+     * Publishes the notification represented by success.
+     * @param message the {@link String} supplied as {@code message}
      */
     public static void success(String message) {
         create(ToastData.SUCCESS, message);
     }
 
     /**
-     * Performs the warning operation.
-     * @param message the message value
+     * Publishes the notification represented by warning.
+     * @param message the {@link String} supplied as {@code message}
      */
     public static void warning(String message) {
         create(ToastData.WARNING, message);
     }
 
     /**
-     * Performs the error operation.
-     * @param message the message value
+     * Publishes the notification represented by error.
+     * @param message the {@link String} supplied as {@code message}
      */
     public static void error(String message) {
         create(ToastData.ERROR, message);
     }
 
     /**
-     * Performs the reward operation.
-     * @param message the message value
+     * Processes reward and updates the affected inventory or currency balances.
+     * @param message the {@link String} supplied as {@code message}
      */
     public static void reward(String message) {
         create(ToastData.REWARD, message);
     }
 
     /**
-     * Performs the purchase operation.
-     * @param message the message value
+     * Processes purchase and updates the affected inventory or currency balances.
+     * @param message the {@link String} supplied as {@code message}
      */
     public static void purchase(String message) {
         create(ToastData.PURCHASE, message);
     }
 
     /**
-     * Performs the sell operation.
-     * @param message the message value
+     * Processes sell and updates the affected inventory or currency balances.
+     * @param message the {@link String} supplied as {@code message}
      */
     public static void sell(String message) {
         create(ToastData.SELL, message);
@@ -180,8 +180,8 @@ public class ToastFactory implements Service<Toast> {
 
     /**
      * Returns create.
-     * @param type the type value
-     * @param message the message value
+     * @param type the {@link ToastData} supplied as {@code type}
+     * @param message the {@link String} supplied as {@code message}
      */
     private static void create(ToastData type, String message) {
         if (message == null || message.isBlank()) {
@@ -200,7 +200,7 @@ public class ToastFactory implements Service<Toast> {
     }
 
     /**
-     * Performs the rearrange operation.
+     * Reorganizes inventory state for rearrange.
      */
     private static void rearrange() {
         float targetX = windowWidth - K.UI.TOAST_WIDTH;
@@ -218,8 +218,8 @@ public class ToastFactory implements Service<Toast> {
     }
 
     /**
-     * Performs the on resize operation.
-     * @param width the width value
+     * Handles resize and updates the affected state.
+     * @param width the {@code float} supplied as {@code width}
      */
     public static void onResize(float width) {
         windowWidth = width;

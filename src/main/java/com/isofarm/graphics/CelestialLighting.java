@@ -6,7 +6,7 @@ import com.isofarm.entity.Sun;
 import org.joml.Vector3f;
 
 /**
- * Provides celestial lighting behavior.
+ * Encapsulates the state and operations required by celestial lighting within the game runtime.
  */
 public class CelestialLighting {
     private final Sun sun;
@@ -20,8 +20,8 @@ public class CelestialLighting {
 
     /**
      * Creates a new {@code CelestialLighting} instance.
-     * @param sun the sun value
-     * @param moon the moon value
+     * @param sun the {@link Sun} supplied as {@code sun}
+     * @param moon the {@link Moon} supplied as {@code moon}
      */
     public CelestialLighting(Sun sun, Moon moon) {
         this.sun = sun;
@@ -32,8 +32,8 @@ public class CelestialLighting {
 
     /**
      * Updates the current state.
-     * @param hoveredCell the hovered cell value
-     * @param timeOfDay the time of day value
+     * @param hoveredCell the {@link BlockPos} supplied as {@code hoveredCell}
+     * @param timeOfDay the {@code float} supplied as {@code timeOfDay}
      */
     public void update(BlockPos hoveredCell, float timeOfDay) {
         sun.update(hoveredCell, timeOfDay);
@@ -58,7 +58,7 @@ public class CelestialLighting {
 
     /**
      * Returns the direction.
-     * @return the direction
+     * @return the {@link Vector3f} representing the direction
      */
     public Vector3f getDirection() {
         return direction;
@@ -66,7 +66,7 @@ public class CelestialLighting {
 
     /**
      * Returns the color.
-     * @return the color
+     * @return the {@link Vector3f} representing the color
      */
     public Vector3f getColor() {
         return color;
@@ -74,7 +74,7 @@ public class CelestialLighting {
 
     /**
      * Returns the intensity.
-     * @return the intensity
+     * @return {@code float}; the intensity
      */
     public float getIntensity() {
         return intensity;
@@ -82,7 +82,7 @@ public class CelestialLighting {
 
     /**
      * Returns the ambient intensity.
-     * @return the ambient intensity
+     * @return {@code float}; the ambient intensity
      */
     public float getAmbientIntensity() {
         return ambientIntensity;
@@ -90,7 +90,7 @@ public class CelestialLighting {
 
     /**
      * Returns the sun.
-     * @return the sun
+     * @return the {@link Sun} representing the sun
      */
     public Sun getSun() {
         return sun;
@@ -98,7 +98,7 @@ public class CelestialLighting {
 
     /**
      * Returns the moon.
-     * @return the moon
+     * @return the {@link Moon} representing the moon
      */
     public Moon getMoon() {
         return moon;

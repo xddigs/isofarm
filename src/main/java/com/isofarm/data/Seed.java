@@ -7,7 +7,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 /**
- * Provides seed behavior.
+ * Encapsulates the state and operations required by seed within the game runtime.
  */
 @DataClass
 public class Seed implements Item, Plantable {
@@ -19,7 +19,7 @@ public class Seed implements Item, Plantable {
 
     /**
      * Creates a new {@code Seed} instance.
-     * @param type the type value
+     * @param type the {@link CropType} supplied as {@code type}
      */
     public Seed(CropType type) {
         this.type = type;
@@ -37,8 +37,9 @@ public class Seed implements Item, Plantable {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the id.
-     * @return the id
+     * @return {@code byte}; the id
      */
     @Override
     public byte getId() {
@@ -46,8 +47,9 @@ public class Seed implements Item, Plantable {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the name.
-     * @return the name
+     * @return the {@link String} representing the name
      */
     @Override
     public String getName() {
@@ -56,15 +58,16 @@ public class Seed implements Item, Plantable {
 
     /**
      * Returns the display name.
-     * @return the display name
+     * @return the {@link String} representing the display name
      */
     public String getDisplayName() {
         return displayName;
     }
 
     /**
+     * {@inheritDoc}
      * Returns the value.
-     * @return the value
+     * @return {@code int}; the value
      */
     @Override
     public int getValue() {
@@ -72,8 +75,9 @@ public class Seed implements Item, Plantable {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the type.
-     * @return the type
+     * @return the {@link CropType} representing the type
      */
     @Override
     public CropType getType() {
@@ -82,17 +86,18 @@ public class Seed implements Item, Plantable {
 
     /**
      * Returns the display name.
-     * @param name the name value
-     * @return the display name
+     * @param name the {@link String} supplied as {@code name}
+     * @return the {@link String} representing the display name
      */
     private String getDisplayName(String name) {
         return Local.lang.t("crop." + name + ".seed");
     }
 
     /**
-     * Performs the equals operation.
-     * @param o the o value
-     * @return the equals result
+     * {@inheritDoc}
+     * Determines whether equals satisfies the required comparison or validity rules.
+     * @param o the {@link Object} supplied as {@code o}
+     * @return {@code boolean}; the equals result
      */
     @Override
     public boolean equals(Object o) {
@@ -102,8 +107,9 @@ public class Seed implements Item, Plantable {
     }
 
     /**
+     * {@inheritDoc}
      * Checks whether hash code.
-     * @return the hash code result
+     * @return {@code int}; the hash code result
      */
     @Override
     public int hashCode() {
@@ -111,8 +117,9 @@ public class Seed implements Item, Plantable {
     }
 
     /**
-     * Performs the copy operation.
-     * @return the copy result
+     * {@inheritDoc}
+     * Creates an independent copy that preserves the relevant state of this object.
+     * @return the {@link Item} representing the copy result
      */
     @Override
     public Item copy() {

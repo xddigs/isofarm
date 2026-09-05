@@ -7,7 +7,7 @@ import com.isofarm.utils.Local;
 import com.isofarm.wrld.GameMaster;
 
 /**
- * Provides backpack behavior.
+ * Encapsulates the state and operations required by backpack within the game runtime.
  */
 public class Backpack extends Usable implements Undroppable {
 
@@ -19,10 +19,11 @@ public class Backpack extends Usable implements Undroppable {
     }
 
     /**
-     * Performs the use operation.
-     * @param gameMaster the game master value
-     * @param isCtrlHeld the is ctrl held value
-     * @return the use result
+     * {@inheritDoc}
+     * Handles use and applies its effect to the current interaction state.
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
+     * @param isCtrlHeld the {@code boolean} supplied as {@code isCtrlHeld}
+     * @return {@code boolean}; the use result
      */
     @Override
     public boolean use(GameMaster gameMaster,  boolean isCtrlHeld) {
@@ -41,13 +42,14 @@ public class Backpack extends Usable implements Undroppable {
     }
 
     /**
+     * {@inheritDoc}
      * Updates the current state.
      */
     @Override
     public void update() {}
 
     /**
-     * Performs the unequip operation.
+     * Applies unequip and updates the affected character or item state.
      */
     public void unequip() {
         if (Player.plyr.getInventory().hasBackpackEquipped()) {
@@ -58,8 +60,9 @@ public class Backpack extends Usable implements Undroppable {
 
 
     /**
-     * Performs the copy operation.
-     * @return the copy result
+     * {@inheritDoc}
+     * Creates an independent copy that preserves the relevant state of this object.
+     * @return the {@link Item} representing the copy result
      */
     @Override
     public Item copy() {
@@ -67,9 +70,10 @@ public class Backpack extends Usable implements Undroppable {
     }
 
     /**
-     * Performs the enchanting operation.
-     * @param enchantment the enchantment value
-     * @return the enchanting result
+     * {@inheritDoc}
+     * Applies enchanting and updates the affected character or item state.
+     * @param enchantment the {@link Enchantment} supplied as {@code enchantment}
+     * @return {@code boolean}; the enchanting result
      */
     @Override
     public boolean enchanting(Enchantment enchantment) {

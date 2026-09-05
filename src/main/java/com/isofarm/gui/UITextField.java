@@ -9,7 +9,7 @@ import org.lwjgl.glfw.GLFW;
 import java.util.List;
 
 /**
- * Provides uitext field behavior.
+ * Encapsulates the state and operations required by uitext field within the game runtime.
  */
 @SuppressWarnings("all")
 @GodObject
@@ -39,10 +39,10 @@ public class UITextField extends UIElement {
 
     /**
      * Creates a new {@code UITextField} instance.
-     * @param x the x value
-     * @param y the y value
-     * @param width the width value
-     * @param height the height value
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param width the {@code float} supplied as {@code width}
+     * @param height the {@code float} supplied as {@code height}
      */
     public UITextField(float x, float y, float width, float height) {
         super(x, y, width, height);
@@ -52,8 +52,9 @@ public class UITextField extends UIElement {
     }
 
     /**
+     * {@inheritDoc}
      * Updates the current state.
-     * @param delta the delta value
+     * @param delta the {@code float} supplied as {@code delta}
      */
     @Override
     public void update(float delta) {
@@ -76,7 +77,8 @@ public class UITextField extends UIElement {
     }
 
     /**
-     * Renders render.
+     * {@inheritDoc}
+     * Renders this object in the requested render pass.
      */
     @Override
     public void render() {
@@ -111,11 +113,12 @@ public class UITextField extends UIElement {
     }
 
     /**
-     * Performs the key pressed operation.
-     * @param key the key value
-     * @param scancode the scancode value
-     * @param modifiers the modifiers value
-     * @return the key pressed result
+     * {@inheritDoc}
+     * Handles key pressed and applies its effect to the current interaction state.
+     * @param key the {@code int} supplied as {@code key}
+     * @param scancode the {@code int} supplied as {@code scancode}
+     * @param modifiers the {@code int} supplied as {@code modifiers}
+     * @return {@code boolean}; the key pressed result
      */
     @Override
     public boolean keyPressed(int key, int scancode, int modifiers) {
@@ -252,9 +255,10 @@ public class UITextField extends UIElement {
     }
 
     /**
-     * Performs the char typed operation.
-     * @param codepoint the codepoint value
-     * @return the char typed result
+     * {@inheritDoc}
+     * Handles char typed and applies its effect to the current interaction state.
+     * @param codepoint the {@code int} supplied as {@code codepoint}
+     * @return {@code boolean}; the char typed result
      */
     @Override
     public boolean charTyped(int codepoint) {
@@ -303,7 +307,7 @@ public class UITextField extends UIElement {
 
     /**
      * Sets the completion provider.
-     * @param completionProvider the completion provider value
+     * @param completionProvider the {@link CompletionProvider} supplied as {@code completionProvider}
      */
     public void setCompletionProvider(CompletionProvider completionProvider) {
         this.completionProvider = completionProvider;
@@ -311,7 +315,7 @@ public class UITextField extends UIElement {
     }
 
     /**
-     * Performs the reset completion operation.
+     * Resets completion to its initial runtime state.
      */
     private void resetCompletion() {
         completions = List.of();
@@ -322,7 +326,7 @@ public class UITextField extends UIElement {
     }
 
     /**
-     * Performs the complete forward operation.
+     * Updates text or selection state for complete forward.
      */
     private void completeForward() {
         if (completionProvider == null) {
@@ -340,7 +344,7 @@ public class UITextField extends UIElement {
     }
 
     /**
-     * Performs the complete backward operation.
+     * Updates text or selection state for complete backward.
      */
     private void completeBackward() {
         if (completionProvider == null) {
@@ -359,8 +363,8 @@ public class UITextField extends UIElement {
     }
 
     /**
-     * Performs the apply completion operation.
-     * @param completion the completion value
+     * Applies completion to the current state.
+     * @param completion the {@link String} supplied as {@code completion}
      */
     private void applyCompletion(String completion) {
         if (completion == null || completion.isEmpty()) {
@@ -378,7 +382,7 @@ public class UITextField extends UIElement {
     }
 
     /**
-     * Performs the prepare completions operation.
+     * Updates text or selection state for prepare completions.
      */
     private void prepareCompletions() {
         if (!completions.isEmpty()
@@ -397,7 +401,7 @@ public class UITextField extends UIElement {
 
     /**
      * Finds and returns the current token start.
-     * @return the located current token start
+     * @return {@code int}; the located current token start
      */
     private int findCurrentTokenStart() {
         int position = cursorPosition;
@@ -414,7 +418,7 @@ public class UITextField extends UIElement {
 
     /**
      * Finds and returns the current token end.
-     * @return the located current token end
+     * @return {@code int}; the located current token end
      */
     private int findCurrentTokenEnd() {
         int position = cursorPosition;
@@ -429,8 +433,8 @@ public class UITextField extends UIElement {
     }
 
     /**
-     * Performs the move cursor left operation.
-     * @param shift the shift value
+     * Updates movement for move cursor left according to the current physics and input state.
+     * @param shift the {@code boolean} supplied as {@code shift}
      */
     private void moveCursorLeft(boolean shift) {
         resetCompletion();
@@ -450,8 +454,8 @@ public class UITextField extends UIElement {
     }
 
     /**
-     * Performs the move cursor right operation.
-     * @param shift the shift value
+     * Updates movement for move cursor right according to the current physics and input state.
+     * @param shift the {@code boolean} supplied as {@code shift}
      */
     private void moveCursorRight(boolean shift) {
         resetCompletion();
@@ -471,8 +475,8 @@ public class UITextField extends UIElement {
     }
 
     /**
-     * Performs the move cursor word left operation.
-     * @param shift the shift value
+     * Updates movement for move cursor word left according to the current physics and input state.
+     * @param shift the {@code boolean} supplied as {@code shift}
      */
     private void moveCursorWordLeft(boolean shift) {
         if (hasSelection() && !shift) {
@@ -510,8 +514,8 @@ public class UITextField extends UIElement {
     }
 
     /**
-     * Performs the move cursor word right operation.
-     * @param shift the shift value
+     * Updates movement for move cursor word right according to the current physics and input state.
+     * @param shift the {@code boolean} supplied as {@code shift}
      */
     private void moveCursorWordRight(boolean shift) {
         if (hasSelection() && !shift) {
@@ -547,18 +551,18 @@ public class UITextField extends UIElement {
     }
 
     /**
-     * Performs the previous code point operation.
-     * @param position the position value
-     * @return the previous code point result
+     * Updates text or selection state for previous code point.
+     * @param position the {@code int} supplied as {@code position}
+     * @return {@code int}; the previous code point result
      */
     private int previousCodePoint(int position) {
         return Character.offsetByCodePoints(text, position, -1);
     }
 
     /**
-     * Performs the next code point operation.
-     * @param position the position value
-     * @return the next code point result
+     * Updates text or selection state for next code point.
+     * @param position the {@code int} supplied as {@code position}
+     * @return {@code int}; the next code point result
      */
     private int nextCodePoint(int position) {
         return Character.offsetByCodePoints(text, position, 1);
@@ -574,7 +578,7 @@ public class UITextField extends UIElement {
 
     /**
      * Returns the selection start.
-     * @return the selection start
+     * @return {@code int}; the selection start
      */
     private int getSelectionStart() {
         return Math.min(cursorPosition, selectionAnchor);
@@ -582,14 +586,14 @@ public class UITextField extends UIElement {
 
     /**
      * Returns the selection end.
-     * @return the selection end
+     * @return {@code int}; the selection end
      */
     private int getSelectionEnd() {
         return Math.max(cursorPosition, selectionAnchor);
     }
 
     /**
-     * Performs the delete selection operation.
+     * Removes selection and updates any dependent state.
      */
     private void deleteSelection() {
         if (!hasSelection()) {
@@ -605,7 +609,7 @@ public class UITextField extends UIElement {
     }
 
     /**
-     * Performs the copy selection operation.
+     * Creates an independent copy that preserves the relevant state of this object.
      */
     private void copySelection() {
         if (!hasSelection()) {
@@ -618,7 +622,7 @@ public class UITextField extends UIElement {
     }
 
     /**
-     * Performs the paste clipboard operation.
+     * Updates text or selection state for paste clipboard.
      */
     private void pasteClipboard() {
         long window = GLFW.glfwGetCurrentContext();
@@ -659,7 +663,7 @@ public class UITextField extends UIElement {
     }
 
     /**
-     * Performs the reset cursor blink operation.
+     * Resets cursor blink to its initial runtime state.
      */
     private void resetCursorBlink() {
         cursorTimer = 0.0f;
@@ -688,8 +692,8 @@ public class UITextField extends UIElement {
 
     /**
      * Returns the text width.
-     * @param value the value value
-     * @return the text width
+     * @param value the {@link String} supplied as {@code value}
+     * @return {@code float}; the text width
      */
     private float getTextWidth(String value) {
         float width = 0.0f;
@@ -709,8 +713,9 @@ public class UITextField extends UIElement {
     }
 
     /**
+     * {@inheritDoc}
      * Sets the focused.
-     * @param focused the focused value
+     * @param focused the {@code boolean} supplied as {@code focused}
      */
     @Override
     public void setFocused(boolean focused) {
@@ -727,7 +732,7 @@ public class UITextField extends UIElement {
 
     /**
      * Returns the text.
-     * @return the text
+     * @return the {@link String} representing the text
      */
     public String getText() {
         return text.toString();
@@ -735,7 +740,7 @@ public class UITextField extends UIElement {
 
     /**
      * Sets the text.
-     * @param text the text value
+     * @param text the {@link String} supplied as {@code text}
      */
     public void setText(String text) {
         this.text.setLength(0);
@@ -772,7 +777,7 @@ public class UITextField extends UIElement {
 
     /**
      * Returns the cursor position.
-     * @return the cursor position
+     * @return {@code int}; the cursor position
      */
     public int getCursorPosition() {
         return cursorPosition;
@@ -780,7 +785,7 @@ public class UITextField extends UIElement {
 
     /**
      * Sets the cursor position.
-     * @param position the position value
+     * @param position the {@code int} supplied as {@code position}
      */
     public void setCursorPosition(int position) {
         cursorPosition = Math.clamp(position, 0, text.length());
@@ -790,7 +795,7 @@ public class UITextField extends UIElement {
 
     /**
      * Returns the max length.
-     * @return the max length
+     * @return {@code int}; the max length
      */
     public int getMaxLength() {
         return maxLength;
@@ -798,7 +803,7 @@ public class UITextField extends UIElement {
 
     /**
      * Sets the max length.
-     * @param maxLength the max length value
+     * @param maxLength the {@code int} supplied as {@code maxLength}
      */
     public void setMaxLength(int maxLength) {
         this.maxLength = Math.max(1, maxLength);
@@ -815,7 +820,7 @@ public class UITextField extends UIElement {
 
     /**
      * Returns the font.
-     * @return the font
+     * @return the {@link UIFont} representing the font
      */
     public UIFont getFont() {
         return font;
@@ -823,7 +828,7 @@ public class UITextField extends UIElement {
 
     /**
      * Sets the font.
-     * @param font the font value
+     * @param font the {@link UIFont} supplied as {@code font}
      */
     public void setFont(UIFont font) {
         if (font != null) {
@@ -834,7 +839,7 @@ public class UITextField extends UIElement {
 
     /**
      * Returns the background color.
-     * @return the background color
+     * @return the {@link Vector4f} representing the background color
      */
     public Vector4f getBackgroundColor() {
         return new Vector4f(backgroundColor);
@@ -842,10 +847,10 @@ public class UITextField extends UIElement {
 
     /**
      * Sets the background color.
-     * @param r the r value
-     * @param g the g value
-     * @param b the b value
-     * @param a the a value
+     * @param r the {@code float} supplied as {@code r}
+     * @param g the {@code float} supplied as {@code g}
+     * @param b the {@code float} supplied as {@code b}
+     * @param a the {@code float} supplied as {@code a}
      */
     public void setBackgroundColor(float r, float g, float b, float a) {
         backgroundColor.set(r, g, b, a);
@@ -853,7 +858,7 @@ public class UITextField extends UIElement {
 
     /**
      * Returns the focused color.
-     * @return the focused color
+     * @return the {@link Vector4f} representing the focused color
      */
     public Vector4f getFocusedColor() {
         return new Vector4f(focusedColor);
@@ -861,10 +866,10 @@ public class UITextField extends UIElement {
 
     /**
      * Sets the focused color.
-     * @param r the r value
-     * @param g the g value
-     * @param b the b value
-     * @param a the a value
+     * @param r the {@code float} supplied as {@code r}
+     * @param g the {@code float} supplied as {@code g}
+     * @param b the {@code float} supplied as {@code b}
+     * @param a the {@code float} supplied as {@code a}
      */
     public void setFocusedColor(float r, float g, float b, float a) {
         focusedColor.set(r, g, b, a);
@@ -872,7 +877,7 @@ public class UITextField extends UIElement {
 
     /**
      * Returns the text color.
-     * @return the text color
+     * @return the {@link Vector4f} representing the text color
      */
     public Vector4f getTextColor() {
         return new Vector4f(textColor);
@@ -880,10 +885,10 @@ public class UITextField extends UIElement {
 
     /**
      * Sets the text color.
-     * @param r the r value
-     * @param g the g value
-     * @param b the b value
-     * @param a the a value
+     * @param r the {@code float} supplied as {@code r}
+     * @param g the {@code float} supplied as {@code g}
+     * @param b the {@code float} supplied as {@code b}
+     * @param a the {@code float} supplied as {@code a}
      */
     public void setTextColor(float r, float g, float b, float a) {
         textColor.set(r, g, b, a);
@@ -891,7 +896,7 @@ public class UITextField extends UIElement {
 
     /**
      * Returns the cursor color.
-     * @return the cursor color
+     * @return the {@link Vector4f} representing the cursor color
      */
     public Vector4f getCursorColor() {
         return new Vector4f(cursorColor);
@@ -899,10 +904,10 @@ public class UITextField extends UIElement {
 
     /**
      * Sets the cursor color.
-     * @param r the r value
-     * @param g the g value
-     * @param b the b value
-     * @param a the a value
+     * @param r the {@code float} supplied as {@code r}
+     * @param g the {@code float} supplied as {@code g}
+     * @param b the {@code float} supplied as {@code b}
+     * @param a the {@code float} supplied as {@code a}
      */
     public void setCursorColor(float r, float g, float b, float a) {
         cursorColor.set(r, g, b, a);
@@ -910,7 +915,7 @@ public class UITextField extends UIElement {
 
     /**
      * Returns the selection color.
-     * @return the selection color
+     * @return the {@link Vector4f} representing the selection color
      */
     public Vector4f getSelectionColor() {
         return new Vector4f(selectionColor);
@@ -918,10 +923,10 @@ public class UITextField extends UIElement {
 
     /**
      * Sets the selection color.
-     * @param r the r value
-     * @param g the g value
-     * @param b the b value
-     * @param a the a value
+     * @param r the {@code float} supplied as {@code r}
+     * @param g the {@code float} supplied as {@code g}
+     * @param b the {@code float} supplied as {@code b}
+     * @param a the {@code float} supplied as {@code a}
      */
     public void setSelectionColor(float r, float g, float b, float a) {
         selectionColor.set(r, g, b, a);
@@ -937,7 +942,7 @@ public class UITextField extends UIElement {
 
     /**
      * Returns the selected text.
-     * @return the selected text
+     * @return the {@link String} representing the selected text
      */
     public String getSelectedText() {
         if (!hasSelection()) {

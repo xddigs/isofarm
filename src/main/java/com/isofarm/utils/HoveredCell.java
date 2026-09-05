@@ -6,16 +6,16 @@ import com.isofarm.input.Mouse;
 import com.isofarm.wrld.GameMaster;
 
 /**
- * Provides hovered cell behavior.
+ * Encapsulates the state and operations required by hovered cell within the game runtime.
  */
 @Utils
 public class HoveredCell {
 
     /**
      * Returns get.
-     * @param gameMaster the game master value
-     * @param isShiftHeld the is shift held value
-     * @return the get result
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
+     * @param isShiftHeld the {@code boolean} supplied as {@code isShiftHeld}
+     * @return the {@link BlockPos} representing the get result
      */
     public static BlockPos get(GameMaster gameMaster, boolean isShiftHeld) {
         return gameMaster.getOrthoCamera().highlight(gameMaster.getWorld(),
@@ -27,8 +27,8 @@ public class HoveredCell {
 
     /**
      * Returns get.
-     * @param gameMaster the game master value
-     * @return the get result
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
+     * @return the {@link BlockPos} representing the get result
      */
     public static BlockPos get(GameMaster gameMaster) {
         return get(gameMaster, false);

@@ -15,7 +15,7 @@ import static org.lwjgl.system.MemoryUtil.memAlloc;
 import static org.lwjgl.system.MemoryUtil.memFree;
 
 /**
- * Provides uifont behavior.
+ * Encapsulates the state and operations required by uifont within the game runtime.
  */
 @SuppressWarnings("all")
 public class UIFont {
@@ -32,8 +32,8 @@ public class UIFont {
 
     /**
      * Creates a new {@code UIFont} instance.
-     * @param path the path value
-     * @param size the size value
+     * @param path the {@link String} supplied as {@code path}
+     * @param size the {@code float} supplied as {@code size}
      */
     public UIFont(String path, float size) {
         this(path, size, 1024, 1024);
@@ -41,10 +41,10 @@ public class UIFont {
 
     /**
      * Creates a new {@code UIFont} instance.
-     * @param path the path value
-     * @param size the size value
-     * @param atlasWidth the atlas width value
-     * @param atlasHeight the atlas height value
+     * @param path the {@link String} supplied as {@code path}
+     * @param size the {@code float} supplied as {@code size}
+     * @param atlasWidth the {@code int} supplied as {@code atlasWidth}
+     * @param atlasHeight the {@code int} supplied as {@code atlasHeight}
      */
     public UIFont(String path, float size, int atlasWidth, int atlasHeight) {
         this.path = path;
@@ -78,8 +78,8 @@ public class UIFont {
 
     /**
      * Loads the font.
-     * @param path the path value
-     * @return the load font result
+     * @param path the {@link String} supplied as {@code path}
+     * @return the {@link ByteBuffer} representing the load font result
      */
     private ByteBuffer loadFont(String path) {
         try (InputStream input = getClass().getClassLoader().getResourceAsStream(path)) {
@@ -100,7 +100,7 @@ public class UIFont {
     }
 
     /**
-     * Performs the bind operation.
+     * Binds this object to the active runtime context.
      */
     public void bind() {
         glActiveTexture(GL_TEXTURE0);
@@ -108,7 +108,7 @@ public class UIFont {
     }
 
     /**
-     * Performs the unbind operation.
+     * Unbinds this object from the active runtime context.
      */
     public void unbind() {
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -116,7 +116,7 @@ public class UIFont {
 
     /**
      * Returns the texture id.
-     * @return the texture id
+     * @return {@code int}; the texture id
      */
     public int getTextureId() {
         return textureId;
@@ -124,7 +124,7 @@ public class UIFont {
 
     /**
      * Returns the size.
-     * @return the size
+     * @return {@code float}; the size
      */
     public float getSize() {
         return size;
@@ -132,7 +132,7 @@ public class UIFont {
 
     /**
      * Returns the atlas width.
-     * @return the atlas width
+     * @return {@code int}; the atlas width
      */
     public int getAtlasWidth() {
         return atlasWidth;
@@ -140,7 +140,7 @@ public class UIFont {
 
     /**
      * Returns the atlas height.
-     * @return the atlas height
+     * @return {@code int}; the atlas height
      */
     public int getAtlasHeight() {
         return atlasHeight;
@@ -148,8 +148,8 @@ public class UIFont {
 
     /**
      * Returns the glyph.
-     * @param character the character value
-     * @return the glyph
+     * @param character the {@code int} supplied as {@code character}
+     * @return the {@link STBTTBakedChar} representing the glyph
      */
     public STBTTBakedChar getGlyph(int character) {
         if (character < FIRST_CHAR || character > LAST_CHAR) {
@@ -161,7 +161,7 @@ public class UIFont {
 
     /**
      * Returns the first char.
-     * @return the first char
+     * @return {@code int}; the first char
      */
     public int getFirstChar() {
         return FIRST_CHAR;
@@ -169,14 +169,14 @@ public class UIFont {
 
     /**
      * Returns the last char.
-     * @return the last char
+     * @return {@code int}; the last char
      */
     public int getLastChar() {
         return LAST_CHAR;
     }
 
     /**
-     * Performs the dispose operation.
+     * Releases the resources associated with this object.
      */
     public void dispose() {
         glDeleteTextures(textureId);

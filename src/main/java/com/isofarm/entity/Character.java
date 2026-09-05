@@ -4,7 +4,7 @@ import com.isofarm.data.*;
 import com.isofarm.utils.ToastFactory;
 
 /**
- * Provides character behavior.
+ * Encapsulates the state and operations required by character within the game runtime.
  */
 @DataClass
 public abstract class Character extends Entity implements Levelable {
@@ -31,7 +31,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Creates a new {@code Character} instance.
-     * @param name the name value
+     * @param name the {@link String} supplied as {@code name}
      */
     public Character(String name) {
         super(name);
@@ -54,8 +54,9 @@ public abstract class Character extends Entity implements Levelable {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the level.
-     * @return the level
+     * @return {@code int}; the level
      */
     @Override
     public int getLevel() {
@@ -63,8 +64,9 @@ public abstract class Character extends Entity implements Levelable {
     }
 
     /**
+     * {@inheritDoc}
      * Sets the level.
-     * @param level the level value
+     * @param level the {@code int} supplied as {@code level}
      */
     @Override
     public void setLevel(int level) {
@@ -72,8 +74,9 @@ public abstract class Character extends Entity implements Levelable {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the experience.
-     * @return the experience
+     * @return {@code int}; the experience
      */
     @Override
     public int getExperience() {
@@ -81,8 +84,9 @@ public abstract class Character extends Entity implements Levelable {
     }
 
     /**
+     * {@inheritDoc}
      * Sets the experience.
-     * @param experience the experience value
+     * @param experience the {@code int} supplied as {@code experience}
      */
     @Override
     public void setExperience(int experience) {
@@ -90,8 +94,9 @@ public abstract class Character extends Entity implements Levelable {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the experience for next level.
-     * @return the experience for next level
+     * @return {@code int}; the experience for next level
      */
     @Override
     public int getExperienceForNextLevel() {
@@ -99,8 +104,9 @@ public abstract class Character extends Entity implements Levelable {
     }
 
     /**
+     * {@inheritDoc}
      * Sets the experience for next level.
-     * @param experienceForNextLevel the experience for next level value
+     * @param experienceForNextLevel the {@code int} supplied as {@code experienceForNextLevel}
      */
     @Override
     public void setExperienceForNextLevel(int experienceForNextLevel) {
@@ -108,8 +114,9 @@ public abstract class Character extends Entity implements Levelable {
     }
 
     /**
-     * Performs the gain operation.
-     * @param experience the experience value
+     * {@inheritDoc}
+     * Adds the supplied amount to accumulated progression and applies any resulting transitions.
+     * @param experience the {@code int} supplied as {@code experience}
      */
     @Override
     public void gain(int experience) {
@@ -128,8 +135,9 @@ public abstract class Character extends Entity implements Levelable {
     }
 
     /**
-     * Performs the calc next level operation.
-     * @return the calc next level result
+     * {@inheritDoc}
+     * Calculates next level from the current inputs.
+     * @return {@code int}; the calc next level result
      */
     @Override
     public int calcNextLevel() {
@@ -137,7 +145,8 @@ public abstract class Character extends Entity implements Levelable {
     }
 
     /**
-     * Performs the level up operation.
+     * {@inheritDoc}
+     * Advances this object to the next progression level and updates dependent statistics.
      */
     @Override
     public void levelUp() {
@@ -147,7 +156,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Returns the frame duration.
-     * @return the frame duration
+     * @return {@code float}; the frame duration
      */
     public float getFrameDuration() {
         return FRAME_DURATION;
@@ -155,7 +164,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Returns the anim timer.
-     * @return the anim timer
+     * @return {@code float}; the anim timer
      */
     public float getAnimTimer() {
         return animTimer;
@@ -163,15 +172,15 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Sets the anim timer.
-     * @param animTimer the anim timer value
+     * @param animTimer the {@code float} supplied as {@code animTimer}
      */
     public void setAnimTimer(float animTimer) {
         this.animTimer = animTimer;
     }
 
     /**
-     * Performs the scale operation.
-     * @param amount the amount value
+     * Transforms this object according to the supplied values.
+     * @param amount the {@code int} supplied as {@code amount}
      */
     public void scale(int amount) {
         strength += (int) (amount * Math.random());
@@ -183,8 +192,8 @@ public abstract class Character extends Entity implements Levelable {
     }
 
     /**
-     * Performs the fall damage operation.
-     * @param amount the amount value
+     * Updates or derives runtime state for fall damage according to the supplied arguments.
+     * @param amount the {@code float} supplied as {@code amount}
      */
     public void fallDamage(float amount) {
         if (!isAlive() || amount <= 0) return;
@@ -193,8 +202,9 @@ public abstract class Character extends Entity implements Levelable {
     }
 
     /**
-     * Performs the damage operation.
-     * @param amount the amount value
+     * {@inheritDoc}
+     * Applies the supplied damage amount and triggers the associated health-state changes.
+     * @param amount the {@code float} supplied as {@code amount}
      */
     @Override
     public void damage(float amount) {
@@ -202,9 +212,10 @@ public abstract class Character extends Entity implements Levelable {
     }
 
     /**
+     * {@inheritDoc}
      * Applies damage attributed to a specific cause.
-     * @param amount the damage amount
-     * @param cause the damage cause
+     * @param amount the {@code float} argument; the damage amount
+     * @param cause the {@link Cause} argument; the damage cause
      */
     @Override
     public void damage(float amount, Cause cause) {
@@ -214,16 +225,17 @@ public abstract class Character extends Entity implements Levelable {
     }
 
     /**
-     * Performs the on damage taken operation.
-     * @param amount the amount value
+     * {@inheritDoc}
+     * Handles damage taken and updates the affected state.
+     * @param amount the {@code float} supplied as {@code amount}
      */
     @Override
     protected void onDamageTaken(float amount) {
     }
 
     /**
-     * Performs the heal operation.
-     * @param amount the amount value
+     * Restores the supplied amount of health without exceeding the configured limit.
+     * @param amount the {@code float} supplied as {@code amount}
      */
     public void heal(float amount) {
         if (amount <= 0 || !isAlive()) return;
@@ -231,8 +243,8 @@ public abstract class Character extends Entity implements Levelable {
     }
 
     /**
-     * Performs the restore stamina operation.
-     * @param amount the amount value
+     * Applies restore stamina and updates the affected character or item state.
+     * @param amount the {@code float} supplied as {@code amount}
      */
     public void restoreStamina(float amount) {
         if (amount <= 0) return;
@@ -240,8 +252,8 @@ public abstract class Character extends Entity implements Levelable {
     }
 
     /**
-     * Performs the consume stamina operation.
-     * @param amount the amount value
+     * Applies consume stamina and updates the affected character or item state.
+     * @param amount the {@code float} supplied as {@code amount}
      */
     public void consumeStamina(float amount) {
         if (amount <= 0) return;
@@ -258,7 +270,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Returns the inventory.
-     * @return the inventory
+     * @return the {@link Inventory} representing the inventory
      */
     public Inventory getInventory() {
         return inventory;
@@ -266,7 +278,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Sets the inventory.
-     * @param inventory the inventory value
+     * @param inventory the {@link Inventory} supplied as {@code inventory}
      */
     public void setInventory(Inventory inventory) {
         this.inventory = inventory;
@@ -274,7 +286,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Returns the backpack.
-     * @return the backpack
+     * @return the {@link Inventory} representing the backpack
      */
     public Inventory getBackpack() {
         return backpack;
@@ -282,7 +294,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Sets the backpack.
-     * @param backpack the backpack value
+     * @param backpack the {@link Inventory} supplied as {@code backpack}
      */
     public void setBackpack(Inventory backpack) {
         this.backpack = backpack;
@@ -290,15 +302,15 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Returns the purse.
-     * @return the purse
+     * @return the {@link Purse} representing the purse
      */
     public Purse getPurse() {
         return purse;
     }
 
     /**
-     * Performs the purse operation.
-     * @return the purse result
+     * Returns the purse associated with this character.
+     * @return {@code int}; the purse result
      */
     public int purse() {
         return purse.getBalance();
@@ -306,7 +318,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Returns the hitpoints.
-     * @return the hitpoints
+     * @return {@code float}; the hitpoints
      */
     public float getHitpoints() {
         return hitpoints;
@@ -314,15 +326,16 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Sets the hitpoints.
-     * @param hitpoints the hitpoints value
+     * @param hitpoints the {@code float} supplied as {@code hitpoints}
      */
     public void setHitpoints(float hitpoints) {
         this.hitpoints = hitpoints;
     }
 
     /**
+     * {@inheritDoc}
      * Returns the max hitpoints.
-     * @return the max hitpoints
+     * @return {@code float}; the max hitpoints
      */
     @Override
     public float getMaxHitpoints() {
@@ -331,7 +344,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Sets the max hitpoints.
-     * @param maxHitpoints the max hitpoints value
+     * @param maxHitpoints the {@code int} supplied as {@code maxHitpoints}
      */
     public void setMaxHitpoints(int maxHitpoints) {
         this.maxHitpoints = maxHitpoints;
@@ -339,7 +352,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Returns the stamina.
-     * @return the stamina
+     * @return {@code float}; the stamina
      */
     public float getStamina() {
         return stamina;
@@ -347,7 +360,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Sets the stamina.
-     * @param stamina the stamina value
+     * @param stamina the {@code float} supplied as {@code stamina}
      */
     public void setStamina(float stamina) {
         this.stamina = stamina;
@@ -355,7 +368,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Returns the max stamina.
-     * @return the max stamina
+     * @return {@code float}; the max stamina
      */
     public float getMaxStamina() {
         return maxStamina * level;
@@ -363,7 +376,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Sets the max stamina.
-     * @param maxStamina the max stamina value
+     * @param maxStamina the {@code float} supplied as {@code maxStamina}
      */
     public void setMaxStamina(float maxStamina) {
         this.maxStamina = maxStamina;
@@ -371,7 +384,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Returns the strength.
-     * @return the strength
+     * @return {@code int}; the strength
      */
     public int getStrength() {
         return strength;
@@ -379,7 +392,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Sets the strength.
-     * @param strength the strength value
+     * @param strength the {@code int} supplied as {@code strength}
      */
     public void setStrength(int strength) {
         this.strength = strength;
@@ -387,7 +400,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Returns the intelligence.
-     * @return the intelligence
+     * @return {@code int}; the intelligence
      */
     public int getIntelligence() {
         return intelligence;
@@ -395,7 +408,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Sets the intelligence.
-     * @param intelligence the intelligence value
+     * @param intelligence the {@code int} supplied as {@code intelligence}
      */
     public void setIntelligence(int intelligence) {
         this.intelligence = intelligence;
@@ -403,7 +416,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Returns the dexterity.
-     * @return the dexterity
+     * @return {@code int}; the dexterity
      */
     public int getDexterity() {
         return dexterity;
@@ -411,7 +424,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Sets the dexterity.
-     * @param dexterity the dexterity value
+     * @param dexterity the {@code int} supplied as {@code dexterity}
      */
     public void setDexterity(int dexterity) {
         this.dexterity = dexterity;
@@ -419,7 +432,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Returns the constitution.
-     * @return the constitution
+     * @return {@code int}; the constitution
      */
     public int getConstitution() {
         return constitution;
@@ -427,7 +440,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Sets the constitution.
-     * @param constitution the constitution value
+     * @param constitution the {@code int} supplied as {@code constitution}
      */
     public void setConstitution(int constitution) {
         this.constitution = constitution;
@@ -435,7 +448,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Returns the wisdom.
-     * @return the wisdom
+     * @return {@code int}; the wisdom
      */
     public int getWisdom() {
         return wisdom;
@@ -443,7 +456,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Sets the wisdom.
-     * @param wisdom the wisdom value
+     * @param wisdom the {@code int} supplied as {@code wisdom}
      */
     public void setWisdom(int wisdom) {
         this.wisdom = wisdom;
@@ -451,7 +464,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Returns the charisma.
-     * @return the charisma
+     * @return {@code int}; the charisma
      */
     public int getCharisma() {
         return charisma;
@@ -459,7 +472,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Sets the charisma.
-     * @param charisma the charisma value
+     * @param charisma the {@code int} supplied as {@code charisma}
      */
     public void setCharisma(int charisma) {
         this.charisma = charisma;
@@ -467,7 +480,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Returns the luck.
-     * @return the luck
+     * @return {@code int}; the luck
      */
     public int getLuck() {
         return luck;
@@ -475,7 +488,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Sets the luck.
-     * @param luck the luck value
+     * @param luck the {@code int} supplied as {@code luck}
      */
     public void setLuck(int luck) {
         this.luck = luck;
@@ -483,7 +496,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Returns the reputation.
-     * @return the reputation
+     * @return the {@link Reputation} representing the reputation
      */
     public Reputation getReputation() {
         return reputation;
@@ -491,7 +504,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Sets the reputation.
-     * @param reputation the reputation value
+     * @param reputation the {@link Reputation} supplied as {@code reputation}
      */
     public void setReputation(Reputation reputation) {
         this.reputation = reputation;
@@ -499,7 +512,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Returns the gamemode.
-     * @return the gamemode
+     * @return the {@link Gamemode} representing the gamemode
      */
     public Gamemode getGamemode() {
         return gamemode;
@@ -507,7 +520,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Sets the gamemode.
-     * @param gamemode the gamemode value
+     * @param gamemode the {@link Gamemode} supplied as {@code gamemode}
      */
     public void setGamemode(Gamemode gamemode) {
         this.gamemode = gamemode;
@@ -523,7 +536,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Returns the is off ground timer.
-     * @return the is off ground timer
+     * @return {@code float}; the is off ground timer
      */
     public float getIsOffGroundTimer() {
         return isOffGroundTimer;
@@ -531,7 +544,7 @@ public abstract class Character extends Entity implements Levelable {
 
     /**
      * Sets the is off ground timer.
-     * @param isOffGroundTimer the is off ground timer value
+     * @param isOffGroundTimer the {@code float} supplied as {@code isOffGroundTimer}
      */
     public void setIsOffGroundTimer(float isOffGroundTimer) {
         this.isOffGroundTimer = isOffGroundTimer;

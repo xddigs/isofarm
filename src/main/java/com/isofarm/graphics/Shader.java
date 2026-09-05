@@ -16,7 +16,7 @@ import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL20.*;
 
 /**
- * Provides shader behavior.
+ * Encapsulates the state and operations required by shader within the game runtime.
  */
 public class Shader {
     private static final Logger log = LoggerFactory.getLogger(Shader.class);
@@ -24,8 +24,8 @@ public class Shader {
 
     /**
      * Creates a new {@code Shader} instance.
-     * @param vertexPath the vertex path value
-     * @param fragmentPath the fragment path value
+     * @param vertexPath the {@link String} supplied as {@code vertexPath}
+     * @param fragmentPath the {@link String} supplied as {@code fragmentPath}
      */
     public Shader(String vertexPath, String fragmentPath) {
         String vertexSource = load(vertexPath);
@@ -53,8 +53,8 @@ public class Shader {
 
     /**
      * Loads load.
-     * @param resourcePath the resource path value
-     * @return the load result
+     * @param resourcePath the {@link String} supplied as {@code resourcePath}
+     * @return the {@link String} representing the load result
      */
     private String load(String resourcePath) {
         try (var inputStream = Shader.class.getClassLoader()
@@ -71,11 +71,11 @@ public class Shader {
     }
 
     /**
-     * Performs the compile operation.
-     * @param type the type value
-     * @param source the source value
-     * @param path the path value
-     * @return the compile result
+     * Executes compile as part of the application lifecycle.
+     * @param type the {@code int} supplied as {@code type}
+     * @param source the {@link String} supplied as {@code source}
+     * @param path the {@link String} supplied as {@code path}
+     * @return {@code int}; the compile result
      */
     private int compile(int type, String source, String path) {
         int shaderId = glCreateShader(type);
@@ -93,21 +93,21 @@ public class Shader {
     }
 
     /**
-     * Performs the bind operation.
+     * Binds this object to the active runtime context.
      */
     public void bind() {
         glUseProgram(programId);
     }
 
     /**
-     * Performs the unbind operation.
+     * Unbinds this object from the active runtime context.
      */
     public void unbind() {
         glUseProgram(0);
     }
 
     /**
-     * Performs the dispose operation.
+     * Releases the resources associated with this object.
      */
     public void dispose() {
         glUnbind();
@@ -116,7 +116,7 @@ public class Shader {
     }
 
     /**
-     * Performs the gl unbind operation.
+     * Unbinds the active OpenGL object from its current target.
      */
     private void glUnbind() {
         glUseProgram(0);
@@ -124,8 +124,8 @@ public class Shader {
 
     /**
      * Sets the uniform.
-     * @param name the name value
-     * @param value the value value
+     * @param name the {@link String} supplied as {@code name}
+     * @param value the {@code int} supplied as {@code value}
      */
     public void setUniform(String name, int value) {
         int location = glGetUniformLocation(programId, name);
@@ -134,8 +134,8 @@ public class Shader {
 
     /**
      * Sets the uniform.
-     * @param name the name value
-     * @param value the value value
+     * @param name the {@link String} supplied as {@code name}
+     * @param value the {@code float} supplied as {@code value}
      */
     public void setUniform(String name, float value) {
         int location = glGetUniformLocation(programId, name);
@@ -144,8 +144,8 @@ public class Shader {
 
     /**
      * Sets the uniform.
-     * @param name the name value
-     * @param value the value value
+     * @param name the {@link String} supplied as {@code name}
+     * @param value the {@link Vector4f} supplied as {@code value}
      */
     public void setUniform(String name, Vector4f value) {
         int location = glGetUniformLocation(programId, name);
@@ -154,8 +154,8 @@ public class Shader {
 
     /**
      * Sets the uniform.
-     * @param name the name value
-     * @param value the value value
+     * @param name the {@link String} supplied as {@code name}
+     * @param value the {@link Vector3f} supplied as {@code value}
      */
     public void setUniform(String name, Vector3f value) {
         int location = glGetUniformLocation(programId, name);
@@ -164,8 +164,8 @@ public class Shader {
 
     /**
      * Sets the uniform.
-     * @param name the name value
-     * @param value the value value
+     * @param name the {@link String} supplied as {@code name}
+     * @param value the {@link Vector2f} supplied as {@code value}
      */
     public void setUniform(String name, Vector2f value) {
         int location = glGetUniformLocation(programId, name);
@@ -174,9 +174,9 @@ public class Shader {
 
     /**
      * Sets the uniform.
-     * @param name the name value
-     * @param x the x value
-     * @param y the y value
+     * @param name the {@link String} supplied as {@code name}
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
      */
     public void setUniform(String name, float x, float y) {
         int location = glGetUniformLocation(programId, name);
@@ -185,10 +185,10 @@ public class Shader {
 
     /**
      * Sets the uniform.
-     * @param name the name value
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
+     * @param name the {@link String} supplied as {@code name}
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param z the {@code float} supplied as {@code z}
      */
     public void setUniform(String name, float x, float y, float z) {
         int location = glGetUniformLocation(programId, name);
@@ -197,8 +197,8 @@ public class Shader {
 
     /**
      * Sets the uniform.
-     * @param name the name value
-     * @param values the values value
+     * @param name the {@link String} supplied as {@code name}
+     * @param values an array of {@code float} values supplied as {@code values}
      */
     public void setUniform(String name, float... values) {
         int location = glGetUniformLocation(programId, name);
@@ -207,8 +207,8 @@ public class Shader {
 
     /**
      * Sets the uniform.
-     * @param name the name value
-     * @param matrix the matrix value
+     * @param name the {@link String} supplied as {@code name}
+     * @param matrix the {@link Matrix4f} supplied as {@code matrix}
      */
     public void setUniform(String name, Matrix4f matrix) {
         int location = glGetUniformLocation(programId, name);
@@ -221,8 +221,8 @@ public class Shader {
 
     /**
      * Sets the uniform.
-     * @param name the name value
-     * @param value the value value
+     * @param name the {@link String} supplied as {@code name}
+     * @param value the {@code boolean} supplied as {@code value}
      */
     public void setUniform(String name, boolean value) {
         int location = glGetUniformLocation(programId, name);

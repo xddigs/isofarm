@@ -4,7 +4,7 @@ import com.isofarm.input.Keyboard;
 import com.isofarm.input.Mouse;
 
 /**
- * Provides uimanager behavior.
+ * Encapsulates the state and operations required by uimanager within the game runtime.
  */
 public class UIManager {
     private static final float MOUSE_OFFSET = 32.0f;
@@ -14,8 +14,8 @@ public class UIManager {
 
     /**
      * Creates a new {@code UIManager} instance.
-     * @param width the width value
-     * @param height the height value
+     * @param width the {@code float} supplied as {@code width}
+     * @param height the {@code float} supplied as {@code height}
      */
     public UIManager(float width, float height) {
         root = new UIPanel(0.0f, 0.0f, width, height);
@@ -27,7 +27,7 @@ public class UIManager {
 
     /**
      * Updates the current state.
-     * @param delta the delta value
+     * @param delta the {@code float} supplied as {@code delta}
      */
     public void update(float delta) {
         root.update(delta);
@@ -117,7 +117,7 @@ public class UIManager {
     }
 
     /**
-     * Renders render.
+     * Renders this object in the requested render pass.
      */
     public void render() {
         GUI.render(root);
@@ -125,7 +125,7 @@ public class UIManager {
 
     /**
      * Returns the root.
-     * @return the root
+     * @return the {@link UIPanel} representing the root
      */
     public UIPanel getRoot() {
         return root;
@@ -133,17 +133,17 @@ public class UIManager {
 
     /**
      * Returns the tooltip.
-     * @return the tooltip
+     * @return the {@link UITooltip} representing the tooltip
      */
     public UITooltip getTooltip() {
         return tooltip;
     }
 
     /**
-     * Performs the show tooltip operation.
-     * @param text the text value
-     * @param mouseX the mouse x value
-     * @param mouseY the mouse y value
+     * Activates tooltip and prepares any state it requires.
+     * @param text the {@link String} supplied as {@code text}
+     * @param mouseX the {@code float} supplied as {@code mouseX}
+     * @param mouseY the {@code float} supplied as {@code mouseY}
      */
     public void showTooltip(String text, float mouseX, float mouseY) {
         if (text == null || text.isBlank()) {
@@ -157,7 +157,7 @@ public class UIManager {
     }
 
     /**
-     * Performs the hide tooltip operation.
+     * Deactivates tooltip and releases its transient state.
      */
     public void hideTooltip() {
         tooltip.hide();
@@ -165,7 +165,7 @@ public class UIManager {
 
     /**
      * Returns the focused element.
-     * @return the focused element
+     * @return the {@link UIElement} representing the focused element
      */
     public UIElement getFocusedElement() {
         return focusedElement;
@@ -173,7 +173,7 @@ public class UIManager {
 
     /**
      * Sets the focused element.
-     * @param element the element value
+     * @param element the {@link UIElement} supplied as {@code element}
      */
     public void setFocusedElement(UIElement element) {
         if (focusedElement == element) {
@@ -204,9 +204,9 @@ public class UIManager {
     }
 
     /**
-     * Performs the resize operation.
-     * @param width the width value
-     * @param height the height value
+     * Transforms this object according to the supplied values.
+     * @param width the {@code float} supplied as {@code width}
+     * @param height the {@code float} supplied as {@code height}
      */
     public void resize(float width, float height) {
         root.setSize(width, height);

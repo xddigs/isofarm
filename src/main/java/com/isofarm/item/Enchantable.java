@@ -8,9 +8,9 @@ import com.isofarm.data.Enchantment;
 @FunctionalInterface
 public interface Enchantable {
     /**
-     * Performs the enchanting operation.
-     * @param enchantment the enchantment value
-     * @return the enchanting result
+     * Applies enchanting and updates the affected character or item state.
+     * @param enchantment the {@link Enchantment} supplied as {@code enchantment}
+     * @return {@code boolean}; the enchanting result
      */
     boolean enchanting(Enchantment enchantment);
 }

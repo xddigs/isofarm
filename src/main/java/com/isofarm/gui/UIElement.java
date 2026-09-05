@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * Provides uielement behavior.
+ * Encapsulates the state and operations required by uielement within the game runtime.
  */
 @SuppressWarnings("unused")
 @GodObject
@@ -68,10 +68,10 @@ public abstract class UIElement {
 
     /**
      * Creates a new {@code UIElement} instance.
-     * @param x the x value
-     * @param y the y value
-     * @param width the width value
-     * @param height the height value
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param width the {@code float} supplied as {@code width}
+     * @param height the {@code float} supplied as {@code height}
      */
     protected UIElement(float x, float y, float width, float height) {
         this.x = x;
@@ -81,13 +81,13 @@ public abstract class UIElement {
     }
 
     /**
-     * Renders render.
+     * Renders this object in the requested render pass.
      */
     public abstract void render();
 
     /**
      * Updates the current state.
-     * @param delta the delta value
+     * @param delta the {@code float} supplied as {@code delta}
      */
     public void update(float delta) {
         if (!visible) {
@@ -103,7 +103,7 @@ public abstract class UIElement {
 
     /**
      * Updates the sprite animation.
-     * @param delta the delta value
+     * @param delta the {@code float} supplied as {@code delta}
      */
     protected void updateSpriteAnimation(float delta) {
         if (!spriteAnimated || spriteSheet == null || spriteFrameCount <= 1) {
@@ -139,7 +139,7 @@ public abstract class UIElement {
 
     /**
      * Adds the child.
-     * @param child the child value
+     * @param child the {@link UIElement} supplied as {@code child}
      */
     public void addChild(UIElement child) {
         if (child == null || child == this) {
@@ -157,7 +157,7 @@ public abstract class UIElement {
 
     /**
      * Removes the child.
-     * @param child the child value
+     * @param child the {@link UIElement} supplied as {@code child}
      */
     public void removeChild(UIElement child) {
         if (child == null) {
@@ -182,14 +182,14 @@ public abstract class UIElement {
 
     /**
      * Returns the children.
-     * @return the children
+     * @return the {@link List} representing the children
      */
     public List<UIElement> getChildren() {
         return List.copyOf(children);
     }
 
     /**
-     * Performs the sort children operation.
+     * Reorganizes inventory state for sort children.
      */
     private void sortChildren() {
         children.sort(Comparator.comparingInt(UIElement::getZIndex));
@@ -197,7 +197,7 @@ public abstract class UIElement {
 
     /**
      * Returns the parent.
-     * @return the parent
+     * @return the {@link UIElement} representing the parent
      */
     public UIElement getParent() {
         return parent;
@@ -205,7 +205,7 @@ public abstract class UIElement {
 
     /**
      * Sets the parent.
-     * @param parent the parent value
+     * @param parent the {@link UIElement} supplied as {@code parent}
      */
     public void setParent(UIElement parent) {
         if (this.parent == parent) {
@@ -223,7 +223,7 @@ public abstract class UIElement {
 
     /**
      * Returns the x.
-     * @return the x
+     * @return {@code float}; the x
      */
     public float getX() {
         return x;
@@ -231,7 +231,7 @@ public abstract class UIElement {
 
     /**
      * Sets the x.
-     * @param x the x value
+     * @param x the {@code float} supplied as {@code x}
      */
     public void setX(float x) {
         this.x = x;
@@ -239,7 +239,7 @@ public abstract class UIElement {
 
     /**
      * Returns the y.
-     * @return the y
+     * @return {@code float}; the y
      */
     public float getY() {
         return y;
@@ -247,7 +247,7 @@ public abstract class UIElement {
 
     /**
      * Sets the y.
-     * @param y the y value
+     * @param y the {@code float} supplied as {@code y}
      */
     public void setY(float y) {
         this.y = y;
@@ -255,9 +255,9 @@ public abstract class UIElement {
 
     /**
      * Sets the position.
-     * @param x the x value
-     * @param y the y value
-     * @return the set position result
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @return the {@link UIElement} representing the set position result
      */
     public UIElement setPosition(float x, float y) {
         this.x = x;
@@ -267,7 +267,7 @@ public abstract class UIElement {
 
     /**
      * Returns the width.
-     * @return the width
+     * @return {@code float}; the width
      */
     public float getWidth() {
         return width;
@@ -275,7 +275,7 @@ public abstract class UIElement {
 
     /**
      * Sets the width.
-     * @param width the width value
+     * @param width the {@code float} supplied as {@code width}
      */
     public void setWidth(float width) {
         this.width = Math.max(0.0f, width);
@@ -283,7 +283,7 @@ public abstract class UIElement {
 
     /**
      * Returns the height.
-     * @return the height
+     * @return {@code float}; the height
      */
     public float getHeight() {
         return height;
@@ -291,7 +291,7 @@ public abstract class UIElement {
 
     /**
      * Sets the height.
-     * @param height the height value
+     * @param height the {@code float} supplied as {@code height}
      */
     public void setHeight(float height) {
         this.height = Math.max(0.0f, height);
@@ -299,9 +299,9 @@ public abstract class UIElement {
 
     /**
      * Sets the size.
-     * @param width the width value
-     * @param height the height value
-     * @return the set size result
+     * @param width the {@code float} supplied as {@code width}
+     * @param height the {@code float} supplied as {@code height}
+     * @return the {@link UIElement} representing the set size result
      */
     public UIElement setSize(float width, float height) {
         this.width = Math.max(0.0f, width);
@@ -311,7 +311,7 @@ public abstract class UIElement {
 
     /**
      * Returns the scale x.
-     * @return the scale x
+     * @return {@code float}; the scale x
      */
     public float getScaleX() {
         return scaleX;
@@ -319,7 +319,7 @@ public abstract class UIElement {
 
     /**
      * Sets the scale x.
-     * @param scaleX the scale x value
+     * @param scaleX the {@code float} supplied as {@code scaleX}
      */
     public void setScaleX(float scaleX) {
         this.scaleX = scaleX;
@@ -327,7 +327,7 @@ public abstract class UIElement {
 
     /**
      * Returns the scale y.
-     * @return the scale y
+     * @return {@code float}; the scale y
      */
     public float getScaleY() {
         return scaleY;
@@ -335,7 +335,7 @@ public abstract class UIElement {
 
     /**
      * Sets the scale y.
-     * @param scaleY the scale y value
+     * @param scaleY the {@code float} supplied as {@code scaleY}
      */
     public void setScaleY(float scaleY) {
         this.scaleY = scaleY;
@@ -343,8 +343,8 @@ public abstract class UIElement {
 
     /**
      * Sets the scale.
-     * @param scale the scale value
-     * @return the set scale result
+     * @param scale the {@code float} supplied as {@code scale}
+     * @return the {@link UIElement} representing the set scale result
      */
     public UIElement setScale(float scale) {
         this.scaleX = scale;
@@ -354,9 +354,9 @@ public abstract class UIElement {
 
     /**
      * Sets the scale.
-     * @param scaleX the scale x value
-     * @param scaleY the scale y value
-     * @return the set scale result
+     * @param scaleX the {@code float} supplied as {@code scaleX}
+     * @param scaleY the {@code float} supplied as {@code scaleY}
+     * @return the {@link UIElement} representing the set scale result
      */
     public UIElement setScale(float scaleX, float scaleY) {
         this.scaleX = scaleX;
@@ -366,7 +366,7 @@ public abstract class UIElement {
 
     /**
      * Returns the rotation.
-     * @return the rotation
+     * @return {@code float}; the rotation
      */
     public float getRotation() {
         return rotation;
@@ -374,8 +374,8 @@ public abstract class UIElement {
 
     /**
      * Sets the rotation.
-     * @param rotation the rotation value
-     * @return the set rotation result
+     * @param rotation the {@code float} supplied as {@code rotation}
+     * @return the {@link UIElement} representing the set rotation result
      */
     public UIElement setRotation(float rotation) {
         this.rotation = rotation;
@@ -384,7 +384,7 @@ public abstract class UIElement {
 
     /**
      * Returns the pivot x.
-     * @return the pivot x
+     * @return {@code float}; the pivot x
      */
     public float getPivotX() {
         return pivotX;
@@ -392,7 +392,7 @@ public abstract class UIElement {
 
     /**
      * Sets the pivot x.
-     * @param pivotX the pivot x value
+     * @param pivotX the {@code float} supplied as {@code pivotX}
      */
     public void setPivotX(float pivotX) {
         this.pivotX = pivotX;
@@ -400,7 +400,7 @@ public abstract class UIElement {
 
     /**
      * Returns the pivot y.
-     * @return the pivot y
+     * @return {@code float}; the pivot y
      */
     public float getPivotY() {
         return pivotY;
@@ -408,7 +408,7 @@ public abstract class UIElement {
 
     /**
      * Sets the pivot y.
-     * @param pivotY the pivot y value
+     * @param pivotY the {@code float} supplied as {@code pivotY}
      */
     public void setPivotY(float pivotY) {
         this.pivotY = pivotY;
@@ -416,9 +416,9 @@ public abstract class UIElement {
 
     /**
      * Sets the pivot.
-     * @param pivotX the pivot x value
-     * @param pivotY the pivot y value
-     * @return the set pivot result
+     * @param pivotX the {@code float} supplied as {@code pivotX}
+     * @param pivotY the {@code float} supplied as {@code pivotY}
+     * @return the {@link UIElement} representing the set pivot result
      */
     public UIElement setPivot(float pivotX, float pivotY) {
         this.pivotX = pivotX;
@@ -428,7 +428,7 @@ public abstract class UIElement {
 
     /**
      * Returns the opacity.
-     * @return the opacity
+     * @return {@code float}; the opacity
      */
     public float getOpacity() {
         return opacity;
@@ -436,7 +436,7 @@ public abstract class UIElement {
 
     /**
      * Sets the opacity.
-     * @param opacity the opacity value
+     * @param opacity the {@code float} supplied as {@code opacity}
      */
     public void setOpacity(float opacity) {
         this.opacity = Math.clamp(opacity, 0.0f, 1.0f);
@@ -444,8 +444,8 @@ public abstract class UIElement {
 
     /**
      * Sets the opacity value.
-     * @param opacity the opacity value
-     * @return the set opacity value result
+     * @param opacity the {@code float} supplied as {@code opacity}
+     * @return the {@link UIElement} representing the set opacity value result
      */
     public UIElement setOpacityValue(float opacity) {
         setOpacity(opacity);
@@ -454,7 +454,7 @@ public abstract class UIElement {
 
     /**
      * Returns the zindex.
-     * @return the zindex
+     * @return {@code int}; the zindex
      */
     public int getZIndex() {
         return zIndex;
@@ -462,7 +462,7 @@ public abstract class UIElement {
 
     /**
      * Sets the zindex.
-     * @param zIndex the z index value
+     * @param zIndex the {@code int} supplied as {@code zIndex}
      */
     public void setZIndex(int zIndex) {
         this.zIndex = zIndex;
@@ -474,8 +474,8 @@ public abstract class UIElement {
 
     /**
      * Sets the layer.
-     * @param zIndex the z index value
-     * @return the set layer result
+     * @param zIndex the {@code int} supplied as {@code zIndex}
+     * @return the {@link UIElement} representing the set layer result
      */
     public UIElement setLayer(int zIndex) {
         setZIndex(zIndex);
@@ -492,7 +492,7 @@ public abstract class UIElement {
 
     /**
      * Sets the visible.
-     * @param visible the visible value
+     * @param visible the {@code boolean} supplied as {@code visible}
      */
     public void setVisible(boolean visible) {
         this.visible = visible;
@@ -504,8 +504,8 @@ public abstract class UIElement {
     }
 
     /**
-     * Performs the show operation.
-     * @return the show result
+     * Activates this object and prepares any state it requires.
+     * @return the {@link UIElement} representing the show result
      */
     public UIElement show() {
         setVisible(true);
@@ -513,8 +513,8 @@ public abstract class UIElement {
     }
 
     /**
-     * Performs the hide operation.
-     * @return the hide result
+     * Deactivates this object and releases its transient state.
+     * @return the {@link UIElement} representing the hide result
      */
     public UIElement hide() {
         setVisible(false);
@@ -531,7 +531,7 @@ public abstract class UIElement {
 
     /**
      * Sets the enabled.
-     * @param enabled the enabled value
+     * @param enabled the {@code boolean} supplied as {@code enabled}
      */
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
@@ -544,8 +544,8 @@ public abstract class UIElement {
     }
 
     /**
-     * Performs the enable operation.
-     * @return the enable result
+     * Activates this object and prepares any state it requires.
+     * @return the {@link UIElement} representing the enable result
      */
     public UIElement enable() {
         setEnabled(true);
@@ -553,8 +553,8 @@ public abstract class UIElement {
     }
 
     /**
-     * Performs the disable operation.
-     * @return the disable result
+     * Deactivates this object and releases its transient state.
+     * @return the {@link UIElement} representing the disable result
      */
     public UIElement disable() {
         setEnabled(false);
@@ -563,7 +563,7 @@ public abstract class UIElement {
 
     /**
      * Returns the tooltip text.
-     * @return the tooltip text
+     * @return the {@link String} representing the tooltip text
      */
     public String getTooltipText() {
         return tooltipText;
@@ -571,16 +571,16 @@ public abstract class UIElement {
 
     /**
      * Sets the tooltip text.
-     * @param tooltipText the tooltip text value
+     * @param tooltipText the {@link String} supplied as {@code tooltipText}
      */
     public void setTooltipText(String tooltipText) {
         this.tooltipText = tooltipText;
     }
 
     /**
-     * Performs the tooltip operation.
-     * @param tooltipText the tooltip text value
-     * @return the tooltip result
+     * Creates or returns tooltip from the supplied arguments.
+     * @param tooltipText the {@link String} supplied as {@code tooltipText}
+     * @return the {@link UIElement} representing the tooltip result
      */
     public UIElement tooltip(String tooltipText) {
         this.tooltipText = tooltipText;
@@ -597,7 +597,7 @@ public abstract class UIElement {
 
     /**
      * Sets the interactable.
-     * @param interactable the interactable value
+     * @param interactable the {@code boolean} supplied as {@code interactable}
      */
     public void setInteractable(boolean interactable) {
         this.interactable = interactable;
@@ -613,7 +613,7 @@ public abstract class UIElement {
 
     /**
      * Sets the focusable.
-     * @param focusable the focusable value
+     * @param focusable the {@code boolean} supplied as {@code focusable}
      */
     public void setFocusable(boolean focusable) {
         this.focusable = focusable;
@@ -629,7 +629,7 @@ public abstract class UIElement {
 
     /**
      * Sets the hovered.
-     * @param hovered the hovered value
+     * @param hovered the {@code boolean} supplied as {@code hovered}
      */
     public void setHovered(boolean hovered) {
         if (this.hovered == hovered) {
@@ -659,7 +659,7 @@ public abstract class UIElement {
 
     /**
      * Sets the pressed.
-     * @param pressed the pressed value
+     * @param pressed the {@code boolean} supplied as {@code pressed}
      */
     public void setPressed(boolean pressed) {
         this.pressed = pressed;
@@ -675,7 +675,7 @@ public abstract class UIElement {
 
     /**
      * Sets the focused.
-     * @param focused the focused value
+     * @param focused the {@code boolean} supplied as {@code focused}
      */
     public void setFocused(boolean focused) {
         if (this.focused == focused) {
@@ -705,7 +705,7 @@ public abstract class UIElement {
 
     /**
      * Sets the mouse inside.
-     * @param mouseInside the mouse inside value
+     * @param mouseInside the {@code boolean} supplied as {@code mouseInside}
      */
     public void setMouseInside(boolean mouseInside) {
         this.mouseInside = mouseInside;
@@ -721,7 +721,7 @@ public abstract class UIElement {
 
     /**
      * Sets the clip children.
-     * @param clipChildren the clip children value
+     * @param clipChildren the {@code boolean} supplied as {@code clipChildren}
      */
     public void setClipChildren(boolean clipChildren) {
         this.clipChildren = clipChildren;
@@ -729,7 +729,7 @@ public abstract class UIElement {
 
     /**
      * Returns the anchor.
-     * @return the anchor
+     * @return the {@link Anchor} representing the anchor
      */
     public Anchor getAnchor() {
         return anchor;
@@ -737,16 +737,16 @@ public abstract class UIElement {
 
     /**
      * Sets the anchor.
-     * @param anchor the anchor value
+     * @param anchor the {@link Anchor} supplied as {@code anchor}
      */
     public void setAnchor(Anchor anchor) {
         this.anchor = anchor == null ? Anchor.TOP_LEFT : anchor;
     }
 
     /**
-     * Performs the anchor operation.
-     * @param anchor the anchor value
-     * @return the anchor result
+     * Creates or returns anchor from the supplied arguments.
+     * @param anchor the {@link Anchor} supplied as {@code anchor}
+     * @return the {@link UIElement} representing the anchor result
      */
     public UIElement anchor(Anchor anchor) {
         setAnchor(anchor);
@@ -755,7 +755,7 @@ public abstract class UIElement {
 
     /**
      * Returns the tint.
-     * @return the tint
+     * @return the {@link Vector4f} representing the tint
      */
     public Vector4f getTint() {
         return new Vector4f(tint);
@@ -763,7 +763,7 @@ public abstract class UIElement {
 
     /**
      * Sets the tint.
-     * @param tint the tint value
+     * @param tint the {@link Vector4f} supplied as {@code tint}
      */
     public void setTint(Vector4f tint) {
         if (tint == null) {
@@ -776,22 +776,22 @@ public abstract class UIElement {
 
     /**
      * Sets the tint.
-     * @param r the r value
-     * @param g the g value
-     * @param b the b value
-     * @param a the a value
+     * @param r the {@code float} supplied as {@code r}
+     * @param g the {@code float} supplied as {@code g}
+     * @param b the {@code float} supplied as {@code b}
+     * @param a the {@code float} supplied as {@code a}
      */
     public void setTint(float r, float g, float b, float a) {
         tint.set(r, g, b, a);
     }
 
     /**
-     * Performs the tint operation.
-     * @param r the r value
-     * @param g the g value
-     * @param b the b value
-     * @param a the a value
-     * @return the tint result
+     * Transforms this object according to the supplied values.
+     * @param r the {@code float} supplied as {@code r}
+     * @param g the {@code float} supplied as {@code g}
+     * @param b the {@code float} supplied as {@code b}
+     * @param a the {@code float} supplied as {@code a}
+     * @return the {@link UIElement} representing the tint result
      */
     public UIElement tint(float r, float g, float b, float a) {
         setTint(r, g, b, a);
@@ -799,11 +799,11 @@ public abstract class UIElement {
     }
 
     /**
-     * Performs the tint operation.
-     * @param r the r value
-     * @param g the g value
-     * @param b the b value
-     * @return the tint result
+     * Transforms this object according to the supplied values.
+     * @param r the {@code float} supplied as {@code r}
+     * @param g the {@code float} supplied as {@code g}
+     * @param b the {@code float} supplied as {@code b}
+     * @return the {@link UIElement} representing the tint result
      */
     public UIElement tint(float r, float g, float b) {
         setTint(r, g, b, 1.0f);
@@ -812,7 +812,7 @@ public abstract class UIElement {
 
     /**
      * Returns the sprite.
-     * @return the sprite
+     * @return the {@link Texture} representing the sprite
      */
     public Texture getSprite() {
         return sprite;
@@ -820,7 +820,7 @@ public abstract class UIElement {
 
     /**
      * Sets the sprite.
-     * @param sprite the sprite value
+     * @param sprite the {@link Texture} supplied as {@code sprite}
      */
     public void setSprite(Texture sprite) {
         this.sprite = sprite;
@@ -831,9 +831,9 @@ public abstract class UIElement {
     }
 
     /**
-     * Performs the sprite operation.
-     * @param sprite the sprite value
-     * @return the sprite result
+     * Creates or returns sprite from the supplied arguments.
+     * @param sprite the {@link Texture} supplied as {@code sprite}
+     * @return the {@link UIElement} representing the sprite result
      */
     public UIElement sprite(Texture sprite) {
         setSprite(sprite);
@@ -842,7 +842,7 @@ public abstract class UIElement {
 
     /**
      * Returns the sprite sheet.
-     * @return the sprite sheet
+     * @return the {@link SpriteSheet} representing the sprite sheet
      */
     public SpriteSheet getSpriteSheet() {
         return spriteSheet;
@@ -850,7 +850,7 @@ public abstract class UIElement {
 
     /**
      * Sets the sprite sheet.
-     * @param spriteSheet the sprite sheet value
+     * @param spriteSheet the {@link SpriteSheet} supplied as {@code spriteSheet}
      */
     public void setSpriteSheet(SpriteSheet spriteSheet) {
         this.spriteSheet = spriteSheet;
@@ -861,9 +861,9 @@ public abstract class UIElement {
     }
 
     /**
-     * Performs the sprite sheet operation.
-     * @param spriteSheet the sprite sheet value
-     * @return the sprite sheet result
+     * Creates or returns sprite sheet from the supplied arguments.
+     * @param spriteSheet the {@link SpriteSheet} supplied as {@code spriteSheet}
+     * @return the {@link UIElement} representing the sprite sheet result
      */
     public UIElement spriteSheet(SpriteSheet spriteSheet) {
         setSpriteSheet(spriteSheet);
@@ -896,7 +896,7 @@ public abstract class UIElement {
 
     /**
      * Returns the sprite col.
-     * @return the sprite col
+     * @return {@code int}; the sprite col
      */
     public int getSpriteCol() {
         return spriteCol;
@@ -904,7 +904,7 @@ public abstract class UIElement {
 
     /**
      * Sets the sprite column.
-     * @param spriteFrame the sprite frame value
+     * @param spriteFrame the {@code int} supplied as {@code spriteFrame}
      */
     public void setSpriteColumn(int spriteFrame) {
         if (spriteSheet == null) {
@@ -917,7 +917,7 @@ public abstract class UIElement {
 
     /**
      * Returns the sprite row.
-     * @return the sprite row
+     * @return {@code int}; the sprite row
      */
     public int getSpriteRow() {
         return spriteRow;
@@ -925,7 +925,7 @@ public abstract class UIElement {
 
     /**
      * Sets the sprite row.
-     * @param spriteRow the sprite row value
+     * @param spriteRow the {@code int} supplied as {@code spriteRow}
      */
     public void setSpriteRow(int spriteRow) {
         if (spriteSheet == null) {
@@ -937,9 +937,9 @@ public abstract class UIElement {
     }
 
     /**
-     * Performs the col operation.
-     * @param frame the frame value
-     * @return the col result
+     * Creates or returns col from the supplied arguments.
+     * @param frame the {@code int} supplied as {@code frame}
+     * @return the {@link UIElement} representing the col result
      */
     public UIElement col(int frame) {
         setSpriteColumn(frame);
@@ -947,9 +947,9 @@ public abstract class UIElement {
     }
 
     /**
-     * Performs the row operation.
-     * @param row the row value
-     * @return the row result
+     * Creates or returns row from the supplied arguments.
+     * @param row the {@code int} supplied as {@code row}
+     * @return the {@link UIElement} representing the row result
      */
     public UIElement row(int row) {
         setSpriteRow(row);
@@ -958,7 +958,7 @@ public abstract class UIElement {
 
     /**
      * Returns the sprite frame count.
-     * @return the sprite frame count
+     * @return {@code int}; the sprite frame count
      */
     public int getSpriteFrameCount() {
         return spriteFrameCount;
@@ -966,7 +966,7 @@ public abstract class UIElement {
 
     /**
      * Sets the sprite frame count.
-     * @param spriteFrameCount the sprite frame count value
+     * @param spriteFrameCount the {@code int} supplied as {@code spriteFrameCount}
      */
     public void setSpriteFrameCount(int spriteFrameCount) {
         this.spriteFrameCount = Math.max(1, spriteFrameCount);
@@ -978,7 +978,7 @@ public abstract class UIElement {
 
     /**
      * Returns the sprite frame duration.
-     * @return the sprite frame duration
+     * @return {@code float}; the sprite frame duration
      */
     public float getSpriteFrameDuration() {
         return spriteFrameDuration;
@@ -986,16 +986,16 @@ public abstract class UIElement {
 
     /**
      * Sets the sprite frame duration.
-     * @param spriteFrameDuration the sprite frame duration value
+     * @param spriteFrameDuration the {@code float} supplied as {@code spriteFrameDuration}
      */
     public void setSpriteFrameDuration(float spriteFrameDuration) {
         this.spriteFrameDuration = Math.max(0.001f, spriteFrameDuration);
     }
 
     /**
-     * Performs the frame duration operation.
-     * @param duration the duration value
-     * @return the frame duration result
+     * Calculates the value represented by frame duration from the current state.
+     * @param duration the {@code float} supplied as {@code duration}
+     * @return the {@link UIElement} representing the frame duration result
      */
     public UIElement frameDuration(float duration) {
         setSpriteFrameDuration(duration);
@@ -1012,16 +1012,16 @@ public abstract class UIElement {
 
     /**
      * Sets the sprite animated.
-     * @param spriteAnimated the sprite animated value
+     * @param spriteAnimated the {@code boolean} supplied as {@code spriteAnimated}
      */
     public void setSpriteAnimated(boolean spriteAnimated) {
         this.spriteAnimated = spriteAnimated && spriteSheet != null && spriteFrameCount > 1;
     }
 
     /**
-     * Performs the animate sprite operation.
-     * @param animate the animate value
-     * @return the animate sprite result
+     * Updates or derives runtime state for animate sprite according to the supplied arguments.
+     * @param animate the {@code boolean} supplied as {@code animate}
+     * @return the {@link UIElement} representing the animate sprite result
      */
     public UIElement animateSprite(boolean animate) {
         setSpriteAnimated(animate);
@@ -1038,16 +1038,16 @@ public abstract class UIElement {
 
     /**
      * Sets the sprite looping.
-     * @param spriteLoop the sprite loop value
+     * @param spriteLoop the {@code boolean} supplied as {@code spriteLoop}
      */
     public void setSpriteLooping(boolean spriteLoop) {
         this.spriteLoop = spriteLoop;
     }
 
     /**
-     * Performs the loop sprite operation.
-     * @param loop the loop value
-     * @return the loop sprite result
+     * Processes each applicable element for loop sprite.
+     * @param loop the {@code boolean} supplied as {@code loop}
+     * @return the {@link UIElement} representing the loop sprite result
      */
     public UIElement loopSprite(boolean loop) {
         setSpriteLooping(loop);
@@ -1056,14 +1056,14 @@ public abstract class UIElement {
 
     /**
      * Returns the sprite animation timer.
-     * @return the sprite animation timer
+     * @return {@code float}; the sprite animation timer
      */
     public float getSpriteAnimationTimer() {
         return spriteAnimationTimer;
     }
 
     /**
-     * Performs the reset sprite animation operation.
+     * Resets sprite animation to its initial runtime state.
      */
     public void resetSpriteAnimation() {
         spriteCol = 0;
@@ -1080,16 +1080,16 @@ public abstract class UIElement {
 
     /**
      * Sets the sprite flip x.
-     * @param spriteFlipX the sprite flip x value
+     * @param spriteFlipX the {@code boolean} supplied as {@code spriteFlipX}
      */
     public void setSpriteFlipX(boolean spriteFlipX) {
         this.spriteFlipX = spriteFlipX;
     }
 
     /**
-     * Performs the flip x operation.
-     * @param flip the flip value
-     * @return the flip x result
+     * Transforms x according to the supplied values.
+     * @param flip the {@code boolean} supplied as {@code flip}
+     * @return the {@link UIElement} representing the flip x result
      */
     public UIElement flipX(boolean flip) {
         setSpriteFlipX(flip);
@@ -1106,16 +1106,16 @@ public abstract class UIElement {
 
     /**
      * Sets the sprite flip y.
-     * @param spriteFlipY the sprite flip y value
+     * @param spriteFlipY the {@code boolean} supplied as {@code spriteFlipY}
      */
     public void setSpriteFlipY(boolean spriteFlipY) {
         this.spriteFlipY = spriteFlipY;
     }
 
     /**
-     * Performs the flip y operation.
-     * @param flip the flip value
-     * @return the flip y result
+     * Transforms y according to the supplied values.
+     * @param flip the {@code boolean} supplied as {@code flip}
+     * @return the {@link UIElement} representing the flip y result
      */
     public UIElement flipY(boolean flip) {
         setSpriteFlipY(flip);
@@ -1124,7 +1124,7 @@ public abstract class UIElement {
 
     /**
      * Returns the sprite scale x.
-     * @return the sprite scale x
+     * @return {@code float}; the sprite scale x
      */
     public float getSpriteScaleX() {
         return spriteScaleX;
@@ -1132,7 +1132,7 @@ public abstract class UIElement {
 
     /**
      * Sets the sprite scale x.
-     * @param spriteScaleX the sprite scale x value
+     * @param spriteScaleX the {@code float} supplied as {@code spriteScaleX}
      */
     public void setSpriteScaleX(float spriteScaleX) {
         this.spriteScaleX = spriteScaleX;
@@ -1140,7 +1140,7 @@ public abstract class UIElement {
 
     /**
      * Returns the sprite scale y.
-     * @return the sprite scale y
+     * @return {@code float}; the sprite scale y
      */
     public float getSpriteScaleY() {
         return spriteScaleY;
@@ -1148,7 +1148,7 @@ public abstract class UIElement {
 
     /**
      * Sets the sprite scale y.
-     * @param spriteScaleY the sprite scale y value
+     * @param spriteScaleY the {@code float} supplied as {@code spriteScaleY}
      */
     public void setSpriteScaleY(float spriteScaleY) {
         this.spriteScaleY = spriteScaleY;
@@ -1156,8 +1156,8 @@ public abstract class UIElement {
 
     /**
      * Sets the sprite scale.
-     * @param scale the scale value
-     * @return the set sprite scale result
+     * @param scale the {@code float} supplied as {@code scale}
+     * @return the {@link UIElement} representing the set sprite scale result
      */
     public UIElement setSpriteScale(float scale) {
         this.spriteScaleX = scale;
@@ -1167,7 +1167,7 @@ public abstract class UIElement {
 
     /**
      * Returns the sprite offset.
-     * @return the sprite offset
+     * @return the {@link Vector2f} representing the sprite offset
      */
     public Vector2f getSpriteOffset() {
         return new Vector2f(spriteOffset);
@@ -1175,18 +1175,18 @@ public abstract class UIElement {
 
     /**
      * Sets the sprite offset.
-     * @param x the x value
-     * @param y the y value
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
      */
     public void setSpriteOffset(float x, float y) {
         spriteOffset.set(x, y);
     }
 
     /**
-     * Performs the sprite offset operation.
-     * @param x the x value
-     * @param y the y value
-     * @return the sprite offset result
+     * Creates or returns sprite offset from the supplied arguments.
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @return the {@link UIElement} representing the sprite offset result
      */
     public UIElement spriteOffset(float x, float y) {
         setSpriteOffset(x, y);
@@ -1195,7 +1195,7 @@ public abstract class UIElement {
 
     /**
      * Returns the absolute x.
-     * @return the absolute x
+     * @return {@code float}; the absolute x
      */
     public float getAbsoluteX() {
         if (parent == null) {
@@ -1207,7 +1207,7 @@ public abstract class UIElement {
 
     /**
      * Returns the absolute y.
-     * @return the absolute y
+     * @return {@code float}; the absolute y
      */
     public float getAbsoluteY() {
         if (parent == null) {
@@ -1219,7 +1219,7 @@ public abstract class UIElement {
 
     /**
      * Returns the content x.
-     * @return the content x
+     * @return {@code float}; the content x
      */
     public float getContentX() {
         return getAbsoluteX();
@@ -1227,7 +1227,7 @@ public abstract class UIElement {
 
     /**
      * Returns the content y.
-     * @return the content y
+     * @return {@code float}; the content y
      */
     public float getContentY() {
         return getAbsoluteY();
@@ -1235,7 +1235,7 @@ public abstract class UIElement {
 
     /**
      * Returns the absolute width.
-     * @return the absolute width
+     * @return {@code float}; the absolute width
      */
     public float getAbsoluteWidth() {
         return width * scaleX;
@@ -1243,7 +1243,7 @@ public abstract class UIElement {
 
     /**
      * Returns the absolute height.
-     * @return the absolute height
+     * @return {@code float}; the absolute height
      */
     public float getAbsoluteHeight() {
         return height * scaleY;
@@ -1251,7 +1251,7 @@ public abstract class UIElement {
 
     /**
      * Returns the absolute position.
-     * @return the absolute position
+     * @return the {@link Vector2f} representing the absolute position
      */
     public Vector2f getAbsolutePosition() {
         return new Vector2f(getAbsoluteX(), getAbsoluteY());
@@ -1259,17 +1259,17 @@ public abstract class UIElement {
 
     /**
      * Returns the absolute size.
-     * @return the absolute size
+     * @return the {@link Vector2f} representing the absolute size
      */
     public Vector2f getAbsoluteSize() {
         return new Vector2f(getAbsoluteWidth(), getAbsoluteHeight());
     }
 
     /**
-     * Performs the contains operation.
-     * @param mouseX the mouse x value
-     * @param mouseY the mouse y value
-     * @return the contains result
+     * Determines whether this object is satisfied by the current state.
+     * @param mouseX the {@code float} supplied as {@code mouseX}
+     * @param mouseY the {@code float} supplied as {@code mouseY}
+     * @return {@code boolean}; the contains result
      */
     public boolean contains(float mouseX, float mouseY) {
         if (!visible || !enabled || !interactable) {
@@ -1289,9 +1289,9 @@ public abstract class UIElement {
 
     /**
      * Finds and returns the element at.
-     * @param mouseX the mouse x value
-     * @param mouseY the mouse y value
-     * @return the located element at
+     * @param mouseX the {@code float} supplied as {@code mouseX}
+     * @param mouseY the {@code float} supplied as {@code mouseY}
+     * @return the {@link UIElement} representing the located element at
      */
     public UIElement findElementAt(float mouseX, float mouseY) {
         if (!visible || !enabled || !interactable) {
@@ -1313,9 +1313,9 @@ public abstract class UIElement {
     }
 
     /**
-     * Performs the mouse moved operation.
-     * @param mouseX the mouse x value
-     * @param mouseY the mouse y value
+     * Handles mouse moved and applies its effect to the current interaction state.
+     * @param mouseX the {@code float} supplied as {@code mouseX}
+     * @param mouseY the {@code float} supplied as {@code mouseY}
      */
     public void mouseMoved(float mouseX, float mouseY) {
         if (!visible || !enabled) {
@@ -1332,11 +1332,11 @@ public abstract class UIElement {
     }
 
     /**
-     * Performs the mouse pressed operation.
-     * @param mouseX the mouse x value
-     * @param mouseY the mouse y value
-     * @param button the button value
-     * @return the mouse pressed result
+     * Handles mouse pressed and applies its effect to the current interaction state.
+     * @param mouseX the {@code float} supplied as {@code mouseX}
+     * @param mouseY the {@code float} supplied as {@code mouseY}
+     * @param button the {@code int} supplied as {@code button}
+     * @return {@code boolean}; the mouse pressed result
      */
     public boolean mousePressed(float mouseX, float mouseY, int button) {
         if (!visible || !enabled || !interactable) {
@@ -1366,11 +1366,11 @@ public abstract class UIElement {
     }
 
     /**
-     * Performs the mouse released operation.
-     * @param mouseX the mouse x value
-     * @param mouseY the mouse y value
-     * @param button the button value
-     * @return the mouse released result
+     * Handles mouse released and applies its effect to the current interaction state.
+     * @param mouseX the {@code float} supplied as {@code mouseX}
+     * @param mouseY the {@code float} supplied as {@code mouseY}
+     * @param button the {@code int} supplied as {@code button}
+     * @return {@code boolean}; the mouse released result
      */
     public boolean mouseReleased(float mouseX, float mouseY, int button) {
         if (!visible || !enabled || !interactable) {
@@ -1409,12 +1409,12 @@ public abstract class UIElement {
     }
 
     /**
-     * Performs the mouse scrolled operation.
-     * @param mouseX the mouse x value
-     * @param mouseY the mouse y value
-     * @param scrollX the scroll x value
-     * @param scrollY the scroll y value
-     * @return the mouse scrolled result
+     * Handles mouse scrolled and applies its effect to the current interaction state.
+     * @param mouseX the {@code float} supplied as {@code mouseX}
+     * @param mouseY the {@code float} supplied as {@code mouseY}
+     * @param scrollX the {@code float} supplied as {@code scrollX}
+     * @param scrollY the {@code float} supplied as {@code scrollY}
+     * @return {@code boolean}; the mouse scrolled result
      */
     public boolean mouseScrolled(float mouseX, float mouseY, float scrollX, float scrollY) {
         if (!visible || !enabled || !interactable) {
@@ -1434,11 +1434,11 @@ public abstract class UIElement {
     }
 
     /**
-     * Performs the key pressed operation.
-     * @param key the key value
-     * @param scancode the scancode value
-     * @param modifiers the modifiers value
-     * @return the key pressed result
+     * Handles key pressed and applies its effect to the current interaction state.
+     * @param key the {@code int} supplied as {@code key}
+     * @param scancode the {@code int} supplied as {@code scancode}
+     * @param modifiers the {@code int} supplied as {@code modifiers}
+     * @return {@code boolean}; the key pressed result
      */
     public boolean keyPressed(int key, int scancode, int modifiers) {
         if (!visible || !enabled) {
@@ -1458,11 +1458,11 @@ public abstract class UIElement {
     }
 
     /**
-     * Performs the key released operation.
-     * @param key the key value
-     * @param scancode the scancode value
-     * @param modifiers the modifiers value
-     * @return the key released result
+     * Handles key released and applies its effect to the current interaction state.
+     * @param key the {@code int} supplied as {@code key}
+     * @param scancode the {@code int} supplied as {@code scancode}
+     * @param modifiers the {@code int} supplied as {@code modifiers}
+     * @return {@code boolean}; the key released result
      */
     public boolean keyReleased(int key, int scancode, int modifiers) {
         if (!visible || !enabled) {
@@ -1482,9 +1482,9 @@ public abstract class UIElement {
     }
 
     /**
-     * Performs the char typed operation.
-     * @param codepoint the codepoint value
-     * @return the char typed result
+     * Handles char typed and applies its effect to the current interaction state.
+     * @param codepoint the {@code int} supplied as {@code codepoint}
+     * @return {@code boolean}; the char typed result
      */
     public boolean charTyped(int codepoint) {
         if (!visible || !enabled) {
@@ -1504,56 +1504,56 @@ public abstract class UIElement {
     }
 
     /**
-     * Performs the on click operation.
-     * @param listener the listener value
+     * Handles click and updates the affected state.
+     * @param listener the {@link Consumer} supplied as {@code listener}
      */
     public void onClick(Consumer<UIElement> listener) {
         this.clickListener = listener;
     }
 
     /**
-     * Performs the on mouse enter operation.
-     * @param listener the listener value
+     * Handles mouse enter and updates the affected state.
+     * @param listener the {@link Consumer} supplied as {@code listener}
      */
     public void onMouseEnter(Consumer<UIElement> listener) {
         this.mouseEnterListener = listener;
     }
 
     /**
-     * Performs the on mouse exit operation.
-     * @param listener the listener value
+     * Handles mouse exit and updates the affected state.
+     * @param listener the {@link Consumer} supplied as {@code listener}
      */
     public void onMouseExit(Consumer<UIElement> listener) {
         this.mouseExitListener = listener;
     }
 
     /**
-     * Performs the on mouse press operation.
-     * @param listener the listener value
+     * Handles mouse press and updates the affected state.
+     * @param listener the {@link Consumer} supplied as {@code listener}
      */
     public void onMousePress(Consumer<UIElement> listener) {
         this.mousePressListener = listener;
     }
 
     /**
-     * Performs the on mouse release operation.
-     * @param listener the listener value
+     * Handles mouse release and updates the affected state.
+     * @param listener the {@link Consumer} supplied as {@code listener}
      */
     public void onMouseRelease(Consumer<UIElement> listener) {
         this.mouseReleaseListener = listener;
     }
 
     /**
-     * Performs the on focus operation.
-     * @param listener the listener value
+     * Handles focus and updates the affected state.
+     * @param listener the {@link Consumer} supplied as {@code listener}
      */
     public void onFocus(Consumer<UIElement> listener) {
         this.focusListener = listener;
     }
 
     /**
-     * Performs the on blur operation.
-     * @param listener the listener value
+     * Handles blur and updates the affected state.
+     * @param listener the {@link Consumer} supplied as {@code listener}
      */
     public void onBlur(Consumer<UIElement> listener) {
         this.blurListener = listener;
@@ -1561,7 +1561,7 @@ public abstract class UIElement {
 
     /**
      * Returns the sorted children.
-     * @return the sorted children
+     * @return the {@link List} representing the sorted children
      */
     public List<UIElement> getSortedChildren() {
         List<UIElement> sorted = new ArrayList<>(children);
@@ -1571,7 +1571,7 @@ public abstract class UIElement {
 
     /**
      * Returns the world opacity.
-     * @return the world opacity
+     * @return {@code float}; the world opacity
      */
     public float getWorldOpacity() {
         if (parent == null) {
@@ -1606,7 +1606,7 @@ public abstract class UIElement {
     }
 
     /**
-     * Performs the dispose operation.
+     * Releases the resources associated with this object.
      */
     public void dispose() {
         for (UIElement child : children) {
@@ -1618,8 +1618,9 @@ public abstract class UIElement {
     }
 
     /**
-     * Performs the to string operation.
-     * @return the to string result
+     * {@inheritDoc}
+     * Produces the textual or converted representation for to string.
+     * @return the {@link String} representing the to string result
      */
     @Override
     public String toString() {

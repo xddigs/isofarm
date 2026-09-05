@@ -31,14 +31,14 @@ public enum SoundGroup {
     /**
      * Creates a new {@code SoundGroup} instance.
      *
-     * @param stepSounds       the step sounds value
-     * @param breakSounds      the break sounds value
-     * @param breakingSounds   the breaking sounds value
-     * @param placeSounds      the place sounds value
-     * @param entitySounds     the entity sounds value
-     * @param backgroundSounds the background sounds value
-     * @param loopingSounds    the looping sounds value
-     * @param useSounds        the use sounds value
+     * @param stepSounds an array of {@link String} values supplied as {@code stepSounds}
+     * @param breakSounds an array of {@link String} values supplied as {@code breakSounds}
+     * @param breakingSounds an array of {@link String} values supplied as {@code breakingSounds}
+     * @param placeSounds an array of {@link String} values supplied as {@code placeSounds}
+     * @param entitySounds an array of {@link String} values supplied as {@code entitySounds}
+     * @param backgroundSounds an array of {@link String} values supplied as {@code backgroundSounds}
+     * @param loopingSounds an array of {@link String} values supplied as {@code loopingSounds}
+     * @param useSounds an array of {@link String} values supplied as {@code useSounds}
      */
     SoundGroup(String[] stepSounds, String[] breakSounds, String[] breakingSounds, String[] placeSounds,
                String[] entitySounds, String[] backgroundSounds, String[] loopingSounds, String[] useSounds) {
@@ -55,7 +55,7 @@ public enum SoundGroup {
     /**
      * Returns the step sounds.
      *
-     * @return the step sounds
+     * @return an array of {@link String} values; the step sounds
      */
     public String[] getStepSounds() {
         return stepSounds;
@@ -64,7 +64,7 @@ public enum SoundGroup {
     /**
      * Returns the break sounds.
      *
-     * @return the break sounds
+     * @return an array of {@link String} values; the break sounds
      */
     public String[] getBreakSounds() {
         return breakSounds;
@@ -72,7 +72,7 @@ public enum SoundGroup {
 
     /**
      * Returns the breaking sounds.
-     * @return the breaking sounds
+     * @return an array of {@link String} values; the breaking sounds
      */
     public String[] getBreakingSounds() {
         return breakingSounds;
@@ -81,7 +81,7 @@ public enum SoundGroup {
     /**
      * Returns the place sounds.
      *
-     * @return the place sounds
+     * @return an array of {@link String} values; the place sounds
      */
     public String[] getPlaceSounds() {
         return placeSounds;
@@ -90,7 +90,7 @@ public enum SoundGroup {
     /**
      * Returns the entity sounds.
      *
-     * @return the entity sounds
+     * @return an array of {@link String} values; the entity sounds
      */
     public String[] getEntitySounds() {
         return entitySounds;
@@ -99,7 +99,7 @@ public enum SoundGroup {
     /**
      * Returns the background sounds.
      *
-     * @return the background sounds
+     * @return an array of {@link String} values; the background sounds
      */
     public String[] getBackgroundSounds() {
         return backgroundSounds;
@@ -108,7 +108,7 @@ public enum SoundGroup {
     /**
      * Returns the looping sounds.
      *
-     * @return the looping sounds
+     * @return an array of {@link String} values; the looping sounds
      */
     public String[] getLoopingSounds() {
         return loopingSounds;
@@ -117,7 +117,7 @@ public enum SoundGroup {
     /**
      * Returns the use sounds.
      *
-     * @return the use sounds
+     * @return an array of {@link String} values; the use sounds
      */
     public String[] getUseSounds() {
         return useSounds;

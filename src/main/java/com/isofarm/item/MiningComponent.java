@@ -6,7 +6,7 @@ import com.isofarm.data.Tier;
 import com.isofarm.utils.Local;
 
 /**
- * Provides mining component behavior.
+ * Encapsulates the state and operations required by mining component within the game runtime.
  */
 @DataClass
 public class MiningComponent extends Material implements Craftable {
@@ -15,8 +15,8 @@ public class MiningComponent extends Material implements Craftable {
 
     /**
      * Creates a new {@code MiningComponent} instance.
-     * @param tier the tier value
-     * @param materialID the material id value
+     * @param tier the {@link Tier} supplied as {@code tier}
+     * @param materialID the {@link MaterialID} supplied as {@code materialID}
      */
     public MiningComponent(Tier tier, MaterialID materialID) {
         super(tier, materialID);
@@ -25,8 +25,9 @@ public class MiningComponent extends Material implements Craftable {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the id.
-     * @return the id
+     * @return {@code byte}; the id
      */
     @Override
     public byte getId() {
@@ -34,8 +35,9 @@ public class MiningComponent extends Material implements Craftable {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the display name.
-     * @return the display name
+     * @return the {@link String} representing the display name
      */
     @Override
     public String getDisplayName() {
@@ -44,8 +46,9 @@ public class MiningComponent extends Material implements Craftable {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the value.
-     * @return the value
+     * @return {@code int}; the value
      */
     @Override
     public int getValue() {
@@ -53,8 +56,9 @@ public class MiningComponent extends Material implements Craftable {
     }
 
     /**
-     * Performs the copy operation.
-     * @return the copy result
+     * {@inheritDoc}
+     * Creates an independent copy that preserves the relevant state of this object.
+     * @return the {@link Item} representing the copy result
      */
     @Override
     public Item copy() {

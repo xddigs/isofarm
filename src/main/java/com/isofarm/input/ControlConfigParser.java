@@ -18,7 +18,9 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-/** Loads logical control bindings and converts GLFW constant names to integer codes. */
+/**
+ * Loads logical control bindings and converts GLFW constant names to integer codes.
+ */
 @Singleton
 public final class ControlConfigParser {
     private static final Logger log = LoggerFactory.getLogger(ControlConfigParser.class);
@@ -32,37 +34,57 @@ public final class ControlConfigParser {
         bindings = loadBindings();
     }
 
-    /** Reloads all bindings from the classpath resource. */
+    /**
+     * Reloads all bindings from the classpath resource.
+     */
     public synchronized void reload() {
         bindings = loadBindings();
     }
 
-    /** @return all keyboard codes assigned to the action */
+    /**
+     * Returns keyboard codes according to the current object state.
+     * @return an array of {@code int} values; all keyboard codes assigned to the action
+     */
     public int[] getKeyboardCodes(ControlAction action) {
         return copy(bindings.keyboard().get(action.id()));
     }
 
-    /** @return all mouse button codes assigned to the action */
+    /**
+     * Returns mouse codes according to the current object state.
+     * @return an array of {@code int} values; all mouse button codes assigned to the action
+     */
     public int[] getMouseCodes(ControlAction action) {
         return copy(bindings.mouse().get(action.id()));
     }
 
-    /** @return all gamepad button codes assigned to the action */
+    /**
+     * Returns joystick button codes according to the current object state.
+     * @return an array of {@code int} values; all gamepad button codes assigned to the action
+     */
     public int[] getJoystickButtonCodes(ControlAction action) {
         return copy(bindings.joystickButtons().get(action.id()));
     }
 
-    /** @return gamepad axis assigned to the action, or {@code -1} when unbound */
+    /**
+     * Returns joystick axis according to the current object state.
+     * @return gamepad axis assigned to the action, or {@code -1} when unbound
+     */
     public int getJoystickAxis(ControlAction action) {
         return bindings.joystickAxes().getOrDefault(action.id(), -1);
     }
 
-    /** @return configured joystick, or {@code -1} to select the first available gamepad */
+    /**
+     * Returns preferred joystick according to the current object state.
+     * @return configured joystick, or {@code -1} to select the first available gamepad
+     */
     public int getPreferredJoystick() {
         return bindings.preferredJoystick();
     }
 
-    /** @return configured gamepad axis dead zone */
+    /**
+     * Returns joystick dead zone according to the current object state.
+     * @return {@code float}; configured gamepad axis dead zone
+     */
     public float getJoystickDeadZone() {
         return bindings.joystickDeadZone();
     }

@@ -17,9 +17,9 @@ public enum Difficulty {
 
     /**
      * Creates a new {@code Difficulty} instance.
-     * @param id the id value
-     * @param name the name value
-     * @param multiplier the multiplier value
+     * @param id the {@code byte} supplied as {@code id}
+     * @param name the {@link String} supplied as {@code name}
+     * @param multiplier the {@code float} supplied as {@code multiplier}
      */
     Difficulty(byte id, String name, float multiplier) {
         this.id = id;
@@ -29,7 +29,7 @@ public enum Difficulty {
 
     /**
      * Returns the id.
-     * @return the id
+     * @return {@code byte}; the id
      */
     public byte getId() {
         return id;
@@ -37,7 +37,7 @@ public enum Difficulty {
 
     /**
      * Returns the name.
-     * @return the name
+     * @return the {@link String} representing the name
      */
     public String getName() {
         return Local.lang.t(name);
@@ -45,16 +45,16 @@ public enum Difficulty {
 
     /**
      * Returns the multiplier.
-     * @return the multiplier
+     * @return {@code float}; the multiplier
      */
     public float getMultiplier() {
         return multiplier;
     }
 
     /**
-     * Performs the from id operation.
-     * @param id the id value
-     * @return the from id result
+     * Creates or returns from id from the supplied arguments.
+     * @param id the {@code byte} supplied as {@code id}
+     * @return the {@link Difficulty} representing the from id result
      */
     public static Difficulty fromId(byte id) {
         for (Difficulty difficulty : values()) {

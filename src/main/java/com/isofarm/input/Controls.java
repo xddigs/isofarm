@@ -1,6 +1,8 @@
 package com.isofarm.input;
 
-/** Queries a logical action across keyboard, mouse and the active gamepad. */
+/**
+ * Queries a logical action across keyboard, mouse and the active gamepad.
+ */
 public final class Controls {
     private Controls() {}
 

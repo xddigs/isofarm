@@ -9,7 +9,7 @@ import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
 
 /**
- * Provides falling state behavior.
+ * Encapsulates the state and operations required by falling state within the game runtime.
  */
 public class FallingState implements PlayerState {
     private final Player player = Player.plyr;
@@ -26,7 +26,8 @@ public class FallingState implements PlayerState {
     private int voidDamageTicks;
 
     /**
-     * Performs the enter operation.
+     * {@inheritDoc}
+     * Activates this object and prepares any state it requires.
      */
     @Override
     public void enter() {
@@ -40,8 +41,9 @@ public class FallingState implements PlayerState {
     }
 
     /**
-     * Performs the input operation.
-     * @param gameMaster the game master value
+     * {@inheritDoc}
+     * Handles input and applies its effect to the current interaction state.
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
      */
     @Override
     public void input(GameMaster gameMaster) {
@@ -51,8 +53,9 @@ public class FallingState implements PlayerState {
     }
 
     /**
+     * {@inheritDoc}
      * Updates the current state.
-     * @param delta the delta value
+     * @param delta the {@code float} supplied as {@code delta}
      */
     @Override
     public void update(float delta) {
@@ -88,7 +91,7 @@ public class FallingState implements PlayerState {
      * Applies increasingly severe damage after falling continuously into the
      * void for ten seconds.
      *
-     * @param delta frame time in seconds
+     * @param delta the {@code float} argument; frame time in seconds
      */
     private void applyVoidDamage(float delta) {
         if (fallTime < VOID_DAMAGE_DELAY) return;
@@ -110,7 +113,8 @@ public class FallingState implements PlayerState {
     }
 
     /**
-     * Performs the exit operation.
+     * {@inheritDoc}
+     * Deactivates this object and releases its transient state.
      */
     @Override
     public void exit() {

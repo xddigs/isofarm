@@ -7,14 +7,15 @@ import com.isofarm.input.Controls;
 import com.isofarm.wrld.GameMaster;
 
 /**
- * Provides sneaking state behavior.
+ * Encapsulates the state and operations required by sneaking state within the game runtime.
  */
 public class SneakingState implements PlayerState {
     private final Player player = Player.plyr;
     private static final float SNEAK_EYE_HEIGHT = 1.2f;
 
     /**
-     * Performs the enter operation.
+     * {@inheritDoc}
+     * Activates this object and prepares any state it requires.
      */
     @Override
     public void enter() {
@@ -23,8 +24,9 @@ public class SneakingState implements PlayerState {
     }
 
     /**
-     * Performs the input operation.
-     * @param gameMaster the game master value
+     * {@inheritDoc}
+     * Handles input and applies its effect to the current interaction state.
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
      */
     @Override
     public void input(GameMaster gameMaster) {
@@ -44,8 +46,9 @@ public class SneakingState implements PlayerState {
     }
 
     /**
+     * {@inheritDoc}
      * Updates the current state.
-     * @param delta the delta value
+     * @param delta the {@code float} supplied as {@code delta}
      */
     @Override
     public void update(float delta) {
@@ -59,7 +62,8 @@ public class SneakingState implements PlayerState {
     }
 
     /**
-     * Performs the exit operation.
+     * {@inheritDoc}
+     * Deactivates this object and releases its transient state.
      */
     @Override
     public void exit() {

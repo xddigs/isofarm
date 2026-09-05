@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Provides world item behavior.
+ * Encapsulates the state and operations required by world item within the game runtime.
  */
 @SuppressWarnings("unused")
 @DataClass
@@ -41,9 +41,9 @@ public class WorldItem extends Entity {
 
     /**
      * Creates a new {@code WorldItem} instance.
-     * @param item the item value
-     * @param amount the amount value
-     * @param position the position value
+     * @param item the {@link Item} supplied as {@code item}
+     * @param amount the {@code int} supplied as {@code amount}
+     * @param position the {@link Vector3f} supplied as {@code position}
      */
     public WorldItem(Item item, int amount, Vector3f position) {
         super(item.getName());
@@ -61,9 +61,10 @@ public class WorldItem extends Entity {
     }
 
     /**
+     * {@inheritDoc}
      * Updates the current state.
-     * @param blockPos the block pos value
-     * @param delta the delta value
+     * @param blockPos the {@link BlockPos} supplied as {@code blockPos}
+     * @param delta the {@code float} supplied as {@code delta}
      */
     @Override
     public void update(BlockPos blockPos, float delta) {
@@ -105,7 +106,7 @@ public class WorldItem extends Entity {
 
     /**
      * Finds and returns the ground y.
-     * @return the located ground y
+     * @return {@code float}; the located ground y
      */
     private float findGroundY() {
         int currentX = (int) Math.floor(position.x);
@@ -120,9 +121,10 @@ public class WorldItem extends Entity {
     }
 
     /**
-     * Renders render.
-     * @param gameMaster the game master value
-     * @param pass the pass value
+     * {@inheritDoc}
+     * Renders this object in the requested render pass.
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
+     * @param pass the {@link RenderPass} supplied as {@code pass}
      */
     @Override
     public void render(GameMaster gameMaster, RenderPass pass) {
@@ -134,7 +136,7 @@ public class WorldItem extends Entity {
 
     /**
      * Returns the item.
-     * @return the item
+     * @return the {@link Item} representing the item
      */
     public Item getItem() {
         return item;
@@ -142,7 +144,7 @@ public class WorldItem extends Entity {
 
     /**
      * Returns the amount.
-     * @return the amount
+     * @return {@code int}; the amount
      */
     public int getAmount() {
         return amount;
@@ -150,7 +152,7 @@ public class WorldItem extends Entity {
 
     /**
      * Sets the amount.
-     * @param amount the amount value
+     * @param amount the {@code int} supplied as {@code amount}
      */
     public void setAmount(int amount) {
         this.amount = Math.max(0, amount);
@@ -158,9 +160,9 @@ public class WorldItem extends Entity {
 
     /**
      * Adds the velocity.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param z the {@code float} supplied as {@code z}
      */
     public void addVelocity(float x, float y, float z) {
         this.velocity.add(x, y, z);
@@ -168,7 +170,7 @@ public class WorldItem extends Entity {
 
     /**
      * Returns the world.
-     * @return the world
+     * @return the {@link World} representing the world
      */
     public World getWorld() {
         return world;
@@ -176,7 +178,7 @@ public class WorldItem extends Entity {
 
     /**
      * Sets the world.
-     * @param world the world value
+     * @param world the {@link World} supplied as {@code world}
      */
     public void setWorld(World world) {
         this.world = world;
@@ -192,7 +194,7 @@ public class WorldItem extends Entity {
 
     /**
      * Returns the rotation.
-     * @return the rotation
+     * @return {@code float}; the rotation
      */
     public float getRotation() {
         return rotation;
@@ -200,7 +202,7 @@ public class WorldItem extends Entity {
 
     /**
      * Sets the rotation.
-     * @param rotation the rotation value
+     * @param rotation the {@code float} supplied as {@code rotation}
      */
     public void setRotation(float rotation) {
         this.rotation = rotation;
@@ -208,7 +210,7 @@ public class WorldItem extends Entity {
 
     /**
      * Returns the bob time.
-     * @return the bob time
+     * @return {@code float}; the bob time
      */
     public float getBobTime() {
         return bobTime;
@@ -216,7 +218,7 @@ public class WorldItem extends Entity {
 
     /**
      * Sets the bob time.
-     * @param bobTime the bob time value
+     * @param bobTime the {@code float} supplied as {@code bobTime}
      */
     public void setBobTime(float bobTime) {
         this.bobTime = bobTime;
@@ -232,7 +234,7 @@ public class WorldItem extends Entity {
 
     /**
      * Sets the attracting.
-     * @param attracting the attracting value
+     * @param attracting the {@code boolean} supplied as {@code attracting}
      */
     public void setAttracting(boolean attracting) {
         this.isAttracting = attracting;

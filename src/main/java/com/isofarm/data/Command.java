@@ -3,7 +3,7 @@ package com.isofarm.data;
 import java.util.function.Consumer;
 
 /**
- * Stores command data.
+ * Immutable value object containing command.
  */
 @DataClass
 public record Command(

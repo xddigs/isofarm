@@ -4,7 +4,7 @@ import com.isofarm.data.BlockData;
 import com.isofarm.data.DataClass;
 
 /**
- * Provides chunk behavior.
+ * Encapsulates the state and operations required by chunk within the game runtime.
  */
 @DataClass
 public class Chunk {
@@ -22,8 +22,8 @@ public class Chunk {
 
     /**
      * Creates a new {@code Chunk} instance.
-     * @param chunkX the chunk x value
-     * @param chunkZ the chunk z value
+     * @param chunkX the {@code int} supplied as {@code chunkX}
+     * @param chunkZ the {@code int} supplied as {@code chunkZ}
      */
     public Chunk(int chunkX, int chunkZ) {
         this.chunkX = chunkX;
@@ -37,10 +37,10 @@ public class Chunk {
 
     /**
      * Returns the block.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
-     * @return the block
+     * @param x the {@code int} supplied as {@code x}
+     * @param y the {@code int} supplied as {@code y}
+     * @param z the {@code int} supplied as {@code z}
+     * @return {@code byte}; the block
      */
     public byte getBlock(int x, int y, int z) {
         if (!isOutOfBounds(x, y, z)) {
@@ -52,10 +52,10 @@ public class Chunk {
 
     /**
      * Sets the block.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
-     * @param blockId the block id value
+     * @param x the {@code int} supplied as {@code x}
+     * @param y the {@code int} supplied as {@code y}
+     * @param z the {@code int} supplied as {@code z}
+     * @param blockId the {@code byte} supplied as {@code blockId}
      */
     public void setBlock(int x, int y, int z, byte blockId) {
         if (isOutOfBounds(x, y, z)) {
@@ -74,7 +74,7 @@ public class Chunk {
 
     /**
      * Checks whether the plant condition is met.
-     * @param blockId the block id value
+     * @param blockId the {@code byte} supplied as {@code blockId}
      * @return {@code true} if plant; otherwise {@code false}
      */
     private boolean isPlant(byte blockId) {
@@ -84,10 +84,10 @@ public class Chunk {
 
     /**
      * Returns the water level.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
-     * @return the water level
+     * @param x the {@code int} supplied as {@code x}
+     * @param y the {@code int} supplied as {@code y}
+     * @param z the {@code int} supplied as {@code z}
+     * @return {@code byte}; the water level
      */
     public byte getWaterLevel(int x, int y, int z) {
         if (!isOutOfBounds(x, y, z)) {
@@ -99,10 +99,10 @@ public class Chunk {
 
     /**
      * Returns the fluid level stored at a local chunk position.
-     * @param x the local x value
-     * @param y the local y value
-     * @param z the local z value
-     * @return the stored fluid level
+     * @param x the {@code int} argument; the local x value
+     * @param y the {@code int} argument; the local y value
+     * @param z the {@code int} argument; the local z value
+     * @return {@code byte}; the stored fluid level
      */
     public byte getFluidLevel(int x, int y, int z) {
         return getWaterLevel(x, y, z);
@@ -110,10 +110,10 @@ public class Chunk {
 
     /**
      * Sets the water level.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
-     * @param waterLevel the water level value
+     * @param x the {@code int} supplied as {@code x}
+     * @param y the {@code int} supplied as {@code y}
+     * @param z the {@code int} supplied as {@code z}
+     * @param waterLevel the {@code byte} supplied as {@code waterLevel}
      */
     public void setWaterLevel(int x, int y, int z, byte waterLevel) {
         if (!isOutOfBounds(x, y, z)) {
@@ -123,10 +123,10 @@ public class Chunk {
 
     /**
      * Sets the fluid level at a local chunk position.
-     * @param x the local x value
-     * @param y the local y value
-     * @param z the local z value
-     * @param fluidLevel the fluid level value
+     * @param x the {@code int} argument; the local x value
+     * @param y the {@code int} argument; the local y value
+     * @param z the {@code int} argument; the local z value
+     * @param fluidLevel the {@code byte} supplied as {@code fluidLevel}
      */
     public void setFluidLevel(int x, int y, int z, byte fluidLevel) {
         setWaterLevel(x, y, z, fluidLevel);
@@ -134,7 +134,7 @@ public class Chunk {
 
     /**
      * Returns the blocks.
-     * @return the blocks
+     * @return an array of {@code byte} values; the blocks
      */
     public byte[] getBlocks() {
         return blocks;
@@ -142,7 +142,7 @@ public class Chunk {
 
     /**
      * Returns the water levels.
-     * @return the water levels
+     * @return an array of {@code byte} values; the water levels
      */
     public byte[] getWaterLevels() {
         return waterLevels;
@@ -150,7 +150,7 @@ public class Chunk {
 
     /**
      * Returns the chunk x.
-     * @return the chunk x
+     * @return {@code int}; the chunk x
      */
     public int getChunkX() {
         return chunkX;
@@ -158,7 +158,7 @@ public class Chunk {
 
     /**
      * Returns the chunk z.
-     * @return the chunk z
+     * @return {@code int}; the chunk z
      */
     public int getChunkZ() {
         return chunkZ;
@@ -166,7 +166,7 @@ public class Chunk {
 
     /**
      * Returns the plant indices.
-     * @return the plant indices
+     * @return an array of {@code int} values; the plant indices
      */
     public int[] getPlantIndices() {
         if (!plantCacheDirty && plantIndices != null) {
@@ -204,27 +204,27 @@ public class Chunk {
     }
 
     /**
-     * Performs the index to x operation.
-     * @param index the index value
-     * @return the index to x result
+     * Calculates the value represented by index to x from the current state.
+     * @param index the {@code int} supplied as {@code index}
+     * @return {@code int}; the index to x result
      */
     public static int indexToX(int index) {
         return index % SIZE_X;
     }
 
     /**
-     * Performs the index to z operation.
-     * @param index the index value
-     * @return the index to z result
+     * Calculates the value represented by index to z from the current state.
+     * @param index the {@code int} supplied as {@code index}
+     * @return {@code int}; the index to z result
      */
     public static int indexToZ(int index) {
         return (index / SIZE_X) % SIZE_Z;
     }
 
     /**
-     * Performs the index to y operation.
-     * @param index the index value
-     * @return the index to y result
+     * Calculates the value represented by index to y from the current state.
+     * @param index the {@code int} supplied as {@code index}
+     * @return {@code int}; the index to y result
      */
     public static int indexToY(int index) {
         return index / (SIZE_X * SIZE_Z);
@@ -232,10 +232,10 @@ public class Chunk {
 
     /**
      * Returns the index.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
-     * @return the index
+     * @param x the {@code int} supplied as {@code x}
+     * @param y the {@code int} supplied as {@code y}
+     * @param z the {@code int} supplied as {@code z}
+     * @return {@code int}; the index
      */
     private int getIndex(int x, int y, int z) {
         return x + SIZE_X * (z + SIZE_Z * y);
@@ -243,9 +243,9 @@ public class Chunk {
 
     /**
      * Checks whether the out of bounds condition is met.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
+     * @param x the {@code int} supplied as {@code x}
+     * @param y the {@code int} supplied as {@code y}
+     * @param z the {@code int} supplied as {@code z}
      * @return {@code true} if out of bounds; otherwise {@code false}
      */
     private boolean isOutOfBounds(int x, int y, int z) {

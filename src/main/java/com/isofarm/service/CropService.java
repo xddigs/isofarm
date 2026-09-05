@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Provides crop service behavior.
+ * Encapsulates the state and operations required by crop service within the game runtime.
  */
 @Singleton
 public class CropService implements Service<Crop> {
@@ -28,13 +28,13 @@ public class CropService implements Service<Crop> {
     private CropService() {}
 
     /**
-     * Performs the plant operation.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
-     * @param type the type value
-     * @param currentSeason the current season value
-     * @return the plant result
+     * Applies the world or inventory action represented by plant.
+     * @param x the {@code int} supplied as {@code x}
+     * @param y the {@code int} supplied as {@code y}
+     * @param z the {@code int} supplied as {@code z}
+     * @param type the {@link CropType} supplied as {@code type}
+     * @param currentSeason the {@link Season} supplied as {@code currentSeason}
+     * @return the {@link Crop} representing the plant result
      */
     public Crop plant(int x, int y, int z, CropType type,
                       Season currentSeason) {
@@ -98,7 +98,9 @@ public class CropService implements Service<Crop> {
         return hasAdjacentWater(world, x, baseY, z);
     }
 
-    /** Returns the terrain level beneath a potentially stacked crop column. */
+    /**
+     * Returns the terrain level beneath a potentially stacked crop column.
+     */
     private int findColumnBase(World world, int x, int y, int z,
                                CropType type) {
         int baseY = y;
@@ -110,7 +112,9 @@ public class CropService implements Service<Crop> {
         return baseY;
     }
 
-    /** Checks the four horizontal cells beside the sugar-cane substrate. */
+    /**
+     * Checks the four horizontal cells beside the sugar-cane substrate.
+     */
     private boolean hasAdjacentWater(World world, int x, int y, int z) {
         int[][] offsets = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
         for (int[] offset : offsets) {
@@ -126,8 +130,8 @@ public class CropService implements Service<Crop> {
 
     /**
      * Updates the current state.
-     * @param delta the delta value
-     * @param weather the weather value
+     * @param delta the {@code float} supplied as {@code delta}
+     * @param weather the {@link WeatherType} supplied as {@code weather}
      */
     public void update(float delta, WeatherType weather) {
         List<Crop> crops = new ArrayList<>();
@@ -140,9 +144,9 @@ public class CropService implements Service<Crop> {
     }
 
     /**
-     * Performs the harvest operation.
-     * @param crop the crop value
-     * @return the harvest result
+     * Applies the world or inventory action represented by harvest.
+     * @param crop the {@link Crop} supplied as {@code crop}
+     * @return {@code int}; the harvest result
      */
     @SuppressWarnings("UnusedReturnValue")
     public int harvest(Crop crop) {
@@ -181,8 +185,8 @@ public class CropService implements Service<Crop> {
     }
 
     /**
-     * Performs the rip operation.
-     * @param crop the crop value
+     * Updates or derives runtime state for rip according to the supplied arguments.
+     * @param crop the {@link Crop} supplied as {@code crop}
      */
     public void rip(Crop crop) {
         World.wrld.removeCrop(crop);

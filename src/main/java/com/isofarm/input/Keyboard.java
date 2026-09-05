@@ -3,7 +3,7 @@ package com.isofarm.input;
 import static org.lwjgl.glfw.GLFW.*;
 
 /**
- * Provides keyboard behavior.
+ * Encapsulates the state and operations required by keyboard within the game runtime.
  */
 public final class Keyboard {
     public static final int KEY_UNKNOWN = GLFW_KEY_UNKNOWN;
@@ -142,7 +142,7 @@ public final class Keyboard {
 
     /**
      * Initializes the component.
-     * @param windowId the window id value
+     * @param windowId the {@code long} supplied as {@code windowId}
      */
     public static void init(long windowId) {
         glfwSetKeyCallback(windowId, (window, key, scancode, action, mods) -> {
@@ -166,14 +166,16 @@ public final class Keyboard {
 
     /**
      * Checks whether the key pressed condition is met.
-     * @param keyCode the key code value
+     * @param keyCode the {@code int} supplied as {@code keyCode}
      * @return {@code true} if key pressed; otherwise {@code false}
      */
     public static boolean isKeyPressed(int keyCode) {
         return keyCode >= 0 && keyCode <= KEY_LAST && keys[keyCode] && !lastKeys[keyCode];
     }
 
-    /** Checks whether any keyboard binding for the logical action was pressed. */
+    /**
+     * Checks whether any keyboard binding for the logical action was pressed.
+     */
     public static boolean isKeyPressed(ControlAction action) {
         for (int keyCode : ControlConfigParser.controls.getKeyboardCodes(action)) {
             if (isKeyPressed(keyCode)) return true;
@@ -183,14 +185,16 @@ public final class Keyboard {
 
     /**
      * Checks whether the key down condition is met.
-     * @param keyCode the key code value
+     * @param keyCode the {@code int} supplied as {@code keyCode}
      * @return {@code true} if key down; otherwise {@code false}
      */
     public static boolean isKeyDown(int keyCode) {
         return keyCode >= 0 && keyCode <= KEY_LAST && keys[keyCode];
     }
 
-    /** Checks whether any keyboard binding for the logical action is down. */
+    /**
+     * Checks whether any keyboard binding for the logical action is down.
+     */
     public static boolean isKeyDown(ControlAction action) {
         for (int keyCode : ControlConfigParser.controls.getKeyboardCodes(action)) {
             if (isKeyDown(keyCode)) return true;
@@ -200,14 +204,16 @@ public final class Keyboard {
 
     /**
      * Checks whether the key released condition is met.
-     * @param keyCode the key code value
+     * @param keyCode the {@code int} supplied as {@code keyCode}
      * @return {@code true} if key released; otherwise {@code false}
      */
     public static boolean isKeyReleased(int keyCode) {
         return keyCode >= 0 && keyCode <= KEY_LAST && !keys[keyCode] && lastKeys[keyCode];
     }
 
-    /** Checks whether any keyboard binding for the logical action was released. */
+    /**
+     * Checks whether any keyboard binding for the logical action was released.
+     */
     public static boolean isKeyReleased(ControlAction action) {
         for (int keyCode : ControlConfigParser.controls.getKeyboardCodes(action)) {
             if (isKeyReleased(keyCode)) return true;
@@ -216,8 +222,8 @@ public final class Keyboard {
     }
 
     /**
-     * Performs the any key pressed operation.
-     * @return the any key pressed result
+     * Updates or derives runtime state for any key pressed according to the supplied arguments.
+     * @return {@code boolean}; the any key pressed result
      */
     public static boolean anyKeyPressed() {
         for (boolean key : keys) {
@@ -231,7 +237,7 @@ public final class Keyboard {
 
     /**
      * Returns the typed characters.
-     * @return the typed characters
+     * @return the {@link String} representing the typed characters
      */
     public static String getTypedCharacters() {
         String text = typedCharacters.toString();
@@ -241,7 +247,7 @@ public final class Keyboard {
 
     /**
      * Returns the modifiers.
-     * @return the modifiers
+     * @return {@code int}; the modifiers
      */
     public static int getModifiers() {
         return modifiers;

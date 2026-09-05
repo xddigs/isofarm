@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 /**
- * Provides world behavior.
+ * Encapsulates the state and operations required by world within the game runtime.
  */
 @Singleton
 public class World {
@@ -29,9 +29,9 @@ public class World {
 
     /**
      * Returns get2 dkey.
-     * @param x the x value
-     * @param z the z value
-     * @return the get2 dkey result
+     * @param x the {@code int} supplied as {@code x}
+     * @param z the {@code int} supplied as {@code z}
+     * @return {@code long}; the get2 dkey result
      */
     public long get2DKey(int x, int z) {
         return (((long) x) << 32) | (z & 0xFFFFFFFFL);
@@ -39,9 +39,9 @@ public class World {
 
     /**
      * Returns the or create chunk.
-     * @param chunkX the chunk x value
-     * @param chunkZ the chunk z value
-     * @return the or create chunk
+     * @param chunkX the {@code int} supplied as {@code chunkX}
+     * @param chunkZ the {@code int} supplied as {@code chunkZ}
+     * @return the {@link Chunk} representing the or create chunk
      */
     public Chunk getOrCreateChunk(int chunkX, int chunkZ) {
         long key = get2DKey(chunkX, chunkZ);
@@ -51,8 +51,8 @@ public class World {
 
     /**
      * Checks whether the chunk loaded at condition is met.
-     * @param x the x value
-     * @param z the z value
+     * @param x the {@code int} supplied as {@code x}
+     * @param z the {@code int} supplied as {@code z}
      * @return {@code true} if chunk loaded at; otherwise {@code false}
      */
     public boolean isChunkLoadedAt(int x, int z) {
@@ -63,7 +63,7 @@ public class World {
 
     /**
      * Returns the chunks.
-     * @return the chunks
+     * @return the {@link Map} representing the chunks
      */
     public Map<Long, Chunk> getChunks() {
         return chunks;
@@ -71,10 +71,10 @@ public class World {
 
     /**
      * Returns the block at.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
-     * @return the block at
+     * @param x the {@code int} supplied as {@code x}
+     * @param y the {@code int} supplied as {@code y}
+     * @param z the {@code int} supplied as {@code z}
+     * @return the {@link Block} representing the block at
      */
     public Block getBlockAt(int x, int y, int z) {
         long key = getBlockKey(x, y, z);
@@ -99,8 +99,8 @@ public class World {
 
     /**
      * Returns the block at.
-     * @param pos the pos value
-     * @return the block at
+     * @param pos the {@link BlockPos} supplied as {@code pos}
+     * @return the {@link Block} representing the block at
      */
     public Block getBlockAt(BlockPos pos) {
         return getBlockAt(pos.x(), pos.y(), pos.z());
@@ -108,7 +108,7 @@ public class World {
 
     /**
      * Adds the block.
-     * @param block the block value
+     * @param block the {@link Block} supplied as {@code block}
      */
     public void addBlock(Block block) {
         if (block == null) return;
@@ -117,7 +117,7 @@ public class World {
 
     /**
      * Removes the block.
-     * @param block the block value
+     * @param block the {@link Block} supplied as {@code block}
      */
     public void removeBlock(Block block) {
         if (block == null) return;
@@ -130,7 +130,7 @@ public class World {
     /**
      * Adds an interactive block to the world.
      *
-     * @param block the interactive block
+     * @param block the {@link iBlock} argument; the interactive block
      */
     public void addInteractiveBlock(iBlock block) {
         if (block == null) return;
@@ -140,10 +140,10 @@ public class World {
     /**
      * Returns the interactive block at a world position.
      *
-     * @param x the x coordinate
-     * @param y the y coordinate
-     * @param z the z coordinate
-     * @return the interactive block, or {@code null} when the position is empty
+     * @param x the {@code int} argument; the x coordinate
+     * @param y the {@code int} argument; the y coordinate
+     * @param z the {@code int} argument; the z coordinate
+     * @return the {@link iBlock} representing the interactive block, or {@code null} when the position is empty
      */
     public iBlock getInteractiveBlockAt(int x, int y, int z) {
         return interactiveBlocks.get(getBlockKey(x, y, z));
@@ -152,10 +152,10 @@ public class World {
     /**
      * Removes and returns the interactive block at a world position.
      *
-     * @param x the x coordinate
-     * @param y the y coordinate
-     * @param z the z coordinate
-     * @return the removed block, or {@code null} when none was present
+     * @param x the {@code int} argument; the x coordinate
+     * @param y the {@code int} argument; the y coordinate
+     * @param z the {@code int} argument; the z coordinate
+     * @return the {@link iBlock} representing the removed block, or {@code null} when none was present
      */
     public iBlock removeInteractiveBlockAt(int x, int y, int z) {
         return interactiveBlocks.remove(getBlockKey(x, y, z));
@@ -164,7 +164,7 @@ public class World {
     /**
      * Visits every placed interactive block.
      *
-     * @param consumer the block consumer
+     * @param consumer the {@link Consumer} argument; the block consumer
      */
     public void forEachInteractiveBlock(Consumer<iBlock> consumer) {
         interactiveBlocks.values().forEach(consumer);
@@ -172,7 +172,7 @@ public class World {
 
     /**
      * Adds the crop.
-     * @param crop the crop value
+     * @param crop the {@link Crop} supplied as {@code crop}
      */
     public void addCrop(Crop crop) {
         addBlock(crop);
@@ -180,7 +180,7 @@ public class World {
 
     /**
      * Removes the crop.
-     * @param crop the crop value
+     * @param crop the {@link Crop} supplied as {@code crop}
      */
     public void removeCrop(Crop crop) {
         removeBlock(crop);
@@ -188,10 +188,10 @@ public class World {
 
     /**
      * Returns the crop at.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
-     * @return the crop at
+     * @param x the {@code int} supplied as {@code x}
+     * @param y the {@code int} supplied as {@code y}
+     * @param z the {@code int} supplied as {@code z}
+     * @return the {@link Crop} representing the crop at
      */
     public Crop getCropAt(int x, int y, int z) {
         Block block = blocks.get(getBlockKey(x, y, z));
@@ -203,15 +203,15 @@ public class World {
 
     /**
      * Returns the blocks.
-     * @return the blocks
+     * @return the {@link Map} representing the blocks
      */
     public Map<Long, Block> getBlocks() {
         return blocks;
     }
 
     /**
-     * Performs the for each operation.
-     * @param consumer the consumer value
+     * Processes each applicable element for for each.
+     * @param consumer the {@link Consumer} supplied as {@code consumer}
      */
     public void forEach(Consumer<Block> consumer) {
         for (Block block : blocks.values()) {
@@ -221,10 +221,10 @@ public class World {
 
     /**
      * Returns the chunk block type at.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
-     * @return the chunk block type at
+     * @param x the {@code int} supplied as {@code x}
+     * @param y the {@code int} supplied as {@code y}
+     * @param z the {@code int} supplied as {@code z}
+     * @return {@code int}; the chunk block type at
      */
     public int getChunkBlockTypeAt(int x, int y, int z) {
         int chunkX = Math.floorDiv(x, Chunk.SIZE_X);
@@ -240,10 +240,10 @@ public class World {
 
     /**
      * Returns the block type at.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
-     * @return the block type at
+     * @param x the {@code int} supplied as {@code x}
+     * @param y the {@code int} supplied as {@code y}
+     * @param z the {@code int} supplied as {@code z}
+     * @return {@code byte}; the block type at
      */
     public byte getBlockTypeAt(int x, int y, int z) {
         if (y < 0 || y >= Chunk.SIZE_Y) return 0;
@@ -260,8 +260,8 @@ public class World {
 
     /**
      * Returns the block type at.
-     * @param pos the pos value
-     * @return the block type at
+     * @param pos the {@link BlockPos} supplied as {@code pos}
+     * @return {@code byte}; the block type at
      */
     public byte getBlockTypeAt(BlockPos pos) {
         return getBlockTypeAt(pos.x(), pos.y(), pos.z());
@@ -269,9 +269,9 @@ public class World {
 
     /**
      * Removes the block at.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
+     * @param x the {@code int} supplied as {@code x}
+     * @param y the {@code int} supplied as {@code y}
+     * @param z the {@code int} supplied as {@code z}
      */
     public void removeBlockAt(int x, int y, int z) {
         blocks.remove(getBlockKey(x, y, z));
@@ -279,10 +279,10 @@ public class World {
 
     /**
      * Sets the block type at.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
-     * @param blockId the block id value
+     * @param x the {@code int} supplied as {@code x}
+     * @param y the {@code int} supplied as {@code y}
+     * @param z the {@code int} supplied as {@code z}
+     * @param blockId the {@code byte} supplied as {@code blockId}
      */
     public void setBlockTypeAt(int x, int y, int z, byte blockId) {
         if (y < 0 || y >= Chunk.SIZE_Y) {
@@ -304,8 +304,8 @@ public class World {
 
     /**
      * Sets the block type at.
-     * @param pos the pos value
-     * @param blockId the block id value
+     * @param pos the {@link BlockPos} supplied as {@code pos}
+     * @param blockId the {@code byte} supplied as {@code blockId}
      */
     public void setBlockTypeAt(BlockPos pos, byte blockId) {
         setBlockTypeAt(pos.x(), pos.y(), pos.z(), blockId);
@@ -313,10 +313,10 @@ public class World {
 
     /**
      * Returns the water level at.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
-     * @return the water level at
+     * @param x the {@code int} supplied as {@code x}
+     * @param y the {@code int} supplied as {@code y}
+     * @param z the {@code int} supplied as {@code z}
+     * @return {@code byte}; the water level at
      */
     public byte getWaterLevelAt(int x, int y, int z) {
         if (y < 0 || y >= Chunk.SIZE_Y) {
@@ -340,8 +340,8 @@ public class World {
 
     /**
      * Returns the water level at.
-     * @param pos the pos value
-     * @return the water level at
+     * @param pos the {@link BlockPos} supplied as {@code pos}
+     * @return {@code byte}; the water level at
      */
     public byte getWaterLevelAt(BlockPos pos) {
         return getWaterLevelAt(pos.x(), pos.y(), pos.z());
@@ -349,10 +349,10 @@ public class World {
 
     /**
      * Returns the fluid level at a world position.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
-     * @return the stored fluid level
+     * @param x the {@code int} supplied as {@code x}
+     * @param y the {@code int} supplied as {@code y}
+     * @param z the {@code int} supplied as {@code z}
+     * @return {@code byte}; the stored fluid level
      */
     public byte getFluidLevelAt(int x, int y, int z) {
         return getWaterLevelAt(x, y, z);
@@ -360,8 +360,8 @@ public class World {
 
     /**
      * Returns the fluid level at a world position.
-     * @param pos the position value
-     * @return the stored fluid level
+     * @param pos the {@link BlockPos} argument; the position value
+     * @return {@code byte}; the stored fluid level
      */
     public byte getFluidLevelAt(BlockPos pos) {
         return getFluidLevelAt(pos.x(), pos.y(), pos.z());
@@ -369,10 +369,10 @@ public class World {
 
     /**
      * Sets the water level at.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
-     * @param waterLevel the water level value
+     * @param x the {@code int} supplied as {@code x}
+     * @param y the {@code int} supplied as {@code y}
+     * @param z the {@code int} supplied as {@code z}
+     * @param waterLevel the {@code byte} supplied as {@code waterLevel}
      */
     public void setWaterLevelAt(int x, int y, int z, byte waterLevel) {
         if (y < 0 || y >= Chunk.SIZE_Y) {
@@ -392,8 +392,8 @@ public class World {
 
     /**
      * Sets the water level at.
-     * @param pos the pos value
-     * @param waterLevel the water level value
+     * @param pos the {@link BlockPos} supplied as {@code pos}
+     * @param waterLevel the {@code byte} supplied as {@code waterLevel}
      */
     public void setWaterLevelAt(BlockPos pos, byte waterLevel) {
         setWaterLevelAt(pos.x(), pos.y(), pos.z(), waterLevel);
@@ -401,10 +401,10 @@ public class World {
 
     /**
      * Sets the fluid level at a world position.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
-     * @param fluidLevel the fluid level value
+     * @param x the {@code int} supplied as {@code x}
+     * @param y the {@code int} supplied as {@code y}
+     * @param z the {@code int} supplied as {@code z}
+     * @param fluidLevel the {@code byte} supplied as {@code fluidLevel}
      */
     public void setFluidLevelAt(int x, int y, int z, byte fluidLevel) {
         setWaterLevelAt(x, y, z, fluidLevel);
@@ -412,8 +412,8 @@ public class World {
 
     /**
      * Sets the fluid level at a world position.
-     * @param pos the position value
-     * @param fluidLevel the fluid level value
+     * @param pos the {@link BlockPos} argument; the position value
+     * @param fluidLevel the {@code byte} supplied as {@code fluidLevel}
      */
     public void setFluidLevelAt(BlockPos pos, byte fluidLevel) {
         setFluidLevelAt(pos.x(), pos.y(), pos.z(), fluidLevel);
@@ -421,10 +421,10 @@ public class World {
 
     /**
      * Returns the block key.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
-     * @return the block key
+     * @param x the {@code int} supplied as {@code x}
+     * @param y the {@code int} supplied as {@code y}
+     * @param z the {@code int} supplied as {@code z}
+     * @return {@code long}; the block key
      */
     public long getBlockKey(int x, int y, int z) {
         return (((long) x & 0x3FFFFFFL) << 38) |
@@ -434,8 +434,8 @@ public class World {
 
     /**
      * Returns the block data.
-     * @param blockId the block id value
-     * @return the block data
+     * @param blockId the {@code byte} supplied as {@code blockId}
+     * @return the {@link BlockData} representing the block data
      */
     private BlockData getBlockData(byte blockId) {
         for (BlockData data : BlockData.values()) {
@@ -449,9 +449,9 @@ public class World {
 
     /**
      * Checks whether the block solid condition is met.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
+     * @param x the {@code int} supplied as {@code x}
+     * @param y the {@code int} supplied as {@code y}
+     * @param z the {@code int} supplied as {@code z}
      * @return {@code true} if block solid; otherwise {@code false}
      */
     public boolean isBlockSolid(int x, int y, int z) {
@@ -465,9 +465,9 @@ public class World {
 
     /**
      * Returns the highest y.
-     * @param spawnX the spawn x value
-     * @param spawnZ the spawn z value
-     * @return the highest y
+     * @param spawnX the {@code float} supplied as {@code spawnX}
+     * @param spawnZ the {@code float} supplied as {@code spawnZ}
+     * @return the {@link GridPos} representing the highest y
      */
     public GridPos getHighestY(float spawnX, float spawnZ) {
         int blockX = (int) Math.floor(spawnX);
@@ -483,8 +483,8 @@ public class World {
     }
 
     /**
-     * Performs the for each plant operation.
-     * @param consumer the consumer value
+     * Updates or derives runtime state for for each plant according to the supplied arguments.
+     * @param consumer the {@link Consumer} supplied as {@code consumer}
      */
     public void forEachPlant(Consumer<PlantInstance> consumer) {
         for (Chunk chunk : chunks.values()) {
@@ -509,7 +509,7 @@ public class World {
     }
 
     /**
-     * Stores plant instance data.
+     * Immutable value object containing plant instance.
      */
     public record PlantInstance(Chunk chunk, int x, int y, int z, BlockData data) {}
 }

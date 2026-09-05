@@ -10,7 +10,7 @@ import oshi.hardware.Sensors;
 import java.util.List;
 
 /**
- * Provides components behavior.
+ * Encapsulates the state and operations required by components within the game runtime.
  */
 @Utils
 public final class Components {
@@ -25,7 +25,7 @@ public final class Components {
 
     /**
      * Loads the gpu name.
-     * @return the load gpu name result
+     * @return the {@link String} representing the load gpu name result
      */
     private static String loadGpuName() {
         List<GraphicsCard> graphicsCards = HARDWARE.getGraphicsCards();
@@ -42,7 +42,7 @@ public final class Components {
 
     /**
      * Returns the cpu.
-     * @return the cpu
+     * @return the {@link String} representing the cpu
      */
     public static String getCpu() {
         return CPU_NAME;
@@ -50,7 +50,7 @@ public final class Components {
 
     /**
      * Returns the gpu.
-     * @return the gpu
+     * @return the {@link String} representing the gpu
      */
     public static String getGpu() {
         return GPU_NAME;
@@ -58,7 +58,7 @@ public final class Components {
 
     /**
      * Returns the cpu temperature.
-     * @return the cpu temperature
+     * @return the {@link String} representing the cpu temperature
      */
     public static String getCpuTemperature() {
         double temperature = SENSORS.getCpuTemperature();
@@ -71,7 +71,7 @@ public final class Components {
 
     /**
      * Returns the physical memory.
-     * @return the physical memory
+     * @return the {@link String} representing the physical memory
      */
     public static String getPhysicalMemory() {
         long total = MEMORY.getTotal();
@@ -88,9 +88,9 @@ public final class Components {
     }
 
     /**
-     * Performs the format bytes operation.
-     * @param bytes the bytes value
-     * @return the format bytes result
+     * Produces the textual or converted representation for format bytes.
+     * @param bytes the {@code long} supplied as {@code bytes}
+     * @return the {@link String} representing the format bytes result
      */
     private static String formatBytes(long bytes) {
         double gb = bytes / (1024.0 * 1024.0 * 1024.0);

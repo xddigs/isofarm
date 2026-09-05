@@ -16,7 +16,7 @@ import static org.joml.Math.lerp;
 import static org.lwjgl.glfw.GLFW.*;
 
 /**
- * Stores camera controller data.
+ * Immutable value object containing camera controller.
  */
 public record CameraController(Camera camera) implements Service<Camera> {
     private static final float NORMAL_ZOOM = 18.0f;
@@ -32,8 +32,8 @@ public record CameraController(Camera camera) implements Service<Camera> {
 
     /**
      * Updates the current state.
-     * @param gameMaster the game master value
-     * @param delta the delta value
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
+     * @param delta the {@code float} supplied as {@code delta}
      */
     public void update(GameMaster gameMaster, float delta) {
         camera.updateDamageTilt(delta);
@@ -77,9 +77,9 @@ public record CameraController(Camera camera) implements Service<Camera> {
     }
 
     /**
-     * Performs the follow player operation.
-     * @param gameMaster the game master value
-     * @param delta the delta value
+     * Updates movement for follow player according to the current physics and input state.
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
+     * @param delta the {@code float} supplied as {@code delta}
      */
     private void followPlayer(GameMaster gameMaster, float delta) {
         Player player = Player.plyr;
@@ -120,9 +120,9 @@ public record CameraController(Camera camera) implements Service<Camera> {
     }
 
     /**
-     * Performs the click operation.
-     * @param gameMaster the game master value
-     * @param world the world value
+     * Handles click and applies its effect to the current interaction state.
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
+     * @param world the {@link World} supplied as {@code world}
      */
     private void click(GameMaster gameMaster, World world) {
         Player player = Player.plyr;
@@ -153,9 +153,9 @@ public record CameraController(Camera camera) implements Service<Camera> {
     }
 
     /**
-     * Performs the follow path operation.
-     * @param world the world value
-     * @param delta the delta value
+     * Updates movement for follow path according to the current physics and input state.
+     * @param world the {@link World} supplied as {@code world}
+     * @param delta the {@code float} supplied as {@code delta}
      */
     private void followPath(World world, float delta) {
         Player player = Player.plyr;
@@ -166,9 +166,9 @@ public record CameraController(Camera camera) implements Service<Camera> {
 
     /**
      * Returns the goal position.
-     * @param world the world value
-     * @param blockPos the block pos value
-     * @return the goal position
+     * @param world the {@link World} supplied as {@code world}
+     * @param blockPos the {@link BlockPos} supplied as {@code blockPos}
+     * @return the {@link GridPos} representing the goal position
      */
     private GridPos getGoalPosition(World world, BlockPos blockPos) {
         int x = blockPos.x();
@@ -182,12 +182,12 @@ public record CameraController(Camera camera) implements Service<Camera> {
 
     /**
      * Returns the mouse world position.
-     * @param mouseX the mouse x value
-     * @param mouseY the mouse y value
-     * @param screenWidth the screen width value
-     * @param screenHeight the screen height value
-     * @param planeY the plane y value
-     * @return the mouse world position
+     * @param mouseX the {@code float} supplied as {@code mouseX}
+     * @param mouseY the {@code float} supplied as {@code mouseY}
+     * @param screenWidth the {@code float} supplied as {@code screenWidth}
+     * @param screenHeight the {@code float} supplied as {@code screenHeight}
+     * @param planeY the {@code float} supplied as {@code planeY}
+     * @return the {@link Vector3f} representing the mouse world position
      */
     public Vector3f getMouseWorldPosition(float mouseX, float mouseY, float screenWidth,
                                           float screenHeight, float planeY) {
@@ -201,8 +201,8 @@ public record CameraController(Camera camera) implements Service<Camera> {
     }
 
     /**
-     * Performs the release mouse operation.
-     * @param gameMaster the game master value
+     * Deactivates mouse and releases its transient state.
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
      */
     private void releaseMouse(GameMaster gameMaster) {
         if (!mouseCaptured) return;
@@ -211,8 +211,8 @@ public record CameraController(Camera camera) implements Service<Camera> {
     }
 
     /**
-     * Performs the release operation.
-     * @param gameMaster the game master value
+     * Deactivates this object and releases its transient state.
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
      */
     public void release(GameMaster gameMaster) {
         releaseMouse(gameMaster);

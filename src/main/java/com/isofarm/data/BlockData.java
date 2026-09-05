@@ -77,20 +77,20 @@ public enum BlockData implements Blockable {
 
     /**
      * Creates a new {@code BlockData} instance.
-     * @param id the id value
-     * @param col the col value
-     * @param row the row value
-     * @param isTillable the is tillable value
-     * @param isPlant the is plant value
-     * @param value the value value
-     * @param topPath the top path value
-     * @param bottomPath the bottom path value
-     * @param sidePath the side path value
-     * @param soundGroup the sound group value
-     * @param destroyTime the destroy time value
-     * @param isTransparent the is transparent value
-     * @param drops the drops value
-     * @param tier the tier value
+     * @param id the {@code byte} supplied as {@code id}
+     * @param col the {@code byte} supplied as {@code col}
+     * @param row the {@code byte} supplied as {@code row}
+     * @param isTillable the {@code boolean} supplied as {@code isTillable}
+     * @param isPlant the {@code boolean} supplied as {@code isPlant}
+     * @param value the {@code int} supplied as {@code value}
+     * @param topPath the {@link String} supplied as {@code topPath}
+     * @param bottomPath the {@link String} supplied as {@code bottomPath}
+     * @param sidePath the {@link String} supplied as {@code sidePath}
+     * @param soundGroup the {@link SoundGroup} supplied as {@code soundGroup}
+     * @param destroyTime the {@code float} supplied as {@code destroyTime}
+     * @param isTransparent the {@code boolean} supplied as {@code isTransparent}
+     * @param drops an array of {@link Object} values supplied as {@code drops}
+     * @param tier the {@link Tier} supplied as {@code tier}
      */
     BlockData(byte id, byte col, byte row, boolean isTillable, boolean isPlant, int value,
               String topPath, String bottomPath, String sidePath, SoundGroup soundGroup,
@@ -113,18 +113,18 @@ public enum BlockData implements Blockable {
 
     /**
      * Creates a new {@code BlockData} instance.
-     * @param id the id value
-     * @param col the col value
-     * @param row the row value
-     * @param isTillable the is tillable value
-     * @param isPlant the is plant value
-     * @param value the value value
-     * @param texturePath the texture path value
-     * @param soundGroup the sound group value
-     * @param destroyTime the destroy time value
-     * @param isTransparent the is transparent value
-     * @param drops the drops value
-     * @param tier the tier value
+     * @param id the {@code byte} supplied as {@code id}
+     * @param col the {@code byte} supplied as {@code col}
+     * @param row the {@code byte} supplied as {@code row}
+     * @param isTillable the {@code boolean} supplied as {@code isTillable}
+     * @param isPlant the {@code boolean} supplied as {@code isPlant}
+     * @param value the {@code int} supplied as {@code value}
+     * @param texturePath the {@link String} supplied as {@code texturePath}
+     * @param soundGroup the {@link SoundGroup} supplied as {@code soundGroup}
+     * @param destroyTime the {@code float} supplied as {@code destroyTime}
+     * @param isTransparent the {@code boolean} supplied as {@code isTransparent}
+     * @param drops an array of {@link Object} values supplied as {@code drops}
+     * @param tier the {@link Tier} supplied as {@code tier}
      */
     BlockData(byte id, byte col, byte row, boolean isTillable, boolean isPlant,
               int value, String texturePath, SoundGroup soundGroup, float destroyTime,
@@ -134,7 +134,7 @@ public enum BlockData implements Blockable {
 
     /**
      * Returns the all texture paths.
-     * @return the all texture paths
+     * @return the {@link List} representing the all texture paths
      */
     public static List<String> getAllTexturePaths() {
         List<String> paths = new ArrayList<>();
@@ -148,7 +148,7 @@ public enum BlockData implements Blockable {
 
     /**
      * Creates and returns the by id.
-     * @return the created by id
+     * @return an array of {@link BlockData} values; the created by id
      */
     private static BlockData[] createById() {
         byte maxId = 0;
@@ -167,9 +167,9 @@ public enum BlockData implements Blockable {
     }
 
     /**
-     * Performs the from id operation.
-     * @param id the id value
-     * @return the from id result
+     * Creates or returns from id from the supplied arguments.
+     * @param id the {@code byte} supplied as {@code id}
+     * @return the {@link BlockData} representing the from id result
      */
     public static BlockData fromId(byte id) {
         int index = Byte.toUnsignedInt(id);
@@ -180,18 +180,18 @@ public enum BlockData implements Blockable {
     }
 
     /**
-     * Performs the from id to operation.
-     * @param id the id value
-     * @return the from id to result
+     * Creates or returns from id to from the supplied arguments.
+     * @param id the {@code byte} supplied as {@code id}
+     * @return the {@link Block} representing the from id to result
      */
     public static Block fromIdTo(byte id) {
         return new Block(fromId(id));
     }
 
     /**
-     * Performs the from name operation.
-     * @param name the name value
-     * @return the from name result
+     * Creates or returns from name from the supplied arguments.
+     * @param name the {@link String} supplied as {@code name}
+     * @return the {@link BlockData} representing the from name result
      */
     public static BlockData fromName(String name) {
         for (BlockData block : all()) {
@@ -201,8 +201,8 @@ public enum BlockData implements Blockable {
     }
 
     /**
-     * Performs the all plants operation.
-     * @return the all plants result
+     * Creates or returns all plants from the supplied arguments.
+     * @return an array of {@link BlockData} values; the all plants result
      */
     public static BlockData[] allPlants() {
         List<BlockData> result = new ArrayList<>();
@@ -213,8 +213,8 @@ public enum BlockData implements Blockable {
     }
 
     /**
-     * Performs the all operation.
-     * @return the all result
+     * Creates or returns all from the supplied arguments.
+     * @return an array of {@link BlockData} values; the all result
      */
     public static BlockData[] all() {
         return values();
@@ -222,7 +222,7 @@ public enum BlockData implements Blockable {
 
     /**
      * Returns the ores.
-     * @return the ores
+     * @return an array of {@link BlockData} values; the ores
      */
     public static BlockData[] getOres() {
         return ORES;
@@ -230,8 +230,8 @@ public enum BlockData implements Blockable {
 
     /**
      * Returns the ore.
-     * @param tier the tier value
-     * @return the ore
+     * @param tier the {@link Tier} supplied as {@code tier}
+     * @return the {@link BlockData} representing the ore
      */
     public static BlockData getOre(Tier tier) {
         for (BlockData block : ORES) {
@@ -242,7 +242,7 @@ public enum BlockData implements Blockable {
 
     /**
      * Returns the random ore.
-     * @return the random ore
+     * @return the {@link BlockData} representing the random ore
      */
     public static BlockData getRandomOre() {
         return ORES[(int) (Math.random() * ORES.length)];
@@ -250,7 +250,7 @@ public enum BlockData implements Blockable {
 
     /**
      * Initializes the regions.
-     * @param atlas the atlas value
+     * @param atlas the {@link TextureAtlas} supplied as {@code atlas}
      */
     public void initRegions(TextureAtlas atlas) {
         if (atlas == null) return;
@@ -261,7 +261,7 @@ public enum BlockData implements Blockable {
 
     /**
      * Returns the id.
-     * @return the id
+     * @return {@code byte}; the id
      */
     public byte getId() {
         return id;
@@ -269,7 +269,7 @@ public enum BlockData implements Blockable {
 
     /**
      * Returns the col.
-     * @return the col
+     * @return {@code byte}; the col
      */
     public byte getCol() {
         return col;
@@ -277,7 +277,7 @@ public enum BlockData implements Blockable {
 
     /**
      * Returns the row.
-     * @return the row
+     * @return {@code byte}; the row
      */
     public byte getRow() {
         return row;
@@ -285,7 +285,7 @@ public enum BlockData implements Blockable {
 
     /**
      * Returns the name.
-     * @return the name
+     * @return the {@link String} representing the name
      */
     public String getName() {
         return name().toLowerCase(Locale.ROOT);
@@ -293,7 +293,7 @@ public enum BlockData implements Blockable {
 
     /**
      * Returns the display name.
-     * @return the display name
+     * @return the {@link String} representing the display name
      */
     public String getDisplayName() {
         return Local.lang.t("block." + name().toLowerCase(Locale.ROOT));
@@ -301,7 +301,7 @@ public enum BlockData implements Blockable {
 
     /**
      * Returns the value.
-     * @return the value
+     * @return {@code int}; the value
      */
     public int getValue() {
         return value;
@@ -309,7 +309,7 @@ public enum BlockData implements Blockable {
 
     /**
      * Returns the tier.
-     * @return the tier
+     * @return the {@link Tier} representing the tier
      */
     public Tier getTier() {
         return tier;
@@ -357,7 +357,7 @@ public enum BlockData implements Blockable {
 
     /**
      * Returns the top path.
-     * @return the top path
+     * @return the {@link String} representing the top path
      */
     public String getTopPath() {
         return topPath;
@@ -365,7 +365,7 @@ public enum BlockData implements Blockable {
 
     /**
      * Returns the bottom path.
-     * @return the bottom path
+     * @return the {@link String} representing the bottom path
      */
     public String getBottomPath() {
         return bottomPath;
@@ -373,7 +373,7 @@ public enum BlockData implements Blockable {
 
     /**
      * Returns the side path.
-     * @return the side path
+     * @return the {@link String} representing the side path
      */
     public String getSidePath() {
         return sidePath;
@@ -381,7 +381,7 @@ public enum BlockData implements Blockable {
 
     /**
      * Returns the top region.
-     * @return the top region
+     * @return the {@link TextureAtlas.TextureRegion} representing the top region
      */
     public TextureAtlas.TextureRegion getTopRegion() {
         return topRegion;
@@ -389,7 +389,7 @@ public enum BlockData implements Blockable {
 
     /**
      * Returns the bottom region.
-     * @return the bottom region
+     * @return the {@link TextureAtlas.TextureRegion} representing the bottom region
      */
     public TextureAtlas.TextureRegion getBottomRegion() {
         return bottomRegion;
@@ -397,7 +397,7 @@ public enum BlockData implements Blockable {
 
     /**
      * Returns the side region.
-     * @return the side region
+     * @return the {@link TextureAtlas.TextureRegion} representing the side region
      */
     public TextureAtlas.TextureRegion getSideRegion() {
         return sideRegion;
@@ -405,7 +405,7 @@ public enum BlockData implements Blockable {
 
     /**
      * Returns the sound group.
-     * @return the sound group
+     * @return the {@link SoundGroup} representing the sound group
      */
     public SoundGroup getSoundGroup() {
         return soundGroup;
@@ -413,7 +413,7 @@ public enum BlockData implements Blockable {
 
     /**
      * Returns the destroy time.
-     * @return the destroy time
+     * @return {@code float}; the destroy time
      */
     public float getDestroyTime() {
         return destroyTime;
@@ -421,7 +421,7 @@ public enum BlockData implements Blockable {
 
     /**
      * Returns the drops.
-     * @return the drops
+     * @return an array of {@link Object} values; the drops
      */
     public Object[] getDrops() {
         return drops;
@@ -437,7 +437,7 @@ public enum BlockData implements Blockable {
 
     /**
      * Returns the random drop.
-     * @return the random drop
+     * @return the {@link Object} representing the random drop
      */
     public Object getRandomDrop() {
         if (!hasDrops()) return null;

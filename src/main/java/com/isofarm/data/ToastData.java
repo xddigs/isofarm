@@ -18,8 +18,8 @@ public enum ToastData {
 
     /**
      * Creates a new {@code ToastData} instance.
-     * @param id the id value
-     * @param title the title value
+     * @param id the {@code byte} supplied as {@code id}
+     * @param title the {@link String} supplied as {@code title}
      */
     ToastData(byte id, String title) {
         this.id = id;
@@ -28,7 +28,7 @@ public enum ToastData {
 
     /**
      * Returns the id.
-     * @return the id
+     * @return {@code byte}; the id
      */
     public byte getId() {
         return id;
@@ -36,16 +36,16 @@ public enum ToastData {
 
     /**
      * Returns the title.
-     * @return the title
+     * @return the {@link String} representing the title
      */
     public String getTitle() {
         return title;
     }
 
     /**
-     * Performs the from id operation.
-     * @param id the id value
-     * @return the from id result
+     * Creates or returns from id from the supplied arguments.
+     * @param id the {@code byte} supplied as {@code id}
+     * @return the {@link ToastData} representing the from id result
      */
     public static ToastData fromId(byte id) {
         for (ToastData data : values()) {

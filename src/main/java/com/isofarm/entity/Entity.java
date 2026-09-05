@@ -11,7 +11,7 @@ import com.isofarm.wrld.World;
 import org.joml.Vector3f;
 
 /**
- * Provides entity behavior.
+ * Encapsulates the state and operations required by entity within the game runtime.
  */
 @DataClass
 public abstract class Entity {
@@ -39,7 +39,7 @@ public abstract class Entity {
 
     /**
      * Creates a new {@code Entity} instance.
-     * @param name the name value
+     * @param name the {@link String} supplied as {@code name}
      */
     public Entity(String name) {
         this.id = (byte) (Math.floor((Math.random() * Math.random()) * 100));
@@ -67,7 +67,7 @@ public abstract class Entity {
 
     /**
      * Applies damage to the entity.
-     * @param amount the damage amount
+     * @param amount the {@code float} argument; the damage amount
      */
     public void damage(float amount) {
         damage(amount, Cause.ENTITY);
@@ -75,8 +75,8 @@ public abstract class Entity {
 
     /**
      * Applies damage attributed to a specific cause.
-     * @param amount the damage amount
-     * @param cause the damage cause
+     * @param amount the {@code float} argument; the damage amount
+     * @param cause the {@link Cause} argument; the damage cause
      */
     public void damage(float amount, Cause cause) {
         if (!isAlive() || amount <= 0) return;
@@ -88,7 +88,7 @@ public abstract class Entity {
 
     /**
      * Immediately kills the entity with the supplied cause.
-     * @param cause the death cause
+     * @param cause the {@link Cause} argument; the death cause
      */
     public void kill(Cause cause) {
         if (!isAlive()) return;
@@ -100,16 +100,18 @@ public abstract class Entity {
 
     /**
      * Handles an applied damage event.
-     * @param amount the applied damage amount
+     * @param amount the {@code float} argument; the applied damage amount
      */
     protected void onDamageTaken(float amount) {}
 
-    /** Called once when damage reduces this entity's hitpoints to zero. */
+    /**
+     * Called once when damage reduces this entity's hitpoints to zero.
+     */
     protected void onDeath(Cause cause) {}
 
     /**
      * Returns the maximum hitpoints used to scale environmental damage.
-     * @return the maximum hitpoints
+     * @return {@code float}; the maximum hitpoints
      */
     public float getMaxHitpoints() {
         return maxHitpoints;
@@ -118,8 +120,8 @@ public abstract class Entity {
     /**
      * Applies increasingly severe damage while the entity remains in direct
      * contact with lava. Leaving the lava resets the damage progression.
-     * @param world the world value
-     * @param delta the elapsed time in seconds
+     * @param world the {@link World} supplied as {@code world}
+     * @param delta the {@code float} argument; the elapsed time in seconds
      */
     public final void updateEnvironmentalDamage(World world, float delta) {
         if (!isAlive() || delta <= 0 || !isTouchingLava(world)) {
@@ -143,7 +145,7 @@ public abstract class Entity {
 
     /**
      * Checks whether the entity bounds touch the occupied portion of a lava cell.
-     * @param world the world value
+     * @param world the {@link World} supplied as {@code world}
      * @return {@code true} when the entity touches lava; otherwise {@code false}
      */
     private boolean isTouchingLava(World world) {
@@ -169,7 +171,7 @@ public abstract class Entity {
 
     /**
      * Returns the id.
-     * @return the id
+     * @return {@code byte}; the id
      */
     public byte getId() {
         return id;
@@ -177,7 +179,7 @@ public abstract class Entity {
 
     /**
      * Returns the name.
-     * @return the name
+     * @return the {@link String} representing the name
      */
     public String getName() {
         return name;
@@ -185,7 +187,7 @@ public abstract class Entity {
 
     /**
      * Sets the name.
-     * @param name the name value
+     * @param name the {@link String} supplied as {@code name}
      */
     public void setName(String name) {
         this.name = name;
@@ -193,7 +195,7 @@ public abstract class Entity {
 
     /**
      * Returns the position.
-     * @return the position
+     * @return the {@link Vector3f} representing the position
      */
     public Vector3f getPosition() {
         return position;
@@ -201,7 +203,7 @@ public abstract class Entity {
 
     /**
      * Returns the position string.
-     * @return the position string
+     * @return the {@link String} representing the position string
      */
     public String getPositionString() {
         return String.format("X:%.2f // Y:%.2f // Z:%.2f",
@@ -210,7 +212,7 @@ public abstract class Entity {
 
     /**
      * Sets the position.
-     * @param position the position value
+     * @param position the {@link Vector3f} supplied as {@code position}
      */
     public void setPosition(Vector3f position) {
         this.position.set(position);
@@ -218,9 +220,9 @@ public abstract class Entity {
 
     /**
      * Sets the position.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param z the {@code float} supplied as {@code z}
      */
     public void setPosition(float x, float y, float z) {
         this.position.set(x, y, z);
@@ -228,7 +230,7 @@ public abstract class Entity {
 
     /**
      * Returns the velocity.
-     * @return the velocity
+     * @return the {@link Vector3f} representing the velocity
      */
     public Vector3f getVelocity() {
         return velocity;
@@ -236,7 +238,7 @@ public abstract class Entity {
 
     /**
      * Sets the velocity.
-     * @param velocity the velocity value
+     * @param velocity the {@link Vector3f} supplied as {@code velocity}
      */
     public void setVelocity(Vector3f velocity) {
         this.velocity.set(velocity);
@@ -244,9 +246,9 @@ public abstract class Entity {
 
     /**
      * Sets the velocity.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param z the {@code float} supplied as {@code z}
      */
     public void setVelocity(float x, float y, float z) {
         this.velocity.set(x, y, z);
@@ -254,7 +256,7 @@ public abstract class Entity {
 
     /**
      * Returns the dimensions.
-     * @return the dimensions
+     * @return the {@link Vector3f} representing the dimensions
      */
     public Vector3f getDimensions() {
         return dimensions;
@@ -262,7 +264,7 @@ public abstract class Entity {
 
     /**
      * Sets the dimensions.
-     * @param dimensions the dimensions value
+     * @param dimensions the {@link Vector3f} supplied as {@code dimensions}
      */
     public void setDimensions(Vector3f dimensions) {
         this.dimensions.set(dimensions);
@@ -270,9 +272,9 @@ public abstract class Entity {
 
     /**
      * Sets the dimensions.
-     * @param width the width value
-     * @param height the height value
-     * @param depth the depth value
+     * @param width the {@code float} supplied as {@code width}
+     * @param height the {@code float} supplied as {@code height}
+     * @param depth the {@code float} supplied as {@code depth}
      */
     public void setDimensions(float width, float height, float depth) {
         this.dimensions.set(width, height, depth);
@@ -284,7 +286,7 @@ public abstract class Entity {
 
     /**
      * Returns the standing height.
-     * @return the standing height
+     * @return {@code float}; the standing height
      */
     public float getStandingHeight() {
         return standingHeight;
@@ -292,7 +294,7 @@ public abstract class Entity {
 
     /**
      * Sets the standing height.
-     * @param standingHeight the standing height value
+     * @param standingHeight the {@code float} supplied as {@code standingHeight}
      */
     public void setStandingHeight(float standingHeight) {
         this.standingHeight = standingHeight;
@@ -300,7 +302,7 @@ public abstract class Entity {
 
     /**
      * Returns the crouching height.
-     * @return the crouching height
+     * @return {@code float}; the crouching height
      */
     public float getCrouchingHeight() {
         return crouchingHeight;
@@ -308,7 +310,7 @@ public abstract class Entity {
 
     /**
      * Sets the crouching height.
-     * @param crouchingHeight the crouching height value
+     * @param crouchingHeight the {@code float} supplied as {@code crouchingHeight}
      */
     public void setCrouchingHeight(float crouchingHeight) {
         this.crouchingHeight = crouchingHeight;
@@ -323,8 +325,8 @@ public abstract class Entity {
     }
 
     /**
-     * Performs the was on ground operation.
-     * @return the was on ground result
+     * Updates or derives runtime state for was on ground according to the supplied arguments.
+     * @return {@code boolean}; the was on ground result
      */
     public boolean wasOnGround() {
         return wasOnGround;
@@ -332,7 +334,7 @@ public abstract class Entity {
 
     /**
      * Sets the on ground.
-     * @param onGround the on ground value
+     * @param onGround the {@code boolean} supplied as {@code onGround}
      */
     public void setOnGround(boolean onGround) {
         this.onGround = onGround;
@@ -340,7 +342,7 @@ public abstract class Entity {
 
     /**
      * Sets the was on ground.
-     * @param wasOnGround the was on ground value
+     * @param wasOnGround the {@code boolean} supplied as {@code wasOnGround}
      */
     public void setWasOnGround(boolean wasOnGround) {
         this.wasOnGround = wasOnGround;
@@ -348,7 +350,7 @@ public abstract class Entity {
 
     /**
      * Checks whether the in fluid condition is met.
-     * @param world the world value
+     * @param world the {@link World} supplied as {@code world}
      * @return {@code true} if in fluid; otherwise {@code false}
      */
     public boolean isInFluid(World world) {
@@ -385,8 +387,8 @@ public abstract class Entity {
 
     /**
      * Returns the fluid submersion.
-     * @param world the world value
-     * @return the fluid submersion
+     * @param world the {@link World} supplied as {@code world}
+     * @return {@code float}; the fluid submersion
      */
     private float getFluidSubmersion(World world) {
         float epsilon = 0.001f;
@@ -435,10 +437,10 @@ public abstract class Entity {
     }
 
     /**
-     * Performs the collide operation.
-     * @param world the world value
-     * @param targetVelocity the target velocity value
-     * @param delta the delta value
+     * Updates movement for collide according to the current physics and input state.
+     * @param world the {@link World} supplied as {@code world}
+     * @param targetVelocity the {@link Vector3f} supplied as {@code targetVelocity}
+     * @param delta the {@code float} supplied as {@code delta}
      */
     public void collide(World world, Vector3f targetVelocity, float delta) {
         float smooth = 1.0f - (float) Math.exp(-12.0f * delta);
@@ -486,15 +488,15 @@ public abstract class Entity {
     }
 
     /**
-     * Performs the adjust velocity operation.
-     * @param delta the delta value
+     * Updates movement for adjust velocity according to the current physics and input state.
+     * @param delta the {@code float} supplied as {@code delta}
      */
     protected void adjustVelocity(float delta) {}
 
     /**
-     * Performs the check collision operation.
-     * @param world the world value
-     * @return the check collision result
+     * Determines whether collision is satisfied by the current state.
+     * @param world the {@link World} supplied as {@code world}
+     * @return {@code boolean}; the check collision result
      */
     public boolean checkCollision(World world) {
         float epsilon = 0.001f;
@@ -531,11 +533,11 @@ public abstract class Entity {
     }
 
     /**
-     * Performs the intersects block operation.
-     * @param blockX the block x value
-     * @param blockY the block y value
-     * @param blockZ the block z value
-     * @return the intersects block result
+     * Determines whether block is satisfied by the current state.
+     * @param blockX the {@code int} supplied as {@code blockX}
+     * @param blockY the {@code int} supplied as {@code blockY}
+     * @param blockZ the {@code int} supplied as {@code blockZ}
+     * @return {@code boolean}; the intersects block result
      */
     public boolean intersectsBlock(int blockX, int blockY, int blockZ) {
         float epsilon = 0.001f;
@@ -562,7 +564,7 @@ public abstract class Entity {
     }
 
     /**
-     * Performs the jump operation.
+     * Starts a jump when the current movement state permits it.
      */
     public void jump() {
         if (!isOnGround()) return;
@@ -572,7 +574,7 @@ public abstract class Entity {
 
     /**
      * Returns the speed.
-     * @return the speed
+     * @return {@code float}; the speed
      */
     public float getSpeed() {
         return speed;
@@ -580,7 +582,7 @@ public abstract class Entity {
 
     /**
      * Sets the speed.
-     * @param speed the speed value
+     * @param speed the {@code float} supplied as {@code speed}
      */
     public void setSpeed(float speed) {
         this.speed = speed;
@@ -588,28 +590,28 @@ public abstract class Entity {
 
     /**
      * Updates the current state.
-     * @param blockPos the block pos value
-     * @param delta the delta value
+     * @param blockPos the {@link BlockPos} supplied as {@code blockPos}
+     * @param delta the {@code float} supplied as {@code delta}
      */
     public abstract void update(BlockPos blockPos, float delta);
 
     /**
-     * Renders render.
-     * @param gameMaster the game master value
+     * Renders this object in the requested render pass.
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
      */
     public void render(GameMaster gameMaster) {
         render(gameMaster, RenderPass.NORMAL);
     }
 
     /**
-     * Renders render.
-     * @param gameMaster the game master value
-     * @param pass the pass value
+     * Renders this object in the requested render pass.
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
+     * @param pass the {@link RenderPass} supplied as {@code pass}
      */
     public abstract void render(GameMaster gameMaster, RenderPass pass);
 
     /**
-     * Performs the drop loot operation.
+     * Transfers or creates the relevant entity or item for drop loot.
      */
     protected void dropLoot() {}
 }

@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Provides time service behavior.
+ * Encapsulates the state and operations required by time service within the game runtime.
  */
 @Singleton
 public class TimeService {
@@ -35,8 +35,8 @@ public class TimeService {
 
     /**
      * Updates the current state.
-     * @param delta the delta value
-     * @param weatherService the weather service value
+     * @param delta the {@code float} supplied as {@code delta}
+     * @param weatherService the {@link WeatherService} supplied as {@code weatherService}
      */
     public void update(float delta, WeatherService weatherService) {
         secondAccumulator += delta * timeScale;
@@ -48,7 +48,7 @@ public class TimeService {
 
     /**
      * Returns the minute.
-     * @return the minute
+     * @return {@code int}; the minute
      */
     public int getMinute() {
         return minute;
@@ -56,7 +56,7 @@ public class TimeService {
 
     /**
      * Returns the hour.
-     * @return the hour
+     * @return {@code int}; the hour
      */
     public int getHour() {
         return hour;
@@ -64,7 +64,7 @@ public class TimeService {
 
     /**
      * Returns the day.
-     * @return the day
+     * @return {@code int}; the day
      */
     public int getDay() {
         return day;
@@ -72,7 +72,7 @@ public class TimeService {
 
     /**
      * Returns the current season.
-     * @return the current season
+     * @return the {@link Season} representing the current season
      */
     public Season getCurrentSeason() {
         return currentSeason;
@@ -80,7 +80,7 @@ public class TimeService {
 
     /**
      * Returns the year.
-     * @return the year
+     * @return {@code int}; the year
      */
     public int getYear() {
         return year;
@@ -88,7 +88,7 @@ public class TimeService {
 
     /**
      * Returns the formatted time.
-     * @return the formatted time
+     * @return the {@link String} representing the formatted time
      */
     public String getFormattedTime() {
         String hour = String.format("%02d", TimeService.hour);
@@ -98,7 +98,7 @@ public class TimeService {
 
     /**
      * Sets the time scale.
-     * @param timeScale the time scale value
+     * @param timeScale the {@code float} supplied as {@code timeScale}
      */
     public void setTimeScale(float timeScale) {
         this.timeScale = Math.max(0.0f, timeScale);
@@ -106,7 +106,7 @@ public class TimeService {
 
     /**
      * Returns the time scale.
-     * @return the time scale
+     * @return {@code float}; the time scale
      */
     public float getTimeScale() {
         return timeScale;
@@ -114,23 +114,23 @@ public class TimeService {
 
     /**
      * Adds the time scale.
-     * @param delta the delta value
+     * @param delta the {@code float} supplied as {@code delta}
      */
     public void addTimeScale(float delta) {
         setTimeScale(getTimeScale() + delta);
     }
 
     /**
-     * Performs the slow time scale operation.
-     * @param delta the delta value
+     * Transforms time scale according to the supplied values.
+     * @param delta the {@code float} supplied as {@code delta}
      */
     public void slowTimeScale(float delta) {
         setTimeScale(getTimeScale() * (1.0f - delta));
     }
 
     /**
-     * Performs the advance minute operation.
-     * @param weatherService the weather service value
+     * Updates minute for the current simulation step.
+     * @param weatherService the {@link WeatherService} supplied as {@code weatherService}
      */
     private void advanceMinute(WeatherService weatherService) {
         minute++;
@@ -141,8 +141,8 @@ public class TimeService {
     }
 
     /**
-     * Performs the advance hour operation.
-     * @param weatherService the weather service value
+     * Updates hour for the current simulation step.
+     * @param weatherService the {@link WeatherService} supplied as {@code weatherService}
      */
     private void advanceHour(WeatherService weatherService) {
         hour++;
@@ -153,7 +153,7 @@ public class TimeService {
     }
 
     /**
-     * Performs the advance day operation.
+     * Updates day for the current simulation step.
      */
     public void advanceDay() {
         hour = STARTING_HOUR;
@@ -170,7 +170,7 @@ public class TimeService {
     }
 
     /**
-     * Performs the advance season operation.
+     * Updates season for the current simulation step.
      */
     private void advanceSeason() {
         Season[] seasons = Season.values();
@@ -187,7 +187,7 @@ public class TimeService {
 
     /**
      * Returns the sky color.
-     * @return the sky color
+     * @return the {@link Vector3f} representing the sky color
      */
     public static Vector3f getSkyColor() {
         float time = hour + minute / 60.0f;
@@ -230,11 +230,11 @@ public class TimeService {
     }
 
     /**
-     * Performs the smooth step operation.
-     * @param start the start value
-     * @param end the end value
-     * @param value the value value
-     * @return the smooth step result
+     * Transforms step according to the supplied values.
+     * @param start the {@code float} supplied as {@code start}
+     * @param end the {@code float} supplied as {@code end}
+     * @param value the {@code float} supplied as {@code value}
+     * @return {@code float}; the smooth step result
      */
     private static float smoothStep(float start, float end, float value) {
         float t = (value - start) / (end - start);

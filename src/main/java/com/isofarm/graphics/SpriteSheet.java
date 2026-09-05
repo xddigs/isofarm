@@ -3,7 +3,7 @@ package com.isofarm.graphics;
 import org.joml.Vector4f;
 
 /**
- * Provides sprite sheet behavior.
+ * Encapsulates the state and operations required by sprite sheet within the game runtime.
  */
 public class SpriteSheet {
     private final Texture texture;
@@ -13,9 +13,9 @@ public class SpriteSheet {
 
     /**
      * Creates a new {@code SpriteSheet} instance.
-     * @param path the path value
-     * @param cols the cols value
-     * @param rows the rows value
+     * @param path the {@link String} supplied as {@code path}
+     * @param cols the {@code int} supplied as {@code cols}
+     * @param rows the {@code int} supplied as {@code rows}
      */
     public SpriteSheet(String path, int cols, int rows) {
         if (cols <= 0) {
@@ -34,21 +34,21 @@ public class SpriteSheet {
 
     /**
      * Returns the texture id.
-     * @return the texture id
+     * @return {@code int}; the texture id
      */
     public int getTextureId() {
         return texture.getId();
     }
 
     /**
-     * Performs the bind operation.
+     * Binds this object to the active runtime context.
      */
     public void bind() {
         texture.bind();
     }
 
     /**
-     * Performs the unbind operation.
+     * Unbinds this object from the active runtime context.
      */
     public void unbind() {
         texture.unbind();
@@ -56,7 +56,7 @@ public class SpriteSheet {
 
     /**
      * Returns the cols.
-     * @return the cols
+     * @return {@code int}; the cols
      */
     public int getCols() {
         return cols;
@@ -64,7 +64,7 @@ public class SpriteSheet {
 
     /**
      * Returns the rows.
-     * @return the rows
+     * @return {@code int}; the rows
      */
     public int getRows() {
         return rows;
@@ -72,7 +72,7 @@ public class SpriteSheet {
 
     /**
      * Returns the frames per row.
-     * @return the frames per row
+     * @return {@code int}; the frames per row
      */
     public int getFramesPerRow() {
         return cols;
@@ -80,7 +80,7 @@ public class SpriteSheet {
 
     /**
      * Returns the width.
-     * @return the width
+     * @return {@code float}; the width
      */
     public float getWidth() {
         return texture.getWidth();
@@ -88,7 +88,7 @@ public class SpriteSheet {
 
     /**
      * Returns the height.
-     * @return the height
+     * @return {@code float}; the height
      */
     public float getHeight() {
         return texture.getHeight();
@@ -96,7 +96,7 @@ public class SpriteSheet {
 
     /**
      * Returns the frame width.
-     * @return the frame width
+     * @return {@code int}; the frame width
      */
     public int getFrameWidth() {
         return texture.getWidth() / cols;
@@ -104,7 +104,7 @@ public class SpriteSheet {
 
     /**
      * Returns the frame height.
-     * @return the frame height
+     * @return {@code int}; the frame height
      */
     public int getFrameHeight() {
         return texture.getHeight() / rows;
@@ -112,7 +112,7 @@ public class SpriteSheet {
 
     /**
      * Returns the total frames.
-     * @return the total frames
+     * @return {@code int}; the total frames
      */
     public int getTotalFrames() {
         return totalFrames;
@@ -120,8 +120,8 @@ public class SpriteSheet {
 
     /**
      * Returns the uvbounds.
-     * @param frameIndex the frame index value
-     * @return the uvbounds
+     * @param frameIndex the {@code int} supplied as {@code frameIndex}
+     * @return the {@link Vector4f} representing the uvbounds
      */
     public Vector4f getUVBounds(int frameIndex) {
         frameIndex = Math.clamp(frameIndex, 0, totalFrames - 1);
@@ -140,7 +140,7 @@ public class SpriteSheet {
     }
 
     /**
-     * Performs the dispose operation.
+     * Releases the resources associated with this object.
      */
     public void dispose() {
         texture.dispose();

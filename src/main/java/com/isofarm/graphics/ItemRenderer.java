@@ -14,7 +14,7 @@ import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 
 /**
- * Provides item renderer behavior.
+ * Encapsulates the state and operations required by item renderer within the game runtime.
  */
 public class ItemRenderer {
     private static final int THICKNESS_LAYERS = 24;
@@ -32,9 +32,9 @@ public class ItemRenderer {
     }
 
     /**
-     * Performs the clamp operation.
-     * @param value the value value
-     * @return the clamp result
+     * Transforms this object according to the supplied values.
+     * @param value the {@code float} supplied as {@code value}
+     * @return {@code float}; the clamp result
      */
     private float clamp(float value) {
         return Math.clamp(value, 0.0f, 1.0f);
@@ -42,9 +42,9 @@ public class ItemRenderer {
 
     /**
      * Renders the world item.
-     * @param gameMaster the game master value
-     * @param worldItem the world item value
-     * @param lighting the lighting value
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
+     * @param worldItem the {@link WorldItem} supplied as {@code worldItem}
+     * @param lighting the {@link CelestialLighting} supplied as {@code lighting}
      */
     public void renderWorldItem(GameMaster gameMaster, WorldItem worldItem,
                                 CelestialLighting lighting) {
@@ -60,12 +60,12 @@ public class ItemRenderer {
 
     /**
      * Renders the world item mesh.
-     * @param gameMaster the game master value
-     * @param worldItem the world item value
-     * @param item the item value
-     * @param spriteSheet the sprite sheet value
-     * @param shader the shader value
-     * @param lighting the lighting value
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
+     * @param worldItem the {@link WorldItem} supplied as {@code worldItem}
+     * @param item the {@link Item} supplied as {@code item}
+     * @param spriteSheet the {@link SpriteSheet} supplied as {@code spriteSheet}
+     * @param shader the {@link Shader} supplied as {@code shader}
+     * @param lighting the {@link CelestialLighting} supplied as {@code lighting}
      */
     private void renderWorldItemMesh(GameMaster gameMaster, WorldItem worldItem,
                                      Item item, SpriteSheet spriteSheet, Shader shader,
@@ -121,9 +121,9 @@ public class ItemRenderer {
 
     /**
      * Sets setup uniforms.
-     * @param shader the shader value
-     * @param gameMaster the game master value
-     * @param lighting the lighting value
+     * @param shader the {@link Shader} supplied as {@code shader}
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
+     * @param lighting the {@link CelestialLighting} supplied as {@code lighting}
      */
     private void setupUniforms(Shader shader, GameMaster gameMaster,
                                CelestialLighting lighting) {
@@ -149,7 +149,7 @@ public class ItemRenderer {
     }
 
     /**
-     * Performs the dispose operation.
+     * Releases the resources associated with this object.
      */
     public void dispose() {
         if (quadMesh != null) {

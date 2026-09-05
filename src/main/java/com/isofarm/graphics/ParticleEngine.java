@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Provides particle engine behavior.
+ * Encapsulates the state and operations required by particle engine within the game runtime.
  */
 @Singleton
 public class ParticleEngine implements Service<Particle> {
@@ -31,8 +31,8 @@ public class ParticleEngine implements Service<Particle> {
 
     /**
      * Adds add.
-     * @param particle the particle value
-     * @return the add result
+     * @param particle the {@link Particle} supplied as {@code particle}
+     * @return the {@link Particle} representing the add result
      */
     public Particle add(Particle particle) {
         particles.add(particle);
@@ -41,7 +41,7 @@ public class ParticleEngine implements Service<Particle> {
 
     /**
      * Updates the current state.
-     * @param delta the delta value
+     * @param delta the {@code float} supplied as {@code delta}
      */
     public void update(float delta) {
         for (Particle p : particles) {
@@ -51,10 +51,10 @@ public class ParticleEngine implements Service<Particle> {
     }
 
     /**
-     * Renders render.
-     * @param shader the shader value
-     * @param quadMesh the quad mesh value
-     * @param camera the camera value
+     * Renders this object in the requested render pass.
+     * @param shader the {@link Shader} supplied as {@code shader}
+     * @param quadMesh the {@link Mesh} supplied as {@code quadMesh}
+     * @param camera the {@link CameraView} supplied as {@code camera}
      */
     public void render(Shader shader, Mesh quadMesh, CameraView camera) {
         if (particles.isEmpty()) return;
@@ -105,10 +105,10 @@ public class ParticleEngine implements Service<Particle> {
     }
 
     /**
-     * Performs the spawn block operation.
-     * @param blockPos the block pos value
-     * @param blockData the block data value
-     * @return the spawn block result
+     * Transfers or creates the relevant entity or item for spawn block.
+     * @param blockPos the {@link BlockPos} supplied as {@code blockPos}
+     * @param blockData the {@link BlockData} supplied as {@code blockData}
+     * @return the {@link Particle} representing the spawn block result
      */
     public Particle spawnBlock(BlockPos blockPos, BlockData blockData) {
         if (blockData == null || blockData == BlockData.AIR) return null;
@@ -151,10 +151,10 @@ public class ParticleEngine implements Service<Particle> {
     }
 
     /**
-     * Performs the spawn plant operation.
-     * @param blockPos the block pos value
-     * @param blockData the block data value
-     * @return the spawn plant result
+     * Transfers or creates the relevant entity or item for spawn plant.
+     * @param blockPos the {@link BlockPos} supplied as {@code blockPos}
+     * @param blockData the {@link BlockData} supplied as {@code blockData}
+     * @return the {@link Particle} representing the spawn plant result
      */
     public Particle spawnPlant(BlockPos blockPos, BlockData blockData) {
         if (blockPos == null) return null;
@@ -200,13 +200,13 @@ public class ParticleEngine implements Service<Particle> {
     }
 
     /**
-     * Performs the spawn crop operation.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
-     * @param cropSheet the crop sheet value
-     * @param frameIndex the frame index value
-     * @return the spawn crop result
+     * Transfers or creates the relevant entity or item for spawn crop.
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param z the {@code float} supplied as {@code z}
+     * @param cropSheet the {@link SpriteSheet} supplied as {@code cropSheet}
+     * @param frameIndex the {@code int} supplied as {@code frameIndex}
+     * @return the {@link Particle} representing the spawn crop result
      */
     public Particle spawnCrop(float x, float y, float z, SpriteSheet cropSheet,
                           int frameIndex) {

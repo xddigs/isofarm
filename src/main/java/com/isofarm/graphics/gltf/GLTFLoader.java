@@ -27,7 +27,7 @@ import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.stb.STBImage.*;
 
 /**
- * Provides gltfloader behavior.
+ * Encapsulates the state and operations required by gltfloader within the game runtime.
  */
 @SuppressWarnings("all")
 public final class GLTFLoader {
@@ -39,8 +39,8 @@ public final class GLTFLoader {
 
     /**
      * Loads load.
-     * @param path the path value
-     * @return the load result
+     * @param path the {@link String} supplied as {@code path}
+     * @return the {@link GLTFModel} representing the load result
      */
     public static GLTFModel load(String path) {
         try {
@@ -54,8 +54,8 @@ public final class GLTFLoader {
 
     /**
      * Loads the text.
-     * @param path the path value
-     * @return the load text result
+     * @param path the {@link String} supplied as {@code path}
+     * @return the {@link String} representing the load text result
      * @throws IOException if the operation cannot be completed
      */
     private static String loadText(String path) throws IOException {
@@ -75,8 +75,8 @@ public final class GLTFLoader {
 
     /**
      * Loads the model.
-     * @param root the root value
-     * @return the load model result
+     * @param root the {@link JsonObject} supplied as {@code root}
+     * @return the {@link GLTFModel} representing the load model result
      */
     private static GLTFModel loadModel(JsonObject root) {
         GLTFModel model = new GLTFModel();
@@ -165,8 +165,8 @@ public final class GLTFLoader {
 
     /**
      * Loads the buffers.
-     * @param buffersJson the buffers json value
-     * @return the load buffers result
+     * @param buffersJson the {@link JsonArray} supplied as {@code buffersJson}
+     * @return the {@link List} representing the load buffers result
      */
     private static List<ByteBuffer> loadBuffers(JsonArray buffersJson) {
         List<ByteBuffer> buffers = new ArrayList<>();
@@ -192,12 +192,12 @@ public final class GLTFLoader {
     }
 
     /**
-     * Performs the read float accessor operation.
-     * @param accessorIndex the accessor index value
-     * @param accessors the accessors value
-     * @param bufferViews the buffer views value
-     * @param buffers the buffers value
-     * @return the read float accessor result
+     * Loads float accessor and converts it into the runtime representation.
+     * @param accessorIndex the {@code int} supplied as {@code accessorIndex}
+     * @param accessors the {@link JsonArray} supplied as {@code accessors}
+     * @param bufferViews the {@link JsonArray} supplied as {@code bufferViews}
+     * @param buffers the {@link List} supplied as {@code buffers}
+     * @return an array of {@code float} values; the read float accessor result
      */
     private static float[] readFloatAccessor(int accessorIndex, JsonArray accessors, JsonArray bufferViews,
                                              List<ByteBuffer> buffers) {
@@ -232,12 +232,12 @@ public final class GLTFLoader {
     }
 
     /**
-     * Performs the read index accessor operation.
-     * @param accessorIndex the accessor index value
-     * @param accessors the accessors value
-     * @param bufferViews the buffer views value
-     * @param buffers the buffers value
-     * @return the read index accessor result
+     * Loads index accessor and converts it into the runtime representation.
+     * @param accessorIndex the {@code int} supplied as {@code accessorIndex}
+     * @param accessors the {@link JsonArray} supplied as {@code accessors}
+     * @param bufferViews the {@link JsonArray} supplied as {@code bufferViews}
+     * @param buffers the {@link List} supplied as {@code buffers}
+     * @return an array of {@code int} values; the read index accessor result
      */
     private static int[] readIndexAccessor(int accessorIndex, JsonArray accessors,
                                            JsonArray bufferViews, List<ByteBuffer> buffers) {
@@ -269,9 +269,9 @@ public final class GLTFLoader {
     }
 
     /**
-     * Performs the component count operation.
-     * @param type the type value
-     * @return the component count result
+     * Returns the number or extent represented by component count.
+     * @param type the {@link String} supplied as {@code type}
+     * @return {@code int}; the component count result
      */
     private static int componentCount(String type) {
         return switch (type) {
@@ -284,9 +284,9 @@ public final class GLTFLoader {
     }
 
     /**
-     * Performs the component size operation.
-     * @param componentType the component type value
-     * @return the component size result
+     * Returns the number or extent represented by component size.
+     * @param componentType the {@code int} supplied as {@code componentType}
+     * @return {@code int}; the component size result
      */
     private static int componentSize(int componentType) {
         return switch (componentType) {
@@ -300,12 +300,12 @@ public final class GLTFLoader {
 
     /**
      * Creates and returns the mesh.
-     * @param positions the positions value
-     * @param normals the normals value
-     * @param uvs the uvs value
-     * @param indices the indices value
-     * @param textureId the texture id value
-     * @return the created mesh
+     * @param positions an array of {@code float} values supplied as {@code positions}
+     * @param normals an array of {@code float} values supplied as {@code normals}
+     * @param uvs an array of {@code float} values supplied as {@code uvs}
+     * @param indices an array of {@code int} values supplied as {@code indices}
+     * @param textureId the {@code int} supplied as {@code textureId}
+     * @return the {@link GLTFModel.GLTFMesh} representing the created mesh
      */
     private static GLTFModel.GLTFMesh createMesh(float[] positions, float[] normals,
                                                  float[] uvs, int[] indices, int textureId) {
@@ -354,9 +354,9 @@ public final class GLTFLoader {
 
     /**
      * Loads the texture.
-     * @param root the root value
-     * @param imageIndex the image index value
-     * @return the load texture result
+     * @param root the {@link JsonObject} supplied as {@code root}
+     * @param imageIndex the {@code int} supplied as {@code imageIndex}
+     * @return {@code int}; the load texture result
      */
     private static int loadTexture(JsonObject root, int imageIndex) {
         JsonArray images = root.getAsJsonArray("images");
@@ -414,10 +414,10 @@ public final class GLTFLoader {
 
     /**
      * Returns the texture id for primitive.
-     * @param root the root value
-     * @param primitive the primitive value
-     * @param textureIds the texture ids value
-     * @return the texture id for primitive
+     * @param root the {@link JsonObject} supplied as {@code root}
+     * @param primitive the {@link JsonObject} supplied as {@code primitive}
+     * @param textureIds the {@link List} supplied as {@code textureIds}
+     * @return {@code int}; the texture id for primitive
      */
     private static int getTextureIdForPrimitive(JsonObject root, JsonObject primitive, List<Integer> textureIds) {
         if (!primitive.has("material")) {
@@ -469,11 +469,11 @@ public final class GLTFLoader {
     }
 
     /**
-     * Performs the read vector3 operation.
-     * @param object the object value
-     * @param property the property value
-     * @param defaultValue the default value value
-     * @return the read vector3 result
+     * Loads vector3 and converts it into the runtime representation.
+     * @param object the {@link JsonObject} supplied as {@code object}
+     * @param property the {@link String} supplied as {@code property}
+     * @param defaultValue the {@link Vector3f} supplied as {@code defaultValue}
+     * @return the {@link Vector3f} representing the read vector3 result
      */
     private static Vector3f readVector3(JsonObject object, String property, Vector3f defaultValue) {
         if (!object.has(property)) {
@@ -484,9 +484,9 @@ public final class GLTFLoader {
     }
 
     /**
-     * Performs the read quaternion operation.
-     * @param object the object value
-     * @return the read quaternion result
+     * Loads quaternion and converts it into the runtime representation.
+     * @param object the {@link JsonObject} supplied as {@code object}
+     * @return the {@link Quaternionf} representing the read quaternion result
      */
     private static Quaternionf readQuaternion(JsonObject object) {
         if (!object.has("rotation")) {

@@ -4,7 +4,7 @@ import com.isofarm.data.Singleton;
 import com.isofarm.item.Item;
 
 /**
- * Provides settings behavior.
+ * Encapsulates the state and operations required by settings within the game runtime.
  */
 @SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
 @Singleton
@@ -33,7 +33,7 @@ public class Settings {
 
     /**
      * Returns the shadow map size.
-     * @return the shadow map size
+     * @return {@code float}; the shadow map size
      */
     public static float getShadowMapSize() {
         return SHADOW_MAP_SIZE;
@@ -41,16 +41,16 @@ public class Settings {
 
     /**
      * Returns the scale.
-     * @return the scale
+     * @return {@code float}; the scale
      */
     public static float getScale() {
         return GUI_SCALES[guiScaleIndex];
     }
 
     /**
-     * Performs the scale operation.
-     * @param value the value value
-     * @return the scale result
+     * Transforms this object according to the supplied values.
+     * @param value the {@code float} supplied as {@code value}
+     * @return {@code float}; the scale result
      */
     public static float scale(float value) {
         return value * getScale();
@@ -58,7 +58,7 @@ public class Settings {
 
     /**
      * Returns the scaled entity.
-     * @return the scaled entity
+     * @return {@code float}; the scaled entity
      */
     public static float getScaledEntity() {
         return scale(0.335f);
@@ -66,7 +66,7 @@ public class Settings {
 
     /**
      * Returns the scaled icon.
-     * @return the scaled icon
+     * @return {@code float}; the scaled icon
      */
     public static float getScaledIcon() {
         return scale(BASE_ICON_SIZE);
@@ -74,7 +74,7 @@ public class Settings {
 
     /**
      * Returns the scaled text.
-     * @return the scaled text
+     * @return {@code float}; the scaled text
      */
     public static float getScaledText() {
         return scale(12.0f);
@@ -82,7 +82,7 @@ public class Settings {
 
     /**
      * Returns the scaled button.
-     * @return the scaled button
+     * @return {@code float}; the scaled button
      */
     public static float getScaledButton() {
         return scale(8.0f);
@@ -90,7 +90,7 @@ public class Settings {
 
     /**
      * Returns the scaled label.
-     * @return the scaled label
+     * @return {@code float}; the scaled label
      */
     public static float getScaledLabel() {
         return scale(5.6f);
@@ -98,7 +98,7 @@ public class Settings {
 
     /**
      * Returns the scaled tooltip.
-     * @return the scaled tooltip
+     * @return {@code float}; the scaled tooltip
      */
     public static float getScaledTooltip() {
         return scale(4.0f);
@@ -106,7 +106,7 @@ public class Settings {
 
     /**
      * Returns the scaled border.
-     * @return the scaled border
+     * @return {@code float}; the scaled border
      */
     public static float getScaledBorder() {
         return scale(1.6f);
@@ -114,7 +114,7 @@ public class Settings {
 
     /**
      * Returns the scaled frame.
-     * @return the scaled frame
+     * @return {@code float}; the scaled frame
      */
     public static float getScaledFrame() {
         return scale(0.8f);
@@ -122,7 +122,7 @@ public class Settings {
 
     /**
      * Returns the scaled window.
-     * @return the scaled window
+     * @return {@code float}; the scaled window
      */
     public static float getScaledWindow() {
         return scale(0.4f);
@@ -130,7 +130,7 @@ public class Settings {
 
     /**
      * Returns the scaled slot.
-     * @return the scaled slot
+     * @return {@code float}; the scaled slot
      */
     public static float getScaledSlot() {
         return getScaledIcon();
@@ -138,7 +138,7 @@ public class Settings {
 
     /**
      * Returns the scaled spacing.
-     * @return the scaled spacing
+     * @return {@code float}; the scaled spacing
      */
     public static float getScaledSpacing() {
         return scale(2.0f);
@@ -146,7 +146,7 @@ public class Settings {
 
     /**
      * Returns the scaled padding.
-     * @return the scaled padding
+     * @return {@code float}; the scaled padding
      */
     public static float getScaledPadding() {
         return scale(6.0f);
@@ -154,7 +154,7 @@ public class Settings {
 
     /**
      * Returns the scaled corner radius.
-     * @return the scaled corner radius
+     * @return {@code float}; the scaled corner radius
      */
     public static float getScaledCornerRadius() {
         return scale(4.0f);
@@ -162,7 +162,7 @@ public class Settings {
 
     /**
      * Returns the scaled thickness.
-     * @return the scaled thickness
+     * @return {@code float}; the scaled thickness
      */
     public static float getScaledThickness() {
         return scale(0.8f);
@@ -170,7 +170,7 @@ public class Settings {
 
     /**
      * Returns the scaled header.
-     * @return the scaled header
+     * @return {@code float}; the scaled header
      */
     public static float getScaledHeader() {
         return getScaledIcon();
@@ -178,7 +178,7 @@ public class Settings {
 
     /**
      * Returns the max interaction distance.
-     * @return the max interaction distance
+     * @return {@code float}; the max interaction distance
      */
     public static float getMaxInteractionDistance() {
         return maxInteractionDistance;
@@ -186,7 +186,7 @@ public class Settings {
 
     /**
      * Sets the max interaction distance.
-     * @param maxInteractionDistance the max interaction distance value
+     * @param maxInteractionDistance the {@code float} supplied as {@code maxInteractionDistance}
      */
     public static void setMaxInteractionDistance(float maxInteractionDistance) {
         Settings.maxInteractionDistance = maxInteractionDistance;
@@ -194,7 +194,7 @@ public class Settings {
 
     /**
      * Returns the fov.
-     * @return the fov
+     * @return {@code float}; the fov
      */
     public static float getFov() {
         return fov;
@@ -202,15 +202,15 @@ public class Settings {
 
     /**
      * Sets the fov.
-     * @param fov the fov value
+     * @param fov the {@code float} supplied as {@code fov}
      */
     public static void setFov(float fov) {
         Settings.fov = fov;
     }
 
     /**
-     * Performs the do enable shadows operation.
-     * @return the do enable shadows result
+     * Updates or derives runtime state for do enable shadows according to the supplied arguments.
+     * @return {@code boolean}; the do enable shadows result
      */
     public static boolean doEnableShadows() {
         return doEnableShadows;
@@ -218,7 +218,7 @@ public class Settings {
 
     /**
      * Sets the do enable shadows.
-     * @param doEnableShadows the do enable shadows value
+     * @param doEnableShadows the {@code boolean} supplied as {@code doEnableShadows}
      */
     public static void setDoEnableShadows(boolean doEnableShadows) {
         Settings.doEnableShadows = doEnableShadows;
@@ -226,23 +226,23 @@ public class Settings {
 
     /**
      * Returns the mouse sensitivity.
-     * @return the mouse sensitivity
+     * @return {@code float}; the mouse sensitivity
      */
     public static float getMouseSensitivity() {
         return mouseSensitivity;
     }
 
     /**
-     * Performs the do enable motions operation.
-     * @return the do enable motions result
+     * Updates or derives runtime state for do enable motions according to the supplied arguments.
+     * @return {@code float}; the do enable motions result
      */
     public static float doEnableMotions() {
         return doEnableMotions ? 0.8f : 0.0f;
     }
 
     /**
-     * Performs the do keep inventory operation.
-     * @return the do keep inventory result
+     * Updates or derives runtime state for do keep inventory according to the supplied arguments.
+     * @return {@code boolean}; the do keep inventory result
      */
     public static boolean doKeepInventory() {
         return doKeepInventory;
@@ -250,7 +250,7 @@ public class Settings {
 
     /**
      * Sets the do keep inventory.
-     * @param doKeepInventory the do keep inventory value
+     * @param doKeepInventory the {@code boolean} supplied as {@code doKeepInventory}
      */
     public static void setDoKeepInventory(boolean doKeepInventory) {
         Settings.doKeepInventory = doKeepInventory;
@@ -258,58 +258,58 @@ public class Settings {
 
     /**
      * Sets the do enable motions.
-     * @param doEnableMotions the do enable motions value
+     * @param doEnableMotions the {@code boolean} supplied as {@code doEnableMotions}
      */
     public static void setDoEnableMotions(boolean doEnableMotions) {
         Settings.doEnableMotions = doEnableMotions;
     }
 
     /**
-     * Performs the toggle motion blur operation.
+     * Toggles the setting represented by motion blur and applies it immediately.
      */
     public static void toggleMotionBlur() {
         doEnableMotions = !doEnableMotions;
     }
 
     /**
-     * Performs the toggle keep inventory operation.
+     * Toggles the setting represented by keep inventory and applies it immediately.
      */
     public static void toggleKeepInventory() {
         doKeepInventory = !doKeepInventory;
     }
 
     /**
-     * Performs the toggle shadows operation.
+     * Toggles the setting represented by shadows and applies it immediately.
      */
     public static void toggleShadows() {
         doEnableShadows = !doEnableShadows;
     }
 
     /**
-     * Performs the toggle music operation.
+     * Toggles the setting represented by music and applies it immediately.
      */
     public static void toggleMusic() {
         doEnableMusic = !doEnableMusic;
     }
 
     /**
-     * Performs the do enable music operation.
-     * @return the do enable music result
+     * Updates or derives runtime state for do enable music according to the supplied arguments.
+     * @return {@code boolean}; the do enable music result
      */
     public static boolean doEnableMusic() {
         return doEnableMusic;
     }
 
     /**
-     * Performs the toggle debug info operation.
+     * Toggles the setting represented by debug info and applies it immediately.
      */
     public static void toggleDebugInfo() {
         doEnableDebugInfo = !doEnableDebugInfo;
     }
 
     /**
-     * Performs the do enable debug info operation.
-     * @return the do enable debug info result
+     * Updates or derives runtime state for do enable debug info according to the supplied arguments.
+     * @return {@code boolean}; the do enable debug info result
      */
     public static boolean doEnableDebugInfo() {
         return doEnableDebugInfo;
@@ -317,7 +317,7 @@ public class Settings {
 
     /**
      * Returns the render distance.
-     * @return the render distance
+     * @return {@code int}; the render distance
      */
     public static int getRenderDistance() {
         return renderDistance;
@@ -325,7 +325,7 @@ public class Settings {
 
     /**
      * Sets the render distance.
-     * @param renderDistance the render distance value
+     * @param renderDistance the {@code int} supplied as {@code renderDistance}
      */
     public static void setRenderDistance(int renderDistance) {
         Settings.renderDistance = renderDistance;
@@ -333,7 +333,7 @@ public class Settings {
 
     /**
      * Returns the unload margin.
-     * @return the unload margin
+     * @return {@code int}; the unload margin
      */
     public static int getUnloadMargin() {
         return unloadMargin;
@@ -341,7 +341,7 @@ public class Settings {
 
     /**
      * Sets the unload margin.
-     * @param unloadMargin the unload margin value
+     * @param unloadMargin the {@code int} supplied as {@code unloadMargin}
      */
     public static void setUnloadMargin(int unloadMargin) {
         Settings.unloadMargin = unloadMargin;
@@ -349,7 +349,7 @@ public class Settings {
 
     /**
      * Returns the gui scale index.
-     * @return the gui scale index
+     * @return {@code int}; the gui scale index
      */
     public static int getGuiScaleIndex() {
         return guiScaleIndex;
@@ -357,7 +357,7 @@ public class Settings {
 
     /**
      * Returns the ticks.
-     * @return the ticks
+     * @return {@code float}; the ticks
      */
     public static float getTicks() {
         return ticks;

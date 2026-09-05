@@ -22,7 +22,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-/** Owns player rules concerning life, attributes, inventory, loot and currency. */
+/**
+ * Owns player rules concerning life, attributes, inventory, loot and currency.
+ */
 public final class PlayerGameplay {
     private static final Logger log = LoggerFactory.getLogger(PlayerGameplay.class);
     private static final float WIDTH = 0.5f, HEIGHT = 2.0f, SPAWN_X = 0.5f, SPAWN_Z = 0.5f;
@@ -32,10 +34,14 @@ public final class PlayerGameplay {
     private int damageSequence;
     private float respawnTimer = -1.0f;
 
-    /** Creates the shared player's gameplay component. */
+    /**
+     * Creates the shared player's gameplay component.
+     */
     public PlayerGameplay() {}
 
-    /** Initializes the player from the shared world. */
+    /**
+     * Initializes the player from the shared world.
+     */
     public void initialize() {
         player = Player.plyr;
         World world = World.wrld;
@@ -52,8 +58,8 @@ public final class PlayerGameplay {
 
     /**
      * Advances death and respawn handling.
-     * @param delta frame time
-     * @return whether normal player updates should continue
+     * @param delta the {@code float} argument; frame time
+     * @return {@code true} if normal player updates should continue; otherwise {@code false}
      */
     public boolean updateLifeCycle(float delta) {
         if (player.isAlive()) return true;
@@ -68,20 +74,28 @@ public final class PlayerGameplay {
         return false;
     }
 
-    /** @param delta frame time */
+    /**
+     * Updates this object for the current simulation step.
+     * @param delta the {@code float} argument; frame time
+     */
     public void update(float delta) {
         player.setAnimTimer(player.getAnimTimer() + delta);
         player.heal(((0.5f + player.getLevel()) * delta) / getDifficultyRegen());
         checkDurability();
     }
 
-    /** @param amount received damage */
+    /**
+     * Handles damage taken and updates the affected state.
+     * @param amount the {@code float} argument; received damage
+     */
     public void onDamageTaken(float amount) {
         damageSequence++;
         SoundService.fx.playEntitySound(SoundGroup.ENTITY);
     }
 
-    /** Drops all droppable inventory stacks into the world. */
+    /**
+     * Drops all droppable inventory stacks into the world.
+     */
     public void dropLoot() {
         for (Item item : List.copyOf(player.getInventory().getItems().keySet())) {
             if (item == null || item instanceof Undroppable) continue;
@@ -92,7 +106,9 @@ public final class PlayerGameplay {
         }
     }
 
-    /** Restores spawn position, core stats and attributes. */
+    /**
+     * Restores spawn position, core stats and attributes.
+     */
     public void respawn() {
         if (!Settings.doKeepInventory()) clear();
         GridPos altitude = GameMaster.game.getWorld().getHighestY(SPAWN_X, SPAWN_Z);
@@ -107,7 +123,9 @@ public final class PlayerGameplay {
         GameMaster.game.toggleHUD();
     }
 
-    /** Resets all six character attributes to their base value. */
+    /**
+     * Resets all six character attributes to their base value.
+     */
     public void resetAttributes() {
         player.setStrength(1); player.setDexterity(1); player.setConstitution(1);
         player.setIntelligence(1); player.setWisdom(1); player.setCharisma(1);
@@ -133,7 +151,11 @@ public final class PlayerGameplay {
         }
     }
 
-    /** @param item item @param amount quantity */
+    /**
+     * Processes sell and updates the affected inventory or currency balances.
+     * @param item the {@link Item} supplied as {@code item}
+     * @param amount the {@code int} argument; quantity
+     */
     public void sell(Item item, int amount) {
         if (item == null || amount <= 0) return;
         int current = player.getInventory().getAmount(item);
@@ -145,27 +167,124 @@ public final class PlayerGameplay {
         earn(earnings);
     }
 
-    /** @param item item @param amount quantity */ public void add(Item item, int amount) { player.getInventory().add(item, amount); log.info("Added x{} of {} to inventory", amount, item.getName()); }
-    /** @param item item */ public void add(Item item) { add(item, 1); log.info("Added x1 of {} to inventory", item.getName()); }
-    /** @param item item @param amount quantity */ public void addToBackpack(Item item, int amount) { if (player.getBackpack().hasBackpackEquipped()) player.getBackpack().add(item, amount); log.info("Added x{} of {} to backpack", amount, item.getName()); }
-    /** @param item item */ public void addToBackpack(Item item) { addToBackpack(item, 1); log.info("Added x1 of {} to backpack", item.getName()); }
-    /** @param item item @param amount quantity */ public void removeFromBackpack(Item item, int amount) { if (player.getBackpack().hasBackpackEquipped()) player.getBackpack().remove(item, amount); log.info("Removed x{} of {} from backpack", amount, item.getName()); }
-    /** @param item item */ public void removeFromBackpack(Item item) { removeFromBackpack(item, 1); log.info("Removed x1 of {} from backpack", item.getName()); }
-    /** Sorts both storage containers. */ public void sort() { player.getInventory().sort(); player.getBackpack().sort(); }
-    /** @param item item @param amount quantity */ public void remove(Item item, int amount) { if (!player.getGamemode().isGodmode()) { player.getInventory().remove(item, amount); log.info("Removed x{} of {} to inventory", amount, item.getName()); } }
-    /** @param item item */ public void remove(Item item) { if (!player.getGamemode().isGodmode()) { player.getInventory().remove(item, 1); log.info("Removed x1 of {} from inventory", item.getName()); } }
-    /** Clears non-backpack inventory items. */ public void clear() { for (Item item :List.copyOf(player.getInventory().getItems().keySet())) if (item != null && !(item instanceof CraftingBook)) remove(item); log.info("Cleared inventory"); }
-    /** @return whether inventory is empty */ public boolean isEmpty() { return player.getInventory().isEmpty(); }
-    /** @return inventory size */ public int size() { return player.getInventory().size(); }
-    /** @param index index @return indexed item */ public Item get(int index) { return player.getInventory().get(index); }
-    /** @param item key @return matching item */ public Item get(Item item) { return player.getInventory().get(item); }
-    /** @param item item @return quantity */ public int getAmount(Item item) { return player.getInventory().getAmount(item); }
-    /** @param amount currency amount */ public void earn(int amount) { log.info("Earned ${}", amount); player.getPurse().add(amount); }
-    /** @param amount currency amount */ public void spend(int amount) { if (amount > 0) { log.info("Spent ${}", amount); player.getPurse().remove(amount); } }
-    /** @return whether storage has space */ public boolean hasSpace() { return !player.getInventory().isFull() || player.getBackpack().hasBackpackEquipped() && !player.getBackpack().isFull(); }
-    /** @return whether seeds are present */ public boolean hasSeeds() { return player.getInventory().hasItemOfType(Seed.class); }
-    /** @return damage event sequence */ public int getDamageSequence() { return damageSequence; }
-    /** @return respawn timer */ public float getRespawnTimer() { return respawnTimer; }
-    /** @param value respawn timer */ public void setRespawnTimer(float value) { respawnTimer = value; }
-    /** @return regeneration multiplier */ public float getDifficultyRegen() { return GameMaster.game.getDifficulty().getMultiplier(); }
+    /**
+     * Adds the supplied element to the corresponding collection or processing queue.
+     * @param item the {@link Item} supplied as {@code item}
+     * @param amount the {@code int} argument; quantity
+     */
+    public void add(Item item, int amount) { player.getInventory().add(item, amount); log.info("Added x{} of {} to inventory", amount, item.getName()); }
+    /**
+     * Adds the supplied element to the corresponding collection or processing queue.
+     * @param item the {@link Item} supplied as {@code item}
+     */
+    public void add(Item item) { add(item, 1); log.info("Added x1 of {} to inventory", item.getName()); }
+    /**
+     * Adds to backpack to the corresponding collection or processing queue.
+     * @param item the {@link Item} supplied as {@code item}
+     * @param amount the {@code int} argument; quantity
+     */
+    public void addToBackpack(Item item, int amount) { if (player.getBackpack().hasBackpackEquipped()) player.getBackpack().add(item, amount); log.info("Added x{} of {} to backpack", amount, item.getName()); }
+    /**
+     * Adds to backpack to the corresponding collection or processing queue.
+     * @param item the {@link Item} supplied as {@code item}
+     */
+    public void addToBackpack(Item item) { addToBackpack(item, 1); log.info("Added x1 of {} to backpack", item.getName()); }
+    /**
+     * Removes from backpack and updates any dependent state.
+     * @param item the {@link Item} supplied as {@code item}
+     * @param amount the {@code int} argument; quantity
+     */
+    public void removeFromBackpack(Item item, int amount) { if (player.getBackpack().hasBackpackEquipped()) player.getBackpack().remove(item, amount); log.info("Removed x{} of {} from backpack", amount, item.getName()); }
+    /**
+     * Removes from backpack and updates any dependent state.
+     * @param item the {@link Item} supplied as {@code item}
+     */
+    public void removeFromBackpack(Item item) { removeFromBackpack(item, 1); log.info("Removed x1 of {} from backpack", item.getName()); }
+    /**
+     * Sorts both storage containers.
+     */
+    public void sort() { player.getInventory().sort(); player.getBackpack().sort(); }
+    /**
+     * Removes the supplied element and updates any dependent state.
+     * @param item the {@link Item} supplied as {@code item}
+     * @param amount the {@code int} argument; quantity
+     */
+    public void remove(Item item, int amount) { if (!player.getGamemode().isGodmode()) { player.getInventory().remove(item, amount); log.info("Removed x{} of {} to inventory", amount, item.getName()); } }
+    /**
+     * Removes the supplied element and updates any dependent state.
+     * @param item the {@link Item} supplied as {@code item}
+     */
+    public void remove(Item item) { if (!player.getGamemode().isGodmode()) { player.getInventory().remove(item, 1); log.info("Removed x1 of {} from inventory", item.getName()); } }
+    /**
+     * Clears non-backpack inventory items.
+     */
+    public void clear() { for (Item item :List.copyOf(player.getInventory().getItems().keySet())) if (item != null && !(item instanceof CraftingBook)) remove(item); log.info("Cleared inventory"); }
+    /**
+     * Determines whether this object contains no elements or active content.
+     * @return {@code true} if inventory is empty; otherwise {@code false}
+     */
+    public boolean isEmpty() { return player.getInventory().isEmpty(); }
+    /**
+     * Returns the number or extent represented by size.
+     * @return {@code int}; inventory size
+     */
+    public int size() { return player.getInventory().size(); }
+    /**
+     * Returns the value identified by the supplied key, index, or current object state.
+     * @param index the {@code int} supplied as {@code index}
+     * @return the {@link Item} result; indexed item
+     */
+    public Item get(int index) { return player.getInventory().get(index); }
+    /**
+     * Returns the value identified by the supplied key, index, or current object state.
+     * @param item the {@link Item} argument; key
+     * @return the {@link Item} result; matching item
+     */
+    public Item get(Item item) { return player.getInventory().get(item); }
+    /**
+     * Returns amount according to the current object state.
+     * @param item the {@link Item} supplied as {@code item}
+     * @return {@code int}; quantity
+     */
+    public int getAmount(Item item) { return player.getInventory().getAmount(item); }
+    /**
+     * Processes earn and updates the affected inventory or currency balances.
+     * @param amount the {@code int} argument; currency amount
+     */
+    public void earn(int amount) { log.info("Earned ${}", amount); player.getPurse().add(amount); }
+    /**
+     * Processes spend and updates the affected inventory or currency balances.
+     * @param amount the {@code int} argument; currency amount
+     */
+    public void spend(int amount) { if (amount > 0) { log.info("Spent ${}", amount); player.getPurse().remove(amount); } }
+    /**
+     * Determines whether space is satisfied by the current state.
+     * @return {@code true} if storage has space; otherwise {@code false}
+     */
+    public boolean hasSpace() { return !player.getInventory().isFull() || player.getBackpack().hasBackpackEquipped() && !player.getBackpack().isFull(); }
+    /**
+     * Determines whether seeds is satisfied by the current state.
+     * @return {@code true} if seeds are present; otherwise {@code false}
+     */
+    public boolean hasSeeds() { return player.getInventory().hasItemOfType(Seed.class); }
+    /**
+     * Returns damage sequence according to the current object state.
+     * @return {@code int}; damage event sequence
+     */
+    public int getDamageSequence() { return damageSequence; }
+    /**
+     * Returns respawn timer according to the current object state.
+     * @return {@code float}; respawn timer
+     */
+    public float getRespawnTimer() { return respawnTimer; }
+    /**
+     * Sets respawn timer and updates the associated state.
+     * @param value the {@code float} argument; respawn timer
+     */
+    public void setRespawnTimer(float value) { respawnTimer = value; }
+    /**
+     * Returns difficulty regen according to the current object state.
+     * @return {@code float}; regeneration multiplier
+     */
+    public float getDifficultyRegen() { return GameMaster.game.getDifficulty().getMultiplier(); }
 }

@@ -39,8 +39,8 @@ public class WorldGenerator implements Generator {
 
     /**
      * Creates a new {@code WorldGenerator} instance with a random seed.
-     * @param world the world value
-     * @param fluidSimulation the fluid simulation used for generated lakes
+     * @param world the {@link World} supplied as {@code world}
+     * @param fluidSimulation the {@link FluidSimulation} argument; the fluid simulation used for generated lakes
      */
     public WorldGenerator(World world, FluidSimulation fluidSimulation) {
         this(world, fluidSimulation, new Random().nextLong());
@@ -48,9 +48,9 @@ public class WorldGenerator implements Generator {
 
     /**
      * Creates a new {@code WorldGenerator} instance.
-     * @param world the world value
-     * @param fluidSimulation the fluid simulation used for generated lakes
-     * @param seed the seed value
+     * @param world the {@link World} supplied as {@code world}
+     * @param fluidSimulation the {@link FluidSimulation} argument; the fluid simulation used for generated lakes
+     * @param seed the {@code long} supplied as {@code seed}
      */
     public WorldGenerator(World world, FluidSimulation fluidSimulation, long seed) {
         WorldGenerator.world = world;
@@ -66,9 +66,10 @@ public class WorldGenerator implements Generator {
     }
 
     /**
+     * {@inheritDoc}
      * Generates the island terrain and features contained in a chunk.
-     * @param chunkX the chunk x value
-     * @param chunkZ the chunk z value
+     * @param chunkX the {@code int} supplied as {@code chunkX}
+     * @param chunkZ the {@code int} supplied as {@code chunkZ}
      */
     @Override
     public void generateChunk(int chunkX, int chunkZ) {
@@ -124,9 +125,9 @@ public class WorldGenerator implements Generator {
 
     /**
      * Returns the generated surface height at a world position.
-     * @param x the world x value
-     * @param z the world z value
-     * @return the generated terrain height
+     * @param x the {@code int} argument; the world x value
+     * @param z the {@code int} argument; the world z value
+     * @return {@code int}; the generated terrain height
      */
     private int terrainHeight(int x, int z) {
         if (!GENERATE_MOUNTAINS || MAX_MOUNTAIN_HEIGHT <= 0 || z >= 0) return SURFACE_Y;
@@ -137,7 +138,7 @@ public class WorldGenerator implements Generator {
 
     /**
      * Selects valid positions for the configured lakes.
-     * @param random the random value
+     * @param random the {@link Random} supplied as {@code random}
      */
     private void chooseLakes(Random random) {
         int requested = Math.max(0, LAKE_COUNT);
@@ -152,8 +153,8 @@ public class WorldGenerator implements Generator {
 
     /**
      * Checks whether a lake would violate the reserved clearance around lava.
-     * @param x the lake center x value
-     * @param z the lake center z value
+     * @param x the {@code int} argument; the lake center x value
+     * @param z the {@code int} argument; the lake center z value
      * @return {@code true} if the lake would be too close; otherwise {@code false}
      */
     private boolean isLakeTooCloseToLava(int x, int z) {
@@ -165,8 +166,8 @@ public class WorldGenerator implements Generator {
 
     /**
      * Checks whether a prospective lake overlaps an existing lake.
-     * @param x the lake center x value
-     * @param z the lake center z value
+     * @param x the {@code int} argument; the lake center x value
+     * @param z the {@code int} argument; the lake center z value
      * @return {@code true} if the lake would overlap; otherwise {@code false}
      */
     private boolean overlapsLake(int x, int z) {
@@ -178,7 +179,7 @@ public class WorldGenerator implements Generator {
 
     /**
      * Selects a guaranteed interior position away from the island spawn and coast.
-     * @return the selected one-block lava puddle
+     * @return the {@link LavaPuddle} representing the selected one-block lava puddle
      */
     private LavaPuddle chooseLavaPuddle() {
         int bestX = ISLAND_CENTER_X;
@@ -206,8 +207,8 @@ public class WorldGenerator implements Generator {
 
     /**
      * Checks whether a horizontal position contains the generated lava puddle.
-     * @param x the world x value
-     * @param z the world z value
+     * @param x the {@code int} argument; the world x value
+     * @param z the {@code int} argument; the world z value
      * @return {@code true} if the position contains lava; otherwise {@code false}
      */
     private boolean isLavaPuddle(int x, int z) {
@@ -216,8 +217,8 @@ public class WorldGenerator implements Generator {
 
     /**
      * Checks whether a position must remain clear around the lava puddle.
-     * @param x the world x value
-     * @param z the world z value
+     * @param x the {@code int} argument; the world x value
+     * @param z the {@code int} argument; the world z value
      * @return {@code true} if the position is near lava; otherwise {@code false}
      */
     private boolean nearLavaPuddle(int x, int z) {
@@ -226,7 +227,7 @@ public class WorldGenerator implements Generator {
 
     /**
      * Selects valid positions for the configured trees.
-     * @param random the random value
+     * @param random the {@link Random} supplied as {@code random}
      */
     private void chooseTrees(Random random) {
         int requested = Math.max(0, TREE_COUNT);
@@ -244,8 +245,8 @@ public class WorldGenerator implements Generator {
 
     /**
      * Checks whether a position is too close to a selected tree.
-     * @param x the world x value
-     * @param z the world z value
+     * @param x the {@code int} argument; the world x value
+     * @param z the {@code int} argument; the world z value
      * @return {@code true} if a tree is nearby; otherwise {@code false}
      */
     private boolean nearTree(int x, int z) {
@@ -255,9 +256,9 @@ public class WorldGenerator implements Generator {
 
     /**
      * Returns the lake occupying a world position.
-     * @param x the world x value
-     * @param z the world z value
-     * @return the lake at the position, or {@code null} when none is present
+     * @param x the {@code int} argument; the world x value
+     * @param z the {@code int} argument; the world z value
+     * @return the {@link Lake} representing the lake at the position, or {@code null} when none is present
      */
     private Lake lakeAt(int x, int z) {
         for (Lake lake : lakes) {
@@ -268,8 +269,8 @@ public class WorldGenerator implements Generator {
 
     /**
      * Checks whether a position belongs to the conditional sand shore around a lake.
-     * @param x the world x value
-     * @param z the world z value
+     * @param x the {@code int} argument; the world x value
+     * @param z the {@code int} argument; the world z value
      * @return {@code true} if sand should be generated at the position; otherwise {@code false}
      */
     private boolean isLakeShore(int x, int z) {
@@ -284,10 +285,10 @@ public class WorldGenerator implements Generator {
 
     /**
      * Returns the organic shoreline radius for a lake at a world position.
-     * @param lake the lake value
-     * @param x the world x value
-     * @param z the world z value
-     * @return the shoreline radius at the position
+     * @param lake the {@link Lake} supplied as {@code lake}
+     * @param x the {@code int} argument; the world x value
+     * @param z the {@code int} argument; the world z value
+     * @return {@code float}; the shoreline radius at the position
      */
     private float lakeBoundaryAt(Lake lake, int x, int z) {
         float organicity = Math.clamp(LAKE_ORGANICITY_PERCENT, 0, 100) / 100.0f;
@@ -296,9 +297,9 @@ public class WorldGenerator implements Generator {
 
     /**
      * Registers generated lake blocks as fluid simulation sources.
-     * @param chunk the generated chunk
-     * @param chunkX the chunk x value
-     * @param chunkZ the chunk z value
+     * @param chunk the {@link Chunk} argument; the generated chunk
+     * @param chunkX the {@code int} supplied as {@code chunkX}
+     * @param chunkZ the {@code int} supplied as {@code chunkZ}
      */
     private void registerFluidSources(Chunk chunk, int chunkX, int chunkZ) {
         for (int x = 0; x < Chunk.SIZE_X; x++) for (int z = 0; z < Chunk.SIZE_Z; z++) {
@@ -311,8 +312,8 @@ public class WorldGenerator implements Generator {
 
     /**
      * Registers the guaranteed lava puddle when its owning chunk is generated.
-     * @param chunkX the chunk x value
-     * @param chunkZ the chunk z value
+     * @param chunkX the {@code int} supplied as {@code chunkX}
+     * @param chunkZ the {@code int} supplied as {@code chunkZ}
      */
     private void registerLavaSource(int chunkX, int chunkZ) {
         if (Math.floorDiv(lavaPuddle.x, Chunk.SIZE_X) == chunkX
@@ -323,9 +324,9 @@ public class WorldGenerator implements Generator {
 
     /**
      * Generates every selected tree owned by a chunk.
-     * @param chunkX the chunk x value
-     * @param chunkZ the chunk z value
-     * @param random the random value
+     * @param chunkX the {@code int} supplied as {@code chunkX}
+     * @param chunkZ the {@code int} supplied as {@code chunkZ}
+     * @param random the {@link Random} supplied as {@code random}
      */
     private void generateTreesInChunk(int chunkX, int chunkZ, Random random) {
         for (Tree tree : trees) {
@@ -338,7 +339,7 @@ public class WorldGenerator implements Generator {
 
     /**
      * Generates decorative plants around the center of the island.
-     * @param random the random value
+     * @param random the {@link Random} supplied as {@code random}
      */
     private void generatePlants(Random random) {
         for (int i = 0; i < PLANT_ATTEMPTS; i++) {
@@ -359,10 +360,10 @@ public class WorldGenerator implements Generator {
 
     /**
      * Generates a plant cluster around a surface position.
-     * @param centerX the center x value
-     * @param centerZ the center z value
-     * @param plant the plant value
-     * @param random the random value
+     * @param centerX the {@code int} supplied as {@code centerX}
+     * @param centerZ the {@code int} supplied as {@code centerZ}
+     * @param plant the {@link BlockData} supplied as {@code plant}
+     * @param random the {@link Random} supplied as {@code random}
      */
     public void generateCluster(int centerX, int centerZ, BlockData plant, Random random) {
         generateCluster(centerX, terrainHeight(centerX, centerZ), centerZ, plant, random);
@@ -370,11 +371,11 @@ public class WorldGenerator implements Generator {
 
     /**
      * Generates a plant cluster at a known surface height.
-     * @param centerX the center x value
-     * @param surfaceY the center surface y value
-     * @param centerZ the center z value
-     * @param plant the plant value
-     * @param random the random value
+     * @param centerX the {@code int} supplied as {@code centerX}
+     * @param surfaceY the {@code int} argument; the center surface y value
+     * @param centerZ the {@code int} supplied as {@code centerZ}
+     * @param plant the {@link BlockData} supplied as {@code plant}
+     * @param random the {@link Random} supplied as {@code random}
      */
     private void generateCluster(int centerX, int surfaceY, int centerZ, BlockData plant, Random random) {
         int placed = 0;
@@ -395,9 +396,9 @@ public class WorldGenerator implements Generator {
 
     /**
      * Generates a tree on the highest solid block in a world column.
-     * @param worldX the world x value
-     * @param worldZ the world z value
-     * @param random the random value
+     * @param worldX the {@code int} supplied as {@code worldX}
+     * @param worldZ the {@code int} supplied as {@code worldZ}
+     * @param random the {@link Random} supplied as {@code random}
      */
     public static void generateTree(int worldX, int worldZ, Random random) {
         int surfaceY = findSurface(worldX, worldZ);
@@ -406,9 +407,9 @@ public class WorldGenerator implements Generator {
 
     /**
      * Returns the highest solid surface in a world column.
-     * @param x the world x value
-     * @param z the world z value
-     * @return the highest solid y value
+     * @param x the {@code int} argument; the world x value
+     * @param z the {@code int} argument; the world z value
+     * @return {@code int}; the highest solid y value
      */
     private static int findSurface(int x, int z) {
         for (int y = Chunk.SIZE_Y - 2; y >= 0; y--) {
@@ -421,10 +422,10 @@ public class WorldGenerator implements Generator {
 
     /**
      * Generates a tree at a known surface height.
-     * @param worldX the world x value
-     * @param surfaceY the surface y value
-     * @param worldZ the world z value
-     * @param random the random value
+     * @param worldX the {@code int} supplied as {@code worldX}
+     * @param surfaceY the {@code int} supplied as {@code surfaceY}
+     * @param worldZ the {@code int} supplied as {@code worldZ}
+     * @param random the {@link Random} supplied as {@code random}
      */
     private static void generateTree(int worldX, int surfaceY, int worldZ, Random random) {
         int trunkHeight = 4 + random.nextInt(5);
@@ -444,10 +445,10 @@ public class WorldGenerator implements Generator {
 
     /**
      * Returns deterministic value noise for a world position.
-     * @param x the world x value
-     * @param z the world z value
-     * @param scale the noise cell scale
-     * @return a noise value between {@code -1} and {@code 1}
+     * @param x the {@code int} argument; the world x value
+     * @param z the {@code int} argument; the world z value
+     * @param scale the {@code int} argument; the noise cell scale
+     * @return {@code float}; a noise value between {@code -1} and {@code 1}
      */
     private float noise(int x, int z, int scale) {
         long value = seed + (long) Math.floorDiv(x, scale) * 341873128712L
@@ -460,22 +461,28 @@ public class WorldGenerator implements Generator {
 
     /**
      * Returns the horizontal distance between two positions.
-     * @param x1 the first x value
-     * @param z1 the first z value
-     * @param x2 the second x value
-     * @param z2 the second z value
-     * @return the horizontal distance
+     * @param x1 the {@code int} argument; the first x value
+     * @param z1 the {@code int} argument; the first z value
+     * @param x2 the {@code int} argument; the second x value
+     * @param z2 the {@code int} argument; the second z value
+     * @return {@code float}; the horizontal distance
      */
     private static float distance(int x1, int z1, int x2, int z2) {
         return (float) Math.hypot(x1 - x2, z1 - z2);
     }
 
-    /** Stores the center and radius of a generated lake. */
+    /**
+     * Stores the center and radius of a generated lake.
+     */
     private record Lake(int x, int z, float radius) {}
 
-    /** Stores the base position of a generated tree. */
+    /**
+     * Stores the base position of a generated tree.
+     */
     private record Tree(int x, int y, int z) {}
 
-    /** Stores the position of the guaranteed one-block lava puddle. */
+    /**
+     * Stores the position of the guaranteed one-block lava puddle.
+     */
     private record LavaPuddle(int x, int y, int z) {}
 }

@@ -22,11 +22,11 @@ public enum CropType {
 
     /**
      * Creates a new {@code CropType} instance.
-     * @param id the id value
-     * @param displayName the display name value
-     * @param yield the yield value
-     * @param value the value value
-     * @param seeds the seeds value
+     * @param id the {@code byte} supplied as {@code id}
+     * @param displayName the {@link String} supplied as {@code displayName}
+     * @param yield the {@code int} supplied as {@code yield}
+     * @param value the {@code int} supplied as {@code value}
+     * @param seeds the {@code int} supplied as {@code seeds}
      */
     CropType(byte id, String displayName,
              int yield, int value, int seeds) {
@@ -39,7 +39,7 @@ public enum CropType {
 
     /**
      * Returns the id.
-     * @return the id
+     * @return {@code byte}; the id
      */
     public byte getId() {
         return id;
@@ -47,7 +47,7 @@ public enum CropType {
 
     /**
      * Returns the name.
-     * @return the name
+     * @return the {@link String} representing the name
      */
     public String getName() {
         return name().toLowerCase(Locale.ROOT);
@@ -55,7 +55,7 @@ public enum CropType {
 
     /**
      * Returns the display name.
-     * @return the display name
+     * @return the {@link String} representing the display name
      */
     public String getDisplayName() {
         return Local.lang.t(displayName);
@@ -63,7 +63,7 @@ public enum CropType {
 
     /**
      * Returns the yield.
-     * @return the yield
+     * @return {@code int}; the yield
      */
     public int getYield() {
         return yield;
@@ -71,7 +71,7 @@ public enum CropType {
 
     /**
      * Returns the value.
-     * @return the value
+     * @return {@code int}; the value
      */
     public int getValue() {
         return value;
@@ -79,7 +79,7 @@ public enum CropType {
 
     /**
      * Returns the seeds.
-     * @return the seeds
+     * @return {@code int}; the seeds
      */
     public int getSeeds() {
         return seeds;
@@ -102,9 +102,9 @@ public enum CropType {
     }
 
     /**
-     * Performs the from id operation.
-     * @param id the id value
-     * @return the from id result
+     * Creates or returns from id from the supplied arguments.
+     * @param id the {@code byte} supplied as {@code id}
+     * @return the {@link CropType} representing the from id result
      */
     public static CropType fromId(byte id) {
         for (CropType crop : CropType.values()) {

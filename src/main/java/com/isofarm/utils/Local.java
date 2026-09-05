@@ -13,7 +13,7 @@ import java.util.Locale;
 import java.util.Properties;
 
 /**
- * Provides local behavior.
+ * Encapsulates the state and operations required by local within the game runtime.
  */
 @Utils
 @Singleton
@@ -40,7 +40,7 @@ public class Local {
 
     /**
      * Sets the language.
-     * @param language the language value
+     * @param language the {@link Languages} supplied as {@code language}
      */
     public void setLanguage(Languages language) {
         if (language == null) return;
@@ -59,8 +59,8 @@ public class Local {
     }
 
     /**
-     * Performs the next language operation.
-     * @return the next language result
+     * Updates text or selection state for next language.
+     * @return the {@link Languages} representing the next language result
      */
     public Languages nextLanguage() {
         int nextIndex = (currentLanguage.ordinal() + 1) % LANGS.length;
@@ -71,36 +71,36 @@ public class Local {
 
     /**
      * Returns the current language.
-     * @return the current language
+     * @return the {@link Languages} representing the current language
      */
     public Languages getCurrentLanguage() {
         return currentLanguage;
     }
 
     /**
-     * Performs the t operation.
-     * @param key the key value
-     * @return the t result
+     * Produces the textual or converted representation for t.
+     * @param key the {@link String} supplied as {@code key}
+     * @return the {@link String} representing the t result
      */
     public String t(String key) {
         return properties.getProperty(key, key);
     }
 
     /**
-     * Performs the f operation.
-     * @param s the s value
-     * @param args the args value
-     * @return the f result
+     * Produces the textual or converted representation for f.
+     * @param s the {@link String} supplied as {@code s}
+     * @param args an array of {@link Object} values supplied as {@code args}
+     * @return the {@link String} representing the f result
      */
     public String f(String s, Object... args) {
         return MessageFormat.format(t(s), args);
     }
 
     /**
-     * Performs the item operation.
-     * @param itemKey the item key value
-     * @param tierKey the tier key value
-     * @return the item result
+     * Creates or returns item from the supplied arguments.
+     * @param itemKey the {@link String} supplied as {@code itemKey}
+     * @param tierKey the {@link String} supplied as {@code tierKey}
+     * @return the {@link String} representing the item result
      */
     public String item(String itemKey, String tierKey) {
         String itemName = t(itemKey);
@@ -115,10 +115,10 @@ public class Local {
      * Formats an enchanted item name according to the active language's
      * grammatical ordering.
      *
-     * @param itemKey localization key of the base item
-     * @param enchantmentKey common enchantment key without the
+     * @param itemKey the {@link String} argument; localization key of the base item
+     * @param enchantmentKey the {@link String} argument; common enchantment key without the
      *                       {@code .adjective} suffix
-     * @return the localized enchanted item name
+     * @return the {@link String} representing the localized enchanted item name
      */
     public static String enchanted(String itemKey, String enchantmentKey) {
         String itemName = lang.t(itemKey);

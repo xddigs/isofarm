@@ -5,7 +5,7 @@ import com.isofarm.item.Item;
 import java.util.Objects;
 
 /**
- * Provides produce behavior.
+ * Encapsulates the state and operations required by produce within the game runtime.
  */
 @DataClass
 public class Produce implements Item {
@@ -17,7 +17,7 @@ public class Produce implements Item {
 
     /**
      * Creates a new {@code Produce} instance.
-     * @param type the type value
+     * @param type the {@link CropType} supplied as {@code type}
      */
     public Produce(CropType type) {
         this.type = type;
@@ -28,8 +28,9 @@ public class Produce implements Item {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the id.
-     * @return the id
+     * @return {@code byte}; the id
      */
     @Override
     public byte getId() {
@@ -37,8 +38,9 @@ public class Produce implements Item {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the name.
-     * @return the name
+     * @return the {@link String} representing the name
      */
     @Override
     public String getName() {
@@ -46,8 +48,9 @@ public class Produce implements Item {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the display name.
-     * @return the display name
+     * @return the {@link String} representing the display name
      */
     @Override
     public String getDisplayName() {
@@ -55,8 +58,9 @@ public class Produce implements Item {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the value.
-     * @return the value
+     * @return {@code int}; the value
      */
     @Override
     public int getValue() {
@@ -65,16 +69,17 @@ public class Produce implements Item {
 
     /**
      * Returns the type.
-     * @return the type
+     * @return the {@link CropType} representing the type
      */
     public CropType getType() {
         return type;
     }
 
     /**
-     * Performs the equals operation.
-     * @param o the o value
-     * @return the equals result
+     * {@inheritDoc}
+     * Determines whether equals satisfies the required comparison or validity rules.
+     * @param o the {@link Object} supplied as {@code o}
+     * @return {@code boolean}; the equals result
      */
     @Override
     public boolean equals(Object o) {
@@ -84,8 +89,9 @@ public class Produce implements Item {
     }
 
     /**
+     * {@inheritDoc}
      * Checks whether hash code.
-     * @return the hash code result
+     * @return {@code int}; the hash code result
      */
     @Override
     public int hashCode() {
@@ -93,8 +99,9 @@ public class Produce implements Item {
     }
 
     /**
-     * Performs the copy operation.
-     * @return the copy result
+     * {@inheritDoc}
+     * Creates an independent copy that preserves the relevant state of this object.
+     * @return the {@link Item} representing the copy result
      */
     @Override
     public Item copy() {

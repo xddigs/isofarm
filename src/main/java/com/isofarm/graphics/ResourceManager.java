@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Provides resource manager behavior.
+ * Encapsulates the state and operations required by resource manager within the game runtime.
  */
 @Singleton
 public class ResourceManager {
@@ -88,8 +88,8 @@ public class ResourceManager {
 
     /**
      * Returns the item sprite sheet.
-     * @param item the item value
-     * @return the item sprite sheet
+     * @param item the {@link Item} supplied as {@code item}
+     * @return the {@link SpriteSheet} representing the item sprite sheet
      */
     public static SpriteSheet getItemSpriteSheet(Item item) {
         return switch (item) {
@@ -108,8 +108,8 @@ public class ResourceManager {
 
     /**
      * Returns the material frame.
-     * @param material the material value
-     * @return the material frame
+     * @param material the {@link Material} supplied as {@code material}
+     * @return {@code int}; the material frame
      */
     private static int getMaterialFrame(Material material) {
         MaterialID materialID = material.getMaterialID();
@@ -139,8 +139,8 @@ public class ResourceManager {
 
     /**
      * Returns the item frame.
-     * @param item the item value
-     * @return the item frame
+     * @param item the {@link Item} supplied as {@code item}
+     * @return {@code int}; the item frame
      */
     public static int getItemFrame(Item item) {
         if (item instanceof iBlock block && block.getType() != null) {
@@ -196,7 +196,7 @@ public class ResourceManager {
     }
 
     /**
-     * Performs the dispose operation.
+     * Releases the resources associated with this object.
      */
     public void dispose() {
         blockMesh.dispose();
@@ -238,7 +238,7 @@ public class ResourceManager {
 
     /**
      * Returns the default shader.
-     * @return the default shader
+     * @return the {@link Shader} representing the default shader
      */
     public Shader getDefaultShader() {
         return defaultShader;
@@ -246,7 +246,7 @@ public class ResourceManager {
 
     /**
      * Returns the rain shader.
-     * @return the rain shader
+     * @return the {@link Shader} representing the rain shader
      */
     public Shader getRainShader() {
         return rainShader;
@@ -254,7 +254,7 @@ public class ResourceManager {
 
     /**
      * Returns the motion blur shader.
-     * @return the motion blur shader
+     * @return the {@link Shader} representing the motion blur shader
      */
     public Shader getMotionBlurShader() {
         return motionBlurShader;
@@ -262,7 +262,7 @@ public class ResourceManager {
 
     /**
      * Returns the shadow map shader.
-     * @return the shadow map shader
+     * @return the {@link Shader} representing the shadow map shader
      */
     public Shader getShadowMapShader() {
         return shadowMapShader;
@@ -270,7 +270,7 @@ public class ResourceManager {
 
     /**
      * Returns the blur shader.
-     * @return the blur shader
+     * @return the {@link Shader} representing the blur shader
      */
     public Shader getBlurShader() {
         return blurShader;
@@ -278,7 +278,7 @@ public class ResourceManager {
 
     /**
      * Returns the screen quad mesh.
-     * @return the screen quad mesh
+     * @return the {@link Mesh} representing the screen quad mesh
      */
     public Mesh getScreenQuadMesh() {
         return screenQuadMesh;
@@ -286,7 +286,7 @@ public class ResourceManager {
 
     /**
      * Returns the block mesh.
-     * @return the block mesh
+     * @return the {@link Mesh} representing the block mesh
      */
     public Mesh getBlockMesh() {
         return blockMesh;
@@ -294,7 +294,7 @@ public class ResourceManager {
 
     /**
      * Returns the flower mesh.
-     * @return the flower mesh
+     * @return the {@link Mesh} representing the flower mesh
      */
     public Mesh getFlowerMesh() {
         return flowerMesh;
@@ -302,7 +302,7 @@ public class ResourceManager {
 
     /**
      * Returns the destroy overlay mesh.
-     * @return the destroy overlay mesh
+     * @return the {@link Mesh} representing the destroy overlay mesh
      */
     public Mesh getDestroyOverlayMesh() {
         return destroyOverlayMesh;
@@ -310,7 +310,7 @@ public class ResourceManager {
 
     /**
      * Returns the selection mesh.
-     * @return the selection mesh
+     * @return the {@link Mesh} representing the selection mesh
      */
     public Mesh getSelectionMesh() {
         return selectionMesh;
@@ -318,7 +318,7 @@ public class ResourceManager {
 
     /**
      * Returns the sprite mesh.
-     * @return the sprite mesh
+     * @return the {@link Mesh} representing the sprite mesh
      */
     public Mesh getSpriteMesh() {
         return spriteMesh;
@@ -326,7 +326,7 @@ public class ResourceManager {
 
     /**
      * Returns the player mesh.
-     * @return the player mesh
+     * @return the {@link Mesh} representing the player mesh
      */
     public Mesh getPlayerMesh() {
         return playerMesh;
@@ -334,7 +334,7 @@ public class ResourceManager {
 
     /**
      * Returns the background gui.
-     * @return the background gui
+     * @return the {@link Texture} representing the background gui
      */
     public Texture getBackgroundGUI() {
         return backgroundGUI;
@@ -342,7 +342,7 @@ public class ResourceManager {
 
     /**
      * Returns the blocks atlas.
-     * @return the blocks atlas
+     * @return the {@link TextureAtlas} representing the blocks atlas
      */
     public TextureAtlas getBlocksAtlas() {
         return blocksAtlas;
@@ -350,7 +350,7 @@ public class ResourceManager {
 
     /**
      * Returns the destroy texture.
-     * @return the destroy texture
+     * @return the {@link SpriteSheet} representing the destroy texture
      */
     public SpriteSheet getDestroyTexture() {
         return destroyTexture;
@@ -358,7 +358,7 @@ public class ResourceManager {
 
     /**
      * Returns the player model.
-     * @return the player model
+     * @return the {@link GLTFModel} representing the player model
      */
     public GLTFModel getPlayerModel() {
         return playerModel;
@@ -366,7 +366,7 @@ public class ResourceManager {
 
     /**
      * Returns the seed icons.
-     * @return the seed icons
+     * @return the {@link SpriteSheet} representing the seed icons
      */
     public SpriteSheet getSeedIcons() {
         return seedIcons;
@@ -374,7 +374,7 @@ public class ResourceManager {
 
     /**
      * Returns the crop icons.
-     * @return the crop icons
+     * @return the {@link SpriteSheet} representing the crop icons
      */
     public SpriteSheet getCropIcons() {
         return cropIcons;
@@ -382,7 +382,7 @@ public class ResourceManager {
 
     /**
      * Returns the tool icons.
-     * @return the tool icons
+     * @return the {@link SpriteSheet} representing the tool icons
      */
     public SpriteSheet getToolIcons() {
         return toolIcons;
@@ -390,7 +390,7 @@ public class ResourceManager {
 
     /**
      * Returns the block icons.
-     * @return the block icons
+     * @return the {@link SpriteSheet} representing the block icons
      */
     public SpriteSheet getBlockIcons() {
         return blockIcons;
@@ -398,7 +398,7 @@ public class ResourceManager {
 
     /**
      * Returns the material icons.
-     * @return the material icons
+     * @return the {@link SpriteSheet} representing the material icons
      */
     public SpriteSheet getMaterialIcons() {
         return materialIcons;
@@ -406,7 +406,7 @@ public class ResourceManager {
 
     /**
      * Returns the usables icons.
-     * @return the usables icons
+     * @return the {@link SpriteSheet} representing the usables icons
      */
     public SpriteSheet getUsablesIcons() {
         return usablesIcons;
@@ -414,7 +414,7 @@ public class ResourceManager {
 
     /**
      * Returns the inventory icons.
-     * @return the inventory icons
+     * @return the {@link SpriteSheet} representing the inventory icons
      */
     public SpriteSheet getInventoryIcons() {
         return inventoryIcons;
@@ -422,7 +422,7 @@ public class ResourceManager {
 
     /**
      * Returns the book animation sheet.
-     * @return the book animation sheet
+     * @return the {@link SpriteSheet} representing the book animation sheet
      */
     public SpriteSheet getBookAnimationSheet() {
         return bookAnimationSheet;
@@ -430,7 +430,7 @@ public class ResourceManager {
 
     /**
      * Returns the hearts sprite sheet.
-     * @return the hearts sprite sheet
+     * @return the {@link SpriteSheet} representing the hearts sprite sheet
      */
     public SpriteSheet getHeartsSpriteSheet() {
         return heartsSpriteSheet;
@@ -438,7 +438,7 @@ public class ResourceManager {
 
     /**
      * Returns the crop spritesheets.
-     * @return the crop spritesheets
+     * @return the {@link Map} representing the crop spritesheets
      */
     public Map<CropType, SpriteSheet> getCropSpritesheets() {
         return cropSpritesheets;
@@ -447,7 +447,7 @@ public class ResourceManager {
     /**
      * Returns the models associated with interactive block types.
      *
-     * @return the interactive block model map
+     * @return the {@link Map} representing the interactive block model map
      */
     public Map<Blockable, GLTFModel> getBlockModels() {
         return blockModels;
@@ -455,8 +455,8 @@ public class ResourceManager {
 
     /**
      * Returns the shader.
-     * @param name the name value
-     * @return the shader
+     * @param name the {@link String} supplied as {@code name}
+     * @return the {@link Shader} representing the shader
      */
     public Shader getShader(String name) {
         if (name == null) return defaultShader;

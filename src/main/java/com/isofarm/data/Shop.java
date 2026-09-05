@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Provides shop behavior.
+ * Encapsulates the state and operations required by shop within the game runtime.
  */
 @DataClass
 public class Shop {
@@ -36,7 +36,7 @@ public class Shop {
 
     /**
      * Returns the owner.
-     * @return the owner
+     * @return the {@link String} representing the owner
      */
     public String getOwner() {
         return owner;
@@ -44,7 +44,7 @@ public class Shop {
 
     /**
      * Returns the stock.
-     * @return the stock
+     * @return the {@link Inventory} representing the stock
      */
     public Inventory getStock() {
         return stock;
@@ -52,23 +52,23 @@ public class Shop {
 
     /**
      * Returns the purse.
-     * @return the purse
+     * @return the {@link Purse} representing the purse
      */
     public Purse getPurse() {
         return purse;
     }
 
     /**
-     * Performs the purse operation.
-     * @return the purse result
+     * Returns the purse associated with this character.
+     * @return {@code int}; the purse result
      */
     public int purse() {
         return purse.getBalance();
     }
 
     /**
-     * Performs the earn operation.
-     * @param amount the amount value
+     * Processes earn and updates the affected inventory or currency balances.
+     * @param amount the {@code int} supplied as {@code amount}
      */
     public void earn(int amount) {
         purse.add(amount);
@@ -76,7 +76,7 @@ public class Shop {
 
     /**
      * Updates the current state.
-     * @param timeService the time service value
+     * @param timeService the {@link TimeService} supplied as {@code timeService}
      */
     public void update(TimeService timeService) {
         if (timeService.getDay() % 10 == 0) {
@@ -86,8 +86,8 @@ public class Shop {
 
     /**
      * Adds add.
-     * @param item the item value
-     * @param amount the amount value
+     * @param item the {@link Item} supplied as {@code item}
+     * @param amount the {@code int} supplied as {@code amount}
      */
     public void add(Item item, int amount) {
         if (amount <= 0) return;
@@ -96,9 +96,9 @@ public class Shop {
     }
 
     /**
-     * Performs the sell operation.
-     * @param item the item value
-     * @param amount the amount value
+     * Processes sell and updates the affected inventory or currency balances.
+     * @param item the {@link Item} supplied as {@code item}
+     * @param amount the {@code int} supplied as {@code amount}
      */
     public void sell(Item item, int amount) {
         if (amount <= 0) return;
@@ -108,9 +108,9 @@ public class Shop {
     }
 
     /**
-     * Performs the buy operation.
-     * @param item the item value
-     * @param amount the amount value
+     * Processes buy and updates the affected inventory or currency balances.
+     * @param item the {@link Item} supplied as {@code item}
+     * @param amount the {@code int} supplied as {@code amount}
      */
     public void buy(Item item, int amount) {
         int totalPrice = item.getValue() * amount;
@@ -148,8 +148,8 @@ public class Shop {
     }
 
     /**
-     * Performs the size operation.
-     * @return the size result
+     * Returns the number or extent represented by size.
+     * @return {@code int}; the size result
      */
     public int size() {
         return stock.size();
@@ -157,8 +157,8 @@ public class Shop {
 
     /**
      * Returns get.
-     * @param index the index value
-     * @return the get result
+     * @param index the {@code int} supplied as {@code index}
+     * @return the {@link Item} representing the get result
      */
     public Item get(int index) {
         return stock.get(index);
@@ -166,15 +166,15 @@ public class Shop {
 
     /**
      * Returns the amount.
-     * @param item the item value
-     * @return the amount
+     * @param item the {@link Item} supplied as {@code item}
+     * @return {@code int}; the amount
      */
     public int getAmount(Item item) {
         return stock.getAmount(item);
     }
 
     /**
-     * Performs the reset operation.
+     * Resets this object to its initial runtime state.
      */
     public void reset() {
         setUpStock();
@@ -183,7 +183,7 @@ public class Shop {
 
     /**
      * Returns the random name.
-     * @return the random name
+     * @return the {@link String} representing the random name
      */
     private String getRandomName() {
         String[] names = {"John", "Michael", "Jeffrey", "Hugh",

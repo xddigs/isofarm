@@ -16,7 +16,7 @@ import org.joml.Vector4f;
 import org.lwjgl.stb.STBTTBakedChar;
 
 /**
- * Provides book ui behavior.
+ * Encapsulates the state and operations required by book ui within the game runtime.
  */
 @Singleton
 public class BookUI extends UIElement {
@@ -48,10 +48,10 @@ public class BookUI extends UIElement {
 
     /**
      * Creates a new {@code BookUI} instance.
-     * @param x the x value
-     * @param y the y value
-     * @param width the width value
-     * @param height the height value
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param width the {@code float} supplied as {@code width}
+     * @param height the {@code float} supplied as {@code height}
      */
     public BookUI(float x, float y, float width, float height) {
         super(x, y, width, height);
@@ -60,10 +60,10 @@ public class BookUI extends UIElement {
 
     /**
      * Initializes the component.
-     * @param x the x value
-     * @param y the y value
-     * @param width the width value
-     * @param height the height value
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param width the {@code float} supplied as {@code width}
+     * @param height the {@code float} supplied as {@code height}
      */
     public static void init(float x, float y, float width, float height) {
         if (bui != null) return;
@@ -71,9 +71,9 @@ public class BookUI extends UIElement {
     }
 
     /**
-     * Performs the ease in out cubic operation.
-     * @param t the t value
-     * @return the ease in out cubic result
+     * Transforms in out cubic according to the supplied values.
+     * @param t the {@code float} supplied as {@code t}
+     * @return {@code float}; the ease in out cubic result
      */
     private static float easeInOutCubic(float t) {
         if (t < 0.5f) {
@@ -84,25 +84,26 @@ public class BookUI extends UIElement {
     }
 
     /**
-     * Performs the lerp operation.
-     * @param start the start value
-     * @param end the end value
-     * @param t the t value
-     * @return the lerp result
+     * Transforms this object according to the supplied values.
+     * @param start the {@code float} supplied as {@code start}
+     * @param end the {@code float} supplied as {@code end}
+     * @param t the {@code float} supplied as {@code t}
+     * @return {@code float}; the lerp result
      */
     private static float lerp(float start, float end, float t) {
         return start + (end - start) * t;
     }
 
     /**
-     * Renders render.
+     * {@inheritDoc}
+     * Renders this object in the requested render pass.
      */
     @Override
     public void render() {
     }
 
     /**
-     * Performs the open operation.
+     * Activates this object and prepares any state it requires.
      */
     public void open() {
         isClosing = false;
@@ -110,7 +111,7 @@ public class BookUI extends UIElement {
     }
 
     /**
-     * Performs the close operation.
+     * Releases the resources associated with this object.
      */
     public void close() {
         if (isClosing) return;
@@ -145,8 +146,8 @@ public class BookUI extends UIElement {
 
     /**
      * Updates the current state.
-     * @param book the book value
-     * @param animSheet the anim sheet value
+     * @param book the {@link Book} supplied as {@code book}
+     * @param animSheet the {@link SpriteSheet} supplied as {@code animSheet}
      */
     public void update(Book book, SpriteSheet animSheet) {
         if (book == null || !isOpen() || isFlippingPage
@@ -166,8 +167,8 @@ public class BookUI extends UIElement {
 
     /**
      * Updates the book line.
-     * @param animSheet the anim sheet value
-     * @param book the book value
+     * @param animSheet the {@link SpriteSheet} supplied as {@code animSheet}
+     * @param book the {@link Book} supplied as {@code book}
      */
     private void updateBookLine(SpriteSheet animSheet, Book book) {
         float screenWidth = GUI.getScreenWidth();
@@ -210,15 +211,15 @@ public class BookUI extends UIElement {
     }
 
     /**
-     * Performs the check hover operation.
-     * @param page the page value
-     * @param pageX the page x value
-     * @param pageY the page y value
-     * @param pageWidth the page width value
-     * @param pageHeight the page height value
-     * @param paddingX the horizontal text padding
-     * @param paddingTop the vertical text padding
-     * @param lineHeight the line height value
+     * Determines whether hover is satisfied by the current state.
+     * @param page the {@link Page} supplied as {@code page}
+     * @param pageX the {@code float} supplied as {@code pageX}
+     * @param pageY the {@code float} supplied as {@code pageY}
+     * @param pageWidth the {@code float} supplied as {@code pageWidth}
+     * @param pageHeight the {@code float} supplied as {@code pageHeight}
+     * @param paddingX the {@code float} argument; the horizontal text padding
+     * @param paddingTop the {@code float} argument; the vertical text padding
+     * @param lineHeight the {@code float} supplied as {@code lineHeight}
      */
     private void checkHover(Page page, float pageX, float pageY,
                             float pageWidth, float pageHeight,
@@ -243,7 +244,9 @@ public class BookUI extends UIElement {
         }
     }
 
-    /** Checks which recipe icon in a page grid is under the mouse. */
+    /**
+     * Checks which recipe icon in a page grid is under the mouse.
+     */
     private void checkGridHover(Page page, float pageX, float pageY,
                                 float pageWidth, float pageHeight) {
         float gridWidth = getGridWidth();
@@ -272,10 +275,10 @@ public class BookUI extends UIElement {
     }
 
     /**
-     * Renders render.
-     * @param book the book value
-     * @param delta the delta value
-     * @param animSheet the anim sheet value
+     * Renders this object in the requested render pass.
+     * @param book the {@link Book} supplied as {@code book}
+     * @param delta the {@code float} supplied as {@code delta}
+     * @param animSheet the {@link SpriteSheet} supplied as {@code animSheet}
      */
     public void render(Book book, float delta, SpriteSheet animSheet) {
         if (book == null || animSheet == null) return;
@@ -366,14 +369,18 @@ public class BookUI extends UIElement {
         }
     }
 
-    /** Renders a page when its index exists. */
+    /**
+     * Renders a page when its index exists.
+     */
     private void renderPageAt(Book book, int pageIndex, float pageX, float pageY,
                               float pageWidth, float pageHeight, float alpha) {
         if (pageIndex < 0 || pageIndex >= book.getPages().size()) return;
         renderPage(book.getPage(pageIndex), pageX, pageY, pageWidth, pageHeight, alpha);
     }
 
-    /** Renders one page with the temporary shader fold enabled. */
+    /**
+     * Renders one page with the temporary shader fold enabled.
+     */
     private void renderTransformedPage(Book book, int pageIndex,
                                        float pageX, float pageY,
                                        float pageWidth, float pageHeight, float alpha,
@@ -386,7 +393,7 @@ public class BookUI extends UIElement {
 
     /**
      * Updates the animation.
-     * @param delta the delta value
+     * @param delta the {@code float} supplied as {@code delta}
      */
     private void updateAnimation(float delta) {
         float amount = delta / ANIMATION_DURATION;
@@ -411,7 +418,7 @@ public class BookUI extends UIElement {
     }
 
     /**
-     * Performs the next page operation.
+     * Updates text or selection state for next page.
      */
     public void nextPage() {
         if (isFlippingPage) return;
@@ -422,7 +429,7 @@ public class BookUI extends UIElement {
     }
 
     /**
-     * Performs the previous page operation.
+     * Updates text or selection state for previous page.
      */
     public void previousPage() {
         if (isFlippingPage) return;
@@ -434,12 +441,12 @@ public class BookUI extends UIElement {
 
     /**
      * Renders the spread.
-     * @param book the book value
-     * @param x the x value
-     * @param y the y value
-     * @param animSheet the anim sheet value
-     * @param scale the scale value
-     * @param alpha the alpha value
+     * @param book the {@link Book} supplied as {@code book}
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param animSheet the {@link SpriteSheet} supplied as {@code animSheet}
+     * @param scale the {@code float} supplied as {@code scale}
+     * @param alpha the {@code float} supplied as {@code alpha}
      */
     private void renderSpread(Book book, float x, float y, SpriteSheet animSheet, float scale, float alpha) {
         if (book.getPages().isEmpty() || alpha <= 0.0f) return;
@@ -461,12 +468,12 @@ public class BookUI extends UIElement {
 
     /**
      * Renders the page.
-     * @param page the page value
-     * @param pageX the page x value
-     * @param pageY the page y value
-     * @param pageWidth the page width value
-     * @param pageHeight the page height value
-     * @param alpha the alpha value
+     * @param page the {@link Page} supplied as {@code page}
+     * @param pageX the {@code float} supplied as {@code pageX}
+     * @param pageY the {@code float} supplied as {@code pageY}
+     * @param pageWidth the {@code float} supplied as {@code pageWidth}
+     * @param pageHeight the {@code float} supplied as {@code pageHeight}
+     * @param alpha the {@code float} supplied as {@code alpha}
      */
     private void renderPage(Page page, float pageX, float pageY,
                             float pageWidth, float pageHeight, float alpha) {
@@ -500,7 +507,9 @@ public class BookUI extends UIElement {
         }
     }
 
-    /** Renders up to sixteen recipe results in a centered 4x4 grid. */
+    /**
+     * Renders up to sixteen recipe results in a centered 4x4 grid.
+     */
     private void renderItemGrid(Page page, float pageX, float pageY,
                                 float pageWidth, float pageHeight, float alpha) {
         float gridX = pageX + (pageWidth - getGridWidth()) * 0.5f;
@@ -530,7 +539,9 @@ public class BookUI extends UIElement {
         }
     }
 
-    /** Draws a white outline shaped by the selected icon's alpha channel. */
+    /**
+     * Draws a white outline shaped by the selected icon's alpha channel.
+     */
     private void renderIconOutline(SpriteSheet spriteSheet, int frame,
                                    float x, float y, float alpha) {
         Vector4f white = new Vector4f(1.0f, 1.0f, 1.0f, alpha);
@@ -559,9 +570,9 @@ public class BookUI extends UIElement {
 
     /**
      * Checks whether the mouse hovering condition is met.
-     * @param x the x value
-     * @param y the y value
-     * @param text the text value
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param text the {@link String} supplied as {@code text}
      * @return {@code true} if mouse hovering; otherwise {@code false}
      */
     public boolean isMouseHovering(float x, float y, String text) {
@@ -604,7 +615,9 @@ public class BookUI extends UIElement {
                 && mouseY >= minY - verticalPadding && mouseY <= maxY + verticalPadding;
     }
 
-    /** Checks whether the mouse is inside a rectangular icon. */
+    /**
+     * Checks whether the mouse is inside a rectangular icon.
+     */
     private boolean isMouseHovering(float x, float y, float width, float height) {
         float mouseX = Mouse.getX();
         float mouseY = Mouse.getY();
@@ -613,7 +626,7 @@ public class BookUI extends UIElement {
     }
 
     /**
-     * Performs the click operation.
+     * Handles click and applies its effect to the current interaction state.
      */
     private void click() {
         if (hoveredBookLine == null || !hoveredBookLine.isInteractive()) {
@@ -624,8 +637,8 @@ public class BookUI extends UIElement {
     }
 
     /**
-     * Performs the reload operation.
-     * @param openedBook the opened book value
+     * Reloads this object from its authoritative source.
+     * @param openedBook the {@link Book} supplied as {@code openedBook}
      */
     public void reload(Book openedBook) {
         openedBook.reload();

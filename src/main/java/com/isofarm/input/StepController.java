@@ -12,7 +12,7 @@ import com.isofarm.wrld.World;
 import org.joml.Vector3f;
 
 /**
- * Provides step controller behavior.
+ * Encapsulates the state and operations required by step controller within the game runtime.
  */
 @Singleton
 public class StepController {
@@ -23,9 +23,9 @@ public class StepController {
 
     /**
      * Updates the current state.
-     * @param gameMaster the game master value
-     * @param soundService the sound service value
-     * @param delta the delta value
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
+     * @param soundService the {@link SoundService} supplied as {@code soundService}
+     * @param delta the {@code float} supplied as {@code delta}
      */
     public void update(GameMaster gameMaster, SoundService soundService, float delta) {
         Player player = Player.plyr;

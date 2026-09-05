@@ -5,13 +5,13 @@ import com.isofarm.data.Tier;
 import com.isofarm.data.ToolType;
 
 /**
- * Provides axe behavior.
+ * Encapsulates the state and operations required by axe within the game runtime.
  */
 public class Axe extends Tool {
 
     /**
      * Creates a new {@code Axe} instance.
-     * @param tier the tier value
+     * @param tier the {@link Tier} supplied as {@code tier}
      */
     public Axe(Tier tier) {
         super((byte) 2, ToolType.AXE.getName(), 150, ToolType.AXE,
@@ -26,8 +26,9 @@ public class Axe extends Tool {
     }
 
     /**
-     * Performs the copy operation.
-     * @return the copy result
+     * {@inheritDoc}
+     * Creates an independent copy that preserves the relevant state of this object.
+     * @return the {@link Item} representing the copy result
      */
     @Override
     public Item copy() {
@@ -35,9 +36,10 @@ public class Axe extends Tool {
     }
 
     /**
-     * Performs the enchanting operation.
-     * @param enchantment the enchantment value
-     * @return the enchanting result
+     * {@inheritDoc}
+     * Applies enchanting and updates the affected character or item state.
+     * @param enchantment the {@link Enchantment} supplied as {@code enchantment}
+     * @return {@code boolean}; the enchanting result
      */
     @Override
     public boolean enchanting(Enchantment enchantment) {

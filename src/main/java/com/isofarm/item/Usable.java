@@ -5,7 +5,7 @@ import com.isofarm.utils.Local;
 import com.isofarm.wrld.GameMaster;
 
 /**
- * Provides usable behavior.
+ * Encapsulates the state and operations required by usable within the game runtime.
  */
 public abstract class Usable implements Craftable,
         Enchantable {
@@ -16,7 +16,7 @@ public abstract class Usable implements Craftable,
 
     /**
      * Creates a new {@code Usable} instance.
-     * @param usablesID the usables id value
+     * @param usablesID the {@link Usables} supplied as {@code usablesID}
      */
     public Usable(Usables usablesID) {
         this.usablesID = usablesID;
@@ -26,8 +26,8 @@ public abstract class Usable implements Craftable,
 
     /**
      * Creates a new {@code Usable} instance.
-     * @param usablesID the usables id value
-     * @param name the name value
+     * @param usablesID the {@link Usables} supplied as {@code usablesID}
+     * @param name the {@link String} supplied as {@code name}
      */
     public Usable(Usables usablesID, String name) {
         this(usablesID);
@@ -35,8 +35,9 @@ public abstract class Usable implements Craftable,
     }
 
     /**
+     * {@inheritDoc}
      * Returns the id.
-     * @return the id
+     * @return {@code byte}; the id
      */
     @Override
     public byte getId() {
@@ -44,8 +45,9 @@ public abstract class Usable implements Craftable,
     }
 
     /**
+     * {@inheritDoc}
      * Returns the value.
-     * @return the value
+     * @return {@code int}; the value
      */
     @Override
     public int getValue() {
@@ -53,8 +55,9 @@ public abstract class Usable implements Craftable,
     }
 
     /**
+     * {@inheritDoc}
      * Returns the name.
-     * @return the name
+     * @return the {@link String} representing the name
      */
     @Override
     public String getName() {
@@ -63,7 +66,7 @@ public abstract class Usable implements Craftable,
 
     /**
      * Returns the display name.
-     * @return the display name
+     * @return the {@link String} representing the display name
      */
     public String getDisplayName() {
         return Local.lang.t("item.usable." + usablesID.name().toLowerCase());
@@ -71,7 +74,7 @@ public abstract class Usable implements Craftable,
 
     /**
      * Returns the usables id.
-     * @return the usables id
+     * @return the {@link Usables} representing the usables id
      */
     public Usables getUsablesID() {
         return usablesID;
@@ -79,17 +82,17 @@ public abstract class Usable implements Craftable,
 
     /**
      * Sets the name.
-     * @param name the name value
+     * @param name the {@link String} supplied as {@code name}
      */
     public void setName(String name) {
         this.name = name;
     }
 
     /**
-     * Performs the use operation.
-     * @param gameMaster the game master value
-     * @param isCtrlHeld the is ctrl held value
-     * @return the use result
+     * Handles use and applies its effect to the current interaction state.
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
+     * @param isCtrlHeld the {@code boolean} supplied as {@code isCtrlHeld}
+     * @return {@code boolean}; the use result
      */
     public abstract boolean use(GameMaster gameMaster, boolean isCtrlHeld);
     /**

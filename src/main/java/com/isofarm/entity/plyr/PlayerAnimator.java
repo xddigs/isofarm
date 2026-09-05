@@ -20,7 +20,9 @@ import org.joml.Vector3f;
 import static org.joml.Math.lerp;
 import static org.lwjgl.opengl.GL13.*;
 
-/** Owns the player model, its rendering, facing and procedural animation. */
+/**
+ * Owns the player model, its rendering, facing and procedural animation.
+ */
 public final class PlayerAnimator {
     private static final float ZERO = 0.0f, MOVE_THRESHOLD = 0.05f;
     private static final float ROTATION_SPEED = 720.0f, FULL_DEGREES = 360.0f, HALF_DEGREES = 180.0f;
@@ -39,10 +41,14 @@ public final class PlayerAnimator {
     private float deathTime, deathWeight, deathAlpha = 1.0f;
     private boolean attacking;
 
-    /** Creates the shared player's animator. */
+    /**
+     * Creates the shared player's animator.
+     */
     public PlayerAnimator() {}
 
-    /** Initializes model state after singleton construction completes. */
+    /**
+     * Initializes model state after singleton construction completes.
+     */
     public void initialize() {
         player = Player.plyr;
         model = ResourceManager.rem.getPlayerModel();
@@ -73,7 +79,10 @@ public final class PlayerAnimator {
     private GLTFNode node(String name) { return model.findNode(name); }
     private static Vector3f copy(GLTFNode node) { return node == null ? null : new Vector3f(node.getTranslation()); }
 
-    /** @param delta frame time in seconds */
+    /**
+     * Updates this object for the current simulation step.
+     * @param delta the {@code float} argument; frame time in seconds
+     */
     public void update(float delta) {
         if (!player.isAlive()) {
             updateDeath(delta);
@@ -127,7 +136,9 @@ public final class PlayerAnimator {
         updateEquipment();
     }
 
-    /** Advances a short procedural ragdoll pose while awaiting respawn. */
+    /**
+     * Advances a short procedural ragdoll pose while awaiting respawn.
+     */
     private void updateDeath(float delta) {
         deathTime += delta;
         float progress = Math.min(deathTime / DEATH_FALL_DURATION, 1.0f);
@@ -209,7 +220,7 @@ public final class PlayerAnimator {
 
     /**
      * Returns the direction the player is facing.
-     * @param angle in radians
+     * @param angle the {@code float} argument; in radians
      * @return {@link Float} the direction the player is facing
      */
     private static float wrap(float angle) {
@@ -239,7 +250,9 @@ public final class PlayerAnimator {
     }
 
     /**
-     * @param game active game @param pass render pass
+     * Renders this object using the active graphics state.
+     * @param game the {@link GameMaster} argument; active game
+     * @param pass the {@link RenderPass} argument; render pass
      */
     public void render(GameMaster game, RenderPass pass) {
         if (model == null) return;
@@ -308,7 +321,18 @@ public final class PlayerAnimator {
         shader.unbind();
     }
 
-    /** Starts the attack animation. */ public void interact() { attacking = true; attackTime = 0; }
-    /** @return whether attacking */ public boolean isAttacking() { return attacking; }
-    /** @return current facing direction */ public Direction getDirection() { return direction; }
+    /**
+     * Starts the attack animation.
+     */
+    public void interact() { attacking = true; attackTime = 0; }
+    /**
+     * Determines whether attacking is satisfied by the current state.
+     * @return {@code true} if attacking; otherwise {@code false}
+     */
+    public boolean isAttacking() { return attacking; }
+    /**
+     * Returns direction according to the current object state.
+     * @return the {@link Direction} result; current facing direction
+     */
+    public Direction getDirection() { return direction; }
 }

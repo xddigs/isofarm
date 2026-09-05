@@ -6,7 +6,7 @@ import com.isofarm.entity.Player;
 import com.isofarm.utils.Settings;
 
 /**
- * Provides backpack inventory ui behavior.
+ * Encapsulates the state and operations required by backpack inventory ui within the game runtime.
  */
 public class BackpackInventoryUI extends InventoryUI {
     private static final int BACKPACK_SLOTS = 16;
@@ -15,8 +15,8 @@ public class BackpackInventoryUI extends InventoryUI {
 
     /**
      * Creates a new {@code BackpackInventoryUI} instance.
-     * @param x the x value
-     * @param y the y value
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
      */
     public BackpackInventoryUI(float x, float y) {
         super(x, y);
@@ -51,8 +51,9 @@ public class BackpackInventoryUI extends InventoryUI {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the slot uis.
-     * @return the slot uis
+     * @return an array of {@link InventorySlotUI} values; the slot uis
      */
     @Override
     public InventorySlotUI[] getSlotUIs() {
@@ -61,15 +62,16 @@ public class BackpackInventoryUI extends InventoryUI {
 
     /**
      * Returns the backpack.
-     * @return the backpack
+     * @return the {@link Inventory} representing the backpack
      */
     public Inventory getBackpack() {
         return backpack;
     }
 
     /**
+     * {@inheritDoc}
      * Updates the current state.
-     * @param delta the delta value
+     * @param delta the {@code float} supplied as {@code delta}
      */
     @Override
     public void update(float delta) {
@@ -79,7 +81,8 @@ public class BackpackInventoryUI extends InventoryUI {
     }
 
     /**
-     * Renders render.
+     * {@inheritDoc}
+     * Renders this object in the requested render pass.
      */
     @Override
     public void render() {

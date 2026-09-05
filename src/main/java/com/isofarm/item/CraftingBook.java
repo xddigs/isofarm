@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Provides crafting book behavior.
+ * Encapsulates the state and operations required by crafting book within the game runtime.
  */
 public class CraftingBook extends Book implements Undroppable {
     private static final int LINES_PER_PAGE = 16;
@@ -29,7 +29,8 @@ public class CraftingBook extends Book implements Undroppable {
     }
 
     /**
-     * Performs the reload operation.
+     * {@inheritDoc}
+     * Reloads this object from its authoritative source.
      */
     @Override
     public void reload() {
@@ -63,10 +64,11 @@ public class CraftingBook extends Book implements Undroppable {
     }
 
     /**
-     * Performs the use operation.
-     * @param gameMaster the game master value
-     * @param isCtrlHeld the is ctrl held value
-     * @return the use result
+     * {@inheritDoc}
+     * Handles use and applies its effect to the current interaction state.
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
+     * @param isCtrlHeld the {@code boolean} supplied as {@code isCtrlHeld}
+     * @return {@code boolean}; the use result
      */
     @Override
     public boolean use(GameMaster gameMaster, boolean isCtrlHeld) {

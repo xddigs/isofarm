@@ -49,7 +49,7 @@ public enum InteractiveBlocks implements Blockable {
 
     /**
      * Returns the GLTF model path of the block.
-     * @return the model path, or {@code null} when the type has no model
+     * @return the {@link String} representing the model path, or {@code null} when the type has no model
      */
     public String getModelPath() {
         return modelPath;
@@ -98,7 +98,7 @@ public enum InteractiveBlocks implements Blockable {
     /**
      * Returns the time required to destroy the block.
      *
-     * @return the destroy time in seconds
+     * @return {@code float}; the destroy time in seconds
      */
     public float getDestroyTime() {
         return destroyTime;

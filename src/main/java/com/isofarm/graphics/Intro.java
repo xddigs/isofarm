@@ -25,7 +25,7 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
- * Provides intro behavior.
+ * Encapsulates the state and operations required by intro within the game runtime.
  */
 public class Intro {
     private static final float CLEAR_COLOR_ALPHA = 1.0f;
@@ -46,7 +46,7 @@ public class Intro {
 
     /**
      * Creates a new {@code Intro} instance.
-     * @param window the window value
+     * @param window the {@code long} supplied as {@code window}
      */
     public Intro(long window) {
         Intro.window = window;
@@ -54,7 +54,7 @@ public class Intro {
 
     /**
      * Returns the window.
-     * @return the window
+     * @return {@code long}; the window
      */
     public static long getWindow() {
         return window;
@@ -62,7 +62,7 @@ public class Intro {
 
     /**
      * Returns the ui manager.
-     * @return the ui manager
+     * @return the {@link UIManager} representing the ui manager
      */
     public static UIManager getUiManager() {
         return uiManager;
@@ -104,7 +104,7 @@ public class Intro {
     }
 
     /**
-     * Performs the show operation.
+     * Activates this object and prepares any state it requires.
      */
     public void show() {
         setupUI();
@@ -189,7 +189,9 @@ public class Intro {
         loop();
     }
 
-    /** Waits for the player to enter a non-empty name after loading. */
+    /**
+     * Waits for the player to enter a non-empty name after loading.
+     */
     private void requestPlayerName() {
         namePrompt.show();
         nameField.show();
@@ -222,7 +224,7 @@ public class Intro {
 
     /**
      * Renders the loading frame.
-     * @param statusText the status text value
+     * @param statusText the {@link String} supplied as {@code statusText}
      */
     private void renderLoadingFrame(String statusText) {
         updateFramebufferSize();
@@ -276,7 +278,7 @@ public class Intro {
     }
 
     /**
-     * Performs the reposition progress bar operation.
+     * Transforms progress bar according to the supplied values.
      */
     private void repositionProgressBar() {
         if (progressBar == null) return;
@@ -290,7 +292,9 @@ public class Intro {
         progressBar.setPosition(x, y);
     }
 
-    /** Keeps the loading and player-name controls centered after a resize. */
+    /**
+     * Keeps the loading and player-name controls centered after a resize.
+     */
     private void repositionIntroElements() {
         repositionProgressBar();
         if (namePrompt == null || nameField == null) return;
@@ -303,7 +307,7 @@ public class Intro {
     }
 
     /**
-     * Performs the loop operation.
+     * Processes each applicable element for loop.
      */
     private void loop() {
         double lastTime = glfwGetTime();
@@ -350,7 +354,7 @@ public class Intro {
     }
 
     /**
-     * Performs the toggle fullscreen operation.
+     * Toggles the setting represented by fullscreen and applies it immediately.
      */
     private void toggleFullscreen() {
         fullscreen = !fullscreen;

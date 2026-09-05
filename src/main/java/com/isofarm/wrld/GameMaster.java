@@ -25,7 +25,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 
 /**
- * Provides game master behavior.
+ * Encapsulates the state and operations required by game master within the game runtime.
  */
 @Singleton
 public class GameMaster {
@@ -71,7 +71,7 @@ public class GameMaster {
 
     /**
      * Loads the resources.
-     * @param progressCallback the progress callback value
+     * @param progressCallback the {@link Consumer} supplied as {@code progressCallback}
      */
     public void loadResources(Consumer<Float> progressCallback) {
         float totalSteps = 10.0f;
@@ -119,9 +119,9 @@ public class GameMaster {
     }
 
     /**
-     * Performs the notify progress operation.
-     * @param callback the callback value
-     * @param progress the progress value
+     * Notifies the relevant subsystem about progress.
+     * @param callback the {@link Consumer} supplied as {@code callback}
+     * @param progress the {@code float} supplied as {@code progress}
      */
     private void notifyProgress(Consumer<Float> callback, float progress) {
         if (callback != null) {
@@ -145,7 +145,7 @@ public class GameMaster {
     }
 
     /**
-     * Performs the spawn operation.
+     * Transfers or creates the relevant entity or item for spawn.
      */
     public void spawn() {
         chunkManager.updateLoadedChunks(0, 0);
@@ -157,7 +157,7 @@ public class GameMaster {
 
     /**
      * Returns the sun.
-     * @return the sun
+     * @return the {@link Sun} representing the sun
      */
     public Sun getSun() {
         return sun;
@@ -165,7 +165,7 @@ public class GameMaster {
 
     /**
      * Returns the moon.
-     * @return the moon
+     * @return the {@link Moon} representing the moon
      */
     public Moon getMoon() {
         return moon;
@@ -173,7 +173,7 @@ public class GameMaster {
 
     /**
      * Returns the celestial lighting.
-     * @return the celestial lighting
+     * @return the {@link CelestialLighting} representing the celestial lighting
      */
     public CelestialLighting getCelestialLighting() {
         return celestialLighting;
@@ -181,7 +181,7 @@ public class GameMaster {
 
     /**
      * Returns the shadow map.
-     * @return the shadow map
+     * @return the {@link ShadowMap} representing the shadow map
      */
     public ShadowMap getShadowMap() {
         return shadowMap;
@@ -189,7 +189,7 @@ public class GameMaster {
 
     /**
      * Returns the chunk manager.
-     * @return the chunk manager
+     * @return the {@link ChunkManager} representing the chunk manager
      */
     public ChunkManager getChunkManager() {
         return chunkManager;
@@ -197,7 +197,7 @@ public class GameMaster {
 
     /**
      * Returns the item renderer.
-     * @return the item renderer
+     * @return the {@link ItemRenderer} representing the item renderer
      */
     public ItemRenderer getItemRenderer() {
         return itemRenderer;
@@ -205,7 +205,7 @@ public class GameMaster {
 
     /**
      * Returns the scene fbo.
-     * @return the scene fbo
+     * @return the {@link Framebuffer} representing the scene fbo
      */
     public Framebuffer getSceneFbo() {
         return sceneFbo;
@@ -213,7 +213,7 @@ public class GameMaster {
 
     /**
      * Returns the rain engine.
-     * @return the rain engine
+     * @return the {@link RainEngine} representing the rain engine
      */
     public RainEngine getRainEngine() {
         return rainEngine;
@@ -221,7 +221,7 @@ public class GameMaster {
 
     /**
      * Returns the window handle.
-     * @return the window handle
+     * @return {@code long}; the window handle
      */
     public long getWindowHandle() {
         return windowHandle;
@@ -229,7 +229,7 @@ public class GameMaster {
 
     /**
      * Returns the world.
-     * @return the world
+     * @return the {@link World} representing the world
      */
     public World getWorld() {
         return world;
@@ -237,7 +237,7 @@ public class GameMaster {
 
     /**
      * Returns the command registry.
-     * @return the command registry
+     * @return the {@link CommandRegistry} representing the command registry
      */
     public CommandRegistry getCommandRegistry() {
         return commandRegistry;
@@ -245,7 +245,7 @@ public class GameMaster {
 
     /**
      * Returns the item registry.
-     * @return the item registry
+     * @return the {@link ItemRegistry} representing the item registry
      */
     public ItemRegistry getItemRegistry() {
         return itemRegistry;
@@ -253,7 +253,7 @@ public class GameMaster {
 
     /**
      * Returns the game uiservice.
-     * @return the game uiservice
+     * @return the {@link GameUIService} representing the game uiservice
      */
     public GameUIService getGameUIService() {
         return gameUIservice;
@@ -261,7 +261,7 @@ public class GameMaster {
 
     /**
      * Returns the command service.
-     * @return the command service
+     * @return the {@link CommandService} representing the command service
      */
     public CommandService getCommandService() {
         return commandService;
@@ -269,7 +269,7 @@ public class GameMaster {
 
     /**
      * Returns the window width.
-     * @return the window width
+     * @return {@code float}; the window width
      */
     public float getWindowWidth() {
         return windowWidth;
@@ -277,7 +277,7 @@ public class GameMaster {
 
     /**
      * Returns the window height.
-     * @return the window height
+     * @return {@code float}; the window height
      */
     public float getWindowHeight() {
         return windowHeight;
@@ -285,7 +285,7 @@ public class GameMaster {
 
     /**
      * Returns the ortho camera.
-     * @return the ortho camera
+     * @return the {@link Camera} representing the ortho camera
      */
     public Camera getOrthoCamera() {
         return orthoCamera;
@@ -293,7 +293,7 @@ public class GameMaster {
 
     /**
      * Returns the blur fbo.
-     * @return the blur fbo
+     * @return the {@link Framebuffer} representing the blur fbo
      */
     public Framebuffer getBlurFbo() {
         return blurFbo;
@@ -309,7 +309,7 @@ public class GameMaster {
 
     /**
      * Sets the chat open.
-     * @param isChatOpen the is chat open value
+     * @param isChatOpen the {@code boolean} supplied as {@code isChatOpen}
      */
     public void setChatOpen(boolean isChatOpen) {
         this.isChatOpen = isChatOpen;
@@ -325,7 +325,7 @@ public class GameMaster {
 
     /**
      * Sets the inventory open.
-     * @param isInventoryOpen the is inventory open value
+     * @param isInventoryOpen the {@code boolean} supplied as {@code isInventoryOpen}
      */
     public void setInventoryOpen(boolean isInventoryOpen) {
         this.isInventoryOpen = isInventoryOpen;
@@ -340,7 +340,7 @@ public class GameMaster {
     }
 
     /**
-     * Performs the toggle hud operation.
+     * Toggles the setting represented by hud and applies it immediately.
      */
     public void toggleHUD() {
         this.isHUDShown = !isHUDShown;
@@ -348,8 +348,8 @@ public class GameMaster {
 
     /**
      * Returns the crop sprite sheet.
-     * @param type the type value
-     * @return the crop sprite sheet
+     * @param type the {@link CropType} supplied as {@code type}
+     * @return the {@link SpriteSheet} representing the crop sprite sheet
      */
     public SpriteSheet getCropSpriteSheet(CropType type) {
         return ResourceManager.rem.getCropSpritesheets().get(type);
@@ -357,7 +357,7 @@ public class GameMaster {
 
     /**
      * Returns the season.
-     * @return the season
+     * @return the {@link Season} representing the season
      */
     public Season getSeason() {
         return TimeService.ts.getCurrentSeason();
@@ -365,7 +365,7 @@ public class GameMaster {
 
     /**
      * Returns the entities immutable.
-     * @return the entities immutable
+     * @return the {@link List} representing the entities immutable
      */
     public List<Entity> getEntitiesImmutable() {
         return List.copyOf(entities);
@@ -373,7 +373,7 @@ public class GameMaster {
 
     /**
      * Returns the entities.
-     * @return the entities
+     * @return the {@link List} representing the entities
      */
     public List<Entity> getEntities() {
         return entities;
@@ -381,7 +381,7 @@ public class GameMaster {
 
     /**
      * Returns the recipes.
-     * @return the recipes
+     * @return the {@link List} representing the recipes
      */
     public List<Recipe> getRecipes() {
         return recipes;
@@ -389,7 +389,7 @@ public class GameMaster {
 
     /**
      * Returns the difficulty.
-     * @return the difficulty
+     * @return the {@link Difficulty} representing the difficulty
      */
     public Difficulty getDifficulty() {
         return difficulty;
@@ -397,7 +397,7 @@ public class GameMaster {
 
     /**
      * Sets the difficulty.
-     * @param difficulty the difficulty value
+     * @param difficulty the {@link Difficulty} supplied as {@code difficulty}
      */
     public void setDifficulty(Difficulty difficulty) {
         this.difficulty = difficulty;
@@ -405,7 +405,7 @@ public class GameMaster {
 
     /**
      * Returns the active camera.
-     * @return the active camera
+     * @return the {@link CameraView} representing the active camera
      */
     public CameraView getActiveCamera() {
         return orthoCamera;
@@ -413,7 +413,7 @@ public class GameMaster {
 
     /**
      * Adds the entity.
-     * @param entity the entity value
+     * @param entity the {@link Entity} supplied as {@code entity}
      */
     public void addEntity(Entity entity) {
         if (entity == null) return;
@@ -427,7 +427,7 @@ public class GameMaster {
 
     /**
      * Removes the entity.
-     * @param entity the entity value
+     * @param entity the {@link Entity} supplied as {@code entity}
      */
     public void removeEntity(Entity entity) {
         if (entity == null) return;
@@ -436,7 +436,7 @@ public class GameMaster {
 
     /**
      * Updates the entities.
-     * @param delta the delta value
+     * @param delta the {@code float} supplied as {@code delta}
      */
     private void updateEntities(float delta) {
         if (!entitiesToAdd.isEmpty()) {
@@ -461,7 +461,7 @@ public class GameMaster {
 
     /**
      * Returns the gen delta.
-     * @return the gen delta
+     * @return {@code float}; the gen delta
      */
     public float getGenDelta() {
         return genDelta;
@@ -469,7 +469,7 @@ public class GameMaster {
 
     /**
      * Returns the fps.
-     * @return the fps
+     * @return the {@link String} representing the fps
      */
     public String getFps() {
         return String.format("%.0f", 1.0f / genDelta) + " FPS";
@@ -477,7 +477,7 @@ public class GameMaster {
 
     /**
      * Updates the current state.
-     * @param delta the delta value
+     * @param delta the {@code float} supplied as {@code delta}
      */
     public void update(float delta) {
         if (WeatherService.isRaining()) {
@@ -521,7 +521,7 @@ public class GameMaster {
     }
 
     /**
-     * Renders render.
+     * Renders this object in the requested render pass.
      */
     public void render() {
         GameRenderer.gamr.render(this, chunkManager.getChunkMeshes());
@@ -529,7 +529,7 @@ public class GameMaster {
     }
 
     /**
-     * Performs the dispose operation.
+     * Releases the resources associated with this object.
      */
     public void dispose() {
         chunkManager.dispose();
@@ -550,8 +550,8 @@ public class GameMaster {
 
     /**
      * Returns the world item.
-     * @param item the item value
-     * @return the world item
+     * @param item the {@link Item} supplied as {@code item}
+     * @return the {@link WorldItem} representing the world item
      */
     public WorldItem getWorldItem(Item item) {
         return entities.stream()
@@ -563,16 +563,16 @@ public class GameMaster {
     }
 
     /**
-     * Performs the toggle inventory operation.
+     * Toggles the setting represented by inventory and applies it immediately.
      */
     public void toggleInventory() {
         setInventoryOpen(!isInventoryOpen());
     }
 
     /**
-     * Performs the on resize operation.
-     * @param newWidth the new width value
-     * @param newHeight the new height value
+     * Handles resize and updates the affected state.
+     * @param newWidth the {@code int} supplied as {@code newWidth}
+     * @param newHeight the {@code int} supplied as {@code newHeight}
      */
     public void onResize(int newWidth, int newHeight) {
         this.windowWidth = newWidth;
@@ -600,9 +600,9 @@ public class GameMaster {
     }
 
     /**
-     * Performs the rebuild chunk mesh at operation.
-     * @param worldX the world x value
-     * @param worldZ the world z value
+     * Rebuilds chunk mesh at from the authoritative runtime state.
+     * @param worldX the {@code int} supplied as {@code worldX}
+     * @param worldZ the {@code int} supplied as {@code worldZ}
      */
     public void rebuildChunkMeshAt(int worldX, int worldZ) {
         chunkManager.rebuildChunkMeshAt(worldX, worldZ);
@@ -627,8 +627,8 @@ public class GameMaster {
     }
 
     /**
-     * Performs the rebuild chunk mesh at operation.
-     * @param pos the pos value
+     * Rebuilds chunk mesh at from the authoritative runtime state.
+     * @param pos the {@link BlockPos} supplied as {@code pos}
      */
     public void rebuildChunkMeshAt(BlockPos pos) {
         rebuildChunkMeshAt(pos.x(), pos.z());

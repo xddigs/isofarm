@@ -4,7 +4,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL30.*;
 
 /**
- * Provides framebuffer behavior.
+ * Encapsulates the state and operations required by framebuffer within the game runtime.
  */
 public class Framebuffer {
     private final int fboId;
@@ -15,8 +15,8 @@ public class Framebuffer {
 
     /**
      * Creates a new {@code Framebuffer} instance.
-     * @param width the width value
-     * @param height the height value
+     * @param width the {@code int} supplied as {@code width}
+     * @param height the {@code int} supplied as {@code height}
      */
     public Framebuffer(int width, int height) {
         this.width = width;
@@ -47,7 +47,7 @@ public class Framebuffer {
     }
 
     /**
-     * Performs the bind operation.
+     * Binds this object to the active runtime context.
      */
     public void bind() {
         glBindFramebuffer(GL_FRAMEBUFFER, fboId);
@@ -55,9 +55,9 @@ public class Framebuffer {
     }
 
     /**
-     * Performs the unbind operation.
-     * @param windowWidth the window width value
-     * @param windowHeight the window height value
+     * Unbinds this object from the active runtime context.
+     * @param windowWidth the {@code int} supplied as {@code windowWidth}
+     * @param windowHeight the {@code int} supplied as {@code windowHeight}
      */
     public void unbind(int windowWidth, int windowHeight) {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -66,14 +66,14 @@ public class Framebuffer {
 
     /**
      * Returns the texture id.
-     * @return the texture id
+     * @return {@code int}; the texture id
      */
     public int getTextureId() {
         return textureId;
     }
 
     /**
-     * Performs the dispose operation.
+     * Releases the resources associated with this object.
      */
     public void dispose() {
         glDeleteTextures(textureId);

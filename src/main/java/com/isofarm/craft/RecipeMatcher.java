@@ -7,14 +7,14 @@ import com.isofarm.item.Item;
 import java.util.*;
 
 /**
- * Provides recipe matcher behavior.
+ * Encapsulates the state and operations required by recipe matcher within the game runtime.
  */
 public class RecipeMatcher {
 
     /**
-     * Performs the summarize slots operation.
-     * @param slots the slots value
-     * @return the summarize slots result
+     * Updates or derives runtime state for summarize slots according to the supplied arguments.
+     * @param slots an array of {@link InventorySlot} values supplied as {@code slots}
+     * @return the {@link Map} representing the summarize slots result
      */
     public static Map<Craftable, Integer> summarizeSlots(InventorySlot[] slots) {
         Map<Craftable, Integer> summary = new HashMap<>();
@@ -30,10 +30,10 @@ public class RecipeMatcher {
     }
 
     /**
-     * Performs the match operation.
-     * @param slots the slots value
-     * @param registeredRecipes the registered recipes value
-     * @return the match result
+     * Determines whether match satisfies the required comparison or validity rules.
+     * @param slots an array of {@link InventorySlot} values supplied as {@code slots}
+     * @param registeredRecipes the {@link List} supplied as {@code registeredRecipes}
+     * @return the {@link Optional} representing the match result
      */
     public static Optional<Recipe> match(InventorySlot[] slots, List<Recipe> registeredRecipes) {
         Map<Craftable, Integer> input = summarizeSlots(slots);
@@ -46,9 +46,9 @@ public class RecipeMatcher {
 
     /**
      * Returns find.
-     * @param availableMaterials the available materials value
-     * @param registeredRecipes the registered recipes value
-     * @return the find result
+     * @param availableMaterials the {@link Map} supplied as {@code availableMaterials}
+     * @param registeredRecipes the {@link List} supplied as {@code registeredRecipes}
+     * @return the {@link List} representing the find result
      */
     public static List<Recipe> find(Map<Craftable, Integer> availableMaterials,
                                     List<Recipe> registeredRecipes) {
@@ -59,9 +59,9 @@ public class RecipeMatcher {
     }
 
     /**
-     * Performs the extract operation.
-     * @param item the item value
-     * @return the extract result
+     * Updates or derives runtime state for extract according to the supplied arguments.
+     * @param item the {@link Item} supplied as {@code item}
+     * @return the {@link Craftable} representing the extract result
      */
     private static Craftable extract(Item item) {
         if (item instanceof Craftable c) return c;

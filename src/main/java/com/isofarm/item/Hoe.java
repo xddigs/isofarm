@@ -9,13 +9,13 @@ import com.isofarm.wrld.GameMaster;
 import com.isofarm.wrld.World;
 
 /**
- * Provides hoe behavior.
+ * Encapsulates the state and operations required by hoe within the game runtime.
  */
 public class Hoe extends Tool {
 
     /**
      * Creates a new {@code Hoe} instance.
-     * @param tier the tier value
+     * @param tier the {@link Tier} supplied as {@code tier}
      */
     public Hoe(Tier tier) {
         super((byte) 3, ToolType.HOE.getName(), 150, ToolType.HOE,
@@ -30,9 +30,9 @@ public class Hoe extends Tool {
     }
 
     /**
-     * Performs the use operation.
-     * @param gameMaster the game master value
-     * @param block the block value
+     * Handles use and applies its effect to the current interaction state.
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
+     * @param block the {@link Block} supplied as {@code block}
      */
     public void use(GameMaster gameMaster, Block block) {
         super.use();
@@ -51,8 +51,9 @@ public class Hoe extends Tool {
     }
 
     /**
-     * Performs the copy operation.
-     * @return the copy result
+     * {@inheritDoc}
+     * Creates an independent copy that preserves the relevant state of this object.
+     * @return the {@link Item} representing the copy result
      */
     @Override
     public Item copy() {
@@ -60,9 +61,10 @@ public class Hoe extends Tool {
     }
 
     /**
-     * Performs the enchanting operation.
-     * @param enchantment the enchantment value
-     * @return the enchanting result
+     * {@inheritDoc}
+     * Applies enchanting and updates the affected character or item state.
+     * @param enchantment the {@link Enchantment} supplied as {@code enchantment}
+     * @return {@code boolean}; the enchanting result
      */
     @Override
     public boolean enchanting(Enchantment enchantment) {

@@ -8,7 +8,7 @@ import com.isofarm.entity.Player;
 import com.isofarm.utils.Local;
 
 /**
- * Provides tool behavior.
+ * Encapsulates the state and operations required by tool within the game runtime.
  */
 @DataClass
 public abstract class Tool implements Item,
@@ -25,12 +25,12 @@ public abstract class Tool implements Item,
 
     /**
      * Creates a new {@code Tool} instance.
-     * @param id the id value
-     * @param name the name value
-     * @param value the value value
-     * @param type the type value
-     * @param tier the tier value
-     * @param durability the durability value
+     * @param id the {@code byte} supplied as {@code id}
+     * @param name the {@link String} supplied as {@code name}
+     * @param value the {@code int} supplied as {@code value}
+     * @param type the {@link ToolType} supplied as {@code type}
+     * @param tier the {@link Tier} supplied as {@code tier}
+     * @param durability the {@code int} supplied as {@code durability}
      */
     public Tool(byte id, String name, int value,
                 ToolType type, Tier tier, int durability) {
@@ -45,8 +45,9 @@ public abstract class Tool implements Item,
     }
 
     /**
+     * {@inheritDoc}
      * Returns the id.
-     * @return the id
+     * @return {@code byte}; the id
      */
     @Override
     public byte getId() {
@@ -54,8 +55,9 @@ public abstract class Tool implements Item,
     }
 
     /**
+     * {@inheritDoc}
      * Returns the name.
-     * @return the name
+     * @return the {@link String} representing the name
      */
     @Override
     public String getName() {
@@ -63,8 +65,9 @@ public abstract class Tool implements Item,
     }
 
     /**
+     * {@inheritDoc}
      * Returns the display name.
-     * @return the display name
+     * @return the {@link String} representing the display name
      */
     @Override
     public String getDisplayName() {
@@ -74,8 +77,9 @@ public abstract class Tool implements Item,
     }
 
     /**
+     * {@inheritDoc}
      * Returns the value.
-     * @return the value
+     * @return {@code int}; the value
      */
     @Override
     public int getValue() {
@@ -84,7 +88,7 @@ public abstract class Tool implements Item,
 
     /**
      * Returns the col.
-     * @return the col
+     * @return {@code int}; the col
      */
     public int getCol() {
         return getId();
@@ -92,7 +96,7 @@ public abstract class Tool implements Item,
 
     /**
      * Returns the row.
-     * @return the row
+     * @return {@code int}; the row
      */
     public int getRow() {
         return tier.getId();
@@ -100,7 +104,7 @@ public abstract class Tool implements Item,
 
     /**
      * Returns the base damage.
-     * @return the base damage
+     * @return {@code float}; the base damage
      */
     public float getBaseDamage() {
         return baseDamage;
@@ -108,7 +112,7 @@ public abstract class Tool implements Item,
 
     /**
      * Returns the type.
-     * @return the type
+     * @return the {@link ToolType} representing the type
      */
     public ToolType getType() {
         return type;
@@ -116,15 +120,15 @@ public abstract class Tool implements Item,
 
     /**
      * Returns the tier.
-     * @return the tier
+     * @return the {@link Tier} representing the tier
      */
     public Tier getTier() {
         return tier;
     }
 
     /**
-     * Performs the upgrade operation.
-     * @param tier the tier value
+     * Applies upgrade and updates the affected character or item state.
+     * @param tier the {@link Tier} supplied as {@code tier}
      */
     public void upgrade(Tier tier) {
         Tier[] tiers = Tier.values();
@@ -136,7 +140,7 @@ public abstract class Tool implements Item,
 
     /**
      * Returns the durability.
-     * @return the durability
+     * @return {@code int}; the durability
      */
     public int getDurability() {
         return durability;
@@ -144,7 +148,7 @@ public abstract class Tool implements Item,
 
     /**
      * Returns the max durability.
-     * @return the max durability
+     * @return {@code float}; the max durability
      */
     public float getMaxDurability() {
         return tier.getDurability() + type.getBaseDurability();
@@ -152,14 +156,14 @@ public abstract class Tool implements Item,
 
     /**
      * Sets the durability.
-     * @param durability the durability value
+     * @param durability the {@code int} supplied as {@code durability}
      */
     public void setDurability(int durability) {
         this.durability = durability;
     }
 
     /**
-     * Performs the use operation.
+     * Handles use and applies its effect to the current interaction state.
      */
     public void use() {
         if (Player.plyr.getGamemode().isGodmode()) return;
@@ -169,7 +173,7 @@ public abstract class Tool implements Item,
     }
 
     /**
-     * Performs the misuse operation.
+     * Publishes the notification represented by misuse.
      */
     public void misuse() {
         if (Player.plyr.getGamemode().isGodmode()) return;
@@ -179,7 +183,7 @@ public abstract class Tool implements Item,
     }
 
     /**
-     * Performs the repair operation.
+     * Applies repair and updates the affected character or item state.
      */
     public void repair() {
         if (Player.plyr.getGamemode().isGodmode()) return;
@@ -189,23 +193,23 @@ public abstract class Tool implements Item,
 
     /**
      * Returns the enchantments.
-     * @return the enchantments
+     * @return an array of {@link Enchantment} values; the enchantments
      */
     public Enchantment[] getEnchantments() {
         return enchantments;
     }
 
     /**
-     * Performs the enchant operation.
-     * @param enchantment the enchantment value
+     * Applies enchant and updates the affected character or item state.
+     * @param enchantment the {@link Enchantment} supplied as {@code enchantment}
      */
     public void enchant(Enchantment enchantment) {
         enchantments[enchantment.getType().ordinal()] = enchantment;
     }
 
     /**
-     * Performs the unenchant operation.
-     * @param enchantment the enchantment value
+     * Applies unenchant and updates the affected character or item state.
+     * @param enchantment the {@link Enchantment} supplied as {@code enchantment}
      */
     public void unenchant(Enchantment enchantment) {
         enchantments[enchantment.getType().ordinal()] = null;

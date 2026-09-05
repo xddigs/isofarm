@@ -14,7 +14,7 @@ import org.joml.Vector3f;
 import java.util.*;
 
 /**
- * Provides tree service behavior.
+ * Encapsulates the state and operations required by tree service within the game runtime.
  */
 @Singleton
 public class TreeService {
@@ -30,10 +30,10 @@ public class TreeService {
     private TreeService() {}
 
     /**
-     * Performs the chop operation.
-     * @param gamemaster the gamemaster value
-     * @param axe the axe value
-     * @return the chop result
+     * Applies the world or inventory action represented by chop.
+     * @param gamemaster the {@link GameMaster} supplied as {@code gamemaster}
+     * @param axe the {@link Axe} supplied as {@code axe}
+     * @return the {@link List} representing the chop result
      */
     public static List<BlockPos> chop(GameMaster gamemaster, Axe axe) {
         List<BlockPos> choppedBlocks = new ArrayList<>();
@@ -105,11 +105,11 @@ public class TreeService {
     }
 
     /**
-     * Performs the plant operation.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
-     * @param saplingBlock the sapling block value
+     * Applies the world or inventory action represented by plant.
+     * @param x the {@code int} supplied as {@code x}
+     * @param y the {@code int} supplied as {@code y}
+     * @param z the {@code int} supplied as {@code z}
+     * @param saplingBlock the {@link BlockData} supplied as {@code saplingBlock}
      */
     public void plant(int x, int y, int z, BlockData saplingBlock) {
         World.wrld.setBlockTypeAt(x, y, z, saplingBlock.getId());
@@ -118,7 +118,7 @@ public class TreeService {
 
     /**
      * Updates the current state.
-     * @param gameMaster the game master value
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
      */
     public void update(GameMaster gameMaster) {
         for (int i = saplings.size() - 1; i >= 0; i--) {
@@ -135,8 +135,8 @@ public class TreeService {
     }
 
     /**
-     * Performs the grow tree operation.
-     * @param sapling the sapling value
+     * Applies the world or inventory action represented by grow tree.
+     * @param sapling the {@link TreeSapling} supplied as {@code sapling}
      */
     private void growTree(TreeSapling sapling) {
         int x = sapling.getX();
@@ -150,7 +150,7 @@ public class TreeService {
 
     /**
      * Updates the leaves.
-     * @param gameMaster the game master value
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
      */
     private void updateLeaves(GameMaster gameMaster) {
         for (Chunk chunk : World.wrld.getChunks().values()) {
@@ -184,7 +184,9 @@ public class TreeService {
         }
     }
 
-    /** Converts a configured leaf drop into a concrete inventory item. */
+    /**
+     * Converts a configured leaf drop into a concrete inventory item.
+     */
     private Item createLeafDrop(Object drop) {
         return switch (drop) {
             case MaterialID materialID -> new Material(Tier.NONE, materialID);
@@ -196,9 +198,9 @@ public class TreeService {
 
     /**
      * Checks whether the connected to log condition is met.
-     * @param startX the start x value
-     * @param startY the start y value
-     * @param startZ the start z value
+     * @param startX the {@code int} supplied as {@code startX}
+     * @param startY the {@code int} supplied as {@code startY}
+     * @param startZ the {@code int} supplied as {@code startZ}
      * @return {@code true} if connected to log; otherwise {@code false}
      */
     private boolean isConnectedToLog(int startX, int startY, int startZ) {

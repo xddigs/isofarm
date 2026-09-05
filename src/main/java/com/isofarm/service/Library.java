@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.function.Supplier;
 
 /**
- * Provides library behavior.
+ * Encapsulates the state and operations required by library within the game runtime.
  */
 @SuppressWarnings("all")
 public class Library implements Service<GameMaster> {
@@ -22,7 +22,7 @@ public class Library implements Service<GameMaster> {
 
     /**
      * Initializes the items.
-     * @param itemR the item r value
+     * @param itemR the {@link ItemRegistry} supplied as {@code itemR}
      */
     public static void initItems(ItemRegistry itemR) {
         registerDefault(itemR, Backpack::new);
@@ -70,9 +70,9 @@ public class Library implements Service<GameMaster> {
     }
 
     /**
-     * Performs the register default operation.
-     * @param itemR the item r value
-     * @param supplier the supplier value
+     * Adds default to the corresponding collection or processing queue.
+     * @param itemR the {@link ItemRegistry} supplied as {@code itemR}
+     * @param supplier the {@link Supplier} supplied as {@code supplier}
      */
     private static void registerDefault(ItemRegistry itemR, Supplier<Item> supplier) {
         Item item = supplier.get();
@@ -85,8 +85,8 @@ public class Library implements Service<GameMaster> {
 
     /**
      * Initializes the commands.
-     * @param delta the delta value
-     * @param gameMaster the game master value
+     * @param delta the {@code float} supplied as {@code delta}
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
      */
     public static void initCommands(float delta, GameMaster gameMaster) {
         Player player = Player.plyr;
@@ -275,10 +275,10 @@ public class Library implements Service<GameMaster> {
     }
 
     /**
-     * Performs the literal operation.
-     * @param name the name value
-     * @param values the values value
-     * @return the literal result
+     * Creates or returns literal from the supplied arguments.
+     * @param name the {@link String} supplied as {@code name}
+     * @param values an array of {@link String} values supplied as {@code values}
+     * @return the {@link CommandArgument} representing the literal result
      */
     private static CommandArgument literal(String name, String... values) {
         return CommandArgument.of(name, (text, cursorPosition) -> {
@@ -289,10 +289,10 @@ public class Library implements Service<GameMaster> {
     }
 
     /**
-     * Performs the dynamic operation.
-     * @param name the name value
-     * @param supplier the supplier value
-     * @return the dynamic result
+     * Creates or returns dynamic from the supplied arguments.
+     * @param name the {@link String} supplied as {@code name}
+     * @param supplier the {@link Supplier} supplied as {@code supplier}
+     * @return the {@link CommandArgument} representing the dynamic result
      */
     private static CommandArgument dynamic(String name, Supplier<Collection<String>> supplier) {
         return CommandArgument.of(name, (text, cursorPosition) -> {
@@ -309,8 +309,8 @@ public class Library implements Service<GameMaster> {
 
     /**
      * Returns the formatted name.
-     * @param name the name value
-     * @return the formatted name
+     * @param name an array of {@link String} values supplied as {@code name}
+     * @return the {@link String} representing the formatted name
      */
     public static String getFormattedName(String... name) {
         StringBuilder builder = new StringBuilder();

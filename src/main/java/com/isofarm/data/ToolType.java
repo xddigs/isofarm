@@ -23,12 +23,12 @@ public enum ToolType implements Item {
 
     /**
      * Creates a new {@code ToolType} instance.
-     * @param id the id value
-     * @param name the name value
-     * @param baseDamage the base damage value
-     * @param usableOn the usable on value
-     * @param baseDurability the base durability value
-     * @param efficiency the efficiency value
+     * @param id the {@code byte} supplied as {@code id}
+     * @param name the {@link String} supplied as {@code name}
+     * @param baseDamage the {@code float} supplied as {@code baseDamage}
+     * @param usableOn an array of {@link BlockData} values supplied as {@code usableOn}
+     * @param baseDurability the {@code int} supplied as {@code baseDurability}
+     * @param efficiency an array of {@code float} values supplied as {@code efficiency}
      */
     ToolType(byte id, String name, float baseDamage, BlockData[] usableOn, int baseDurability, float[] efficiency) {
         this.id = id;
@@ -40,8 +40,9 @@ public enum ToolType implements Item {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the id.
-     * @return the id
+     * @return {@code byte}; the id
      */
     @Override
     public byte getId() {
@@ -49,8 +50,9 @@ public enum ToolType implements Item {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the name.
-     * @return the name
+     * @return the {@link String} representing the name
      */
     @Override
     public String getName() {
@@ -58,8 +60,9 @@ public enum ToolType implements Item {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the display name.
-     * @return the display name
+     * @return the {@link String} representing the display name
      */
     @Override
     public String getDisplayName() {
@@ -67,8 +70,9 @@ public enum ToolType implements Item {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the value.
-     * @return the value
+     * @return {@code int}; the value
      */
     @Override
     public int getValue() {
@@ -76,8 +80,9 @@ public enum ToolType implements Item {
     }
 
     /**
-     * Performs the copy operation.
-     * @return the copy result
+     * {@inheritDoc}
+     * Creates an independent copy that preserves the relevant state of this object.
+     * @return the {@link Item} representing the copy result
      */
     @Override
     public Item copy() {
@@ -86,7 +91,7 @@ public enum ToolType implements Item {
 
     /**
      * Returns the base damage.
-     * @return the base damage
+     * @return {@code float}; the base damage
      */
     public float getBaseDamage() {
         return baseDamage;
@@ -94,7 +99,7 @@ public enum ToolType implements Item {
 
     /**
      * Returns the usable on.
-     * @return the usable on
+     * @return an array of {@link BlockData} values; the usable on
      */
     public BlockData[] getUsableOn() {
         return usableOn;
@@ -102,7 +107,7 @@ public enum ToolType implements Item {
 
     /**
      * Returns the base durability.
-     * @return the base durability
+     * @return {@code int}; the base durability
      */
     public int getBaseDurability() {
         return baseDurability;
@@ -110,7 +115,7 @@ public enum ToolType implements Item {
 
     /**
      * Returns the efficiency.
-     * @return the efficiency
+     * @return an array of {@code float} values; the efficiency
      */
     public float[] getEfficiency() {
         return efficiency;

@@ -18,7 +18,7 @@ public enum GrowthStage {
 
     /**
      * Creates a new {@code GrowthStage} instance.
-     * @param frameIndex the frame index value
+     * @param frameIndex the {@code int} supplied as {@code frameIndex}
      */
     GrowthStage(int frameIndex) {
         this.frameIndex = frameIndex;
@@ -26,7 +26,7 @@ public enum GrowthStage {
 
     /**
      * Returns the name.
-     * @return {@code String} the name
+     * @return the {@link String} result; {@code String} the name
      */
     public String getName() {
         return name().toLowerCase(Locale.ROOT);
@@ -34,7 +34,7 @@ public enum GrowthStage {
 
     /**
      * Returns the display name.
-     * @return {@code String} the display name
+     * @return the {@link String} result; {@code String} the display name
      */
     public String getDisplayName() {
         return Local.lang.t("growth." + name().toLowerCase(Locale.ROOT));
@@ -42,7 +42,7 @@ public enum GrowthStage {
 
     /**
      * Returns the frame index.
-     * @return the frame index
+     * @return {@code int}; the frame index
      */
     public int getFrameIndex() {
         return frameIndex;

@@ -15,7 +15,7 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
 
 /**
- * Provides gltfmodel behavior.
+ * Encapsulates the state and operations required by gltfmodel within the game runtime.
  */
 public class GLTFModel {
     private final List<GLTFMesh> meshes;
@@ -33,7 +33,7 @@ public class GLTFModel {
 
     /**
      * Adds the mesh.
-     * @param mesh the mesh value
+     * @param mesh the {@link GLTFMesh} supplied as {@code mesh}
      */
     public void addMesh(GLTFMesh mesh) {
         meshes.add(mesh);
@@ -41,7 +41,7 @@ public class GLTFModel {
 
     /**
      * Adds the node.
-     * @param node the node value
+     * @param node the {@link GLTFNode} supplied as {@code node}
      */
     public void addNode(GLTFNode node) {
         nodes.add(node);
@@ -49,16 +49,16 @@ public class GLTFModel {
 
     /**
      * Adds the root node.
-     * @param node the node value
+     * @param node the {@link GLTFNode} supplied as {@code node}
      */
     public void addRootNode(GLTFNode node) {
         rootNodes.add(node);
     }
 
     /**
-     * Renders render.
-     * @param shader the shader value
-     * @param modelMatrix the model matrix value
+     * Renders this object in the requested render pass.
+     * @param shader the {@link Shader} supplied as {@code shader}
+     * @param modelMatrix the {@link Matrix4f} supplied as {@code modelMatrix}
      */
     public void render(Shader shader, Matrix4f modelMatrix) {
         shader.bind();
@@ -70,9 +70,9 @@ public class GLTFModel {
 
     /**
      * Renders the mesh.
-     * @param meshIndex the mesh index value
-     * @param worldMatrix the world matrix value
-     * @param shader the shader value
+     * @param meshIndex the {@code int} supplied as {@code meshIndex}
+     * @param worldMatrix the {@link Matrix4f} supplied as {@code worldMatrix}
+     * @param shader the {@link Shader} supplied as {@code shader}
      */
     public void renderMesh(int meshIndex, Matrix4f worldMatrix, Shader shader) {
         if (meshIndex < 0 || meshIndex >= meshes.size()) {
@@ -85,11 +85,11 @@ public class GLTFModel {
 
     /**
      * Renders the mesh.
-     * @param meshIndex the mesh index value
-     * @param worldMatrix the world matrix value
-     * @param shader the shader value
-     * @param textureId the texture id value
-     * @param uvBounds the uv bounds value
+     * @param meshIndex the {@code int} supplied as {@code meshIndex}
+     * @param worldMatrix the {@link Matrix4f} supplied as {@code worldMatrix}
+     * @param shader the {@link Shader} supplied as {@code shader}
+     * @param textureId the {@code int} supplied as {@code textureId}
+     * @param uvBounds the {@link Vector4f} supplied as {@code uvBounds}
      */
     public void renderMesh(int meshIndex, Matrix4f worldMatrix, Shader shader, int textureId, Vector4f uvBounds) {
         if (meshIndex < 0 || meshIndex >= meshes.size()) {
@@ -103,8 +103,8 @@ public class GLTFModel {
 
     /**
      * Finds and returns the node.
-     * @param name the name value
-     * @return the located node
+     * @param name the {@link String} supplied as {@code name}
+     * @return the {@link GLTFNode} representing the located node
      */
     public GLTFNode findNode(String name) {
         for (GLTFNode node : rootNodes) {
@@ -120,7 +120,7 @@ public class GLTFModel {
 
     /**
      * Returns the texture.
-     * @return the texture
+     * @return {@code int}; the texture
      */
     public int getTexture() {
         for (GLTFMesh mesh : meshes) {
@@ -134,7 +134,7 @@ public class GLTFModel {
 
     /**
      * Returns the nodes.
-     * @return the nodes
+     * @return the {@link List} representing the nodes
      */
     public List<GLTFNode> getNodes() {
         return nodes;
@@ -142,7 +142,7 @@ public class GLTFModel {
 
     /**
      * Returns the root nodes.
-     * @return the root nodes
+     * @return the {@link List} representing the root nodes
      */
     public List<GLTFNode> getRootNodes() {
         return rootNodes;
@@ -150,7 +150,7 @@ public class GLTFModel {
 
     /**
      * Returns the meshes.
-     * @return the meshes
+     * @return the {@link List} representing the meshes
      */
     public List<GLTFMesh> getMeshes() {
         return meshes;
@@ -166,7 +166,7 @@ public class GLTFModel {
     }
 
     /**
-     * Performs the dispose operation.
+     * Releases the resources associated with this object.
      */
     public void dispose() {
         for (GLTFMesh mesh : meshes) {
@@ -179,7 +179,7 @@ public class GLTFModel {
     }
 
     /**
-     * Provides gltfmesh behavior.
+     * Encapsulates the state and operations required by gltfmesh within the game runtime.
      */
     public static class GLTFMesh {
         private final int vao;
@@ -191,11 +191,11 @@ public class GLTFModel {
 
         /**
          * Creates a new {@code GLTFMesh} instance.
-         * @param vao the vao value
-         * @param vbo the vbo value
-         * @param ebo the ebo value
-         * @param indexCount the index count value
-         * @param textureId the texture id value
+         * @param vao the {@code int} supplied as {@code vao}
+         * @param vbo the {@code int} supplied as {@code vbo}
+         * @param ebo the {@code int} supplied as {@code ebo}
+         * @param indexCount the {@code int} supplied as {@code indexCount}
+         * @param textureId the {@code int} supplied as {@code textureId}
          */
         public GLTFMesh(int vao, int vbo, int ebo, int indexCount, int textureId) {
             this.vao = vao;
@@ -207,25 +207,25 @@ public class GLTFModel {
 
         /**
          * Returns the texture id.
-         * @return the texture id
+         * @return {@code int}; the texture id
          */
         public int getTextureId() {
             return textureId;
         }
 
         /**
-         * Renders render.
-         * @param shader the shader value
+         * Renders this object in the requested render pass.
+         * @param shader the {@link Shader} supplied as {@code shader}
          */
         public void render(Shader shader) {
             render(shader, textureId, new Vector4f(0.0f, 0.0f, 1.0f, 1.0f));
         }
 
         /**
-         * Renders render.
-         * @param shader the shader value
-         * @param renderTextureId the render texture id value
-         * @param uvBounds the uv bounds value
+         * Renders this object in the requested render pass.
+         * @param shader the {@link Shader} supplied as {@code shader}
+         * @param renderTextureId the {@code int} supplied as {@code renderTextureId}
+         * @param uvBounds the {@link Vector4f} supplied as {@code uvBounds}
          */
         public void render(Shader shader, int renderTextureId,
                            Vector4f uvBounds) {
@@ -249,7 +249,7 @@ public class GLTFModel {
         }
 
         /**
-         * Performs the dispose operation.
+         * Releases the resources associated with this object.
          */
         public void dispose() {
             glDeleteVertexArrays(vao);

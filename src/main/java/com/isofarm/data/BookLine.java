@@ -5,7 +5,7 @@ import com.isofarm.item.Item;
 import java.util.function.Consumer;
 
 /**
- * Provides book line behavior.
+ * Encapsulates the state and operations required by book line within the game runtime.
  */
 public class BookLine {
     private String text;
@@ -15,7 +15,7 @@ public class BookLine {
 
     /**
      * Creates a new {@code BookLine} instance.
-     * @param text the text value
+     * @param text the {@link String} supplied as {@code text}
      */
     public BookLine(String text) {
         this(text, null);
@@ -23,8 +23,8 @@ public class BookLine {
 
     /**
      * Creates a new {@code BookLine} instance.
-     * @param text the text value
-     * @param action the action value
+     * @param text the {@link String} supplied as {@code text}
+     * @param action the {@link Consumer} supplied as {@code action}
      */
     public BookLine(String text, Consumer<BookLine> action) {
         this.text = text;
@@ -33,8 +33,8 @@ public class BookLine {
 
     /**
      * Creates an icon-backed interactive book line.
-     * @param item the item rendered by the book UI
-     * @param action the action value
+     * @param item the {@link Item} argument; the item rendered by the book UI
+     * @param action the {@link Consumer} supplied as {@code action}
      */
     public BookLine(Item item, Consumer<BookLine> action) {
         this(item != null ? item.getDisplayName() : "", action);
@@ -43,7 +43,7 @@ public class BookLine {
 
     /**
      * Returns the text.
-     * @return the text
+     * @return the {@link String} representing the text
      */
     public String getText() {
         return text;
@@ -51,7 +51,7 @@ public class BookLine {
 
     /**
      * Sets the text.
-     * @param text the text value
+     * @param text the {@link String} supplied as {@code text}
      */
     public void setText(String text) {
         this.text = text;
@@ -67,14 +67,14 @@ public class BookLine {
 
     /**
      * Sets the click.
-     * @param action the action value
+     * @param action the {@link Consumer} supplied as {@code action}
      */
     public void setClick(Consumer<BookLine> action) {
         this.action = action;
     }
 
     /**
-     * Performs the click operation.
+     * Handles click and applies its effect to the current interaction state.
      */
     public void click() {
         if (action != null) {
@@ -84,7 +84,7 @@ public class BookLine {
 
     /**
      * Returns the tooltip text.
-     * @return the tooltip text
+     * @return the {@link String} representing the tooltip text
      */
     public String getTooltipText() {
         return tooltipText;
@@ -92,8 +92,8 @@ public class BookLine {
 
     /**
      * Sets the tooltip text.
-     * @param tooltipText the tooltip text value
-     * @return the set tooltip text result
+     * @param tooltipText the {@link String} supplied as {@code tooltipText}
+     * @return the {@link BookLine} representing the set tooltip text result
      */
     public BookLine setTooltipText(String tooltipText) {
         this.tooltipText = tooltipText;
@@ -102,7 +102,7 @@ public class BookLine {
 
     /**
      * Returns the item represented by this line.
-     * @return the represented item, or {@code null} for a text line
+     * @return the {@link Item} representing the represented item, or {@code null} for a text line
      */
     public Item getItem() {
         return item;

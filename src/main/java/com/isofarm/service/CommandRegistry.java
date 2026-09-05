@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Provides command registry behavior.
+ * Encapsulates the state and operations required by command registry within the game runtime.
  */
 public class CommandRegistry implements Service<Command> {
     private final Map<String, Command> commands = new HashMap<>();
@@ -19,8 +19,8 @@ public class CommandRegistry implements Service<Command> {
     }
 
     /**
-     * Performs the register operation.
-     * @param command the command value
+     * Adds the supplied element to the corresponding collection or processing queue.
+     * @param command the {@link Command} supplied as {@code command}
      */
     public void register(Command command) {
         if (command == null || command.name() == null) {
@@ -32,8 +32,8 @@ public class CommandRegistry implements Service<Command> {
 
     /**
      * Returns get.
-     * @param name the name value
-     * @return the get result
+     * @param name the {@link String} supplied as {@code name}
+     * @return the {@link Command} representing the get result
      */
     public Command get(String name) {
         if (name == null) {
@@ -44,17 +44,17 @@ public class CommandRegistry implements Service<Command> {
     }
 
     /**
-     * Performs the contains operation.
-     * @param name the name value
-     * @return the contains result
+     * Determines whether this object is satisfied by the current state.
+     * @param name the {@link String} supplied as {@code name}
+     * @return {@code boolean}; the contains result
      */
     public boolean contains(String name) {
         return name != null && commands.containsKey(normalize(name));
     }
 
     /**
-     * Performs the unregister operation.
-     * @param name the name value
+     * Removes the supplied element and updates any dependent state.
+     * @param name the {@link String} supplied as {@code name}
      */
     public void unregister(String name) {
         if (name != null) {
@@ -78,8 +78,8 @@ public class CommandRegistry implements Service<Command> {
     }
 
     /**
-     * Performs the size operation.
-     * @return the size result
+     * Returns the number or extent represented by size.
+     * @return {@code int}; the size result
      */
     public int size() {
         return commands.size();
@@ -87,7 +87,7 @@ public class CommandRegistry implements Service<Command> {
 
     /**
      * Returns the commands.
-     * @return the commands
+     * @return the {@link Map} representing the commands
      */
     public Map<String, Command> getCommands() {
         return commands;
@@ -95,7 +95,7 @@ public class CommandRegistry implements Service<Command> {
 
     /**
      * Returns the names.
-     * @return the names
+     * @return the {@link List} representing the names
      */
     public List<String> getNames() {
         return commands.keySet()
@@ -105,9 +105,9 @@ public class CommandRegistry implements Service<Command> {
     }
 
     /**
-     * Performs the normalize operation.
-     * @param name the name value
-     * @return the normalize result
+     * Transforms this object according to the supplied values.
+     * @param name the {@link String} supplied as {@code name}
+     * @return the {@link String} representing the normalize result
      */
     private String normalize(String name) {
         return name.startsWith("/")

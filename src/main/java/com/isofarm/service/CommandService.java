@@ -5,7 +5,7 @@ import com.isofarm.gui.GameUIService;
 import com.isofarm.utils.ToastFactory;
 
 /**
- * Provides command service behavior.
+ * Encapsulates the state and operations required by command service within the game runtime.
  */
 public class CommandService implements Service<Command> {
     private final CommandRegistry registry;
@@ -13,7 +13,7 @@ public class CommandService implements Service<Command> {
 
     /**
      * Creates a new {@code CommandService} instance.
-     * @param registry the registry value
+     * @param registry the {@link CommandRegistry} supplied as {@code registry}
      */
     public CommandService(CommandRegistry registry) {
         this.registry = registry;
@@ -21,15 +21,15 @@ public class CommandService implements Service<Command> {
 
     /**
      * Sets the game uiservice.
-     * @param gameUIService the game uiservice value
+     * @param gameUIService the {@link GameUIService} supplied as {@code gameUIService}
      */
     public void setGameUIService(GameUIService gameUIService) {
         this.gameUIService = gameUIService;
     }
 
     /**
-     * Performs the execute operation.
-     * @param input the input value
+     * Executes execute as part of the application lifecycle.
+     * @param input the {@link String} supplied as {@code input}
      */
     public void execute(String input) {
         if (input == null || input.isBlank()) return;

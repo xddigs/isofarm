@@ -3,7 +3,7 @@ package com.isofarm.data;
 import com.isofarm.utils.K;
 
 /**
- * Provides toast behavior.
+ * Encapsulates the state and operations required by toast within the game runtime.
  */
 @DataClass
 public class Toast {
@@ -25,13 +25,13 @@ public class Toast {
 
     /**
      * Creates a new {@code Toast} instance.
-     * @param startX the start x value
-     * @param startY the start y value
-     * @param targetX the target x value
-     * @param targetY the target y value
-     * @param type the type value
-     * @param message the message value
-     * @param duration the duration value
+     * @param startX the {@code float} supplied as {@code startX}
+     * @param startY the {@code float} supplied as {@code startY}
+     * @param targetX the {@code float} supplied as {@code targetX}
+     * @param targetY the {@code float} supplied as {@code targetY}
+     * @param type the {@link ToastData} supplied as {@code type}
+     * @param message the {@link String} supplied as {@code message}
+     * @param duration the {@code float} supplied as {@code duration}
      */
     public Toast(float startX, float startY, float targetX, float targetY,
                  ToastData type, String message, float duration) {
@@ -53,7 +53,7 @@ public class Toast {
 
     /**
      * Sets the window width.
-     * @param windowWidth the window width value
+     * @param windowWidth the {@code float} supplied as {@code windowWidth}
      */
     public void setWindowWidth(float windowWidth) {
         this.windowWidth = windowWidth;
@@ -62,7 +62,7 @@ public class Toast {
 
     /**
      * Updates the current state.
-     * @param delta the delta value
+     * @param delta the {@code float} supplied as {@code delta}
      */
     public void update(float delta) {
         elapsed += delta;
@@ -94,7 +94,7 @@ public class Toast {
 
     /**
      * Returns the type.
-     * @return the type
+     * @return the {@link ToastData} representing the type
      */
     public ToastData getType() {
         return type;
@@ -102,7 +102,7 @@ public class Toast {
 
     /**
      * Returns the message.
-     * @return the message
+     * @return the {@link String} representing the message
      */
     public String getMessage() {
         return message;
@@ -110,7 +110,7 @@ public class Toast {
 
     /**
      * Returns the x.
-     * @return the x
+     * @return {@code float}; the x
      */
     public float getX() {
         return x;
@@ -118,7 +118,7 @@ public class Toast {
 
     /**
      * Returns the y.
-     * @return the y
+     * @return {@code float}; the y
      */
     public float getY() {
         return y;
@@ -126,7 +126,7 @@ public class Toast {
 
     /**
      * Returns the target x.
-     * @return the target x
+     * @return {@code float}; the target x
      */
     public float getTargetX() {
         return targetX;
@@ -134,7 +134,7 @@ public class Toast {
 
     /**
      * Returns the target y.
-     * @return the target y
+     * @return {@code float}; the target y
      */
     public float getTargetY() {
         return targetY;
@@ -142,7 +142,7 @@ public class Toast {
 
     /**
      * Returns the duration.
-     * @return the duration
+     * @return {@code float}; the duration
      */
     public float getDuration() {
         return duration;
@@ -150,7 +150,7 @@ public class Toast {
 
     /**
      * Returns the elapsed.
-     * @return the elapsed
+     * @return {@code float}; the elapsed
      */
     public float getElapsed() {
         return elapsed;
@@ -166,7 +166,7 @@ public class Toast {
 
     /**
      * Sets the target x.
-     * @param targetX the target x value
+     * @param targetX the {@code float} supplied as {@code targetX}
      */
     public void setTargetX(float targetX) {
         this.targetX = targetX;
@@ -174,7 +174,7 @@ public class Toast {
 
     /**
      * Sets the target y.
-     * @param targetY the target y value
+     * @param targetY the {@code float} supplied as {@code targetY}
      */
     public void setTargetY(float targetY) {
         this.targetY = targetY;

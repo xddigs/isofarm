@@ -28,7 +28,7 @@ import java.util.List;
 import static org.joml.Math.lerp;
 
 /**
- * Provides game interaction behavior.
+ * Encapsulates the state and operations required by game interaction within the game runtime.
  */
 @Singleton
 @GodObject
@@ -58,9 +58,9 @@ public class GameInteraction {
     
     /**
      * Updates the current state.
-     * @param gameMaster the game master value
-     * @param selectedItem the selected item value
-     * @return the update result
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
+     * @param selectedItem the {@link Item} supplied as {@code selectedItem}
+     * @return the {@link BlockPos} representing the update result
      */
     public BlockPos update(GameMaster gameMaster, Item selectedItem) {
         Player player = Player.plyr;
@@ -262,9 +262,9 @@ public class GameInteraction {
     }
 
     /**
-     * Performs the drop item operation.
-     * @param selectedItem the selected item value
-     * @param dropAll the drop all value
+     * Transfers or creates the relevant entity or item for drop item.
+     * @param selectedItem the {@link Item} supplied as {@code selectedItem}
+     * @param dropAll the {@code boolean} supplied as {@code dropAll}
      */
     public void dropItem(Item selectedItem, boolean dropAll) {
         if (selectedItem == null) return;
@@ -313,7 +313,7 @@ public class GameInteraction {
     }
 
     /**
-     * Performs the pick up operation.
+     * Transfers or creates the relevant entity or item for pick up.
      */
     private void pickUp() {
         Player player = Player.plyr;
@@ -370,7 +370,9 @@ public class GameInteraction {
         }
     }
 
-    /** Stores as much of a world item as possible and returns the remainder. */
+    /**
+     * Stores as much of a world item as possible and returns the remainder.
+     */
     private int storeItem(Player player, Item item, int amount) {
         int remaining = player.getInventory().add(item, amount);
         if (remaining > 0 && player.getInventory().hasBackpackEquipped()) {
@@ -381,7 +383,7 @@ public class GameInteraction {
 
     /**
      * Checks whether the within range condition is met.
-     * @param cell the cell value
+     * @param cell the {@link BlockPos} supplied as {@code cell}
      * @return {@code true} if within range; otherwise {@code false}
      */
     private boolean isWithinRange(BlockPos cell) {
@@ -391,8 +393,8 @@ public class GameInteraction {
 
     /**
      * Returns the distance to block.
-     * @param cell the cell value
-     * @return the distance to block
+     * @param cell the {@link BlockPos} supplied as {@code cell}
+     * @return {@code float}; the distance to block
      */
     public float getDistanceToBlock(BlockPos cell) {
         if (cell == null) return Float.MAX_VALUE;
@@ -408,9 +410,9 @@ public class GameInteraction {
     }
 
     /**
-     * Performs the breaking operation.
-     * @param gameMaster the game master value
-     * @param cell the cell value
+     * Updates or derives runtime state for breaking according to the supplied arguments.
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
+     * @param cell the {@link BlockPos} supplied as {@code cell}
      */
     private void breaking(GameMaster gameMaster, BlockPos cell) {
         if (BookService.bs.isOpen()) return;
@@ -515,7 +517,9 @@ public class GameInteraction {
         }
     }
 
-    /** Advances or completes the destruction of an interactive block. */
+    /**
+     * Advances or completes the destruction of an interactive block.
+     */
     private void breakInteractiveBlock(GameMaster gameMaster, World world,
                                        BlockPos cell, iBlock block) {
         int x = cell.x();
@@ -547,7 +551,9 @@ public class GameInteraction {
         }
     }
 
-    /** Removes an interactive block and drops it together with all its contents. */
+    /**
+     * Removes an interactive block and drops it together with all its contents.
+     */
     private void destroyInteractiveBlock(GameMaster gameMaster, World world, iBlock block) {
         Vector3f dropPosition = new Vector3f(
                 block.getX() + 0.5f, block.getY() + 0.5f, block.getZ() + 0.5f);
@@ -569,7 +575,9 @@ public class GameInteraction {
                 block.getX(), block.getY(), block.getZ());
     }
 
-    /** Removes a stackable crop from the selected segment upwards. */
+    /**
+     * Removes a stackable crop from the selected segment upwards.
+     */
     private void breakStackedCrop(World world, Crop first) {
         int x = first.getX();
         int y = first.getY();
@@ -597,12 +605,12 @@ public class GameInteraction {
     }
 
     /**
-     * Performs the break block operation.
-     * @param gameMaster the game master value
-     * @param cell the cell value
-     * @param blockable the block data value
-     * @param blockId the block id value
-     * @param selectedItem the selected item value
+     * Applies the world or inventory action represented by break block.
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
+     * @param cell the {@link BlockPos} supplied as {@code cell}
+     * @param blockable the {@link Blockable} argument; the block data value
+     * @param blockId the {@code byte} supplied as {@code blockId}
+     * @param selectedItem the {@link Item} supplied as {@code selectedItem}
      */
     private void breakBlock(GameMaster gameMaster, BlockPos cell, Blockable blockable,
                             byte blockId, Item selectedItem) {
@@ -703,7 +711,7 @@ public class GameInteraction {
     }
 
     /**
-     * Performs the reset breaking operation.
+     * Resets breaking to its initial runtime state.
      */
     private void resetBreaking() {
         SoundService.fx.stopBreakingSound();
@@ -715,10 +723,10 @@ public class GameInteraction {
     }
 
     /**
-     * Performs the place operation.
-     * @param gameMaster the game master value
-     * @param cell the cell value
-     * @param selectedItem the selected item value
+     * Applies the world or inventory action represented by place.
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
+     * @param cell the {@link BlockPos} supplied as {@code cell}
+     * @param selectedItem the {@link Item} supplied as {@code selectedItem}
      */
     private void place(GameMaster gameMaster, BlockPos cell,
                        Item selectedItem) {
@@ -873,10 +881,10 @@ public class GameInteraction {
     }
 
     /**
-     * Performs the break above operation.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
+     * Applies the world or inventory action represented by break above.
+     * @param x the {@code int} supplied as {@code x}
+     * @param y the {@code int} supplied as {@code y}
+     * @param z the {@code int} supplied as {@code z}
      */
     private void breakAbove(int x, int y, int z) {
         int aboveY = y + 1;
@@ -910,8 +918,8 @@ public class GameInteraction {
 
     /**
      * Returns the block data.
-     * @param blockId the block id value
-     * @return the block data
+     * @param blockId the {@code byte} supplied as {@code blockId}
+     * @return the {@link BlockData} representing the block data
      */
     private BlockData getBlockData(byte blockId) {
         for (BlockData data : BlockData.values()) {
@@ -933,7 +941,7 @@ public class GameInteraction {
 
     /**
      * Returns the breaking block pos.
-     * @return the breaking block pos
+     * @return the {@link Vector3i} representing the breaking block pos
      */
     public Vector3i getBreakingBlockPos() {
         return new Vector3i(breakingX, breakingY, breakingZ);
@@ -941,7 +949,7 @@ public class GameInteraction {
 
     /**
      * Returns the break progress.
-     * @return the break progress
+     * @return {@code float}; the break progress
      */
     public float getBreakProgress() {
         return breakProgress;

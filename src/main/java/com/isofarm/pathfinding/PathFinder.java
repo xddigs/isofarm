@@ -6,7 +6,7 @@ import com.isofarm.wrld.World;
 import java.util.List;
 
 /**
- * Provides path finder behavior.
+ * Encapsulates the state and operations required by path finder within the game runtime.
  */
 public final class PathFinder {
 
@@ -17,10 +17,10 @@ public final class PathFinder {
 
     /**
      * Finds and returns the path.
-     * @param world the world value
-     * @param start the start value
-     * @param goal the goal value
-     * @return the located path
+     * @param world the {@link World} supplied as {@code world}
+     * @param start the {@link GridPos} supplied as {@code start}
+     * @param goal the {@link GridPos} supplied as {@code goal}
+     * @return the {@link List} representing the located path
      */
     public static List<GridPos> findPath(World world, GridPos start, GridPos goal) {
         return AStar.findPath(world, start, goal);
@@ -28,7 +28,7 @@ public final class PathFinder {
 
     /**
      * Returns the player grid position.
-     * @return the player grid position
+     * @return the {@link GridPos} representing the player grid position
      */
     public static GridPos getPlayerGridPosition() {
         Player player = Player.plyr;
@@ -41,10 +41,10 @@ public final class PathFinder {
 
     /**
      * Returns the walkable position.
-     * @param world the world value
-     * @param x the x value
-     * @param z the z value
-     * @return the walkable position
+     * @param world the {@link World} supplied as {@code world}
+     * @param x the {@code int} supplied as {@code x}
+     * @param z the {@code int} supplied as {@code z}
+     * @return the {@link GridPos} representing the walkable position
      */
     public static GridPos getWalkablePosition(World world, int x, int z) {
         GridPos highestY = world.getHighestY(
@@ -62,10 +62,10 @@ public final class PathFinder {
 
     /**
      * Checks whether the stand condition is met.
-     * @param world the world value
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
+     * @param world the {@link World} supplied as {@code world}
+     * @param x the {@code int} supplied as {@code x}
+     * @param y the {@code int} supplied as {@code y}
+     * @param z the {@code int} supplied as {@code z}
      * @return {@code true} if stand; otherwise {@code false}
      */
     private static boolean canStand(World world, int x, int y, int z) {

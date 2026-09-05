@@ -4,7 +4,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL30.*;
 
 /**
- * Provides shadow map behavior.
+ * Encapsulates the state and operations required by shadow map within the game runtime.
  */
 public class ShadowMap {
     private final int width;
@@ -14,8 +14,8 @@ public class ShadowMap {
 
     /**
      * Creates a new {@code ShadowMap} instance.
-     * @param width the width value
-     * @param height the height value
+     * @param width the {@code int} supplied as {@code width}
+     * @param height the {@code int} supplied as {@code height}
      */
     public ShadowMap(int width, int height) {
         this.width = width;
@@ -50,7 +50,7 @@ public class ShadowMap {
     }
 
     /**
-     * Performs the bind operation.
+     * Binds this object to the active runtime context.
      */
     public void bind() {
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
@@ -59,9 +59,9 @@ public class ShadowMap {
     }
 
     /**
-     * Performs the unbind operation.
-     * @param windowWidth the window width value
-     * @param windowHeight the window height value
+     * Unbinds this object from the active runtime context.
+     * @param windowWidth the {@code int} supplied as {@code windowWidth}
+     * @param windowHeight the {@code int} supplied as {@code windowHeight}
      */
     public void unbind(int windowWidth, int windowHeight) {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -70,7 +70,7 @@ public class ShadowMap {
 
     /**
      * Returns the depth texture.
-     * @return the depth texture
+     * @return {@code int}; the depth texture
      */
     public int getDepthTexture() {
         return depthTexture;
@@ -78,7 +78,7 @@ public class ShadowMap {
 
     /**
      * Returns the framebuffer.
-     * @return the framebuffer
+     * @return {@code int}; the framebuffer
      */
     public int getFramebuffer() {
         return framebuffer;
@@ -86,7 +86,7 @@ public class ShadowMap {
 
     /**
      * Returns the width.
-     * @return the width
+     * @return {@code int}; the width
      */
     public int getWidth() {
         return width;
@@ -94,14 +94,14 @@ public class ShadowMap {
 
     /**
      * Returns the height.
-     * @return the height
+     * @return {@code int}; the height
      */
     public int getHeight() {
         return height;
     }
 
     /**
-     * Performs the dispose operation.
+     * Releases the resources associated with this object.
      */
     public void dispose() {
         glDeleteFramebuffers(framebuffer);

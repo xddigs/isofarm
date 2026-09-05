@@ -1,7 +1,7 @@
 package com.isofarm.data;
 
 /**
- * Provides enchantment behavior.
+ * Encapsulates the state and operations required by enchantment within the game runtime.
  */
 @DataClass
 public class Enchantment {
@@ -12,9 +12,9 @@ public class Enchantment {
 
     /**
      * Creates a new {@code Enchantment} instance.
-     * @param type the type value
-     * @param level the level value
-     * @param cost the cost value
+     * @param type the {@link Enchantments} supplied as {@code type}
+     * @param level the {@code int} supplied as {@code level}
+     * @param cost the {@code int} supplied as {@code cost}
      */
     public Enchantment(Enchantments type, int level, int cost) {
         this.type = type;
@@ -25,7 +25,7 @@ public class Enchantment {
 
     /**
      * Returns the type.
-     * @return the type
+     * @return the {@link Enchantments} representing the type
      */
     public Enchantments getType() {
         return type;
@@ -33,7 +33,7 @@ public class Enchantment {
 
     /**
      * Returns the name.
-     * @return the name
+     * @return the {@link String} representing the name
      */
     public String getName() {
         return name;
@@ -41,14 +41,14 @@ public class Enchantment {
 
     /**
      * Returns the level.
-     * @return the level
+     * @return {@code int}; the level
      */
     public int getLevel() {
         return level;
     }
 
     /**
-     * Performs the upgrade operation.
+     * Applies upgrade and updates the affected character or item state.
      */
     public void upgrade() {
         level++;
@@ -56,7 +56,7 @@ public class Enchantment {
 
     /**
      * Returns the cost.
-     * @return the cost
+     * @return {@code int}; the cost
      */
     public int getCost() {
         return cost;

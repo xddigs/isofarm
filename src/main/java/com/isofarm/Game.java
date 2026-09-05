@@ -25,7 +25,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 /**
- * Provides game behavior.
+ * Encapsulates the state and operations required by game within the game runtime.
  */
 public class Game {
     private static final Logger log = LoggerFactory.getLogger(Game.class);
@@ -38,7 +38,7 @@ public class Game {
     private long window;
 
     /**
-     * Performs the run operation.
+     * Executes run as part of the application lifecycle.
      */
     public void run() {
         log.info("Starting LWJGL 3 application...");
@@ -142,11 +142,11 @@ public class Game {
 
     /**
      * Loads the icon.
-     * @param icons the icons value
-     * @param index the index value
-     * @param resourcePath the resource path value
-     * @param stack the stack value
-     * @return the load icon result
+     * @param icons the {@link GLFWImage.Buffer} supplied as {@code icons}
+     * @param index the {@code int} supplied as {@code index}
+     * @param resourcePath the {@link String} supplied as {@code resourcePath}
+     * @param stack the {@link MemoryStack} supplied as {@code stack}
+     * @return the {@link ByteBuffer} representing the load icon result
      */
     private static ByteBuffer loadIcon(GLFWImage.Buffer icons, int index, String resourcePath,
                                        int targetSize, MemoryStack stack) {
@@ -191,7 +191,9 @@ public class Game {
         }
     }
 
-    /** Fits a non-square source image into a transparent square RGBA canvas. */
+    /**
+     * Fits a non-square source image into a transparent square RGBA canvas.
+     */
     private static ByteBuffer fit(ByteBuffer source, int width, int height,
                                   int targetSize) {
         ByteBuffer result = MemoryUtil.memCalloc(targetSize * targetSize * 4);
@@ -216,8 +218,8 @@ public class Game {
     }
 
     /**
-     * Performs the main operation.
-     * @param ignoredArgs the ignored args value
+     * Executes main as part of the application lifecycle.
+     * @param ignoredArgs an array of {@link String} values supplied as {@code ignoredArgs}
      */
     public static void main(String[] ignoredArgs) {
         new Game().run();

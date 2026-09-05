@@ -19,7 +19,7 @@ import com.isofarm.wrld.GameMaster;
 import java.util.List;
 
 /**
- * Provides hotbar ui behavior.
+ * Encapsulates the state and operations required by hotbar ui within the game runtime.
  */
 public class HotbarUI extends UIElement {
     private final InventorySlotUI[] slotUIs = new InventorySlotUI[K.UI.INVENTORY_COLUMNS];
@@ -41,8 +41,8 @@ public class HotbarUI extends UIElement {
 
     /**
      * Creates a new {@code HotbarUI} instance.
-     * @param x the x value
-     * @param y the y value
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
      */
     public HotbarUI(float x, float y) {
         super(x, y, getInitialHotbarWidth(), getHotbarHeight());
@@ -52,8 +52,9 @@ public class HotbarUI extends UIElement {
     }
 
     /**
+     * {@inheritDoc}
      * Updates the current state.
-     * @param delta the delta value
+     * @param delta the {@code float} supplied as {@code delta}
      */
     @Override
     public void update(float delta) {
@@ -71,7 +72,8 @@ public class HotbarUI extends UIElement {
     }
 
     /**
-     * Renders render.
+     * {@inheritDoc}
+     * Renders this object in the requested render pass.
      */
     @Override
     public void render() {
@@ -81,7 +83,7 @@ public class HotbarUI extends UIElement {
 
     /**
      * Returns the selected item.
-     * @return the selected item
+     * @return the {@link Item} representing the selected item
      */
     public Item getSelectedItem() {
         InventorySlot slot = getSelectedInventorySlot();
@@ -103,7 +105,7 @@ public class HotbarUI extends UIElement {
 
     /**
      * Returns the initial hotbar width.
-     * @return the initial hotbar width
+     * @return {@code float}; the initial hotbar width
      */
     private static float getInitialHotbarWidth() {
         float padding = Settings.getScaledPadding();
@@ -116,7 +118,7 @@ public class HotbarUI extends UIElement {
 
     /**
      * Returns the hotbar width.
-     * @return the hotbar width
+     * @return {@code float}; the hotbar width
      */
     public float getHotbarWidth() {
         float padding = Settings.getScaledPadding();
@@ -141,7 +143,7 @@ public class HotbarUI extends UIElement {
 
     /**
      * Returns the hotbar height.
-     * @return the hotbar height
+     * @return {@code float}; the hotbar height
      */
     private static float getHotbarHeight() {
         return Settings.getScaledPadding() * 2.0f +
@@ -150,7 +152,7 @@ public class HotbarUI extends UIElement {
 
     /**
      * Returns the max selectable slots.
-     * @return the max selectable slots
+     * @return {@code int}; the max selectable slots
      */
     public int getMaxSelectableSlots() {
         int max = K.UI.INVENTORY_COLUMNS;
@@ -164,8 +166,8 @@ public class HotbarUI extends UIElement {
     }
 
     /**
-     * Performs the select slot operation.
-     * @param index the index value
+     * Updates or derives runtime state for select slot according to the supplied arguments.
+     * @param index the {@code int} supplied as {@code index}
      */
     public void selectSlot(int index) {
         if (index < 0 || index >= getMaxSelectableSlots()) {
@@ -176,14 +178,14 @@ public class HotbarUI extends UIElement {
     }
 
     /**
-     * Performs the select next operation.
+     * Updates or derives runtime state for select next according to the supplied arguments.
      */
     public void selectNext() {
         selectSlot((selectedSlot + 1) % getMaxSelectableSlots());
     }
 
     /**
-     * Performs the select previous operation.
+     * Updates or derives runtime state for select previous according to the supplied arguments.
      */
     public void selectPrevious() {
         int max = getMaxSelectableSlots();
@@ -191,7 +193,7 @@ public class HotbarUI extends UIElement {
     }
 
     /**
-     * Performs the refresh size operation.
+     * Refreshes dependent runtime state for refresh size.
      */
     public void refreshSize() {
         setWidth(getHotbarWidth());
@@ -199,8 +201,8 @@ public class HotbarUI extends UIElement {
 
     /**
      * Returns the extra slot index.
-     * @param item the item value
-     * @return the extra slot index
+     * @param item the {@link Item} supplied as {@code item}
+     * @return {@code int}; the extra slot index
      */
     private int getExtraSlotIndex(Item item) {
         if (inventory == null || item == null) {
@@ -218,8 +220,8 @@ public class HotbarUI extends UIElement {
 
     /**
      * Returns the extra slot ui.
-     * @param index the index value
-     * @return the extra slot ui
+     * @param index the {@code int} supplied as {@code index}
+     * @return the {@link InventorySlotUI} representing the extra slot ui
      */
     private InventorySlotUI getExtraSlotUI(int index) {
         if (inventory == null) {
@@ -283,7 +285,7 @@ public class HotbarUI extends UIElement {
 
     /**
      * Returns the inventory.
-     * @return the inventory
+     * @return the {@link Inventory} representing the inventory
      */
     public Inventory getInventory() {
         return inventory;
@@ -291,7 +293,7 @@ public class HotbarUI extends UIElement {
 
     /**
      * Sets the inventory.
-     * @param inventory the inventory value
+     * @param inventory the {@link Inventory} supplied as {@code inventory}
      */
     public void setInventory(Inventory inventory) {
         this.inventory = inventory;
@@ -299,14 +301,14 @@ public class HotbarUI extends UIElement {
 
     /**
      * Sets the inventory mode.
-     * @param inventoryMode the inventory mode value
+     * @param inventoryMode the {@code boolean} supplied as {@code inventoryMode}
      */
     public void setInventoryMode(boolean inventoryMode) {
         this.inventoryMode = inventoryMode;
     }
 
     /**
-     * Performs the sync inventory operation.
+     * Refreshes dependent runtime state for sync inventory.
      */
     private void syncInventory() {
         if (player == null) {
@@ -324,7 +326,7 @@ public class HotbarUI extends UIElement {
     }
 
     /**
-     * Performs the sync extra slots operation.
+     * Refreshes dependent runtime state for sync extra slots.
      */
     private void syncExtraSlots() {
         backpackSlotUI.hide();
@@ -353,7 +355,7 @@ public class HotbarUI extends UIElement {
 
     /**
      * Updates the item sprite.
-     * @param slotUI the slot ui value
+     * @param slotUI the {@link InventorySlotUI} supplied as {@code slotUI}
      */
     private void updateItemSprite(InventorySlotUI slotUI) {
         Item item = slotUI.getItem();
@@ -423,7 +425,7 @@ public class HotbarUI extends UIElement {
     }
 
     /**
-     * Performs the interact operation.
+     * Handles interact and applies its effect to the current interaction state.
      */
     private void interact() {
         boolean isLeftClick = Controls.isPressed(ControlAction.UI_SELECT);
@@ -465,7 +467,7 @@ public class HotbarUI extends UIElement {
 
     /**
      * Checks whether the slot hovered condition is met.
-     * @param slotUI the slot ui value
+     * @param slotUI the {@link InventorySlotUI} supplied as {@code slotUI}
      * @return {@code true} if slot hovered; otherwise {@code false}
      */
     private boolean isSlotHovered(InventorySlotUI slotUI) {
@@ -482,7 +484,7 @@ public class HotbarUI extends UIElement {
 
     /**
      * Returns the selected inventory slot.
-     * @return the selected inventory slot
+     * @return the {@link InventorySlot} representing the selected inventory slot
      */
     public InventorySlot getSelectedInventorySlot() {
         if (player == null || inventory == null) {
@@ -542,7 +544,7 @@ public class HotbarUI extends UIElement {
 
     /**
      * Returns the seed icons.
-     * @return the seed icons
+     * @return the {@link SpriteSheet} representing the seed icons
      */
     public SpriteSheet getSeedIcons() {
         return seedIcons;
@@ -550,7 +552,7 @@ public class HotbarUI extends UIElement {
 
     /**
      * Sets the seed icons.
-     * @param seedIcons the seed icons value
+     * @param seedIcons the {@link SpriteSheet} supplied as {@code seedIcons}
      */
     public void setSeedIcons(SpriteSheet seedIcons) {
         this.seedIcons = seedIcons;
@@ -558,7 +560,7 @@ public class HotbarUI extends UIElement {
 
     /**
      * Returns the crop icons.
-     * @return the crop icons
+     * @return the {@link SpriteSheet} representing the crop icons
      */
     public SpriteSheet getCropIcons() {
         return cropIcons;
@@ -566,7 +568,7 @@ public class HotbarUI extends UIElement {
 
     /**
      * Sets the crop icons.
-     * @param cropIcons the crop icons value
+     * @param cropIcons the {@link SpriteSheet} supplied as {@code cropIcons}
      */
     public void setCropIcons(SpriteSheet cropIcons) {
         this.cropIcons = cropIcons;
@@ -574,7 +576,7 @@ public class HotbarUI extends UIElement {
 
     /**
      * Returns the block icons.
-     * @return the block icons
+     * @return the {@link SpriteSheet} representing the block icons
      */
     public SpriteSheet getBlockIcons() {
         return blockIcons;
@@ -582,7 +584,7 @@ public class HotbarUI extends UIElement {
 
     /**
      * Sets the block icons.
-     * @param blockIcons the block icons value
+     * @param blockIcons the {@link SpriteSheet} supplied as {@code blockIcons}
      */
     public void setBlockIcons(SpriteSheet blockIcons) {
         this.blockIcons = blockIcons;
@@ -590,7 +592,7 @@ public class HotbarUI extends UIElement {
 
     /**
      * Returns the tool icons.
-     * @return the tool icons
+     * @return the {@link SpriteSheet} representing the tool icons
      */
     public SpriteSheet getToolIcons() {
         return toolIcons;
@@ -598,7 +600,7 @@ public class HotbarUI extends UIElement {
 
     /**
      * Sets the tool icons.
-     * @param toolIcons the tool icons value
+     * @param toolIcons the {@link SpriteSheet} supplied as {@code toolIcons}
      */
     public void setToolIcons(SpriteSheet toolIcons) {
         this.toolIcons = toolIcons;
@@ -606,7 +608,7 @@ public class HotbarUI extends UIElement {
 
     /**
      * Returns the material icons.
-     * @return the material icons
+     * @return the {@link SpriteSheet} representing the material icons
      */
     public SpriteSheet getMaterialIcons() {
         return materialIcons;
@@ -614,7 +616,7 @@ public class HotbarUI extends UIElement {
 
     /**
      * Sets the material icons.
-     * @param materialIcons the material icons value
+     * @param materialIcons the {@link SpriteSheet} supplied as {@code materialIcons}
      */
     public void setMaterialIcons(SpriteSheet materialIcons) {
         this.materialIcons = materialIcons;
@@ -622,7 +624,7 @@ public class HotbarUI extends UIElement {
 
     /**
      * Returns the inventory icons.
-     * @return the inventory icons
+     * @return the {@link SpriteSheet} representing the inventory icons
      */
     public SpriteSheet getInventoryIcons() {
         return inventoryIcons;
@@ -630,7 +632,7 @@ public class HotbarUI extends UIElement {
 
     /**
      * Sets the inventory icons.
-     * @param inventoryIcons the inventory icons value
+     * @param inventoryIcons the {@link SpriteSheet} supplied as {@code inventoryIcons}
      */
     public void setInventoryIcons(SpriteSheet inventoryIcons) {
         this.inventoryIcons = inventoryIcons;
@@ -638,7 +640,7 @@ public class HotbarUI extends UIElement {
 
     /**
      * Returns the selected slot.
-     * @return the selected slot
+     * @return {@code int}; the selected slot
      */
     public int getSelectedSlot() {
         return selectedSlot;
@@ -646,7 +648,7 @@ public class HotbarUI extends UIElement {
 
     /**
      * Returns the slot uis.
-     * @return the slot uis
+     * @return an array of {@link InventorySlotUI} values; the slot uis
      */
     public InventorySlotUI[] getSlotUIs() {
         return slotUIs.clone();

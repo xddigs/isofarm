@@ -7,21 +7,21 @@ import com.isofarm.wrld.GameMaster;
  */
 public interface PlayerState {
     /**
-     * Performs the input operation.
-     * @param gameMaster the game master value
+     * Handles input and applies its effect to the current interaction state.
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
      */
     void input(GameMaster gameMaster);
     /**
      * Updates the current state.
-     * @param delta the delta value
+     * @param delta the {@code float} supplied as {@code delta}
      */
     void update(float delta);
     /**
-     * Performs the enter operation.
+     * Activates this object and prepares any state it requires.
      */
     void enter();
     /**
-     * Performs the exit operation.
+     * Deactivates this object and releases its transient state.
      */
     void exit();
 }

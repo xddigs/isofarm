@@ -3,14 +3,14 @@ package com.isofarm.entity;
 import com.isofarm.data.DataClass;
 
 /**
- * Provides animal behavior.
+ * Encapsulates the state and operations required by animal within the game runtime.
  */
 @DataClass
 public abstract class Animal extends Entity {
 
     /**
      * Creates a new {@code Animal} instance.
-     * @param name the name value
+     * @param name the {@link String} supplied as {@code name}
      */
     public Animal(String name) {
         super(name);

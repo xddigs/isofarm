@@ -1,7 +1,7 @@
 package com.isofarm.data;
 
 /**
- * Provides tree sapling behavior.
+ * Encapsulates the state and operations required by tree sapling within the game runtime.
  */
 public class TreeSapling {
     private final int x, y, z;
@@ -11,11 +11,11 @@ public class TreeSapling {
 
     /**
      * Creates a new {@code TreeSapling} instance.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
-     * @param treeType the tree type value
-     * @param targetTicks the target ticks value
+     * @param x the {@code int} supplied as {@code x}
+     * @param y the {@code int} supplied as {@code y}
+     * @param z the {@code int} supplied as {@code z}
+     * @param treeType the {@link BlockData} supplied as {@code treeType}
+     * @param targetTicks the {@code int} supplied as {@code targetTicks}
      */
     public TreeSapling(int x, int y, int z, BlockData treeType, int targetTicks) {
         this.x = x;
@@ -27,8 +27,8 @@ public class TreeSapling {
     }
 
     /**
-     * Performs the tick operation.
-     * @return the tick result
+     * Updates this object for the current simulation step.
+     * @return {@code boolean}; the tick result
      */
     public boolean tick() {
         currentTicks++;
@@ -37,7 +37,7 @@ public class TreeSapling {
 
     /**
      * Returns the x.
-     * @return the x
+     * @return {@code int}; the x
      */
     public int getX() {
         return x;
@@ -45,7 +45,7 @@ public class TreeSapling {
 
     /**
      * Returns the y.
-     * @return the y
+     * @return {@code int}; the y
      */
     public int getY() {
         return y;
@@ -53,7 +53,7 @@ public class TreeSapling {
 
     /**
      * Returns the z.
-     * @return the z
+     * @return {@code int}; the z
      */
     public int getZ() {
         return z;
@@ -61,7 +61,7 @@ public class TreeSapling {
 
     /**
      * Returns the tree type.
-     * @return the tree type
+     * @return the {@link BlockData} representing the tree type
      */
     public BlockData getTreeType() {
         return treeType;

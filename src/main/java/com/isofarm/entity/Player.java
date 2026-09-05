@@ -52,6 +52,7 @@ public class Player extends Character {
     }
 
     /**
+     * Updates this object for the current simulation step.
      * {@inheritDoc}
      */
     @Override
@@ -66,6 +67,7 @@ public class Player extends Character {
     }
 
     /**
+     * Renders this object using the active graphics state.
      * {@inheritDoc}
      */
     @Override
@@ -74,6 +76,7 @@ public class Player extends Character {
     }
 
     /**
+     * Handles damage taken and updates the affected state.
      * {@inheritDoc}
      */
     @Override
@@ -84,13 +87,20 @@ public class Player extends Character {
         }
     }
 
-    /** Records the cause attached to the lethal damage event. */
+    /**
+     * Records the cause attached to the lethal damage event.
+     */
+    /**
+     * Handles death and updates the affected state.
+     * {@inheritDoc}
+     */
     @Override
     protected void onDeath(Cause cause) {
         DeathManager.dth.setCauseOfDeath(cause);
     }
 
     /**
+     * Transfers or creates the relevant entity or item for drop loot.
      * {@inheritDoc}
      */
     @Override
@@ -106,35 +116,41 @@ public class Player extends Character {
     }
 
     /**
-     * @return whether an attack animation is active
+     * Determines whether attacking is satisfied by the current state.
+     * @return {@code true} if an attack animation is active; otherwise {@code false}
      */
     public boolean isAttacking() {
         return animator.isAttacking();
     }
 
     /**
-     * @param state state to enter
+     * Updates or derives runtime state for change state according to the supplied arguments.
+     * @param state the {@link PlayerState} argument; state to enter
      */
     public void changeState(PlayerState state) {
         manager.changeState(state);
     }
 
     /**
-     * @param velocity velocity @param delta frame time
+     * Updates movement for auto jump according to the current physics and input state.
+     * @param velocity the {@link Vector3f} supplied as {@code velocity}
+     * @param delta the {@code float} argument; frame time
      */
     public void autoJump(Vector3f velocity, float delta) {
         manager.autoJump(velocity, delta);
     }
 
     /**
-     * @return active state
+     * Returns current state according to the current object state.
+     * @return the {@link PlayerState} result; active state
      */
     public PlayerState getCurrentState() {
         return manager.getCurrentState();
     }
 
     /**
-     * @param state state to store
+     * Sets current state and updates the associated state.
+     * @param state the {@link PlayerState} argument; state to store
      */
     public void setCurrentState(PlayerState state) {
         manager.setCurrentState(state);
@@ -155,41 +171,51 @@ public class Player extends Character {
     }
 
     /**
-     * @return damage event sequence
+     * Returns damage sequence according to the current object state.
+     * @return {@code int}; damage event sequence
      */
     public int getDamageSequence() {
         return gameplay.getDamageSequence();
     }
 
     /**
-     * @param delta frame time
+     * Updates movement for move according to the current physics and input state.
+     * @param delta the {@code float} argument; frame time
      */
     public void move(float delta) {
         manager.move(delta);
     }
 
     /**
-     * @param delta frame time @param yaw camera yaw @param flying flight flag
+     * Updates movement for wasd according to the current physics and input state.
+     * @param delta the {@code float} argument; frame time
+     * @param yaw the {@code float} argument; camera yaw
+     * @param flying the {@code boolean} argument; flight flag
      */
     public void wasd(float delta, float yaw, boolean flying) {
         manager.wasd(delta, yaw, flying);
     }
 
     /**
-     * @param delta frame time @param yaw camera yaw @param flying flight flag
+     * Updates movement for fly according to the current physics and input state.
+     * @param delta the {@code float} argument; frame time
+     * @param yaw the {@code float} argument; camera yaw
+     * @param flying the {@code boolean} argument; flight flag
      */
     public void fly(float delta, float yaw, boolean flying) {
         manager.fly(delta, yaw, flying);
     }
 
     /**
-     * @return whether support exists below the proposed position
+     * Determines whether ground below is satisfied by the current state.
+     * @return {@code true} if support exists below the proposed position; otherwise {@code false}
      */
     public boolean hasGroundBelow(float x, float z) {
         return manager.hasGroundBelow(x, z);
     }
 
     /**
+     * Updates movement for adjust velocity according to the current physics and input state.
      * {@inheritDoc}
      */
     @Override
@@ -198,49 +224,60 @@ public class Player extends Character {
     }
 
     /**
-     * @param item item @param amount quantity
+     * Processes sell and updates the affected inventory or currency balances.
+     * @param item the {@link Item} supplied as {@code item}
+     * @param amount the {@code int} argument; quantity
      */
     public void sell(Item item, int amount) {
         gameplay.sell(item, amount);
     }
 
     /**
-     * @param item item @param amount quantity
+     * Adds the supplied element to the corresponding collection or processing queue.
+     * @param item the {@link Item} supplied as {@code item}
+     * @param amount the {@code int} argument; quantity
      */
     public void add(Item item, int amount) {
         gameplay.add(item, amount);
     }
 
     /**
-     * @param item item
+     * Adds the supplied element to the corresponding collection or processing queue.
+     * @param item the {@link Item} supplied as {@code item}
      */
     public void add(Item item) {
         gameplay.add(item);
     }
 
     /**
-     * @param item item @param amount quantity
+     * Adds to backpack to the corresponding collection or processing queue.
+     * @param item the {@link Item} supplied as {@code item}
+     * @param amount the {@code int} argument; quantity
      */
     public void addToBackpack(Item item, int amount) {
         gameplay.addToBackpack(item, amount);
     }
 
     /**
-     * @param item item
+     * Adds to backpack to the corresponding collection or processing queue.
+     * @param item the {@link Item} supplied as {@code item}
      */
     public void addToBackpack(Item item) {
         gameplay.addToBackpack(item);
     }
 
     /**
-     * @param item item @param amount quantity
+     * Removes from backpack and updates any dependent state.
+     * @param item the {@link Item} supplied as {@code item}
+     * @param amount the {@code int} argument; quantity
      */
     public void removeFromBackpack(Item item, int amount) {
         gameplay.removeFromBackpack(item, amount);
     }
 
     /**
-     * @param item item
+     * Removes from backpack and updates any dependent state.
+     * @param item the {@link Item} supplied as {@code item}
      */
     public void removeFromBackpack(Item item) {
         gameplay.removeFromBackpack(item);
@@ -254,14 +291,17 @@ public class Player extends Character {
     }
 
     /**
-     * @param item item @param amount quantity
+     * Removes the supplied element and updates any dependent state.
+     * @param item the {@link Item} supplied as {@code item}
+     * @param amount the {@code int} argument; quantity
      */
     public void remove(Item item, int amount) {
         gameplay.remove(item, amount);
     }
 
     /**
-     * @param item item
+     * Removes the supplied element and updates any dependent state.
+     * @param item the {@link Item} supplied as {@code item}
      */
     public void remove(Item item) {
         gameplay.remove(item);
@@ -275,119 +315,139 @@ public class Player extends Character {
     }
 
     /**
-     * @return whether inventory is empty
+     * Determines whether this object contains no elements or active content.
+     * @return {@code true} if inventory is empty; otherwise {@code false}
      */
     public boolean isEmpty() {
         return gameplay.isEmpty();
     }
 
     /**
-     * @return inventory size
+     * Returns the number or extent represented by size.
+     * @return {@code int}; inventory size
      */
     public int size() {
         return gameplay.size();
     }
 
     /**
-     * @param index index @return indexed item
+     * Returns the value identified by the supplied key, index, or current object state.
+     * @param index the {@code int} supplied as {@code index}
+     * @return the {@link Item} result; indexed item
      */
     public Item get(int index) {
         return gameplay.get(index);
     }
 
     /**
-     * @param item key @return matching item
+     * Returns the value identified by the supplied key, index, or current object state.
+     * @param item the {@link Item} argument; key
+     * @return the {@link Item} result; matching item
      */
     public Item get(Item item) {
         return gameplay.get(item);
     }
 
     /**
-     * @param item item @return quantity
+     * Returns amount according to the current object state.
+     * @param item the {@link Item} supplied as {@code item}
+     * @return {@code int}; quantity
      */
     public int getAmount(Item item) {
         return gameplay.getAmount(item);
     }
 
     /**
-     * @param amount currency amount
+     * Processes earn and updates the affected inventory or currency balances.
+     * @param amount the {@code int} argument; currency amount
      */
     public void earn(int amount) {
         gameplay.earn(amount);
     }
 
     /**
-     * @param amount currency amount
+     * Processes spend and updates the affected inventory or currency balances.
+     * @param amount the {@code int} argument; currency amount
      */
     public void spend(int amount) {
         gameplay.spend(amount);
     }
 
     /**
-     * @return whether storage has space
+     * Determines whether space is satisfied by the current state.
+     * @return {@code true} if storage has space; otherwise {@code false}
      */
     public boolean hasSpace() {
         return gameplay.hasSpace();
     }
 
     /**
-     * @return whether seeds are available
+     * Determines whether seeds is satisfied by the current state.
+     * @return {@code true} if seeds are available; otherwise {@code false}
      */
     public boolean hasSeeds() {
         return gameplay.hasSeeds();
     }
 
     /**
-     * @return interpolated eye height
+     * Returns current eye height according to the current object state.
+     * @return {@code float}; interpolated eye height
      */
     public float getCurrentEyeHeight() {
         return manager.getCurrentEyeHeight();
     }
 
     /**
-     * @return forward angle
+     * Returns forward according to the current object state.
+     * @return {@code float}; forward angle
      */
     public float getForward() {
         return manager.getForward();
     }
 
     /**
-     * @return facing direction
+     * Returns direction according to the current object state.
+     * @return the {@link Direction} result; facing direction
      */
     public Direction getDirection() {
         return animator.getDirection();
     }
 
     /**
-     * @return whether a path remains
+     * Determines whether following path is satisfied by the current state.
+     * @return {@code true} if a path remains; otherwise {@code false}
      */
     public boolean isFollowingPath() {
         return manager.isFollowingPath();
     }
 
     /**
-     * @return active path
+     * Returns path according to the current object state.
+     * @return the {@link List} result; active path
      */
     public List<GridPos> getPath() {
         return manager.getPath();
     }
 
     /**
-     * @param path path to follow
+     * Sets path and updates the associated state.
+     * @param path the {@link List} argument; path to follow
      */
     public void setPath(List<GridPos> path) {
         manager.setPath(path);
     }
 
     /**
-     * @return path index
+     * Returns path index according to the current object state.
+     * @return {@code int}; path index
      */
     public int getPathIndex() {
         return manager.getPathIndex();
     }
 
     /**
-     * @param index path index
+     * Sets path index and updates the associated state.
+     * @param index the {@code int} argument; path index
      */
     public void setPathIndex(int index) {
         manager.setPathIndex(index);
@@ -401,49 +461,56 @@ public class Player extends Character {
     }
 
     /**
-     * @return respawn timer
+     * Returns respawn timer according to the current object state.
+     * @return {@code float}; respawn timer
      */
     public float getRespawnTimer() {
         return gameplay.getRespawnTimer();
     }
 
     /**
-     * @param timer respawn timer
+     * Sets respawn timer and updates the associated state.
+     * @param timer the {@code float} argument; respawn timer
      */
     public void setRespawnTimer(float timer) {
         gameplay.setRespawnTimer(timer);
     }
 
     /**
-     * @return target eye height
+     * Returns target eye height according to the current object state.
+     * @return {@code float}; target eye height
      */
     public float getTargetEyeHeight() {
         return manager.getTargetEyeHeight();
     }
 
     /**
-     * @param height target eye height
+     * Sets target eye height and updates the associated state.
+     * @param height the {@code float} argument; target eye height
      */
     public void setTargetEyeHeight(float height) {
         manager.setTargetEyeHeight(height);
     }
 
     /**
-     * @return whether falling
+     * Determines whether falling is satisfied by the current state.
+     * @return {@code true} if falling; otherwise {@code false}
      */
     public boolean isFalling() {
         return manager.isFalling();
     }
 
     /**
-     * @param falling falling flag
+     * Sets falling and updates the associated state.
+     * @param falling the {@code boolean} argument; falling flag
      */
     public void setFalling(boolean falling) {
         manager.setFalling(falling);
     }
 
     /**
-     * @return regeneration multiplier
+     * Returns difficulty regen according to the current object state.
+     * @return {@code float}; regeneration multiplier
      */
     public float getDifficultyRegen() {
         return gameplay.getDifficultyRegen();

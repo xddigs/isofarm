@@ -3,7 +3,7 @@ package com.isofarm.data;
 import org.joml.Vector3f;
 
 /**
- * Stores ray data.
+ * Immutable value object containing ray.
  */
 @DataClass
 public record Ray(Vector3f origin, Vector3f direction) {}

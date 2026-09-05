@@ -6,7 +6,7 @@ import com.isofarm.wrld.GameMaster;
 import org.joml.Vector3f;
 
 /**
- * Provides sun behavior.
+ * Encapsulates the state and operations required by sun within the game runtime.
  */
 public class Sun extends Entity {
     private final Vector3f direction;
@@ -15,7 +15,7 @@ public class Sun extends Entity {
 
     /**
      * Creates a new {@code Sun} instance.
-     * @param name the name value
+     * @param name the {@link String} supplied as {@code name}
      */
     public Sun(String name) {
         super(name);
@@ -26,7 +26,7 @@ public class Sun extends Entity {
 
     /**
      * Returns the direction.
-     * @return the direction
+     * @return the {@link Vector3f} representing the direction
      */
     public Vector3f getDirection() {
         return direction;
@@ -34,7 +34,7 @@ public class Sun extends Entity {
 
     /**
      * Returns the color.
-     * @return the color
+     * @return the {@link Vector3f} representing the color
      */
     public Vector3f getColor() {
         return color;
@@ -42,16 +42,17 @@ public class Sun extends Entity {
 
     /**
      * Returns the intensity.
-     * @return the intensity
+     * @return {@code float}; the intensity
      */
     public float getIntensity() {
         return intensity;
     }
 
     /**
+     * {@inheritDoc}
      * Updates the current state.
-     * @param blockPos the block pos value
-     * @param timeOfDay the time of day value
+     * @param blockPos the {@link BlockPos} supplied as {@code blockPos}
+     * @param timeOfDay the {@code float} supplied as {@code timeOfDay}
      */
     @Override
     public void update(BlockPos blockPos, float timeOfDay) {
@@ -74,9 +75,10 @@ public class Sun extends Entity {
     }
 
     /**
-     * Renders render.
-     * @param gameMaster the game master value
-     * @param pass the pass value
+     * {@inheritDoc}
+     * Renders this object in the requested render pass.
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
+     * @param pass the {@link RenderPass} supplied as {@code pass}
      */
     @Override
     public void render(GameMaster gameMaster, RenderPass pass) {}

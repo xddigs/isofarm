@@ -14,7 +14,7 @@ import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 
 /**
- * Provides mesh behavior.
+ * Encapsulates the state and operations required by mesh within the game runtime.
  */
 public class Mesh {
     private static final Logger log = LoggerFactory.getLogger(Mesh.class);
@@ -27,10 +27,10 @@ public class Mesh {
 
     /**
      * Creates a new {@code Mesh} instance.
-     * @param positions the positions value
-     * @param normals the normals value
-     * @param textCoords the text coords value
-     * @param indices the indices value
+     * @param positions an array of {@code float} values supplied as {@code positions}
+     * @param normals an array of {@code float} values supplied as {@code normals}
+     * @param textCoords an array of {@code float} values supplied as {@code textCoords}
+     * @param indices an array of {@code int} values supplied as {@code indices}
      */
     public Mesh(float[] positions, float[] normals, float[] textCoords, int[] indices) {
         this.vertexCount = indices.length;
@@ -88,12 +88,12 @@ public class Mesh {
 
     /**
      * Returns the indices count.
-     * @return the indices count
+     * @return {@code int}; the indices count
      */
     public int getIndicesCount() { return vertexCount; }
 
     /**
-     * Renders render.
+     * Renders this object in the requested render pass.
      */
     public void render() {
         glBindVertexArray(vaoId);
@@ -112,7 +112,7 @@ public class Mesh {
     }
 
     /**
-     * Performs the dispose operation.
+     * Releases the resources associated with this object.
      */
     public void dispose() {
         glDisableVertexAttribArray(0);
@@ -133,8 +133,8 @@ public class Mesh {
 
     /**
      * Creates and returns the mesh.
-     * @param depth the depth value
-     * @return the created mesh
+     * @param depth the {@code float} supplied as {@code depth}
+     * @return the {@link Mesh} representing the created mesh
      */
     public static Mesh createMesh(float depth) {
         float[] positions = getFloats(depth);
@@ -147,7 +147,7 @@ public class Mesh {
 
     /**
      * Creates and returns the cross mesh.
-     * @return the created cross mesh
+     * @return the {@link Mesh} representing the created cross mesh
      */
     public static Mesh createCrossMesh() {
         float[] positions = new float[]{-0.5f, 0.0f, -0.5f, 0.5f, 0.0f, 0.5f, 0.5f, 1.0f, 0.5f, -0.5f, 1.0f, -0.5f, 0.5f, 0.0f, -0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 1.0f, 0.5f, 0.5f, 1.0f, -0.5f};
@@ -159,7 +159,7 @@ public class Mesh {
 
     /**
      * Creates and returns the destroy overlay mesh.
-     * @return the created destroy overlay mesh
+     * @return the {@link Mesh} representing the created destroy overlay mesh
      */
     public static Mesh createDestroyOverlayMesh() {
         float[] positions = new float[]{0,1,0, 0,1,1, 1,1,1, 1,1,0, 0,0,1, 0,1,1, 1,1,1, 1,0,1, 1,0,1, 1,1,1, 1,1,0, 1,0,0, 1,0,0, 1,1,0, 0,1,0, 0,0,0, 0,0,0, 0,1,0, 0,1,1, 0,0,1, 0,0,1, 0,0,0, 1,0,0, 1,0,1};
@@ -172,7 +172,7 @@ public class Mesh {
 
     /**
      * Creates and returns the centered quad.
-     * @return the created centered quad
+     * @return the {@link Mesh} representing the created centered quad
      */
     public static Mesh createCenteredQuad() {
         float[] positions = new float[]{-0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.5f, 0.5f, 0.0f, -0.5f, 0.5f, 0.0f};
@@ -184,7 +184,7 @@ public class Mesh {
 
     /**
      * Creates and returns the quad.
-     * @return the created quad
+     * @return the {@link Mesh} representing the created quad
      */
     public static Mesh createQuad() {
         float[] positions = new float[]{0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f};
@@ -195,8 +195,8 @@ public class Mesh {
     }
 
     /**
-     * Performs the screen quad operation.
-     * @return the screen quad result
+     * Creates or returns screen quad from the supplied arguments.
+     * @return the {@link Mesh} representing the screen quad result
      */
     public static Mesh screenQuad() {
         float[] positions = new float[]{-1.0f, 1.0f, 0.0f, -1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f};
@@ -208,8 +208,8 @@ public class Mesh {
 
     /**
      * Returns the floats.
-     * @param depth the depth value
-     * @return the floats
+     * @param depth the {@code float} supplied as {@code depth}
+     * @return an array of {@code float} values; the floats
      */
     private static float[] getFloats(float depth) {
         float height = 1.0f;
@@ -224,8 +224,8 @@ public class Mesh {
     }
 
     /**
-     * Performs the selection operation.
-     * @return the selection result
+     * Creates or returns selection from the supplied arguments.
+     * @return the {@link Mesh} representing the selection result
      */
     public static Mesh selection() {
         float eps = 0.002f;
@@ -238,8 +238,8 @@ public class Mesh {
 
     /**
      * Returns the positions.
-     * @param eps the eps value
-     * @return the positions
+     * @param eps the {@code float} supplied as {@code eps}
+     * @return an array of {@code float} values; the positions
      */
     private static float[] getPositions(float eps) {
         float minX = -eps; float maxX = 1.0f + eps;
@@ -249,8 +249,8 @@ public class Mesh {
     }
 
     /**
-     * Performs the quad vertical operation.
-     * @return the quad vertical result
+     * Creates or returns quad vertical from the supplied arguments.
+     * @return the {@link Mesh} representing the quad vertical result
      */
     public static Mesh quadVertical() {
         float[] positions = new float[]{-0.5f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.5f, 1.0f, 0.0f, -0.5f, 1.0f, 0.0f};
@@ -262,7 +262,7 @@ public class Mesh {
 
     /**
      * Creates and returns the crop.
-     * @return the created crop
+     * @return the {@link Mesh} representing the created crop
      */
     public static Mesh createCrop() {
         float[] positions = new float[]{-0.4f, 0.0f, -0.25f, 0.4f, 0.0f, -0.25f, 0.4f, 0.8f, -0.25f, -0.4f, 0.8f, -0.25f, -0.4f, 0.0f, 0.25f, 0.4f, 0.0f, 0.25f, 0.4f, 0.8f, 0.25f, -0.4f, 0.8f, 0.25f, -0.25f, 0.0f, -0.4f, -0.25f, 0.0f, 0.4f, -0.25f, 0.8f, 0.4f, -0.25f, 0.8f, -0.4f, 0.25f, 0.0f, -0.4f, 0.25f, 0.0f, 0.4f, 0.25f, 0.8f, 0.4f, 0.25f, 0.8f, -0.4f};
@@ -274,7 +274,7 @@ public class Mesh {
 
     /**
      * Creates and returns the cube.
-     * @return the created cube
+     * @return the {@link Mesh} representing the created cube
      */
     public static Mesh createCube() {
         float[] positions = new float[]{-0.5f, 0.5f, -0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f};

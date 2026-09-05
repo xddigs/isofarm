@@ -21,12 +21,12 @@ public enum Usables {
 
     /**
      * Creates a new {@code Usables} instance.
-     * @param id the id value
-     * @param col the col value
-     * @param row the row value
-     * @param name the name value
-     * @param displayName the display name value
-     * @param value the value value
+     * @param id the {@code byte} supplied as {@code id}
+     * @param col the {@code byte} supplied as {@code col}
+     * @param row the {@code byte} supplied as {@code row}
+     * @param name the {@link String} supplied as {@code name}
+     * @param displayName the {@link String} supplied as {@code displayName}
+     * @param value the {@code int} supplied as {@code value}
      */
     Usables(byte id, byte col, byte row, String name, String displayName, int value) {
         this.id = id;
@@ -39,7 +39,7 @@ public enum Usables {
 
     /**
      * Returns the id.
-     * @return the id
+     * @return {@code byte}; the id
      */
     public byte getId() {
         return id;
@@ -47,7 +47,7 @@ public enum Usables {
 
     /**
      * Returns the col.
-     * @return the col
+     * @return {@code byte}; the col
      */
     public byte getCol() {
         return col;
@@ -55,7 +55,7 @@ public enum Usables {
 
     /**
      * Returns the row.
-     * @return the row
+     * @return {@code byte}; the row
      */
     public byte getRow() {
         return row;
@@ -63,7 +63,7 @@ public enum Usables {
 
     /**
      * Returns the name.
-     * @return the name
+     * @return the {@link String} representing the name
      */
     public String getName() {
         return name;
@@ -71,7 +71,7 @@ public enum Usables {
 
     /**
      * Returns the display name.
-     * @return the display name
+     * @return the {@link String} representing the display name
      */
     public String getDisplayName() {
         return Local.lang.t(displayName);
@@ -79,7 +79,7 @@ public enum Usables {
 
     /**
      * Returns the value.
-     * @return the value
+     * @return {@code int}; the value
      */
     public int getValue() {
         return value;

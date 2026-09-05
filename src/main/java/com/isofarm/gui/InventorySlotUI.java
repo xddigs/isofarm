@@ -13,7 +13,7 @@ import org.joml.Vector4f;
 import java.lang.Character;
 
 /**
- * Provides inventory slot ui behavior.
+ * Encapsulates the state and operations required by inventory slot ui within the game runtime.
  */
 @SuppressWarnings("all")
 public class InventorySlotUI extends UIElement {
@@ -33,11 +33,11 @@ public class InventorySlotUI extends UIElement {
     private float squishTimer = 0.0f;
     /**
      * Creates a new {@code InventorySlotUI} instance.
-     * @param x the x value
-     * @param y the y value
-     * @param width the width value
-     * @param height the height value
-     * @param slotType the slot type value
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param width the {@code float} supplied as {@code width}
+     * @param height the {@code float} supplied as {@code height}
+     * @param slotType the {@link SlotType} supplied as {@code slotType}
      */
     public InventorySlotUI(float x, float y, float width, float height, SlotType slotType) {
         super(x, y, width, height);
@@ -47,8 +47,9 @@ public class InventorySlotUI extends UIElement {
     }
 
     /**
+     * {@inheritDoc}
      * Updates the current state.
-     * @param delta the delta value
+     * @param delta the {@code float} supplied as {@code delta}
      */
     @Override
     public void update(float delta) {
@@ -77,14 +78,15 @@ public class InventorySlotUI extends UIElement {
     }
 
     /**
-     * Performs the trigger squish operation.
+     * Updates or derives runtime state for trigger squish according to the supplied arguments.
      */
     public void triggerSquish() {
         this.squishTimer = K.UI.SQUISH_DURATION;
     }
 
     /**
-     * Renders render.
+     * {@inheritDoc}
+     * Renders this object in the requested render pass.
      */
     @Override
     public void render() {
@@ -114,7 +116,7 @@ public class InventorySlotUI extends UIElement {
 
     /**
      * Returns the slot type.
-     * @return the slot type
+     * @return the {@link InventorySlot} representing the slot type
      */
     public InventorySlot getSlotType() {
         return switch (slotType) {
@@ -126,7 +128,7 @@ public class InventorySlotUI extends UIElement {
 
     /**
      * Sets the slot.
-     * @param slot the slot value
+     * @param slot the {@link InventorySlot} supplied as {@code slot}
      */
     public void setSlot(InventorySlot slot) {
         if (slotType == SlotType.BACKPACK) {
@@ -235,8 +237,8 @@ public class InventorySlotUI extends UIElement {
 
     /**
      * Returns the text width.
-     * @param value the value value
-     * @return the text width
+     * @param value the {@link String} supplied as {@code value}
+     * @return {@code float}; the text width
      */
     private float getTextWidth(String value) {
         float width = 0.0f;
@@ -256,7 +258,7 @@ public class InventorySlotUI extends UIElement {
 
     /**
      * Returns the slot.
-     * @return the slot
+     * @return the {@link InventorySlot} representing the slot
      */
     public InventorySlot getSlot() {
         return slot;
@@ -264,7 +266,7 @@ public class InventorySlotUI extends UIElement {
 
     /**
      * Returns the backpack slot.
-     * @return the backpack slot
+     * @return the {@link InventorySlot} representing the backpack slot
      */
     public InventorySlot getBackpackSlot() {
         return backpackSlot;
@@ -272,7 +274,7 @@ public class InventorySlotUI extends UIElement {
 
     /**
      * Returns the item.
-     * @return the item
+     * @return the {@link Item} representing the item
      */
     public Item getItem() {
         InventorySlot currentSlot = getSlotType();
@@ -290,7 +292,7 @@ public class InventorySlotUI extends UIElement {
 
     /**
      * Returns the sprite sheet.
-     * @return the sprite sheet
+     * @return the {@link SpriteSheet} representing the sprite sheet
      */
     public SpriteSheet getSpriteSheet() {
         return spriteSheet;
@@ -298,7 +300,7 @@ public class InventorySlotUI extends UIElement {
 
     /**
      * Sets the sprite sheet.
-     * @param spriteSheet the sprite sheet value
+     * @param spriteSheet the {@link SpriteSheet} supplied as {@code spriteSheet}
      */
     public void setSpriteSheet(SpriteSheet spriteSheet) {
         this.spriteSheet = spriteSheet;
@@ -306,7 +308,7 @@ public class InventorySlotUI extends UIElement {
 
     /**
      * Returns the sprite frame.
-     * @return the sprite frame
+     * @return {@code int}; the sprite frame
      */
     public int getSpriteFrame() {
         return spriteFrame;
@@ -314,7 +316,7 @@ public class InventorySlotUI extends UIElement {
 
     /**
      * Sets the sprite frame.
-     * @param spriteFrame the sprite frame value
+     * @param spriteFrame the {@code int} supplied as {@code spriteFrame}
      */
     public void setSpriteFrame(int spriteFrame) {
         this.spriteFrame = Math.max(0, spriteFrame);
@@ -330,7 +332,7 @@ public class InventorySlotUI extends UIElement {
 
     /**
      * Sets the selected.
-     * @param selected the selected value
+     * @param selected the {@code boolean} supplied as {@code selected}
      */
     public void setSelected(boolean selected) {
         this.selected = selected;
@@ -346,7 +348,7 @@ public class InventorySlotUI extends UIElement {
 
     /**
      * Sets the hovered.
-     * @param hovered the hovered value
+     * @param hovered the {@code boolean} supplied as {@code hovered}
      */
     public void setHovered(boolean hovered) {
         this.hovered = hovered;
@@ -354,7 +356,7 @@ public class InventorySlotUI extends UIElement {
 
     /**
      * Returns the count font.
-     * @return the count font
+     * @return the {@link UIFont} representing the count font
      */
     public UIFont getCountFont() {
         return countFont;
@@ -362,7 +364,7 @@ public class InventorySlotUI extends UIElement {
 
     /**
      * Sets the count font.
-     * @param countFont the count font value
+     * @param countFont the {@link UIFont} supplied as {@code countFont}
      */
     public void setCountFont(UIFont countFont) {
         if (countFont != null) {

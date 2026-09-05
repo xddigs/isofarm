@@ -7,7 +7,7 @@ import com.isofarm.utils.K;
 import java.util.Random;
 
 /**
- * Provides weather service behavior.
+ * Encapsulates the state and operations required by weather service within the game runtime.
  */
 @Singleton
 public class WeatherService implements Service<WeatherType> {
@@ -31,7 +31,7 @@ public class WeatherService implements Service<WeatherType> {
 
     /**
      * Returns the weather.
-     * @return the weather
+     * @return the {@link WeatherType} representing the weather
      */
     public WeatherType getWeather() {
         return weather;
@@ -39,15 +39,15 @@ public class WeatherService implements Service<WeatherType> {
 
     /**
      * Sets the weather.
-     * @param weather the weather value
+     * @param weather the {@link WeatherType} supplied as {@code weather}
      */
     public void setWeather(WeatherType weather) {
         WeatherService.weather = weather;
     }
 
     /**
-     * Performs the next weather operation.
-     * @return the next weather result
+     * Updates text or selection state for next weather.
+     * @return the {@link WeatherType} representing the next weather result
      */
     public WeatherType nextWeather() {
         if (random.nextFloat() < K.World.WEATHER_CHANGE_PROBABILITY) {

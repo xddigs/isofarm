@@ -42,6 +42,7 @@ public enum ControlAction {
     }
 
     /**
+     * Creates or returns id from the supplied arguments.
      * @return {@link String} identifier used by {@code config.json}
      */
     public String id() {

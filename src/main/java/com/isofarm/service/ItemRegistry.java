@@ -9,16 +9,16 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 /**
- * Provides item registry behavior.
+ * Encapsulates the state and operations required by item registry within the game runtime.
  */
 public class ItemRegistry {
     private final Map<String, Supplier<Item>> items = new HashMap<>();
     private final Map<MaterialID, Supplier<Item>> materials = new HashMap<>();
 
     /**
-     * Performs the register operation.
-     * @param id the id value
-     * @param factory the factory value
+     * Adds the supplied element to the corresponding collection or processing queue.
+     * @param id the {@link String} supplied as {@code id}
+     * @param factory the {@link Supplier} supplied as {@code factory}
      */
     public void register(String id, Supplier<Item> factory) {
         items.put(id.toLowerCase(), factory);
@@ -26,8 +26,8 @@ public class ItemRegistry {
 
     /**
      * Returns create.
-     * @param id the id value
-     * @return the create result
+     * @param id the {@link String} supplied as {@code id}
+     * @return the {@link Item} representing the create result
      */
     public Item create(String id) {
         if (id == null) return null;
@@ -37,9 +37,9 @@ public class ItemRegistry {
     }
 
     /**
-     * Performs the register operation.
-     * @param materialID the material id value
-     * @param factory the factory value
+     * Adds the supplied element to the corresponding collection or processing queue.
+     * @param materialID the {@link MaterialID} supplied as {@code materialID}
+     * @param factory the {@link Supplier} supplied as {@code factory}
      */
     public void register(MaterialID materialID,
                          Supplier<Item> factory) {
@@ -49,8 +49,8 @@ public class ItemRegistry {
 
     /**
      * Returns create.
-     * @param materialID the material id value
-     * @return the create result
+     * @param materialID the {@link MaterialID} supplied as {@code materialID}
+     * @return the {@link Item} representing the create result
      */
     public Item create(MaterialID materialID) {
         if (materialID == null) return null;
@@ -60,17 +60,17 @@ public class ItemRegistry {
     }
 
     /**
-     * Performs the contains operation.
-     * @param materialID the material id value
-     * @return the contains result
+     * Determines whether this object is satisfied by the current state.
+     * @param materialID the {@link MaterialID} supplied as {@code materialID}
+     * @return {@code boolean}; the contains result
      */
     public boolean contains(MaterialID materialID) {
         return materialID != null && materials.containsKey(materialID);
     }
 
     /**
-     * Performs the unregister operation.
-     * @param materialID the material id value
+     * Removes the supplied element and updates any dependent state.
+     * @param materialID the {@link MaterialID} supplied as {@code materialID}
      */
     public void unregister(MaterialID materialID) {
         if (materialID != null) {
@@ -94,16 +94,16 @@ public class ItemRegistry {
     }
 
     /**
-     * Performs the size operation.
-     * @return the size result
+     * Returns the number or extent represented by size.
+     * @return {@code int}; the size result
      */
     public int size() {
         return items.size();
     }
 
     /**
-     * Performs the material size operation.
-     * @return the material size result
+     * Returns the number or extent represented by material size.
+     * @return {@code int}; the material size result
      */
     public int materialSize() {
         return materials.size();
@@ -111,7 +111,7 @@ public class ItemRegistry {
 
     /**
      * Returns the ids.
-     * @return the ids
+     * @return the {@link List} representing the ids
      */
     public List<String> getIds() {
         return items.keySet()
@@ -122,7 +122,7 @@ public class ItemRegistry {
 
     /**
      * Returns the material ids.
-     * @return the material ids
+     * @return the {@link List} representing the material ids
      */
     public List<String> getMaterialIds() {
         return materials.keySet()

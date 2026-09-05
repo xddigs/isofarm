@@ -1,7 +1,7 @@
 package com.isofarm.data;
 
 /**
- * Provides rain drop behavior.
+ * Encapsulates the state and operations required by rain drop within the game runtime.
  */
 @DataClass
 public class RainDrop {
@@ -11,11 +11,11 @@ public class RainDrop {
 
     /**
      * Creates a new {@code RainDrop} instance.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
-     * @param velocity the velocity value
-     * @param length the length value
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param z the {@code float} supplied as {@code z}
+     * @param velocity the {@code float} supplied as {@code velocity}
+     * @param length the {@code float} supplied as {@code length}
      */
     public RainDrop(float x, float y, float z,
                     float velocity, float length) {
@@ -28,7 +28,7 @@ public class RainDrop {
 
     /**
      * Updates the current state.
-     * @param delta the delta value
+     * @param delta the {@code float} supplied as {@code delta}
      */
     public void update(float delta) {
         y -= velocity * delta;
@@ -36,7 +36,7 @@ public class RainDrop {
 
     /**
      * Checks whether the dead condition is met.
-     * @param groundY the ground y value
+     * @param groundY the {@code float} supplied as {@code groundY}
      * @return {@code true} if dead; otherwise {@code false}
      */
     public boolean isDead(float groundY) {
@@ -45,7 +45,7 @@ public class RainDrop {
 
     /**
      * Returns the x.
-     * @return the x
+     * @return {@code float}; the x
      */
     public float getX() {
         return x;
@@ -53,7 +53,7 @@ public class RainDrop {
 
     /**
      * Returns the y.
-     * @return the y
+     * @return {@code float}; the y
      */
     public float getY() {
         return y;
@@ -61,7 +61,7 @@ public class RainDrop {
 
     /**
      * Returns the z.
-     * @return the z
+     * @return {@code float}; the z
      */
     public float getZ() {
         return z;
@@ -69,7 +69,7 @@ public class RainDrop {
 
     /**
      * Returns the length.
-     * @return the length
+     * @return {@code float}; the length
      */
     public float getLength() {
         return length;

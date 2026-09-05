@@ -4,7 +4,7 @@ import com.isofarm.data.*;
 import com.isofarm.utils.Local;
 
 /**
- * Provides material behavior.
+ * Encapsulates the state and operations required by material within the game runtime.
  */
 @DataClass
 public class Material implements Craftable, Plantable {
@@ -14,8 +14,8 @@ public class Material implements Craftable, Plantable {
 
     /**
      * Creates a new {@code Material} instance.
-     * @param tier the tier value
-     * @param materialID the material id value
+     * @param tier the {@link Tier} supplied as {@code tier}
+     * @param materialID the {@link MaterialID} supplied as {@code materialID}
      */
     public Material(Tier tier, MaterialID materialID) {
         this.tier = tier;
@@ -24,8 +24,9 @@ public class Material implements Craftable, Plantable {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the id.
-     * @return the id
+     * @return {@code byte}; the id
      */
     @Override
     public byte getId() {
@@ -33,8 +34,9 @@ public class Material implements Craftable, Plantable {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the name.
-     * @return the name
+     * @return the {@link String} representing the name
      */
     @Override
     public String getName() {
@@ -42,8 +44,9 @@ public class Material implements Craftable, Plantable {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the display name.
-     * @return the display name
+     * @return the {@link String} representing the display name
      */
     @Override
     public String getDisplayName() {
@@ -52,8 +55,9 @@ public class Material implements Craftable, Plantable {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the crop type, either {@code null} or {@code SUGAR_CANE}
-     * @return {@code null} or {@code CropType.SUGAR_CANE}
+     * @return the {@link CropType} result; {@code null} or {@code CropType.SUGAR_CANE}
      */
     @Override
     public CropType getType() {
@@ -62,8 +66,9 @@ public class Material implements Craftable, Plantable {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the value.
-     * @return the value
+     * @return {@code int}; the value
      */
     @Override
     public int getValue() {
@@ -71,8 +76,9 @@ public class Material implements Craftable, Plantable {
     }
 
     /**
-     * Performs the copy operation.
-     * @return the copy result
+     * {@inheritDoc}
+     * Creates an independent copy that preserves the relevant state of this object.
+     * @return the {@link Item} representing the copy result
      */
     @Override
     public Item copy() {
@@ -81,7 +87,7 @@ public class Material implements Craftable, Plantable {
 
     /**
      * Returns the tier.
-     * @return the tier
+     * @return the {@link Tier} representing the tier
      */
     public Tier getTier() {
         return tier;
@@ -89,7 +95,7 @@ public class Material implements Craftable, Plantable {
 
     /**
      * Returns the material id.
-     * @return the material id
+     * @return the {@link MaterialID} representing the material id
      */
     public MaterialID getMaterialID() {
         return materialID;

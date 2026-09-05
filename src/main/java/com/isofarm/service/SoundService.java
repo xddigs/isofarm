@@ -23,7 +23,7 @@ import static org.lwjgl.openal.ALC10.*;
 import static org.lwjgl.stb.STBVorbis.stb_vorbis_decode_memory;
 
 /**
- * Provides sound service behavior.
+ * Encapsulates the state and operations required by sound service within the game runtime.
  */
 @SuppressWarnings("all")
 @Singleton
@@ -71,7 +71,7 @@ public class SoundService implements Service<SoundGroup> {
 
     /**
      * Loads the sound array.
-     * @param paths the paths value
+     * @param paths an array of {@link String} values supplied as {@code paths}
      */
     private void loadSoundArray(String[] paths) {
         if (paths == null) return;
@@ -117,8 +117,8 @@ public class SoundService implements Service<SoundGroup> {
     }
 
     /**
-     * Performs the play step sound operation.
-     * @param group the group value
+     * Updates audio playback for play step sound.
+     * @param group the {@link SoundGroup} supplied as {@code group}
      */
     public void playStepSound(SoundGroup group) {
         playSound(stepSource, group != null ? group.getStepSounds() : null,
@@ -126,8 +126,8 @@ public class SoundService implements Service<SoundGroup> {
     }
 
     /**
-     * Performs the play break sound operation.
-     * @param group the group value
+     * Updates audio playback for play break sound.
+     * @param group the {@link SoundGroup} supplied as {@code group}
      */
     public void playBreakSound(SoundGroup group) {
         playSound(breakSource, group != null ? group.getBreakSounds() : null,
@@ -135,8 +135,8 @@ public class SoundService implements Service<SoundGroup> {
     }
 
     /**
-     * Performs the play breaking sound operation.
-     * @param group the group value
+     * Updates audio playback for play breaking sound.
+     * @param group the {@link SoundGroup} supplied as {@code group}
      */
     public void playBreakingSound(SoundGroup group) {
         String[] sounds = group != null ? group.getBreakingSounds() : null;
@@ -152,7 +152,9 @@ public class SoundService implements Service<SoundGroup> {
         playSound(breakingSource, sounds, 0.8f, 0.2f, 1.0f);
     }
 
-    /** Stops the sound played while a block is being broken. */
+    /**
+     * Stops the sound played while a block is being broken.
+     */
     public void stopBreakingSound() {
         alSourceStop(breakingSource);
         alSourcei(breakingSource, AL_BUFFER, 0);
@@ -160,8 +162,8 @@ public class SoundService implements Service<SoundGroup> {
     }
 
     /**
-     * Performs the play place sound operation.
-     * @param group the group value
+     * Updates audio playback for play place sound.
+     * @param group the {@link SoundGroup} supplied as {@code group}
      */
     public void playPlaceSound(SoundGroup group) {
         playSound(breakSource, group != null ? group.getPlaceSounds() : null,
@@ -169,8 +171,8 @@ public class SoundService implements Service<SoundGroup> {
     }
 
     /**
-     * Performs the play entity sound operation.
-     * @param group the group value
+     * Updates audio playback for play entity sound.
+     * @param group the {@link SoundGroup} supplied as {@code group}
      */
     public void playEntitySound(SoundGroup group) {
         playSound(entitySource, group != null ? group.getEntitySounds() : null,
@@ -178,8 +180,8 @@ public class SoundService implements Service<SoundGroup> {
     }
 
     /**
-     * Performs the play looping sound operation.
-     * @param group the group value
+     * Updates audio playback for play looping sound.
+     * @param group the {@link SoundGroup} supplied as {@code group}
      */
     public void playLoopingSound(SoundGroup group) {
         if (group == null) return;
@@ -189,8 +191,8 @@ public class SoundService implements Service<SoundGroup> {
     }
 
     /**
-     * Performs the play use sound operation.
-     * @param group the group value
+     * Updates audio playback for play use sound.
+     * @param group the {@link SoundGroup} supplied as {@code group}
      */
     public void playUseSound(SoundGroup group) {
         if (group == null) return;
@@ -203,8 +205,8 @@ public class SoundService implements Service<SoundGroup> {
      * Plays a specific use sound without randomizing either the selected effect
      * or its pitch.
      *
-     * @param group the sound group
-     * @param soundIndex the index of the sound within the group's use sounds
+     * @param group the {@link SoundGroup} argument; the sound group
+     * @param soundIndex the {@code int} argument; the index of the sound within the group's use sounds
      */
     public void playUseSound(SoundGroup group, int soundIndex) {
         if (group == null) return;
@@ -213,7 +215,7 @@ public class SoundService implements Service<SoundGroup> {
 
     /**
      * Sets the background sound.
-     * @param group the group value
+     * @param group the {@link SoundGroup} supplied as {@code group}
      */
     public void setBackgroundSound(SoundGroup group) {
         if (group == null) {
@@ -254,12 +256,12 @@ public class SoundService implements Service<SoundGroup> {
     }
 
     /**
-     * Performs the play sound operation.
-     * @param source the source value
-     * @param sounds the sounds value
-     * @param basePitch the base pitch value
-     * @param pitchVariation the pitch variation value
-     * @param volume the volume value
+     * Updates audio playback for play sound.
+     * @param source the {@code int} supplied as {@code source}
+     * @param sounds an array of {@link String} values supplied as {@code sounds}
+     * @param basePitch the {@code float} supplied as {@code basePitch}
+     * @param pitchVariation the {@code float} supplied as {@code pitchVariation}
+     * @param volume the {@code float} supplied as {@code volume}
      */
     private void playSound(int source, String[] sounds, float basePitch,
                            float pitchVariation, float volume) {
@@ -272,11 +274,11 @@ public class SoundService implements Service<SoundGroup> {
     /**
      * Plays one concrete sound from an array without random selection or pitch.
      *
-     * @param source the OpenAL source
-     * @param sounds the available sound paths
-     * @param pitch the exact playback pitch
-     * @param volume the playback volume
-     * @param soundIndex the sound path index to play
+     * @param source the {@code int} argument; the OpenAL source
+     * @param sounds an array of {@link String} values argument; the available sound paths
+     * @param pitch the {@code float} argument; the exact playback pitch
+     * @param volume the {@code float} argument; the playback volume
+     * @param soundIndex the {@code int} argument; the sound path index to play
      */
     private void playSound(int source, String[] sounds, float pitch,
                            float volume, int soundIndex) {
@@ -284,7 +286,9 @@ public class SoundService implements Service<SoundGroup> {
         playSoundBuffer(source, sounds[soundIndex], pitch, volume);
     }
 
-    /** Plays a loaded sound buffer with the supplied source settings. */
+    /**
+     * Plays a loaded sound buffer with the supplied source settings.
+     */
     private void playSoundBuffer(int source, String soundPath, float pitch, float volume) {
         Integer bufferId = soundBuffers.get(soundPath);
 
@@ -298,7 +302,7 @@ public class SoundService implements Service<SoundGroup> {
     }
 
     /**
-     * Performs the stop background sound operation.
+     * Updates audio playback for stop background sound.
      */
     public void stopBackgroundSound() {
         if (alGetSourcei(backgroundSource, AL_SOURCE_STATE) == AL_PLAYING) {
@@ -311,8 +315,8 @@ public class SoundService implements Service<SoundGroup> {
 
     /**
      * Loads the ogg.
-     * @param resourcePath the resource path value
-     * @return the load ogg result
+     * @param resourcePath the {@link String} supplied as {@code resourcePath}
+     * @return {@code int}; the load ogg result
      */
     public int loadOgg(String resourcePath) {
         if (resourcePath == null) return -1;
@@ -357,7 +361,7 @@ public class SoundService implements Service<SoundGroup> {
     }
 
     /**
-     * Performs the cleanup operation.
+     * Releases the resources associated with this object.
      */
     public void cleanup() {
         alDeleteSources(stepSource);

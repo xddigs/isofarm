@@ -15,8 +15,8 @@ public enum Languages {
 
     /**
      * Creates a new {@code Languages} instance.
-     * @param code the code value
-     * @param name the name value
+     * @param code the {@link String} supplied as {@code code}
+     * @param name the {@link String} supplied as {@code name}
      */
     Languages(String code, String name) {
         this.code = code;
@@ -25,7 +25,7 @@ public enum Languages {
 
     /**
      * Returns the code.
-     * @return the code
+     * @return the {@link String} representing the code
      */
     public String getCode() {
         return code;
@@ -33,7 +33,7 @@ public enum Languages {
 
     /**
      * Returns the name.
-     * @return the name
+     * @return the {@link String} representing the name
      */
     public String getName() {
         return Local.lang.t(name);

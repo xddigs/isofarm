@@ -20,7 +20,7 @@ import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 
 /**
- * Provides gui behavior.
+ * Encapsulates the state and operations required by gui within the game runtime.
  */
 @Utils
 @GodObject
@@ -54,9 +54,9 @@ public class GUI {
     }
 
     /**
-     * Performs the begin operation.
-     * @param screenWidth the screen width value
-     * @param screenHeight the screen height value
+     * Activates this object and prepares any state it requires.
+     * @param screenWidth the {@code float} supplied as {@code screenWidth}
+     * @param screenHeight the {@code float} supplied as {@code screenHeight}
      */
     public static void begin(float screenWidth, float screenHeight) {
         glDisable(GL_DEPTH_TEST);
@@ -77,7 +77,7 @@ public class GUI {
     }
 
     /**
-     * Performs the end operation.
+     * Deactivates this object and releases its transient state.
      */
     public static void end() {
         shader.unbind();
@@ -89,12 +89,12 @@ public class GUI {
 
     /**
      * Draws the line.
-     * @param x1 the x1 value
-     * @param y1 the y1 value
-     * @param x2 the x2 value
-     * @param y2 the y2 value
-     * @param thickness the thickness value
-     * @param color the color value
+     * @param x1 the {@code float} supplied as {@code x1}
+     * @param y1 the {@code float} supplied as {@code y1}
+     * @param x2 the {@code float} supplied as {@code x2}
+     * @param y2 the {@code float} supplied as {@code y2}
+     * @param thickness the {@code float} supplied as {@code thickness}
+     * @param color the {@link Vector4f} supplied as {@code color}
      */
     public static void drawLine(float x1, float y1, float x2, float y2,
                                 float thickness, Vector4f color) {
@@ -123,12 +123,12 @@ public class GUI {
 
     /**
      * Draws the border.
-     * @param x the x value
-     * @param y the y value
-     * @param width the width value
-     * @param height the height value
-     * @param color the color value
-     * @param borderWidth the border width value
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param width the {@code float} supplied as {@code width}
+     * @param height the {@code float} supplied as {@code height}
+     * @param color the {@link Vector4f} supplied as {@code color}
+     * @param borderWidth the {@code float} supplied as {@code borderWidth}
      */
     public static void drawBorder(float x, float y, float width, float height,
                                   Vector4f color, float borderWidth) {
@@ -137,13 +137,13 @@ public class GUI {
 
     /**
      * Draws the border.
-     * @param x the x value
-     * @param y the y value
-     * @param width the width value
-     * @param height the height value
-     * @param color the color value
-     * @param borderWidth the border width value
-     * @param arc the arc value
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param width the {@code float} supplied as {@code width}
+     * @param height the {@code float} supplied as {@code height}
+     * @param color the {@link Vector4f} supplied as {@code color}
+     * @param borderWidth the {@code float} supplied as {@code borderWidth}
+     * @param arc the {@code float} supplied as {@code arc}
      */
     public static void drawBorder(float x, float y, float width, float height,
                                   Vector4f color, float borderWidth, float arc) {
@@ -170,11 +170,11 @@ public class GUI {
 
     /**
      * Draws the rect.
-     * @param x the x value
-     * @param y the y value
-     * @param width the width value
-     * @param height the height value
-     * @param color the color value
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param width the {@code float} supplied as {@code width}
+     * @param height the {@code float} supplied as {@code height}
+     * @param color the {@link Vector4f} supplied as {@code color}
      */
     public static void drawRect(float x, float y, float width, float height,
                                 Vector4f color) {
@@ -183,13 +183,13 @@ public class GUI {
 
     /**
      * Draws the rect.
-     * @param x the x value
-     * @param y the y value
-     * @param width the width value
-     * @param height the height value
-     * @param color the color value
-     * @param borderColor the border color value
-     * @param borderWidth the border width value
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param width the {@code float} supplied as {@code width}
+     * @param height the {@code float} supplied as {@code height}
+     * @param color the {@link Vector4f} supplied as {@code color}
+     * @param borderColor the {@link Vector4f} supplied as {@code borderColor}
+     * @param borderWidth the {@code float} supplied as {@code borderWidth}
      */
     public static void drawRect(float x, float y, float width, float height,
                                 Vector4f color, Vector4f borderColor, float borderWidth) {
@@ -198,12 +198,12 @@ public class GUI {
 
     /**
      * Draws the rect.
-     * @param x the x value
-     * @param y the y value
-     * @param width the width value
-     * @param height the height value
-     * @param color the color value
-     * @param arc the arc value
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param width the {@code float} supplied as {@code width}
+     * @param height the {@code float} supplied as {@code height}
+     * @param color the {@link Vector4f} supplied as {@code color}
+     * @param arc the {@code float} supplied as {@code arc}
      */
     public static void drawRect(float x, float y, float width, float height,
                                 Vector4f color, float arc) {
@@ -212,14 +212,14 @@ public class GUI {
 
     /**
      * Draws the rect.
-     * @param x the x value
-     * @param y the y value
-     * @param width the width value
-     * @param height the height value
-     * @param color the color value
-     * @param arc the arc value
-     * @param borderColor the border color value
-     * @param borderWidth the border width value
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param width the {@code float} supplied as {@code width}
+     * @param height the {@code float} supplied as {@code height}
+     * @param color the {@link Vector4f} supplied as {@code color}
+     * @param arc the {@code float} supplied as {@code arc}
+     * @param borderColor the {@link Vector4f} supplied as {@code borderColor}
+     * @param borderWidth the {@code float} supplied as {@code borderWidth}
      */
     public static void drawRect(float x, float y, float width, float height,
                                 Vector4f color, float arc,
@@ -249,12 +249,12 @@ public class GUI {
 
     /**
      * Draws the texture.
-     * @param texture the texture value
-     * @param x the x value
-     * @param y the y value
-     * @param width the width value
-     * @param height the height value
-     * @param tint the tint value
+     * @param texture the {@link Texture} supplied as {@code texture}
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param width the {@code float} supplied as {@code width}
+     * @param height the {@code float} supplied as {@code height}
+     * @param tint the {@link Vector4f} supplied as {@code tint}
      */
     public static void drawTexture(Texture texture, float x, float y,
                                    float width, float height, Vector4f tint) {
@@ -277,14 +277,14 @@ public class GUI {
 
     /**
      * Draws the sprite.
-     * @param spriteSheet the sprite sheet value
-     * @param column the column value
-     * @param row the row value
-     * @param x the x value
-     * @param y the y value
-     * @param width the width value
-     * @param height the height value
-     * @param tint the tint value
+     * @param spriteSheet the {@link SpriteSheet} supplied as {@code spriteSheet}
+     * @param column the {@code int} supplied as {@code column}
+     * @param row the {@code int} supplied as {@code row}
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param width the {@code float} supplied as {@code width}
+     * @param height the {@code float} supplied as {@code height}
+     * @param tint the {@link Vector4f} supplied as {@code tint}
      */
     public static void drawSprite(SpriteSheet spriteSheet, int column, int row,
                                   float x, float y, float width, float height,
@@ -315,13 +315,13 @@ public class GUI {
 
     /**
      * Draws the sprite.
-     * @param spriteSheet the sprite sheet value
-     * @param frame the frame value
-     * @param x the x value
-     * @param y the y value
-     * @param width the width value
-     * @param height the height value
-     * @param tint the tint value
+     * @param spriteSheet the {@link SpriteSheet} supplied as {@code spriteSheet}
+     * @param frame the {@code int} supplied as {@code frame}
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param width the {@code float} supplied as {@code width}
+     * @param height the {@code float} supplied as {@code height}
+     * @param tint the {@link Vector4f} supplied as {@code tint}
      */
     public static void drawSprite(SpriteSheet spriteSheet, int frame,
                                   float x, float y, float width, float height, Vector4f tint) {
@@ -329,7 +329,9 @@ public class GUI {
                 frame / spriteSheet.getCols(), x, y, width, height, tint);
     }
 
-    /** Draws a sprite as a solid color while preserving its texture alpha. */
+    /**
+     * Draws a sprite as a solid color while preserving its texture alpha.
+     */
     public static void drawSpriteSilhouette(SpriteSheet spriteSheet, int frame,
                                             float x, float y, float width, float height,
                                             Vector4f color) {
@@ -352,18 +354,20 @@ public class GUI {
         shader.setUniform("uUsePageTransform", true);
     }
 
-    /** Restores normal UI rendering after a page fold. */
+    /**
+     * Restores normal UI rendering after a page fold.
+     */
     public static void endPageTransform() {
         shader.setUniform("uUsePageTransform", false);
     }
 
     /**
      * Draws the string.
-     * @param text the text value
-     * @param x the x value
-     * @param y the y value
-     * @param font the font value
-     * @param color the color value
+     * @param text the {@link String} supplied as {@code text}
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param font the {@link UIFont} supplied as {@code font}
+     * @param color the {@link Vector4f} supplied as {@code color}
      */
     public static void drawString(String text, float x, float y,
                                   UIFont font, Vector4f color) {
@@ -372,12 +376,12 @@ public class GUI {
 
     /**
      * Draws the string.
-     * @param text the text value
-     * @param x the x value
-     * @param y the y value
-     * @param font the font value
-     * @param color the color value
-     * @param textScale the text scale value
+     * @param text the {@link String} supplied as {@code text}
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param font the {@link UIFont} supplied as {@code font}
+     * @param color the {@link Vector4f} supplied as {@code color}
+     * @param textScale the {@code float} supplied as {@code textScale}
      */
     public static void drawString(String text, float x, float y,
                                   UIFont font, Vector4f color, float textScale) {
@@ -434,10 +438,10 @@ public class GUI {
 
     /**
      * Draws the small string.
-     * @param text the text value
-     * @param x the x value
-     * @param y the y value
-     * @param color the color value
+     * @param text the {@link String} supplied as {@code text}
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param color the {@link Vector4f} supplied as {@code color}
      */
     public static void drawSmallString(String text, float x, float y, Vector4f color) {
         drawString(text, x, y, small, color);
@@ -445,10 +449,10 @@ public class GUI {
 
     /**
      * Draws the normal string.
-     * @param text the text value
-     * @param x the x value
-     * @param y the y value
-     * @param color the color value
+     * @param text the {@link String} supplied as {@code text}
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param color the {@link Vector4f} supplied as {@code color}
      */
     public static void drawNormalString(String text, float x, float y, Vector4f color) {
         drawString(text, x, y, normal, color);
@@ -456,10 +460,10 @@ public class GUI {
 
     /**
      * Draws the bold string.
-     * @param line the line value
-     * @param textX the text x value
-     * @param textY the text y value
-     * @param uiBookTextColor the ui book text color value
+     * @param line the {@link String} supplied as {@code line}
+     * @param textX the {@code float} supplied as {@code textX}
+     * @param textY the {@code float} supplied as {@code textY}
+     * @param uiBookTextColor the {@link Vector4f} supplied as {@code uiBookTextColor}
      */
     public static void drawBoldString(String line, float textX, float textY, Vector4f uiBookTextColor) {
         drawString(line, textX, textY, normalBold, uiBookTextColor);
@@ -467,10 +471,10 @@ public class GUI {
 
     /**
      * Draws the big string.
-     * @param text the text value
-     * @param x the x value
-     * @param y the y value
-     * @param color the color value
+     * @param text the {@link String} supplied as {@code text}
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param color the {@link Vector4f} supplied as {@code color}
      */
     public static void drawBigString(String text, float x, float y, Vector4f color) {
         drawString(text, x, y, big, color);
@@ -478,9 +482,9 @@ public class GUI {
 
     /**
      * Returns the string width.
-     * @param text the text value
-     * @param font the font value
-     * @return the string width
+     * @param text the {@link String} supplied as {@code text}
+     * @param font the {@link UIFont} supplied as {@code font}
+     * @return {@code float}; the string width
      */
     public static float getStringWidth(String text, UIFont font) {
         return getStringWidth(text, font, 1.0f);
@@ -488,10 +492,10 @@ public class GUI {
 
     /**
      * Returns the string width.
-     * @param text the text value
-     * @param font the font value
-     * @param textScale the text scale value
-     * @return the string width
+     * @param text the {@link String} supplied as {@code text}
+     * @param font the {@link UIFont} supplied as {@code font}
+     * @param textScale the {@code float} supplied as {@code textScale}
+     * @return {@code float}; the string width
      */
     public static float getStringWidth(String text, UIFont font, float textScale) {
         if (text == null || text.isEmpty() || font == null) {
@@ -513,9 +517,9 @@ public class GUI {
 
     /**
      * Returns the string height.
-     * @param text the text value
-     * @param normalFont the normal font value
-     * @return the string height
+     * @param text the {@link String} supplied as {@code text}
+     * @param normalFont the {@link UIFont} supplied as {@code normalFont}
+     * @return {@code float}; the string height
      */
     public static float getStringHeight(String text, UIFont normalFont) {
         return normalFont.getSize() * text.length();
@@ -523,11 +527,11 @@ public class GUI {
 
     /**
      * Returns the centered text y.
-     * @param text the text value
-     * @param font the font value
-     * @param boxY the box y value
-     * @param boxHeight the box height value
-     * @return the centered text y
+     * @param text the {@link String} supplied as {@code text}
+     * @param font the {@link UIFont} supplied as {@code font}
+     * @param boxY the {@code float} supplied as {@code boxY}
+     * @param boxHeight the {@code float} supplied as {@code boxHeight}
+     * @return {@code float}; the centered text y
      */
     public static float getCenteredTextY(String text, UIFont font,
                                          float boxY, float boxHeight) {
@@ -563,11 +567,11 @@ public class GUI {
     }
 
     /**
-     * Performs the wrap text operation.
-     * @param text the text value
-     * @param maxWidth the max width value
-     * @param font the font value
-     * @return the wrap text result
+     * Updates text or selection state for wrap text.
+     * @param text the {@link String} supplied as {@code text}
+     * @param maxWidth the {@code float} supplied as {@code maxWidth}
+     * @param font the {@link UIFont} supplied as {@code font}
+     * @return an array of {@link String} values; the wrap text result
      */
     public static String[] wrapText(String text, float maxWidth, UIFont font) {
         if (text == null || text.isEmpty() || maxWidth <= 0.0f) {
@@ -603,11 +607,11 @@ public class GUI {
     }
 
     /**
-     * Performs the push scissor operation.
-     * @param x the x value
-     * @param y the y value
-     * @param width the width value
-     * @param height the height value
+     * Adds scissor to the corresponding collection or processing queue.
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param width the {@code float} supplied as {@code width}
+     * @param height the {@code float} supplied as {@code height}
      */
     public static void pushScissor(float x, float y, float width, float height) {
         int windowHeight = (int) getScreenHeight();
@@ -617,15 +621,15 @@ public class GUI {
     }
 
     /**
-     * Performs the pop scissor operation.
+     * Removes scissor and updates any dependent state.
      */
     public static void popScissor() {
         glDisable(GL_SCISSOR_TEST);
     }
 
     /**
-     * Renders render.
-     * @param element the element value
+     * Renders this object in the requested render pass.
+     * @param element the {@link UIElement} supplied as {@code element}
      */
     public static void render(UIElement element) {
         if (element == null || !element.isActuallyVisible()) {
@@ -661,9 +665,9 @@ public class GUI {
     }
 
     /**
-     * Performs the resize operation.
-     * @param width the width value
-     * @param height the height value
+     * Transforms this object according to the supplied values.
+     * @param width the {@code int} supplied as {@code width}
+     * @param height the {@code int} supplied as {@code height}
      */
     public static void resize(int width, int height) {
         screenWidth = width;
@@ -685,7 +689,7 @@ public class GUI {
 
     /**
      * Draws the cursor.
-     * @param gameMaster the game master value
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
      */
     public static void drawCursor(GameMaster gameMaster) {
         if (gameMaster == null) return;
@@ -727,7 +731,7 @@ public class GUI {
 
     /**
      * Returns the screen width.
-     * @return the screen width
+     * @return {@code int}; the screen width
      */
     public static int getScreenWidth() {
         return screenWidth;
@@ -735,7 +739,7 @@ public class GUI {
 
     /**
      * Returns the screen height.
-     * @return the screen height
+     * @return {@code int}; the screen height
      */
     public static int getScreenHeight() {
         return screenHeight;
@@ -743,7 +747,7 @@ public class GUI {
 
     /**
      * Returns the shader.
-     * @return the shader
+     * @return the {@link Shader} representing the shader
      */
     public static Shader getShader() {
         return shader;
@@ -751,7 +755,7 @@ public class GUI {
 
     /**
      * Returns the small font.
-     * @return the small font
+     * @return the {@link UIFont} representing the small font
      */
     public static UIFont getSmallFont() {
         return small;
@@ -759,7 +763,7 @@ public class GUI {
 
     /**
      * Returns the normal font.
-     * @return the normal font
+     * @return the {@link UIFont} representing the normal font
      */
     public static UIFont getNormalFont() {
         return normal;
@@ -767,7 +771,7 @@ public class GUI {
 
     /**
      * Returns the big font.
-     * @return the big font
+     * @return the {@link UIFont} representing the big font
      */
     public static UIFont getBigFont() {
         return big;
@@ -775,7 +779,7 @@ public class GUI {
 
     /**
      * Returns the small bold font.
-     * @return the small bold font
+     * @return the {@link UIFont} representing the small bold font
      */
     public static UIFont getSmallBoldFont() {
         return smallBold;
@@ -783,7 +787,7 @@ public class GUI {
 
     /**
      * Returns the normal bold font.
-     * @return the normal bold font
+     * @return the {@link UIFont} representing the normal bold font
      */
     public static UIFont getNormalBoldFont() {
         return normalBold;
@@ -791,14 +795,14 @@ public class GUI {
 
     /**
      * Returns the big bold font.
-     * @return the big bold font
+     * @return the {@link UIFont} representing the big bold font
      */
     public static UIFont getBigBoldFont() {
         return bigBold;
     }
 
     /**
-     * Performs the dispose operation.
+     * Releases the resources associated with this object.
      */
     public static void dispose() {
         mesh.dispose();

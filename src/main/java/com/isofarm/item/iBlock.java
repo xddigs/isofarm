@@ -32,11 +32,11 @@ public class iBlock implements Craftable {
     /**
      * Creates an interactive block at the supplied position and orientation.
      *
-     * @param type the interactive block type
-     * @param x the x coordinate
-     * @param y the y coordinate
-     * @param z the z coordinate
-     * @param orientation the rotation around the vertical axis, in radians
+     * @param type the {@link InteractiveBlocks} argument; the interactive block type
+     * @param x the {@code int} argument; the x coordinate
+     * @param y the {@code int} argument; the y coordinate
+     * @param z the {@code int} argument; the z coordinate
+     * @param orientation the {@code float} argument; the rotation around the vertical axis, in radians
      */
     public iBlock(InteractiveBlocks type, int x, int y, int z, float orientation) {
         this.type = type;
@@ -60,6 +60,7 @@ public class iBlock implements Craftable {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the id of the block
      *
      * @return {@link Byte} the id of the block
@@ -70,6 +71,7 @@ public class iBlock implements Craftable {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the name of the block
      *
      * @return {@link String} the name of the block
@@ -80,6 +82,7 @@ public class iBlock implements Craftable {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the display name of the block
      *
      * @return {@link String} the display name of the block
@@ -90,6 +93,7 @@ public class iBlock implements Craftable {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the value of the block
      *
      * @return {@link Integer} the value of the block
@@ -100,9 +104,10 @@ public class iBlock implements Craftable {
     }
 
     /**
-     * Performs the copy operation.
+     * {@inheritDoc}
+     * Creates an independent copy that preserves the relevant state of this object.
      *
-     * @return {@code this} the copy result
+     * @return the {@link Item} result; {@code this} the copy result
      */
     @Override
     public Item copy() {
@@ -129,7 +134,7 @@ public class iBlock implements Craftable {
     /**
      * Returns this block's persistent inventory.
      *
-     * @return the block inventory
+     * @return the {@link Inventory} representing the block inventory
      */
     public Inventory getInventory() {
         return inventory;
@@ -147,7 +152,7 @@ public class iBlock implements Craftable {
     /**
      * Sets the activated value
      *
-     * @param isActivated the activated value
+     * @param isActivated the {@code boolean} argument; the activated value
      */
     public void setActivated(boolean isActivated) {
         if (this.isActivated == isActivated) {
@@ -200,7 +205,7 @@ public class iBlock implements Craftable {
     /**
      * Returns the normalized animation progress.
      *
-     * @return a value between {@code 0} (closed) and {@code 1} (open)
+     * @return {@code float}; a value between {@code 0} (closed) and {@code 1} (open)
      */
     public float getAnimationProgress() {
         return animationProgress;
@@ -209,7 +214,7 @@ public class iBlock implements Craftable {
     /**
      * Returns the block orientation around the vertical axis.
      *
-     * @return the orientation in radians
+     * @return {@code float}; the orientation in radians
      */
     public float getOrientation() {
         return orientation;
@@ -264,9 +269,9 @@ public class iBlock implements Craftable {
     /**
      * Sets the position of the block
      *
-     * @param x the position of the block (x)
-     * @param y the position of the block (y)
-     * @param z the position of the block (z)
+     * @param x the {@code int} argument; the position of the block (x)
+     * @param y the {@code int} argument; the position of the block (y)
+     * @param z the {@code int} argument; the position of the block (z)
      * @return {@link BlockPos} blockPos new object
      */
     public BlockPos setPosition(int x, int y, int z) {

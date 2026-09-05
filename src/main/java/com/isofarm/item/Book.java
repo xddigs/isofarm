@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Provides book behavior.
+ * Encapsulates the state and operations required by book within the game runtime.
  */
 public class Book extends Usable {
     private final List<Page> pages;
@@ -23,7 +23,7 @@ public class Book extends Usable {
 
     /**
      * Creates a new {@code Book} instance.
-     * @param hasContent the has content value
+     * @param hasContent the {@code boolean} supplied as {@code hasContent}
      */
     public Book(boolean hasContent) {
         super(Usables.BOOK, "Book");
@@ -41,10 +41,11 @@ public class Book extends Usable {
     }
 
     /**
-     * Performs the use operation.
-     * @param gameMaster the game master value
-     * @param isCtrlHeld the is ctrl held value
-     * @return the use result
+     * {@inheritDoc}
+     * Handles use and applies its effect to the current interaction state.
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
+     * @param isCtrlHeld the {@code boolean} supplied as {@code isCtrlHeld}
+     * @return {@code boolean}; the use result
      */
     @Override
     public boolean use(GameMaster gameMaster, boolean isCtrlHeld) {
@@ -58,6 +59,7 @@ public class Book extends Usable {
     }
 
     /**
+     * {@inheritDoc}
      * Updates the current state.
      */
     @Override
@@ -68,8 +70,9 @@ public class Book extends Usable {
 
 
     /**
-     * Performs the copy operation.
-     * @return the copy result
+     * {@inheritDoc}
+     * Creates an independent copy that preserves the relevant state of this object.
+     * @return the {@link Item} representing the copy result
      */
     @Override
     public Item copy() {
@@ -77,9 +80,10 @@ public class Book extends Usable {
     }
 
     /**
-     * Performs the enchanting operation.
-     * @param enchantment the enchantment value
-     * @return the enchanting result
+     * {@inheritDoc}
+     * Applies enchanting and updates the affected character or item state.
+     * @param enchantment the {@link Enchantment} supplied as {@code enchantment}
+     * @return {@code boolean}; the enchanting result
      */
     @Override
     public boolean enchanting(Enchantment enchantment) {
@@ -87,14 +91,14 @@ public class Book extends Usable {
     }
 
     /**
-     * Performs the open operation.
+     * Activates this object and prepares any state it requires.
      */
     public void open() {
         isOpen = true;
     }
 
     /**
-     * Performs the close operation.
+     * Releases the resources associated with this object.
      */
     public void close() {
         isOpen = false;
@@ -102,7 +106,7 @@ public class Book extends Usable {
 
     /**
      * Returns the pages.
-     * @return the pages
+     * @return the {@link List} representing the pages
      */
     public List<Page> getPages() {
         return pages;
@@ -110,7 +114,7 @@ public class Book extends Usable {
 
     /**
      * Adds the page.
-     * @param page the page value
+     * @param page the {@link Page} supplied as {@code page}
      */
     public void addPage(Page page) {
         pages.add(page);
@@ -118,8 +122,8 @@ public class Book extends Usable {
 
     /**
      * Returns the page.
-     * @param index the index value
-     * @return the page
+     * @param index the {@code int} supplied as {@code index}
+     * @return the {@link Page} representing the page
      */
     public Page getPage(int index) {
         return pages.get(index);
@@ -127,7 +131,7 @@ public class Book extends Usable {
 
     /**
      * Removes the page.
-     * @param page the page value
+     * @param page the {@link Page} supplied as {@code page}
      */
     public void removePage(Page page) {
         pages.remove(page);
@@ -158,14 +162,14 @@ public class Book extends Usable {
 
     /**
      * Returns the current page.
-     * @return the current page
+     * @return {@code int}; the current page
      */
     public int getCurrentPage() {
         return currentPage;
     }
 
     /**
-     * Performs the next page operation.
+     * Updates text or selection state for next page.
      */
     public void nextPage() {
         if (hasNextPage()) {
@@ -176,7 +180,7 @@ public class Book extends Usable {
     }
 
     /**
-     * Performs the previous page operation.
+     * Updates text or selection state for previous page.
      */
     public void previousPage() {
         if (hasPreviousPage()) {
@@ -187,8 +191,8 @@ public class Book extends Usable {
     }
 
     /**
-     * Performs the navigate to operation.
-     * @param targetPage the target page value
+     * Updates movement for navigate to according to the current physics and input state.
+     * @param targetPage the {@code int} supplied as {@code targetPage}
      */
     public void navigateTo(int targetPage) {
         if (targetPage < 0 || targetPage >= pages.size() || targetPage == currentPage) {
@@ -226,6 +230,8 @@ public class Book extends Usable {
         return currentPage - 2 >= 0;
     }
 
-    /** Reloads dynamic book contents. */
+    /**
+     * Reloads dynamic book contents.
+     */
     public void reload() {}
 }

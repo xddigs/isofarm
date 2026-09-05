@@ -9,26 +9,26 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Stores recipe data.
+ * Immutable value object containing recipe.
  */
 public record Recipe(Tier tier, Item result, int resultAmount, List<Ingredient> ingredients) {
 
     /**
-     * Performs the of operation.
-     * @param tier the tier value
-     * @param result the result value
-     * @param resultAmount the result amount value
-     * @param ingredients the ingredients value
-     * @return the of result
+     * Creates or returns of from the supplied arguments.
+     * @param tier the {@link Tier} supplied as {@code tier}
+     * @param result the {@link Item} supplied as {@code result}
+     * @param resultAmount the {@code int} supplied as {@code resultAmount}
+     * @param ingredients an array of {@link Ingredient} values supplied as {@code ingredients}
+     * @return the {@link Recipe} representing the of result
      */
     public static Recipe of(Tier tier, Item result, int resultAmount, Ingredient... ingredients) {
         return new Recipe(tier, result, resultAmount, List.of(ingredients));
     }
 
     /**
-     * Performs the match operation.
-     * @param inputIngredients the input ingredients value
-     * @return the match result
+     * Determines whether match satisfies the required comparison or validity rules.
+     * @param inputIngredients the {@link Map} supplied as {@code inputIngredients}
+     * @return {@code boolean}; the match result
      */
     public boolean match(Map<Craftable, Integer> inputIngredients) {
         if (inputIngredients.size() != ingredients.size()) {
@@ -54,7 +54,7 @@ public record Recipe(Tier tier, Item result, int resultAmount, List<Ingredient> 
 
     /**
      * Checks whether the craft with condition is met.
-     * @param availableMaterials the available materials value
+     * @param availableMaterials the {@link Map} supplied as {@code availableMaterials}
      * @return {@code true} if craft with; otherwise {@code false}
      */
     public boolean canCraftWith(Map<Craftable, Integer> availableMaterials) {
@@ -75,8 +75,8 @@ public record Recipe(Tier tier, Item result, int resultAmount, List<Ingredient> 
 
     /**
      * Checks whether the same craftable condition is met.
-     * @param a the a value
-     * @param b the b value
+     * @param a the {@link Craftable} supplied as {@code a}
+     * @param b the {@link Craftable} supplied as {@code b}
      * @return {@code true} if same craftable; otherwise {@code false}
      */
     public static boolean isSameCraftable(Craftable a, Craftable b) {
@@ -95,8 +95,8 @@ public record Recipe(Tier tier, Item result, int resultAmount, List<Ingredient> 
     }
 
     /**
-     * Performs the to book lines operation.
-     * @return the to book lines result
+     * Produces the textual or converted representation for to book lines.
+     * @return the {@link List} representing the to book lines result
      */
     public List<String> toBookLines() {
         List<String> lines = new ArrayList<>();
@@ -109,8 +109,9 @@ public record Recipe(Tier tier, Item result, int resultAmount, List<Ingredient> 
     }
 
     /**
-     * Performs the to string operation.
-     * @return the to string result
+     * {@inheritDoc}
+     * Produces the textual or converted representation for to string.
+     * @return the {@link String} representing the to string result
      */
     @Override
     public String toString() {

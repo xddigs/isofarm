@@ -3,14 +3,14 @@ package com.isofarm.pathfinding;
 import com.isofarm.data.DataClass;
 
 /**
- * Stores node data.
+ * Immutable value object containing node.
  */
 @DataClass
 public record Node(GridPos position, Node parent, float gCost, float hCost) {
 
     /**
-     * Performs the f cost operation.
-     * @return the f cost result
+     * Produces the textual or converted representation for f cost.
+     * @return {@code float}; the f cost result
      */
     public float fCost() {
         return gCost + hCost;

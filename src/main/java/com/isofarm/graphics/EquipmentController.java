@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Provides equipment controller behavior.
+ * Encapsulates the state and operations required by equipment controller within the game runtime.
  */
 @Singleton
 public class EquipmentController {
@@ -20,7 +20,7 @@ public class EquipmentController {
 
     /**
      * Initializes the component.
-     * @param playerModel the player model value
+     * @param playerModel the {@link GLTFModel} supplied as {@code playerModel}
      */
     public void init(GLTFModel playerModel) {
         String[] materials = new String[Tier.values().length];
@@ -49,9 +49,9 @@ public class EquipmentController {
     }
 
     /**
-     * Performs the equip operation.
-     * @param material the material value
-     * @param type the type value
+     * Applies equip and updates the affected character or item state.
+     * @param material the {@link String} supplied as {@code material}
+     * @param type the {@link String} supplied as {@code type}
      */
     public void equip(String material, String type) {
         if (currentActiveNode != null) {

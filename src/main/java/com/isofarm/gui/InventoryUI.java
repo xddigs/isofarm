@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Provides inventory ui behavior.
+ * Encapsulates the state and operations required by inventory ui within the game runtime.
  */
 @SuppressWarnings("all")
 public class InventoryUI extends UIElement {
@@ -70,8 +70,8 @@ public class InventoryUI extends UIElement {
 
     /**
      * Creates a new {@code InventoryUI} instance.
-     * @param x the x value
-     * @param y the y value
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
      */
     public InventoryUI(float x, float y) {
         super(x, y, getInventoryWidth(), getInventoryHeight());
@@ -98,7 +98,7 @@ public class InventoryUI extends UIElement {
 
     /**
      * Returns the inventory width.
-     * @return the inventory width
+     * @return {@code float}; the inventory width
      */
     private static float getInventoryWidth() {
         return Settings.getScaledPadding() * 2.0f +
@@ -108,7 +108,7 @@ public class InventoryUI extends UIElement {
 
     /**
      * Returns the inventory height.
-     * @return the inventory height
+     * @return {@code float}; the inventory height
      */
     private static float getInventoryHeight() {
         return Settings.getScaledPadding() * 2.0f + Settings.getScaledHeader() +
@@ -118,7 +118,7 @@ public class InventoryUI extends UIElement {
 
     /**
      * Returns the backpack width.
-     * @return the backpack width
+     * @return {@code float}; the backpack width
      */
     public static float getBackpackWidth() {
         return Settings.getScaledPadding() * 2.0f +
@@ -128,7 +128,7 @@ public class InventoryUI extends UIElement {
 
     /**
      * Returns the backpack height.
-     * @return the backpack height
+     * @return {@code float}; the backpack height
      */
     public static float getBackpackHeight() {
         return Settings.getScaledPadding() * 2.0f + Settings.getScaledHeader() +
@@ -138,7 +138,7 @@ public class InventoryUI extends UIElement {
 
     /**
      * Returns the slot uis.
-     * @return the slot uis
+     * @return an array of {@link InventorySlotUI} values; the slot uis
      */
     public InventorySlotUI[] getSlotUIs() {
         return slotUIs;
@@ -186,8 +186,8 @@ public class InventoryUI extends UIElement {
 
     /**
      * Creates the five category buttons used by the creative inventory.
-     * @param width the button width
-     * @param height the button height
+     * @param width the {@code float} argument; the button width
+     * @param height the {@code float} argument; the button height
      */
     private void createCreativeTabButtons(float width, float height) {
         Tab[] tabs = {Tab.BLOCKS, Tab.TOOLS_ITEMS, Tab.USABLES,
@@ -226,14 +226,14 @@ public class InventoryUI extends UIElement {
 
     /**
      * Returns the buttons.
-     * @return the buttons
+     * @return the {@link List} representing the buttons
      */
     public List<UIButton> getButtons() {
         return buttons;
     }
 
     /**
-     * Performs the sort inventory operation.
+     * Reorganizes inventory state for sort inventory.
      */
     public void sortInventory() {
         if (player != null && inventory != null) {
@@ -242,7 +242,7 @@ public class InventoryUI extends UIElement {
     }
 
     /**
-     * Performs the group inventory operation.
+     * Creates or returns group inventory from the supplied arguments.
      */
     public void groupInventory() {
         if (player != null && inventory != null) {
@@ -252,7 +252,7 @@ public class InventoryUI extends UIElement {
 
     /**
      * Updates the position.
-     * @param delta the delta value
+     * @param delta the {@code float} supplied as {@code delta}
      */
     private void updatePosition(float delta) {
         float currentX = getX();
@@ -293,8 +293,8 @@ public class InventoryUI extends UIElement {
     }
 
     /**
-     * Performs the open backpack operation.
-     * @param backpackUI the backpack ui value
+     * Activates backpack and prepares any state it requires.
+     * @param backpackUI the {@link BackpackInventoryUI} supplied as {@code backpackUI}
      */
     public void openBackpack(BackpackInventoryUI backpackUI) {
         if (backpackUI == null) return;
@@ -313,7 +313,7 @@ public class InventoryUI extends UIElement {
     }
 
     /**
-     * Performs the close backpack operation.
+     * Releases the resources associated with backpack.
      */
     public void closeBackpack() {
         if (!isBackpackOpen || isBackpackClosing) return;
@@ -325,8 +325,9 @@ public class InventoryUI extends UIElement {
     }
 
     /**
+     * {@inheritDoc}
      * Updates the current state.
-     * @param delta the delta value
+     * @param delta the {@code float} supplied as {@code delta}
      */
     @Override
     public void update(float delta) {
@@ -350,7 +351,7 @@ public class InventoryUI extends UIElement {
     }
 
     /**
-     * Performs the on open operation.
+     * Handles open and updates the affected state.
      */
     private void onOpen() {
         isClosing = false;
@@ -370,7 +371,7 @@ public class InventoryUI extends UIElement {
     }
 
     /**
-     * Performs the on close operation.
+     * Handles close and updates the affected state.
      */
     private void onClose() {
         if (backpackUI != null) {
@@ -392,8 +393,9 @@ public class InventoryUI extends UIElement {
     }
 
     /**
-     * Performs the hide operation.
-     * @return the hide result
+     * {@inheritDoc}
+     * Deactivates this object and releases its transient state.
+     * @return the {@link UIElement} representing the hide result
      */
     @Override
     public UIElement hide() {
@@ -403,7 +405,7 @@ public class InventoryUI extends UIElement {
     }
 
     /**
-     * Performs the return carried item operation.
+     * Updates or derives runtime state for return carried item according to the supplied arguments.
      */
     private void returnCarriedItem() {
         if (carriedItem == null || carriedAmount <= 0 || player == null) {
@@ -429,7 +431,7 @@ public class InventoryUI extends UIElement {
     }
 
     /**
-     * Performs the sync inventory operation.
+     * Refreshes dependent runtime state for sync inventory.
      */
     protected void syncInventory() {
         if (inventory == null) return;
@@ -480,7 +482,9 @@ public class InventoryUI extends UIElement {
         }
     }
 
-    /** Switches the controls and contents when GODMODE changes. */
+    /**
+     * Switches the controls and contents when GODMODE changes.
+     */
     private void updateInventoryMode() {
         boolean creative = containerBlock == null
                 && player != null && player.getGamemode().isGodmode();
@@ -509,7 +513,9 @@ public class InventoryUI extends UIElement {
         }
     }
 
-    /** Builds the creative catalog from every item registered by the game. */
+    /**
+     * Builds the creative catalog from every item registered by the game.
+     */
     private void buildCreativeCatalog() {
         creativeItems.clear();
         for (Tab tab : Tab.values()) {
@@ -534,8 +540,8 @@ public class InventoryUI extends UIElement {
 
     /**
      * Returns the creative category for an item.
-     * @param item the item to classify
-     * @return its creative tab, or {@code null} when unsupported
+     * @param item the {@link Item} argument; the item to classify
+     * @return the {@link Tab} result; its creative tab, or {@code null} when unsupported
      */
     private Tab getCreativeTab(Item item) {
         return switch (item) {
@@ -549,7 +555,9 @@ public class InventoryUI extends UIElement {
         };
     }
 
-    /** Displays the selected creative category in the virtual slots. */
+    /**
+     * Displays the selected creative category in the virtual slots.
+     */
     private void syncCreativeInventory() {
         List<Item> items = creativeItems.getOrDefault(currentTab, List.of());
         for (int i = 0; i < slotUIs.length; i++) {
@@ -575,14 +583,18 @@ public class InventoryUI extends UIElement {
         }
     }
 
-    /** Selects one of the creative inventory filters. */
+    /**
+     * Selects one of the creative inventory filters.
+     */
     private void selectCreativeTab(Tab tab) {
         if (!isGodmode || !tab.isCreative()) return;
         currentTab = tab;
         syncCreativeInventory();
     }
 
-    /** Assigns the requested representative item icon to every creative tab. */
+    /**
+     * Assigns the requested representative item icon to every creative tab.
+     */
     private void configureCreativeTabIcons() {
         Item[] icons = {
                 new Block(BlockData.GRASS),
@@ -602,7 +614,7 @@ public class InventoryUI extends UIElement {
 
     /**
      * Updates the item sprite.
-     * @param slotUI the slot ui value
+     * @param slotUI the {@link InventorySlotUI} supplied as {@code slotUI}
      */
     private void updateItemSprite(InventorySlotUI slotUI) {
         Item item = slotUI.getItem();
@@ -659,7 +671,7 @@ public class InventoryUI extends UIElement {
     }
 
     /**
-     * Performs the slot interact operation.
+     * Handles slot interact and applies its effect to the current interaction state.
      */
     public void slotInteract() {
         if (hotbarUI == null) return;
@@ -701,7 +713,7 @@ public class InventoryUI extends UIElement {
 
     /**
      * Copies an item from an infinite creative slot to the cursor.
-     * @param slot the creative source slot
+     * @param slot the {@link InventorySlot} argument; the creative source slot
      */
     private void takeCreativeItem(InventorySlot slot) {
         if (slot.isEmpty()) return;
@@ -710,8 +722,8 @@ public class InventoryUI extends UIElement {
     }
 
     /**
-     * Performs the left click operation.
-     * @param slot the slot value
+     * Handles left click and applies its effect to the current interaction state.
+     * @param slot the {@link InventorySlot} supplied as {@code slot}
      */
     private void leftClick(InventorySlot slot) {
         if (carriedItem == null) {
@@ -732,8 +744,8 @@ public class InventoryUI extends UIElement {
     }
 
     /**
-     * Performs the pick entire stack operation.
-     * @param slot the slot value
+     * Transfers or creates the relevant entity or item for pick entire stack.
+     * @param slot the {@link InventorySlot} supplied as {@code slot}
      */
     private void pickEntireStack(InventorySlot slot) {
         if (slot.isEmpty()) {
@@ -747,8 +759,8 @@ public class InventoryUI extends UIElement {
     }
 
     /**
-     * Performs the place entire stack operation.
-     * @param slot the slot value
+     * Applies the world or inventory action represented by place entire stack.
+     * @param slot the {@link InventorySlot} supplied as {@code slot}
      */
     private void placeEntireStack(InventorySlot slot) {
         slot.setItem(carriedItem);
@@ -757,8 +769,8 @@ public class InventoryUI extends UIElement {
     }
 
     /**
-     * Performs the merge carried stack operation.
-     * @param slot the slot value
+     * Reorganizes inventory state for merge carried stack.
+     * @param slot the {@link InventorySlot} supplied as {@code slot}
      */
     private void mergeCarriedStack(InventorySlot slot) {
         int maxStack = K.World.MAX_STACK;
@@ -778,8 +790,8 @@ public class InventoryUI extends UIElement {
     }
 
     /**
-     * Performs the swap stacks operation.
-     * @param slot the slot value
+     * Reorganizes inventory state for swap stacks.
+     * @param slot the {@link InventorySlot} supplied as {@code slot}
      */
     private void swapStacks(InventorySlot slot) {
         Item tempItem = slot.getItem();
@@ -793,8 +805,8 @@ public class InventoryUI extends UIElement {
     }
 
     /**
-     * Performs the right click operation.
-     * @param slot the slot value
+     * Handles right click and applies its effect to the current interaction state.
+     * @param slot the {@link InventorySlot} supplied as {@code slot}
      */
     private void rightClick(InventorySlot slot) {
         if (carriedItem == null) {
@@ -815,8 +827,8 @@ public class InventoryUI extends UIElement {
     }
 
     /**
-     * Performs the take half operation.
-     * @param slot the slot value
+     * Transfers or creates the relevant entity or item for take half.
+     * @param slot the {@link InventorySlot} supplied as {@code slot}
      */
     private void takeHalf(InventorySlot slot) {
         if (slot.isEmpty()) {
@@ -832,8 +844,8 @@ public class InventoryUI extends UIElement {
     }
 
     /**
-     * Performs the place one operation.
-     * @param slot the slot value
+     * Applies the world or inventory action represented by place one.
+     * @param slot the {@link InventorySlot} supplied as {@code slot}
      */
     private void placeOne(InventorySlot slot) {
         int maxStack = K.World.MAX_STACK;
@@ -851,7 +863,7 @@ public class InventoryUI extends UIElement {
 
     /**
      * Adds the one to slot.
-     * @param slot the slot value
+     * @param slot the {@link InventorySlot} supplied as {@code slot}
      */
     private void addOneToSlot(InventorySlot slot) {
         int maxStack = K.World.MAX_STACK;
@@ -870,8 +882,8 @@ public class InventoryUI extends UIElement {
 
     /**
      * Checks whether the same type condition is met.
-     * @param a the a value
-     * @param b the b value
+     * @param a the {@link Item} supplied as {@code a}
+     * @param b the {@link Item} supplied as {@code b}
      * @return {@code true} if same type; otherwise {@code false}
      */
     private boolean isSameType(Item a, Item b) {
@@ -894,7 +906,8 @@ public class InventoryUI extends UIElement {
     }
 
     /**
-     * Renders render.
+     * {@inheritDoc}
+     * Renders this object in the requested render pass.
      */
     @Override
     public void render() {
@@ -940,12 +953,12 @@ public class InventoryUI extends UIElement {
 
     /**
      * Sets the icons.
-     * @param seed the seed value
-     * @param crop the crop value
-     * @param block the block value
-     * @param tool the tool value
-     * @param material the material value
-     * @param inv the inv value
+     * @param seed the {@link SpriteSheet} supplied as {@code seed}
+     * @param crop the {@link SpriteSheet} supplied as {@code crop}
+     * @param block the {@link SpriteSheet} supplied as {@code block}
+     * @param tool the {@link SpriteSheet} supplied as {@code tool}
+     * @param material the {@link SpriteSheet} supplied as {@code material}
+     * @param inv the {@link SpriteSheet} supplied as {@code inv}
      */
     public void setIcons(SpriteSheet seed, SpriteSheet crop,
                          SpriteSheet block, SpriteSheet tool,
@@ -969,7 +982,7 @@ public class InventoryUI extends UIElement {
 
     /**
      * Returns the inventory.
-     * @return the inventory
+     * @return the {@link Inventory} representing the inventory
      */
     public Inventory getInventory() {
         return inventory;
@@ -977,7 +990,7 @@ public class InventoryUI extends UIElement {
 
     /**
      * Sets the inventory.
-     * @param inventory the inventory value
+     * @param inventory the {@link Inventory} supplied as {@code inventory}
      */
     public void setInventory(Inventory inventory) {
         this.inventory = inventory;
@@ -986,7 +999,7 @@ public class InventoryUI extends UIElement {
     /**
      * Opens the inventory owned by an interactive block.
      *
-     * @param block the block whose inventory will be displayed
+     * @param block the {@link iBlock} argument; the block whose inventory will be displayed
      */
     public void openContainer(iBlock block) {
         if (block == null || GameMaster.game == null) return;
@@ -996,7 +1009,9 @@ public class InventoryUI extends UIElement {
         SoundService.fx.playUseSound(block.getType().getSoundGroup(), 0);
     }
 
-    /** Restores the player's inventory after closing a block container. */
+    /**
+     * Restores the player's inventory after closing a block container.
+     */
     private void closeContainer() {
         if (containerBlock == null) return;
         containerBlock.setActivated(false);
@@ -1008,7 +1023,7 @@ public class InventoryUI extends UIElement {
 
     /**
      * Sets the hotbar ui.
-     * @param hotbarUI the hotbar ui value
+     * @param hotbarUI the {@link HotbarUI} supplied as {@code hotbarUI}
      */
     public void setHotbarUI(HotbarUI hotbarUI) {
         this.hotbarUI = hotbarUI;
@@ -1016,7 +1031,7 @@ public class InventoryUI extends UIElement {
 
     /**
      * Returns the backpack ui.
-     * @return the backpack ui
+     * @return the {@link BackpackInventoryUI} representing the backpack ui
      */
     public BackpackInventoryUI getBackpackUI() {
         return backpackUI;
@@ -1024,7 +1039,7 @@ public class InventoryUI extends UIElement {
 
     /**
      * Sets the backpack ui.
-     * @param backpackUI the backpack ui value
+     * @param backpackUI the {@link BackpackInventoryUI} supplied as {@code backpackUI}
      */
     public void setBackpackUI(BackpackInventoryUI backpackUI) {
         this.backpackUI = backpackUI;

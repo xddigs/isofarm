@@ -26,7 +26,7 @@ public class DeathManager {
 
     /**
      * Stores the cause that produced the player's latest death.
-     * @param cause the lethal damage cause
+     * @param cause the {@link Cause} argument; the lethal damage cause
      */
     public void setCauseOfDeath(Cause cause) {
         lastCauseOfDeath = cause == null ? Cause.NULL : cause;
@@ -34,7 +34,7 @@ public class DeathManager {
 
     /**
      * Returns the localized message for the latest death cause.
-     * @return the localized death message
+     * @return the {@link String} representing the localized death message
      */
     public String onDeath() {
         String translationKey = messages.getOrDefault(lastCauseOfDeath.getId(),
@@ -44,13 +44,16 @@ public class DeathManager {
 
     /**
      * Returns the death-message translation map.
-     * @return the death-message translation map
+     * @return the {@link Map} representing the death-message translation map
      */
     public static Map<Byte, String> getMessages() {
         return messages;
     }
 
-    /** @return the cause of the player's latest death */
+    /**
+     * Returns cause of death according to the current object state.
+     * @return the {@link Cause} representing the cause of the player's latest death
+     */
     public Cause getCauseOfDeath() {
         return lastCauseOfDeath;
     }

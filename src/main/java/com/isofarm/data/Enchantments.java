@@ -32,10 +32,10 @@ public enum Enchantments {
 
     /**
      * Creates a new {@code Enchantments} instance.
-     * @param id the id value
-     * @param applicableTools the applicable tools value
-     * @param maxLevel the max level value
-     * @param singleLevel the single level value
+     * @param id the {@code int} supplied as {@code id}
+     * @param applicableTools an array of {@link ToolType} values supplied as {@code applicableTools}
+     * @param maxLevel the {@code int} supplied as {@code maxLevel}
+     * @param singleLevel the {@code boolean} supplied as {@code singleLevel}
      */
     Enchantments(int id, ToolType[] applicableTools,
                  int maxLevel, boolean singleLevel) {
@@ -47,7 +47,7 @@ public enum Enchantments {
 
     /**
      * Returns the id.
-     * @return the id
+     * @return {@code int}; the id
      */
     public int getId() {
         return id;
@@ -55,7 +55,7 @@ public enum Enchantments {
 
     /**
      * Returns the name.
-     * @return {@code String} the name
+     * @return the {@link String} result; {@code String} the name
      */
     public String getName() {
         return name().toLowerCase(Locale.ROOT);
@@ -63,7 +63,7 @@ public enum Enchantments {
 
     /**
      * Returns the display name.
-     * @return the display name
+     * @return the {@link String} representing the display name
      */
     public String getDisplayName() {
         return Local.lang.t(getTranslationKey() + ".name");
@@ -71,7 +71,7 @@ public enum Enchantments {
 
     /**
      * Returns the localized adjective used to decorate enchanted item names.
-     * @return the localized adjective
+     * @return the {@link String} representing the localized adjective
      */
     public String getAdjective() {
         return Local.lang.t(getTranslationKey() + ".adjective");
@@ -79,7 +79,7 @@ public enum Enchantments {
 
     /**
      * Returns the description.
-     * @return the description
+     * @return the {@link String} representing the description
      */
     public String getDescription() {
         return Local.lang.t(getTranslationKey() + ".description");
@@ -87,7 +87,7 @@ public enum Enchantments {
 
     /**
      * Returns the common localization-key prefix for this enchantment.
-     * @return the localization-key prefix
+     * @return the {@link String} representing the localization-key prefix
      */
     public String getTranslationKey() {
         return "enchantment." + getName();
@@ -95,7 +95,7 @@ public enum Enchantments {
 
     /**
      * Returns the applicable tools.
-     * @return the applicable tools
+     * @return an array of {@link ToolType} values; the applicable tools
      */
     public ToolType[] getApplicableTools() {
         return applicableTools;
@@ -103,7 +103,7 @@ public enum Enchantments {
 
     /**
      * Returns the max level.
-     * @return the max level
+     * @return {@code int}; the max level
      */
     public int getMaxLevel() {
         return maxLevel;
@@ -118,9 +118,9 @@ public enum Enchantments {
     }
 
     /**
-     * Performs the from id operation.
-     * @param id the id value
-     * @return the from id result
+     * Creates or returns from id from the supplied arguments.
+     * @param id the {@code int} supplied as {@code id}
+     * @return the {@link Enchantments} representing the from id result
      */
     public static Enchantments fromId(int id) {
         return BY_ID[id];

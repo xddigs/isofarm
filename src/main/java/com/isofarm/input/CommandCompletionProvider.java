@@ -9,23 +9,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Provides command completion provider behavior.
+ * Encapsulates the state and operations required by command completion provider within the game runtime.
  */
 public class CommandCompletionProvider implements CompletionProvider {
     private final CommandRegistry commandRegistry;
     /**
      * Creates a new {@code CommandCompletionProvider} instance.
-     * @param commandRegistry the command registry value
+     * @param commandRegistry the {@link CommandRegistry} supplied as {@code commandRegistry}
      */
     public CommandCompletionProvider(CommandRegistry commandRegistry) {
         this.commandRegistry = commandRegistry;
     }
 
     /**
-     * Performs the complete operation.
-     * @param text the text value
-     * @param cursorPosition the cursor position value
-     * @return the complete result
+     * {@inheritDoc}
+     * Updates text or selection state for complete.
+     * @param text the {@link String} supplied as {@code text}
+     * @param cursorPosition the {@code int} supplied as {@code cursorPosition}
+     * @return the {@link List} representing the complete result
      */
     @Override
     public List<String> complete(String text, int cursorPosition) {
@@ -40,9 +41,9 @@ public class CommandCompletionProvider implements CompletionProvider {
     }
 
     /**
-     * Performs the complete command operation.
-     * @param text the text value
-     * @return the complete command result
+     * Updates text or selection state for complete command.
+     * @param text the {@link String} supplied as {@code text}
+     * @return the {@link List} representing the complete command result
      */
     private List<String> completeCommand(String text) {
         if (!text.startsWith("/")) {
@@ -62,9 +63,9 @@ public class CommandCompletionProvider implements CompletionProvider {
     }
 
     /**
-     * Performs the complete argument operation.
-     * @param text the text value
-     * @return the complete argument result
+     * Updates text or selection state for complete argument.
+     * @param text the {@link String} supplied as {@code text}
+     * @return the {@link List} representing the complete argument result
      */
     private List<String> completeArgument(String text) {
         String trimmedLead = text.stripLeading();

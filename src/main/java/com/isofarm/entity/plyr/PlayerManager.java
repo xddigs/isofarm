@@ -17,7 +17,9 @@ import java.util.List;
 
 import static org.joml.Math.lerp;
 
-/** Manages player state, input-driven movement, paths and edge-safe sneaking. */
+/**
+ * Manages player state, input-driven movement, paths and edge-safe sneaking.
+ */
 public final class PlayerManager {
     private static final float ZERO = 0.0f;
     private static final float EYE_HEIGHT = 1.6f;
@@ -33,16 +35,23 @@ public final class PlayerManager {
     private boolean falling;
     private PlayerState currentState;
 
-    /** Creates the shared player's movement manager. */
+    /**
+     * Creates the shared player's movement manager.
+     */
     public PlayerManager() {}
 
-    /** Installs the initial grounded state. */
+    /**
+     * Installs the initial grounded state.
+     */
     public void initialize() {
         currentState = new GroundedState();
         currentState.enter();
     }
 
-    /** @param delta frame time in seconds */
+    /**
+     * Updates this object for the current simulation step.
+     * @param delta the {@code float} argument; frame time in seconds
+     */
     public void update(float delta) {
         currentState.input(GameMaster.game);
         currentState.update(delta);
@@ -53,14 +62,21 @@ public final class PlayerManager {
         }
     }
 
-    /** @param newState state to enter */
+    /**
+     * Updates or derives runtime state for change state according to the supplied arguments.
+     * @param newState the {@link PlayerState} argument; state to enter
+     */
     public void changeState(PlayerState newState) {
         if (currentState != null) currentState.exit();
         currentState = newState;
         currentState.enter();
     }
 
-    /** @param velocity intended velocity @param delta frame time */
+    /**
+     * Updates movement for auto jump according to the current physics and input state.
+     * @param velocity the {@link Vector3f} argument; intended velocity
+     * @param delta the {@code float} argument; frame time
+     */
     public void autoJump(Vector3f velocity, float delta) {
         Player player = Player.plyr;
         World world = World.wrld;
@@ -77,7 +93,10 @@ public final class PlayerManager {
         }
     }
 
-    /** @param delta frame time */
+    /**
+     * Updates movement for move according to the current physics and input state.
+     * @param delta the {@code float} argument; frame time
+     */
     public void move(float delta) {
         Player player = Player.plyr;
         World world = World.wrld;
@@ -101,7 +120,12 @@ public final class PlayerManager {
         player.collide(world, player.getVelocity(), delta);
     }
 
-    /** @param delta frame time @param cameraYaw camera yaw @param flying flight flag */
+    /**
+     * Updates movement for wasd according to the current physics and input state.
+     * @param delta the {@code float} argument; frame time
+     * @param cameraYaw the {@code float} argument; camera yaw
+     * @param flying the {@code boolean} argument; flight flag
+     */
     public void wasd(float delta, float cameraYaw, boolean flying) {
         Player player = Player.plyr;
         World world = World.wrld;
@@ -128,12 +152,20 @@ public final class PlayerManager {
         }
     }
 
-    /** @param delta frame time @param yaw camera yaw @param flying flight flag */
+    /**
+     * Updates movement for fly according to the current physics and input state.
+     * @param delta the {@code float} argument; frame time
+     * @param yaw the {@code float} argument; camera yaw
+     * @param flying the {@code boolean} argument; flight flag
+     */
     public void fly(float delta, float yaw, boolean flying) {
         if (!Player.plyr.isOnGround()) wasd(delta, yaw, flying);
     }
 
-    /** @return whether a solid block supports at least one player corner */
+    /**
+     * Determines whether ground below is satisfied by the current state.
+     * @return {@code true} if a solid block supports at least one player corner; otherwise {@code false}
+     */
     public boolean hasGroundBelow(float testX, float testZ) {
         Player player = Player.plyr;
         World world = World.wrld;
@@ -147,7 +179,9 @@ public final class PlayerManager {
         return false;
     }
 
-    /** Restricts sneaking velocity just enough to retain support while allowing edge travel. */
+    /**
+     * Restricts sneaking velocity just enough to retain support while allowing edge travel.
+     */
     public void adjustVelocity(float delta) {
         Player player = Player.plyr;
         World world = World.wrld;
@@ -168,18 +202,73 @@ public final class PlayerManager {
         return Math.abs(value) <= amount ? ZERO : value - Math.copySign(amount, value);
     }
 
-    /** @return active state */ public PlayerState getCurrentState() { return currentState; }
-    /** @param state state to store */ public void setCurrentState(PlayerState state) { currentState = state; }
-    /** @return interpolated eye height */ public float getCurrentEyeHeight() { return currentEyeHeight; }
-    /** @return desired eye height */ public float getTargetEyeHeight() { return targetEyeHeight; }
-    /** @param height desired eye height */ public void setTargetEyeHeight(float height) { targetEyeHeight = height; }
-    /** @return whether falling */ public boolean isFalling() { return falling; }
-    /** @param value falling flag */ public void setFalling(boolean value) { falling = value; }
-    /** @return movement direction angle */ public float getForward() { return (float) Math.atan2(Player.plyr.getVelocity().z, Player.plyr.getVelocity().x); }
-    /** @return whether a waypoint remains */ public boolean isFollowingPath() { return pathIndex < path.size(); }
-    /** @return active path */ public List<GridPos> getPath() { return path; }
-    /** @param value path to follow */ public void setPath(List<GridPos> value) { path = value != null ? value : List.of(); pathIndex = 0; }
-    /** @return path index */ public int getPathIndex() { return pathIndex; }
-    /** @param value path index */ public void setPathIndex(int value) { pathIndex = Math.max(0, value); }
-    /** Clears the active path. */ public void clearPath() { path = List.of(); pathIndex = 0; }
+    /**
+     * Returns current state according to the current object state.
+     * @return the {@link PlayerState} result; active state
+     */
+    public PlayerState getCurrentState() { return currentState; }
+    /**
+     * Sets current state and updates the associated state.
+     * @param state the {@link PlayerState} argument; state to store
+     */
+    public void setCurrentState(PlayerState state) { currentState = state; }
+    /**
+     * Returns current eye height according to the current object state.
+     * @return {@code float}; interpolated eye height
+     */
+    public float getCurrentEyeHeight() { return currentEyeHeight; }
+    /**
+     * Returns target eye height according to the current object state.
+     * @return {@code float}; desired eye height
+     */
+    public float getTargetEyeHeight() { return targetEyeHeight; }
+    /**
+     * Sets target eye height and updates the associated state.
+     * @param height the {@code float} argument; desired eye height
+     */
+    public void setTargetEyeHeight(float height) { targetEyeHeight = height; }
+    /**
+     * Determines whether falling is satisfied by the current state.
+     * @return {@code true} if falling; otherwise {@code false}
+     */
+    public boolean isFalling() { return falling; }
+    /**
+     * Sets falling and updates the associated state.
+     * @param value the {@code boolean} argument; falling flag
+     */
+    public void setFalling(boolean value) { falling = value; }
+    /**
+     * Returns forward according to the current object state.
+     * @return {@code float}; movement direction angle
+     */
+    public float getForward() { return (float) Math.atan2(Player.plyr.getVelocity().z, Player.plyr.getVelocity().x); }
+    /**
+     * Determines whether following path is satisfied by the current state.
+     * @return {@code true} if a waypoint remains; otherwise {@code false}
+     */
+    public boolean isFollowingPath() { return pathIndex < path.size(); }
+    /**
+     * Returns path according to the current object state.
+     * @return the {@link List} result; active path
+     */
+    public List<GridPos> getPath() { return path; }
+    /**
+     * Sets path and updates the associated state.
+     * @param value the {@link List} argument; path to follow
+     */
+    public void setPath(List<GridPos> value) { path = value != null ? value : List.of(); pathIndex = 0; }
+    /**
+     * Returns path index according to the current object state.
+     * @return {@code int}; path index
+     */
+    public int getPathIndex() { return pathIndex; }
+    /**
+     * Sets path index and updates the associated state.
+     * @param value the {@code int} argument; path index
+     */
+    public void setPathIndex(int value) { pathIndex = Math.max(0, value); }
+    /**
+     * Clears the active path.
+     */
+    public void clearPath() { path = List.of(); pathIndex = 0; }
 }

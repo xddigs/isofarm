@@ -13,7 +13,7 @@ import org.joml.Vector3f;
 import static org.joml.Math.lerp;
 
 /**
- * Provides camera behavior.
+ * Encapsulates the state and operations required by camera within the game runtime.
  */
 public class Camera implements CameraView {
     private static final float MIN_ZOOM = 1.0f;
@@ -43,9 +43,9 @@ public class Camera implements CameraView {
 
     /**
      * Creates a new {@code Camera} instance.
-     * @param width the width value
-     * @param height the height value
-     * @param renderDistanceChunks the render distance chunks value
+     * @param width the {@code float} supplied as {@code width}
+     * @param height the {@code float} supplied as {@code height}
+     * @param renderDistanceChunks the {@code int} supplied as {@code renderDistanceChunks}
      */
     public Camera(float width, float height, int renderDistanceChunks) {
         this.position = new Vector3f();
@@ -55,9 +55,9 @@ public class Camera implements CameraView {
 
     /**
      * Updates the projection.
-     * @param width the width value
-     * @param height the height value
-     * @param renderDistanceChunks the render distance chunks value
+     * @param width the {@code float} supplied as {@code width}
+     * @param height the {@code float} supplied as {@code height}
+     * @param renderDistanceChunks the {@code int} supplied as {@code renderDistanceChunks}
      */
     public void updateProjection(float width, float height, int renderDistanceChunks) {
         this.aspectRatio = width / Math.max(height, 1.0f);
@@ -67,8 +67,9 @@ public class Camera implements CameraView {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the projection matrix.
-     * @return the projection matrix
+     * @return the {@link Matrix4f} representing the projection matrix
      */
     @Override
     public Matrix4f getProjectionMatrix() {
@@ -76,8 +77,9 @@ public class Camera implements CameraView {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the view matrix.
-     * @return the view matrix
+     * @return the {@link Matrix4f} representing the view matrix
      */
     @Override
     public Matrix4f getViewMatrix() {
@@ -90,8 +92,9 @@ public class Camera implements CameraView {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the position.
-     * @return the position
+     * @return the {@link Vector3f} representing the position
      */
     @Override
     public Vector3f getPosition() {
@@ -99,8 +102,9 @@ public class Camera implements CameraView {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the pitch.
-     * @return the pitch
+     * @return {@code float}; the pitch
      */
     @Override
     public float getPitch() {
@@ -108,8 +112,9 @@ public class Camera implements CameraView {
     }
 
     /**
+     * {@inheritDoc}
      * Returns the yaw.
-     * @return the yaw
+     * @return {@code float}; the yaw
      */
     @Override
     public float getYaw() {
@@ -120,7 +125,7 @@ public class Camera implements CameraView {
      * Applies a small screen tilt in response to player damage.
      * Consecutive impacts alternate direction to avoid a permanent visual bias.
      *
-     * @param amount the received damage
+     * @param amount the {@code float} argument; the received damage
      */
     public void applyDamageTilt(float amount) {
         if (amount <= 0.0f) return;
@@ -134,7 +139,7 @@ public class Camera implements CameraView {
     /**
      * Smoothly restores the camera to its normal roll.
      *
-     * @param delta frame time in seconds
+     * @param delta the {@code float} argument; frame time in seconds
      */
     public void updateDamageTilt(float delta) {
         if (delta <= 0.0f || damageTilt == 0.0f) return;
@@ -146,9 +151,9 @@ public class Camera implements CameraView {
 
     /**
      * Sets the position.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param z the {@code float} supplied as {@code z}
      */
     public void setPosition(float x, float y, float z) {
         position.set(x, y, z);
@@ -156,7 +161,7 @@ public class Camera implements CameraView {
 
     /**
      * Returns the forward vector.
-     * @return the forward vector
+     * @return the {@link Vector3f} representing the forward vector
      */
     public Vector3f getForwardVector() {
         float yawRad = (float) Math.toRadians(yaw);
@@ -170,7 +175,7 @@ public class Camera implements CameraView {
 
     /**
      * Returns the right vector.
-     * @return the right vector
+     * @return the {@link Vector3f} representing the right vector
      */
     public Vector3f getRightVector() {
         Vector3f forward = getForwardVector();
@@ -181,7 +186,7 @@ public class Camera implements CameraView {
 
     /**
      * Returns the zoom.
-     * @return the zoom
+     * @return {@code float}; the zoom
      */
     public float getZoom() {
         return zoom;
@@ -189,7 +194,7 @@ public class Camera implements CameraView {
 
     /**
      * Sets the zoom.
-     * @param zoom the zoom value
+     * @param zoom the {@code float} supplied as {@code zoom}
      */
     public void setZoom(float zoom) {
         this.zoom = lerp(this.zoom, Math.clamp(zoom, MIN_ZOOM, MAX_ZOOM), .01f);
@@ -198,7 +203,7 @@ public class Camera implements CameraView {
 
     /**
      * Returns the up vector.
-     * @return the up vector
+     * @return the {@link Vector3f} representing the up vector
      */
     public Vector3f getUpVector() {
         Vector3f forward = getForwardVector();
@@ -210,11 +215,11 @@ public class Camera implements CameraView {
 
     /**
      * Returns the mouse ray.
-     * @param mouseX the mouse x value
-     * @param mouseY the mouse y value
-     * @param screenWidth the screen width value
-     * @param screenHeight the screen height value
-     * @return the mouse ray
+     * @param mouseX the {@code float} supplied as {@code mouseX}
+     * @param mouseY the {@code float} supplied as {@code mouseY}
+     * @param screenWidth the {@code float} supplied as {@code screenWidth}
+     * @param screenHeight the {@code float} supplied as {@code screenHeight}
+     * @return the {@link Ray} representing the mouse ray
      */
     public Ray getMouseRay(float mouseX, float mouseY, float screenWidth, float screenHeight) {
         float ndcX = (2.0f * mouseX / screenWidth) - 1.0f;
@@ -229,15 +234,15 @@ public class Camera implements CameraView {
     }
 
     /**
-     * Performs the highlight operation.
-     * @param world the world value
-     * @param playerPos the player pos value
-     * @param mouseX the mouse x value
-     * @param mouseY the mouse y value
-     * @param screenWidth the screen width value
-     * @param screenHeight the screen height value
-     * @param smartFilter the smart filter value
-     * @return the highlight result
+     * Transforms this object according to the supplied values.
+     * @param world the {@link World} supplied as {@code world}
+     * @param playerPos the {@link Vector3f} supplied as {@code playerPos}
+     * @param mouseX the {@code float} supplied as {@code mouseX}
+     * @param mouseY the {@code float} supplied as {@code mouseY}
+     * @param screenWidth the {@code float} supplied as {@code screenWidth}
+     * @param screenHeight the {@code float} supplied as {@code screenHeight}
+     * @param smartFilter the {@code boolean} supplied as {@code smartFilter}
+     * @return the {@link BlockPos} representing the highlight result
      */
     public BlockPos highlight(World world, Vector3f playerPos, float mouseX, float mouseY,
                               float screenWidth, float screenHeight, boolean smartFilter) {
@@ -252,14 +257,14 @@ public class Camera implements CameraView {
     }
 
     /**
-     * Performs the raycast operation.
-     * @param world the world value
-     * @param playerPos the player pos value
-     * @param origin the origin value
-     * @param direction the direction value
-     * @param isSmartFilter the is smart filter value
-     * @param isBucket the is bucket value
-     * @return the raycast result
+     * Calculates the value represented by raycast from the current state.
+     * @param world the {@link World} supplied as {@code world}
+     * @param playerPos the {@link Vector3f} supplied as {@code playerPos}
+     * @param origin the {@link Vector3f} supplied as {@code origin}
+     * @param direction the {@link Vector3f} supplied as {@code direction}
+     * @param isSmartFilter the {@code boolean} supplied as {@code isSmartFilter}
+     * @param isBucket the {@code boolean} supplied as {@code isBucket}
+     * @return the {@link BlockPos} representing the raycast result
      */
     private BlockPos raycast(World world, Vector3f playerPos,
                              Vector3f origin, Vector3f direction,
@@ -356,7 +361,7 @@ public class Camera implements CameraView {
 
     /**
      * Returns the last hit normal x.
-     * @return the last hit normal x
+     * @return {@code int}; the last hit normal x
      */
     public int getLastHitNormalX() {
         return lastHitNormalX;
@@ -364,7 +369,7 @@ public class Camera implements CameraView {
 
     /**
      * Returns the last hit normal y.
-     * @return the last hit normal y
+     * @return {@code int}; the last hit normal y
      */
     public int getLastHitNormalY() {
         return lastHitNormalY;
@@ -372,7 +377,7 @@ public class Camera implements CameraView {
 
     /**
      * Returns the last hit normal z.
-     * @return the last hit normal z
+     * @return {@code int}; the last hit normal z
      */
     public int getLastHitNormalZ() {
         return lastHitNormalZ;

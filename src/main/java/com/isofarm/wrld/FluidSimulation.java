@@ -33,7 +33,9 @@ public abstract class FluidSimulation {
     private final Map<FluidPos, FluidSlope> slopes = new ConcurrentHashMap<>();
     private float timer;
 
-    /** Direction in which a fluid surface descends across one block. */
+    /**
+     * Direction in which a fluid surface descends across one block.
+     */
     public record FluidSlope(int dx, int dz) {
         public FluidSlope {
             if (Math.abs(dx) + Math.abs(dz) != 1) {
@@ -44,9 +46,9 @@ public abstract class FluidSimulation {
 
     /**
      * Creates a new {@code FluidSimulation} instance.
-     * @param fluidType the fluid block type
-     * @param stepTime the number of seconds between simulation steps
-     * @param renewableSources whether adjacent sources may create new sources
+     * @param fluidType the {@link BlockData} argument; the fluid block type
+     * @param stepTime the {@code float} argument; the number of seconds between simulation steps
+     * @param renewableSources the {@code boolean} argument; whether adjacent sources may create new sources
      */
     protected FluidSimulation(BlockData fluidType, float stepTime, boolean renewableSources) {
         if (fluidType == null || !fluidType.isFluid()) {
@@ -59,8 +61,8 @@ public abstract class FluidSimulation {
 
     /**
      * Returns the simulation responsible for a block type.
-     * @param blockType the block type
-     * @return the matching simulation, or {@code null} for a non-fluid block
+     * @param blockType the {@link BlockData} supplied as {@code blockType}
+     * @return the {@link FluidSimulation} representing the matching simulation, or {@code null} for a non-fluid block
      */
     public static FluidSimulation forBlock(BlockData blockType) {
         if (blockType == BlockData.WATER) return WaterSimulation.ws;
@@ -70,11 +72,11 @@ public abstract class FluidSimulation {
 
     /**
      * Returns the downhill direction recorded for a fluid cell.
-     * @param blockType the fluid type
-     * @param x the world x value
-     * @param y the world y value
-     * @param z the world z value
-     * @return its downhill direction, or {@code null} for a flat fluid cell
+     * @param blockType the {@link BlockData} argument; the fluid type
+     * @param x the {@code int} argument; the world x value
+     * @param y the {@code int} argument; the world y value
+     * @param z the {@code int} argument; the world z value
+     * @return the {@link FluidSlope} result; its downhill direction, or {@code null} for a flat fluid cell
      */
     public static FluidSlope getSlope(BlockData blockType, int x, int y, int z) {
         FluidSimulation simulation = forBlock(blockType);
@@ -84,7 +86,7 @@ public abstract class FluidSimulation {
 
     /**
      * Updates every registered fluid simulation.
-     * @param delta the elapsed time in seconds
+     * @param delta the {@code float} argument; the elapsed time in seconds
      */
     public static void updateAll(float delta) {
         WaterSimulation.ws.update(delta);
@@ -93,9 +95,9 @@ public abstract class FluidSimulation {
 
     /**
      * Notifies every fluid simulation that a block was destroyed.
-     * @param x the block x value
-     * @param y the block y value
-     * @param z the block z value
+     * @param x the {@code int} argument; the block x value
+     * @param y the {@code int} argument; the block y value
+     * @param z the {@code int} argument; the block z value
      */
     public static void notifyBlockDestroyed(int x, int y, int z) {
         WaterSimulation.ws.onBlockDestroyed(x, y, z);
@@ -104,9 +106,9 @@ public abstract class FluidSimulation {
 
     /**
      * Notifies every fluid simulation that a block was placed.
-     * @param x the block x value
-     * @param y the block y value
-     * @param z the block z value
+     * @param x the {@code int} argument; the block x value
+     * @param y the {@code int} argument; the block y value
+     * @param z the {@code int} argument; the block z value
      */
     public static void notifyBlockPlaced(int x, int y, int z) {
         WaterSimulation.ws.onBlockPlaced(x, y, z);
@@ -115,7 +117,7 @@ public abstract class FluidSimulation {
 
     /**
      * Returns the fluid block type managed by this simulation.
-     * @return the fluid block type
+     * @return the {@link BlockData} representing the fluid block type
      */
     public final BlockData getFluidType() {
         return fluidType;
@@ -123,9 +125,9 @@ public abstract class FluidSimulation {
 
     /**
      * Adds a full source block at a world position.
-     * @param x the source x value
-     * @param y the source y value
-     * @param z the source z value
+     * @param x the {@code int} argument; the source x value
+     * @param y the {@code int} argument; the source y value
+     * @param z the {@code int} argument; the source z value
      * @return {@code true} when the source was added; otherwise {@code false}
      */
     public final boolean addSource(int x, int y, int z) {
@@ -141,9 +143,9 @@ public abstract class FluidSimulation {
 
     /**
      * Removes a fluid cell and recalculates its connected flow.
-     * @param x the fluid x value
-     * @param y the fluid y value
-     * @param z the fluid z value
+     * @param x the {@code int} argument; the fluid x value
+     * @param y the {@code int} argument; the fluid y value
+     * @param z the {@code int} argument; the fluid z value
      * @return {@code true} when fluid was removed; otherwise {@code false}
      */
     public final boolean removeFluid(int x, int y, int z) {
@@ -156,9 +158,9 @@ public abstract class FluidSimulation {
 
     /**
      * Checks whether a position is a source owned by this simulation.
-     * @param x the source x value
-     * @param y the source y value
-     * @param z the source z value
+     * @param x the {@code int} argument; the source x value
+     * @param y the {@code int} argument; the source y value
+     * @param z the {@code int} argument; the source z value
      * @return {@code true} if the position is a source; otherwise {@code false}
      */
     public final boolean isSource(int x, int y, int z) {
@@ -167,7 +169,7 @@ public abstract class FluidSimulation {
 
     /**
      * Advances the simulation according to its configured step time.
-     * @param delta the elapsed time in seconds
+     * @param delta the {@code float} argument; the elapsed time in seconds
      */
     public final void update(float delta) {
         timer += delta;
@@ -186,9 +188,9 @@ public abstract class FluidSimulation {
 
     /**
      * Updates surrounding flow after a block is destroyed.
-     * @param x the block x value
-     * @param y the block y value
-     * @param z the block z value
+     * @param x the {@code int} argument; the block x value
+     * @param y the {@code int} argument; the block y value
+     * @param z the {@code int} argument; the block z value
      */
     public final void onBlockDestroyed(int x, int y, int z) {
         FluidPos pos = new FluidPos(x, y, z);
@@ -199,9 +201,9 @@ public abstract class FluidSimulation {
 
     /**
      * Updates surrounding flow after a block is placed.
-     * @param x the block x value
-     * @param y the block y value
-     * @param z the block z value
+     * @param x the {@code int} argument; the block x value
+     * @param y the {@code int} argument; the block y value
+     * @param z the {@code int} argument; the block z value
      */
     public final void onBlockPlaced(int x, int y, int z) {
         FluidPos pos = new FluidPos(x, y, z);
@@ -212,7 +214,9 @@ public abstract class FluidSimulation {
         enqueueNeighbours(pos);
     }
 
-    /** Updates one queued fluid cell. */
+    /**
+     * Updates one queued fluid cell.
+     */
     private void updateCell(FluidPos pos) {
         if (!isFluid(pos)) return;
         byte level = levelAt(pos);
@@ -263,7 +267,9 @@ public abstract class FluidSimulation {
         return false;
     }
 
-    /** Resolves contact with the opposite fluid on the four horizontal sides. */
+    /**
+     * Resolves contact with the opposite fluid on the four horizontal sides.
+     */
     private boolean solidify(FluidPos pos) {
         FluidPos[] neighbours = {
                 new FluidPos(pos.x() + 1, pos.y(), pos.z()),
@@ -301,7 +307,9 @@ public abstract class FluidSimulation {
         return false;
     }
 
-    /** Replaces a fluid cell with a solid and invalidates both simulations. */
+    /**
+     * Replaces a fluid cell with a solid and invalidates both simulations.
+     */
     private static void solidifyFluid(FluidPos pos, BlockData result) {
         byte blockId = World.wrld.getBlockTypeAt(pos.x(), pos.y(), pos.z());
         BlockData replacedFluid = BlockData.fromId(blockId);
@@ -322,7 +330,9 @@ public abstract class FluidSimulation {
         lava.enqueueNeighbours(pos);
     }
 
-    /** Marks the changed cell and neighbouring chunks whose boundary faces may change. */
+    /**
+     * Marks the changed cell and neighbouring chunks whose boundary faces may change.
+     */
     private void markChangedArea(FluidPos pos) {
         mark(pos);
         mark(new FluidPos(pos.x() + 1, pos.y(), pos.z()));
@@ -331,7 +341,9 @@ public abstract class FluidSimulation {
         mark(new FluidPos(pos.x(), pos.y(), pos.z() - 1));
     }
 
-    /** Renews a supported source when the fluid permits infinite sources. */
+    /**
+     * Renews a supported source when the fluid permits infinite sources.
+     */
     private void renewSource(FluidPos pos) {
         if (!renewableSources || sources.contains(pos) || !hasSourceSupport(pos)) return;
         int adjacent = 0;
@@ -346,14 +358,18 @@ public abstract class FluidSimulation {
         }
     }
 
-    /** Returns whether a source has solid or source support below it. */
+    /**
+     * Returns whether a source has solid or source support below it.
+     */
     private boolean hasSourceSupport(FluidPos pos) {
         if (pos.y() <= 0) return false;
         FluidPos below = new FluidPos(pos.x(), pos.y() - 1, pos.z());
         return sources.contains(below) || World.wrld.isBlockSolid(below.x(), below.y(), below.z());
     }
 
-    /** Spreads a fluid level into a neighbouring cell. */
+    /**
+     * Spreads a fluid level into a neighbouring cell.
+     */
     private void spread(FluidPos from, FluidPos pos, byte level) {
         if (level < MIN_LEVEL || !canContainFluid(pos) || levelAt(pos) >= level) return;
         FluidSlope slope = hasDeepDrop(pos)
@@ -362,7 +378,9 @@ public abstract class FluidSimulation {
         enqueue(pos);
     }
 
-    /** A free cell directly below means the surface drops by more than one block. */
+    /**
+     * A free cell directly below means the surface drops by more than one block.
+     */
     private boolean hasDeepDrop(FluidPos pos) {
         if (pos.y() <= 0) return false;
         FluidPos below = new FluidPos(pos.x(), pos.y() - 1, pos.z());
@@ -373,7 +391,9 @@ public abstract class FluidSimulation {
                 below.x(), below.y(), below.z()) != null);
     }
 
-    /** Keeps a falling edge aligned after terrain is changed beneath existing fluid. */
+    /**
+     * Keeps a falling edge aligned after terrain is changed beneath existing fluid.
+     */
     private void refreshSlope(FluidPos pos, byte level) {
         if (!hasDeepDrop(pos)) {
             setSlope(pos, null);
@@ -400,12 +420,16 @@ public abstract class FluidSimulation {
         }
     }
 
-    /** Places or updates a fluid cell. */
+    /**
+     * Places or updates a fluid cell.
+     */
     private void setFluid(FluidPos pos, byte level) {
         setFluid(pos, level, null);
     }
 
-    /** Places or updates a fluid cell and its optional downhill surface. */
+    /**
+     * Places or updates a fluid cell and its optional downhill surface.
+     */
     private void setFluid(FluidPos pos, byte level, FluidSlope slope) {
         if (pos.y() < 0 || pos.y() >= Chunk.SIZE_Y || !canContainFluid(pos)) return;
         byte currentBlock = World.wrld.getBlockTypeAt(pos.x(), pos.y(), pos.z());
@@ -424,7 +448,9 @@ public abstract class FluidSimulation {
         mark(pos);
     }
 
-    /** Updates slope metadata and invalidates its mesh when the shape changes. */
+    /**
+     * Updates slope metadata and invalidates its mesh when the shape changes.
+     */
     private void setSlope(FluidPos pos, FluidSlope slope) {
         FluidSlope previous = slope == null ? slopes.remove(pos) : slopes.put(pos, slope);
         if ((previous == null && slope != null) || (previous != null && !previous.equals(slope))) {
@@ -432,7 +458,9 @@ public abstract class FluidSimulation {
         }
     }
 
-    /** Removes one cell belonging to this fluid. */
+    /**
+     * Removes one cell belonging to this fluid.
+     */
     private void removeFluidCell(FluidPos pos) {
         if (!isFluid(pos)) return;
         slopes.remove(pos);
@@ -441,7 +469,9 @@ public abstract class FluidSimulation {
         mark(pos);
     }
 
-    /** Removes and reconstructs the connected fluid component. */
+    /**
+     * Removes and reconstructs the connected fluid component.
+     */
     private void removeAndRebuild(FluidPos removed) {
         Set<FluidPos> component = collect(removed);
         Set<FluidPos> componentSources = new HashSet<>();
@@ -474,7 +504,9 @@ public abstract class FluidSimulation {
         }
     }
 
-    /** Rebuilds one cell inside a removed fluid component. */
+    /**
+     * Rebuilds one cell inside a removed fluid component.
+     */
     private void rebuild(FluidPos pos, byte level, Set<FluidPos> component,
                          Set<FluidPos> rebuilt, Queue<FluidPos> rebuildQueue) {
         if (level < MIN_LEVEL || !component.contains(pos) || !canContainFluid(pos) || levelAt(pos) >= level) return;
@@ -482,7 +514,9 @@ public abstract class FluidSimulation {
         if (rebuilt.add(pos)) rebuildQueue.add(pos);
     }
 
-    /** Collects the connected component belonging to this fluid. */
+    /**
+     * Collects the connected component belonging to this fluid.
+     */
     private Set<FluidPos> collect(FluidPos start) {
         Set<FluidPos> component = new HashSet<>();
         Queue<FluidPos> searchQueue = new ArrayDeque<>();
@@ -504,12 +538,16 @@ public abstract class FluidSimulation {
         return component;
     }
 
-    /** Adds a matching fluid neighbour to a component search. */
+    /**
+     * Adds a matching fluid neighbour to a component search.
+     */
     private void addFluidNeighbour(FluidPos pos, Queue<FluidPos> searchQueue, Set<FluidPos> visited) {
         if (visited.add(pos) && isFluid(pos)) searchQueue.add(pos);
     }
 
-    /** Returns whether a cell can receive this fluid. */
+    /**
+     * Returns whether a cell can receive this fluid.
+     */
     private boolean canContainFluid(FluidPos pos) {
         if (pos.y() < 0 || pos.y() >= Chunk.SIZE_Y) return false;
         byte blockId = World.wrld.getBlockTypeAt(pos.x(), pos.y(), pos.z());
@@ -526,22 +564,30 @@ public abstract class FluidSimulation {
         return data != null && (data.isPlant() || crop != null);
     }
 
-    /** Returns whether a position contains this simulation's fluid. */
+    /**
+     * Returns whether a position contains this simulation's fluid.
+     */
     private boolean isFluid(FluidPos pos) {
         return World.wrld.getBlockTypeAt(pos.x(), pos.y(), pos.z()) == fluidType.getId();
     }
 
-    /** Returns the stored fluid level at a position. */
+    /**
+     * Returns the stored fluid level at a position.
+     */
     private byte levelAt(FluidPos pos) {
         return World.wrld.getFluidLevelAt(pos.x(), pos.y(), pos.z());
     }
 
-    /** Adds a position to the pending update queue. */
+    /**
+     * Adds a position to the pending update queue.
+     */
     private void enqueue(FluidPos pos) {
         if (queued.add(pos)) queue.add(pos);
     }
 
-    /** Adds a position and all adjacent positions to the update queue. */
+    /**
+     * Adds a position and all adjacent positions to the update queue.
+     */
     private void enqueueNeighbours(FluidPos pos) {
         enqueue(pos);
         enqueue(new FluidPos(pos.x() + 1, pos.y(), pos.z()));
@@ -552,13 +598,17 @@ public abstract class FluidSimulation {
         enqueue(new FluidPos(pos.x(), pos.y(), pos.z() - 1));
     }
 
-    /** Marks a chunk for mesh rebuilding. */
+    /**
+     * Marks a chunk for mesh rebuilding.
+     */
     private void mark(FluidPos pos) {
         changedChunks.add(World.wrld.get2DKey(Math.floorDiv(pos.x(), Chunk.SIZE_X),
                 Math.floorDiv(pos.z(), Chunk.SIZE_Z)));
     }
 
-    /** Rebuilds meshes changed by the most recent simulation steps. */
+    /**
+     * Rebuilds meshes changed by the most recent simulation steps.
+     */
     private void rebuildChangedChunks() {
         if (changedChunks.isEmpty() || GameMaster.game == null) return;
         for (long key : changedChunks) {

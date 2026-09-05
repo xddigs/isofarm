@@ -30,7 +30,7 @@ import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 
 /**
- * Provides game uiservice behavior.
+ * Encapsulates the state and operations required by game uiservice within the game runtime.
  */
 @SuppressWarnings("all")
 @GodObject
@@ -79,15 +79,15 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Creates a new {@code GameUIService} instance.
-     * @param windowHandle the window handle value
-     * @param gameMaster the game master value
-     * @param uiManager the ui manager value
-     * @param seedIcons the seed icons value
-     * @param cropIcons the crop icons value
-     * @param blockIcons the block icons value
-     * @param toolIcons the tool icons value
-     * @param materialIcons the material icons value
-     * @param inventoryIcons the inventory icons value
+     * @param windowHandle the {@code long} supplied as {@code windowHandle}
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
+     * @param uiManager the {@link UIManager} supplied as {@code uiManager}
+     * @param seedIcons the {@link SpriteSheet} supplied as {@code seedIcons}
+     * @param cropIcons the {@link SpriteSheet} supplied as {@code cropIcons}
+     * @param blockIcons the {@link SpriteSheet} supplied as {@code blockIcons}
+     * @param toolIcons the {@link SpriteSheet} supplied as {@code toolIcons}
+     * @param materialIcons the {@link SpriteSheet} supplied as {@code materialIcons}
+     * @param inventoryIcons the {@link SpriteSheet} supplied as {@code inventoryIcons}
      */
     public GameUIService(
             long windowHandle,
@@ -194,7 +194,7 @@ public class GameUIService implements Service<GameMaster> {
     }
 
     /**
-     * Performs the debug print operation.
+     * Updates or derives runtime state for debug print according to the supplied arguments.
      */
     private void debugPrint() {
         uiManager.getRoot().getChildren().forEach(uiElement ->
@@ -203,7 +203,7 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Returns the inventory ui.
-     * @return the inventory ui
+     * @return the {@link InventoryUI} representing the inventory ui
      */
     public InventoryUI getInventoryUI() {
         return inventoryUI;
@@ -211,7 +211,7 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Returns the hotbar ui.
-     * @return the hotbar ui
+     * @return the {@link HotbarUI} representing the hotbar ui
      */
     public HotbarUI getHotbarUI() {
         return hotbarUI;
@@ -219,7 +219,7 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Returns the backpack inventory ui.
-     * @return the backpack inventory ui
+     * @return the {@link BackpackInventoryUI} representing the backpack inventory ui
      */
     public BackpackInventoryUI getBackpackInventoryUI() {
         return backpackUI;
@@ -227,7 +227,7 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Sets the shop.
-     * @param shop the shop value
+     * @param shop the {@link Shop} supplied as {@code shop}
      */
     public void setShop(Shop shop) {
         this.shop = shop;
@@ -235,7 +235,7 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Updates the current state.
-     * @param delta the delta value
+     * @param delta the {@code float} supplied as {@code delta}
      */
     public void update(float delta) {
         if (!Player.plyr.isAlive()) {
@@ -339,9 +339,9 @@ public class GameUIService implements Service<GameMaster> {
     }
 
     /**
-     * Renders render.
-     * @param isHUDShown the is hudshown value
-     * @param gameMaster the game master value
+     * Renders this object in the requested render pass.
+     * @param isHUDShown the {@code boolean} supplied as {@code isHUDShown}
+     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
      */
     public void render(boolean isHUDShown, GameMaster gameMaster) {
         if (!Player.plyr.isAlive()) {
@@ -376,7 +376,9 @@ public class GameUIService implements Service<GameMaster> {
         glEnable(GL_DEPTH_TEST);
     }
 
-    /** Renders the progressively blurred and red-tinted death screen. */
+    /**
+     * Renders the progressively blurred and red-tinted death screen.
+     */
     private void renderDeathScreen(GameMaster gameMaster) {
         float progress = deathOverlayAlpha / DEATH_OVERLAY_MAX_ALPHA;
         float blurRadius = Math.max(0.01f, DEATH_BLUR_RADIUS * progress);
@@ -420,9 +422,9 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Renders the hearts.
-     * @param heartsSheet the hearts sheet value
-     * @param startX the start x value
-     * @param startY the start y value
+     * @param heartsSheet the {@link SpriteSheet} supplied as {@code heartsSheet}
+     * @param startX the {@code float} supplied as {@code startX}
+     * @param startY the {@code float} supplied as {@code startY}
      */
     public void renderHearts(SpriteSheet heartsSheet, float startX,
                              float startY) {
@@ -458,7 +460,7 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Returns the uimanager.
-     * @return the uimanager
+     * @return the {@link UIManager} representing the uimanager
      */
     public UIManager getUIManager() {
         return uiManager;
@@ -490,7 +492,7 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Adds the chat message.
-     * @param message the message value
+     * @param message the {@link String} supplied as {@code message}
      */
     public void addChatMessage(String message) {
         if (message == null || message.isBlank()) return;
@@ -518,7 +520,7 @@ public class GameUIService implements Service<GameMaster> {
     }
 
     /**
-     * Performs the reset hotbar position operation.
+     * Resets hotbar position to its initial runtime state.
      */
     public void resetHotbarPosition() {
         hotbarUI.refreshSize();
@@ -529,7 +531,7 @@ public class GameUIService implements Service<GameMaster> {
     }
 
     /**
-     * Performs the refresh hotbar label operation.
+     * Refreshes dependent runtime state for refresh hotbar label.
      */
     public void refreshHotbarLabel() {
         Item item = hotbarUI.getSelectedItem();
@@ -556,8 +558,8 @@ public class GameUIService implements Service<GameMaster> {
     }
 
     /**
-     * Performs the select item operation.
-     * @param direction the direction value
+     * Updates or derives runtime state for select item according to the supplied arguments.
+     * @param direction the {@code int} supplied as {@code direction}
      */
     public void selectItem(int direction) {
         if (player == null) {
@@ -580,8 +582,8 @@ public class GameUIService implements Service<GameMaster> {
     }
 
     /**
-     * Performs the show hotbar label operation.
-     * @param item the item value
+     * Activates hotbar label and prepares any state it requires.
+     * @param item the {@link Item} supplied as {@code item}
      */
     private void showHotbarLabel(Item item) {
         if (item == null) {
@@ -596,7 +598,7 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Renders the toast.
-     * @param toast the toast value
+     * @param toast the {@link Toast} supplied as {@code toast}
      */
     private void renderToast(Toast toast) {
         UIFont prefixFont = GUI.getNormalBoldFont();
@@ -658,8 +660,8 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Returns the toast accent.
-     * @param type the type value
-     * @return the toast accent
+     * @param type the {@link ToastData} supplied as {@code type}
+     * @return an array of {@code float} values; the toast accent
      */
     private float[] getToastAccent(ToastData type) {
         return switch (type) {
@@ -675,8 +677,8 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Returns the toast background.
-     * @param type the type value
-     * @return the toast background
+     * @param type the {@link ToastData} supplied as {@code type}
+     * @return an array of {@code float} values; the toast background
      */
     private float[] getToastBackground(ToastData type) {
         return switch (type) {
@@ -692,8 +694,8 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Returns the toast prefix.
-     * @param type the type value
-     * @return the toast prefix
+     * @param type the {@link ToastData} supplied as {@code type}
+     * @return the {@link String} representing the toast prefix
      */
     private String getToastPrefix(ToastData type) {
         return switch (type) {
@@ -707,17 +709,17 @@ public class GameUIService implements Service<GameMaster> {
     }
 
     /**
-     * Performs the log action operation.
-     * @param cell the cell value
+     * Publishes the notification represented by log action.
+     * @param cell the {@link BlockPos} supplied as {@code cell}
      */
     public void logAction(BlockPos cell) {
         this.lastActionCell = new Vector2i(cell.x(), cell.y());
     }
 
     /**
-     * Performs the on resize operation.
-     * @param width the width value
-     * @param height the height value
+     * Handles resize and updates the affected state.
+     * @param width the {@code int} supplied as {@code width}
+     * @param height the {@code int} supplied as {@code height}
      */
     public void onResize(int width, int height) {
         this.windowWidth = width;
@@ -744,7 +746,7 @@ public class GameUIService implements Service<GameMaster> {
     }
 
     /**
-     * Performs the open chat operation.
+     * Activates chat and prepares any state it requires.
      */
     public void openChat() {
         chatField.clear();
@@ -753,7 +755,7 @@ public class GameUIService implements Service<GameMaster> {
     }
 
     /**
-     * Performs the close chat operation.
+     * Releases the resources associated with chat.
      */
     public void closeChat() {
         chatField.hide();
@@ -762,16 +764,16 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Returns the chat text.
-     * @return the chat text
+     * @return the {@link String} representing the chat text
      */
     public String getChatText() {
         return chatField.getText();
     }
 
     /**
-     * Performs the sell item operation.
-     * @param inv the inv value
-     * @param item the item value
+     * Processes sell item and updates the affected inventory or currency balances.
+     * @param inv the {@link Inventory} supplied as {@code inv}
+     * @param item the {@link Item} supplied as {@code item}
      */
     private void sellItem(Inventory inv, Item item) {
         Item targetItem = null;
@@ -792,10 +794,10 @@ public class GameUIService implements Service<GameMaster> {
     }
 
     /**
-     * Performs the buy item operation.
-     * @param stock the stock value
-     * @param item the item value
-     * @param amount the amount value
+     * Processes buy item and updates the affected inventory or currency balances.
+     * @param stock the {@link Inventory} supplied as {@code stock}
+     * @param item the {@link Item} supplied as {@code item}
+     * @param amount the {@code int} supplied as {@code amount}
      */
     private void buyItem(Inventory stock, Item item, int amount) {
         if (amount <= 0) return;

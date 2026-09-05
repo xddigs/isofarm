@@ -7,7 +7,7 @@ import com.isofarm.wrld.FluidSimulation;
 import com.isofarm.wrld.World;
 
 /**
- * Provides chunk mesh builder behavior.
+ * Encapsulates the state and operations required by chunk mesh builder within the game runtime.
  */
 public class ChunkMeshBuilder {
     private static final float PIXEL = 1.0f / K.World.DEFAULT_TEXTURE_SCALE;
@@ -33,20 +33,20 @@ public class ChunkMeshBuilder {
     }
 
     /**
-     * Stores raw mesh data data.
+     * Immutable value object containing raw mesh.
      */
     public record RawMeshData(float[] positions, float[] normals, float[] uv, int[] indices) {}
     /**
-     * Stores chunk mesh data data.
+     * Immutable value object containing chunk mesh.
      */
     public record ChunkMeshData(RawMeshData solidData, RawMeshData waterData) {}
 
     /**
-     * Stores chunk render mesh data.
+     * Immutable value object containing chunk render mesh.
      */
     public record ChunkRenderMesh(Mesh solidMesh, Mesh waterMesh) {
         /**
-         * Performs the dispose operation.
+         * Releases the resources associated with this object.
          */
         public void dispose() {
             if (solidMesh != null) solidMesh.dispose();
@@ -55,10 +55,10 @@ public class ChunkMeshBuilder {
     }
 
     /**
-     * Performs the build mesh operation.
-     * @param world the world value
-     * @param chunk the chunk value
-     * @return the build mesh result
+     * Creates mesh from the supplied state and configuration.
+     * @param world the {@link World} supplied as {@code world}
+     * @param chunk the {@link Chunk} supplied as {@code chunk}
+     * @return the {@link ChunkMeshData} representing the build mesh result
      */
     public static ChunkMeshData buildMesh(World world, Chunk chunk) {
         int posIdx = 0, normIdx = 0, uvIdx = 0, elemIdx = 0, vertexCount = 0;
@@ -236,16 +236,16 @@ public class ChunkMeshBuilder {
     }
 
     /**
-     * Performs the build raw data operation.
-     * @param pBuf the p buf value
-     * @param pIdx the p idx value
-     * @param nBuf the n buf value
-     * @param nIdx the n idx value
-     * @param uBuf the u buf value
-     * @param uIdx the u idx value
-     * @param iBuf the i buf value
-     * @param iIdx the i idx value
-     * @return the build raw data result
+     * Creates raw data from the supplied state and configuration.
+     * @param pBuf an array of {@code float} values supplied as {@code pBuf}
+     * @param pIdx the {@code int} supplied as {@code pIdx}
+     * @param nBuf an array of {@code float} values supplied as {@code nBuf}
+     * @param nIdx the {@code int} supplied as {@code nIdx}
+     * @param uBuf an array of {@code float} values supplied as {@code uBuf}
+     * @param uIdx the {@code int} supplied as {@code uIdx}
+     * @param iBuf an array of {@code int} values supplied as {@code iBuf}
+     * @param iIdx the {@code int} supplied as {@code iIdx}
+     * @return the {@link RawMeshData} representing the build raw data result
      */
     private static RawMeshData buildRawData(float[] pBuf, int pIdx, float[] nBuf, int nIdx, float[] uBuf, int uIdx, int[] iBuf, int iIdx) {
         if (iIdx == 0) return null;
@@ -258,8 +258,8 @@ public class ChunkMeshBuilder {
 
     /**
      * Creates and returns the mesh.
-     * @param data the data value
-     * @return the created mesh
+     * @param data the {@link ChunkMeshData} supplied as {@code data}
+     * @return the {@link ChunkRenderMesh} representing the created mesh
      */
     public static ChunkRenderMesh createMesh(ChunkMeshData data) {
         Mesh solid = data.solidData() != null ? new Mesh(data.solidData().positions(), data.solidData().normals(), data.solidData().uv(), data.solidData().indices()) : null;
@@ -269,19 +269,19 @@ public class ChunkMeshBuilder {
 
     /**
      * Returns the block top y.
-     * @param data the data value
-     * @param y the y value
-     * @return the block top y
+     * @param data the {@link BlockData} supplied as {@code data}
+     * @param y the {@code float} supplied as {@code y}
+     * @return {@code float}; the block top y
      */
     private static float getBlockTopY(BlockData data, float y) { return (data == BlockData.TILLED_DIRT ||
             data.isFluid()) ? y + TILLED_HEIGHT : y + 1.0f; }
     /**
      * Returns the block bottom y.
-     * @param world the world value
-     * @param worldX the world x value
-     * @param worldY the world y value
-     * @param worldZ the world z value
-     * @return the block bottom y
+     * @param world the {@link World} supplied as {@code world}
+     * @param worldX the {@code int} supplied as {@code worldX}
+     * @param worldY the {@code int} supplied as {@code worldY}
+     * @param worldZ the {@code int} supplied as {@code worldZ}
+     * @return {@code float}; the block bottom y
      */
     private static float getBlockBottomY(World world, int worldX, int worldY, int worldZ) {
         if (worldY < 0 || worldY >= Chunk.SIZE_Y || !world.isChunkLoadedAt(worldX, worldZ)) return 0.0f;
@@ -293,11 +293,11 @@ public class ChunkMeshBuilder {
 
     /**
      * Returns the block top y.
-     * @param world the world value
-     * @param worldX the world x value
-     * @param worldY the world y value
-     * @param worldZ the world z value
-     * @return the block top y
+     * @param world the {@link World} supplied as {@code world}
+     * @param worldX the {@code int} supplied as {@code worldX}
+     * @param worldY the {@code int} supplied as {@code worldY}
+     * @param worldZ the {@code int} supplied as {@code worldZ}
+     * @return {@code float}; the block top y
      */
     private static float getBlockTopY(World world, int worldX, int worldY, int worldZ) {
         if (worldY < 0 || worldY >= Chunk.SIZE_Y || !world.isChunkLoadedAt(worldX, worldZ)) return 0.0f;
@@ -308,13 +308,13 @@ public class ChunkMeshBuilder {
     }
 
     /**
-     * Performs the should render face operation.
-     * @param world the world value
-     * @param worldX the world x value
-     * @param worldY the world y value
-     * @param worldZ the world z value
-     * @param currentBlock the current block value
-     * @return the should render face result
+     * Determines whether render face is satisfied by the current state.
+     * @param world the {@link World} supplied as {@code world}
+     * @param worldX the {@code int} supplied as {@code worldX}
+     * @param worldY the {@code int} supplied as {@code worldY}
+     * @param worldZ the {@code int} supplied as {@code worldZ}
+     * @param currentBlock the {@link BlockData} supplied as {@code currentBlock}
+     * @return {@code boolean}; the should render face result
      */
     private static boolean shouldRenderFace(World world, int worldX, int worldY, int worldZ, BlockData currentBlock) {
         if (worldY < 0) return false;
@@ -336,13 +336,13 @@ public class ChunkMeshBuilder {
     }
 
     /**
-     * Performs the should render water top operation.
-     * @param world the world value
-     * @param worldX the world x value
-     * @param y the y value
-     * @param worldZ the world z value
-     * @param currentFluid the fluid being rendered
-     * @return the should render water top result
+     * Determines whether render water top is satisfied by the current state.
+     * @param world the {@link World} supplied as {@code world}
+     * @param worldX the {@code int} supplied as {@code worldX}
+     * @param y the {@code int} supplied as {@code y}
+     * @param worldZ the {@code int} supplied as {@code worldZ}
+     * @param currentFluid the {@link BlockData} argument; the fluid being rendered
+     * @return {@code boolean}; the should render water top result
      */
     private static boolean shouldRenderWaterTop(World world, int worldX, int y, int worldZ,
                                                 BlockData currentFluid) {
@@ -357,12 +357,12 @@ public class ChunkMeshBuilder {
 
     /**
      * Returns the water corner height.
-     * @param world the world value
-     * @param wx the wx value
-     * @param wy the wy value
-     * @param wz the wz value
-     * @param currentFluid the fluid being rendered
-     * @return the water corner height
+     * @param world the {@link World} supplied as {@code world}
+     * @param wx the {@code int} supplied as {@code wx}
+     * @param wy the {@code int} supplied as {@code wy}
+     * @param wz the {@code int} supplied as {@code wz}
+     * @param currentFluid the {@link BlockData} argument; the fluid being rendered
+     * @return {@code float}; the water corner height
      */
     private static float getWaterCornerHeight(World world, int wx, int wy, int wz,
                                               BlockData currentFluid) {
@@ -392,11 +392,11 @@ public class ChunkMeshBuilder {
 
     /**
      * Checks whether the partial side exposure condition is met.
-     * @param world the world value
-     * @param worldX the world x value
-     * @param worldY the world y value
-     * @param worldZ the world z value
-     * @param currentBlock the current block value
+     * @param world the {@link World} supplied as {@code world}
+     * @param worldX the {@code int} supplied as {@code worldX}
+     * @param worldY the {@code int} supplied as {@code worldY}
+     * @param worldZ the {@code int} supplied as {@code worldZ}
+     * @param currentBlock the {@link BlockData} supplied as {@code currentBlock}
      * @return {@code true} if partial side exposure; otherwise {@code false}
      */
     private static boolean isPartialSideExposure(World world, int worldX, int worldY, int worldZ, BlockData currentBlock) {
@@ -409,13 +409,13 @@ public class ChunkMeshBuilder {
 
     /**
      * Returns the side bottom y.
-     * @param world the world value
-     * @param worldX the world x value
-     * @param worldY the world y value
-     * @param worldZ the world z value
-     * @param currentBottomY the current bottom y value
-     * @param currentBlock the current block value
-     * @return the side bottom y
+     * @param world the {@link World} supplied as {@code world}
+     * @param worldX the {@code int} supplied as {@code worldX}
+     * @param worldY the {@code int} supplied as {@code worldY}
+     * @param worldZ the {@code int} supplied as {@code worldZ}
+     * @param currentBottomY the {@code float} supplied as {@code currentBottomY}
+     * @param currentBlock the {@link BlockData} supplied as {@code currentBlock}
+     * @return {@code float}; the side bottom y
      */
     private static float getSideBottomY(World world, int worldX, int worldY, int worldZ, float currentBottomY, BlockData currentBlock) {
         if (!world.isChunkLoadedAt(worldX, worldZ) || worldY < 0 || worldY >= Chunk.SIZE_Y) return currentBottomY;
@@ -428,10 +428,10 @@ public class ChunkMeshBuilder {
 
     /**
      * Calculates and returns the side uv bottom.
-     * @param expBottom the exp bottom value
-     * @param bottomY the bottom y value
-     * @param topY the top y value
-     * @return the calculate side uv bottom result
+     * @param expBottom the {@code float} supplied as {@code expBottom}
+     * @param bottomY the {@code float} supplied as {@code bottomY}
+     * @param topY the {@code float} supplied as {@code topY}
+     * @return {@code float}; the calculate side uv bottom result
      */
     private static float calculateSideUvBottom(float expBottom, float bottomY, float topY) {
         if (topY <= bottomY) return 0.0f;
@@ -443,21 +443,21 @@ public class ChunkMeshBuilder {
 
     /**
      * Adds the quad pos.
-     * @param buf the buf value
-     * @param idx the idx value
-     * @param x1 the x1 value
-     * @param y1 the y1 value
-     * @param z1 the z1 value
-     * @param x2 the x2 value
-     * @param y2 the y2 value
-     * @param z2 the z2 value
-     * @param x3 the x3 value
-     * @param y3 the y3 value
-     * @param z3 the z3 value
-     * @param x4 the x4 value
-     * @param y4 the y4 value
-     * @param z4 the z4 value
-     * @return the add quad pos result
+     * @param buf an array of {@code float} values supplied as {@code buf}
+     * @param idx the {@code int} supplied as {@code idx}
+     * @param x1 the {@code float} supplied as {@code x1}
+     * @param y1 the {@code float} supplied as {@code y1}
+     * @param z1 the {@code float} supplied as {@code z1}
+     * @param x2 the {@code float} supplied as {@code x2}
+     * @param y2 the {@code float} supplied as {@code y2}
+     * @param z2 the {@code float} supplied as {@code z2}
+     * @param x3 the {@code float} supplied as {@code x3}
+     * @param y3 the {@code float} supplied as {@code y3}
+     * @param z3 the {@code float} supplied as {@code z3}
+     * @param x4 the {@code float} supplied as {@code x4}
+     * @param y4 the {@code float} supplied as {@code y4}
+     * @param z4 the {@code float} supplied as {@code z4}
+     * @return {@code int}; the add quad pos result
      */
     private static int addQuadPos(float[] buf, int idx, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4) {
         buf[idx] = x1; buf[idx + 1] = y1; buf[idx + 2] = z1;
@@ -469,17 +469,17 @@ public class ChunkMeshBuilder {
 
     /**
      * Adds the quad uv.
-     * @param buf the buf value
-     * @param idx the idx value
-     * @param u1 the u1 value
-     * @param v1 the v1 value
-     * @param u2 the u2 value
-     * @param v2 the v2 value
-     * @param u3 the u3 value
-     * @param v3 the v3 value
-     * @param u4 the u4 value
-     * @param v4 the v4 value
-     * @return the add quad uv result
+     * @param buf an array of {@code float} values supplied as {@code buf}
+     * @param idx the {@code int} supplied as {@code idx}
+     * @param u1 the {@code float} supplied as {@code u1}
+     * @param v1 the {@code float} supplied as {@code v1}
+     * @param u2 the {@code float} supplied as {@code u2}
+     * @param v2 the {@code float} supplied as {@code v2}
+     * @param u3 the {@code float} supplied as {@code u3}
+     * @param v3 the {@code float} supplied as {@code v3}
+     * @param u4 the {@code float} supplied as {@code u4}
+     * @param v4 the {@code float} supplied as {@code v4}
+     * @return {@code int}; the add quad uv result
      */
     private static int addQuadUV(float[] buf, int idx, float u1, float v1, float u2, float v2, float u3, float v3, float u4, float v4) {
         buf[idx] = u1; buf[idx + 1] = v1;
@@ -491,12 +491,12 @@ public class ChunkMeshBuilder {
 
     /**
      * Adds the quad norm.
-     * @param buf the buf value
-     * @param idx the idx value
-     * @param nx the nx value
-     * @param ny the ny value
-     * @param nz the nz value
-     * @return the add quad norm result
+     * @param buf an array of {@code float} values supplied as {@code buf}
+     * @param idx the {@code int} supplied as {@code idx}
+     * @param nx the {@code float} supplied as {@code nx}
+     * @param ny the {@code float} supplied as {@code ny}
+     * @param nz the {@code float} supplied as {@code nz}
+     * @return {@code int}; the add quad norm result
      */
     private static int addQuadNorm(float[] buf, int idx, float nx, float ny, float nz) {
         for (int i = 0; i < 4; i++) { buf[idx++] = nx; buf[idx++] = ny; buf[idx++] = nz; }
@@ -505,10 +505,10 @@ public class ChunkMeshBuilder {
 
     /**
      * Adds the quad indices.
-     * @param buf the buf value
-     * @param idx the idx value
-     * @param vertexCount the vertex count value
-     * @return the add quad indices result
+     * @param buf an array of {@code int} values supplied as {@code buf}
+     * @param idx the {@code int} supplied as {@code idx}
+     * @param vertexCount the {@code int} supplied as {@code vertexCount}
+     * @return {@code int}; the add quad indices result
      */
     private static int addQuadIndices(int[] buf, int idx, int vertexCount) {
         buf[idx] = vertexCount; buf[idx + 1] = vertexCount + 1; buf[idx + 2] = vertexCount + 2;
@@ -518,29 +518,29 @@ public class ChunkMeshBuilder {
 
     /**
      * Adds the side quad direct.
-     * @param pos the pos value
-     * @param norm the norm value
-     * @param uv the uv value
-     * @param idx the idx value
-     * @param posI the pos i value
-     * @param normI the norm i value
-     * @param uvI the uv i value
-     * @param elemI the elem i value
-     * @param vertexCount the vertex count value
-     * @param x1 the x1 value
-     * @param x2 the x2 value
-     * @param y1 the y1 value
-     * @param topY1 the top y at the first endpoint
-     * @param topY2 the top y at the second endpoint
-     * @param z1 the z1 value
-     * @param z2 the z2 value
-     * @param nx the nx value
-     * @param ny the ny value
-     * @param nz the nz value
-     * @param data the data value
-     * @param uvB the uv b value
-     * @param uvT the uv t value
-     * @return the add side quad direct result
+     * @param pos an array of {@code float} values supplied as {@code pos}
+     * @param norm an array of {@code float} values supplied as {@code norm}
+     * @param uv an array of {@code float} values supplied as {@code uv}
+     * @param idx an array of {@code int} values supplied as {@code idx}
+     * @param posI the {@code int} supplied as {@code posI}
+     * @param normI the {@code int} supplied as {@code normI}
+     * @param uvI the {@code int} supplied as {@code uvI}
+     * @param elemI the {@code int} supplied as {@code elemI}
+     * @param vertexCount the {@code int} supplied as {@code vertexCount}
+     * @param x1 the {@code float} supplied as {@code x1}
+     * @param x2 the {@code float} supplied as {@code x2}
+     * @param y1 the {@code float} supplied as {@code y1}
+     * @param topY1 the {@code float} argument; the top y at the first endpoint
+     * @param topY2 the {@code float} argument; the top y at the second endpoint
+     * @param z1 the {@code float} supplied as {@code z1}
+     * @param z2 the {@code float} supplied as {@code z2}
+     * @param nx the {@code float} supplied as {@code nx}
+     * @param ny the {@code float} supplied as {@code ny}
+     * @param nz the {@code float} supplied as {@code nz}
+     * @param data the {@link BlockData} supplied as {@code data}
+     * @param uvB the {@code float} supplied as {@code uvB}
+     * @param uvT the {@code float} supplied as {@code uvT}
+     * @return {@code int}; the add side quad direct result
      */
     private static int addSideQuadDirect(float[] pos, float[] norm, float[] uv, int[] idx,
                                          int posI, int normI, int uvI, int elemI, int vertexCount, float x1,

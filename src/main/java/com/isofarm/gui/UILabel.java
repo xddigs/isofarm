@@ -4,7 +4,7 @@ import com.isofarm.utils.Local;
 import org.joml.Vector4f;
 
 /**
- * Provides uilabel behavior.
+ * Encapsulates the state and operations required by uilabel within the game runtime.
  */
 @SuppressWarnings("unused")
 public class UILabel extends UIElement {
@@ -16,11 +16,11 @@ public class UILabel extends UIElement {
 
     /**
      * Creates a new {@code UILabel} instance.
-     * @param x the x value
-     * @param y the y value
-     * @param width the width value
-     * @param height the height value
-     * @param text the text value
+     * @param x the {@code float} supplied as {@code x}
+     * @param y the {@code float} supplied as {@code y}
+     * @param width the {@code float} supplied as {@code width}
+     * @param height the {@code float} supplied as {@code height}
+     * @param text the {@link String} supplied as {@code text}
      */
     public UILabel(float x, float y, float width, float height, String text) {
         super(x, y, width, height);
@@ -29,7 +29,8 @@ public class UILabel extends UIElement {
     }
 
     /**
-     * Renders render.
+     * {@inheritDoc}
+     * Renders this object in the requested render pass.
      */
     @Override
     public void render() {
@@ -59,7 +60,7 @@ public class UILabel extends UIElement {
 
     /**
      * Returns the text.
-     * @return the text
+     * @return the {@link String} representing the text
      */
     public String getText() {
         return text;
@@ -67,8 +68,8 @@ public class UILabel extends UIElement {
 
     /**
      * Sets the text.
-     * @param text the text value
-     * @return the set text result
+     * @param text the {@link String} supplied as {@code text}
+     * @return the {@link UILabel} representing the set text result
      */
     public UILabel setText(String text) {
         this.text = Local.lang.t(text);
@@ -77,7 +78,7 @@ public class UILabel extends UIElement {
 
     /**
      * Returns the font.
-     * @return the font
+     * @return the {@link UIFont} representing the font
      */
     public UIFont getFont() {
         return font;
@@ -85,8 +86,8 @@ public class UILabel extends UIElement {
 
     /**
      * Sets the font.
-     * @param font the font value
-     * @return the set font result
+     * @param font the {@link UIFont} supplied as {@code font}
+     * @return the {@link UILabel} representing the set font result
      */
     public UILabel setFont(UIFont font) {
         this.font = font;
@@ -95,7 +96,7 @@ public class UILabel extends UIElement {
 
     /**
      * Returns the color.
-     * @return the color
+     * @return the {@link Vector4f} representing the color
      */
     public Vector4f getColor() {
         return new Vector4f(color);
@@ -103,8 +104,8 @@ public class UILabel extends UIElement {
 
     /**
      * Sets the color.
-     * @param color the color value
-     * @return the set color result
+     * @param color the {@link Vector4f} supplied as {@code color}
+     * @return the {@link UILabel} representing the set color result
      */
     public UILabel setColor(Vector4f color) {
         if (color == null) {
@@ -118,10 +119,10 @@ public class UILabel extends UIElement {
 
     /**
      * Sets the color.
-     * @param r the r value
-     * @param g the g value
-     * @param b the b value
-     * @return the set color result
+     * @param r the {@code float} supplied as {@code r}
+     * @param g the {@code float} supplied as {@code g}
+     * @param b the {@code float} supplied as {@code b}
+     * @return the {@link UILabel} representing the set color result
      */
     public UILabel setColor(float r, float g, float b) {
         this.color.set(r, g, b, 1.0f);
@@ -130,11 +131,11 @@ public class UILabel extends UIElement {
 
     /**
      * Sets the color.
-     * @param r the r value
-     * @param g the g value
-     * @param b the b value
-     * @param a the a value
-     * @return the set color result
+     * @param r the {@code float} supplied as {@code r}
+     * @param g the {@code float} supplied as {@code g}
+     * @param b the {@code float} supplied as {@code b}
+     * @param a the {@code float} supplied as {@code a}
+     * @return the {@link UILabel} representing the set color result
      */
     public UILabel setColor(float r, float g, float b, float a) {
         this.color.set(r, g, b, a);
@@ -143,7 +144,7 @@ public class UILabel extends UIElement {
 
     /**
      * Returns the horizontal alignment.
-     * @return the horizontal alignment
+     * @return the {@link HorizontalAlignment} representing the horizontal alignment
      */
     public HorizontalAlignment getHorizontalAlignment() {
         return horizontalAlignment;
@@ -151,8 +152,8 @@ public class UILabel extends UIElement {
 
     /**
      * Sets the horizontal alignment.
-     * @param alignment the alignment value
-     * @return the set horizontal alignment result
+     * @param alignment the {@link HorizontalAlignment} supplied as {@code alignment}
+     * @return the {@link UILabel} representing the set horizontal alignment result
      */
     public UILabel setHorizontalAlignment(HorizontalAlignment alignment) {
         this.horizontalAlignment = alignment == null ? HorizontalAlignment.LEFT : alignment;
@@ -161,7 +162,7 @@ public class UILabel extends UIElement {
 
     /**
      * Returns the vertical alignment.
-     * @return the vertical alignment
+     * @return the {@link VerticalAlignment} representing the vertical alignment
      */
     public VerticalAlignment getVerticalAlignment() {
         return verticalAlignment;
@@ -169,8 +170,8 @@ public class UILabel extends UIElement {
 
     /**
      * Sets the vertical alignment.
-     * @param alignment the alignment value
-     * @return the set vertical alignment result
+     * @param alignment the {@link VerticalAlignment} supplied as {@code alignment}
+     * @return the {@link UILabel} representing the set vertical alignment result
      */
     public UILabel setVerticalAlignment(VerticalAlignment alignment) {
         this.verticalAlignment = alignment == null ? VerticalAlignment.TOP : alignment;
@@ -179,7 +180,7 @@ public class UILabel extends UIElement {
 
     /**
      * Returns the text width.
-     * @return the text width
+     * @return {@code float}; the text width
      */
     public float getTextWidth() {
         if (text == null || text.isEmpty() || font == null) {

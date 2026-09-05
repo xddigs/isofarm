@@ -5,7 +5,7 @@ import com.isofarm.wrld.Chunk;
 import com.isofarm.wrld.World;
 
 /**
- * Provides crop behavior.
+ * Encapsulates the state and operations required by crop within the game runtime.
  */
 @DataClass
 public class Crop extends Block {
@@ -21,12 +21,12 @@ public class Crop extends Block {
 
     /**
      * Creates a new {@code Crop} instance.
-     * @param x the x value
-     * @param y the y value
-     * @param z the z value
-     * @param type the type value
-     * @param block the block value
-     * @param season the season value
+     * @param x the {@code int} supplied as {@code x}
+     * @param y the {@code int} supplied as {@code y}
+     * @param z the {@code int} supplied as {@code z}
+     * @param type the {@link CropType} supplied as {@code type}
+     * @param block the {@link Block} supplied as {@code block}
+     * @param season the {@link Season} supplied as {@code season}
      */
     public Crop(int x, int y, int z,
                 CropType type, Block block, Season season) {
@@ -41,7 +41,7 @@ public class Crop extends Block {
 
     /**
      * Returns the crop type.
-     * @return the crop type
+     * @return the {@link CropType} representing the crop type
      */
     public CropType getCropType() {
         return type;
@@ -49,7 +49,7 @@ public class Crop extends Block {
 
     /**
      * Returns the block.
-     * @return the block
+     * @return the {@link Block} representing the block
      */
     public Block getBlock() {
         return block;
@@ -57,7 +57,7 @@ public class Crop extends Block {
 
     /**
      * Returns the season.
-     * @return the season
+     * @return the {@link Season} representing the season
      */
     public Season getSeason() {
         return season;
@@ -65,7 +65,7 @@ public class Crop extends Block {
 
     /**
      * Returns the value.
-     * @return the value
+     * @return {@code int}; the value
      */
     public int getValue() {
         return value;
@@ -73,7 +73,7 @@ public class Crop extends Block {
 
     /**
      * Returns the stage.
-     * @return the stage
+     * @return the {@link GrowthStage} representing the stage
      */
     public GrowthStage getStage() {
         return stage;
@@ -88,8 +88,8 @@ public class Crop extends Block {
     }
 
     /**
-     * Performs the was harvested operation.
-     * @return the was harvested result
+     * Calculates the value represented by was harvested from the current state.
+     * @return {@code boolean}; the was harvested result
      */
     public boolean wasHarvested() {
         return wasHarvested;
@@ -97,7 +97,7 @@ public class Crop extends Block {
 
     /**
      * Sets the harvested.
-     * @param wasHarvested the was harvested value
+     * @param wasHarvested the {@code boolean} supplied as {@code wasHarvested}
      */
     public void setHarvested(boolean wasHarvested) {
         this.wasHarvested = wasHarvested;
@@ -105,8 +105,8 @@ public class Crop extends Block {
 
     /**
      * Updates the current state.
-     * @param delta the delta value
-     * @param weather the weather value
+     * @param delta the {@code float} supplied as {@code delta}
+     * @param weather the {@link WeatherType} supplied as {@code weather}
      */
     public void update(float delta, WeatherType weather) {
         if (isReadyToHarvest() && !type.equals(CropType.SUGAR_CANE_CROP)) {
@@ -135,7 +135,7 @@ public class Crop extends Block {
     /**
      * Adds one harvestable segment to a stackable crop column, up to three blocks.
      * A segment is never created before the crop that triggered the growth is harvestable.
-     * @return the new segment, or {@code null} when the column cannot grow
+     * @return the {@link Crop} representing the new segment, or {@code null} when the column cannot grow
      */
     public Crop growStack() {
         if (!type.isStackable() || !isReadyToHarvest()) {

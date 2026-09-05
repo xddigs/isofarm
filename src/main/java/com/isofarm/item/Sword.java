@@ -5,13 +5,13 @@ import com.isofarm.data.Tier;
 import com.isofarm.data.ToolType;
 
 /**
- * Provides sword behavior.
+ * Encapsulates the state and operations required by sword within the game runtime.
  */
 public class Sword extends Tool {
 
     /**
      * Creates a new {@code Sword} instance.
-     * @param tier the tier value
+     * @param tier the {@link Tier} supplied as {@code tier}
      */
     public Sword(Tier tier) {
         super((byte) 0, ToolType.SWORD.getName(), 150, ToolType.SWORD,
@@ -26,8 +26,9 @@ public class Sword extends Tool {
     }
     
     /**
-     * Performs the copy operation.
-     * @return the copy result
+     * {@inheritDoc}
+     * Creates an independent copy that preserves the relevant state of this object.
+     * @return the {@link Item} representing the copy result
      */
     @Override
     public Item copy() {
@@ -35,9 +36,10 @@ public class Sword extends Tool {
     }
 
     /**
-     * Performs the enchanting operation.
-     * @param enchantment the enchantment value
-     * @return the enchanting result
+     * {@inheritDoc}
+     * Applies enchanting and updates the affected character or item state.
+     * @param enchantment the {@link Enchantment} supplied as {@code enchantment}
+     * @return {@code boolean}; the enchanting result
      */
     @Override
     public boolean enchanting(Enchantment enchantment) {

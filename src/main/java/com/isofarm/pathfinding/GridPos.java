@@ -3,7 +3,7 @@ package com.isofarm.pathfinding;
 import com.isofarm.data.DataClass;
 
 /**
- * Stores grid pos data.
+ * Immutable value object containing grid pos.
  */
 @DataClass
 public record GridPos(int x, int y, int z) {}

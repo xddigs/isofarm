@@ -3,7 +3,7 @@ package com.isofarm.data;
 import com.isofarm.item.Item;
 
 /**
- * Provides inventory slot behavior.
+ * Encapsulates the state and operations required by inventory slot within the game runtime.
  */
 @DataClass
 public class InventorySlot {
@@ -20,7 +20,7 @@ public class InventorySlot {
 
     /**
      * Creates a new {@code InventorySlot} instance.
-     * @param item the item value
+     * @param item the {@link Item} supplied as {@code item}
      */
     public InventorySlot(Item item) {
         this(item, 1);
@@ -28,8 +28,8 @@ public class InventorySlot {
 
     /**
      * Creates a new {@code InventorySlot} instance.
-     * @param item the item value
-     * @param amount the amount value
+     * @param item the {@link Item} supplied as {@code item}
+     * @param amount the {@code int} supplied as {@code amount}
      */
     public InventorySlot(Item item, int amount) {
         if (item == null || amount <= 0) {
@@ -44,7 +44,7 @@ public class InventorySlot {
 
     /**
      * Returns the item.
-     * @return the item
+     * @return the {@link Item} representing the item
      */
     public Item getItem() {
         return item;
@@ -52,7 +52,7 @@ public class InventorySlot {
 
     /**
      * Sets the item.
-     * @param item the item value
+     * @param item the {@link Item} supplied as {@code item}
      */
     public void setItem(Item item) {
         this.item = item;
@@ -66,7 +66,7 @@ public class InventorySlot {
 
     /**
      * Returns the amount.
-     * @return the amount
+     * @return {@code int}; the amount
      */
     public int getAmount() {
         return amount;
@@ -74,7 +74,7 @@ public class InventorySlot {
 
     /**
      * Sets the amount.
-     * @param amount the amount value
+     * @param amount the {@code int} supplied as {@code amount}
      */
     public void setAmount(int amount) {
         if (item == null || amount <= 0) {
@@ -87,7 +87,7 @@ public class InventorySlot {
 
     /**
      * Adds the amount.
-     * @param amount the amount value
+     * @param amount the {@code int} supplied as {@code amount}
      */
     public void addAmount(int amount) {
         setAmount(this.amount + amount);
