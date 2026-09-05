@@ -109,7 +109,7 @@ void main() {
     if (vIsWater > 0.5 && uIsWater) {
         bool isLava = vTexCoord.x > uLavaUVBounds.x && vTexCoord.x < uLavaUVBounds.z &&
                       vTexCoord.y > uLavaUVBounds.y && vTexCoord.y < uLavaUVBounds.w;
-        alpha = isLava ? 1.0 : 0.50;
+        alpha = isLava ? 1.0 : 0.80;
     }
 
     if (uIsSubmergedEntity) {
