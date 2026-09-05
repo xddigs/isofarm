@@ -5,7 +5,6 @@ in vec2 vTexCoord;
 in vec3 vFragPos;
 in vec4 vLightSpacePosition;
 in float vIsWater;
-in float vIsLava;
 
 out vec4 FragColor;
 
@@ -28,6 +27,7 @@ uniform bool uEnableShadows;
 uniform bool uIsSprite;
 uniform bool uIsSubmergedEntity;
 uniform bool uIsWater;
+uniform vec4 uLavaUVBounds;
 
 float calculateShadow(vec4 lightSpacePosition, vec3 normal) {
     vec3 projectionCoordinates = lightSpacePosition.xyz / lightSpacePosition.w;
@@ -97,7 +97,12 @@ void main() {
     vec3 finalColor = texColor.rgb * totalLight;
 
     if (vIsWater > 0.5 && uIsWater) {
-        alpha = vIsLava > 0.5 ? 1.0 : 0.50;
+        // Classify the fluid per fragment.  A vertex on the shared edge of two
+        // atlas regions can belong to both regions; interpolating that boolean
+        // splits a quad along its two triangles and makes half the water opaque.
+        bool isLava = vTexCoord.x > uLavaUVBounds.x && vTexCoord.x < uLavaUVBounds.z &&
+                      vTexCoord.y > uLavaUVBounds.y && vTexCoord.y < uLavaUVBounds.w;
+        alpha = isLava ? 1.0 : 0.50;
     }
 
     if (uIsSubmergedEntity) {

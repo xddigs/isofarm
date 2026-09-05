@@ -65,7 +65,7 @@ public class GameMaster {
     private float genDelta;
 
     /**
-     * Creates a new {@code GameMaster} instance.
+     * Creates a new {@link GameMaster} instance.
      */
     private GameMaster() {}
 
