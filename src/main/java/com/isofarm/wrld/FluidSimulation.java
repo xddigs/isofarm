@@ -193,17 +193,112 @@ public abstract class FluidSimulation {
         if (sources.contains(pos)) level = MAX_LEVEL;
 
         FluidPos below = new FluidPos(pos.x(), pos.y() - 1, pos.z());
+        if (solidify(pos, below)) return;
+        if (solidify(pos)) return;
+
         if (canContainFluid(below) && levelAt(below) < MAX_LEVEL) {
             setFluid(below, MAX_LEVEL);
             enqueue(below);
             return;
         }
+
         if (level <= MIN_LEVEL) return;
         byte spreadLevel = (byte) (level - 1);
         spread(new FluidPos(pos.x() + 1, pos.y(), pos.z()), spreadLevel);
         spread(new FluidPos(pos.x() - 1, pos.y(), pos.z()), spreadLevel);
         spread(new FluidPos(pos.x(), pos.y(), pos.z() + 1), spreadLevel);
         spread(new FluidPos(pos.x(), pos.y(), pos.z() - 1), spreadLevel);
+    }
+
+    /**
+     * Resolves a fluid collision in the downward flow direction. Falling lava
+     * meeting water creates stone in the water cell. Water falling onto lava
+     * cools the lava into obsidian when it is a source, or stone when flowing.
+     */
+    private boolean solidify(FluidPos pos, FluidPos below) {
+        if (below.y() < 0) return false;
+        byte belowBlock = World.wrld.getBlockTypeAt(below.x(), below.y(), below.z());
+
+        if (fluidType == BlockData.LAVA && belowBlock == BlockData.WATER.getId()) {
+            solidifyFluid(below, BlockData.STONE);
+            return true;
+        }
+
+        if (fluidType == BlockData.WATER && belowBlock == BlockData.LAVA.getId()) {
+            BlockData result = LavaSimulation.ls.isSource(below.x(), below.y(), below.z())
+                    ? BlockData.OBSIDIAN : BlockData.STONE;
+            solidifyFluid(below, result);
+            return true;
+        }
+
+        return false;
+    }
+
+    /** Resolves contact with the opposite fluid on the four horizontal sides. */
+    private boolean solidify(FluidPos pos) {
+        FluidPos[] neighbours = {
+                new FluidPos(pos.x() + 1, pos.y(), pos.z()),
+                new FluidPos(pos.x() - 1, pos.y(), pos.z()),
+                new FluidPos(pos.x(), pos.y(), pos.z() + 1),
+                new FluidPos(pos.x(), pos.y(), pos.z() - 1)
+        };
+
+        if (fluidType == BlockData.LAVA) {
+            for (FluidPos neighbour : neighbours) {
+                if (World.wrld.getBlockTypeAt(neighbour.x(), neighbour.y(), neighbour.z())
+                        == BlockData.WATER.getId()) {
+                    solidifyFluid(pos, sources.contains(pos)
+                            ? BlockData.OBSIDIAN : BlockData.STONE);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        if (fluidType == BlockData.WATER) {
+            boolean solidified = false;
+            for (FluidPos neighbour : neighbours) {
+                if (World.wrld.getBlockTypeAt(neighbour.x(), neighbour.y(), neighbour.z())
+                        != BlockData.LAVA.getId()) continue;
+                BlockData result = LavaSimulation.ls.isSource(
+                        neighbour.x(), neighbour.y(), neighbour.z())
+                        ? BlockData.OBSIDIAN : BlockData.STONE;
+                solidifyFluid(neighbour, result);
+                solidified = true;
+            }
+            return solidified;
+        }
+
+        return false;
+    }
+
+    /** Replaces a fluid cell with a solid and invalidates both simulations. */
+    private static void solidifyFluid(FluidPos pos, BlockData result) {
+        byte blockId = World.wrld.getBlockTypeAt(pos.x(), pos.y(), pos.z());
+        BlockData replacedFluid = BlockData.fromId(blockId);
+        FluidSimulation owner = forBlock(replacedFluid);
+        if (owner == null) return;
+
+        owner.sources.remove(pos);
+        owner.queue.remove(pos);
+        owner.queued.remove(pos);
+        World.wrld.setFluidLevelAt(pos.x(), pos.y(), pos.z(), (byte) 0);
+        World.wrld.setBlockTypeAt(pos.x(), pos.y(), pos.z(), result.getId());
+
+        owner.markChangedArea(pos);
+        FluidSimulation water = WaterSimulation.ws;
+        FluidSimulation lava = LavaSimulation.ls;
+        water.enqueueNeighbours(pos);
+        lava.enqueueNeighbours(pos);
+    }
+
+    /** Marks the changed cell and neighbouring chunks whose boundary faces may change. */
+    private void markChangedArea(FluidPos pos) {
+        mark(pos);
+        mark(new FluidPos(pos.x() + 1, pos.y(), pos.z()));
+        mark(new FluidPos(pos.x() - 1, pos.y(), pos.z()));
+        mark(new FluidPos(pos.x(), pos.y(), pos.z() + 1));
+        mark(new FluidPos(pos.x(), pos.y(), pos.z() - 1));
     }
 
     /** Renews a supported source when the fluid permits infinite sources. */
