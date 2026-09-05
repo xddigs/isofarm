@@ -29,6 +29,7 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class Intro {
     private static final float CLEAR_COLOR_ALPHA = 1.0f;
+    private static final long LOADING_FRAME_INTERVAL_NANOS = 100_000_000L;
     private static long window;
     private static UIManager uiManager;
     private UIProgressBar progressBar;
@@ -36,6 +37,7 @@ public class Intro {
     private UITextField nameField;
     private int framebufferWidth;
     private int framebufferHeight;
+    private long lastLoadingFrameNanos;
 
     private boolean fullscreen = false;
 
@@ -125,7 +127,7 @@ public class Intro {
             completedTasks[0]++;
             float overallProgress = ((float) completedTasks[0] / totalTasks) * 100.0f;
             progressBar.setValue(overallProgress);
-            renderLoadingFrame(Local.lang.t("engine.loading"));
+            renderLoadingProgress(Local.lang.t("engine.loading"));
         });
 
         int minZ = -r;
@@ -147,7 +149,7 @@ public class Intro {
             progressBar.setValue(overallProgress);
 
             String stepText = String.format(Local.lang.f("engine.generating_terrain", currentChunkX, currentChunkZ));
-            renderLoadingFrame(stepText);
+            renderLoadingProgress(stepText);
         }
 
         currentChunkX = -r;
@@ -168,7 +170,7 @@ public class Intro {
             progressBar.setValue(overallProgress);
 
             String stepText = String.format(Local.lang.f("engine.building_meshes", currentChunkX, currentChunkZ));
-            renderLoadingFrame(stepText);
+            renderLoadingProgress(stepText);
         }
 
         GameMaster.game.getChunkManager().setLastPlayerChunkX(0);
@@ -187,6 +189,23 @@ public class Intro {
         progressBar.hide();
         requestPlayerName();
         loop();
+    }
+
+    /**
+     * Refreshes loading progress without tying every loading operation to a
+     * buffer swap. Buffer swaps may block on VSync, so the loading UI is capped
+     * independently while resource generation continues at full speed.
+     * @param statusText the loading status to display
+     */
+    private void renderLoadingProgress(String statusText) {
+        long now = System.nanoTime();
+        if (lastLoadingFrameNanos != 0L
+                && now - lastLoadingFrameNanos < LOADING_FRAME_INTERVAL_NANOS) {
+            return;
+        }
+
+        renderLoadingFrame(statusText);
+        lastLoadingFrameNanos = System.nanoTime();
     }
 
     /**
