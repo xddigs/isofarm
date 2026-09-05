@@ -116,13 +116,13 @@ public class Game {
     public static void setWindowIcon(long windowHandle) {
         int[] sizes = {16, 24, 32, 48, 64, 128, 256};
         String[] resources = {
-                "/assets/gui/iconx32.png",
-                "/assets/gui/iconx32.png",
-                "/assets/gui/iconx32.png",
-                "/assets/gui/iconx64.png",
-                "/assets/gui/iconx64.png",
-                "/assets/gui/iconx128.png",
-                "/assets/gui/iconx256.png"
+                "/assets/ui/iconx32.png",
+                "/assets/ui/iconx32.png",
+                "/assets/ui/iconx32.png",
+                "/assets/ui/iconx64.png",
+                "/assets/ui/iconx64.png",
+                "/assets/ui/iconx128.png",
+                "/assets/ui/iconx256.png"
         };
         ByteBuffer[] pixels = new ByteBuffer[sizes.length];
         try (MemoryStack stack = MemoryStack.stackPush()) {

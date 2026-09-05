@@ -1,4 +1,4 @@
-![isofarm_logo](./src/main/resources/assets/gui/logo.png)
+![isofarm_logo](src/main/resources/assets/ui/logo.png)
 
 **Isofarm** is a 3D open-world survival micro-RPG simulation game built in Java using 
 LWJGL and OpenGL. Explore a voxel-based island generated through chunk management, cultivate 

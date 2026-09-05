@@ -176,10 +176,10 @@ public final class K {
         public static final String PLAYER_MODEL = "assets/models/player/steve.gltf";
 
         public static final String DESTROY_STAGES = "assets/textures/blocks/destroy.png";
-        public static final String HEARTS_SPRITESHEET = "assets/gui/hearts.png";
-        public static final String DEFAULT_BACKGROUND_GUI = "assets/gui/background_gui.png";
-        public static final String BOOK_ANIMATION = "assets/gui/book.png";
-        public static final String CURSOR_POINTER = "assets/gui/pointer.png";
+        public static final String HEARTS_SPRITESHEET = "assets/ui/hearts.png";
+        public static final String DEFAULT_BACKGROUND_GUI = "assets/ui/background_gui.png";
+        public static final String BOOK_ANIMATION = "assets/ui/book.png";
+        public static final String CURSOR_POINTER = "assets/ui/pointer.png";
     }
 
     /**
