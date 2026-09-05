@@ -1,9 +1,12 @@
 package com.isofarm.graphics;
 
 import com.isofarm.Game;
+import com.isofarm.entity.Player;
 import com.isofarm.gui.*;
 import com.isofarm.input.ControlAction;
 import com.isofarm.input.Controls;
+import com.isofarm.input.Keyboard;
+import com.isofarm.input.Mouse;
 import com.isofarm.service.BookService;
 import com.isofarm.service.TimeService;
 import com.isofarm.utils.K;
@@ -29,6 +32,8 @@ public class Intro {
     private static long window;
     private static UIManager uiManager;
     private UIProgressBar progressBar;
+    private UILabel namePrompt;
+    private UITextField nameField;
     private int framebufferWidth;
     private int framebufferHeight;
 
@@ -82,6 +87,19 @@ public class Intro {
         progressBar.show();
         uiManager.getRoot().show();
         uiManager.getRoot().addChild(progressBar);
+
+        namePrompt = new UILabel(0.0f, 0.0f, 360.0f, 30.0f,
+                Local.lang.t("intro.who_are_you"));
+        namePrompt.setHorizontalAlignment(UILabel.HorizontalAlignment.CENTER);
+        namePrompt.hide();
+        uiManager.getRoot().addChild(namePrompt);
+
+        nameField = new UITextField(0.0f, 0.0f, 360.0f, 40.0f);
+        nameField.setMaxLength(24);
+        nameField.hide();
+        uiManager.getRoot().addChild(nameField);
+
+        repositionIntroElements();
         uiManager.resize(framebufferWidth, framebufferHeight);
     }
 
@@ -167,7 +185,39 @@ public class Intro {
         renderLoadingFrame(Local.lang.t("engine.post_processing"));
 
         progressBar.hide();
+        requestPlayerName();
         loop();
+    }
+
+    /** Waits for the player to enter a non-empty name after loading. */
+    private void requestPlayerName() {
+        namePrompt.show();
+        nameField.show();
+        uiManager.setFocusedElement(nameField);
+        Keyboard.update();
+
+        while (!glfwWindowShouldClose(window)) {
+            glfwPollEvents();
+            renderLoadingFrame(null);
+
+            boolean submitted = Keyboard.isKeyPressed(Keyboard.KEY_ENTER)
+                    || Keyboard.isKeyPressed(Keyboard.KEY_KP_ENTER);
+            String playerName = nameField.getText().trim();
+            if (submitted && !playerName.isEmpty()) {
+                Player.plyr.setName(playerName);
+                ToastFactory.info(Local.lang.f("toast.open_inventory", playerName));
+                Mouse.update();
+                Keyboard.update();
+                break;
+            }
+
+            Mouse.update();
+            Keyboard.update();
+        }
+
+        uiManager.clearFocus();
+        namePrompt.hide();
+        nameField.hide();
     }
 
     /**
@@ -221,7 +271,7 @@ public class Intro {
                 GameMaster.game.onResize(width, height);
             }
 
-            repositionProgressBar();
+            repositionIntroElements();
         });
     }
 
@@ -238,6 +288,18 @@ public class Intro {
         float y = (framebufferHeight - barHeight) / 2.0f;
 
         progressBar.setPosition(x, y);
+    }
+
+    /** Keeps the loading and player-name controls centered after a resize. */
+    private void repositionIntroElements() {
+        repositionProgressBar();
+        if (namePrompt == null || nameField == null) return;
+
+        float fieldWidth = nameField.getWidth();
+        float centerX = (framebufferWidth - fieldWidth) / 2.0f;
+        float centerY = (framebufferHeight - nameField.getHeight()) / 2.0f;
+        namePrompt.setPosition(centerX, centerY - namePrompt.getHeight() - 12.0f);
+        nameField.setPosition(centerX, centerY);
     }
 
     /**
@@ -343,7 +405,7 @@ public class Intro {
             GameMaster.game.onResize(framebufferWidth, framebufferHeight);
         }
 
-        repositionProgressBar();
+        repositionIntroElements();
     }
 
     /**

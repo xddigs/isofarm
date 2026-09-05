@@ -91,6 +91,8 @@ public class TimeService {
      * @return the formatted time
      */
     public String getFormattedTime() {
+        String hour = String.format("%02d", TimeService.hour);
+        String minute = String.format("%02d", TimeService.minute);
         return Local.lang.f("time.formatted", year, currentSeason.getDisplayName(), day, hour, minute);
     }
 

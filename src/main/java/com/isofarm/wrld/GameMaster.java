@@ -142,12 +142,6 @@ public class GameMaster {
         commandService.setGameUIService(gameUIservice);
         gameUIservice.setShop(shop);
 
-        String[] defaultNames = {"Alex", "Avery", "Blake", "Casey", "Charlie", "Cameron", "Dakota",
-                "Drew", "Eden", "Emery", "Finley", "Harper", "Hayden", "Jamie", "Jordan", "Jesse",
-                "Kai", "Kendall", "Logan", "Morgan", "Parker", "Quinn", "Reese", "Riley", "River",
-                "Robin", "Rowan", "Sam", "Shawn", "Skyler", "Taylor", "Terry", "Tristan", "Wren"};
-        Player.plyr.setName(defaultNames[(int) (Math.random() * defaultNames.length)]);
-        ToastFactory.info(Local.lang.f("toast.open_inventory", Player.plyr.getName()));
     }
 
     /**
