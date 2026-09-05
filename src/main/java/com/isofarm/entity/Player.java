@@ -61,6 +61,7 @@ public class Player extends Character {
             animator.update(delta);
             return;
         }
+        if (gameplay.checkOceanDrowning()) return;
         manager.update(delta);
         animator.update(delta);
         gameplay.update(delta);

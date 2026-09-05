@@ -11,10 +11,10 @@ import java.util.Random;
  * a continuous land mass rooted in the seabed rather than a floating volume.
  */
 public final class IslandGenerator implements Generator {
-    public static final int SEA_LEVEL = 25;
-    public static final int OCEAN_DEPTH = 36;
+    public static final int OCEAN_DEPTH = 24;
+    public static final int SEA_LEVEL = OCEAN_DEPTH + 1;
 
-    private static final int OCEAN_FLOOR_Y = SEA_LEVEL - OCEAN_DEPTH;
+    private static final int OCEAN_FLOOR_Y = 1;
     private static final int CENTER_X = 0;
     private static final int CENTER_Z = 0;
     private static final float ISLAND_RADIUS = 18.0f;
@@ -34,6 +34,8 @@ public final class IslandGenerator implements Generator {
 
     /**
      * Creates a generator with a random world seed.
+     * @param world the {@link World} supplied as {@code world}
+     * @param waterSimulation the {@link FluidSimulation} argument; the fluid simulation used for generated ocean and lakes
      */
     public IslandGenerator(World world, FluidSimulation waterSimulation) {
         this(world, waterSimulation, new Random().nextLong());
@@ -41,6 +43,9 @@ public final class IslandGenerator implements Generator {
 
     /**
      * Creates a deterministic generator for the supplied seed.
+     * @param world the {@link World} supplied as {@code world}
+     * @param waterSimulation the {@link FluidSimulation} argument; the fluid simulation used for generated ocean and lakes
+     * @param seed the {@code long} supplied as {@code seed}
      */
     public IslandGenerator(World world, FluidSimulation waterSimulation, long seed) {
         this.world = world;
@@ -54,7 +59,10 @@ public final class IslandGenerator implements Generator {
     }
 
     /**
+     * {@inheritDoc}
      * Generates terrain and features owned by one chunk.
+     * @param chunkX the {@code int} supplied as {@code chunkX}
+     * @param chunkZ the {@code int} supplied as {@code chunkZ}
      */
     @Override
     public void generateChunk(int chunkX, int chunkZ) {
@@ -72,19 +80,32 @@ public final class IslandGenerator implements Generator {
         generateTreesInChunk(chunkX, chunkZ);
     }
 
+    /**
+     * Generates a single vertical column of blocks within a chunk.
+     * @param chunk the {@link Chunk} supplied as {@code chunk}
+     * @param localX the {@code int} supplied as {@code localX}
+     * @param localZ the {@code int} supplied as {@code localZ}
+     * @param worldX the {@code int} supplied as {@code worldX}
+     * @param worldZ the {@code int} supplied as {@code worldZ}
+     */
     private void generateColumn(Chunk chunk, int localX, int localZ, int worldX, int worldZ) {
         boolean island = isIsland(worldX, worldZ);
         boolean inLake = island && isInLake(worldX, worldZ);
         boolean inLava = island && isInLavaPool(worldX, worldZ);
+        boolean lakeBank = island && !inLake && isLakeBank(worldX, worldZ);
+        boolean lavaBank = island && !inLava && isLavaBank(worldX, worldZ);
 
         int topY = island ? terrainHeight(worldX, worldZ) : seabedHeight(worldX, worldZ);
         if (inLake) topY = lake.surfaceY - 2;
         if (inLava) topY = lavaPool.surfaceY - 1;
+        if (lakeBank) topY = Math.max(topY, lake.surfaceY);
+        if (lavaBank) topY = Math.max(topY, lavaPool.surfaceY);
 
         for (int y = OCEAN_FLOOR_Y; y <= topY; y++) {
             byte block;
             if (y == topY) {
-                block = islandSurfaceBlock(worldX, worldZ, inLake, inLava);
+                block = islandSurfaceBlock(worldX, worldZ,
+                        inLake || lakeBank, inLava || lavaBank);
             } else if (y >= topY - 3) {
                 block = BlockData.DIRT.getId();
             } else {
@@ -100,18 +121,30 @@ public final class IslandGenerator implements Generator {
             chunk.setBlock(localX, lavaPool.surfaceY, localZ, BlockData.LAVA.getId());
             chunk.setFluidLevel(localX, lavaPool.surfaceY, localZ, (byte) 8);
         } else if (!island) {
-            // The ocean begins as one perfectly level source layer. WaterSimulation
-            // progressively drops it onto the generated seabed.
             chunk.setBlock(localX, SEA_LEVEL, localZ, waterSimulation.getFluidType().getId());
             chunk.setFluidLevel(localX, SEA_LEVEL, localZ, (byte) 8);
         }
     }
 
+    /**
+     * Determines the surface block ID for island terrain based on proximity to fluids and coastlines.
+     * @param x the {@code int} argument; the world x value
+     * @param z the {@code int} argument; the world z value
+     * @param inLake the {@code boolean} argument; whether the block is inside or bordering a lake
+     * @param inLava the {@code boolean} argument; whether the block is inside or bordering a lava pool
+     * @return {@code byte}; the block ID corresponding to the surface material
+     */
     private byte islandSurfaceBlock(int x, int z, boolean inLake, boolean inLava) {
         if (inLake || inLava || isCoast(x, z)) return BlockData.SAND.getId();
         return BlockData.GRASS.getId();
     }
 
+    /**
+     * Calculates the island surface terrain height at a world position using distance attenuation and noise.
+     * @param x the {@code int} argument; the world x value
+     * @param z the {@code int} argument; the world z value
+     * @return {@code int}; the calculated terrain height
+     */
     private int terrainHeight(int x, int z) {
         float boundary = islandBoundary(x, z);
         float inland = Math.clamp(1.0f - distance(x, z, CENTER_X, CENTER_Z) / boundary,
@@ -122,7 +155,10 @@ public final class IslandGenerator implements Generator {
 
     /**
      * Raises the seabed in broad terraces near the island and lets it descend
-     * naturally to the configured 24-block ocean depth.
+     * naturally to the configured ocean depth.
+     * @param x the {@code int} argument; the world x value
+     * @param z the {@code int} argument; the world z value
+     * @return {@code int}; the seabed height at the position
      */
     private int seabedHeight(int x, int z) {
         float outside = Math.max(0.0f,
@@ -131,19 +167,42 @@ public final class IslandGenerator implements Generator {
         return Math.max(OCEAN_FLOOR_Y, SEA_LEVEL - descent);
     }
 
+    /**
+     * Checks whether a horizontal position falls within the island boundary.
+     * @param x the {@code int} argument; the world x value
+     * @param z the {@code int} argument; the world z value
+     * @return {@code true} if the position is on the island; otherwise {@code false}
+     */
     private boolean isIsland(int x, int z) {
         return distance(x, z, CENTER_X, CENTER_Z) <= islandBoundary(x, z);
     }
 
+    /**
+     * Calculates the noisy radial boundary of the island at a given position.
+     * @param x the {@code int} argument; the world x value
+     * @param z the {@code int} argument; the world z value
+     * @return {@code float}; the maximum island radius at this angle
+     */
     private float islandBoundary(int x, int z) {
         return ISLAND_RADIUS + noise(x, z, 5) * 1.6f + noise(x, z, 11) * 1.2f;
     }
 
+    /**
+     * Checks whether a horizontal position belongs to the coastal transition zone.
+     * @param x the {@code int} argument; the world x value
+     * @param z the {@code int} argument; the world z value
+     * @return {@code true} if the position is a coast block; otherwise {@code false}
+     */
     private boolean isCoast(int x, int z) {
         float edgeDistance = islandBoundary(x, z) - distance(x, z, CENTER_X, CENTER_Z);
         return edgeDistance <= COAST_WIDTH || terrainHeight(x, z) <= SEA_LEVEL + 1;
     }
 
+    /**
+     * Selects a valid interior position and height for the primary lake.
+     * @param random the {@link Random} supplied as {@code random}
+     * @return the {@link Lake} representing the configured lake instance
+     */
     private Lake chooseLake(Random random) {
         for (int attempt = 0; attempt < 100; attempt++) {
             int x = random.nextInt(19) - 9;
@@ -156,6 +215,11 @@ public final class IslandGenerator implements Generator {
         return new Lake(7, 0, Math.max(SEA_LEVEL + 1, terrainHeight(7, 0) - 1));
     }
 
+    /**
+     * Attempts to select a valid position for a lava pool away from spawn and the lake.
+     * @param random the {@link Random} supplied as {@code random}
+     * @return the {@link LavaPool} instance, or {@code null} if no valid placement was found
+     */
     private LavaPool chooseLavaPool(Random random) {
         for (int attempt = 0; attempt < 100; attempt++) {
             int x = random.nextInt(21) - 10;
@@ -170,6 +234,10 @@ public final class IslandGenerator implements Generator {
         return null;
     }
 
+    /**
+     * Selects valid positions for tree placement across the island.
+     * @param random the {@link Random} supplied as {@code random}
+     */
     private void chooseTrees(Random random) {
         int requested = 4 + random.nextInt(3);
         for (int attempt = 0; trees.size() < requested && attempt < 500; attempt++) {
@@ -184,6 +252,12 @@ public final class IslandGenerator implements Generator {
         }
     }
 
+    /**
+     * Checks whether a position is too close to an existing tree.
+     * @param x the {@code int} argument; the world x value
+     * @param z the {@code int} argument; the world z value
+     * @return {@code true} if another tree is within minimum clearance; otherwise {@code false}
+     */
     private boolean nearTree(int x, int z) {
         for (Tree tree : trees) {
             if (distance(x, z, tree.x, tree.z) < 5.0f) return true;
@@ -191,16 +265,61 @@ public final class IslandGenerator implements Generator {
         return false;
     }
 
+    /**
+     * Checks whether a horizontal position falls within the organic lake boundary.
+     * @param x the {@code int} argument; the world x value
+     * @param z the {@code int} argument; the world z value
+     * @return {@code true} if the position is inside the lake; otherwise {@code false}
+     */
     private boolean isInLake(int x, int z) {
         return distance(x, z, lake.x, lake.z)
                 <= LAKE_RADIUS + noise(x, z, 3) * 0.75f;
     }
 
+    /**
+     * Checks whether a horizontal position falls within the lava pool boundary.
+     * @param x the {@code int} argument; the world x value
+     * @param z the {@code int} argument; the world z value
+     * @return {@code true} if the position is inside the lava pool; otherwise {@code false}
+     */
     private boolean isInLavaPool(int x, int z) {
         return lavaPool != null && distance(x, z, lavaPool.x, lavaPool.z)
                 <= LAVA_RADIUS + noise(x, z, 2) * 0.3f;
     }
 
+    /**
+     * Checks whether a position immediately borders the lake.
+     * @param x the {@code int} argument; the world x value
+     * @param z the {@code int} argument; the world z value
+     * @return {@code true} if adjacent to a lake block; otherwise {@code false}
+     */
+    private boolean isLakeBank(int x, int z) {
+        if (isInLake(x, z)) return false;
+        return isInLake(x + 1, z) || isInLake(x - 1, z)
+                || isInLake(x, z + 1) || isInLake(x, z - 1);
+    }
+
+    /**
+     * Checks whether a position immediately borders the lava pool.
+     * @param x the {@code int} argument; the world x value
+     * @param z the {@code int} argument; the world z value
+     * @return {@code true} if adjacent to a lava block; otherwise {@code false}
+     */
+    private boolean isLavaBank(int x, int z) {
+        if (lavaPool == null || isInLavaPool(x, z)) return false;
+        return isInLavaPool(x + 1, z) || isInLavaPool(x - 1, z)
+                || isInLavaPool(x, z + 1) || isInLavaPool(x, z - 1);
+    }
+
+    /**
+     * Fills a vertical column within a chunk with fluid blocks and full fluid levels.
+     * @param chunk the {@link Chunk} supplied as {@code chunk}
+     * @param x the {@code int} argument; the local chunk x coordinate
+     * @param z the {@code int} argument; the local chunk z coordinate
+     * @param bottomY the {@code int} argument; the starting vertical level
+     * @param topY the {@code int} argument; the ending vertical level
+     * @param fluidId the {@code byte} argument; the block ID of the fluid
+     */
     private void fillFluidColumn(Chunk chunk, int x, int z, int bottomY, int topY, byte fluidId) {
         for (int y = bottomY; y <= topY; y++) {
             chunk.setBlock(x, y, z, fluidId);
@@ -208,6 +327,12 @@ public final class IslandGenerator implements Generator {
         }
     }
 
+    /**
+     * Registers generated water blocks in a chunk as fluid simulation sources.
+     * @param chunk the {@link Chunk} supplied as {@code chunk}
+     * @param chunkX the {@code int} supplied as {@code chunkX}
+     * @param chunkZ the {@code int} supplied as {@code chunkZ}
+     */
     private void registerWaterSources(Chunk chunk, int chunkX, int chunkZ) {
         for (int x = 0; x < Chunk.SIZE_X; x++) {
             for (int z = 0; z < Chunk.SIZE_Z; z++) {
@@ -223,11 +348,17 @@ public final class IslandGenerator implements Generator {
 
                 if (chunk.getBlock(x, SEA_LEVEL, z) == waterSimulation.getFluidType().getId()) {
                     waterSimulation.addSource(worldX, SEA_LEVEL, worldZ);
+                    chunk.setGeneratedOceanWater(x, SEA_LEVEL, z, true);
                 }
             }
         }
     }
 
+    /**
+     * Registers generated lava pool blocks in a chunk to the global lava simulation.
+     * @param chunkX the {@code int} supplied as {@code chunkX}
+     * @param chunkZ the {@code int} supplied as {@code chunkZ}
+     */
     private void registerLavaSources(int chunkX, int chunkZ) {
         if (lavaPool == null) return;
         for (int x = (int) Math.floor(lavaPool.x - LAVA_RADIUS - 1);
@@ -242,6 +373,11 @@ public final class IslandGenerator implements Generator {
         }
     }
 
+    /**
+     * Generates every selected tree owned by a chunk.
+     * @param chunkX the {@code int} supplied as {@code chunkX}
+     * @param chunkZ the {@code int} supplied as {@code chunkZ}
+     */
     private void generateTreesInChunk(int chunkX, int chunkZ) {
         for (Tree tree : trees) {
             if (Math.floorDiv(tree.x, Chunk.SIZE_X) != chunkX
@@ -250,6 +386,10 @@ public final class IslandGenerator implements Generator {
         }
     }
 
+    /**
+     * Builds the trunk and canopy blocks for a single tree instance in the world.
+     * @param tree the {@link Tree} argument; the tree descriptor to generate
+     */
     private void generateTree(Tree tree) {
         Random random = new Random(tree.seed);
         for (int y = 1; y <= tree.height; y++) {
@@ -272,6 +412,13 @@ public final class IslandGenerator implements Generator {
         }
     }
 
+    /**
+     * Returns deterministic value noise for a world position.
+     * @param x the {@code int} argument; the world x value
+     * @param z the {@code int} argument; the world z value
+     * @param scale the {@code int} argument; the noise cell scale
+     * @return {@code float}; a noise value between {@code -1} and {@code 1}
+     */
     private float noise(int x, int z, int scale) {
         long value = seed + (long) Math.floorDiv(x, scale) * 341873128712L
                 + (long) Math.floorDiv(z, scale) * 132897987541L;
@@ -281,13 +428,30 @@ public final class IslandGenerator implements Generator {
         return ((value & 0xffffL) / 32767.5f) - 1.0f;
     }
 
+    /**
+     * Returns the horizontal distance between two positions.
+     * @param x1 the {@code int} argument; the first x value
+     * @param z1 the {@code int} argument; the first z value
+     * @param x2 the {@code int} argument; the second x value
+     * @param z2 the {@code int} argument; the second z value
+     * @return {@code float}; the horizontal distance
+     */
     private static float distance(int x1, int z1, int x2, int z2) {
         return (float) Math.hypot(x1 - x2, z1 - z2);
     }
 
+    /**
+     * Stores the position and surface height of a generated lake.
+     */
     private record Lake(int x, int z, int surfaceY) {}
 
+    /**
+     * Stores the position and surface height of a generated lava pool.
+     */
     private record LavaPool(int x, int z, int surfaceY) {}
 
+    /**
+     * Stores the position, dimensions, and seed of a generated tree.
+     */
     private record Tree(int x, int surfaceY, int z, int height, long seed) {}
 }

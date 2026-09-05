@@ -367,6 +367,16 @@ public class World {
         return getFluidLevelAt(pos.x(), pos.y(), pos.z());
     }
 
+    /** Returns whether a position contains ocean water generated with the terrain. */
+    public boolean isGeneratedOceanWaterAt(int x, int y, int z) {
+        if (y < 0 || y >= Chunk.SIZE_Y) return false;
+        int chunkX = Math.floorDiv(x, Chunk.SIZE_X);
+        int chunkZ = Math.floorDiv(z, Chunk.SIZE_Z);
+        Chunk chunk = chunks.get(get2DKey(chunkX, chunkZ));
+        return chunk != null && chunk.isGeneratedOceanWater(
+                Math.floorMod(x, Chunk.SIZE_X), y, Math.floorMod(z, Chunk.SIZE_Z));
+    }
+
     /**
      * Sets the water level at.
      * @param x the {@code int} supplied as {@code x}

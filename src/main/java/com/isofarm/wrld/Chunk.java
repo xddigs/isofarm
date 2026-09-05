@@ -3,6 +3,8 @@ package com.isofarm.wrld;
 import com.isofarm.data.BlockData;
 import com.isofarm.data.DataClass;
 
+import java.util.BitSet;
+
 /**
  * Encapsulates the state and operations required by chunk within the game runtime.
  */
@@ -16,6 +18,7 @@ public class Chunk {
     private final int chunkZ;
     private final byte[] blocks;
     private final byte[] waterLevels;
+    private final BitSet generatedOceanWater;
 
     private int[] plantIndices;
     private boolean plantCacheDirty = true;
@@ -33,6 +36,7 @@ public class Chunk {
 
         this.blocks = new byte[size];
         this.waterLevels = new byte[size];
+        this.generatedOceanWater = new BitSet(size);
     }
 
     /**
@@ -65,6 +69,7 @@ public class Chunk {
         int index = getIndex(x, y, z);
         byte oldBlockId = blocks[index];
         blocks[index] = blockId;
+        generatedOceanWater.clear(index);
         boolean oldWasPlant = isPlant(oldBlockId);
         boolean newIsPlant = isPlant(blockId);
         if (oldWasPlant || newIsPlant) {
@@ -130,6 +135,18 @@ public class Chunk {
      */
     public void setFluidLevel(int x, int y, int z, byte fluidLevel) {
         setWaterLevel(x, y, z, fluidLevel);
+    }
+
+    /** Marks a cell as ocean water created by the terrain generator. */
+    public void setGeneratedOceanWater(int x, int y, int z, boolean generated) {
+        if (!isOutOfBounds(x, y, z)) {
+            generatedOceanWater.set(getIndex(x, y, z), generated);
+        }
+    }
+
+    /** Returns whether the cell is generated ocean rather than lake or placed water. */
+    public boolean isGeneratedOceanWater(int x, int y, int z) {
+        return !isOutOfBounds(x, y, z) && generatedOceanWater.get(getIndex(x, y, z));
     }
 
     /**

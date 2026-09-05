@@ -1,6 +1,7 @@
 package com.isofarm.entity.plyr;
 
 import com.isofarm.data.Gamemode;
+import com.isofarm.data.Cause;
 import com.isofarm.data.InventorySlot;
 import com.isofarm.data.Reputation;
 import com.isofarm.data.Seed;
@@ -82,6 +83,34 @@ public final class PlayerGameplay {
         player.setAnimTimer(player.getAnimTimer() + delta);
         player.heal(((0.5f + player.getLevel()) * delta) / getDifficultyRegen());
         checkDurability();
+    }
+
+    /** Kills the survival player as soon as their body enters generated ocean. */
+    public boolean checkOceanDrowning() {
+        if (player.getGamemode() != Gamemode.SURVIVAL) return false;
+        Vector3f position = player.getPosition();
+        Vector3f size = player.getDimensions();
+        int minX = (int) Math.floor(position.x - size.x * 0.5f + 0.001f);
+        int maxX = (int) Math.floor(position.x + size.x * 0.5f - 0.001f);
+        int minY = (int) Math.floor(position.y + 0.001f);
+        int maxY = (int) Math.floor(position.y + size.y - 0.001f);
+        int minZ = (int) Math.floor(position.z - size.z * 0.5f + 0.001f);
+        int maxZ = (int) Math.floor(position.z + size.z * 0.5f - 0.001f);
+
+        World world = World.wrld;
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    if (!world.isGeneratedOceanWaterAt(x, y, z)) continue;
+                    float waterTop = y + world.getFluidLevelAt(x, y, z) / 8.0f;
+                    if (position.y < waterTop) {
+                        player.kill(Cause.DROWN);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**

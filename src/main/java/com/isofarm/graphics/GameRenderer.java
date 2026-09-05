@@ -115,6 +115,7 @@ public class GameRenderer {
 
         defaultShader.setUniform("uIsWater", false);
         defaultShader.setUniform("uIsSubmergedEntity", false);
+        Player player = Player.plyr;
         chunkMeshes.forEach((chunk, chunkMesh) -> {
             if (chunkMesh != null && chunkMesh.solidMesh() != null && chunkMesh.solidMesh().getIndicesCount() > 0) {
                 float minX = chunk.getChunkX() * Chunk.SIZE_X;
@@ -130,6 +131,21 @@ public class GameRenderer {
                 }
             }
         });
+
+        // Draw the player before the translucent water. The depth buffer then
+        // keeps the dry part unobscured while water blends over submerged parts.
+        if (player != null) {
+            player.render(gameMaster, RenderPass.NORMAL);
+            defaultShader.bind();
+            if (blockAtlas != null) {
+                glActiveTexture(GL_TEXTURE0 + textureUnit);
+                blockAtlas.bind();
+                defaultShader.setUniform("uTexture", textureUnit);
+                defaultShader.setUniform("uUseTexture", true);
+                defaultShader.setUniform("uUseFaceAtlas", false);
+                defaultShader.setUniform("uUVBounds", new Vector4f(0.0f, 0.0f, 1.0f, 1.0f));
+            }
+        }
 
         defaultShader.setUniform("uIsWater", true);
         glEnable(GL_DEPTH_TEST);
@@ -162,7 +178,6 @@ public class GameRenderer {
         glDepthMask(true);
         glEnable(GL_DEPTH_TEST);
 
-        Player player = Player.plyr;
         BlockPos hoveredCell = HoveredCell.get(gameMaster);
 
         defaultShader.setUniform("uIsWater", false);
@@ -272,9 +287,9 @@ public class GameRenderer {
         glDepthFunc(GL_LESS);
         glDepthMask(true);
 
-        gameMaster.getEntities().forEach(entity ->
-                entity.render(gameMaster, RenderPass.NORMAL)
-        );
+        gameMaster.getEntities().stream()
+                .filter(entity -> entity != player)
+                .forEach(entity -> entity.render(gameMaster, RenderPass.NORMAL));
 
         glDepthFunc(GL_LESS);
         glDepthMask(true);

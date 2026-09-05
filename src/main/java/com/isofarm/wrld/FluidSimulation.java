@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class FluidSimulation {
     protected static final byte MAX_LEVEL = 8;
     protected static final byte MIN_LEVEL = 1;
-    private static final int MAX_UPDATES_PER_FRAME = 2048;
+    private static final int MAX_UPDATES_PER_FRAME = 1024;
 
     private final BlockData fluidType;
     private final float stepTime;
