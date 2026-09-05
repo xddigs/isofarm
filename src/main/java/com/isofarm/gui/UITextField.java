@@ -20,7 +20,7 @@ public class UITextField extends UIElement {
     private final Vector4f cursorColor = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
     private final Vector4f selectionColor = new Vector4f(0.2f, 0.4f, 0.8f, 0.8f);
     private final StringBuilder text = new StringBuilder();
-    private UIFont font = GUI.getNormalFont();
+    private UIFont font = Frontend.getNormalFont();
 
     private int cursorPosition;
     private int selectionAnchor;
@@ -83,10 +83,10 @@ public class UITextField extends UIElement {
     @Override
     public void render() {
         Vector4f background = isFocused() ? focusedColor : backgroundColor;
-        GUI.drawRect(getAbsoluteX(), getAbsoluteY(), getAbsoluteWidth(), getAbsoluteHeight(), new Vector4f(background.x, background.y, background.z, background.w * getWorldOpacity()));
+        Frontend.drawRect(getAbsoluteX(), getAbsoluteY(), getAbsoluteWidth(), getAbsoluteHeight(), new Vector4f(background.x, background.y, background.z, background.w * getWorldOpacity()));
 
         float textX = getAbsoluteX() + 8.0f - scrollOffset;
-        float textY = GUI.getCenteredTextY(text.toString(), font, getAbsoluteY(), getAbsoluteHeight());
+        float textY = Frontend.getCenteredTextY(text.toString(), font, getAbsoluteY(), getAbsoluteHeight());
 
         int selectionStart = getSelectionStart();
         int selectionEnd = getSelectionEnd();
@@ -94,21 +94,21 @@ public class UITextField extends UIElement {
         if (selectionStart != selectionEnd) {
             float selectionX = textX + getTextWidth(text.substring(0, selectionStart));
             float selectionWidth = getTextWidth(text.substring(selectionStart, selectionEnd));
-            GUI.drawRect(selectionX, getAbsoluteY() + 5.0f, selectionWidth, getAbsoluteHeight() - 10.0f, new Vector4f(selectionColor.x, selectionColor.y, selectionColor.z, selectionColor.w * getWorldOpacity()));
+            Frontend.drawRect(selectionX, getAbsoluteY() + 5.0f, selectionWidth, getAbsoluteHeight() - 10.0f, new Vector4f(selectionColor.x, selectionColor.y, selectionColor.z, selectionColor.w * getWorldOpacity()));
         }
 
-        GUI.pushScissor(getAbsoluteX() + 8.0f, getAbsoluteY(), getAbsoluteWidth() - 16.0f, getAbsoluteHeight());
-        GUI.drawString(text.toString(), textX, textY, font, new Vector4f(textColor.x, textColor.y, textColor.z, textColor.w * getWorldOpacity()));
+        Frontend.pushScissor(getAbsoluteX() + 8.0f, getAbsoluteY(), getAbsoluteWidth() - 16.0f, getAbsoluteHeight());
+        Frontend.drawString(text.toString(), textX, textY, font, new Vector4f(textColor.x, textColor.y, textColor.z, textColor.w * getWorldOpacity()));
 
         if (isFocused() && cursorVisible) {
             String beforeCursor = text.substring(0, cursorPosition);
             float cursorX = textX + getTextWidth(beforeCursor);
 
-            GUI.drawRect(cursorX, getAbsoluteY() + 6.0f, 1.0f, getAbsoluteHeight() - 12.0f,
+            Frontend.drawRect(cursorX, getAbsoluteY() + 6.0f, 1.0f, getAbsoluteHeight() - 12.0f,
                     new Vector4f(cursorColor.x, cursorColor.y, cursorColor.z, cursorColor.w * getWorldOpacity()));
         }
 
-        GUI.popScissor();
+        Frontend.popScissor();
         renderChildren();
     }
 

@@ -940,14 +940,14 @@ public class InventoryUI extends UIElement {
         float y = Mouse.getY() - iconSize / 2f;
         int frame = ResourceManager.getItemFrame(carriedItem);
 
-        GUI.drawSprite(sheet, frame, x, y,
+        Frontend.drawSprite(sheet, frame, x, y,
                 iconSize, iconSize, K.UI.UI_ITEM_TINT);
 
         if (carriedAmount > 1) {
             String amount = String.valueOf(carriedAmount);
 
-            GUI.drawString(amount, x + iconSize - 10, y + iconSize - 10,
-                    GUI.getNormalFont(), K.UI.UI_TEXT_COLOR);
+            Frontend.drawString(amount, x + iconSize - 10, y + iconSize - 10,
+                    Frontend.getNormalFont(), K.UI.UI_TEXT_COLOR);
         }
     }
 

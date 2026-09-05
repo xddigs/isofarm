@@ -235,17 +235,17 @@ public class Intro {
         glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         uiManager.update(0.016f);
-        GUI.begin(framebufferWidth, framebufferHeight);
+        Frontend.begin(framebufferWidth, framebufferHeight);
         uiManager.render();
 
         if (statusText != null) {
             float textX = (framebufferWidth - 500f) / 2.0f;
             float textY = ((framebufferHeight - 25f) / 2.0f) - 30.0f;
-            UIFont font = GUI.getNormalFont();
-            GUI.drawString(statusText, textX, textY, font, K.UI.UI_TEXT_COLOR);
+            UIFont font = Frontend.getNormalFont();
+            Frontend.drawString(statusText, textX, textY, font, K.UI.UI_TEXT_COLOR);
         }
 
-        GUI.end();
+        Frontend.end();
         glfwSwapBuffers(window);
         glFlush();
     }
@@ -266,7 +266,7 @@ public class Intro {
 
             if (uiManager != null) {
                 uiManager.resize(width, height);
-                GUI.resize(width, height);
+                Frontend.resize(width, height);
             }
 
             if (GameMaster.game != null) {
@@ -404,7 +404,7 @@ public class Intro {
             uiManager.resize(framebufferWidth, framebufferHeight);
         }
 
-        GUI.resize(framebufferWidth, framebufferHeight);
+        Frontend.resize(framebufferWidth, framebufferHeight);
         if (GameMaster.game != null) {
             GameMaster.game.onResize(framebufferWidth, framebufferHeight);
         }

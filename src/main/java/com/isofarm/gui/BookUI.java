@@ -171,8 +171,8 @@ public class BookUI extends UIElement {
      * @param book the {@link Book} supplied as {@code book}
      */
     private void updateBookLine(SpriteSheet animSheet, Book book) {
-        float screenWidth = GUI.getScreenWidth();
-        float screenHeight = GUI.getScreenHeight();
+        float screenWidth = Frontend.getScreenWidth();
+        float screenHeight = Frontend.getScreenHeight();
 
         float scale = 2.0f;
 
@@ -187,7 +187,7 @@ public class BookUI extends UIElement {
 
         float paddingX = K.UI.UI_BOOK_PADDING_X;
         float paddingTop = K.UI.UI_BOOK_PADDING_TOP;
-        float lineHeight = GUI.getNormalFont().getSize();
+        float lineHeight = Frontend.getNormalFont().getSize();
 
         setTooltipText(null);
         GameMaster.game.getGameUIService()
@@ -282,8 +282,8 @@ public class BookUI extends UIElement {
      */
     public void render(Book book, float delta, SpriteSheet animSheet) {
         if (book == null || animSheet == null) return;
-        float screenWidth = GUI.getScreenWidth();
-        float screenHeight = GUI.getScreenHeight();
+        float screenWidth = Frontend.getScreenWidth();
+        float screenHeight = Frontend.getScreenHeight();
 
         float scale = 2.0f;
         float bookWidth = animSheet.getFrameWidth() * scale;
@@ -297,7 +297,7 @@ public class BookUI extends UIElement {
         float y = lerp(screenHeight, centerY, alpha);
 
         Vector4f color = new Vector4f(0.8706f, 0.8196f, 0.6745f, 1.0f);
-        GUI.drawRect(centerX, y + BASE_CONTENT_HEIGHT_OFFSET + BASE_CONTENT_HEIGHT_OFFSET/2f, bookWidth, bookHeight + BASE_CONTENT_HEIGHT_OFFSET, color);
+        Frontend.drawRect(centerX, y + BASE_CONTENT_HEIGHT_OFFSET + BASE_CONTENT_HEIGHT_OFFSET/2f, bookWidth, bookHeight + BASE_CONTENT_HEIGHT_OFFSET, color);
 
         if (isFlippingPage) {
             pageFlipTimer += delta;
@@ -305,7 +305,7 @@ public class BookUI extends UIElement {
             float animFrameProgress = isFlippingNext ? progress : (1.0f - progress);
             int currentFrame = (int) (animFrameProgress * (TOTAL_ANIM_FRAMES - 1));
             renderFlippingSpread(book, centerX, y, bookWidth, bookHeight, alpha, progress);
-            GUI.drawSprite(animSheet, currentFrame, centerX, y, bookWidth, bookHeight, new Vector4f(1.0f));
+            Frontend.drawSprite(animSheet, currentFrame, centerX, y, bookWidth, bookHeight, new Vector4f(1.0f));
 
             if (progress >= 1.0f) {
                 isFlippingPage = false;
@@ -313,7 +313,7 @@ public class BookUI extends UIElement {
 
         } else {
             renderSpread(book, centerX, y, animSheet, scale, alpha);
-            GUI.drawSprite(animSheet, 0, centerX, y, bookWidth, bookHeight, new Vector4f(1.0f));
+            Frontend.drawSprite(animSheet, 0, centerX, y, bookWidth, bookHeight, new Vector4f(1.0f));
         }
         renderChildren();
     }
@@ -386,9 +386,9 @@ public class BookUI extends UIElement {
                                        float pageWidth, float pageHeight, float alpha,
                                        float spineX, float scaleX, float curve) {
         if (pageIndex < 0 || pageIndex >= book.getPages().size()) return;
-        GUI.beginPageTransform(spineX, scaleX, pageWidth, curve);
+        Frontend.beginPageTransform(spineX, scaleX, pageWidth, curve);
         renderPage(book.getPage(pageIndex), pageX, pageY, pageWidth, pageHeight, alpha);
-        GUI.endPageTransform();
+        Frontend.endPageTransform();
     }
 
     /**
@@ -484,7 +484,7 @@ public class BookUI extends UIElement {
 
         float textX = pageX + K.UI.UI_BOOK_PADDING_X;
         float textY = pageY + K.UI.UI_BOOK_PADDING_TOP;
-        float lineHeight = GUI.getNormalFont().getSize();
+        float lineHeight = Frontend.getNormalFont().getSize();
         for (BookLine bookLine : page.getLines()) {
             String renderText = bookLine.getText();
             if (renderText.startsWith("-")) {
@@ -497,12 +497,12 @@ public class BookUI extends UIElement {
 
             if (isHovered) {
                 float cursorOffset = 24.0f;
-                GUI.drawNormalString(">", textX - cursorOffset, textY, finalColor);
+                Frontend.drawNormalString(">", textX - cursorOffset, textY, finalColor);
             }
             if (renderText.startsWith("**")) {
                 renderText = renderText.replace("**", "");
             }
-            GUI.drawNormalString(renderText, textX, textY, finalColor);
+            Frontend.drawNormalString(renderText, textX, textY, finalColor);
             textY += lineHeight;
         }
     }
@@ -534,7 +534,7 @@ public class BookUI extends UIElement {
                 renderIconOutline(spriteSheet, frame, iconX, iconY, alpha);
             }
 
-            GUI.drawSprite(spriteSheet, frame, iconX, iconY,
+            Frontend.drawSprite(spriteSheet, frame, iconX, iconY,
                     GRID_ICON_SIZE, GRID_ICON_SIZE, new Vector4f(1.0f, 1.0f, 1.0f, alpha));
         }
     }
@@ -548,7 +548,7 @@ public class BookUI extends UIElement {
         for (int offsetX = -1; offsetX <= 1; offsetX++) {
             for (int offsetY = -1; offsetY <= 1; offsetY++) {
                 if (offsetX == 0 && offsetY == 0) continue;
-                GUI.drawSpriteSilhouette(spriteSheet, frame,
+                Frontend.drawSpriteSilhouette(spriteSheet, frame,
                         x + offsetX * GRID_OUTLINE_SIZE,
                         y + offsetY * GRID_OUTLINE_SIZE,
                         GRID_ICON_SIZE, GRID_ICON_SIZE, white);
@@ -588,8 +588,8 @@ public class BookUI extends UIElement {
             return false;
         }
 
-        UIFont font = GUI.getNormalFont();
-        float width = GUI.getStringWidth(cleanText, font);
+        UIFont font = Frontend.getNormalFont();
+        float width = Frontend.getStringWidth(cleanText, font);
         float minY = Float.MAX_VALUE;
         float maxY = -Float.MAX_VALUE;
 

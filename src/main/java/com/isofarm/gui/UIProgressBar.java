@@ -51,7 +51,7 @@ public class UIProgressBar extends UIElement {
         float absW = getAbsoluteWidth();
         float absH = getAbsoluteHeight();
 
-        GUI.drawRect(absX, absY, absW, absH, backgroundColor,
+        Frontend.drawRect(absX, absY, absW, absH, backgroundColor,
                 cornerRadius, borderColor, borderWidth);
 
         float fillPercentage = Math.clamp(value / maxValue, 0.0f, 1.0f);
@@ -63,17 +63,17 @@ public class UIProgressBar extends UIElement {
             float fillH = absH - (borderWidth * 2.0f);
             
             float fillRadius = Math.max(0.0f, cornerRadius - borderWidth);
-            GUI.drawRect(fillX, fillY, fillWidth, fillH, fillColor, fillRadius);
+            Frontend.drawRect(fillX, fillY, fillWidth, fillH, fillColor, fillRadius);
         }
 
         if (showText) {
             String text = (int) value + " / " + (int) maxValue;
-            UIFont font = GUI.getSmallBoldFont();
-            float textW = GUI.getStringWidth(text, font);
+            UIFont font = Frontend.getSmallBoldFont();
+            float textW = Frontend.getStringWidth(text, font);
             float textX = absX + (absW - textW) * 0.5f;
-            float textY = GUI.getCenteredTextY(text, font, absY, absH);
+            float textY = Frontend.getCenteredTextY(text, font, absY, absH);
 
-            GUI.drawString(text, textX, textY, font, textColor);
+            Frontend.drawString(text, textX, textY, font, textColor);
         }
     }
 

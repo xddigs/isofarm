@@ -348,7 +348,7 @@ public class GameUIService implements Service<GameMaster> {
             renderDeathScreen(gameMaster);
             return;
         }
-        GUI.begin(windowWidth, windowHeight);
+        Frontend.begin(windowWidth, windowHeight);
 
         SpriteSheet bookSheet = ResourceManager.rem.getBookAnimationSheet();
         if (BookService.bs.isOpen()) {
@@ -369,10 +369,10 @@ public class GameUIService implements Service<GameMaster> {
         renderChatHistory();
 
         if (!gameMaster.isInventoryOpen() && !BookUI.bui.isOpen()) {
-            GUI.drawCursor(gameMaster);
+            Frontend.drawCursor(gameMaster);
         }
 
-        GUI.end();
+        Frontend.end();
         glEnable(GL_DEPTH_TEST);
     }
 
@@ -412,11 +412,11 @@ public class GameUIService implements Service<GameMaster> {
         ResourceManager.rem.getScreenQuadMesh().render();
         blurShader.unbind();
 
-        GUI.begin(windowWidth, windowHeight);
-        GUI.drawRect(0.0f, 0.0f, windowWidth, windowHeight,
+        Frontend.begin(windowWidth, windowHeight);
+        Frontend.drawRect(0.0f, 0.0f, windowWidth, windowHeight,
                 new Vector4f(0.65f, 0.0f, 0.0f, deathOverlayAlpha));
         youDied.render();
-        GUI.end();
+        Frontend.end();
         glEnable(GL_DEPTH_TEST);
     }
 
@@ -450,10 +450,10 @@ public class GameUIService implements Service<GameMaster> {
             int frame = (heartHp == 2) ? 0 : (heartHp == 1 ? 1 : 2);
             Vector4f color = new Vector4f(1.0f);
 
-            GUI.drawSprite(heartsSheet, frame, posX, posY, heartSize, heartSize, color);
+            Frontend.drawSprite(heartsSheet, frame, posX, posY, heartSize, heartSize, color);
             if (flashTimer > 0.0f) {
                 int overlayFrame = 3;
-                GUI.drawSprite(heartsSheet, overlayFrame, posX, posY, heartSize, heartSize, color);
+                Frontend.drawSprite(heartsSheet, overlayFrame, posX, posY, heartSize, heartSize, color);
             }
         }
     }
@@ -485,7 +485,7 @@ public class GameUIService implements Service<GameMaster> {
         );
 
         for (int i = chatHistory.size() - 1; i >= start; i--) {
-            GUI.drawNormalString(chatHistory.get(i), x, y, color);
+            Frontend.drawNormalString(chatHistory.get(i), x, y, color);
             y -= K.UI.CHAT_HISTORY_LINE_HEIGHT;
         }
     }
@@ -514,9 +514,9 @@ public class GameUIService implements Service<GameMaster> {
 
         float alpha = Math.min(1.0f, hotbarLabelTimer * 2.0f);
         Vector4f color = new Vector4f(1.0f, 1.0f, 1.0f, alpha);
-        float x = windowWidth / 2.0f - GUI.getStringWidth(hotbarLabel, GUI.getNormalFont()) / 2.0f;
+        float x = windowWidth / 2.0f - Frontend.getStringWidth(hotbarLabel, Frontend.getNormalFont()) / 2.0f;
         float y = hotbarUI.getY() - K.UI.HOTBAR_LABEL_OFFSET_Y * Settings.getScale();
-        GUI.drawNormalString(hotbarLabel, x, y, color);
+        Frontend.drawNormalString(hotbarLabel, x, y, color);
     }
 
     /**
@@ -601,8 +601,8 @@ public class GameUIService implements Service<GameMaster> {
      * @param toast the {@link Toast} supplied as {@code toast}
      */
     private void renderToast(Toast toast) {
-        UIFont prefixFont = GUI.getNormalBoldFont();
-        UIFont messageFont = GUI.getNormalFont();
+        UIFont prefixFont = Frontend.getNormalBoldFont();
+        UIFont messageFont = Frontend.getNormalFont();
 
         String prefix = getToastPrefix(toast.getType());
         String message = toast.getMessage();
@@ -612,8 +612,8 @@ public class GameUIService implements Service<GameMaster> {
         float gap = Settings.scale(K.UI.TOAST_GAP_X);
         float accentWidth = Settings.scale(K.UI.TOAST_ACCENT_WIDTH);
 
-        float prefixWidth = GUI.getStringWidth(prefix, prefixFont);
-        float messageWidth = GUI.getStringWidth(message, messageFont);
+        float prefixWidth = Frontend.getStringWidth(prefix, prefixFont);
+        float messageWidth = Frontend.getStringWidth(message, messageFont);
 
         float x = toast.getX();
         float y = toast.getY();
@@ -629,7 +629,7 @@ public class GameUIService implements Service<GameMaster> {
         float availableTextWidth = Math.max(Settings.scale(100.0f),
                 width - paddingLeft - prefixWidth - gap - paddingRight);
 
-        String[] lines = GUI.wrapText(message, availableTextWidth, messageFont);
+        String[] lines = Frontend.wrapText(message, availableTextWidth, messageFont);
 
         float fontHeight = messageFont.getSize();
         float lineHeight = fontHeight * 1.2f;
@@ -644,17 +644,17 @@ public class GameUIService implements Service<GameMaster> {
         Vector4f accentColor = new Vector4f(acc[0], acc[1], acc[2], acc[3]);
 
         float cornerRadius = Settings.getScaledCornerRadius();
-        GUI.drawRect(x, y, width, height, bgColor, cornerRadius);
-        GUI.drawRect(x, y, accentWidth, height, accentColor, cornerRadius);
+        Frontend.drawRect(x, y, width, height, bgColor, cornerRadius);
+        Frontend.drawRect(x, y, accentWidth, height, accentColor, cornerRadius);
 
         float messageX = x + paddingLeft + prefixWidth + gap;
         float startY = y + (height - textBlockHeight) * 0.5f + (fontHeight * 0.7f);
         float prefixFontHeight = prefixFont.getSize();
         float prefixY = y + (height - prefixFontHeight) * 0.5f + (prefixFontHeight * 0.7f);
-        GUI.drawString(prefix, x + paddingLeft, prefixY, prefixFont, accentColor, 1.0f);
+        Frontend.drawString(prefix, x + paddingLeft, prefixY, prefixFont, accentColor, 1.0f);
 
         for (int i = 0; i < lines.length; i++) {
-            GUI.drawString(lines[i], messageX, startY + (i * lineHeight), messageFont, K.UI.UI_TEXT_COLOR, 1.0f);
+            Frontend.drawString(lines[i], messageX, startY + (i * lineHeight), messageFont, K.UI.UI_TEXT_COLOR, 1.0f);
         }
     }
 

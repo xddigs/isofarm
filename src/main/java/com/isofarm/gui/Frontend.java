@@ -24,7 +24,7 @@ import static org.lwjgl.opengl.GL13.glActiveTexture;
  */
 @Utils
 @GodObject
-public class GUI {
+public class Frontend {
     private static final Shader shader = new Shader(K.Paths.UI_VERTEX_SHADER, K.Paths.UI_FRAG_SHADER);
     private static final Mesh mesh = Mesh.createQuad();
     private static final Matrix4f projection = new Matrix4f();
@@ -50,7 +50,7 @@ public class GUI {
     /**
      * Creates a new {@code GUI} instance.
      */
-    private GUI() {
+    private Frontend() {
     }
 
     /**
@@ -66,8 +66,8 @@ public class GUI {
         glDepthMask(false);
         glActiveTexture(GL_TEXTURE0);
         shader.bind();
-        GUI.screenWidth = (int) screenWidth;
-        GUI.screenHeight = (int) screenHeight;
+        Frontend.screenWidth = (int) screenWidth;
+        Frontend.screenHeight = (int) screenHeight;
         updateProjection();
         shader.setUniform("uProjection", projection);
         shader.setUniform("uTexture", 0);
@@ -726,7 +726,7 @@ public class GUI {
      * @param wasCursorIconDrawn the new value of the {@code wasCursorIconDrawn} field
      */
     public static void setWasCursorIconDrawn(boolean wasCursorIconDrawn) {
-        GUI.wasCursorIconDrawn = wasCursorIconDrawn;
+        Frontend.wasCursorIconDrawn = wasCursorIconDrawn;
     }
 
     /**

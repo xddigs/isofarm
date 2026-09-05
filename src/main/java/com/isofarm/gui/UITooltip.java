@@ -32,16 +32,16 @@ public class UITooltip extends UIElement {
     @Override
     public void render() {
         if (!isActuallyVisible() || text == null || text.isBlank()) return;
-        GUI.drawRect(getAbsoluteX(), getAbsoluteY(), getAbsoluteWidth(), getAbsoluteHeight(),
+        Frontend.drawRect(getAbsoluteX(), getAbsoluteY(), getAbsoluteWidth(), getAbsoluteHeight(),
                 K.UI.UI_BACKGROUND_COLOR, Settings.getScaledCornerRadius(),
                 K.UI.UI_BORDER_COLOR, Settings.getScaledThickness());
 
-        UIFont font = GUI.getNormalFont();
+        UIFont font = Frontend.getNormalFont();
         float lineHeight = font.getSize();
         String[] lines = text.split("\n", -1);
         float textY = getAbsoluteY() + padding * 2.2f;
         for (String line : lines) {
-            GUI.drawString(line, getAbsoluteX() + padding, textY, font, K.UI.UI_TEXT_COLOR);
+            Frontend.drawString(line, getAbsoluteX() + padding, textY, font, K.UI.UI_TEXT_COLOR);
             textY += lineHeight;
         }
 
@@ -71,13 +71,13 @@ public class UITooltip extends UIElement {
      */
     public UITooltip text(String text) {
         setText(text);
-        UIFont font = GUI.getNormalFont();
+        UIFont font = Frontend.getNormalFont();
         String[] lines = this.text.split("\n", -1);
         float maxWidth = 0.0f;
         for (String line : lines) {
             maxWidth = Math.max(
                     maxWidth,
-                    GUI.getStringWidth(line, font)
+                    Frontend.getStringWidth(line, font)
             );
         }
 

@@ -50,7 +50,7 @@ public class UIManager {
             tooltip.show();
         } else {
             tooltip.hide();
-            GUI.setWasCursorIconDrawn(false);
+            Frontend.setWasCursorIconDrawn(false);
         }
 
         for (int button = Mouse.BUTTON_1;
@@ -120,7 +120,7 @@ public class UIManager {
      * Renders this object in the requested render pass.
      */
     public void render() {
-        GUI.render(root);
+        Frontend.render(root);
     }
 
     /**
@@ -210,6 +210,6 @@ public class UIManager {
      */
     public void resize(float width, float height) {
         root.setSize(width, height);
-        GUI.resize((int) width, (int) height);
+        Frontend.resize((int) width, (int) height);
     }
 }

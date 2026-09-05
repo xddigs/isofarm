@@ -5,7 +5,7 @@ import com.isofarm.craft.RecipeRegistry;
 import com.isofarm.data.*;
 import com.isofarm.entity.*;
 import com.isofarm.graphics.*;
-import com.isofarm.gui.GUI;
+import com.isofarm.gui.Frontend;
 import com.isofarm.gui.GameUIService;
 import com.isofarm.gui.UIManager;
 import com.isofarm.input.*;
@@ -536,7 +536,7 @@ public class GameMaster {
         ResourceManager.rem.dispose();
         itemRenderer.dispose();
 
-        GUI.dispose();
+        Frontend.dispose();
         sceneFbo.dispose();
         blurFbo.dispose();
 
@@ -590,7 +590,7 @@ public class GameMaster {
 
         if (uiManager != null) {
             uiManager.resize(newWidth, newHeight);
-            GUI.resize(newWidth, newHeight);
+            Frontend.resize(newWidth, newHeight);
         }
 
         if (gameUIservice != null) {

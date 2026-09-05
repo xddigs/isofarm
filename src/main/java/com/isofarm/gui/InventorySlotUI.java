@@ -22,7 +22,7 @@ public class InventorySlotUI extends UIElement {
     private InventorySlot backpackSlot;
     private SpriteSheet spriteSheet;
     private int spriteFrame;
-    private UIFont countFont = GUI.getNormalFont();
+    private UIFont countFont = Frontend.getNormalFont();
     private boolean selected;
     private boolean hovered;
     private boolean selectedOutline = false;
@@ -96,16 +96,16 @@ public class InventorySlotUI extends UIElement {
         float height = getAbsoluteHeight();
 
         Vector4f background = selected ? K.UI.UI_SELECTED_COLOR : hovered ? K.UI.UI_HOVERED_COLOR : K.UI.UI_BACKGROUND_COLOR_SLOT;
-        GUI.drawRect(x, y, width, height, new Vector4f(background.x, background.y, background.z, background.w * getWorldOpacity()));
+        Frontend.drawRect(x, y, width, height, new Vector4f(background.x, background.y, background.z, background.w * getWorldOpacity()));
 
         Vector4f border = K.UI.UI_SELECTED_BORDER_COLOR;
         Vector4f borderTint = new Vector4f(border.x, border.y, border.z, border.w * getWorldOpacity());
 
         float borderSize = Settings.getScaledBorder();
-        GUI.drawRect(x, y, width, borderSize, borderTint);
-        GUI.drawRect(x, y + height - borderSize, width, borderSize, borderTint);
-        GUI.drawRect(x, y, borderSize, height, borderTint);
-        GUI.drawRect(x + width - borderSize, y, borderSize, height, borderTint);
+        Frontend.drawRect(x, y, width, borderSize, borderTint);
+        Frontend.drawRect(x, y + height - borderSize, width, borderSize, borderTint);
+        Frontend.drawRect(x, y, borderSize, height, borderTint);
+        Frontend.drawRect(x + width - borderSize, y, borderSize, height, borderTint);
 
         if (!isEmpty() && spriteSheet != null) {
             renderItem();
@@ -158,7 +158,7 @@ public class InventorySlotUI extends UIElement {
         float x = Math.round(getAbsoluteX() + (getAbsoluteWidth() - renderWidth) * 0.5f);
         float y = Math.round(getAbsoluteY() + (getAbsoluteHeight() - renderHeight) * 0.5f);
 
-        GUI.drawSprite(spriteSheet, spriteFrame, x, y, renderWidth, renderHeight,
+        Frontend.drawSprite(spriteSheet, spriteFrame, x, y, renderWidth, renderHeight,
                 new Vector4f(K.UI.UI_ITEM_TINT.x, K.UI.UI_ITEM_TINT.y, K.UI.UI_ITEM_TINT.z,
                         K.UI.UI_ITEM_TINT.w * getWorldOpacity()));
 
@@ -185,7 +185,7 @@ public class InventorySlotUI extends UIElement {
         float barWidth = getAbsoluteWidth() - padding * 2.0f;
         float x = getAbsoluteX() + padding;
         float y = getAbsoluteY() + getAbsoluteHeight() - barHeight - padding;
-        GUI.drawRect(x, y, barWidth, barHeight,
+        Frontend.drawRect(x, y, barWidth, barHeight,
                 new Vector4f(0.0f, 0.0f, 0.0f, getWorldOpacity()));
 
         if (progress <= 0.0f) return;
@@ -204,7 +204,7 @@ public class InventorySlotUI extends UIElement {
             green = t * 0.5f;
         }
 
-        GUI.drawRect(x, y, barWidth * progress, barHeight,
+        Frontend.drawRect(x, y, barWidth * progress, barHeight,
                 new Vector4f(red, green, blue, getWorldOpacity()));
     }
 
@@ -228,10 +228,10 @@ public class InventorySlotUI extends UIElement {
         float x = getAbsoluteX() + getAbsoluteWidth() - textWidth - paddingX;
         float y = getAbsoluteY() + getAbsoluteHeight() - textHeight - paddingY;
 
-        GUI.drawString(amount, x + Settings.scale(0.5f), y + textHeight, countFont,
+        Frontend.drawString(amount, x + Settings.scale(0.5f), y + textHeight, countFont,
                 new Vector4f(0.0f, 0.0f, 0.0f, getWorldOpacity()));
 
-        GUI.drawString(amount, x, y + textHeight, countFont, new Vector4f(K.UI.UI_TEXT_COLOR.x,
+        Frontend.drawString(amount, x, y + textHeight, countFont, new Vector4f(K.UI.UI_TEXT_COLOR.x,
                 K.UI.UI_TEXT_COLOR.y, K.UI.UI_TEXT_COLOR.z, K.UI.UI_TEXT_COLOR.w * getWorldOpacity()));
     }
 

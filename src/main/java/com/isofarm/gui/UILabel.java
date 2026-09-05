@@ -25,7 +25,7 @@ public class UILabel extends UIElement {
     public UILabel(float x, float y, float width, float height, String text) {
         super(x, y, width, height);
         this.text = text;
-        this.font = GUI.getNormalFont();
+        this.font = Frontend.getNormalFont();
     }
 
     /**
@@ -54,7 +54,7 @@ public class UILabel extends UIElement {
             case BOTTOM -> drawY += getAbsoluteHeight() - textHeight;
         }
 
-        GUI.drawString(text, drawX, drawY, font, new Vector4f(color.x,
+        Frontend.drawString(text, drawX, drawY, font, new Vector4f(color.x,
                 color.y, color.z, color.w * getWorldOpacity()));
     }
 

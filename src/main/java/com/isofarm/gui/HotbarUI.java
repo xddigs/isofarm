@@ -539,7 +539,7 @@ public class HotbarUI extends UIElement {
         float x = slot.getAbsoluteX() - thickness;
         float y = slot.getAbsoluteY() - thickness;
         float size = slot.getAbsoluteWidth() + thickness * 2.0f;
-        GUI.drawBorder(x, y, size, size, K.UI.UI_HOTBAR_SELECTED_COLOR, thickness);
+        Frontend.drawBorder(x, y, size, size, K.UI.UI_HOTBAR_SELECTED_COLOR, thickness);
     }
 
     /**
