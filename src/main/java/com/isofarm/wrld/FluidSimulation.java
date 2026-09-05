@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class FluidSimulation {
     protected static final byte MAX_LEVEL = 8;
     protected static final byte MIN_LEVEL = 1;
+    private static final int MAX_UPDATES_PER_FRAME = 2048;
 
     private final BlockData fluidType;
     private final float stepTime;
@@ -172,15 +173,17 @@ public abstract class FluidSimulation {
      * @param delta the {@code float} argument; the elapsed time in seconds
      */
     public final void update(float delta) {
-        timer += delta;
-        while (timer >= stepTime) {
+        timer = Math.min(timer + delta, stepTime * 2.0f);
+        int remainingBudget = MAX_UPDATES_PER_FRAME;
+        while (timer >= stepTime && remainingBudget > 0) {
             timer -= stepTime;
-            int count = queue.size();
+            int count = Math.min(queue.size(), remainingBudget);
             while (count-- > 0) {
                 FluidPos pos = queue.poll();
                 if (pos == null) continue;
                 queued.remove(pos);
                 updateCell(pos);
+                remainingBudget--;
             }
         }
         rebuildChangedChunks();
