@@ -11,9 +11,13 @@ import com.isofarm.wrld.GameMaster;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.lwjgl.stb.STBTTBakedChar;
+import org.lwjgl.system.MemoryUtil;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.lwjgl.opengl.GL11C.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
@@ -29,6 +33,7 @@ public class Frontend {
     private static final Mesh mesh = Mesh.createQuad();
     private static final Matrix4f projection = new Matrix4f();
     private static final Matrix4f model = new Matrix4f();
+    private static final Map<NineSliceKey, Texture> nineSliceTextures = new HashMap<>();
 
     private static final float FONT_SMALL = 16.0f;
     private static final float FONT_NORMAL = 24.0f;
@@ -273,6 +278,84 @@ public class Frontend {
 
         mesh.render();
         texture.unbind();
+    }
+
+    /**
+     * Creates or returns a cached nine-slice texture generated from a 16x16
+     * source. Corners are preserved, edges stretch on one axis and the center
+     * stretches on both axes.
+     * @param source the 16x16 source texture
+     * @param width the resulting texture width in pixels
+     * @param height the resulting texture height in pixels
+     * @param sliceSize the inset of each source border in pixels
+     * @return the generated {@link Texture}
+     */
+    public static Texture createNineSliceTexture(Texture source, int width,
+                                                  int height, int sliceSize) {
+        if (source == null) {
+            throw new IllegalArgumentException("Nine-slice source cannot be null");
+        }
+        if (source.getWidth() != 16 || source.getHeight() != 16) {
+            throw new IllegalArgumentException("Nine-slice source must be 16x16 pixels");
+        }
+        if (sliceSize <= 0 || sliceSize * 2 >= source.getWidth()) {
+            throw new IllegalArgumentException("Invalid nine-slice border size: " + sliceSize);
+        }
+        if (width < sliceSize * 2 || height < sliceSize * 2) {
+            throw new IllegalArgumentException("Nine-slice target is smaller than its borders");
+        }
+        if (width == source.getWidth() && height == source.getHeight()) {
+            return source;
+        }
+
+        NineSliceKey key = new NineSliceKey(source.getId(), width, height, sliceSize);
+        return nineSliceTextures.computeIfAbsent(key,
+                ignored -> buildNineSliceTexture(source, width, height, sliceSize));
+    }
+
+    private static Texture buildNineSliceTexture(Texture source, int width,
+                                                  int height, int sliceSize) {
+        int sourceWidth = source.getWidth();
+        int sourceHeight = source.getHeight();
+        ByteBuffer sourcePixels = MemoryUtil.memAlloc(sourceWidth * sourceHeight * 4);
+        ByteBuffer targetPixels = MemoryUtil.memAlloc(width * height * 4);
+
+        try {
+            source.bind();
+            glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, sourcePixels);
+            source.unbind();
+
+            for (int y = 0; y < height; y++) {
+                int sourceY = mapNineSliceCoordinate(y, height, sourceHeight, sliceSize);
+                for (int x = 0; x < width; x++) {
+                    int sourceX = mapNineSliceCoordinate(x, width, sourceWidth, sliceSize);
+                    int sourceIndex = (sourceY * sourceWidth + sourceX) * 4;
+                    int targetIndex = (y * width + x) * 4;
+                    for (int channel = 0; channel < 4; channel++) {
+                        targetPixels.put(targetIndex + channel,
+                                sourcePixels.get(sourceIndex + channel));
+                    }
+                }
+            }
+
+            return new Texture(width, height, targetPixels);
+        } finally {
+            source.unbind();
+            MemoryUtil.memFree(sourcePixels);
+            MemoryUtil.memFree(targetPixels);
+        }
+    }
+
+    private static int mapNineSliceCoordinate(int coordinate, int targetSize,
+                                               int sourceSize, int sliceSize) {
+        if (coordinate < sliceSize) return coordinate;
+        if (coordinate >= targetSize - sliceSize) {
+            return sourceSize - (targetSize - coordinate);
+        }
+
+        int sourceCenterSize = sourceSize - sliceSize * 2;
+        int targetCenterSize = targetSize - sliceSize * 2;
+        return sliceSize + (coordinate - sliceSize) * sourceCenterSize / targetCenterSize;
     }
 
     /**
@@ -805,7 +888,11 @@ public class Frontend {
      * Releases the resources associated with this object.
      */
     public static void dispose() {
+        nineSliceTextures.values().forEach(Texture::dispose);
+        nineSliceTextures.clear();
         mesh.dispose();
         shader.dispose();
     }
+
+    private record NineSliceKey(int sourceId, int width, int height, int sliceSize) {}
 }

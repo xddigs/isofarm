@@ -87,6 +87,7 @@ public class BackpackInventoryUI extends InventoryUI {
     @Override
     public void render() {
         if (!isVisible()) return;
+        renderBackground();
         renderChildren();
     }
 }

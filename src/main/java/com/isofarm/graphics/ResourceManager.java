@@ -56,7 +56,8 @@ public class ResourceManager {
     private static final Mesh flowerMesh = Mesh.createCrossMesh();
     private static final Mesh playerMesh = Mesh.quadVertical();
     private static final Mesh destroyOverlayMesh = Mesh.createDestroyOverlayMesh();
-    private static final Texture backgroundGUI = new Texture(K.Paths.DEFAULT_BACKGROUND_GUI);
+    private static final Texture backgroundUI = new Texture(K.Paths.DEFAULT_BACKGROUND_UI);
+    private static final Texture selectorUI = new Texture(K.Paths.DEFAULT_SELECTOR_UI);
     private static final TextureAtlas blocksAtlas;
 
     static {
@@ -207,7 +208,8 @@ public class ResourceManager {
         playerMesh.dispose();
         destroyOverlayMesh.dispose();
 
-        backgroundGUI.dispose();
+        backgroundUI.dispose();
+        selectorUI.dispose();
         blocksAtlas.dispose();
 
         wheat.dispose();
@@ -336,8 +338,16 @@ public class ResourceManager {
      * Returns the background ui.
      * @return the {@link Texture} representing the background ui
      */
-    public Texture getBackgroundGUI() {
-        return backgroundGUI;
+    public Texture getBackgroundUI() {
+        return backgroundUI;
+    }
+
+    /**
+     * Returns the selector of the hotbar
+     * @return the {@link Texture} representing the hotbar selector
+     */
+    public Texture getSelectorUI() {
+        return selectorUI;
     }
 
     /**

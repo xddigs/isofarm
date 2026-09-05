@@ -60,31 +60,45 @@ public class Texture {
             this.width = pWidth.get(0);
             this.height = pHeight.get(0);
 
-            this.id = glGenTextures();
-            glBindTexture(GL_TEXTURE_2D, this.id);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-            glTexImage2D(
-                    GL_TEXTURE_2D,
-                    0,
-                    GL_RGBA,
-                    width,
-                    height,
-                    0,
-                    GL_RGBA,
-                    GL_UNSIGNED_BYTE,
-                    imageBuffer
-            );
+            this.id = upload(width, height, imageBuffer);
 
             stbi_image_free(imageBuffer);
-            glBindTexture(GL_TEXTURE_2D, 0);
         }
 
         log.info("Texture loaded successfully [{}] ({}x{} px, ID: {})",
                 resourcePath, width, height, id);
+    }
+
+    /**
+     * Creates a texture from RGBA pixel data.
+     * @param width the texture width in pixels
+     * @param height the texture height in pixels
+     * @param pixels the RGBA pixel buffer
+     */
+    public Texture(int width, int height, ByteBuffer pixels) {
+        if (width <= 0 || height <= 0) {
+            throw new IllegalArgumentException("Texture dimensions must be positive");
+        }
+        if (pixels == null || pixels.remaining() < width * height * 4) {
+            throw new IllegalArgumentException("Insufficient RGBA pixel data");
+        }
+
+        this.width = width;
+        this.height = height;
+        this.id = upload(width, height, pixels);
+    }
+
+    private static int upload(int width, int height, ByteBuffer pixels) {
+        int textureId = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, textureId);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
+                GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        return textureId;
     }
 
     /**

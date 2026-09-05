@@ -4,6 +4,7 @@ import com.isofarm.data.*;
 import com.isofarm.entity.Player;
 import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.SpriteSheet;
+import com.isofarm.graphics.Texture;
 import com.isofarm.input.ControlAction;
 import com.isofarm.input.Controls;
 import com.isofarm.input.Mouse;
@@ -12,6 +13,7 @@ import com.isofarm.service.SoundService;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
+import org.joml.Vector4f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +31,7 @@ import java.util.Set;
 public class InventoryUI extends UIElement {
     private static final int BACKPACK_COLUMNS = 4;
     private static final int BACKPACK_ROWS = 4;
+    private static final int GUI_SLICE_SIZE = 3;
     private static final Logger log = LoggerFactory.getLogger(InventoryUI.class);
 
     private final InventorySlotUI[] slotUIs;
@@ -911,6 +914,7 @@ public class InventoryUI extends UIElement {
      */
     @Override
     public void render() {
+        renderBackground();
         renderChildren();
         renderCarriedItem();
 
@@ -920,6 +924,23 @@ public class InventoryUI extends UIElement {
         } else {
             backpackButton.hide();
         }
+    }
+
+    /**
+     * Renders the scalable inventory background.
+     */
+    protected void renderBackground() {
+        float width = getAbsoluteWidth();
+        float height = getAbsoluteHeight();
+        int textureWidth = Math.max(GUI_SLICE_SIZE * 2,
+                Math.round(width / Settings.getScale()));
+        int textureHeight = Math.max(GUI_SLICE_SIZE * 2,
+                Math.round(height / Settings.getScale()));
+        Texture background = Frontend.createNineSliceTexture(
+                ResourceManager.rem.getBackgroundUI(), textureWidth,
+                textureHeight, GUI_SLICE_SIZE);
+        Frontend.drawTexture(background, getAbsoluteX(), getAbsoluteY(), width,
+                height, new Vector4f(1.0f, 1.0f, 1.0f, getWorldOpacity()));
     }
 
     /**

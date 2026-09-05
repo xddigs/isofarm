@@ -6,6 +6,7 @@ import com.isofarm.data.SlotType;
 import com.isofarm.entity.Player;
 import com.isofarm.graphics.ResourceManager;
 import com.isofarm.graphics.SpriteSheet;
+import com.isofarm.graphics.Texture;
 import com.isofarm.input.ControlAction;
 import com.isofarm.input.Controls;
 import com.isofarm.input.Mouse;
@@ -15,6 +16,7 @@ import com.isofarm.item.Item;
 import com.isofarm.utils.K;
 import com.isofarm.utils.Settings;
 import com.isofarm.wrld.GameMaster;
+import org.joml.Vector4f;
 
 import java.util.List;
 
@@ -535,11 +537,11 @@ public class HotbarUI extends UIElement {
             }
         }
 
-        float thickness = Settings.getScaledThickness() * 2;
-        float x = slot.getAbsoluteX() - thickness;
-        float y = slot.getAbsoluteY() - thickness;
-        float size = slot.getAbsoluteWidth() + thickness * 2.0f;
-        Frontend.drawBorder(x, y, size, size, K.UI.UI_HOTBAR_SELECTED_COLOR, thickness);
+        float x = slot.getAbsoluteX();
+        float y = slot.getAbsoluteY();
+        float size = slot.getAbsoluteWidth();
+        Texture selector = ResourceManager.rem.getSelectorUI();
+        Frontend.drawTexture(selector, x, y, size, size, new Vector4f(1.0f));
     }
 
     /**

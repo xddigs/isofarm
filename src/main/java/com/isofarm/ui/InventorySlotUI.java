@@ -3,6 +3,7 @@ package com.isofarm.ui;
 import com.isofarm.data.*;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.graphics.ResourceManager;
+import com.isofarm.graphics.Texture;
 import com.isofarm.item.Bucket;
 import com.isofarm.item.Item;
 import com.isofarm.item.Tool;
@@ -17,6 +18,8 @@ import java.lang.Character;
  */
 @SuppressWarnings("all")
 public class InventorySlotUI extends UIElement {
+    private static final int GUI_SLICE_SIZE = 3;
+    private static final float GUI_CENTER_COLOR = 64.0f / 255.0f;
     private final SlotType slotType;
     private InventorySlot slot;
     private InventorySlot backpackSlot;
@@ -96,16 +99,19 @@ public class InventorySlotUI extends UIElement {
         float height = getAbsoluteHeight();
 
         Vector4f background = selected ? K.UI.UI_SELECTED_COLOR : hovered ? K.UI.UI_HOVERED_COLOR : K.UI.UI_BACKGROUND_COLOR_SLOT;
-        Frontend.drawRect(x, y, width, height, new Vector4f(background.x, background.y, background.z, background.w * getWorldOpacity()));
-
-        Vector4f border = K.UI.UI_SELECTED_BORDER_COLOR;
-        Vector4f borderTint = new Vector4f(border.x, border.y, border.z, border.w * getWorldOpacity());
-
-        float borderSize = Settings.getScaledBorder();
-        Frontend.drawRect(x, y, width, borderSize, borderTint);
-        Frontend.drawRect(x, y + height - borderSize, width, borderSize, borderTint);
-        Frontend.drawRect(x, y, borderSize, height, borderTint);
-        Frontend.drawRect(x + width - borderSize, y, borderSize, height, borderTint);
+        int textureWidth = Math.max(GUI_SLICE_SIZE * 2,
+                Math.round(width / Settings.getScale()));
+        int textureHeight = Math.max(GUI_SLICE_SIZE * 2,
+                Math.round(height / Settings.getScale()));
+        Texture slotTexture = Frontend.createNineSliceTexture(
+                ResourceManager.rem.getBackgroundUI(), textureWidth,
+                textureHeight, GUI_SLICE_SIZE);
+        Vector4f tint = new Vector4f(
+                background.x / GUI_CENTER_COLOR,
+                background.y / GUI_CENTER_COLOR,
+                background.z / GUI_CENTER_COLOR,
+                background.w * getWorldOpacity());
+        Frontend.drawTexture(slotTexture, x, y, width, height, tint);
 
         if (!isEmpty() && spriteSheet != null) {
             renderItem();

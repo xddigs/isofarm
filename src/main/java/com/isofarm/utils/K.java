@@ -72,7 +72,7 @@ public final class K {
      */
     public static final class UI {
         public static final int INVENTORY_COLUMNS = 9;
-        public static final int INVENTORY_ROWS = 6;
+        public static final int INVENTORY_ROWS = 4;
         public static final int INVENTORY_SLOTS = INVENTORY_COLUMNS * INVENTORY_ROWS;
 
         public static final float SQUISH_DURATION = 0.25f;
@@ -127,7 +127,6 @@ public final class K {
         public static final Vector4f UI_BORDER_COLOR = new Vector4f(0.06f, 0.06f, 0.06f, 1.0f);
         public static final Vector4f UI_HOVERED_COLOR = new Vector4f(0.12f, 0.12f, 0.12f, 1.0f);
         public static final Vector4f UI_SELECTED_COLOR = new Vector4f(0.16f, 0.16f, 0.16f, 1.0f);
-        public static final Vector4f UI_SELECTED_BORDER_COLOR = new Vector4f(0.0f);
         public static final Vector4f UI_ITEM_TINT = new Vector4f(1.0f);
         public static final Vector4f UI_TEXT_COLOR = new Vector4f(1.0f);
         public static final Vector4f UI_BOOK_TEXT_COLOR = new Vector4f(0.0f, 0.0f, 0.0f, 1.0f);
@@ -177,9 +176,11 @@ public final class K {
 
         public static final String DESTROY_STAGES = "assets/textures/blocks/destroy.png";
         public static final String HEARTS_SPRITESHEET = "assets/ui/hearts.png";
-        public static final String DEFAULT_BACKGROUND_GUI = "assets/ui/background_gui.png";
-        public static final String BOOK_ANIMATION = "assets/ui/book.png";
+
         public static final String CURSOR_POINTER = "assets/ui/pointer.png";
+        public static final String DEFAULT_BACKGROUND_UI = "assets/ui/slot.png";
+        public static final String DEFAULT_SELECTOR_UI = "assets/ui/selector.png";
+        public static final String BOOK_ANIMATION = "assets/ui/book.png";
     }
 
     /**
