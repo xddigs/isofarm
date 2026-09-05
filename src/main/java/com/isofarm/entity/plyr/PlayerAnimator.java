@@ -47,13 +47,26 @@ public final class PlayerAnimator {
         player = Player.plyr;
         model = ResourceManager.rem.getPlayerModel();
         if (model == null) return;
-        head = node("Head"); torso = node("Body"); backpack = node("Backpack");
-        rightArm = node("Right Arm"); leftArm = node("Left Arm");
-        rightLeg = node("Right Leg"); leftLeg = node("Left Leg");
+        head = node("Head");
+        torso = node("Body");
+        backpack = node("Backpack");
+        rightArm = node("Right Arm");
+        leftArm = node("Left Arm");
+        rightLeg = node("Right Leg");
+        leftLeg = node("Left Leg");
         EquipmentController.ec.init(model);
-        if (head != null) { headPosition = copy(head); baseHeadRotation = new Quaternionf(head.getRotation()); }
-        torsoPosition = copy(torso); backpackPosition = copy(backpack); rightArmPosition = copy(rightArm);
-        leftArmPosition = copy(leftArm); rightLegPosition = copy(rightLeg); leftLegPosition = copy(leftLeg);
+
+        if (head != null) {
+            headPosition = copy(head);
+            baseHeadRotation = new Quaternionf(head.getRotation());
+        }
+
+        torsoPosition = copy(torso);
+        backpackPosition = copy(backpack);
+        rightArmPosition = copy(rightArm);
+        leftArmPosition = copy(leftArm);
+        rightLegPosition = copy(rightLeg);
+        leftLegPosition = copy(leftLeg);
         if (backpack != null) backpack.setVisible(false);
     }
 
@@ -179,7 +192,11 @@ public final class PlayerAnimator {
         float width = Math.max(game.getWindowWidth(), 1), height = Math.max(game.getWindowHeight(), 1);
         Ray ray = game.getOrthoCamera().getMouseRay(Mouse.getX(), Mouse.getY(), width, height);
         Vector3f mouse = new Vector3f(ray.origin());
-        if (Math.abs(ray.direction().y) > .0001f) mouse.fma((player.getPosition().y - ray.origin().y) / ray.direction().y, ray.direction());
+
+        if (Math.abs(ray.direction().y) > .0001f) {
+            mouse.fma((player.getPosition().y - ray.origin().y) / ray.direction().y, ray.direction());
+        }
+
         Vector3f toward = mouse.sub(player.getPosition());
         float worldYaw = (float) Math.atan2(toward.x, toward.z) + (float) Math.PI;
         float yaw = Math.clamp(wrap(worldYaw - (float) Math.toRadians(modelYaw)), -MAX_HEAD_YAW, MAX_HEAD_YAW);
@@ -190,50 +207,105 @@ public final class PlayerAnimator {
         head.setRotation(current);
     }
 
+    /**
+     * Returns the direction the player is facing.
+     * @param angle in radians
+     * @return {@link Float} the direction the player is facing
+     */
     private static float wrap(float angle) {
         while (angle > Math.PI) angle -= (float) (Math.PI * 2);
         while (angle < -Math.PI) angle += (float) (Math.PI * 2);
         return angle;
     }
 
+    /**
+     * Updates equipment based on held tool/weapon
+     */
     private void updateEquipment() {
         Item item = Settings.selectedItem;
-        if (!(item instanceof Tool tool)) { EquipmentController.ec.equip(null, null); return; }
-        String type = switch (item) { case Sword ignored -> "sword"; case Pickaxe ignored -> "pickaxe";
-            case Axe ignored -> "axe"; case Hoe ignored -> "hoe"; case Shovel ignored -> "shovel"; default -> null; };
+        if (!(item instanceof Tool tool)) {
+            EquipmentController.ec.equip(null, null);
+            return;
+        }
+        String type = switch (item) {
+            case Sword ignored -> "sword";
+            case Pickaxe ignored -> "pickaxe";
+            case Axe ignored -> "axe";
+            case Hoe ignored -> "hoe";
+            case Shovel ignored -> "shovel";
+            default -> null;
+        };
         EquipmentController.ec.equip(tool.getTier().getName(), type);
     }
 
-    /** @param game active game @param pass render pass */
+    /**
+     * @param game active game @param pass render pass
+     */
     public void render(GameMaster game, RenderPass pass) {
         if (model == null) return;
         float scale = Settings.getScaledEntity();
         float deathRoll = (float) Math.toRadians(82.0f) * deathWeight;
         float deathDrop = 0.35f * deathWeight;
         if (pass == RenderPass.SHADOW) {
-            Shader shader = ResourceManager.rem.getShadowMapShader(); if (shader == null) return;
-            shader.bind(); shader.setUniform("uLightSpaceMatrix", ShadowSystem.sys.getLightSpaceMatrix());
-            modelMatrix.identity().translate(player.getPosition().x, player.getPosition().y - deathDrop, player.getPosition().z)
-                    .rotateY((float) Math.toRadians(modelYaw)).rotateZ(deathRoll).scale(scale);
-            shader.setUniform("uModel", modelMatrix); glEnable(GL_DEPTH_TEST); glDepthFunc(GL_LESS); glDepthMask(true);
-            model.render(shader, modelMatrix); glDepthMask(true); glDepthFunc(GL_LESS); shader.unbind(); return;
+            Shader shader = ResourceManager.rem.getShadowMapShader();
+            if (shader == null) return;
+            shader.bind();
+            shader.setUniform("uLightSpaceMatrix", ShadowSystem.sys.getLightSpaceMatrix());
+            modelMatrix.identity().translate(player.getPosition().x, player.getPosition().y - deathDrop,
+                    player.getPosition().z).rotateY((float) Math.toRadians(modelYaw)).rotateZ(deathRoll).scale(scale);
+            shader.setUniform("uModel", modelMatrix);
+            glEnable(GL_DEPTH_TEST);
+            glDepthFunc(GL_LESS);
+            glDepthMask(true);
+            model.render(shader, modelMatrix);
+            glDepthMask(true);
+            glDepthFunc(GL_LESS);
+            shader.unbind();
+            return;
         }
-        Shader shader = ResourceManager.rem.getDefaultShader(); if (shader == null) return;
-        CameraView camera = game.getActiveCamera(); CelestialLighting light = game.getCelestialLighting();
-        shader.bind(); shader.setUniform("uProjection", camera.getProjectionMatrix()); shader.setUniform("uView", camera.getViewMatrix());
-        shader.setUniform("uLightIntensity", light.getIntensity()); shader.setUniform("uLightDirection", light.getDirection());
-        shader.setUniform("uAmbientIntensity", light.getAmbientIntensity()); shader.setUniform("uSkyColor", TimeService.getSkyColor());
-        shader.setUniform("uBaseColor", new Vector3f(1)); shader.setUniform("uIsSprite", false); shader.setUniform("uUseTexture", true);
-        shader.setUniform("uParticleAlpha", deathAlpha); shader.setUniform("uIsMaskPass", false); shader.setUniform("uEnableShadows", Settings.doEnableShadows());
-        shader.setUniform("uLightSpaceMatrix", ShadowSystem.sys.getLightSpaceMatrix()); shader.setUniform("uIsSubmergedEntity", pass == RenderPass.SUBMERGED);
+        Shader shader = ResourceManager.rem.getDefaultShader();
+        if (shader == null) return;
+        CameraView camera = game.getActiveCamera();
+        CelestialLighting light = game.getCelestialLighting();
+        shader.bind();
+        shader.setUniform("uProjection", camera.getProjectionMatrix());
+        shader.setUniform("uView", camera.getViewMatrix());
+        shader.setUniform("uLightIntensity", light.getIntensity());
+        shader.setUniform("uLightDirection", light.getDirection());
+        shader.setUniform("uAmbientIntensity", light.getAmbientIntensity());
+        shader.setUniform("uSkyColor", TimeService.getSkyColor());
+        shader.setUniform("uBaseColor", new Vector3f(1));
+        shader.setUniform("uIsSprite", false);
+        shader.setUniform("uUseTexture", true);
+        shader.setUniform("uParticleAlpha", deathAlpha);
+        shader.setUniform("uIsMaskPass", false);
+        shader.setUniform("uEnableShadows", Settings.doEnableShadows());
+        shader.setUniform("uLightSpaceMatrix", ShadowSystem.sys.getLightSpaceMatrix());
+        shader.setUniform("uIsSubmergedEntity", pass == RenderPass.SUBMERGED);
         float bob = (float) Math.sin(idleTime) * .025f * idleWeight;
-        modelMatrix.identity().translate(player.getPosition().x, player.getPosition().y + bob - deathDrop, player.getPosition().z)
-                .rotateY((float) Math.toRadians(modelYaw)).rotateZ(deathRoll).scale(scale);
-        shader.setUniform("uModel", modelMatrix); glEnable(GL_DEPTH_TEST); glEnable(GL_CULL_FACE); glCullFace(GL_BACK);
-        glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        if (pass == RenderPass.NORMAL) { glDepthFunc(GL_LESS); glDepthMask(true); shader.setUniform("uIsSubmergedEntity", false); }
-        else { glDepthFunc(GL_GREATER); glDepthMask(false); shader.setUniform("uIsSubmergedEntity", true); }
-        model.render(shader, modelMatrix); glDepthFunc(GL_LESS); glDepthMask(true); glBindTexture(GL_TEXTURE_2D, 0); glDisable(GL_BLEND); shader.unbind();
+        modelMatrix.identity().translate(player.getPosition().x, player.getPosition().y + bob - deathDrop,
+                player.getPosition().z).rotateY((float) Math.toRadians(modelYaw)).rotateZ(deathRoll).scale(scale);
+        shader.setUniform("uModel", modelMatrix);
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        if (pass == RenderPass.NORMAL) {
+            glDepthFunc(GL_LESS);
+            glDepthMask(true);
+            shader.setUniform("uIsSubmergedEntity", false);
+        } else {
+            glDepthFunc(GL_GREATER);
+            glDepthMask(false);
+            shader.setUniform("uIsSubmergedEntity", true);
+        }
+        model.render(shader, modelMatrix);
+        glDepthFunc(GL_LESS);
+        glDepthMask(true);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glDisable(GL_BLEND);
+        shader.unbind();
     }
 
     /** Starts the attack animation. */ public void interact() { attacking = true; attackTime = 0; }
