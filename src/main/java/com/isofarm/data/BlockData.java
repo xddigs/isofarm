@@ -36,7 +36,7 @@ public enum BlockData implements Blockable {
     SAND((byte) 18, (byte) 7, (byte) 1, false, false, 100, "assets/textures/blocks/sand.png", SoundGroup.SOIL, 0.7f, false, new Object[]{}, Tier.NONE),
     GRAVEL((byte) 17, (byte) 8, (byte) 1, false, false, 100, "assets/textures/blocks/gravel.png", SoundGroup.SOIL, 0.9f, false, new Object[]{}, Tier.NONE),
     FOSSIL((byte) 19, (byte) 9, (byte) 1, false, false, 100, "assets/textures/blocks/fossil.png", SoundGroup.STONE, 8.0f, false, new Object[]{}, Tier.NONE),
-    BASALT((byte) 20,(byte) 10,(byte) 1, false,  false, 100, "assets/textures/blocks/basalt.png", SoundGroup.STONE, 6.0f, false, new Object[]{}, Tier.NONE),
+    OBSIDIAN((byte) 20,(byte) 10,(byte) 1, false,  false, 100, "assets/textures/blocks/obsidian.png", SoundGroup.STONE, 48.0f, false, new Object[]{}, Tier.NONE),
 
     TALL_GRASS((byte) 21, (byte) 1, (byte) (K.UI.ICON_BLOCK_ROWS - 1), false, true, 5, "assets/textures/blocks/tall_grass.png", SoundGroup.SOIL, 0.01f, true, new Object[]{new Seed(CropType.WHEAT)}, Tier.NONE),
     ROSE((byte) 22, (byte) 2, (byte) (K.UI.ICON_BLOCK_ROWS - 1), false, true, 10, "assets/textures/blocks/rose.png", SoundGroup.SOIL, 0.01f, true, new Object[]{}, Tier.NONE),
