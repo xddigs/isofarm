@@ -3,6 +3,7 @@ package com.isofarm.graphics;
 import com.isofarm.data.BlockData;
 import com.isofarm.utils.K;
 import com.isofarm.wrld.Chunk;
+import com.isofarm.wrld.FluidSimulation;
 import com.isofarm.wrld.World;
 
 /**
@@ -100,6 +101,28 @@ public class ChunkMeshBuilder {
                         topY = y + 1.0f;
                     }
 
+                    float fluidY00 = topY;
+                    float fluidY10 = topY;
+                    float fluidY11 = topY;
+                    float fluidY01 = topY;
+                    FluidSimulation.FluidSlope fluidSlope = isWater
+                            ? FluidSimulation.getSlope(data, worldX, y, worldZ) : null;
+                    if (fluidSlope != null) {
+                        if (fluidSlope.dx() > 0) {
+                            fluidY10 = bottomY;
+                            fluidY11 = bottomY;
+                        } else if (fluidSlope.dx() < 0) {
+                            fluidY00 = bottomY;
+                            fluidY01 = bottomY;
+                        } else if (fluidSlope.dz() > 0) {
+                            fluidY01 = bottomY;
+                            fluidY11 = bottomY;
+                        } else {
+                            fluidY00 = bottomY;
+                            fluidY10 = bottomY;
+                        }
+                    }
+
                     boolean renderTopFace = isWater
                             ? shouldRenderWaterTop(world, worldX, y, worldZ, data)
                             : (shouldRenderFace(world, worldX, y + 1, worldZ, data) || getBlockBottomY(world, worldX, y + 1, worldZ) > topY);
@@ -108,15 +131,27 @@ public class ChunkMeshBuilder {
                         TextureAtlas.TextureRegion region = data.getTopRegion();
                         if (region != null) {
                             if (isWater) {
-                                float y00 = getWaterCornerHeight(world, worldX, y, worldZ, data);
-                                float y10 = getWaterCornerHeight(world, worldX + 1, y, worldZ, data);
-                                float y11 = getWaterCornerHeight(world, worldX + 1, y, worldZ + 1, data);
-                                float y01 = getWaterCornerHeight(world, worldX, y, worldZ + 1, data);
+                                float y00 = fluidSlope == null
+                                        ? getWaterCornerHeight(world, worldX, y, worldZ, data) : fluidY00;
+                                float y10 = fluidSlope == null
+                                        ? getWaterCornerHeight(world, worldX + 1, y, worldZ, data) : fluidY10;
+                                float y11 = fluidSlope == null
+                                        ? getWaterCornerHeight(world, worldX + 1, y, worldZ + 1, data) : fluidY11;
+                                float y01 = fluidSlope == null
+                                        ? getWaterCornerHeight(world, worldX, y, worldZ + 1, data) : fluidY01;
 
                                 wPosIdx = addQuadPos(wPosBuf, wPosIdx, x, y01, z + 1, x + 1, y11, z + 1, x + 1, y10, z, x, y00, z);
 
                                 wUvIdx = addQuadUV(wUvBuf, wUvIdx, region.uvMin().x, region.uvMax().y, region.uvMax().x, region.uvMax().y, region.uvMax().x, region.uvMin().y, region.uvMin().x, region.uvMin().y);
-                                wNormIdx = addQuadNorm(wNormBuf, wNormIdx, 0, 1, 0);
+                                if (fluidSlope == null) {
+                                    wNormIdx = addQuadNorm(wNormBuf, wNormIdx, 0, 1, 0);
+                                } else {
+                                    float rise = topY - bottomY;
+                                    float length = (float) Math.sqrt(1.0f + rise * rise);
+                                    wNormIdx = addQuadNorm(wNormBuf, wNormIdx,
+                                            fluidSlope.dx() * rise / length, 1.0f / length,
+                                            fluidSlope.dz() * rise / length);
+                                }
                                 wElemIdx = addQuadIndices(wIdxBuf, wElemIdx, wVertexCount);
                                 wVertexCount += 4;
                             } else {
@@ -148,10 +183,10 @@ public class ChunkMeshBuilder {
                         float expBottom = getSideBottomY(world, worldX, y, worldZ + 1, bottomY, data);
                         float uvB = calculateSideUvBottom(expBottom, bottomY, topY);
                         if (isWater) {
-                            int next = addSideQuadDirect(wPosBuf, wNormBuf, wUvBuf, wIdxBuf, wPosIdx, wNormIdx, wUvIdx, wElemIdx, wVertexCount, x, x + 1, expBottom, topY, z + 1, z + 1, 0, 0, 1, data, uvB, 1.0f);
+                            int next = addSideQuadDirect(wPosBuf, wNormBuf, wUvBuf, wIdxBuf, wPosIdx, wNormIdx, wUvIdx, wElemIdx, wVertexCount, x, x + 1, expBottom, fluidY01, fluidY11, z + 1, z + 1, 0, 0, 1, data, uvB, 1.0f);
                             if (next != wVertexCount) { wVertexCount = next; wPosIdx += 12; wNormIdx += 12; wUvIdx += 8; wElemIdx += 6; }
                         } else {
-                            int next = addSideQuadDirect(posBuf, normBuf, uvBuf, idxBuf, posIdx, normIdx, uvIdx, elemIdx, vertexCount, x, x + 1, expBottom, topY, z + 1, z + 1, 0, 0, 1, data, uvB, 1.0f);
+                            int next = addSideQuadDirect(posBuf, normBuf, uvBuf, idxBuf, posIdx, normIdx, uvIdx, elemIdx, vertexCount, x, x + 1, expBottom, topY, topY, z + 1, z + 1, 0, 0, 1, data, uvB, 1.0f);
                             if (next != vertexCount) { vertexCount = next; posIdx += 12; normIdx += 12; uvIdx += 8; elemIdx += 6; }
                         }
                     }
@@ -160,10 +195,10 @@ public class ChunkMeshBuilder {
                         float expBottom = getSideBottomY(world, worldX, y, worldZ - 1, bottomY, data);
                         float uvB = calculateSideUvBottom(expBottom, bottomY, topY);
                         if (isWater) {
-                            int next = addSideQuadDirect(wPosBuf, wNormBuf, wUvBuf, wIdxBuf, wPosIdx, wNormIdx, wUvIdx, wElemIdx, wVertexCount, x + 1, x, expBottom, topY, z, z, 0, 0, -1, data, uvB, 1.0f);
+                            int next = addSideQuadDirect(wPosBuf, wNormBuf, wUvBuf, wIdxBuf, wPosIdx, wNormIdx, wUvIdx, wElemIdx, wVertexCount, x + 1, x, expBottom, fluidY10, fluidY00, z, z, 0, 0, -1, data, uvB, 1.0f);
                             if (next != wVertexCount) { wVertexCount = next; wPosIdx += 12; wNormIdx += 12; wUvIdx += 8; wElemIdx += 6; }
                         } else {
-                            int next = addSideQuadDirect(posBuf, normBuf, uvBuf, idxBuf, posIdx, normIdx, uvIdx, elemIdx, vertexCount, x + 1, x, expBottom, topY, z, z, 0, 0, -1, data, uvB, 1.0f);
+                            int next = addSideQuadDirect(posBuf, normBuf, uvBuf, idxBuf, posIdx, normIdx, uvIdx, elemIdx, vertexCount, x + 1, x, expBottom, topY, topY, z, z, 0, 0, -1, data, uvB, 1.0f);
                             if (next != vertexCount) { vertexCount = next; posIdx += 12; normIdx += 12; uvIdx += 8; elemIdx += 6; }
                         }
                     }
@@ -172,10 +207,10 @@ public class ChunkMeshBuilder {
                         float expBottom = getSideBottomY(world, worldX + 1, y, worldZ, bottomY, data);
                         float uvB = calculateSideUvBottom(expBottom, bottomY, topY);
                         if (isWater) {
-                            int next = addSideQuadDirect(wPosBuf, wNormBuf, wUvBuf, wIdxBuf, wPosIdx, wNormIdx, wUvIdx, wElemIdx, wVertexCount, x + 1, x + 1, expBottom, topY, z + 1, z, 1, 0, 0, data, uvB, 1.0f);
+                            int next = addSideQuadDirect(wPosBuf, wNormBuf, wUvBuf, wIdxBuf, wPosIdx, wNormIdx, wUvIdx, wElemIdx, wVertexCount, x + 1, x + 1, expBottom, fluidY11, fluidY10, z + 1, z, 1, 0, 0, data, uvB, 1.0f);
                             if (next != wVertexCount) { wVertexCount = next; wPosIdx += 12; wNormIdx += 12; wUvIdx += 8; wElemIdx += 6; }
                         } else {
-                            int next = addSideQuadDirect(posBuf, normBuf, uvBuf, idxBuf, posIdx, normIdx, uvIdx, elemIdx, vertexCount, x + 1, x + 1, expBottom, topY, z + 1, z, 1, 0, 0, data, uvB, 1.0f);
+                            int next = addSideQuadDirect(posBuf, normBuf, uvBuf, idxBuf, posIdx, normIdx, uvIdx, elemIdx, vertexCount, x + 1, x + 1, expBottom, topY, topY, z + 1, z, 1, 0, 0, data, uvB, 1.0f);
                             if (next != vertexCount) { vertexCount = next; posIdx += 12; normIdx += 12; uvIdx += 8; elemIdx += 6; }
                         }
                     }
@@ -184,10 +219,10 @@ public class ChunkMeshBuilder {
                         float expBottom = getSideBottomY(world, worldX - 1, y, worldZ, bottomY, data);
                         float uvB = calculateSideUvBottom(expBottom, bottomY, topY);
                         if (isWater) {
-                            int next = addSideQuadDirect(wPosBuf, wNormBuf, wUvBuf, wIdxBuf, wPosIdx, wNormIdx, wUvIdx, wElemIdx, wVertexCount, x, x, expBottom, topY, z, z + 1, -1, 0, 0, data, uvB, 1.0f);
+                            int next = addSideQuadDirect(wPosBuf, wNormBuf, wUvBuf, wIdxBuf, wPosIdx, wNormIdx, wUvIdx, wElemIdx, wVertexCount, x, x, expBottom, fluidY00, fluidY01, z, z + 1, -1, 0, 0, data, uvB, 1.0f);
                             if (next != wVertexCount) { wVertexCount = next; wPosIdx += 12; wNormIdx += 12; wUvIdx += 8; wElemIdx += 6; }
                         } else {
-                            int next = addSideQuadDirect(posBuf, normBuf, uvBuf, idxBuf, posIdx, normIdx, uvIdx, elemIdx, vertexCount, x, x, expBottom, topY, z, z + 1, -1, 0, 0, data, uvB, 1.0f);
+                            int next = addSideQuadDirect(posBuf, normBuf, uvBuf, idxBuf, posIdx, normIdx, uvIdx, elemIdx, vertexCount, x, x, expBottom, topY, topY, z, z + 1, -1, 0, 0, data, uvB, 1.0f);
                             if (next != vertexCount) { vertexCount = next; posIdx += 12; normIdx += 12; uvIdx += 8; elemIdx += 6; }
                         }
                     }
@@ -495,7 +530,8 @@ public class ChunkMeshBuilder {
      * @param x1 the x1 value
      * @param x2 the x2 value
      * @param y1 the y1 value
-     * @param y2 the y2 value
+     * @param topY1 the top y at the first endpoint
+     * @param topY2 the top y at the second endpoint
      * @param z1 the z1 value
      * @param z2 the z2 value
      * @param nx the nx value
@@ -508,11 +544,12 @@ public class ChunkMeshBuilder {
      */
     private static int addSideQuadDirect(float[] pos, float[] norm, float[] uv, int[] idx,
                                          int posI, int normI, int uvI, int elemI, int vertexCount, float x1,
-                                         float x2, float y1, float y2, float z1, float z2, float nx, float ny,
+                                         float x2, float y1, float topY1, float topY2, float z1, float z2, float nx, float ny,
                                          float nz, BlockData data, float uvB, float uvT) {
         TextureAtlas.TextureRegion region = data.getSideRegion();
         if (region == null) return vertexCount;
-        addQuadPos(pos, posI, x1, y1, z1, x2, y1, z2, x2, y2, z2, x1, y2, z1);
+        addQuadPos(pos, posI, x1, y1, z1, x2, y1, z2,
+                x2, topY2, z2, x1, topY1, z1);
         float u1 = region.uvMin().x; float u2 = region.uvMax().x;
         float heightUV = region.uvMax().y - region.uvMin().y;
         float v1 = region.uvMin().y + heightUV * (1.0f - uvB);

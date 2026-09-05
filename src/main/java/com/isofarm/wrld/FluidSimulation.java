@@ -9,8 +9,10 @@ import com.isofarm.graphics.ResourceManager;
 
 import java.util.ArrayDeque;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Defines the shared source, flow and chunk-rebuild behavior used by fluid
@@ -28,7 +30,17 @@ public abstract class FluidSimulation {
     private final Set<FluidPos> queued = new HashSet<>();
     private final Set<Long> changedChunks = new HashSet<>();
     private final Set<FluidPos> sources = new HashSet<>();
+    private final Map<FluidPos, FluidSlope> slopes = new ConcurrentHashMap<>();
     private float timer;
+
+    /** Direction in which a fluid surface descends across one block. */
+    public record FluidSlope(int dx, int dz) {
+        public FluidSlope {
+            if (Math.abs(dx) + Math.abs(dz) != 1) {
+                throw new IllegalArgumentException("A fluid slope must point to one horizontal neighbour");
+            }
+        }
+    }
 
     /**
      * Creates a new {@code FluidSimulation} instance.
@@ -54,6 +66,20 @@ public abstract class FluidSimulation {
         if (blockType == BlockData.WATER) return WaterSimulation.ws;
         if (blockType == BlockData.LAVA) return LavaSimulation.ls;
         return null;
+    }
+
+    /**
+     * Returns the downhill direction recorded for a fluid cell.
+     * @param blockType the fluid type
+     * @param x the world x value
+     * @param y the world y value
+     * @param z the world z value
+     * @return its downhill direction, or {@code null} for a flat fluid cell
+     */
+    public static FluidSlope getSlope(BlockData blockType, int x, int y, int z) {
+        FluidSimulation simulation = forBlock(blockType);
+        if (simulation == null) return null;
+        return simulation.slopes.get(new FluidPos(x, y, z));
     }
 
     /**
@@ -166,6 +192,7 @@ public abstract class FluidSimulation {
      */
     public final void onBlockDestroyed(int x, int y, int z) {
         FluidPos pos = new FluidPos(x, y, z);
+        slopes.remove(pos);
         mark(pos);
         enqueueNeighbours(pos);
     }
@@ -179,6 +206,7 @@ public abstract class FluidSimulation {
     public final void onBlockPlaced(int x, int y, int z) {
         FluidPos pos = new FluidPos(x, y, z);
         sources.remove(pos);
+        slopes.remove(pos);
         World.wrld.setFluidLevelAt(x, y, z, (byte) 0);
         mark(pos);
         enqueueNeighbours(pos);
@@ -191,6 +219,7 @@ public abstract class FluidSimulation {
         if (level < MIN_LEVEL) return;
         renewSource(pos);
         if (sources.contains(pos)) level = MAX_LEVEL;
+        refreshSlope(pos, level);
 
         FluidPos below = new FluidPos(pos.x(), pos.y() - 1, pos.z());
         if (solidify(pos, below)) return;
@@ -204,10 +233,10 @@ public abstract class FluidSimulation {
 
         if (level <= MIN_LEVEL) return;
         byte spreadLevel = (byte) (level - 1);
-        spread(new FluidPos(pos.x() + 1, pos.y(), pos.z()), spreadLevel);
-        spread(new FluidPos(pos.x() - 1, pos.y(), pos.z()), spreadLevel);
-        spread(new FluidPos(pos.x(), pos.y(), pos.z() + 1), spreadLevel);
-        spread(new FluidPos(pos.x(), pos.y(), pos.z() - 1), spreadLevel);
+        spread(pos, new FluidPos(pos.x() + 1, pos.y(), pos.z()), spreadLevel);
+        spread(pos, new FluidPos(pos.x() - 1, pos.y(), pos.z()), spreadLevel);
+        spread(pos, new FluidPos(pos.x(), pos.y(), pos.z() + 1), spreadLevel);
+        spread(pos, new FluidPos(pos.x(), pos.y(), pos.z() - 1), spreadLevel);
     }
 
     /**
@@ -280,6 +309,7 @@ public abstract class FluidSimulation {
         if (owner == null) return;
 
         owner.sources.remove(pos);
+        owner.slopes.remove(pos);
         owner.queue.remove(pos);
         owner.queued.remove(pos);
         World.wrld.setFluidLevelAt(pos.x(), pos.y(), pos.z(), (byte) 0);
@@ -324,14 +354,59 @@ public abstract class FluidSimulation {
     }
 
     /** Spreads a fluid level into a neighbouring cell. */
-    private void spread(FluidPos pos, byte level) {
+    private void spread(FluidPos from, FluidPos pos, byte level) {
         if (level < MIN_LEVEL || !canContainFluid(pos) || levelAt(pos) >= level) return;
-        setFluid(pos, level);
+        FluidSlope slope = hasDeepDrop(pos)
+                ? new FluidSlope(pos.x() - from.x(), pos.z() - from.z()) : null;
+        setFluid(pos, level, slope);
         enqueue(pos);
+    }
+
+    /** A free cell directly below means the surface drops by more than one block. */
+    private boolean hasDeepDrop(FluidPos pos) {
+        if (pos.y() <= 0) return false;
+        FluidPos below = new FluidPos(pos.x(), pos.y() - 1, pos.z());
+        byte blockId = World.wrld.getBlockTypeAt(below.x(), below.y(), below.z());
+        if (blockId == BlockData.AIR.getId() || blockId == fluidType.getId()) return true;
+        BlockData data = BlockData.fromId(blockId);
+        return data != null && (data.isPlant() || World.wrld.getCropAt(
+                below.x(), below.y(), below.z()) != null);
+    }
+
+    /** Keeps a falling edge aligned after terrain is changed beneath existing fluid. */
+    private void refreshSlope(FluidPos pos, byte level) {
+        if (!hasDeepDrop(pos)) {
+            setSlope(pos, null);
+            return;
+        }
+        if (slopes.containsKey(pos)) return;
+
+        FluidPos[] neighbours = {
+                new FluidPos(pos.x() + 1, pos.y(), pos.z()),
+                new FluidPos(pos.x() - 1, pos.y(), pos.z()),
+                new FluidPos(pos.x(), pos.y(), pos.z() + 1),
+                new FluidPos(pos.x(), pos.y(), pos.z() - 1)
+        };
+        FluidPos upstream = null;
+        byte upstreamLevel = level;
+        for (FluidPos neighbour : neighbours) {
+            if (isFluid(neighbour) && levelAt(neighbour) > upstreamLevel) {
+                upstream = neighbour;
+                upstreamLevel = levelAt(neighbour);
+            }
+        }
+        if (upstream != null) {
+            setSlope(pos, new FluidSlope(pos.x() - upstream.x(), pos.z() - upstream.z()));
+        }
     }
 
     /** Places or updates a fluid cell. */
     private void setFluid(FluidPos pos, byte level) {
+        setFluid(pos, level, null);
+    }
+
+    /** Places or updates a fluid cell and its optional downhill surface. */
+    private void setFluid(FluidPos pos, byte level, FluidSlope slope) {
         if (pos.y() < 0 || pos.y() >= Chunk.SIZE_Y || !canContainFluid(pos)) return;
         byte currentBlock = World.wrld.getBlockTypeAt(pos.x(), pos.y(), pos.z());
         if (currentBlock != BlockData.AIR.getId() && currentBlock != fluidType.getId()) {
@@ -339,15 +414,28 @@ public abstract class FluidSimulation {
             if (data == null || !data.isPlant()) return;
             World.wrld.removeBlockAt(pos.x(), pos.y(), pos.z());
         }
-        if (currentBlock == fluidType.getId() && levelAt(pos) == level) return;
+        if (currentBlock == fluidType.getId() && levelAt(pos) == level) {
+            setSlope(pos, slope);
+            return;
+        }
         World.wrld.setBlockTypeAt(pos.x(), pos.y(), pos.z(), fluidType.getId());
         World.wrld.setFluidLevelAt(pos.x(), pos.y(), pos.z(), level);
+        setSlope(pos, slope);
         mark(pos);
+    }
+
+    /** Updates slope metadata and invalidates its mesh when the shape changes. */
+    private void setSlope(FluidPos pos, FluidSlope slope) {
+        FluidSlope previous = slope == null ? slopes.remove(pos) : slopes.put(pos, slope);
+        if ((previous == null && slope != null) || (previous != null && !previous.equals(slope))) {
+            markChangedArea(pos);
+        }
     }
 
     /** Removes one cell belonging to this fluid. */
     private void removeFluidCell(FluidPos pos) {
         if (!isFluid(pos)) return;
+        slopes.remove(pos);
         World.wrld.setFluidLevelAt(pos.x(), pos.y(), pos.z(), (byte) 0);
         World.wrld.setBlockTypeAt(pos.x(), pos.y(), pos.z(), BlockData.AIR.getId());
         mark(pos);
