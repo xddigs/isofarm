@@ -61,16 +61,17 @@ public record CameraController(Camera camera) implements Service<Camera> {
             }
         }
 
-        updateZoom();
-        followPlayer(gameMaster, delta);
+        boolean isZoomed = Controls.isToggled(ControlAction.ZOOM);
+        updateZoom(isZoomed);
+        followPlayer(gameMaster, delta, isZoomed);
     }
 
     /**
      * Updates the zoom.
+     * @param isZoomed whether the zoom toggle is active
      */
-    private void updateZoom() {
-        boolean isZooming = Controls.isDown(ControlAction.ZOOM);
-        float targetZoom = isZooming ? ZOOMED_ZOOM : NORMAL_ZOOM;
+    private void updateZoom(boolean isZoomed) {
+        float targetZoom = isZoomed ? ZOOMED_ZOOM : NORMAL_ZOOM;
         if (camera.getZoom() != targetZoom) {
             camera.setZoom(targetZoom);
         }
@@ -80,8 +81,9 @@ public record CameraController(Camera camera) implements Service<Camera> {
      * Updates movement for follow player according to the current physics and input state.
      * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
      * @param delta the {@code float} supplied as {@code delta}
+     * @param isZoomed whether the zoom toggle is active
      */
-    private void followPlayer(GameMaster gameMaster, float delta) {
+    private void followPlayer(GameMaster gameMaster, float delta, boolean isZoomed) {
         Player player = Player.plyr;
         Vector3f playerPos = player.getPosition();
 
@@ -96,7 +98,6 @@ public record CameraController(Camera camera) implements Service<Camera> {
         Vector3f directionToMouse = new Vector3f(mouseWorldPos).sub(playerPos);
         directionToMouse.y = 0.0f;
 
-        boolean isZoomed = Controls.isDown(ControlAction.ZOOM);
         float cursorWeight = isZoomed ? ZOOMED_CURSOR_WEIGHT : NORMAL_CURSOR_WEIGHT;
 
         Vector3f targetOffset = new Vector3f(directionToMouse).mul(cursorWeight);

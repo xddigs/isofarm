@@ -26,7 +26,7 @@ public class Camera implements CameraView {
 
     private static final float NEAR_PLANE = 0.1f;
     private static final float FAR_PLANE = 2000.0f;
-    private static final float ZOOM_SPEED = 0.01f;
+    private static final float ZOOM_SPEED = 0.2f;
     private final float yaw = DEFAULT_YAW;
     private final Vector3f position;
     private final Matrix4f projectionMatrix;
