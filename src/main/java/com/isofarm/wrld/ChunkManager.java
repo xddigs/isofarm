@@ -19,6 +19,7 @@ import java.util.concurrent.Executors;
  */
 public class ChunkManager {
     private static final float SOIL_GRASS_TIME = 10.0f;
+    private static final int MAX_MESH_UPLOADS_PER_FRAME = 2;
     private final World world;
     private final Generator generator;
     private final Map<Chunk, ChunkMeshBuilder.ChunkRenderMesh> chunkMeshes;
@@ -169,7 +170,10 @@ public class ChunkManager {
      */
     private void processCompletedMeshes() {
         MeshBuildResult result;
-        while ((result = completedMeshes.poll()) != null) {
+        int processed = 0;
+        while (processed < MAX_MESH_UPLOADS_PER_FRAME
+                && (result = completedMeshes.poll()) != null) {
+            processed++;
             Chunk chunk = result.chunk();
             long key = world.get2DKey(chunk.getChunkX(), chunk.getChunkZ());
 
@@ -199,7 +203,7 @@ public class ChunkManager {
         int chunkZ = Math.floorDiv(worldZ, Chunk.SIZE_Z);
         dirtyChunks.add(world.get2DKey(chunkX, chunkZ));
 
-        updateGrass(chunkX, chunkZ);
+        updateGrassColumn(worldX, worldZ);
         rebuildSingleChunk(chunkX, chunkZ);
 
         int localX = Math.floorMod(worldX, Chunk.SIZE_X);
@@ -246,6 +250,16 @@ public class ChunkManager {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    /** Updates soil exposure only in the column affected by a block change. */
+    private void updateGrassColumn(int worldX, int worldZ) {
+        for (int y = Chunk.SIZE_Y - 2; y >= 0; y--) {
+            byte block = world.getBlockTypeAt(worldX, y, worldZ);
+            if (isSoil(block) && isExposedToAir(worldX, y, worldZ)) {
+                startSoilTimer(worldX, y, worldZ);
             }
         }
     }

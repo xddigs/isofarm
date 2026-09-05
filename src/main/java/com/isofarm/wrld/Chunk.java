@@ -149,6 +149,14 @@ public class Chunk {
         return !isOutOfBounds(x, y, z) && generatedOceanWater.get(getIndex(x, y, z));
     }
 
+    /** Returns whether this horizontal layer contains any generated ocean water. */
+    public boolean hasGeneratedOceanWaterAtY(int y) {
+        if (y < 0 || y >= SIZE_Y) return false;
+        int start = y * SIZE_X * SIZE_Z;
+        int next = generatedOceanWater.nextSetBit(start);
+        return next >= start && next < start + SIZE_X * SIZE_Z;
+    }
+
     /**
      * Returns the blocks.
      * @return an array of {@code byte} values; the blocks

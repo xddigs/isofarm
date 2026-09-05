@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL20.*;
@@ -21,6 +23,7 @@ import static org.lwjgl.opengl.GL20.*;
 public class Shader {
     private static final Logger log = LoggerFactory.getLogger(Shader.class);
     private final int programId;
+    private final Map<String, Integer> uniformLocations = new HashMap<>();
 
     /**
      * Creates a new {@code Shader} instance.
@@ -128,7 +131,7 @@ public class Shader {
      * @param value the {@code int} supplied as {@code value}
      */
     public void setUniform(String name, int value) {
-        int location = glGetUniformLocation(programId, name);
+        int location = uniformLocation(name);
         glUniform1i(location, value);
     }
 
@@ -138,7 +141,7 @@ public class Shader {
      * @param value the {@code float} supplied as {@code value}
      */
     public void setUniform(String name, float value) {
-        int location = glGetUniformLocation(programId, name);
+        int location = uniformLocation(name);
         glUniform1f(location, value);
     }
 
@@ -148,7 +151,7 @@ public class Shader {
      * @param value the {@link Vector4f} supplied as {@code value}
      */
     public void setUniform(String name, Vector4f value) {
-        int location = glGetUniformLocation(programId, name);
+        int location = uniformLocation(name);
         glUniform4f(location, value.x, value.y, value.z, value.w);
     }
 
@@ -158,7 +161,7 @@ public class Shader {
      * @param value the {@link Vector3f} supplied as {@code value}
      */
     public void setUniform(String name, Vector3f value) {
-        int location = glGetUniformLocation(programId, name);
+        int location = uniformLocation(name);
         glUniform3f(location, value.x, value.y, value.z);
     }
 
@@ -168,7 +171,7 @@ public class Shader {
      * @param value the {@link Vector2f} supplied as {@code value}
      */
     public void setUniform(String name, Vector2f value) {
-        int location = glGetUniformLocation(programId, name);
+        int location = uniformLocation(name);
         glUniform2f(location, value.x, value.y);
     }
 
@@ -179,7 +182,7 @@ public class Shader {
      * @param y the {@code float} supplied as {@code y}
      */
     public void setUniform(String name, float x, float y) {
-        int location = glGetUniformLocation(programId, name);
+        int location = uniformLocation(name);
         glUniform2f(location, x, y);
     }
 
@@ -191,7 +194,7 @@ public class Shader {
      * @param z the {@code float} supplied as {@code z}
      */
     public void setUniform(String name, float x, float y, float z) {
-        int location = glGetUniformLocation(programId, name);
+        int location = uniformLocation(name);
         glUniform3f(location, x, y, z);
     }
 
@@ -201,7 +204,7 @@ public class Shader {
      * @param values an array of {@code float} values supplied as {@code values}
      */
     public void setUniform(String name, float... values) {
-        int location = glGetUniformLocation(programId, name);
+        int location = uniformLocation(name);
         glUniform4f(location, values[0], values[1], values[2], values[3]);
     }
 
@@ -211,7 +214,7 @@ public class Shader {
      * @param matrix the {@link Matrix4f} supplied as {@code matrix}
      */
     public void setUniform(String name, Matrix4f matrix) {
-        int location = glGetUniformLocation(programId, name);
+        int location = uniformLocation(name);
         try (MemoryStack stack = MemoryStack.stackPush()) {
             FloatBuffer buffer = stack.mallocFloat(16);
             matrix.get(buffer);
@@ -225,7 +228,12 @@ public class Shader {
      * @param value the {@code boolean} supplied as {@code value}
      */
     public void setUniform(String name, boolean value) {
-        int location = glGetUniformLocation(programId, name);
+        int location = uniformLocation(name);
         glUniform1i(location, value ? 1 : 0);
+    }
+
+    private int uniformLocation(String name) {
+        return uniformLocations.computeIfAbsent(name,
+                key -> glGetUniformLocation(programId, key));
     }
 }

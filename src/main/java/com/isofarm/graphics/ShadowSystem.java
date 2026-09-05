@@ -7,6 +7,7 @@ import com.isofarm.data.Singleton;
 import com.isofarm.entity.Entity;
 import com.isofarm.entity.WorldItem;
 import com.isofarm.utils.K;
+import com.isofarm.utils.Settings;
 import com.isofarm.wrld.Chunk;
 import com.isofarm.wrld.GameMaster;
 import com.isofarm.entity.Player;
@@ -30,6 +31,7 @@ public class ShadowSystem {
     private static final float SHADOW_SIZE = 70.0f;
     private static final float SHADOW_NEAR = 1.0f;
     private static final float SHADOW_FAR = 220.0f;
+    private static final float SHADOW_UPDATE_INTERVAL = 1.0f / 30.0f;
 
     private final Matrix4f projection = new Matrix4f();
     private final Matrix4f view = new Matrix4f();
@@ -40,6 +42,8 @@ public class ShadowSystem {
     private final Vector3f lightDirection = new Vector3f();
 
     private final Matrix4f modelMatrix = new Matrix4f();
+    private float updateTimer;
+    private boolean hasRendered;
 
     /**
      * Renders this object in the requested render pass.
@@ -48,6 +52,12 @@ public class ShadowSystem {
      */
     public void render(GameMaster gameMaster,
                        Map<Chunk, ChunkMeshBuilder.ChunkRenderMesh> chunkMeshes) {
+        if (!Settings.doEnableShadows()) return;
+        updateTimer += Math.min(gameMaster.getGenDelta(), SHADOW_UPDATE_INTERVAL);
+        if (hasRendered && updateTimer < SHADOW_UPDATE_INTERVAL) return;
+        updateTimer = 0.0f;
+        hasRendered = true;
+
         ShadowMap shadowMap = gameMaster.getShadowMap();
         updateLightMatrix(gameMaster);
         shadowMap.bind();
@@ -60,6 +70,7 @@ public class ShadowSystem {
         Shader shadowShader = ResourceManager.rem.getShadowMapShader();
         shadowShader.bind();
         shadowShader.setUniform("uLightSpaceMatrix", lightSpace);
+        Player player = Player.plyr;
         for (Map.Entry<Chunk, ChunkMeshBuilder.ChunkRenderMesh> entry : chunkMeshes.entrySet()) {
             Chunk chunk = entry.getKey();
             ChunkMeshBuilder.ChunkRenderMesh chunkMesh = entry.getValue();
@@ -68,6 +79,10 @@ public class ShadowSystem {
 
             float worldX = chunk.getChunkX() * Chunk.SIZE_X;
             float worldZ = chunk.getChunkZ() * Chunk.SIZE_Z;
+            float centerX = worldX + Chunk.SIZE_X * 0.5f;
+            float centerZ = worldZ + Chunk.SIZE_Z * 0.5f;
+            if (player != null && (Math.abs(centerX - player.getPosition().x) > SHADOW_SIZE
+                    || Math.abs(centerZ - player.getPosition().z) > SHADOW_SIZE)) continue;
             modelMatrix.identity().translate(worldX, 0.0f, worldZ);
             shadowShader.setUniform("uModel", modelMatrix);
             chunkMesh.solidMesh().render();

@@ -26,16 +26,14 @@ public class Camera implements CameraView {
 
     private static final float NEAR_PLANE = 0.1f;
     private static final float FAR_PLANE = 2000.0f;
-
+    private static final float ZOOM_SPEED = 0.01f;
     private final float yaw = DEFAULT_YAW;
     private final Vector3f position;
     private final Matrix4f projectionMatrix;
-
     private float zoom = 25.0f;
     private float aspectRatio = 1.0f;
     private float damageTilt;
     private boolean tiltRight;
-
     private BlockPos lastHit;
     private int lastHitNormalX;
     private int lastHitNormalY;
@@ -43,8 +41,9 @@ public class Camera implements CameraView {
 
     /**
      * Creates a new {@code Camera} instance.
-     * @param width the {@code float} supplied as {@code width}
-     * @param height the {@code float} supplied as {@code height}
+     *
+     * @param width                the {@code float} supplied as {@code width}
+     * @param height               the {@code float} supplied as {@code height}
      * @param renderDistanceChunks the {@code int} supplied as {@code renderDistanceChunks}
      */
     public Camera(float width, float height, int renderDistanceChunks) {
@@ -55,8 +54,9 @@ public class Camera implements CameraView {
 
     /**
      * Updates the projection.
-     * @param width the {@code float} supplied as {@code width}
-     * @param height the {@code float} supplied as {@code height}
+     *
+     * @param width                the {@code float} supplied as {@code width}
+     * @param height               the {@code float} supplied as {@code height}
      * @param renderDistanceChunks the {@code int} supplied as {@code renderDistanceChunks}
      */
     public void updateProjection(float width, float height, int renderDistanceChunks) {
@@ -69,6 +69,7 @@ public class Camera implements CameraView {
     /**
      * {@inheritDoc}
      * Returns the projection matrix.
+     *
      * @return the {@link Matrix4f} representing the projection matrix
      */
     @Override
@@ -79,6 +80,7 @@ public class Camera implements CameraView {
     /**
      * {@inheritDoc}
      * Returns the view matrix.
+     *
      * @return the {@link Matrix4f} representing the view matrix
      */
     @Override
@@ -94,6 +96,7 @@ public class Camera implements CameraView {
     /**
      * {@inheritDoc}
      * Returns the position.
+     *
      * @return the {@link Vector3f} representing the position
      */
     @Override
@@ -104,6 +107,7 @@ public class Camera implements CameraView {
     /**
      * {@inheritDoc}
      * Returns the pitch.
+     *
      * @return {@code float}; the pitch
      */
     @Override
@@ -114,6 +118,7 @@ public class Camera implements CameraView {
     /**
      * {@inheritDoc}
      * Returns the yaw.
+     *
      * @return {@code float}; the yaw
      */
     @Override
@@ -151,6 +156,7 @@ public class Camera implements CameraView {
 
     /**
      * Sets the position.
+     *
      * @param x the {@code float} supplied as {@code x}
      * @param y the {@code float} supplied as {@code y}
      * @param z the {@code float} supplied as {@code z}
@@ -161,6 +167,7 @@ public class Camera implements CameraView {
 
     /**
      * Returns the forward vector.
+     *
      * @return the {@link Vector3f} representing the forward vector
      */
     public Vector3f getForwardVector() {
@@ -175,6 +182,7 @@ public class Camera implements CameraView {
 
     /**
      * Returns the right vector.
+     *
      * @return the {@link Vector3f} representing the right vector
      */
     public Vector3f getRightVector() {
@@ -186,6 +194,7 @@ public class Camera implements CameraView {
 
     /**
      * Returns the zoom.
+     *
      * @return {@code float}; the zoom
      */
     public float getZoom() {
@@ -194,15 +203,17 @@ public class Camera implements CameraView {
 
     /**
      * Sets the zoom.
+     *
      * @param zoom the {@code float} supplied as {@code zoom}
      */
     public void setZoom(float zoom) {
-        this.zoom = lerp(this.zoom, Math.clamp(zoom, MIN_ZOOM, MAX_ZOOM), .01f);
+        this.zoom = lerp(this.zoom, Math.clamp(zoom, MIN_ZOOM, MAX_ZOOM), ZOOM_SPEED);
         updateProjection(aspectRatio, 1.0f, Settings.getRenderDistance());
     }
 
     /**
      * Returns the up vector.
+     *
      * @return the {@link Vector3f} representing the up vector
      */
     public Vector3f getUpVector() {
@@ -215,9 +226,10 @@ public class Camera implements CameraView {
 
     /**
      * Returns the mouse ray.
-     * @param mouseX the {@code float} supplied as {@code mouseX}
-     * @param mouseY the {@code float} supplied as {@code mouseY}
-     * @param screenWidth the {@code float} supplied as {@code screenWidth}
+     *
+     * @param mouseX       the {@code float} supplied as {@code mouseX}
+     * @param mouseY       the {@code float} supplied as {@code mouseY}
+     * @param screenWidth  the {@code float} supplied as {@code screenWidth}
      * @param screenHeight the {@code float} supplied as {@code screenHeight}
      * @return the {@link Ray} representing the mouse ray
      */
@@ -235,13 +247,14 @@ public class Camera implements CameraView {
 
     /**
      * Transforms this object according to the supplied values.
-     * @param world the {@link World} supplied as {@code world}
-     * @param playerPos the {@link Vector3f} supplied as {@code playerPos}
-     * @param mouseX the {@code float} supplied as {@code mouseX}
-     * @param mouseY the {@code float} supplied as {@code mouseY}
-     * @param screenWidth the {@code float} supplied as {@code screenWidth}
+     *
+     * @param world        the {@link World} supplied as {@code world}
+     * @param playerPos    the {@link Vector3f} supplied as {@code playerPos}
+     * @param mouseX       the {@code float} supplied as {@code mouseX}
+     * @param mouseY       the {@code float} supplied as {@code mouseY}
+     * @param screenWidth  the {@code float} supplied as {@code screenWidth}
      * @param screenHeight the {@code float} supplied as {@code screenHeight}
-     * @param smartFilter the {@code boolean} supplied as {@code smartFilter}
+     * @param smartFilter  the {@code boolean} supplied as {@code smartFilter}
      * @return the {@link BlockPos} representing the highlight result
      */
     public BlockPos highlight(World world, Vector3f playerPos, float mouseX, float mouseY,
@@ -258,12 +271,13 @@ public class Camera implements CameraView {
 
     /**
      * Calculates the value represented by raycast from the current state.
-     * @param world the {@link World} supplied as {@code world}
-     * @param playerPos the {@link Vector3f} supplied as {@code playerPos}
-     * @param origin the {@link Vector3f} supplied as {@code origin}
-     * @param direction the {@link Vector3f} supplied as {@code direction}
+     *
+     * @param world         the {@link World} supplied as {@code world}
+     * @param playerPos     the {@link Vector3f} supplied as {@code playerPos}
+     * @param origin        the {@link Vector3f} supplied as {@code origin}
+     * @param direction     the {@link Vector3f} supplied as {@code direction}
      * @param isSmartFilter the {@code boolean} supplied as {@code isSmartFilter}
-     * @param isBucket the {@code boolean} supplied as {@code isBucket}
+     * @param isBucket      the {@code boolean} supplied as {@code isBucket}
      * @return the {@link BlockPos} representing the raycast result
      */
     private BlockPos raycast(World world, Vector3f playerPos,
@@ -361,6 +375,7 @@ public class Camera implements CameraView {
 
     /**
      * Returns the last hit normal x.
+     *
      * @return {@code int}; the last hit normal x
      */
     public int getLastHitNormalX() {
@@ -369,6 +384,7 @@ public class Camera implements CameraView {
 
     /**
      * Returns the last hit normal y.
+     *
      * @return {@code int}; the last hit normal y
      */
     public int getLastHitNormalY() {
@@ -377,6 +393,7 @@ public class Camera implements CameraView {
 
     /**
      * Returns the last hit normal z.
+     *
      * @return {@code int}; the last hit normal z
      */
     public int getLastHitNormalZ() {

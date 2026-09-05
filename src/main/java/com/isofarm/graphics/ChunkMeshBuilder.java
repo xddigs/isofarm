@@ -6,6 +6,8 @@ import com.isofarm.wrld.Chunk;
 import com.isofarm.wrld.FluidSimulation;
 import com.isofarm.wrld.World;
 
+import java.util.Arrays;
+
 /**
  * Encapsulates the state and operations required by chunk mesh builder within the game runtime.
  */
@@ -25,6 +27,8 @@ public class ChunkMeshBuilder {
     private static final ThreadLocal<float[]> WATER_NORMAL_BUFFER = ThreadLocal.withInitial(() -> new float[MAX_NORMAL_FLOATS]);
     private static final ThreadLocal<float[]> WATER_UV_BUFFER = ThreadLocal.withInitial(() -> new float[MAX_UV_FLOATS]);
     private static final ThreadLocal<int[]> WATER_INDEX_BUFFER = ThreadLocal.withInitial(() -> new int[MAX_INDICES]);
+    private static final ThreadLocal<boolean[]> OCEAN_MERGED_BUFFER = ThreadLocal.withInitial(
+            () -> new boolean[Chunk.SIZE_X * Chunk.SIZE_Y * Chunk.SIZE_Z]);
 
     static {
         for (BlockData data : BlockData.values()) {
@@ -40,6 +44,8 @@ public class ChunkMeshBuilder {
      * Immutable value object containing chunk mesh.
      */
     public record ChunkMeshData(RawMeshData solidData, RawMeshData waterData) {}
+
+    private record WaterMeshCursor(int position, int normal, int uv, int element, int vertices) {}
 
     /**
      * Immutable value object containing chunk render mesh.
@@ -76,6 +82,14 @@ public class ChunkMeshBuilder {
         float[] wNormBuf = WATER_NORMAL_BUFFER.get();
         float[] wUvBuf = WATER_UV_BUFFER.get();
         int[] wIdxBuf = WATER_INDEX_BUFFER.get();
+
+        WaterMeshCursor oceanCursor = addGreedyOceanSurface(
+                world, chunk, wPosBuf, wNormBuf, wUvBuf, wIdxBuf);
+        wPosIdx = oceanCursor.position();
+        wNormIdx = oceanCursor.normal();
+        wUvIdx = oceanCursor.uv();
+        wElemIdx = oceanCursor.element();
+        wVertexCount = oceanCursor.vertices();
 
         for (int x = 0; x < Chunk.SIZE_X; x++) {
             for (int y = 0; y < Chunk.SIZE_Y; y++) {
@@ -124,7 +138,8 @@ public class ChunkMeshBuilder {
                     }
 
                     boolean renderTopFace = isWater
-                            ? shouldRenderWaterTop(world, worldX, y, worldZ, data)
+                            ? !chunk.isGeneratedOceanWater(x, y, z)
+                                && shouldRenderWaterTop(world, worldX, y, worldZ, data)
                             : (shouldRenderFace(world, worldX, y + 1, worldZ, data) || getBlockBottomY(world, worldX, y + 1, worldZ) > topY);
 
                     if (renderTopFace) {
@@ -233,6 +248,101 @@ public class ChunkMeshBuilder {
         RawMeshData solidData = buildRawData(posBuf, posIdx, normBuf, normIdx, uvBuf, uvIdx, idxBuf, elemIdx);
         RawMeshData waterData = buildRawData(wPosBuf, wPosIdx, wNormBuf, wNormIdx, wUvBuf, wUvIdx, wIdxBuf, wElemIdx);
         return new ChunkMeshData(solidData, waterData);
+    }
+
+    /**
+     * Merges each contiguous rectangle of generated ocean surface into one quad.
+     * Simulated fluids, lakes and player-placed water deliberately remain unmerged.
+     */
+    private static WaterMeshCursor addGreedyOceanSurface(World world, Chunk chunk,
+                                                          float[] positions, float[] normals,
+                                                          float[] uv, int[] indices) {
+        boolean[] merged = OCEAN_MERGED_BUFFER.get();
+        Arrays.fill(merged, false);
+
+        int positionIndex = 0;
+        int normalIndex = 0;
+        int uvIndex = 0;
+        int elementIndex = 0;
+        int vertexCount = 0;
+        int chunkWorldX = chunk.getChunkX() * Chunk.SIZE_X;
+        int chunkWorldZ = chunk.getChunkZ() * Chunk.SIZE_Z;
+        TextureAtlas.TextureRegion region = BlockData.WATER.getTopRegion();
+        if (region == null) {
+            return new WaterMeshCursor(0, 0, 0, 0, 0);
+        }
+
+        for (int y = 0; y < Chunk.SIZE_Y; y++) {
+            if (!chunk.hasGeneratedOceanWaterAtY(y)) continue;
+            for (int z = 0; z < Chunk.SIZE_Z; z++) {
+                for (int x = 0; x < Chunk.SIZE_X; x++) {
+                    int index = blockIndex(x, y, z);
+                    if (merged[index] || !isMergeableOceanSurface(
+                            world, chunk, chunkWorldX, chunkWorldZ, x, y, z)) {
+                        continue;
+                    }
+
+                    int width = 1;
+                    while (x + width < Chunk.SIZE_X
+                            && !merged[blockIndex(x + width, y, z)]
+                            && isMergeableOceanSurface(world, chunk, chunkWorldX, chunkWorldZ,
+                                    x + width, y, z)) {
+                        width++;
+                    }
+
+                    int depth = 1;
+                    boolean canExpand = true;
+                    while (z + depth < Chunk.SIZE_Z && canExpand) {
+                        for (int dx = 0; dx < width; dx++) {
+                            int candidate = blockIndex(x + dx, y, z + depth);
+                            if (merged[candidate] || !isMergeableOceanSurface(
+                                    world, chunk, chunkWorldX, chunkWorldZ,
+                                    x + dx, y, z + depth)) {
+                                canExpand = false;
+                                break;
+                            }
+                        }
+                        if (canExpand) depth++;
+                    }
+
+                    for (int dz = 0; dz < depth; dz++) {
+                        for (int dx = 0; dx < width; dx++) {
+                            merged[blockIndex(x + dx, y, z + dz)] = true;
+                        }
+                    }
+
+                    float surfaceY = y + TILLED_HEIGHT;
+                    positionIndex = addQuadPos(positions, positionIndex,
+                            x, surfaceY, z + depth,
+                            x + width, surfaceY, z + depth,
+                            x + width, surfaceY, z,
+                            x, surfaceY, z);
+                    uvIndex = addQuadUV(uv, uvIndex,
+                            region.uvMin().x, region.uvMax().y,
+                            region.uvMax().x, region.uvMax().y,
+                            region.uvMax().x, region.uvMin().y,
+                            region.uvMin().x, region.uvMin().y);
+                    normalIndex = addQuadNorm(normals, normalIndex, 0, 1, 0);
+                    elementIndex = addQuadIndices(indices, elementIndex, vertexCount);
+                    vertexCount += 4;
+                }
+            }
+        }
+
+        return new WaterMeshCursor(positionIndex, normalIndex, uvIndex, elementIndex, vertexCount);
+    }
+
+    private static boolean isMergeableOceanSurface(World world, Chunk chunk,
+                                                     int chunkWorldX, int chunkWorldZ,
+                                                     int x, int y, int z) {
+        return chunk.isGeneratedOceanWater(x, y, z)
+                && chunk.getBlock(x, y, z) == BlockData.WATER.getId()
+                && shouldRenderWaterTop(world, chunkWorldX + x, y, chunkWorldZ + z,
+                        BlockData.WATER);
+    }
+
+    private static int blockIndex(int x, int y, int z) {
+        return (y * Chunk.SIZE_Z + z) * Chunk.SIZE_X + x;
     }
 
     /**
