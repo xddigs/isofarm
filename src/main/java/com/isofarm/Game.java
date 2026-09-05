@@ -33,7 +33,7 @@ public class Game {
 
     private static final int OPENGL_MAJOR_VERSION = 3;
     private static final int OPENGL_MINOR_VERSION = 3;
-    private static final int VSYNC_INTERVAL = 0;
+    private static final int VSYNC_INTERVAL = 1;
 
     private long window;
 
