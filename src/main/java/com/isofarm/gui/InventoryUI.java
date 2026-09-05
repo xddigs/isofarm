@@ -682,7 +682,7 @@ public class InventoryUI extends UIElement {
 
             if (Controls.isPressed(ControlAction.UI_SELECT)) {
                 if (isGodmode && creativeSlots.contains(slot)) {
-                    takeCreativeItem(slot, false);
+                    takeCreativeItem(slot);
                     break;
                 }
                 leftClick(slot);
@@ -691,7 +691,6 @@ public class InventoryUI extends UIElement {
 
             if (Controls.isPressed(ControlAction.UI_CONTEXT)) {
                 if (isGodmode && creativeSlots.contains(slot)) {
-                    takeCreativeItem(slot, true);
                     break;
                 }
                 rightClick(slot);
@@ -703,12 +702,11 @@ public class InventoryUI extends UIElement {
     /**
      * Copies an item from an infinite creative slot to the cursor.
      * @param slot the creative source slot
-     * @param isSingle whether only one item should be copied
      */
-    private void takeCreativeItem(InventorySlot slot, boolean isSingle) {
+    private void takeCreativeItem(InventorySlot slot) {
         if (slot.isEmpty()) return;
         carriedItem = slot.getItem().copy();
-        carriedAmount = isSingle ? 1 : Math.max(1, inventory.getMaxStack(carriedItem));
+        carriedAmount += Math.max(1, inventory.getMaxStack(slot.getItem()));
     }
 
     /**
