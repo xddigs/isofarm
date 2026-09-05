@@ -267,7 +267,7 @@ public class Library implements Service<GameMaster> {
                 log.warn("Cannot execute command: player does not exist.");
                 return;
             }
-            player.setHitpoints(-player.getHitpoints());
+            player.kill(Cause.SELF);
             SoundService.fx.playEntitySound(SoundGroup.ENTITY);
             log.info("Command kill executed");
             ToastFactory.success(Local.lang.t("toast.self_kill"));

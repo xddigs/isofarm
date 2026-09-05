@@ -31,6 +31,7 @@ public class BookUI extends UIElement {
     private static final float PAGE_CONTENT_CURVE = 18.0f;
     private static final float PAGE_STATIC_CONTENT_HIDE_PROGRESS = 0.99f;
     private static final float BASE_CONTENT_HEIGHT_OFFSET = 0.15f;
+    private static final float MOUSE_OFFSET = 32.0f;
 
     public static BookUI bui;
     private float animationProgress = 0.0f;
@@ -232,8 +233,10 @@ public class BookUI extends UIElement {
         for (BookLine bookLine : page.getLines()) {
             if (bookLine.isInteractive() && isMouseHovering(textX, textY, bookLine.getText())) {
                 hoveredBookLine = bookLine;
+                float mouseX = Mouse.getX() + MOUSE_OFFSET + MOUSE_OFFSET / 2;
+                float mouseY = Mouse.getY() - MOUSE_OFFSET / 2;
                 GameMaster.game.getGameUIService().getUIManager().showTooltip(bookLine.getTooltipText(),
-                        Mouse.getX(), Mouse.getY());
+                        mouseX, mouseY);
                 break;
             }
             textY += lineHeight;
@@ -259,8 +262,10 @@ public class BookUI extends UIElement {
             float iconY = gridY + row * (GRID_ICON_SIZE + GRID_GAP);
             if (isMouseHovering(iconX, iconY, GRID_ICON_SIZE, GRID_ICON_SIZE)) {
                 hoveredBookLine = bookLine;
+                float mouseX = Mouse.getX() + MOUSE_OFFSET + MOUSE_OFFSET / 2;
+                float mouseY = Mouse.getY() - MOUSE_OFFSET / 2;
                 GameMaster.game.getGameUIService().getUIManager().showTooltip(
-                        bookLine.getTooltipText(), Mouse.getX(), Mouse.getY());
+                        bookLine.getTooltipText(), mouseX, mouseY);
                 return;
             }
         }

@@ -88,6 +88,15 @@ public class Texture {
     }
 
     /**
+     * Returns the texture long
+     * @param texture path to the texture
+     * @return {@link Long} the texture long
+     */
+    public static long getTextureLong(Texture texture) {
+        return texture.getId();
+    }
+
+    /**
      * Performs the bind operation.
      */
     public void bind() {

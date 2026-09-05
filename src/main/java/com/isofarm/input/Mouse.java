@@ -1,6 +1,16 @@
 package com.isofarm.input;
 
+import org.lwjgl.glfw.GLFWImage;
+import org.lwjgl.system.MemoryStack;
+import org.lwjgl.system.MemoryUtil;
+
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.stb.STBImage.*;
+import static org.lwjgl.system.MemoryUtil.NULL;
 
 /**
  * Provides mouse behavior.
@@ -27,6 +37,10 @@ public final class Mouse {
     private static float deltaX = 0, deltaY = 0;
     private static boolean firstMouse = true;
     private static float scrollY = 0.0f;
+    private static long windowId;
+    private static long defaultCursor;
+    private static long hoverCursor;
+    private static boolean cursorHovered;
 
     /**
      * Creates a new private* {@code Mouse} instance.
@@ -38,6 +52,7 @@ public final class Mouse {
      * @param windowId the window id value
      */
     public static void init(long windowId) {
+        Mouse.windowId = windowId;
         glfwSetCursorPosCallback(windowId, (window, xpos, ypos) -> {
             float currentX = (float) xpos;
             float currentY = (float) ypos;
@@ -131,6 +146,119 @@ public final class Mouse {
             if (isButtonReleased(button)) return true;
         }
         return false;
+    }
+
+    /**
+     * Loads a horizontal two-frame cursor spritesheet. Frame 0 is the default
+     * cursor and frame 1 is used while hovering an interactive UI element.
+     * @param path classpath path to the cursor spritesheet
+     */
+    public static void setCursorImage(String path) {
+        byte[] rawData;
+        try (InputStream in = Mouse.class.getClassLoader().getResourceAsStream(path)) {
+            if (in == null) {
+                throw new IllegalArgumentException("Cursor resource not found: " + path);
+            }
+            rawData = in.readAllBytes();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to read cursor spritesheet [" + path + "]", e);
+        }
+
+        ByteBuffer rawBuffer = MemoryUtil.memAlloc(rawData.length);
+        ByteBuffer sheetPixels = null;
+        long newDefaultCursor = NULL;
+        long newHoverCursor = NULL;
+
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            rawBuffer.put(rawData).flip();
+            IntBuffer widthBuffer = stack.mallocInt(1);
+            IntBuffer heightBuffer = stack.mallocInt(1);
+            IntBuffer channelsBuffer = stack.mallocInt(1);
+
+            stbi_set_flip_vertically_on_load(false);
+            sheetPixels = stbi_load_from_memory(rawBuffer, widthBuffer,
+                    heightBuffer, channelsBuffer, 4);
+            if (sheetPixels == null) {
+                throw new IllegalArgumentException("Failed to decode cursor spritesheet [" +
+                        path + "]: " + stbi_failure_reason());
+            }
+
+            int sheetWidth = widthBuffer.get(0);
+            int frameHeight = heightBuffer.get(0);
+            if (sheetWidth % 2 != 0) {
+                throw new IllegalArgumentException("Cursor spritesheet must contain two equal horizontal frames: " + path);
+            }
+
+            int frameWidth = sheetWidth / 2;
+            newDefaultCursor = createCursorFrame(sheetPixels, sheetWidth,
+                    frameWidth, frameHeight, 0, stack);
+            newHoverCursor = createCursorFrame(sheetPixels, sheetWidth,
+                    frameWidth, frameHeight, 1, stack);
+
+            if (newDefaultCursor == NULL || newHoverCursor == NULL) {
+                throw new IllegalStateException("Failed to create GLFW cursors from: " + path);
+            }
+        } finally {
+            MemoryUtil.memFree(rawBuffer);
+            if (sheetPixels != null) stbi_image_free(sheetPixels);
+            if (newDefaultCursor == NULL && newHoverCursor != NULL) {
+                glfwDestroyCursor(newHoverCursor);
+            } else if (newHoverCursor == NULL && newDefaultCursor != NULL) {
+                glfwDestroyCursor(newDefaultCursor);
+            }
+        }
+
+        destroyCursors();
+        defaultCursor = newDefaultCursor;
+        hoverCursor = newHoverCursor;
+        cursorHovered = false;
+        glfwSetCursor(windowId, defaultCursor);
+    }
+
+    private static long createCursorFrame(ByteBuffer sheetPixels, int sheetWidth,
+                                          int frameWidth, int frameHeight,
+                                          int frame, MemoryStack stack) {
+        ByteBuffer framePixels = MemoryUtil.memAlloc(frameWidth * frameHeight * 4);
+        try {
+            int frameOffset = frame * frameWidth;
+            for (int row = 0; row < frameHeight; row++) {
+                for (int column = 0; column < frameWidth; column++) {
+                    int source = (row * sheetWidth + frameOffset + column) * 4;
+                    int destination = (row * frameWidth + column) * 4;
+                    framePixels.put(destination, sheetPixels.get(source));
+                    framePixels.put(destination + 1, sheetPixels.get(source + 1));
+                    framePixels.put(destination + 2, sheetPixels.get(source + 2));
+                    framePixels.put(destination + 3, sheetPixels.get(source + 3));
+                }
+            }
+
+            GLFWImage image = GLFWImage.malloc(stack)
+                    .set(frameWidth, frameHeight, framePixels);
+            return glfwCreateCursor(image, 0, 0);
+        } finally {
+            MemoryUtil.memFree(framePixels);
+        }
+    }
+
+    /** Selects the hover or default frame of the configured cursor. */
+    public static void setCursorHovered(boolean hovered) {
+        if (cursorHovered == hovered || defaultCursor == NULL || hoverCursor == NULL) return;
+        cursorHovered = hovered;
+        glfwSetCursor(windowId, hovered ? hoverCursor : defaultCursor);
+    }
+
+    /** Releases the native cursor handles. */
+    public static void dispose() {
+        destroyCursors();
+        windowId = NULL;
+    }
+
+    private static void destroyCursors() {
+        if (defaultCursor != NULL) glfwDestroyCursor(defaultCursor);
+        if (hoverCursor != NULL) glfwDestroyCursor(hoverCursor);
+        defaultCursor = NULL;
+        hoverCursor = NULL;
+        cursorHovered = false;
     }
 
     /**

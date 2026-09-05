@@ -7,6 +7,7 @@ import com.isofarm.input.Mouse;
  * Provides uimanager behavior.
  */
 public class UIManager {
+    private static final float MOUSE_OFFSET = 32.0f;
     private final UIPanel root;
     private final UITooltip tooltip;
     private UIElement focusedElement;
@@ -33,20 +34,23 @@ public class UIManager {
         root.mouseMoved(Mouse.getX(), Mouse.getY());
 
         UIElement hovered = root.findElementAt(Mouse.getX(), Mouse.getY());
-        if (hovered != null
-                && hovered != tooltip
+        Mouse.setCursorHovered(hovered != null && hovered != root && hovered != tooltip);
+
+        if (hovered != null && hovered != tooltip
                 && hovered.getTooltipText() != null
                 && !hovered.getTooltipText().isBlank()) {
             tooltip.text(hovered.getTooltipText());
+            float cursorX = Mouse.getX() + MOUSE_OFFSET + MOUSE_OFFSET / 2;
+            float cursorY = Mouse.getY() - MOUSE_OFFSET / 2;
             tooltip.updatePosition(
-                    Mouse.getX(),
-                    Mouse.getY(),
+                    cursorX,
+                    cursorY,
                     root.getWidth(),
-                    root.getHeight()
-            );
+                    root.getHeight());
             tooltip.show();
         } else {
             tooltip.hide();
+            GUI.setWasCursorIconDrawn(false);
         }
 
         for (int button = Mouse.BUTTON_1;
@@ -61,7 +65,6 @@ public class UIManager {
                 } else {
                     clearFocus();
                 }
-
                 root.mousePressed(Mouse.getX(), Mouse.getY(), button);
             }
 

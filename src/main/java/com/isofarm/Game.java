@@ -45,6 +45,7 @@ public class Game {
         init();
 
         log.debug("Closing window and releasing native resources...");
+        Mouse.dispose();
         glfwFreeCallbacks(window);
         glfwDestroyWindow(window);
         glfwTerminate();
@@ -87,6 +88,7 @@ public class Game {
         glfwWindowHint(GLFW_SAMPLES, 16);
         Keyboard.init(window);
         Mouse.init(window);
+        Mouse.setCursorImage(K.Paths.CURSOR_POINTER);
         Joystick.init();
 
         glfwMakeContextCurrent(window);

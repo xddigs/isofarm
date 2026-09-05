@@ -179,6 +179,7 @@ public final class K {
         public static final String HEARTS_SPRITESHEET = "assets/gui/hearts.png";
         public static final String DEFAULT_BACKGROUND_GUI = "assets/gui/background_gui.png";
         public static final String BOOK_ANIMATION = "assets/gui/book.png";
+        public static final String CURSOR_POINTER = "assets/gui/pointer.png";
     }
 
     /**

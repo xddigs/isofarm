@@ -95,7 +95,7 @@ public class ChunkMeshBuilder {
                         int waterLevel = (level <= 0) ? 8 : level;
                         boolean hasWaterAbove = y < Chunk.SIZE_Y - 1
                                 && chunk.getBlock(x, y + 1, z) == blockId;
-                        topY = hasWaterAbove ? (y + 1.0f) : (y + (waterLevel / 8.0f) * 0.9f);
+                        topY = hasWaterAbove ? (y + 1.0f) : (y + (waterLevel / 8.0f) * TILLED_HEIGHT);
                     } else {
                         topY = y + 1.0f;
                     }
@@ -238,7 +238,8 @@ public class ChunkMeshBuilder {
      * @param y the y value
      * @return the block top y
      */
-    private static float getBlockTopY(BlockData data, float y) { return (data == BlockData.TILLED_DIRT || data.isFluid()) ? y + TILLED_HEIGHT : y + 1.0f; }
+    private static float getBlockTopY(BlockData data, float y) { return (data == BlockData.TILLED_DIRT ||
+            data.isFluid()) ? y + TILLED_HEIGHT : y + 1.0f; }
     /**
      * Returns the block bottom y.
      * @param world the world value
@@ -342,7 +343,7 @@ public class ChunkMeshBuilder {
                     if (bData == currentFluid) {
                         byte lvl = world.getFluidLevelAt(nx, wy, nz);
                         float level = (lvl <= 0) ? 8 : lvl;
-                        totalHeight += wy + (level / 8.0f) * 0.88f;
+                        totalHeight += wy + (level / 8.0f) * TILLED_HEIGHT;
                         count++;
                     } else if (bData != null && bData.isSolid()) {
                         totalHeight += wy + 1.0f;
@@ -351,7 +352,7 @@ public class ChunkMeshBuilder {
                 }
             }
         }
-        return count > 0 ? (totalHeight / count) : (wy + 0.88f);
+        return count > 0 ? (totalHeight / count) : (wy + TILLED_HEIGHT);
     }
 
     /**

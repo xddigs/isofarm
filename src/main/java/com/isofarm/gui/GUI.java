@@ -41,9 +41,11 @@ public class GUI {
     private static final UIFont smallBold = new UIFont(K.Paths.FONT_BOLD, FONT_SMALL);
     private static final UIFont normalBold = new UIFont(K.Paths.FONT_BOLD, FONT_NORMAL);
     private static final UIFont bigBold = new UIFont(K.Paths.FONT_BOLD, FONT_BIG);
+    private static final float CURSOR_ICON_OFFSET = 36.0f;
 
     private static int screenWidth;
     private static int screenHeight;
+    private static boolean wasCursorIconDrawn = false;
 
     /**
      * Creates a new {@code GUI} instance.
@@ -687,6 +689,7 @@ public class GUI {
      */
     public static void drawCursor(GameMaster gameMaster) {
         if (gameMaster == null) return;
+        if (wasCursorIconDrawn) return;
 
         var hotbarUI = gameMaster.getGameUIService().getHotbarUI();
         if (hotbarUI == null) return;
@@ -699,12 +702,27 @@ public class GUI {
 
         int frameIndex = ResourceManager.getItemFrame(selectedItem);
         float iconSize = 32.0f;
-        float offsetX = 12.0f;
-        float offsetY = 12.0f;
 
-        float renderX = Mouse.getX() + offsetX;
-        float renderY = Mouse.getY() + offsetY;
+        float renderX = Mouse.getX() + CURSOR_ICON_OFFSET;
+        float renderY = Mouse.getY() + CURSOR_ICON_OFFSET;
         drawSprite(spriteSheet, frameIndex, renderX, renderY, iconSize, iconSize, new Vector4f(1.0f));
+        wasCursorIconDrawn = true;
+    }
+
+    /**
+     * Checks if the cursor was drawn
+     * @return {@code true} if the cursor was drawn, {@code false} otherwise
+     */
+    public static boolean wasCursorIconDrawn() {
+        return wasCursorIconDrawn;
+    }
+
+    /**
+     * Sets the value of the {@code wasCursorIconDrawn} field.
+     * @param wasCursorIconDrawn the new value of the {@code wasCursorIconDrawn} field
+     */
+    public static void setWasCursorIconDrawn(boolean wasCursorIconDrawn) {
+        GUI.wasCursorIconDrawn = wasCursorIconDrawn;
     }
 
     /**
