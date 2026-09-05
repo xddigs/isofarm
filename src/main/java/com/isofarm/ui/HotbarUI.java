@@ -521,7 +521,7 @@ public class HotbarUI extends UIElement {
     }
 
     /**
-     * Renders the selector.
+     * Renders the hotbar selector.
      */
     private void renderSelector() {
         InventorySlotUI slot;
@@ -537,11 +537,17 @@ public class HotbarUI extends UIElement {
             }
         }
 
-        float x = slot.getAbsoluteX();
-        float y = slot.getAbsoluteY();
-        float size = slot.getAbsoluteWidth();
         Texture selector = ResourceManager.rem.getSelectorUI();
-        Frontend.drawTexture(selector, x, y, size, size, new Vector4f(1.0f));
+        if (selector == null) {
+            return;
+        }
+
+        float padding = Settings.getScaledPadding();
+        float width = slot.getAbsoluteWidth() + (padding * 2.0f);
+        float height = slot.getAbsoluteHeight() + (padding * 2.0f);
+        float x = slot.getAbsoluteX() - padding;
+        float y = slot.getAbsoluteY() - padding;
+        Frontend.drawTexture(selector, x, y, width, height, new Vector4f(1.0f));
     }
 
     /**

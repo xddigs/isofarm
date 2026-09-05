@@ -42,6 +42,8 @@ public class GameUIService implements Service<GameMaster> {
     private static final float DEATH_OVERLAY_MAX_ALPHA = 0.50f;
     private static final float DEATH_FADE_DURATION = 2.0f;
     private static final float DEATH_BLUR_RADIUS = 5.0f;
+    private static final float HEARTS_HOTBAR_X_OFFSET = 10.0f;
+    private static final float HEARTS_HOTBAR_OFFSET = 40.0f;
     private final GameMaster gameMaster;
     private final UIManager uiManager;
     private final InventoryUI inventoryUI;
@@ -358,8 +360,8 @@ public class GameUIService implements Service<GameMaster> {
 
         if (isHUDShown) {
             uiManager.render();
-            float startX = hotbarUI.getAbsoluteX() + 10.0f;
-            float startY = hotbarUI.getAbsoluteY() - 25.0f;
+            float startX = hotbarUI.getAbsoluteX() + HEARTS_HOTBAR_X_OFFSET;
+            float startY = hotbarUI.getAbsoluteY() - HEARTS_HOTBAR_OFFSET;
             renderHearts(ResourceManager.rem.getHeartsSpriteSheet(),
                     startX, startY);
             renderHotbarLabel();

@@ -19,13 +19,11 @@ import java.lang.Character;
 @SuppressWarnings("all")
 public class InventorySlotUI extends UIElement {
     private static final int GUI_SLICE_SIZE = 3;
-    private static final float GUI_CENTER_COLOR = 64.0f / 255.0f;
     private final SlotType slotType;
     private InventorySlot slot;
     private InventorySlot backpackSlot;
     private SpriteSheet spriteSheet;
     private int spriteFrame;
-    private UIFont countFont = Frontend.getNormalFont();
     private boolean selected;
     private boolean hovered;
     private boolean selectedOutline = false;
@@ -98,7 +96,6 @@ public class InventorySlotUI extends UIElement {
         float width = getAbsoluteWidth();
         float height = getAbsoluteHeight();
 
-        Vector4f background = selected ? K.UI.UI_SELECTED_COLOR : hovered ? K.UI.UI_HOVERED_COLOR : K.UI.UI_BACKGROUND_COLOR_SLOT;
         int textureWidth = Math.max(GUI_SLICE_SIZE * 2,
                 Math.round(width / Settings.getScale()));
         int textureHeight = Math.max(GUI_SLICE_SIZE * 2,
@@ -106,12 +103,8 @@ public class InventorySlotUI extends UIElement {
         Texture slotTexture = Frontend.createNineSliceTexture(
                 ResourceManager.rem.getBackgroundUI(), textureWidth,
                 textureHeight, GUI_SLICE_SIZE);
-        Vector4f tint = new Vector4f(
-                background.x / GUI_CENTER_COLOR,
-                background.y / GUI_CENTER_COLOR,
-                background.z / GUI_CENTER_COLOR,
-                background.w * getWorldOpacity());
-        Frontend.drawTexture(slotTexture, x, y, width, height, tint);
+        Frontend.drawTexture(slotTexture, x, y, width, height,
+                new Vector4f(1.0f, 1.0f, 1.0f, getWorldOpacity()));
 
         if (!isEmpty() && spriteSheet != null) {
             renderItem();
@@ -163,6 +156,12 @@ public class InventorySlotUI extends UIElement {
         float renderHeight = iconSize * scaleY;
         float x = Math.round(getAbsoluteX() + (getAbsoluteWidth() - renderWidth) * 0.5f);
         float y = Math.round(getAbsoluteY() + (getAbsoluteHeight() - renderHeight) * 0.5f);
+
+        if (hovered) {
+            Frontend.drawSpriteOutline(spriteSheet, spriteFrame, x, y,
+                    renderWidth, renderHeight, Settings.getScale(),
+                    new Vector4f(1.0f, 1.0f, 1.0f, getWorldOpacity()));
+        }
 
         Frontend.drawSprite(spriteSheet, spriteFrame, x, y, renderWidth, renderHeight,
                 new Vector4f(K.UI.UI_ITEM_TINT.x, K.UI.UI_ITEM_TINT.y, K.UI.UI_ITEM_TINT.z,
@@ -228,16 +227,14 @@ public class InventorySlotUI extends UIElement {
 
         String amount = String.valueOf(currentSlot.getAmount());
         float textWidth = getTextWidth(amount);
-        float textHeight = countFont.getSize();
+        float textHeight = Frontend.getNormalFont().getSize();
         float paddingX = Settings.scale(2.0f);
         float paddingY = Settings.scale(1.0f);
         float x = getAbsoluteX() + getAbsoluteWidth() - textWidth - paddingX;
         float y = getAbsoluteY() + getAbsoluteHeight() - textHeight - paddingY;
 
-        Frontend.drawString(amount, x + Settings.scale(0.5f), y + textHeight, countFont,
-                new Vector4f(0.0f, 0.0f, 0.0f, getWorldOpacity()));
-
-        Frontend.drawString(amount, x, y + textHeight, countFont, new Vector4f(K.UI.UI_TEXT_COLOR.x,
+        Frontend.drawNormalString(amount, x + Settings.scale(0.5f), y + textHeight, new Vector4f(1.0f));
+        Frontend.drawNormalString(amount, x, y + textHeight, new Vector4f(K.UI.UI_TEXT_COLOR.x,
                 K.UI.UI_TEXT_COLOR.y, K.UI.UI_TEXT_COLOR.z, K.UI.UI_TEXT_COLOR.w * getWorldOpacity()));
     }
 
@@ -250,7 +247,7 @@ public class InventorySlotUI extends UIElement {
         float width = 0.0f;
         for (int i = 0; i < value.length(); ) {
             int codePoint = value.codePointAt(i);
-            var glyph = countFont.getGlyph(codePoint);
+            var glyph = Frontend.getNormalFont().getGlyph(codePoint);
 
             if (glyph != null) {
                 width += glyph.xadvance();
@@ -358,23 +355,5 @@ public class InventorySlotUI extends UIElement {
      */
     public void setHovered(boolean hovered) {
         this.hovered = hovered;
-    }
-
-    /**
-     * Returns the count font.
-     * @return the {@link UIFont} representing the count font
-     */
-    public UIFont getCountFont() {
-        return countFont;
-    }
-
-    /**
-     * Sets the count font.
-     * @param countFont the {@link UIFont} supplied as {@code countFont}
-     */
-    public void setCountFont(UIFont countFont) {
-        if (countFont != null) {
-            this.countFont = countFont;
-        }
     }
 }

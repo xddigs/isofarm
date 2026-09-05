@@ -424,6 +424,33 @@ public class Frontend {
     }
 
     /**
+     * Draws an outline shaped by a sprite's alpha channel.
+     * @param spriteSheet the sprite sheet containing the icon
+     * @param frame the icon frame
+     * @param x the icon x position
+     * @param y the icon y position
+     * @param width the icon width
+     * @param height the icon height
+     * @param outlineSize the outline thickness in screen pixels
+     * @param color the outline color
+     */
+    public static void drawSpriteOutline(SpriteSheet spriteSheet, int frame,
+                                         float x, float y, float width, float height,
+                                         float outlineSize, Vector4f color) {
+        if (spriteSheet == null || outlineSize <= 0.0f || color == null) return;
+
+        for (int offsetX = -1; offsetX <= 1; offsetX++) {
+            for (int offsetY = -1; offsetY <= 1; offsetY++) {
+                if (offsetX == 0 && offsetY == 0) continue;
+                drawSpriteSilhouette(spriteSheet, frame,
+                        x + offsetX * outlineSize,
+                        y + offsetY * outlineSize,
+                        width, height, color);
+            }
+        }
+    }
+
+    /**
      * Applies a temporary horizontal fold and curve around a book spine.
      * Every UI primitive rendered until {@link #endPageTransform()} receives
      * the same deformation.

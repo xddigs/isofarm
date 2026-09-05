@@ -531,28 +531,13 @@ public class BookUI extends UIElement {
             int frame = ResourceManager.getItemFrame(item);
 
             if (bookLine == hoveredBookLine) {
-                renderIconOutline(spriteSheet, frame, iconX, iconY, alpha);
+                Frontend.drawSpriteOutline(spriteSheet, frame, iconX, iconY,
+                        GRID_ICON_SIZE, GRID_ICON_SIZE, GRID_OUTLINE_SIZE,
+                        new Vector4f(1.0f, 1.0f, 1.0f, alpha));
             }
 
             Frontend.drawSprite(spriteSheet, frame, iconX, iconY,
                     GRID_ICON_SIZE, GRID_ICON_SIZE, new Vector4f(1.0f, 1.0f, 1.0f, alpha));
-        }
-    }
-
-    /**
-     * Draws a white outline shaped by the selected icon's alpha channel.
-     */
-    private void renderIconOutline(SpriteSheet spriteSheet, int frame,
-                                   float x, float y, float alpha) {
-        Vector4f white = new Vector4f(1.0f, 1.0f, 1.0f, alpha);
-        for (int offsetX = -1; offsetX <= 1; offsetX++) {
-            for (int offsetY = -1; offsetY <= 1; offsetY++) {
-                if (offsetX == 0 && offsetY == 0) continue;
-                Frontend.drawSpriteSilhouette(spriteSheet, frame,
-                        x + offsetX * GRID_OUTLINE_SIZE,
-                        y + offsetY * GRID_OUTLINE_SIZE,
-                        GRID_ICON_SIZE, GRID_ICON_SIZE, white);
-            }
         }
     }
 
