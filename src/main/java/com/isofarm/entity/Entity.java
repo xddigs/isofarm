@@ -2,6 +2,7 @@ package com.isofarm.entity;
 
 import com.isofarm.data.BlockData;
 import com.isofarm.data.BlockPos;
+import com.isofarm.data.Cause;
 import com.isofarm.data.DataClass;
 import com.isofarm.data.RenderPass;
 import com.isofarm.utils.K;
@@ -69,10 +70,32 @@ public abstract class Entity {
      * @param amount the damage amount
      */
     public void damage(float amount) {
+        damage(amount, Cause.ENTITY);
+    }
+
+    /**
+     * Applies damage attributed to a specific cause.
+     * @param amount the damage amount
+     * @param cause the damage cause
+     */
+    public void damage(float amount, Cause cause) {
         if (!isAlive() || amount <= 0) return;
         float previousHitpoints = hitpoints;
         hitpoints = Math.max(0.0f, hitpoints - amount);
         if (hitpoints < previousHitpoints) onDamageTaken(amount);
+        if (hitpoints == 0.0f) onDeath(cause == null ? Cause.NULL : cause);
+    }
+
+    /**
+     * Immediately kills the entity with the supplied cause.
+     * @param cause the death cause
+     */
+    public void kill(Cause cause) {
+        if (!isAlive()) return;
+        float previousHitpoints = hitpoints;
+        hitpoints = 0.0f;
+        onDamageTaken(previousHitpoints);
+        onDeath(cause == null ? Cause.NULL : cause);
     }
 
     /**
@@ -80,6 +103,9 @@ public abstract class Entity {
      * @param amount the applied damage amount
      */
     protected void onDamageTaken(float amount) {}
+
+    /** Called once when damage reduces this entity's hitpoints to zero. */
+    protected void onDeath(Cause cause) {}
 
     /**
      * Returns the maximum hitpoints used to scale environmental damage.
@@ -110,7 +136,8 @@ public abstract class Entity {
         while (lavaDamageTimer >= LAVA_DAMAGE_INTERVAL && isAlive()) {
             lavaDamageTimer -= LAVA_DAMAGE_INTERVAL;
             lavaDamageTicks++;
-            damage(Math.max(1.0f, getMaxHitpoints() * LAVA_DAMAGE_STEP * lavaDamageTicks));
+            damage(Math.max(1.0f, getMaxHitpoints() * LAVA_DAMAGE_STEP * lavaDamageTicks),
+                    Cause.BURN);
         }
     }
 

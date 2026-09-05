@@ -2,7 +2,9 @@ package com.isofarm.gui;
 
 import com.isofarm.data.*;
 import com.isofarm.entity.Player;
+import com.isofarm.graphics.Framebuffer;
 import com.isofarm.graphics.ResourceManager;
+import com.isofarm.graphics.Shader;
 import com.isofarm.graphics.SpriteSheet;
 import com.isofarm.input.CommandCompletionProvider;
 import com.isofarm.input.Mouse;
@@ -12,6 +14,7 @@ import com.isofarm.service.Service;
 import com.isofarm.service.TimeService;
 import com.isofarm.utils.*;
 import com.isofarm.wrld.GameMaster;
+import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector4f;
 import org.slf4j.Logger;
@@ -22,8 +25,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
 
 /**
  * Provides game uiservice behavior.
@@ -35,6 +39,9 @@ public class GameUIService implements Service<GameMaster> {
     private static final float CHAT_HISTORY_DURATION = 3.0f;
     private static final float HARDWARE_UPDATE_INTERVAL = 0.5f;
     private static final float DEBUG_LABEL_WIDTH = 500.0f;
+    private static final float DEATH_OVERLAY_MAX_ALPHA = 0.50f;
+    private static final float DEATH_FADE_DURATION = 2.0f;
+    private static final float DEATH_BLUR_RADIUS = 5.0f;
     private final GameMaster gameMaster;
     private final UIManager uiManager;
     private final InventoryUI inventoryUI;
@@ -49,6 +56,7 @@ public class GameUIService implements Service<GameMaster> {
     private final UILabel cpu;
     private final UILabel cpuTemp;
     private final UILabel memory;
+    private final UILabel youDied;
     private final List<String> chatHistory;
     private final SpriteSheet seedIcons;
     private final SpriteSheet cropIcons;
@@ -66,6 +74,8 @@ public class GameUIService implements Service<GameMaster> {
     private float hardwareUpdateTimer = 0.0f;
     private int lastRenderedDamageSequence = -1;
     private float flashTimer = 0.0f;
+    private float deathOverlayAlpha = 0.0f;
+    private boolean deathScreenActive;
 
     /**
      * Creates a new {@code GameUIService} instance.
@@ -174,6 +184,13 @@ public class GameUIService implements Service<GameMaster> {
                 DEBUG_LABEL_WIDTH, 25f, null);
         this.memory.show();
         uiManager.getRoot().addChild(memory);
+
+        this.youDied = new UILabel(100, 100, DEBUG_LABEL_WIDTH, 25f, null);
+        this.youDied.setPosition(windowWidth / 2 - DEBUG_LABEL_WIDTH / 2,
+                windowHeight / 2 - this.youDied.getFont().getSize());
+        this.youDied.setHorizontalAlignment(UILabel.HorizontalAlignment.CENTER);
+        this.youDied.hide();
+        uiManager.getRoot().addChild(youDied);
     }
 
     /**
@@ -221,6 +238,21 @@ public class GameUIService implements Service<GameMaster> {
      * @param delta the delta value
      */
     public void update(float delta) {
+        if (!Player.plyr.isAlive()) {
+            if (!deathScreenActive) {
+                deathScreenActive = true;
+                deathOverlayAlpha = 0.0f;
+                youDied.setText(DeathManager.dth.onDeath());
+            }
+            deathOverlayAlpha = Math.min(DEATH_OVERLAY_MAX_ALPHA,
+                    deathOverlayAlpha + delta * DEATH_OVERLAY_MAX_ALPHA / DEATH_FADE_DURATION);
+            youDied.show();
+        } else {
+            deathScreenActive = false;
+            deathOverlayAlpha = 0.0f;
+            youDied.hide();
+        }
+
         if (Settings.doEnableDebugInfo()) {
             hardwareUpdateTimer -= delta;
             if (hardwareUpdateTimer <= 0.0f) {
@@ -312,7 +344,10 @@ public class GameUIService implements Service<GameMaster> {
      * @param gameMaster the game master value
      */
     public void render(boolean isHUDShown, GameMaster gameMaster) {
-        if (!Player.plyr.isAlive()) return;
+        if (!Player.plyr.isAlive()) {
+            renderDeathScreen(gameMaster);
+            return;
+        }
         GUI.begin(windowWidth, windowHeight);
 
         SpriteSheet bookSheet = ResourceManager.rem.getBookAnimationSheet();
@@ -332,10 +367,53 @@ public class GameUIService implements Service<GameMaster> {
         } else {}
 
         renderChatHistory();
+
         if (!gameMaster.isInventoryOpen() && !BookUI.bui.isOpen()) {
             GUI.drawCursor(gameMaster);
         }
 
+        GUI.end();
+        glEnable(GL_DEPTH_TEST);
+    }
+
+    /** Renders the progressively blurred and red-tinted death screen. */
+    private void renderDeathScreen(GameMaster gameMaster) {
+        float progress = deathOverlayAlpha / DEATH_OVERLAY_MAX_ALPHA;
+        float blurRadius = Math.max(0.01f, DEATH_BLUR_RADIUS * progress);
+        Vector2f resolution = new Vector2f(windowWidth, windowHeight);
+        Shader blurShader = ResourceManager.rem.getBlurShader();
+        Framebuffer sceneFbo = gameMaster.getSceneFbo();
+        Framebuffer blurFbo = gameMaster.getBlurFbo();
+
+        glDisable(GL_DEPTH_TEST);
+        blurFbo.bind();
+        glClear(GL_COLOR_BUFFER_BIT);
+        blurShader.bind();
+        blurShader.setUniform("uResolution", resolution);
+        blurShader.setUniform("uDirection", new Vector2f(1.0f, 0.0f));
+        blurShader.setUniform("uBlurRadius", blurRadius);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, sceneFbo.getTextureId());
+        blurShader.setUniform("screenTexture", 0);
+        ResourceManager.rem.getScreenQuadMesh().render();
+        blurShader.unbind();
+        blurFbo.unbind((int) windowWidth, (int) windowHeight);
+
+        glClear(GL_COLOR_BUFFER_BIT);
+        blurShader.bind();
+        blurShader.setUniform("uResolution", resolution);
+        blurShader.setUniform("uDirection", new Vector2f(0.0f, 1.0f));
+        blurShader.setUniform("uBlurRadius", blurRadius);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, blurFbo.getTextureId());
+        blurShader.setUniform("screenTexture", 0);
+        ResourceManager.rem.getScreenQuadMesh().render();
+        blurShader.unbind();
+
+        GUI.begin(windowWidth, windowHeight);
+        GUI.drawRect(0.0f, 0.0f, windowWidth, windowHeight,
+                new Vector4f(0.65f, 0.0f, 0.0f, deathOverlayAlpha));
+        youDied.render();
         GUI.end();
         glEnable(GL_DEPTH_TEST);
     }
@@ -657,6 +735,11 @@ public class GameUIService implements Service<GameMaster> {
         if (chatField != null) {
             chatField.setPosition(10, height - 40);
             chatField.setWidth(width - 20);
+        }
+
+        if (youDied != null) {
+            youDied.setPosition(width / 2.0f - DEBUG_LABEL_WIDTH / 2.0f,
+                    height / 2.0f - youDied.getFont().getSize());
         }
     }
 

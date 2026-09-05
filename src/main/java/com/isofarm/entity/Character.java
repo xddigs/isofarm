@@ -189,7 +189,7 @@ public abstract class Character extends Entity implements Levelable {
     public void fallDamage(float amount) {
         if (!isAlive() || amount <= 0) return;
         if (gamemode.isGodmode() || gamemode.isNoClip()) return;
-        damage(amount);
+        damage(amount, Cause.FALL);
     }
 
     /**
@@ -198,9 +198,19 @@ public abstract class Character extends Entity implements Levelable {
      */
     @Override
     public void damage(float amount) {
+        damage(amount, Cause.ENTITY);
+    }
+
+    /**
+     * Applies damage attributed to a specific cause.
+     * @param amount the damage amount
+     * @param cause the damage cause
+     */
+    @Override
+    public void damage(float amount, Cause cause) {
         if (!isAlive() || amount <= 0) return;
         if (gamemode.isGodmode() || gamemode.isNoClip()) return;
-        super.damage(amount);
+        super.damage(amount, cause);
     }
 
     /**

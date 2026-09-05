@@ -1,6 +1,7 @@
 package com.isofarm.entity.states;
 
 import com.isofarm.data.PlayerState;
+import com.isofarm.data.Cause;
 import com.isofarm.data.SoundGroup;
 import com.isofarm.entity.Player;
 import com.isofarm.service.SoundService;
@@ -104,7 +105,7 @@ public class FallingState implements PlayerState {
             float healthFraction = VOID_DAMAGE_STEP * voidDamageTicks;
             float damage = Math.max(1.0f,
                     player.getMaxHitpoints() * healthFraction);
-            player.fallDamage(damage);
+            player.damage(damage, Cause.VOID);
         }
     }
 

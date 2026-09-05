@@ -1,6 +1,7 @@
 package com.isofarm.entity;
 
 import com.isofarm.data.BlockPos;
+import com.isofarm.data.Cause;
 import com.isofarm.data.Direction;
 import com.isofarm.data.PlayerState;
 import com.isofarm.data.RenderPass;
@@ -10,6 +11,7 @@ import com.isofarm.entity.plyr.PlayerGameplay;
 import com.isofarm.entity.plyr.PlayerManager;
 import com.isofarm.item.Item;
 import com.isofarm.pathfinding.GridPos;
+import com.isofarm.utils.DeathManager;
 import com.isofarm.wrld.GameMaster;
 import org.joml.Vector3f;
 
@@ -80,6 +82,12 @@ public class Player extends Character {
         if (GameMaster.game != null && GameMaster.game.getOrthoCamera() != null) {
             GameMaster.game.getOrthoCamera().applyDamageTilt(amount);
         }
+    }
+
+    /** Records the cause attached to the lethal damage event. */
+    @Override
+    protected void onDeath(Cause cause) {
+        DeathManager.dth.setCauseOfDeath(cause);
     }
 
     /**
