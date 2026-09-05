@@ -103,6 +103,12 @@ public class GameRenderer {
                         lavaRegion.uvMin().x, lavaRegion.uvMin().y,
                         lavaRegion.uvMax().x, lavaRegion.uvMax().y));
             }
+            TextureAtlas.TextureRegion waterRegion = BlockData.WATER.getTopRegion();
+            if (waterRegion != null) {
+                defaultShader.setUniform("uWaterUVBounds", new Vector4f(
+                        waterRegion.uvMin().x, waterRegion.uvMin().y,
+                        waterRegion.uvMax().x, waterRegion.uvMax().y));
+            }
         }
 
         viewProjMatrix.set(camera.getProjectionMatrix()).mul(camera.getViewMatrix());

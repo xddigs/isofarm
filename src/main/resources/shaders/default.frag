@@ -9,6 +9,7 @@ in float vIsWater;
 out vec4 FragColor;
 
 uniform sampler2D uTexture;
+uniform vec4 uWaterUVBounds;
 uniform sampler2D uShadowMap;
 
 uniform bool uUseTexture;
@@ -62,7 +63,16 @@ void main() {
     vec4 texColor = vec4(uBaseColor, 1.0);
 
     if (uUseTexture) {
-        texColor = texture(uTexture, vTexCoord);
+        vec2 sampleUV = vTexCoord;
+        bool isWaterSurface = uIsWater && abs(normalize(vNormal).y) > 0.5 &&
+                              vTexCoord.x >= uWaterUVBounds.x && vTexCoord.x <= uWaterUVBounds.z &&
+                              vTexCoord.y >= uWaterUVBounds.y && vTexCoord.y <= uWaterUVBounds.w;
+        if (isWaterSurface) {
+            // A greedy quad may cover many blocks; repeat the atlas tile once
+            // per world block instead of stretching it over the whole coast.
+            sampleUV = mix(uWaterUVBounds.xy, uWaterUVBounds.zw, fract(vFragPos.xz));
+        }
+        texColor = texture(uTexture, sampleUV);
         if (texColor.a < 0.01 && !uIsWater) {
             discard;
         }
@@ -97,9 +107,6 @@ void main() {
     vec3 finalColor = texColor.rgb * totalLight;
 
     if (vIsWater > 0.5 && uIsWater) {
-        // Classify the fluid per fragment.  A vertex on the shared edge of two
-        // atlas regions can belong to both regions; interpolating that boolean
-        // splits a quad along its two triangles and makes half the water opaque.
         bool isLava = vTexCoord.x > uLavaUVBounds.x && vTexCoord.x < uLavaUVBounds.z &&
                       vTexCoord.y > uLavaUVBounds.y && vTexCoord.y < uLavaUVBounds.w;
         alpha = isLava ? 1.0 : 0.50;
