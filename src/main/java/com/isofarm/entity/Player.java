@@ -36,7 +36,7 @@ public class Player extends Character {
      * Creates and initializes a player.
      */
     private Player() {
-        super(null);
+        super(null, true);
         gameplay = new PlayerGameplay();
         manager = new PlayerManager();
         animator = new PlayerAnimator();

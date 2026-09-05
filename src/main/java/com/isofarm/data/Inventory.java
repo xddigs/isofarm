@@ -20,11 +20,22 @@ public class Inventory {
      * Creates a new {@code Inventory} instance.
      */
     public Inventory() {
+        this(false);
+    }
+
+    /**
+     * Creates a new {@code Inventory} instance.
+     * @param includeHotbar whether to allocate independent player hotbar slots
+     */
+    public Inventory(boolean includeHotbar) {
         this.slots = new ArrayList<>();
         this.backpackSlot = new InventorySlot();
         this.bookSlot = new InventorySlot();
 
-        for (int i = 0; i < K.UI.INVENTORY_SLOTS; i++) {
+        int capacity = includeHotbar
+                ? K.UI.PLAYER_INVENTORY_SLOTS
+                : K.UI.INVENTORY_SLOTS;
+        for (int i = 0; i < capacity; i++) {
             this.slots.add(new InventorySlot());
         }
     }
@@ -624,7 +635,7 @@ public class Inventory {
      * @return {@code int}; the hotbar start
      */
     public int getHotbarStart() {
-        return (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
+        return K.UI.INVENTORY_SLOTS;
     }
 
     /**

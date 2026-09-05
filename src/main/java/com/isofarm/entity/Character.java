@@ -34,8 +34,17 @@ public abstract class Character extends Entity implements Levelable {
      * @param name the {@link String} supplied as {@code name}
      */
     public Character(String name) {
+        this(name, false);
+    }
+
+    /**
+     * Creates a new {@code Character} instance.
+     * @param name the character name
+     * @param includeHotbar whether its inventory includes independent hotbar slots
+     */
+    protected Character(String name, boolean includeHotbar) {
         super(name);
-        this.inventory = new Inventory();
+        this.inventory = new Inventory(includeHotbar);
         this.backpack = new Inventory();
         this.purse = new Purse();
         this.reputation = Reputation.NEUTRAL;

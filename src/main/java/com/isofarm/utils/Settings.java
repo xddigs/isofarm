@@ -141,7 +141,7 @@ public class Settings {
      * @return {@code float}; the scaled spacing
      */
     public static float getScaledSpacing() {
-        return scale(2.0f);
+        return scale(1.75f);
     }
 
     /**

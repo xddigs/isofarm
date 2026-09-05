@@ -317,7 +317,7 @@ public class HotbarUI extends UIElement {
             return;
         }
 
-        int hotbarStart = (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
+        int hotbarStart = inventory.getHotbarStart();
         for (int i = 0; i < K.UI.INVENTORY_COLUMNS; i++) {
             InventorySlotUI slotUI = slotUIs[i];
             int inventoryIndex = hotbarStart + i;
@@ -511,7 +511,7 @@ public class HotbarUI extends UIElement {
             return null;
         }
 
-        int hotbarStart = (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
+        int hotbarStart = inventory.getHotbarStart();
         int inventoryIndex = hotbarStart + selectedSlot;
         if (inventoryIndex < 0 ||
                 inventoryIndex >= inventory.getSlots().size()) {

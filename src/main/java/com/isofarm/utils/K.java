@@ -74,6 +74,8 @@ public final class K {
         public static final int INVENTORY_COLUMNS = 9;
         public static final int INVENTORY_ROWS = 4;
         public static final int INVENTORY_SLOTS = INVENTORY_COLUMNS * INVENTORY_ROWS;
+        public static final int HOTBAR_SLOTS = INVENTORY_COLUMNS;
+        public static final int PLAYER_INVENTORY_SLOTS = INVENTORY_SLOTS + HOTBAR_SLOTS;
 
         public static final float SQUISH_DURATION = 0.25f;
 

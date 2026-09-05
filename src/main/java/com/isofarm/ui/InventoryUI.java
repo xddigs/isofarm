@@ -84,7 +84,7 @@ public class InventoryUI extends UIElement {
         targetY = y + 1000.0f;
         setPosition(x, targetY);
 
-        int totalVisualSlots = (K.UI.INVENTORY_ROWS - 1) * K.UI.INVENTORY_COLUMNS;
+        int totalVisualSlots = K.UI.INVENTORY_SLOTS;
         this.slotUIs = new InventorySlotUI[totalVisualSlots];
         this.creativeSlotData = new InventorySlot[totalVisualSlots];
         this.creativeSlots = java.util.Collections.newSetFromMap(new IdentityHashMap<>());
