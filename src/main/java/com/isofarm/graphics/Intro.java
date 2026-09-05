@@ -2,7 +2,7 @@ package com.isofarm.graphics;
 
 import com.isofarm.Game;
 import com.isofarm.entity.Player;
-import com.isofarm.gui.*;
+import com.isofarm.ui.*;
 import com.isofarm.input.ControlAction;
 import com.isofarm.input.Controls;
 import com.isofarm.input.Keyboard;

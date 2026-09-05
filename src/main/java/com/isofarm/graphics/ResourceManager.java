@@ -333,8 +333,8 @@ public class ResourceManager {
     }
 
     /**
-     * Returns the background gui.
-     * @return the {@link Texture} representing the background gui
+     * Returns the background ui.
+     * @return the {@link Texture} representing the background ui
      */
     public Texture getBackgroundGUI() {
         return backgroundGUI;

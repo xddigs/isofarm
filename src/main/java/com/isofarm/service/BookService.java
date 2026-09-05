@@ -1,7 +1,7 @@
 package com.isofarm.service;
 
 import com.isofarm.data.Singleton;
-import com.isofarm.gui.BookUI;
+import com.isofarm.ui.BookUI;
 import com.isofarm.item.Book;
 
 /**

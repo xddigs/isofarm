@@ -1,7 +1,7 @@
 package com.isofarm.service;
 
 import com.isofarm.data.Command;
-import com.isofarm.gui.GameUIService;
+import com.isofarm.ui.GameUIService;
 import com.isofarm.utils.ToastFactory;
 
 /**

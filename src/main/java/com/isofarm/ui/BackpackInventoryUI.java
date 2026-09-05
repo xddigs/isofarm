@@ -1,4 +1,4 @@
-package com.isofarm.gui;
+package com.isofarm.ui;
 
 import com.isofarm.data.Inventory;
 import com.isofarm.data.SlotType;

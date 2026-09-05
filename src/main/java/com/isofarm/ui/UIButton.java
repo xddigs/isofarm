@@ -1,4 +1,4 @@
-package com.isofarm.gui;
+package com.isofarm.ui;
 
 import com.isofarm.graphics.SpriteSheet;
 import org.joml.Vector4f;

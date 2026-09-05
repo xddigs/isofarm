@@ -1,4 +1,4 @@
-package com.isofarm.gui;
+package com.isofarm.ui;
 
 import com.isofarm.data.GodObject;
 import com.isofarm.graphics.*;
@@ -20,7 +20,7 @@ import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 
 /**
- * Encapsulates the state and operations required by gui within the game runtime.
+ * Encapsulates the state and operations required by ui within the game runtime.
  */
 @Utils
 @GodObject

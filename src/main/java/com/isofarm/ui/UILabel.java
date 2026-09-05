@@ -1,4 +1,4 @@
-package com.isofarm.gui;
+package com.isofarm.ui;
 
 import com.isofarm.utils.Local;
 import org.joml.Vector4f;

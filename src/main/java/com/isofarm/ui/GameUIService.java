@@ -1,4 +1,4 @@
-package com.isofarm.gui;
+package com.isofarm.ui;
 
 import com.isofarm.data.*;
 import com.isofarm.entity.Player;

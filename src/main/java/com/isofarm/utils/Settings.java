@@ -348,8 +348,8 @@ public class Settings {
     }
 
     /**
-     * Returns the gui scale index.
-     * @return {@code int}; the gui scale index
+     * Returns the ui scale index.
+     * @return {@code int}; the ui scale index
      */
     public static int getGuiScaleIndex() {
         return guiScaleIndex;

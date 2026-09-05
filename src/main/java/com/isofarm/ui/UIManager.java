@@ -1,4 +1,4 @@
-package com.isofarm.gui;
+package com.isofarm.ui;
 
 import com.isofarm.input.Keyboard;
 import com.isofarm.input.Mouse;

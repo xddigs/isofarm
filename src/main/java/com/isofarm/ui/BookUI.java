@@ -1,4 +1,4 @@
-package com.isofarm.gui;
+package com.isofarm.ui;
 
 import com.isofarm.data.BookLine;
 import com.isofarm.data.Singleton;

@@ -1,8 +1,7 @@
 package com.isofarm.item;
 
 import com.isofarm.data.*;
-import com.isofarm.entity.Player;
-import com.isofarm.gui.BookUI;
+import com.isofarm.ui.BookUI;
 import com.isofarm.input.ControlAction;
 import com.isofarm.input.Controls;
 import com.isofarm.service.BookService;
