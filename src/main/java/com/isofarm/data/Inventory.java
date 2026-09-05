@@ -638,10 +638,13 @@ public class Inventory {
         }
 
         return switch (item) {
-            case Block ignored -> K.World.MAX_STACK;
             case Tool ignored -> 1;
+            case Usable usable -> switch (usable) {
+                case Bucket bucket -> bucket.isFull() ? 1 : 16;
+                default -> 1;
+            };
             case Seed ignored -> K.World.MAX_STACK * 2;
-            default -> K.World.MAX_STACK / 2;
+            default -> K.World.MAX_STACK;
         };
     }
 
