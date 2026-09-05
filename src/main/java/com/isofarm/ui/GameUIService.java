@@ -42,8 +42,6 @@ public class GameUIService implements Service<GameMaster> {
     private static final float DEATH_OVERLAY_MAX_ALPHA = 0.50f;
     private static final float DEATH_FADE_DURATION = 2.0f;
     private static final float DEATH_BLUR_RADIUS = 5.0f;
-    private static final float HEARTS_HOTBAR_X_OFFSET = 10.0f;
-    private static final float HEARTS_HOTBAR_OFFSET = 40.0f;
     private final GameMaster gameMaster;
     private final UIManager uiManager;
     private final InventoryUI inventoryUI;
@@ -66,6 +64,8 @@ public class GameUIService implements Service<GameMaster> {
     private final SpriteSheet toolIcons;
     private final SpriteSheet materialIcons;
     private final Player player = Player.plyr;
+    private final float startingX = 20.0f;
+    private final float startingY = 25.0f;
     private Shop shop;
     private float windowWidth;
     private float windowHeight;
@@ -81,14 +81,15 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Creates a new {@code GameUIService} instance.
-     * @param windowHandle the {@code long} supplied as {@code windowHandle}
-     * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
-     * @param uiManager the {@link UIManager} supplied as {@code uiManager}
-     * @param seedIcons the {@link SpriteSheet} supplied as {@code seedIcons}
-     * @param cropIcons the {@link SpriteSheet} supplied as {@code cropIcons}
-     * @param blockIcons the {@link SpriteSheet} supplied as {@code blockIcons}
-     * @param toolIcons the {@link SpriteSheet} supplied as {@code toolIcons}
-     * @param materialIcons the {@link SpriteSheet} supplied as {@code materialIcons}
+     *
+     * @param windowHandle   the {@code long} supplied as {@code windowHandle}
+     * @param gameMaster     the {@link GameMaster} supplied as {@code gameMaster}
+     * @param uiManager      the {@link UIManager} supplied as {@code uiManager}
+     * @param seedIcons      the {@link SpriteSheet} supplied as {@code seedIcons}
+     * @param cropIcons      the {@link SpriteSheet} supplied as {@code cropIcons}
+     * @param blockIcons     the {@link SpriteSheet} supplied as {@code blockIcons}
+     * @param toolIcons      the {@link SpriteSheet} supplied as {@code toolIcons}
+     * @param materialIcons  the {@link SpriteSheet} supplied as {@code materialIcons}
      * @param inventoryIcons the {@link SpriteSheet} supplied as {@code inventoryIcons}
      */
     public GameUIService(
@@ -125,7 +126,7 @@ public class GameUIService implements Service<GameMaster> {
                 windowWidth / 2.0f - hotbarUI.getAbsoluteWidth() / 2.0f,
                 windowHeight - hotbarUI.getAbsoluteHeight() - K.UI.HOTBAR_OFFSET);
 
-        this.backpackUI = new BackpackInventoryUI(0,0);
+        this.backpackUI = new BackpackInventoryUI(0, 0);
         inventoryUI.setInventory(player.getInventory());
         inventoryUI.createSlots();
         hotbarUI.setInventory(player.getInventory());
@@ -147,43 +148,47 @@ public class GameUIService implements Service<GameMaster> {
         uiManager.getRoot().addChild(hotbarUI);
         uiManager.getRoot().addChild(backpackUI);
 
-        this.chatField = new UITextField(10, windowHeight - 40, windowWidth - 20, 30);
+        this.chatField = new UITextField(10, windowHeight - 10, windowWidth - 10, 32);
         chatField.setCompletionProvider(
                 new CommandCompletionProvider(gameMaster.getCommandRegistry()));
 
         uiManager.getRoot().addChild(chatField);
 
-        this.time = new UILabel(20, 40, 100f, 25f, null);
+        final float lineheight = 32.0f;
+        float y = startingY;
+
+        y += lineheight * 2.0f;
+        this.time = new UILabel(startingX, y, 100f, 25f, null);
         this.time.show();
         uiManager.getRoot().addChild(time);
 
-        this.coords = new UILabel(20, time.getAbsoluteY() + time.getAbsoluteHeight(),
-                100f, 25f, null);
+        y += lineheight;
+        this.coords = new UILabel(startingX, y, 100f, 25f, null);
         this.coords.show();
         uiManager.getRoot().addChild(coords);
 
-        this.fps = new UILabel(20, coords.getAbsoluteY() + coords.getAbsoluteHeight(),
-                100f, 25f, null);
+        y += lineheight;
+        this.fps = new UILabel(startingX, y, 100f, 25f, null);
         this.fps.show();
         uiManager.getRoot().addChild(fps);
 
-        this.cpu = new UILabel(20, fps.getAbsoluteY() + fps.getAbsoluteHeight(),
-                DEBUG_LABEL_WIDTH, 25f, null);
+        y += lineheight;
+        this.cpu = new UILabel(startingX, y, DEBUG_LABEL_WIDTH, 25f, null);
         this.cpu.show();
         uiManager.getRoot().addChild(cpu);
 
-        this.cpuTemp = new UILabel(20, cpu.getAbsoluteY() + cpu.getAbsoluteHeight(),
-                DEBUG_LABEL_WIDTH, 25f, null);
+        y += lineheight;
+        this.cpuTemp = new UILabel(startingX, y, DEBUG_LABEL_WIDTH, 25f, null);
         this.cpuTemp.show();
         uiManager.getRoot().addChild(cpuTemp);
 
-        this.gpu = new UILabel(20, cpuTemp.getAbsoluteY() + cpuTemp.getAbsoluteHeight(),
-                DEBUG_LABEL_WIDTH, 25f, null);
+        y += lineheight;
+        this.gpu = new UILabel(startingX, y, DEBUG_LABEL_WIDTH, 25f, null);
         this.gpu.show();
         uiManager.getRoot().addChild(gpu);
 
-        this.memory = new UILabel(20, gpu.getAbsoluteY() + gpu.getAbsoluteHeight(),
-                DEBUG_LABEL_WIDTH, 25f, null);
+        y += lineheight;
+        this.memory = new UILabel(startingX, y, DEBUG_LABEL_WIDTH, 25f, null);
         this.memory.show();
         uiManager.getRoot().addChild(memory);
 
@@ -205,6 +210,7 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Returns the inventory ui.
+     *
      * @return the {@link InventoryUI} representing the inventory ui
      */
     public InventoryUI getInventoryUI() {
@@ -213,6 +219,7 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Returns the hotbar ui.
+     *
      * @return the {@link HotbarUI} representing the hotbar ui
      */
     public HotbarUI getHotbarUI() {
@@ -221,6 +228,7 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Returns the backpack inventory ui.
+     *
      * @return the {@link BackpackInventoryUI} representing the backpack inventory ui
      */
     public BackpackInventoryUI getBackpackInventoryUI() {
@@ -229,6 +237,7 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Sets the shop.
+     *
      * @param shop the {@link Shop} supplied as {@code shop}
      */
     public void setShop(Shop shop) {
@@ -237,6 +246,7 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Updates the current state.
+     *
      * @param delta the {@code float} supplied as {@code delta}
      */
     public void update(float delta) {
@@ -342,6 +352,7 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Renders this object in the requested render pass.
+     *
      * @param isHUDShown the {@code boolean} supplied as {@code isHUDShown}
      * @param gameMaster the {@link GameMaster} supplied as {@code gameMaster}
      */
@@ -360,13 +371,14 @@ public class GameUIService implements Service<GameMaster> {
 
         if (isHUDShown) {
             uiManager.render();
-            float startX = hotbarUI.getAbsoluteX() + HEARTS_HOTBAR_X_OFFSET;
-            float startY = hotbarUI.getAbsoluteY() - HEARTS_HOTBAR_OFFSET;
+            float startX = startingX;
+            float startY = startingY;
             renderHearts(ResourceManager.rem.getHeartsSpriteSheet(),
                     startX, startY);
             renderHotbarLabel();
             renderToasts();
-        } else {}
+        } else {
+        }
 
         renderChatHistory();
 
@@ -424,9 +436,10 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Renders the hearts.
+     *
      * @param heartsSheet the {@link SpriteSheet} supplied as {@code heartsSheet}
-     * @param startX the {@code float} supplied as {@code startX}
-     * @param startY the {@code float} supplied as {@code startY}
+     * @param startX      the {@code float} supplied as {@code startX}
+     * @param startY      the {@code float} supplied as {@code startY}
      */
     public void renderHearts(SpriteSheet heartsSheet, float startX,
                              float startY) {
@@ -462,6 +475,7 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Returns the uimanager.
+     *
      * @return the {@link UIManager} representing the uimanager
      */
     public UIManager getUIManager() {
@@ -494,6 +508,7 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Adds the chat message.
+     *
      * @param message the {@link String} supplied as {@code message}
      */
     public void addChatMessage(String message) {
@@ -561,6 +576,7 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Updates or derives runtime state for select item according to the supplied arguments.
+     *
      * @param direction the {@code int} supplied as {@code direction}
      */
     public void selectItem(int direction) {
@@ -585,6 +601,7 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Activates hotbar label and prepares any state it requires.
+     *
      * @param item the {@link Item} supplied as {@code item}
      */
     private void showHotbarLabel(Item item) {
@@ -600,6 +617,7 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Renders the toast.
+     *
      * @param toast the {@link Toast} supplied as {@code toast}
      */
     private void renderToast(Toast toast) {
@@ -662,6 +680,7 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Returns the toast accent.
+     *
      * @param type the {@link ToastData} supplied as {@code type}
      * @return an array of {@code float} values; the toast accent
      */
@@ -679,6 +698,7 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Returns the toast background.
+     *
      * @param type the {@link ToastData} supplied as {@code type}
      * @return an array of {@code float} values; the toast background
      */
@@ -696,6 +716,7 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Returns the toast prefix.
+     *
      * @param type the {@link ToastData} supplied as {@code type}
      * @return the {@link String} representing the toast prefix
      */
@@ -712,6 +733,7 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Publishes the notification represented by log action.
+     *
      * @param cell the {@link BlockPos} supplied as {@code cell}
      */
     public void logAction(BlockPos cell) {
@@ -720,7 +742,8 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Handles resize and updates the affected state.
-     * @param width the {@code int} supplied as {@code width}
+     *
+     * @param width  the {@code int} supplied as {@code width}
      * @param height the {@code int} supplied as {@code height}
      */
     public void onResize(int width, int height) {
@@ -766,6 +789,7 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Returns the chat text.
+     *
      * @return the {@link String} representing the chat text
      */
     public String getChatText() {
@@ -774,7 +798,8 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Processes sell item and updates the affected inventory or currency balances.
-     * @param inv the {@link Inventory} supplied as {@code inv}
+     *
+     * @param inv  the {@link Inventory} supplied as {@code inv}
      * @param item the {@link Item} supplied as {@code item}
      */
     private void sellItem(Inventory inv, Item item) {
@@ -797,8 +822,9 @@ public class GameUIService implements Service<GameMaster> {
 
     /**
      * Processes buy item and updates the affected inventory or currency balances.
-     * @param stock the {@link Inventory} supplied as {@code stock}
-     * @param item the {@link Item} supplied as {@code item}
+     *
+     * @param stock  the {@link Inventory} supplied as {@code stock}
+     * @param item   the {@link Item} supplied as {@code item}
      * @param amount the {@code int} supplied as {@code amount}
      */
     private void buyItem(Inventory stock, Item item, int amount) {
